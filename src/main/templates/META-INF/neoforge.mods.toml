@@ -1,0 +1,45 @@
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "${mod_license}"
+issueTrackerURL = "https://github.com/JAX3/Functional-Resources/issues"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}"
+description = '''${mod_description}'''
+# Square icon in the mod list and wide banner in the mod info panel (pixel art, so no blur).
+iconFile = "icon.png"
+iconBlur = false
+bannerFile = "banner.png"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neo_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+# Optional: recipe viewer integration (generator fuels, sheep infusion, mechanical separation).
+[[dependencies.${mod_id}]]
+modId = "jei"
+type = "optional"
+versionRange = "${jei_version_range}"
+ordering = "AFTER"
+side = "CLIENT"
+
+# Optional: block/entity info overlay for generators, separators and infused sheep.
+[[dependencies.${mod_id}]]
+modId = "jade"
+type = "optional"
+versionRange = "${jade_version_range}"
+ordering = "NONE"
+side = "BOTH"

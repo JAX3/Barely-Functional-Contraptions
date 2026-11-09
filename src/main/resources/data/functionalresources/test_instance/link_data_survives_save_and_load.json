@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:function",
+  "function": "functionalresources:link_data_survives_save_and_load",
+  "environment": "functionalresources:default",
+  "structure": "functionalresources:empty",
+  "max_ticks": 100,
+  "required": true
+}

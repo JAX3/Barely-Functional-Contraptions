@@ -1,0 +1,21 @@
+{
+  "feeding_item": "minecraft:red_mushroom_block",
+  "feeding_amount": 1,
+  "wool_color": "#B8302A",
+  "accent_color": "#E8E2D4",
+  "category": "organic",
+  "wool_drop_count": 1,
+  "infusion_uses": 3,
+  "separator": {
+    "primary_output": "minecraft:red_mushroom",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_output": "minecraft:string",
+    "secondary_count": 2,
+    "bonus_output": { "item": "minecraft:mycelium", "chance": 0.05 },
+    "energy_cost": 8000,
+    "processing_ticks": 80
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:function",
+  "function": "functionalresources:mycelium_converts_dirt",
+  "environment": "functionalresources:default",
+  "structure": "functionalresources:empty",
+  "max_ticks": 400,
+  "required": true
+}

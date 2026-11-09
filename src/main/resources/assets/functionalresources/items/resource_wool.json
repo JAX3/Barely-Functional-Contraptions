@@ -1,0 +1,107 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "functionalresources:sheep_resource",
+    "cases": [
+      {
+        "when": "functionalresources:iron",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/iron_wool"
+        }
+      },
+      {
+        "when": "functionalresources:gold",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/gold_wool"
+        }
+      },
+      {
+        "when": "functionalresources:copper",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/copper_wool"
+        }
+      },
+      {
+        "when": "functionalresources:diamond",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/diamond_wool"
+        }
+      },
+      {
+        "when": "functionalresources:emerald",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/emerald_wool"
+        }
+      },
+      {
+        "when": "functionalresources:redstone",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/redstone_wool"
+        }
+      },
+      {
+        "when": "functionalresources:lapis",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/lapis_wool"
+        }
+      },
+      {
+        "when": "functionalresources:coal",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/coal_wool"
+        }
+      },
+      {
+        "when": "functionalresources:netherite",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/netherite_wool"
+        }
+      },
+      {
+        "when": "functionalresources:stone",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/stone_wool"
+        }
+      },
+      {
+        "when": "functionalresources:wood",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/wood_wool"
+        }
+      },
+      {
+        "when": "functionalresources:quartz",
+        "model": {
+          "type": "minecraft:model",
+          "model": "functionalresources:item/quartz_wool"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "functionalresources:item/resource_wool",
+      "tints": [
+        {
+          "type": "functionalresources:resource_wool",
+          "channel": "wool"
+        },
+        {
+          "type": "functionalresources:resource_wool",
+          "channel": "accent"
+        }
+      ]
+    }
+  }
+}

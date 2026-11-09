@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:function",
+  "function": "functionalresources:single_generator_produces_energy",
+  "environment": "functionalresources:default",
+  "structure": "functionalresources:empty",
+  "max_ticks": 100,
+  "required": true
+}

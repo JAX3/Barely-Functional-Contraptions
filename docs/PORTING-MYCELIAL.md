@@ -1,0 +1,124 @@
+# Port to Minecraft 26.3 / NeoForge 26.3
+
+Branch `port/minecraft-26.3` builds on the 26.1.2 port below, updated for **Minecraft 26.3** and **NeoForge 26.3.0.101**.
+
+> **Status: builds and runs.**
+> - `./gradlew build` succeeds.
+> - `./gradlew runGameTestServer` passes all 15 Mycelial Power GameTests, plus 1 from JEI.
+> - A real 26.3 client loaded the mod together with Resourceful Sheep and JEI 31.17 with no errors.
+
+## Versions
+
+| | 26.1.2 branch | This branch |
+|---|---|---|
+| Minecraft | 26.1.2 | **26.3** |
+| NeoForge | 26.1.2.126 | **26.3.0.101** |
+| JEI | 29.37.0.100 | **31.17.0.109** (any 31.x) |
+| Java / Gradle / ModDevGradle | 25 / 9.2.1 / 2.0.148 | unchanged |
+
+## What changed (26.1.2 → 26.3)
+- **Config:** `ModConfig.Type.SERVER` was renamed `SYNCED`, so the per-world config now lives in `<world>/syncedconfig/`.
+- **Mushroom growth:** `ConfiguredFeature<?, ?>` and `Registries.CONFIGURED_FEATURE` became `Feature` and `Registries.FEATURE`. This matches vanilla's `MushroomBlock#growMushroom`.
+- **Block codecs:** blocks no longer declare a codec, so `CODEC` and `codec()` were removed from `MycelialGeneratorBlock`.
+- **Push reaction:** `PushReaction.BLOCK` was renamed `IMMOVEABLE`.
+- **Bucket interaction:** `FluidUtil.interactWithFluidHandler(player, hand, pos, handler)` now takes an extra transaction argument. Passing `null` opens its own transaction.
+- **Recipe advancements:** the `minecraft:recipe_unlocked` condition key `recipe` became `recipes`. The old key stopped the world from loading, which the GameTests caught.
+- **Loot table format:** 26.3 renamed pool `conditions` (a list) to `condition` (a single object with `type`), and `functions` to `modifier`. The old keys are silently ignored rather than rejected, so the "survives explosion" rule was being dropped. The table was rewritten in the 26.3 format.
+- **Build:** JEI 31's runtime needs `net.mezzdev.config` from the BlameJared maven, which was added to the repository filter.
+- **Jade support (new):** optional integration with Jade 26.3.5 from Modrinth's maven. It shows state, FE/t, burning fuel with a progress bar, and network info. Jade's provider rules for 26.3 apply: server-data and client-tooltip providers must be separate classes.
+- **Mod icon:** the deprecated `logoFile` was replaced with `iconFile` (plus `iconBlur=false`), so the logo appears as the mod-list icon.
+
+# Port to Minecraft 26.1.2 / NeoForge 26.1.2
+
+This branch (`port/minecraft-26.1.2`) is the Mycelial Power 1.21.1 mod ported to **Minecraft 26.1.2** with **NeoForge 26.1.2.126**. The 1.21.1 version stays on `claude/mycelial-power-generator-wipojt`.
+
+> **Status: builds and runs.** The port was written against NeoForge's 26.1.2 source code, the official 26.1.2 MDK, JEI's 26.1 API source and NeoForge's porting guides for every version from 1.21.2 to 26.1. The first local build had one compile error (`SoundEvents.ITEM_BREAK` is now a `Holder`), which is fixed. The game starts with the mod, and `./gradlew runGameTestServer` passes all 15 GameTests.
+
+## Versions
+
+| | 1.21.1 branch | This branch |
+|---|---|---|
+| Minecraft | 1.21.1 | 26.1.2 |
+| NeoForge | 21.1.172 | 26.1.2.126 |
+| Java | 21 | **25** |
+| Gradle | 8.14.3 | 9.2.1 |
+| ModDevGradle | 2.0.141 | 2.0.148 |
+| Mappings | Parchment | none (Minecraft 26.1 ships unobfuscated) |
+| JEI | 19.21.0.247 | 29.37.0.100 (any 29.x for 26.1.2) |
+| Mekanism | 10.7.14 (dev only) | **removed**: no Mekanism release exists for 26.1.2 yet |
+| Mod version | 1.1.0 | 2.0.0 |
+
+## What changed
+
+**Build**
+- Java 25 toolchain, Gradle 9.2.1, ModDevGradle 2.0.148, NeoForge 26.1.2.126 (all from the official NeoForge 26.1.2 MDK).
+- Parchment removed. JUnit is now aligned through its BOM (Gradle 9 needs the launcher declared).
+- JEI uses the MDK's `localRuntime` configuration. Mekanism is removed.
+
+**Renames across the code**
+- `ResourceLocation` → `Identifier`, `ResourceKey#location()` → `identifier()` (1.21.11).
+- `Level#isClientSide` field → `isClientSide()`, `level.random` → `getRandom()`.
+- Registry lookups: `get(id)` → `getValue(id)`, `getTag` → `get(TagKey)`, `registryOrThrow` → `lookupOrThrow`, `getHolder` → `get` (1.21.2).
+- `BlockState#getBlockHolder()` → `typeHolder()` (26.1).
+- `getMaxBuildHeight()` → `getMaxY()`. `DustParticleOptions` now takes an RGB `int`.
+- `Player#displayClientMessage(msg, true)` → `sendOverlayMessage(msg)` (26.1).
+
+**Registration**
+- Blocks and items register with `registerBlock` / `registerItem`, so their properties carry the registry id (required since 1.21.2).
+- `BlockEntityType.Builder` → NeoForge's `new BlockEntityType<>(factory, block)`.
+
+**Block and block entity**
+- `useItemOn` / `useWithoutItem` / `Item#use` return the unified `InteractionResult` (`ItemInteractionResult` and `InteractionResultHolder` are gone).
+- `DirectionProperty` → `EnumProperty<Direction>`.
+- `onRemove` was split: the block entity drops its inventory and removes its wrench links in `preRemoveSideEffects`, and the block updates neighbours in `affectNeighborsAfterRemoval` (1.21.5).
+- `getAnalogOutputSignal` takes the direction (1.21.9).
+- Save and load use `ValueOutput` / `ValueInput` instead of `CompoundTag` (1.21.6). **Old 1.21.1 worlds are not supported by this branch**, since Minecraft does not support upgrading modded worlds across this many versions anyway.
+
+**NeoForge transfer API (the biggest change)**
+- `IItemHandler`, `IFluidHandler` and `IEnergyStorage` capabilities were replaced by `ResourceHandler<ItemResource>`, `ResourceHandler<FluidResource>` and `EnergyHandler`, where every change happens inside a `Transaction`.
+- The energy buffer is a transactional `EnergyHandler`, still extract-only from outside.
+- The water tank is a `FluidStacksResourceHandler`, and the inventory is an `ItemStacksResourceHandler`, with menu slots as `ResourceHandlerSlot`.
+- Pushing energy to cables uses `Capabilities.Energy.BLOCK` and a transaction. Bucket emptying uses `ItemAccess` plus `ResourceHandlerUtil.move`. Right-click filling uses the new `transfer.fluid.FluidUtil`.
+
+**Items**
+- New `appendHoverText(..., TooltipDisplay, Consumer<Component>, ...)` and `inventoryTick(ItemStack, ServerLevel, Entity, EquipmentSlot)` signatures.
+- Item model definitions added under `assets/functionalresources/items/` (required since 1.21.4).
+- Recipe ingredients use the plain-string form (`"I": "minecraft:iron_ingot"`).
+
+**Saved data**
+- Wrench links use the codec-based `SavedDataType` and are stored in the server's global data storage (`data/functionalresources/generator_links.dat`), as the 26.1 guide recommends for data that spans dimensions.
+
+**GUI (26.1 rendering rewrite)**
+- `GuiGraphics` → `GuiGraphicsExtractor`. `renderBg` → `extractBackground`, `renderLabels` → `extractLabels`, `renderTooltip` → `extractTooltip`, `drawString` → `text`. The pose is a 2D matrix stack, and `blit` takes a `RenderPipeline`.
+- The background size is passed to the screen constructor.
+- The water tank is now drawn as a blue gradient bar instead of the animated water texture, because 26.1 replaced the fluid texture lookup.
+
+**JEI 29**
+- `RecipeType` → `IRecipeType`. Categories have no `getBackground` (the panel is drawn in `draw`).
+- Tooltips go through `getTooltip(ITooltipBuilder, ...)`, fluids through `add(fluid, amount)`, catalysts through `addRecipeCatalysts`.
+- The client sends packets with `ClientPacketDistributor`.
+
+**GameTests (1.21.5 rewrite)**
+- `@GameTest` / `@GameTestHolder` are gone. The 15 tests are now registered functions (`ModGameTests`) plus JSON test instances in `data/functionalresources/test_instance/`, with a clear-weather environment in `test_environment/default.json`.
+- `GameTestHelper#assertTrue` takes a `Component`, and `getBlockEntity` takes a class.
+
+**Models**
+- The block model drops NeoForge's old `render_type` (26.1 detects cutout textures itself). The glowing window uses `light_emission` (vanilla) plus the updated `neoforge_data` format.
+
+## Highest-risk areas (check these first)
+
+These were written from documentation and source excerpts rather than compiled code:
+
+1. **Screen** (`MycelialGeneratorScreen`): exact signatures of `extractBackground`, `extractTooltip` and `blit` in `GuiGraphicsExtractor`.
+2. **GameTests**: the JSON test instance format, and `succeedWhen` / `runAfterDelay` still existing on `GameTestHelper`.
+3. **Block model glow**: whether `light_emission` and `neoforge_data` are both accepted.
+4. **Saved data**: `SavedDataType` constructor and `server.getDataStorage()`.
+5. **Fake player**: the `GameProfile(UUID, String)` constructor used for protection checks.
+
+## How to test
+
+```bash
+./gradlew build               # compile + unit tests (31)
+./gradlew runGameTestServer   # 15 in-game tests
+./gradlew runClient           # visual checks from TESTING.md
+```

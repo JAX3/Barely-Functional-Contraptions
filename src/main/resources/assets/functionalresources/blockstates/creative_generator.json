@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "functionalresources:block/creative_generator"
+    }
+  }
+}
