@@ -78,6 +78,7 @@ public final class ModGameTests {
         TESTS.put("infusion_runs_out_after_uses", ModGameTests::infusionRunsOut);
         TESTS.put("dispenser_shears_infused_sheep", ModGameTests::dispenserShears);
         TESTS.put("infusion_survives_save_and_load", ModGameTests::infusionPersists);
+        TESTS.put("infusion_survives_eating_grass", ModGameTests::infusionSurvivesEatingGrass);
         TESTS.put("replacing_infusion_is_refused_by_default", ModGameTests::replaceRefused);
         TESTS.put("separator_produces_raw_iron_and_string", ModGameTests::separatorProcesses);
         TESTS.put("separator_halts_without_energy", ModGameTests::separatorNoEnergy);
@@ -212,6 +213,45 @@ public final class ModGameTests {
         h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 8, "one use consumed");
         // Already sheared: a second shear attempt does nothing (no duplication).
         h.assertFalse(((IShearable) sheep).isShearable(null, new ItemStack(Items.SHEARS), h.getLevel(), sheep.blockPosition()), "sheared sheep not shearable");
+        h.succeed();
+    }
+
+    /**
+     * Regrowing wool by eating grass keeps the infusion: shear an iron sheep, let vanilla's own grass-eating goal
+     * (EatBlockGoal) eat a real grass block, then shear again and get Iron Wool again.
+     */
+    private static void infusionSurvivesEatingGrass(GameTestHelper h) {
+        Sheep sheep = sheep(h);
+        BlockPos below = new BlockPos(3, 0, 3);
+        h.setBlock(below, net.minecraft.world.level.block.Blocks.GRASS_BLOCK);
+        feed(playerHolding(h, new ItemStack(Items.IRON_BLOCK)), sheep);
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 9, "iron block gives 9 uses");
+
+        List<ItemStack> first = shear(h, sheep);
+        h.assertTrue(sheep.isSheared(), "sheep should be sheared");
+        h.assertTrue(first.stream().anyMatch(s -> IRON.equals(ResourceWoolItem.getResourceId(s))), "first shearing drops iron wool: " + first);
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 8, "one use consumed");
+
+        // Run the sheep's real grass-eating goal to completion (the same code that runs when a sheep grazes).
+        var eat = sheep.goalSelector.getAvailableGoals().stream()
+                .map(net.minecraft.world.entity.ai.goal.WrappedGoal::getGoal)
+                .filter(g -> g instanceof net.minecraft.world.entity.ai.goal.EatBlockGoal)
+                .findFirst().orElseThrow(() -> h.assertionException("sheep has no EatBlockGoal"));
+        eat.start();
+        for (int i = 0; i < 60 && sheep.isSheared(); i++) eat.tick();
+        eat.stop();
+        h.assertFalse(sheep.isSheared(), "eating grass should regrow the wool");
+        h.assertBlockPresent(net.minecraft.world.level.block.Blocks.DIRT, below);
+
+        // Still the same infusion with the same uses left, and it still renders as infused.
+        h.assertTrue(SheepInfusionEvents.getInfusedResource(sheep).map(r -> r.id().equals(IRON)).orElse(false),
+                "still infused with iron after eating grass");
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 8, "eating grass must not change the uses left");
+
+        List<ItemStack> second = shear(h, sheep);
+        h.assertTrue(second.stream().noneMatch(s -> s.is(Items.WOOL.white())), "regrown wool must not be normal wool: " + second);
+        h.assertTrue(second.stream().anyMatch(s -> IRON.equals(ResourceWoolItem.getResourceId(s))), "regrown wool shears as iron wool: " + second);
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 7, "second shearing uses one more");
         h.succeed();
     }
 

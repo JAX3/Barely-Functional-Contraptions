@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/functionalresources-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 43 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 24 Resourceful Sheep, 3 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 44 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 25 Resourceful Sheep, 3 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 11 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.functionalresources.gametest.IntegrationGameTests`)
@@ -18,6 +18,9 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | `integration_mycelial_generator_powers_separator` | A Mycelial Generator placed against a Mechanical Separator's energy face, with no cables, powers it. The separator turns Iron Wool into Raw Iron + String on mycelial power alone. |
 | `integration_mushroom_block_infuses_sheep` | The built-in `red_mushroom` and `brown_mushroom` sheep resources load. Feeding a Red Mushroom Block infuses a sheep with Red Mushroom and consumes exactly one block. |
 | `integration_mushroom_wool_fuels_generator` | The whole loop: Red Mushroom Wool goes through a separator powered by a Mycelial Generator, the 2–4 Red Mushrooms that come out are valid generator fuel, and a second generator fed with them starts running. |
+
+### Infusion survives eating grass (`infusion_survives_eating_grass`)
+An iron-infused sheep (9 uses) is sheared: it drops Iron Wool and has 8 uses left. Then the sheep's own vanilla grass-eating goal (`EatBlockGoal`) runs on a real grass block: the grass turns to dirt and the wool regrows. The sheep is still infused with iron with 8 uses left. Shearing it again drops Iron Wool (no normal wool), and it has 7 uses left.
 
 ### Generator filter (`generator_filter_limits_tabs_and_stacking`)
 With the default `[generator]` config: Stone Bricks, Raw Iron and Bread are allowed outputs, while the Redstone Torch (wrong tab) and Mushroom Stew (doesn't stack) are not. Diamond Swords and Water Buckets are refused as feeding items. Every definition from `generate all` passes the filter and parses. In vanilla it keeps 13 materials (iron, gold, copper, coal, diamond, emerald, lapis, redstone, netherite, slime → slime ball, wheat, bone meal, dried kelp) and drops resin. An empty tab list allows any tab but still blacklists non-stacking items.
