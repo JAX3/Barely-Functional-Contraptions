@@ -148,8 +148,21 @@ public final class DevScreenshotHarness {
                 server.execute(() -> openGenerator(server));
             }
             case 600 -> shot(mc, "11_generator_gui");
-            case 610 -> {
+            case 605 -> {
                 mc.player.closeContainer();
+                server.execute(() -> openAutomaticShears(server));
+            }
+            case 630 -> shot(mc, "12_automatic_shears_gui");
+            case 635 -> {
+                mc.player.closeContainer();
+                setHudHidden(mc, true);
+                command(server, "gamemode spectator @a"); // hover above the sheep instead of falling
+                server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %d.5 %d %d.5 -99 24", origin.getX(), origin.getY() + 3, origin.getZ() + 1)));
+            }
+            case 660 -> shot(mc, "13_automatic_shears");
+            case 670 -> {
+                setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
             }
@@ -219,10 +232,27 @@ public final class DevScreenshotHarness {
         if (level.getBlockEntity(active) instanceof MechanicalSeparatorBlockEntity be) {
             fill(be, 64);
         }
+        // Automatic Shears beside the camera, facing west, with a gold sheep and a plain sheep in its 3x3 area.
+        BlockPos shearsPos = o.offset(6, 0, 0);
+        level.setBlock(shearsPos, ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.functionalresources.sheep.blocks.AutomaticShearsBlock.FACING, Direction.WEST), 3);
+        if (level.getBlockEntity(shearsPos) instanceof com.jax3.functionalresources.sheep.blockentity.AutomaticShearsBlockEntity shearsBe) {
+            shearsBe.getEnergy().set(30_000); // it runs on FE now
+        }
+        Object[][] shearSheep = {{"gold", 4, 0}, {null, 4, -1}, {"diamond", 3, 1}};
+        for (Object[] s : shearSheep) {
+            Sheep sh = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            sh.snapTo(o.getX() + (int) s[1] + 0.5, o.getY(), o.getZ() + (int) s[2] + 0.5, 90, 0);
+            sh.setNoAi(true);
+            sh.setColor(DyeColor.WHITE);
+            if (s[0] != null) SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id((String) s[0])), 9, 0));
+            level.addFreshEntity(sh);
+        }
         // Inventory: every wool type plus the machine.
         player.getInventory().clearContent();
         player.getInventory().add(new ItemStack(ModItems.MECHANICAL_SEPARATOR.get(), 4));
         player.getInventory().add(new ItemStack(ModItems.CREATIVE_GENERATOR.get(), 1));
+        player.getInventory().add(new ItemStack(ModItems.AUTOMATIC_SHEARS.get(), 2));
         player.getInventory().add(new ItemStack(com.jax3.functionalresources.mycelial.registry.ModItems.MYCELIAL_GENERATOR.get(), 4));
         player.getInventory().add(new ItemStack(com.jax3.functionalresources.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()));
         player.getInventory().add(new ItemStack(Items.RED_MUSHROOM_BLOCK, 8));
@@ -253,6 +283,14 @@ public final class DevScreenshotHarness {
         BlockPos pos = origin.offset(3, 0, -8);
         if (player.level().getBlockEntity(pos) instanceof com.jax3.functionalresources.mycelial.blockentity.MycelialGeneratorBlockEntity be) {
             player.openMenu(be, buf -> buf.writeBlockPos(pos));
+        }
+    }
+
+    private static void openAutomaticShears(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        BlockPos pos = origin.offset(6, 0, 0);
+        if (player.level().getBlockEntity(pos) instanceof com.jax3.functionalresources.sheep.blockentity.AutomaticShearsBlockEntity be) {
+            player.openMenu(be, pos); // the menu needs the position, exactly like a right-click on the block
         }
     }
 

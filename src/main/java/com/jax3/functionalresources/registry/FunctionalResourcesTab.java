@@ -31,6 +31,7 @@ public final class FunctionalResourcesTab {
                 output.accept(com.jax3.functionalresources.mycelial.registry.ModItems.MYCELIUM_WRENCH.get());
                 // Processing
                 output.accept(com.jax3.functionalresources.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get());
+                output.accept(com.jax3.functionalresources.sheep.registry.ModItems.AUTOMATIC_SHEARS.get());
                 output.accept(com.jax3.functionalresources.sheep.registry.ModItems.CREATIVE_GENERATOR.get());
                 // Resource wool
                 SheepResourceRegistry loaded = SheepResourceRegistry.client();

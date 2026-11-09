@@ -17,6 +17,8 @@ public final class ModItems {
 
     public static final DeferredItem<BlockItem> MECHANICAL_SEPARATOR = REGISTER.registerSimpleBlockItem(ModBlocks.MECHANICAL_SEPARATOR);
 
+    public static final DeferredItem<BlockItem> AUTOMATIC_SHEARS = REGISTER.registerSimpleBlockItem(ModBlocks.AUTOMATIC_SHEARS);
+
     public static final DeferredItem<BlockItem> CREATIVE_GENERATOR = REGISTER.registerSimpleBlockItem(ModBlocks.CREATIVE_GENERATOR,
             p -> p.rarity(net.minecraft.world.item.Rarity.EPIC));
 

@@ -109,6 +109,8 @@ def item_models():
     })
     write(os.path.join(ASSETS, "items", "mechanical_separator.json"),
           {"model": {"type": "minecraft:model", "model": f"{MOD}:block/mechanical_separator"}})
+    write(os.path.join(ASSETS, "items", "automatic_shears.json"),
+          {"model": {"type": "minecraft:model", "model": f"{MOD}:block/automatic_shears"}})
 
 
 def block_models():
@@ -135,6 +137,25 @@ def block_models():
                 v["y"] = rot
             variants[f"active={active},facing={facing}"] = v
     write(os.path.join(ASSETS, "blockstates", "mechanical_separator.json"), {"variants": variants})
+    write(os.path.join(ASSETS, "models", "block", "automatic_shears.json"), {
+        "parent": "minecraft:block/cube",
+        "textures": {
+            "particle": f"{MOD}:block/automatic_shears_side",
+            "north": f"{MOD}:block/automatic_shears_front",
+            "south": f"{MOD}:block/automatic_shears_back",
+            "east": f"{MOD}:block/automatic_shears_side",
+            "west": f"{MOD}:block/automatic_shears_side",
+            "up": f"{MOD}:block/automatic_shears_top",
+            "down": f"{MOD}:block/automatic_shears_bottom",
+        },
+    })
+    shear_variants = {}
+    for facing, rot in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
+        v = {"model": f"{MOD}:block/automatic_shears"}
+        if rot:
+            v["y"] = rot
+        shear_variants[f"facing={facing}"] = v
+    write(os.path.join(ASSETS, "blockstates", "automatic_shears.json"), {"variants": shear_variants})
     write(os.path.join(ASSETS, "models", "block", "creative_generator.json"),
           {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/creative_generator"}})
     write(os.path.join(ASSETS, "blockstates", "creative_generator.json"),
@@ -148,6 +169,30 @@ def lang():
         "itemGroup.functionalresources": "Functional Resources",
         "block.functionalresources.mechanical_separator": "Mechanical Separator",
         "block.functionalresources.creative_generator": "Creative Generator",
+        "block.functionalresources.automatic_shears": "Automatic Shears",
+        "tooltip.functionalresources.automatic_shears": "Uses FE to shear sheep in the 3x3 area in front of it and keeps the wool. Take it out by hand or with a hopper below.",
+        "gui.functionalresources.shears.energy_stored": "%s FE",
+        "gui.functionalresources.shears.energy_capacity": "of %s",
+        "gui.functionalresources.shears.energy_per_shear": "Uses %s FE per sheep sheared",
+        "gui.functionalresources.shears.energy_sides": "Accepts FE on every side except the front",
+        "gui.functionalresources.shears.area": "Shears every sheep in the 3x3 area in front",
+        "gui.functionalresources.shears.next_sweep": "Next sweep in %ss",
+        "gui.functionalresources.shears.interval": "Sweeps every %ss",
+        "gui.functionalresources.shears.status.idle": "Waiting for Sheep",
+        "gui.functionalresources.shears.status.idle.desc": "No sheep with wool in the 3x3 area in front right now",
+        "gui.functionalresources.shears.status.processing": "Shearing",
+        "gui.functionalresources.shears.status.processing.desc": "Just sheared the sheep in front of it",
+        "gui.functionalresources.shears.status.no_energy": "No Energy",
+        "gui.functionalresources.shears.status.no_energy.desc": "Not enough FE stored to shear the next sheep",
+        "gui.functionalresources.shears.status.output_full": "Storage Full",
+        "gui.functionalresources.shears.status.output_full.desc": "Take the wool out, or put a hopper below, to keep shearing",
+        "gui.functionalresources.shears.status.invalid_input": "Idle",
+        "gui.functionalresources.shears.status.invalid_input.desc": "",
+        "gui.functionalresources.shears.status.redstone_disabled": "Disabled by Redstone",
+        "gui.functionalresources.shears.status.redstone_disabled.desc": "Change the redstone signal or mode to run",
+        "functionalresources.configuration.energyPerShear": "Energy per shear",
+        "functionalresources.configuration.automatic_shears": "Automatic Shears",
+        "functionalresources.configuration.shearInterval": "Shear interval",
         "tooltip.functionalresources.creative_generator": "Infinite Forge Energy for testing. Pushes FE into adjacent machines; cables can also pull from any side.",
         "jei.functionalresources.info.creative_generator": "Creative-only. Produces unlimited Forge Energy (FE): every tick it pushes power into all adjacent energy receivers (rate set by creativeGeneratorOutput in the server config), and cables or machines can pull unlimited FE from any side. Place it next to a Mechanical Separator to test without a power setup.",
         "item.functionalresources.resource_wool": "Resource Wool",
@@ -284,6 +329,18 @@ def recipes_loot_tags():
         "pattern": ["IHI", "PSP", "CRC"],
         "result": {"id": f"{MOD}:mechanical_separator"},
     })
+    write(os.path.join(DATA, MOD, "recipe", "automatic_shears.json"), {
+        "type": "minecraft:crafting_shaped",
+        "category": "redstone",
+        "key": {
+            "I": "minecraft:iron_ingot",
+            "S": "minecraft:shears",
+            "R": "minecraft:redstone",
+            "C": "minecraft:chest",
+        },
+        "pattern": ["ISI", "SRS", "ICI"],
+        "result": {"id": f"{MOD}:automatic_shears"},
+    })
     # Example explicit separating recipe: plain wool back into string.
     write(os.path.join(DATA, MOD, "recipe", "separating", "wool_to_string.json"), {
         "type": f"{MOD}:separating",
@@ -309,14 +366,29 @@ def recipes_loot_tags():
         }],
         "random_sequence": f"{MOD}:blocks/mechanical_separator",
     })
+    write(os.path.join(DATA, MOD, "loot_table", "blocks", "automatic_shears.json"), {
+        "type": "minecraft:block",
+        "pools": [{
+            "rolls": 1,
+            "condition": {"type": "minecraft:survives_explosion"},
+            "entries": [{
+                "type": "minecraft:item",
+                "name": f"{MOD}:automatic_shears",
+                "modifier": {"type": "minecraft:copy_components", "source": "block_entity",
+                             "include": ["minecraft:custom_name", f"{MOD}:machine_contents"]},
+            }],
+        }],
+        "random_sequence": f"{MOD}:blocks/automatic_shears",
+    })
     write(os.path.join(DATA, MOD, "loot_modifiers", "infused_wool.json"), {
         "type": f"{MOD}:infused_wool",
         "table_prefix": "shearing/",
     })
     write(os.path.join(DATA, MOD, "tags", "entity_type", "infusable.json"), {"values": ["minecraft:sheep"]})
+    write(os.path.join(DATA, MOD, "tags", "entity_type", "auto_shearable.json"), {"values": [f"#{MOD}:infusable"]})
     write(os.path.join(DATA, MOD, "tags", "item", "replaceable_wool.json"), {"values": ["#minecraft:wool"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears"]})
 
 
 if __name__ == "__main__":

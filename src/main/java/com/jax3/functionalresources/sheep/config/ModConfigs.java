@@ -97,6 +97,10 @@ public final class ModConfigs {
         public final ModConfigSpec.BooleanValue redstoneControlEnabled;
         public final ModConfigSpec.EnumValue<RedstoneMode> defaultRedstoneMode;
         public final ModConfigSpec.IntValue creativeGeneratorOutput;
+        public final ModConfigSpec.IntValue automaticShearsInterval;
+        public final ModConfigSpec.IntValue automaticShearsEnergyPerShear;
+        public final ModConfigSpec.IntValue automaticShearsEnergyCapacity;
+        public final ModConfigSpec.IntValue automaticShearsMaxEnergyInput;
 
         // ---------------------------------------------------------------- /functionalresources generate
         public final ModConfigSpec.ConfigValue<List<? extends String>> generatorAllowedTabs;
@@ -186,6 +190,17 @@ public final class ModConfigs {
             b.comment("Creative Generator (creative-only infinite FE source for testing)").push("creative_generator");
             creativeGeneratorOutput = b.comment("FE pushed into each adjacent energy receiver per tick (receivers still apply their own input limits). 0 disables pushing.")
                     .defineInRange("creativeGeneratorOutput", 1_000_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Automatic Shears (FE-powered; shears sheep in the 3x3 area in front of it into its inventory)").push("automatic_shears");
+            automaticShearsInterval = b.comment("Ticks between shearing sweeps (20 = once a second). Each sweep shears every ready sheep in the area.")
+                    .defineInRange("shearInterval", 20, 1, 72_000);
+            automaticShearsEnergyPerShear = b.comment("FE used for each sheep sheared. 0 = runs without power.")
+                    .defineInRange("energyPerShear", 2_000, 0, Integer.MAX_VALUE);
+            automaticShearsEnergyCapacity = b.comment("FE buffer.")
+                    .defineInRange("energyCapacity", 50_000, 1, Integer.MAX_VALUE);
+            automaticShearsMaxEnergyInput = b.comment("FE accepted per tick (every face except the front).")
+                    .defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
             b.pop();
 
             b.comment("Which items /functionalresources generate may turn into wool types (feeding items and separator outputs).",

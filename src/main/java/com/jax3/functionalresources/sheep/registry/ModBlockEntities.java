@@ -1,6 +1,7 @@
 package com.jax3.functionalresources.sheep.registry;
 
 import com.jax3.functionalresources.sheep.ResourcefulSheep;
+import com.jax3.functionalresources.sheep.blockentity.AutomaticShearsBlockEntity;
 import com.jax3.functionalresources.sheep.blockentity.CreativeGeneratorBlockEntity;
 import com.jax3.functionalresources.sheep.blockentity.MechanicalSeparatorBlockEntity;
 import java.util.function.Supplier;
@@ -13,6 +14,9 @@ public final class ModBlockEntities {
 
     public static final Supplier<BlockEntityType<MechanicalSeparatorBlockEntity>> MECHANICAL_SEPARATOR = REGISTER.register("mechanical_separator",
             () -> new BlockEntityType<>(MechanicalSeparatorBlockEntity::new, ModBlocks.MECHANICAL_SEPARATOR.get()));
+
+    public static final Supplier<BlockEntityType<AutomaticShearsBlockEntity>> AUTOMATIC_SHEARS = REGISTER.register("automatic_shears",
+            () -> new BlockEntityType<>(AutomaticShearsBlockEntity::new, ModBlocks.AUTOMATIC_SHEARS.get()));
 
     public static final Supplier<BlockEntityType<CreativeGeneratorBlockEntity>> CREATIVE_GENERATOR = REGISTER.register("creative_generator",
             () -> new BlockEntityType<>(CreativeGeneratorBlockEntity::new, ModBlocks.CREATIVE_GENERATOR.get()));

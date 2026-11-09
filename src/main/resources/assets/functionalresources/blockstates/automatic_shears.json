@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "functionalresources:block/automatic_shears"
+    },
+    "facing=east": {
+      "model": "functionalresources:block/automatic_shears",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "functionalresources:block/automatic_shears",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "functionalresources:block/automatic_shears",
+      "y": 270
+    }
+  }
+}

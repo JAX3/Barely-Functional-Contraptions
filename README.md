@@ -171,6 +171,32 @@ C R C      C = Copper Ingot   R = Redstone
 - Hardness 3.5, blast resistance 6.
 - When broken, it keeps its stored energy and redstone mode.
 
+### Automatic Shears
+An FE-powered machine that shears sheep for you and keeps the wool.
+
+![Automatic Shears](docs/screenshots/13_automatic_shears.png)
+
+- **Where it shears:** the **3×3 area in front of its face** (the face with the crossed blades, which points at you when you place it). That's the three block columns 1–3 blocks out, one column either side, from one block below the machine to one block above it. A sheep counts when its feet are in that area.
+- **Power:** it runs on Forge Energy and uses **2,000 FE per sheep sheared** (`energyPerShear`). It holds 50,000 FE and accepts up to 1,000 FE/t on every face except the front, from any FE cable or generator. A Mycelial Generator placed against its back powers it directly. Without enough FE it waits, showing *No Energy*.
+- **How often:** every second by default (`shearInterval` in `[automatic_shears]`), shearing every ready sheep in the area each time. Once a sheep eats grass and regrows its wool, it gets sheared again.
+- **Infused sheep:** these work exactly like hand shears. They drop their resource wool and use up one infusion shearing.
+- **GUI:** right-click to open it. It's in the same style as the Mechanical Separator: an energy gauge, a status lamp and line (*Waiting for Sheep*, *Shearing*, *No Energy*, *Storage Full*, *Disabled by Redstone*), the redstone button, a shears icon that snips while it works, a bar counting down to the next sweep, and its 9 storage slots. Hover over things for details.
+- **Inventory:** 9 slots. Take the wool out by hand (shift-click works), or put a **hopper underneath** (or any pipe) to pull it out automatically. Nothing can be put *into* it. A comparator reads how full it is.
+- **When it's full:** it stops shearing until there is room again, so wool is never thrown away. If one sheep's drops only partly fit, the rest drop on the ground at the sheep.
+- **Redstone:** the same four modes as the separator, cycled with the button in the top-right corner: *Ignored* (default), *Active with Signal*, *Active without Signal*, *Disabled*.
+- **Which mobs:** only those in the entity tag `#functionalresources:auto_shearable`, which is sheep by default. It never turns a mooshroom into a cow or takes a snow golem's pumpkin.
+- Its shears never wear out. Mine it with a stone pickaxe or better. When broken it keeps its stored energy and redstone mode, like the separator, and its wool drops on the ground.
+
+```
+I S I      I = Iron Ingot
+S R S      S = Shears
+I C I      R = Redstone Dust   C = Chest
+```
+
+| GUI |
+|---|
+| ![Automatic Shears GUI](docs/screenshots/12_automatic_shears_gui.png) |
+
 ### Creative Generator (testing)
 A creative-only block, found in the Resourceful Sheep creative tab. It has no recipe and can't be broken in survival.
 - Produces **unlimited Forge Energy**.
@@ -274,6 +300,15 @@ Each part can be switched off in Jade's settings under *Plugins → Functional R
 | `itemOutputSides` | BOTTOM | Faces to extract from and auto-push into |
 | `autoPushOutputs` / `autoPushInterval` | true / 10 | Automatic output |
 | `redstoneControlEnabled` / `defaultRedstoneMode` | true / IGNORED | Redstone behaviour |
+
+**`[automatic_shears]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `shearInterval` | 20 | Ticks between shearing sweeps (20 = once a second) |
+| `energyPerShear` | 2000 | FE used per sheep sheared (0 = runs without power) |
+| `energyCapacity` | 50000 | FE buffer |
+| `maxEnergyInput` | 1000 | FE accepted per tick (every face except the front) |
 
 **`[creative_generator]`**
 
@@ -397,6 +432,7 @@ An explicit recipe always takes priority over a resource definition. JEI shows o
 |---|---|---|
 | `#functionalresources:infusable` (entity type) | `minecraft:sheep` | Which mobs can be infused. Add modded sheep here. |
 | `#functionalresources:replaceable_wool` (item) | `#minecraft:wool` | Which drops infused wool replaces |
+| `#functionalresources:auto_shearable` (entity type) | `#functionalresources:infusable` | Which mobs the Automatic Shears shear |
 
 Shearing drops are hooked through a global loot modifier on loot tables whose path starts with `shearing/`. That means hand shears, dispensers and modded shears are all covered, along with modded sheep that use their own `shearing/...` table. Infused-fleece rendering is applied to any entity whose renderer extends the vanilla `SheepRenderer`.
 

@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/functionalresources-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 44 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 25 Resourceful Sheep, 3 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 11 screenshots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 50 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 30 Resourceful Sheep, 4 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 13 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.functionalresources.gametest.IntegrationGameTests`)
 
@@ -18,6 +18,18 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | `integration_mycelial_generator_powers_separator` | A Mycelial Generator placed against a Mechanical Separator's energy face, with no cables, powers it. The separator turns Iron Wool into Raw Iron + String on mycelial power alone. |
 | `integration_mushroom_block_infuses_sheep` | The built-in `red_mushroom` and `brown_mushroom` sheep resources load. Feeding a Red Mushroom Block infuses a sheep with Red Mushroom and consumes exactly one block. |
 | `integration_mushroom_wool_fuels_generator` | The whole loop: Red Mushroom Wool goes through a separator powered by a Mycelial Generator, the 2–4 Red Mushrooms that come out are valid generator fuel, and a second generator fed with them starts running. |
+
+### Automatic Shears
+| Test | Verifies |
+|---|---|
+| `automatic_shears_shear_sheep_in_front` | With the shears facing south: an iron-infused sheep, a plain sheep and a sheep in the far corner of the 3×3 are all sheared. A sheep 5 blocks out and one a column too far to the side are not. The inventory holds 1 Iron Wool plus the white wool, nothing lands on the ground, the iron sheep has 8 uses left, and a comparator reads a signal. (Checked that this test fails if the area is made one block wider.) |
+| `automatic_shears_stop_when_full` | With all 9 slots full it doesn't shear. After one slot is emptied, it shears and stores the wool. |
+| `automatic_shears_redstone_modes` | In *Active without Signal* mode a redstone block pauses it (status *Disabled by Redstone*), and removing the redstone block lets it shear. In *Disabled* mode it never shears. |
+| `automatic_shears_need_power` | With no FE it doesn't shear (status *No Energy*). The front face takes no FE; the back face does. With exactly one shear's worth (2,000 FE) it shears one of the two sheep, ends with 0 FE, and the second sheep waits until more FE arrives. |
+| `integration_mycelial_generator_powers_automatic_shears` | An unpowered Automatic Shears with a running Mycelial Generator against its back shears the sheep in front and stores the wool. |
+| `automatic_shears_hopper_output_only_sheep` | A hopper below pulls the wool out. Neither the item capability (for pipes) nor hoppers can insert anything. A mooshroom in the area is not sheared into a cow. |
+
+In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): the block renders with its crossed-blade front, and the three sheep in front of it (gold, diamond and plain) are sheared bald. Its slate-style screen shows the energy gauge and readout (24,000 of 50,000 FE: it started with 30,000 and sheared 3 sheep at 2,000 each), the *Waiting for Sheep* status, the redstone button, and the Gold Wool, Diamond Wool and 2 White Wool it collected.
 
 ### Infusion survives eating grass (`infusion_survives_eating_grass`)
 An iron-infused sheep (9 uses) is sheared: it drops Iron Wool and has 8 uses left. Then the sheep's own vanilla grass-eating goal (`EatBlockGoal`) runs on a real grass block: the grass turns to dirt and the wool regrows. The sheep is still infused with iron with 8 uses left. Shearing it again drops Iron Wool (no normal wool), and it has 7 uses left.
