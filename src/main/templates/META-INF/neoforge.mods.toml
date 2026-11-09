@@ -1,12 +1,13 @@
 modLoader = "javafml"
 loaderVersion = "${loader_version_range}"
 license = "${mod_license}"
-issueTrackerURL = "https://github.com/JAX3/Functional-Resources/issues"
+issueTrackerURL = "https://github.com/JAX3/Barely-Functional-Contraptions/issues"
 
 [[mods]]
 modId = "${mod_id}"
 version = "${mod_version}"
 displayName = "${mod_name}"
+displayURL = "https://github.com/JAX3/Barely-Functional-Contraptions"
 authors = "${mod_authors}"
 description = '''${mod_description}'''
 # Square icon in the mod list and wide banner in the mod info panel (pixel art, so no blur).
