@@ -227,6 +227,11 @@ A creative-only block, found in the Resourceful Sheep creative tab. It has no re
 
 Every resource also gives 2 String. Plain wool (`#minecraft:wool`) can be separated into 3 string through the bundled `functionalresources:separating` recipe.
 
+### JEI: every wool type the separator handles
+With JEI installed, click the Mechanical Separator in JEI (or press **U** over it) to open **Mechanical Separation**. It lists **every wool type that's loaded**: built-in, mushroom, command-generated and data-pack ones, sorted by name. Plain wool → string and other explicit recipes come after them. Each wool type is one compact row: wool → resource (cycling through 2–4) + string + bonus chance, with energy and time. Hover over things for the details. JEI updates by itself after `/reload` or `/functionalresources generate`. Press **U** on any resource wool to jump to its row (**R** shows how to make it: the infusion page).
+
+![JEI Mechanical Separation](docs/screenshots/06_jei_separation.png)
+
 ### The Mechanical Separator GUI
 - **Energy bar:** shows stored / max FE. Hover for the input rate and the current usage per tick.
 - **Progress arrow and spinning gear:** hover for time remaining and the cost of one operation.

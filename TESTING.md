@@ -31,6 +31,9 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 
 In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): the block renders with its crossed-blade front, and the three sheep in front of it (gold, diamond and plain) are sheared bald. Its slate-style screen shows the energy gauge and readout (24,000 of 50,000 FE: it started with 30,000 and sheared 3 sheep at 2,000 each), the *Waiting for Sheep* status, the redstone button, and the Gold Wool, Diamond Wool and 2 White Wool it collected.
 
+### JEI: Mechanical Separation lists every wool type
+In the real client, the harness compares JEI with the loaded wool types: `wool types loaded=15, resource wool in JEI list=15, separation recipes=16 (with resource wool input=15), missing from JEI list=[]`. That's the 14 built-in types plus the Amethyst type the harness generates, and the extra recipe is plain wool → string. The category now uses one compact row per wool type, sorted by name, with explicit recipes last. In the 1280×720 test client that's 4 per page (4 pages) instead of 1 per page (16 pages); see `06_jei_separation.png`.
+
 ### Feeding items (your "Infusion recipes" change)
 Built-in wool types are fed single items: Iron/Gold/Copper Ingot, Coal, Redstone Dust, Lapis Lazuli and Red/Brown Mushroom. Tests that fed storage blocks now feed those items, and `definitions_loaded` checks that an Iron Ingot maps to iron and an Iron Block no longer does. `tools/sheep/generate_data.py` writes the same feeding items, so regenerating keeps them.
 

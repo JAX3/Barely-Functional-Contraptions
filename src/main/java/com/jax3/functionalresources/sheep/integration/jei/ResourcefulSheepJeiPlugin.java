@@ -64,20 +64,27 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addItemStackInfo(new ItemStack(ModItems.CREATIVE_GENERATOR.get()), Component.translatable("jei.functionalresources.info.creative_generator"));
     }
 
+    /**
+     * Every wool type the separator can process (built-in, mushroom, command-generated and data-pack ones), sorted by
+     * name, followed by explicit separating recipes such as plain wool to string.
+     */
     static List<SeparationDisplay> buildSeparations(SheepResourceRegistry resources) {
         List<SeparationDisplay> displays = new ArrayList<>();
         List<RecipeHolder<SeparatingRecipe>> recipes = SeparationLookup.clientRecipes();
-        for (RecipeHolder<SeparatingRecipe> holder : recipes) {
-            List<ItemStack> inputs = Arrays.stream(holder.value().ingredient().items().map(ItemStack::new).toArray(ItemStack[]::new)).toList();
-            displays.add(new SeparationDisplay(holder.id().identifier(), inputs, holder.value().toSeparation()));
-        }
-        for (SheepResource resource : resources.all()) {
+        List<SheepResource> sorted = resources.all().stream()
+                .sorted(java.util.Comparator.comparing((SheepResource r) -> r.name().getString().toLowerCase(java.util.Locale.ROOT)))
+                .toList();
+        for (SheepResource resource : sorted) {
             ItemStack wool = ResourceWoolItem.create(resource.id(), 1);
             // An explicit recipe that matches this wool overrides the definition in the machine; show only that one.
             boolean overridden = recipes.stream().anyMatch(h -> h.value().ingredient().test(wool));
             if (!overridden) {
                 displays.add(new SeparationDisplay(resource.id(), List.of(wool), resource.separation()));
             }
+        }
+        for (RecipeHolder<SeparatingRecipe> holder : recipes) {
+            List<ItemStack> inputs = Arrays.stream(holder.value().ingredient().items().map(ItemStack::new).toArray(ItemStack[]::new)).toList();
+            displays.add(new SeparationDisplay(holder.id().identifier(), inputs, holder.value().toSeparation()));
         }
         return displays;
     }

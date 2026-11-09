@@ -121,7 +121,12 @@ public final class DevScreenshotHarness {
                     com.jax3.functionalresources.sheep.integration.jei.JeiDevHook.showCategory(false);
                 }
             }
-            case 460 -> shot(mc, "06_jei_separation");
+            case 460 -> {
+                shot(mc, "06_jei_separation");
+                if (ModList.get().isLoaded("jei")) {
+                    ResourcefulSheep.LOGGER.warn("Harness JEI report: {}", com.jax3.functionalresources.sheep.integration.jei.JeiDevHook.separatorReport());
+                }
+            }
             case 470 -> {
                 mc.gui.setScreen(null);
                 server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
