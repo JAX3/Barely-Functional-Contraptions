@@ -47,6 +47,11 @@
 	creativeIgnoresCooldown = true
 	#Sneak + right-click a sheep with an empty hand to see its infusion in the action bar.
 	sneakToInspect = true
+	#Shearings every infusion lasts, for every wool type (built-in, generated and data-pack ones).
+	#-1 uses each resource definition's own 'infusion_uses' (9 for blocks, 1 for gems...). The multiplier below still applies.
+	# Default: 100
+	# Range: -1 ~ 1000000
+	infusionUsesOverride = 100
 
 #Mechanical Separator machine
 [separator]
@@ -129,3 +134,22 @@
 	allowedCreativeTabs = ["minecraft:building_blocks", "minecraft:ingredients", "minecraft:food_and_drinks"]
 	#Blacklist every item that does not stack (max stack size 1): tools, armour, buckets, potions, stews...
 	requireStackable = true
+
+#Automatic Shears (FE-powered; shears sheep in the 3x3 area in front of it into its inventory)
+[automatic_shears]
+	#Ticks between shearing sweeps (20 = once a second). Each sweep shears every ready sheep in the area.
+	# Default: 20
+	# Range: 1 ~ 72000
+	shearInterval = 20
+	#FE used for each sheep sheared. 0 = runs without power.
+	# Default: 2000
+	# Range: > 0
+	energyPerShear = 2000
+	#FE buffer.
+	# Default: 50000
+	# Range: > 1
+	energyCapacity = 50000
+	#FE accepted per tick (every face except the front).
+	# Default: 1000
+	# Range: > 1
+	maxEnergyInput = 1000

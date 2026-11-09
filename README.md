@@ -35,7 +35,7 @@ A NeoForge mod for **Minecraft 26.3** (Java 25) that combines two systems, **Myc
 ```
 
 1. **Generators power separators directly.** Both use NeoForge's standard energy capability, so a Mycelial Generator placed against any energy face of a Mechanical Separator (back, left, right, top or bottom) pushes FE into it. One generator makes 200–250 FE/t, which is exactly what a separator uses for most wool. FE cables from other mods work too.
-2. **Mushroom sheep.** Two new built-in sheep resources, **Red Mushroom** and **Brown Mushroom**, are infused with a **Red/Brown Mushroom Block** (3 shearings each). The separator turns each Mushroom Wool into **2–4 mushrooms** + 2 String, with a 5% chance of a **Mycelium** block. Those mushrooms are the Mycelial Generator's fuel.
+2. **Mushroom sheep.** Two new built-in sheep resources, **Red Mushroom** and **Brown Mushroom**, are infused with a **Red/Brown Mushroom Block** (100 shearings per feeding by default). The separator turns each Mushroom Wool into **2–4 mushrooms** + 2 String, with a 5% chance of a **Mycelium** block. Those mushrooms are the Mycelial Generator's fuel.
 3. **The loop closes.** Running generators spread mycelium and grow huge mushrooms, which give you mushroom blocks for the sheep. The sheep give you mushrooms for the generators, and the generators power the separators that process all your other resource wool.
 4. **One mod.** One creative tab (*Functional Resources*), one entry in the mod list, one config button listing all four config files, and one JEI and Jade plugin set.
 
@@ -142,7 +142,7 @@ Right-click an **adult** sheep while holding a resource, for example an **Iron B
 - One item is consumed (this is configurable). You'll see coloured particles and hear a chime.
 - The sheep's fleece takes on the resource colour with glinting strands, and **the resource itself grows out of it the way mushrooms grow on a mooshroom**: two on its back and one on its head (Raw Iron on an iron sheep, Diamonds on a diamond sheep, Red Mushrooms on a red mushroom sheep). This applies to flat 2D items, which are drawn as crossed sprites like a mooshroom's mushrooms; they drop off one by one as the infusion is used up, and the head one goes last. Block-shaped resources (Cobblestone on a stone sheep, Oak Log on a wood sheep) keep the original look instead: a cluster of small blocks sunk into the fleece that shrinks as the infusion is sheared away.
 - Its dye colour still shows through slightly, so a blue diamond sheep looks different from a white one.
-- Each infusion lasts a set number of shearings. Iron, gold, copper, redstone, lapis and coal blocks last **9** shearings (one block holds 9 items). Single items such as diamond, emerald, netherite scrap, cobblestone, oak log and quartz last **1**.
+- **Each infusion lasts 100 shearings by default**, whatever the resource (`infusionUsesOverride` in the config). Set that to `-1` to use each resource's own count instead: iron, gold, copper, redstone, lapis and coal blocks last **9** shearings (one block holds 9 items), and single items such as diamond, emerald, netherite scrap, cobblestone, oak log and quartz last **1**.
 - Feeding an item that isn't a resource does nothing special, so wheat breeding, dyes and so on work as normal.
 - Sneak + right-click a sheep with an empty hand to see its infusion and how many shearings it has left.
 
@@ -159,7 +159,7 @@ Put the wool into a **Mechanical Separator** and supply Forge Energy (FE).
 | Time | 100 ticks (5 s) |
 | Output | **2–4** Raw Iron (random each time) + 2 String (+10% chance of 3 Iron Nuggets) |
 
-**Balance:** every wool separates into **2–4** of its resource (3 on average). One Iron Block (9 shearings) therefore yields about 27 Raw Iron, and one Diamond about 3 Diamonds, so infused sheep **multiply** resources. The cost is the shearing time and the machine's energy. To tone it down, lower `primaryOutputMultiplier` (e.g. `0.34` brings it back to about 1 per wool), lower `infusionUsesMultiplier`, or set `primary_count` per resource.
+**Balance:** every wool separates into **2–4** of its resource (3 on average). With the default of 100 shearings per feeding, one Iron Block yields about 300 Raw Iron and one Diamond about 300 Diamonds, so infused sheep **multiply** resources a lot. (With `infusionUsesOverride = -1`, one Iron Block gives about 27 Raw Iron and one Diamond about 3 Diamonds.) The cost is the shearing time and the machine's energy. To tone it down, lower `primaryOutputMultiplier` (e.g. `0.34` brings it back to about 1 per wool), lower `infusionUsesOverride` (or set it to `-1`) or `infusionUsesMultiplier`, or set `primary_count` per resource.
 
 ### Crafting the separator
 ```
@@ -206,7 +206,7 @@ A creative-only block, found in the Resourceful Sheep creative tab. It has no re
 
 ### Built-in resources
 
-| Fed item | Wool | Separator output (per wool) | Uses | FE / time |
+| Fed item | Wool | Separator output (per wool) | Own uses (`-1`) | FE / time |
 |---|---|---|---|---|
 | Iron Block | Iron Wool | 2–4 Raw Iron | 9 | 20,000 / 5 s |
 | Gold Block | Gold Wool | 2–4 Raw Gold | 9 | 20,000 / 5 s |
@@ -270,6 +270,7 @@ Each part can be switched off in Jade's settings under *Plugins → Functional R
 | `allowReplacingInfusion` | false | Feed a different resource to replace an infusion |
 | `sameResourceRefreshesUses` | true | Re-feeding the same resource tops the uses back up |
 | `infusionConsumedByShearing` | true | `false` makes infusions **permanent** |
+| `infusionUsesOverride` | 100 | Shearings every infusion lasts, for every wool type. `-1` = each resource's own `infusion_uses` |
 | `infusionUsesMultiplier` | 1.0 | Scales every resource's `infusion_uses` |
 | `woolDropCountOverride` | -1 | Wool dropped per shearing |
 | `shearingBonusChance` / `shearingBonusAmount` | 0.0 / 1 | Chance of extra wool per shearing |
@@ -357,7 +358,7 @@ Definitions live in `data/<namespace>/functionalresources/sheep_resources/<name>
   "accent_color": "#E6EEF2",                 // colour of the glinting strands
   "category": "ore",                         // ore | gem | dust | material | organic
   "wool_drop_count": 1,                      // wool per shearing
-  "infusion_uses": 9,                        // shearings per feeding
+  "infusion_uses": 9,                        // shearings per feeding (used when infusionUsesOverride = -1)
   "separator": {
     "primary_output": "mekanism:raw_tin",    // item id or {"id": ..., "count": ..., "components": {...}}; default: the fed item
     "primary_count": { "min": 2, "max": 4 }, // random 2-4 per wool; a plain number means a fixed count
@@ -410,7 +411,7 @@ How the generator chooses each value:
 - **Uses:** 9 when a block is broken down into one of those units (a block holds 9), otherwise 1.
 - **Colours:** taken from the block's map colour. The category comes from whichever tag supplied the output.
 
-Picking single items or materials adds one file without touching the others. It refuses anything an existing built-in or hand-written resource already covers (same feeding item or same name), so you can't create duplicates this way. A wool type made from an arbitrary item (not a storage block) lasts **1** shearing by default, because the mod can't know how many units the item holds. Edit `infusion_uses` in its JSON if you want more.
+Picking single items or materials adds one file without touching the others. It refuses anything an existing built-in or hand-written resource already covers (same feeding item or same name), so you can't create duplicates this way. A wool type made from an arbitrary item (not a storage block) has `infusion_uses` 1, because the mod can't know how many units the item holds. That only matters with `infusionUsesOverride = -1`; by default every wool type lasts 100 shearings.
 
 Generated files are ordinary JSON in `<world>/datapacks/functionalresources_generated/`. You can edit them freely. Re-running `generate` (or `generate all`) rewrites only the wool types it generates itself; other generated ones, such as those added with `generate item`/`hand`/`material`, stay until you delete them with `generate remove` or `generate dedupe`. Sheep infused with them keep their infusion. In plain vanilla this adds Bone Meal, Dried Kelp, Slime and Wheat (Resin is skipped because the Resin Clump is not in an allowed creative tab).
 

@@ -31,6 +31,9 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 
 In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): the block renders with its crossed-blade front, and the three sheep in front of it (gold, diamond and plain) are sheared bald. Its slate-style screen shows the energy gauge and readout (24,000 of 50,000 FE: it started with 30,000 and sheared 3 sheep at 2,000 each), the *Waiting for Sheep* status, the redstone button, and the Gold Wool, Diamond Wool and 2 White Wool it collected.
 
+### 100 shearings per feeding by default (`infusionUsesOverride = 100`)
+Feeding an Iron Block gives 100 uses, and shearing counts down from there (99, 98…), including through eating grass and the Automatic Shears. `infusion_runs_out_after_uses` switches the override to `-1` while it runs: an Iron Block then gives its own 9 uses, and a Diamond (1 use) runs out after one shearing.
+
 ### Generated wool types keep their sheep (`generated_resource_keeps_infusion`, `unloaded_infusion_is_kept_but_replaceable`)
 This runs the real commands in their own test batch, because they reload data packs:
 * `generate material slime` adds Slime. A sheep fed a Slime Block is infused with it (9 uses). The infusion survives saving and loading the sheep, a shearing (it drops Slime Wool and has 8 uses left), regrowing, and `/reload`. It shears Slime Wool again after that.

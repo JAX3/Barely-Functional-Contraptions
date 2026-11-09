@@ -126,7 +126,9 @@ public record SheepResource(
     public int effectiveInfusionUses() {
         if (!ModConfigs.getBool(ModConfigs.SERVER.infusionConsumedByShearing)) return -1;
         double mult = ModConfigs.getDouble(ModConfigs.SERVER.infusionUsesMultiplier);
-        return Math.max(1, (int) Math.round(infusionUses * mult));
+        int override = ModConfigs.getInt(ModConfigs.SERVER.infusionUsesOverride);
+        int base = override > 0 ? override : infusionUses;
+        return Math.max(1, (int) Math.round(base * mult));
     }
 
     /** Example item to show for the feeding input (first matching item). */

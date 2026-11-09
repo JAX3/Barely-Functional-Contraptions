@@ -202,7 +202,7 @@ public final class ModGameTests {
         feed(player, sheep);
         SheepInfusion infusion = SheepInfusionEvents.getInfusion(sheep);
         h.assertTrue(infusion.resource().map(IRON::equals).orElse(false), "sheep should be infused with iron, was " + infusion);
-        h.assertTrue(infusion.usesRemaining() == 9, "iron infusion should last 9 shearings, was " + infusion.usesRemaining());
+        h.assertTrue(infusion.usesRemaining() == 100, "infusions last 100 shearings by default (infusionUsesOverride), was " + infusion.usesRemaining());
         h.assertTrue(player.getMainHandItem().getCount() == 2, "one iron block should be consumed");
         h.assertTrue(sheep.getColor() == DyeColor.WHITE, "dye colour must be preserved");
         // Feeding again at full uses is refused and does not consume.
@@ -228,7 +228,7 @@ public final class ModGameTests {
         h.assertTrue(drops.stream().noneMatch(s -> s.is(Items.WOOL.white())), "infused sheep must not drop normal wool: " + drops);
         long ironWool = drops.stream().filter(s -> IRON.equals(ResourceWoolItem.getResourceId(s))).mapToInt(ItemStack::getCount).sum();
         h.assertTrue(ironWool == 1, "expected exactly 1 iron wool, got " + drops);
-        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 8, "one use consumed");
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 99, "one use consumed");
         // Already sheared: a second shear attempt does nothing (no duplication).
         h.assertFalse(((IShearable) sheep).isShearable(null, new ItemStack(Items.SHEARS), h.getLevel(), sheep.blockPosition()), "sheared sheep not shearable");
         h.succeed();
@@ -243,12 +243,12 @@ public final class ModGameTests {
         BlockPos below = new BlockPos(3, 0, 3);
         h.setBlock(below, net.minecraft.world.level.block.Blocks.GRASS_BLOCK);
         feed(playerHolding(h, new ItemStack(Items.IRON_BLOCK)), sheep);
-        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 9, "iron block gives 9 uses");
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 100, "100 uses by default");
 
         List<ItemStack> first = shear(h, sheep);
         h.assertTrue(sheep.isSheared(), "sheep should be sheared");
         h.assertTrue(first.stream().anyMatch(s -> IRON.equals(ResourceWoolItem.getResourceId(s))), "first shearing drops iron wool: " + first);
-        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 8, "one use consumed");
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 99, "one use consumed");
 
         // Run the sheep's real grass-eating goal to completion (the same code that runs when a sheep grazes).
         var eat = sheep.goalSelector.getAvailableGoals().stream()
@@ -264,12 +264,12 @@ public final class ModGameTests {
         // Still the same infusion with the same uses left, and it still renders as infused.
         h.assertTrue(SheepInfusionEvents.getInfusedResource(sheep).map(r -> r.id().equals(IRON)).orElse(false),
                 "still infused with iron after eating grass");
-        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 8, "eating grass must not change the uses left");
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 99, "eating grass must not change the uses left");
 
         List<ItemStack> second = shear(h, sheep);
         h.assertTrue(second.stream().noneMatch(s -> s.is(Items.WOOL.white())), "regrown wool must not be normal wool: " + second);
         h.assertTrue(second.stream().anyMatch(s -> IRON.equals(ResourceWoolItem.getResourceId(s))), "regrown wool shears as iron wool: " + second);
-        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 7, "second shearing uses one more");
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 98, "second shearing uses one more");
         h.succeed();
     }
 
@@ -319,7 +319,7 @@ public final class ModGameTests {
             h.assertFalse(beside.isSheared(), "sheep beside the area must not be sheared");
             h.assertTrue(countIn(shears, s -> IRON.equals(ResourceWoolItem.getResourceId(s))) == 1, "1 iron wool stored");
             h.assertTrue(countIn(shears, s -> s.is(Items.WOOL.white())) >= 2, "plain sheep's white wool stored");
-            h.assertTrue(SheepInfusionEvents.getInfusion(iron).usesRemaining() == 8, "infusion uses one shearing as usual");
+            h.assertTrue(SheepInfusionEvents.getInfusion(iron).usesRemaining() == 99, "infusion uses one shearing as usual");
             h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, h.getBounds()).isEmpty(),
                     "everything went into the inventory, nothing on the ground");
             h.assertTrue(shears.getBlockState().getAnalogOutputSignal(h.getLevel(), h.absolutePos(SHEARS_POS), net.minecraft.core.Direction.NORTH) > 0,
@@ -521,15 +521,25 @@ public final class ModGameTests {
         h.succeed();
     }
 
+    /** With infusionUsesOverride = -1, each wool type's own uses apply: a diamond (1 use) runs out after one shearing. */
     private static void infusionRunsOut(GameTestHelper h) {
-        Sheep sheep = sheep(h);
-        feed(playerHolding(h, new ItemStack(Items.DIAMOND)), sheep); // diamond: 1 use
-        List<ItemStack> first = shear(h, sheep);
-        h.assertTrue(first.stream().anyMatch(s -> ResourcefulSheep.id("diamond").equals(ResourceWoolItem.getResourceId(s))), "diamond wool dropped");
-        h.assertFalse(SheepInfusionEvents.getInfusion(sheep).isInfused(), "single-use infusion must be cleared after shearing");
-        sheep.setSheared(false); // regrow
-        List<ItemStack> second = shear(h, sheep);
-        h.assertTrue(second.stream().allMatch(s -> s.is(Items.WOOL.white())), "sheep returns to normal wool, got " + second);
+        int old = ModConfigs.SERVER.infusionUsesOverride.get();
+        ModConfigs.SERVER.infusionUsesOverride.set(-1);
+        try {
+            Sheep iron = sheep(h);
+            feed(playerHolding(h, new ItemStack(Items.IRON_BLOCK)), iron);
+            h.assertTrue(SheepInfusionEvents.getInfusion(iron).usesRemaining() == 9, "override off: iron block's own 9 uses");
+            Sheep sheep = sheep(h);
+            feed(playerHolding(h, new ItemStack(Items.DIAMOND)), sheep); // diamond: 1 use
+            List<ItemStack> first = shear(h, sheep);
+            h.assertTrue(first.stream().anyMatch(s -> ResourcefulSheep.id("diamond").equals(ResourceWoolItem.getResourceId(s))), "diamond wool dropped");
+            h.assertFalse(SheepInfusionEvents.getInfusion(sheep).isInfused(), "single-use infusion must be cleared after shearing");
+            sheep.setSheared(false); // regrow
+            List<ItemStack> second = shear(h, sheep);
+            h.assertTrue(second.stream().allMatch(s -> s.is(Items.WOOL.white())), "sheep returns to normal wool, got " + second);
+        } finally {
+            ModConfigs.SERVER.infusionUsesOverride.set(old);
+        }
         h.succeed();
     }
 

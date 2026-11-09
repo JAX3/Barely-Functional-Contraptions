@@ -66,6 +66,7 @@ public final class ModConfigs {
         public final ModConfigSpec.BooleanValue allowReplacingInfusion;
         public final ModConfigSpec.BooleanValue sameResourceRefreshesUses;
         public final ModConfigSpec.BooleanValue infusionConsumedByShearing;
+        public final ModConfigSpec.IntValue infusionUsesOverride;
         public final ModConfigSpec.DoubleValue infusionUsesMultiplier;
         public final ModConfigSpec.IntValue woolDropCountOverride;
         public final ModConfigSpec.DoubleValue shearingBonusChance;
@@ -124,6 +125,9 @@ public final class ModConfigs {
             infusionConsumedByShearing = b.comment("If true, each shearing uses up one 'use' of the infusion; when none remain the sheep returns to normal.",
                             "If false, infusions are PERMANENT (turns sheep into an unlimited generator - not recommended for survival packs).")
                     .define("infusionConsumedByShearing", true);
+            infusionUsesOverride = b.comment("Shearings every infusion lasts, for every wool type (built-in, generated and data-pack ones).",
+                            "-1 uses each resource definition's own 'infusion_uses' (9 for blocks, 1 for gems...). The multiplier below still applies.")
+                    .defineInRange("infusionUsesOverride", 100, -1, 1_000_000);
             infusionUsesMultiplier = b.comment("Multiplier applied to each resource's 'infusion_uses' (number of shearings an infusion lasts). Result is rounded, minimum 1.")
                     .defineInRange("infusionUsesMultiplier", 1.0, 0.01, 100.0);
             woolDropCountOverride = b.comment("Infused wool items dropped per shearing. -1 uses each resource definition's 'wool_drop_count'.")
