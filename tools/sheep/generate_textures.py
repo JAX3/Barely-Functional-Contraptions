@@ -769,7 +769,65 @@ def generate_jei():
             t = y / 39.0
             c = mix(hexc("#ff6ae6"), hexc("#5c2aa6"), t)
             img.putpixel((40 + x, 16 + y), hexc("#17181c") if edge else shade(c, 1.1 if x in (2, 3) else 1.0))
+    jei_slate_sprites(img)
     img.save(out("gui/jei.png"))
+
+
+def jei_arrow(fill, outline):
+    """24x16 right-pointing arrow in the separator GUI's style (body 1..14, head 14..22)."""
+    a = Image.new("RGBA", (24, 16), CLEAR)
+    for y in range(5, 11):
+        for x in range(1, 15):
+            a.putpixel((x, y), fill)
+    for i in range(8):
+        for y in range(8 - i - 1, 8 + i + 1):
+            a.putpixel((14 + (7 - i), y), fill)
+    px = a.load()
+    o = Image.new("RGBA", (24, 16), CLEAR)
+    for y in range(16):
+        for x in range(24):
+            if px[x, y][3] == 0:
+                for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < 24 and 0 <= ny < 16 and px[nx, ny][3]:
+                        o.putpixel((x, y), outline)
+                        break
+    o.alpha_composite(a)
+    return o
+
+
+def jei_slate_sprites(img):
+    """
+    Dark slate pieces so the JEI pages match the machine GUIs:
+      (0,64)   200x20 Mechanical Separation row panel
+      (0,88)   150x58 Resource Infusion panel
+      (176,0)  18x18 slot frame        (196,0) 26x26 big (output) slot frame
+      (176,32) 24x16 arrow, empty      (176,48) 24x16 arrow, filled (purple, animated in JEI)
+      (204,32) 13x13 plus sign
+    """
+    panel(img, 0, 64, 200, 84)
+    panel(img, 0, 88, 150, 146)
+    # Infusion panel decorations: a recessed strip behind the text, and the wool/grass fringe of the machine GUIs.
+    inset(img, 4, 119, 146, 144, GUI["panel"])
+    rnd = random.Random(11)
+    for x in range(3, 147):
+        if rnd.random() < 0.18:
+            img.putpixel((x, 145), rnd.choice([hexc("#e3e1ea"), hexc("#b7b3c6"), hexc("#86c25a")]))
+    slot(img, 177, 1)                                   # 18x18 frame at (176,0)
+    inset(img, 196, 0, 222, 26, GUI["panel"])            # 26x26 big frame at (196,0)
+    inset(img, 200, 4, 218, 22, GUI["slot"])
+    img.alpha_composite(jei_arrow(hexc("#2c2e36"), hexc("#17181c")), (176, 32))
+    full = jei_arrow(hexc("#c27cff"), hexc("#3a1a66"))
+    for x in range(2, 14):
+        for y in (6, 7):
+            full.putpixel((x, y), hexc("#ffd2fb"))
+    img.alpha_composite(full, (176, 48))
+    for i in range(13):                                 # plus sign, slate highlight on outline
+        for (x, y) in [(i, 5), (i, 6), (i, 7), (5, i), (6, i), (7, i)]:
+            img.putpixel((204 + x, 32 + y), hexc("#8d97bc"))
+    for i in range(1, 12):
+        img.putpixel((204 + i, 32 + 6), hexc("#dfe4f5"))
+        img.putpixel((204 + 6, 32 + i), hexc("#dfe4f5"))
 
 
 # ---------------------------------------------------------------------------

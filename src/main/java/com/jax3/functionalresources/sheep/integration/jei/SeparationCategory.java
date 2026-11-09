@@ -26,19 +26,34 @@ public class SeparationCategory extends AbstractRecipeCategory<SeparationDisplay
      * One compact row per recipe (wool, arrow, outputs, energy and time), so JEI stacks many on a page and every wool
      * type can be seen at a glance instead of one per page.
      */
-    public static final int WIDTH = 168, HEIGHT = 20;
+    public static final int WIDTH = 200, HEIGHT = 20;
     private static final int INPUT_X = 1, ARROW_X = 22, PRIMARY_X = 50, SECONDARY_X = 70, BONUS_X = 90, TEXT_X = 112;
+
+    private final IGuiHelper gui;
+    private final mezz.jei.api.gui.drawable.IDrawableStatic background;
+    private final mezz.jei.api.gui.drawable.IDrawableStatic slot;
+    private final mezz.jei.api.gui.drawable.IDrawableStatic arrowEmpty;
 
     public SeparationCategory(IGuiHelper gui) {
         super(TYPE, Component.translatable("jei.functionalresources.mechanical_separation"),
                 gui.createDrawableItemLike(ModItems.MECHANICAL_SEPARATOR.get()), WIDTH, HEIGHT);
+        this.gui = gui;
+        this.background = JeiTextures.sprite(gui, 0, 64, WIDTH, HEIGHT);   // slate row, like the separator GUI
+        this.slot = JeiTextures.slot(gui);
+        this.arrowEmpty = JeiTextures.arrowEmpty(gui);
+    }
+
+    @Override
+    public void draw(SeparationDisplay recipe, mezz.jei.api.gui.ingredient.IRecipeSlotsView slots,
+                     net.minecraft.client.gui.GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+        background.draw(graphics);
     }
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, SeparationDisplay recipe, IFocusGroup focuses) {
         Separation s = recipe.separation();
         builder.addSlot(RecipeIngredientRole.INPUT, INPUT_X, 1)
-                .setStandardSlotBackground()
+                .setBackground(slot, -1, -1)
                 .addItemStacks(recipe.inputs());
 
         double expected = s.expectedPrimaryCount();
@@ -48,17 +63,17 @@ public class SeparationCategory extends AbstractRecipeCategory<SeparationDisplay
         int lo = Integer.parseInt(bounds[0]), hi = Integer.parseInt(bounds[bounds.length - 1]);
         for (int n = Math.max(1, lo); n <= Math.max(1, hi); n++) counts.add(s.primary().create().copyWithCount(n));
         builder.addSlot(RecipeIngredientRole.OUTPUT, PRIMARY_X, 1)
-                .setStandardSlotBackground()
+                .setBackground(slot, -1, -1)
                 .addItemStacks(counts)
                 .addRichTooltipCallback((view, tooltip) -> {
                     tooltip.add(Component.translatable("jei.functionalresources.range", s.primaryLabel(),
                             String.format(Locale.ROOT, "%.1f", expected)).withStyle(ChatFormatting.GRAY));
                 });
         s.secondary().ifPresent(sec -> builder.addSlot(RecipeIngredientRole.OUTPUT, SECONDARY_X, 1)
-                .setStandardSlotBackground()
+                .setBackground(slot, -1, -1)
                 .add(sec));
         s.bonus().ifPresent(bonus -> builder.addSlot(RecipeIngredientRole.OUTPUT, BONUS_X, 1)
-                .setStandardSlotBackground()
+                .setBackground(slot, -1, -1)
                 .add(bonus.item())
                 .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.functionalresources.chance",
                         Math.round(bonus.chance() * 100)).withStyle(ChatFormatting.GOLD))));
@@ -67,14 +82,15 @@ public class SeparationCategory extends AbstractRecipeCategory<SeparationDisplay
     @Override
     public void createRecipeExtras(IRecipeExtrasBuilder builder, SeparationDisplay recipe, IFocusGroup focuses) {
         Separation s = recipe.separation();
-        builder.addAnimatedRecipeArrowWidget(s.effectiveTicks()).setPosition(ARROW_X, 2);
+        // The separator GUI's purple arrow, filling over the real processing time.
+        builder.addDrawableWidget(arrowEmpty).setPosition(ARROW_X, 2);
+        builder.addDrawableWidget(JeiTextures.arrowFilling(gui, s.effectiveTicks())).setPosition(ARROW_X, 2);
         // Energy and time, compact, with the full figures in the tooltip.
-        builder.addText(List.<FormattedText>of(
-                        Component.translatable("jei.functionalresources.energy_short", fe(s.effectiveEnergy())),
-                        Component.translatable("jei.functionalresources.time_short", String.format(Locale.ROOT, "%.1f", s.effectiveTicks() / 20.0))),
-                        WIDTH - TEXT_X, HEIGHT)
-                .setPosition(TEXT_X, 1)
-                .setColor(0xFF555555)
+        builder.addText(List.<FormattedText>of(Component.translatable("jei.functionalresources.energy_time_short",
+                        fe(s.effectiveEnergy()), String.format(Locale.ROOT, "%.1f", s.effectiveTicks() / 20.0))),
+                        WIDTH - TEXT_X - 4, 10)
+                .setPosition(TEXT_X + 2, 6)
+                .setColor(JeiTextures.TEXT)
                 .setTextAlignment(HorizontalAlignment.LEFT);
         builder.addTooltipArea(TEXT_X, 0, WIDTH - TEXT_X, HEIGHT).setTooltip(List.<FormattedText>of(
                 Component.translatable("jei.functionalresources.energy", fe(s.effectiveEnergy())),

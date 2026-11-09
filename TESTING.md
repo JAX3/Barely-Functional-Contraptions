@@ -34,6 +34,9 @@ In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): t
 ### JEI: Mechanical Separation lists every wool type
 In the real client, the harness compares JEI with the loaded wool types: `wool types loaded=15, resource wool in JEI list=15, separation recipes=16 (with resource wool input=15), missing from JEI list=[]`. That's the 14 built-in types plus the Amethyst type the harness generates, and the extra recipe is plain wool → string. The category now uses one compact row per wool type, sorted by name, with explicit recipes last. In the 1280×720 test client that's 4 per page (4 pages) instead of 1 per page (16 pages); see `06_jei_separation.png`.
 
+### JEI pages in the machine style
+The Mechanical Separation and Resource Infusion pages draw slate panels with recessed slots, the separator's purple arrow (filling over the processing time) and light text, matching the machine GUIs and the Mycelial Generator's JEI page. Checked in the real client (`05_jei_infusion.png`, `06_jei_separation.png`): no clipped text, and every slot and arrow is aligned.
+
 ### Feeding items (your "Infusion recipes" change)
 Built-in wool types are fed single items: Iron/Gold/Copper Ingot, Coal, Redstone Dust, Lapis Lazuli and Red/Brown Mushroom. Tests that fed storage blocks now feed those items, and `definitions_loaded` checks that an Iron Ingot maps to iron and an Iron Block no longer does. `tools/sheep/generate_data.py` writes the same feeding items, so regenerating keeps them.
 

@@ -25,11 +25,29 @@ public class InfusionCategory extends AbstractRecipeCategory<InfusionDisplay> {
     public static final int WIDTH = 150, HEIGHT = 58;
 
     private final IDrawable sheep;
+    private final IDrawable background;
+    private final IDrawable slot;
+    private final IDrawable bigSlot;
+    private final IDrawable arrowEmpty;
+    private final IDrawable arrowFull;
+    private final IDrawable plus;
 
     public InfusionCategory(IGuiHelper gui) {
         super(TYPE, Component.translatable("jei.functionalresources.resource_infusion"),
                 gui.drawableBuilder(JeiTextures.TEXTURE, 0, 0, 16, 16).setTextureSize(256, 256).build(), WIDTH, HEIGHT);
         this.sheep = gui.drawableBuilder(JeiTextures.TEXTURE, 0, 16, 32, 24).setTextureSize(256, 256).build();
+        this.background = JeiTextures.sprite(gui, 0, 88, WIDTH, HEIGHT);   // slate panel, like the machine GUIs
+        this.slot = JeiTextures.slot(gui);
+        this.bigSlot = JeiTextures.bigSlot(gui);
+        this.arrowEmpty = JeiTextures.arrowEmpty(gui);
+        this.arrowFull = JeiTextures.arrowFilling(gui, 40);
+        this.plus = JeiTextures.plus(gui);
+    }
+
+    @Override
+    public void draw(InfusionDisplay recipe, mezz.jei.api.gui.ingredient.IRecipeSlotsView slots,
+                     net.minecraft.client.gui.GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+        background.draw(graphics);
     }
 
     @Override
@@ -38,29 +56,30 @@ public class InfusionCategory extends AbstractRecipeCategory<InfusionDisplay> {
         int amount = r.effectiveFeedingAmount();
         List<ItemStack> feeding = r.feedingItems().stream().map(h -> new ItemStack(h, amount)).toList();
         builder.addSlot(RecipeIngredientRole.INPUT, 6, 8)
-                .setStandardSlotBackground()
+                .setBackground(slot, -1, -1)
                 .addItemStacks(feeding)
                 .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.functionalresources.consumed", amount).withStyle(ChatFormatting.GRAY)));
         int drop = Math.max(1, r.effectiveWoolDropCount());
         builder.addSlot(RecipeIngredientRole.OUTPUT, 124, 8)
-                .setOutputSlotBackground()
+                .setBackground(bigSlot, -5, -5)
                 .add(ResourceWoolItem.create(r.id(), drop))
                 .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.functionalresources.per_shearing", drop).withStyle(ChatFormatting.GRAY)));
     }
 
     @Override
     public void createRecipeExtras(IRecipeExtrasBuilder builder, InfusionDisplay recipe, IFocusGroup focuses) {
-        builder.addRecipePlusSignWidget().setPosition(27, 9);
+        builder.addDrawableWidget(plus).setPosition(27, 10);
         builder.addDrawableWidget(sheep).setPosition(42, 4);
-        builder.addRecipeArrowWidget().setPosition(87, 8);
+        builder.addDrawableWidget(arrowEmpty).setPosition(88, 8);
+        builder.addDrawableWidget(arrowFull).setPosition(88, 8);
         SheepResource r = recipe.resource();
         int uses = r.effectiveInfusionUses();
         Component usesLine = uses < 0
                 ? Component.translatable("jei.functionalresources.uses_permanent")
                 : Component.translatable("jei.functionalresources.uses", uses);
         builder.addText(List.<FormattedText>of(usesLine, Component.translatable("jei.functionalresources.category", r.category().displayName())), WIDTH, 22)
-                .setPosition(0, 34)
-                .setColor(0xFF555555)
+                .setPosition(0, 33)
+                .setColor(JeiTextures.TEXT)
                 .setTextAlignment(mezz.jei.api.gui.placement.HorizontalAlignment.CENTER);
     }
 

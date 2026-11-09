@@ -381,5 +381,6 @@
   "functionalresources.configuration.energyPerShear": "Energy per shear",
   "tooltip.functionalresources.shift_place": "Hold Shift while placing to face it away from you",
   "jei.functionalresources.energy_short": "%s FE",
-  "jei.functionalresources.time_short": "%ss"
+  "jei.functionalresources.time_short": "%ss",
+  "jei.functionalresources.energy_time_short": "%s FE · %ss"
 }
