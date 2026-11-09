@@ -98,7 +98,8 @@ public final class SheepInfusionEvents {
             long seconds = (current.cooldownUntil() - sheep.level().getGameTime() + 19) / 20;
             return Component.translatable("message.functionalresources.cooldown", seconds);
         }
-        if (current.isInfused()) {
+        // An infusion whose wool type isn't loaded (pack removed, mod missing) never blocks a new one.
+        if (current.isInfused() && getInfusedResource(sheep).isPresent()) {
             boolean same = current.resource().get().equals(resource.id());
             if (same) {
                 int max = resource.effectiveInfusionUses();

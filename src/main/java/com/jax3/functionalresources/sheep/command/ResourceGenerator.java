@@ -329,15 +329,15 @@ public final class ResourceGenerator {
         return removed;
     }
 
-    /** Writes the definitions as a world data pack (replacing any previous generated pack). Returns the pack folder. */
+    /**
+     * Writes (or updates) the definitions in the world data pack. Other generated definitions already in the pack are
+     * left alone: wool types added with {@code generate item/hand/material}, or skipped by today's filter, keep working
+     * for the sheep that are infused with them. Use {@code generate remove} or {@code dedupe} to delete. Returns the
+     * pack folder.
+     */
     public static Path write(Path datapacksDir, List<Generated> generated) throws IOException {
         Path pack = datapacksDir.resolve(PACK_NAME);
         Path dir = pack.resolve("data").resolve(NAMESPACE).resolve("functionalresources").resolve("sheep_resources");
-        if (Files.exists(dir)) {
-            try (var files = Files.list(dir)) {
-                for (Path p : files.filter(f -> f.toString().endsWith(".json")).toList()) Files.delete(p);
-            }
-        }
         Files.createDirectories(dir);
         for (Generated g : generated) {
             Files.writeString(dir.resolve(g.name() + ".json"), GSON.toJson(g.json()), StandardCharsets.UTF_8);

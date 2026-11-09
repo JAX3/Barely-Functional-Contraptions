@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/functionalresources-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 50 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 30 Resourceful Sheep, 4 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 52 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 32 Resourceful Sheep, 4 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 13 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.functionalresources.gametest.IntegrationGameTests`)
@@ -30,6 +30,12 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | `automatic_shears_hopper_output_only_sheep` | A hopper below pulls the wool out. Neither the item capability (for pipes) nor hoppers can insert anything. A mooshroom in the area is not sheared into a cow. |
 
 In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): the block renders with its crossed-blade front, and the three sheep in front of it (gold, diamond and plain) are sheared bald. Its slate-style screen shows the energy gauge and readout (24,000 of 50,000 FE: it started with 30,000 and sheared 3 sheep at 2,000 each), the *Waiting for Sheep* status, the redstone button, and the Gold Wool, Diamond Wool and 2 White Wool it collected.
+
+### Generated wool types keep their sheep (`generated_resource_keeps_infusion`, `unloaded_infusion_is_kept_but_replaceable`)
+This runs the real commands in their own test batch, because they reload data packs:
+* `generate material slime` adds Slime. A sheep fed a Slime Block is infused with it (9 uses). The infusion survives saving and loading the sheep, a shearing (it drops Slime Wool and has 8 uses left), regrowing, and `/reload`. It shears Slime Wool again after that.
+* `generate item minecraft:amethyst_block` adds Amethyst, and a sheep is infused with it. Then a plain `generate` runs. Amethyst is still loaded, the sheep is still infused, and it shears Amethyst Wool. **This failed before the fix:** `generate` deleted every generated file it didn't plan itself, so Amethyst vanished and the sheep lost its infusion at the next shearing. I checked that the test fails with the old behaviour restored.
+* A sheep infused with a wool type that isn't loaded drops normal wool, keeps the infusion unchanged, and can still be fed Iron.
 
 ### Infusion survives eating grass (`infusion_survives_eating_grass`)
 An iron-infused sheep (9 uses) is sheared: it drops Iron Wool and has 8 uses left. Then the sheep's own vanilla grass-eating goal (`EatBlockGoal`) runs on a real grass block: the grass turns to dirt and the wool regrows. The sheep is still infused with iron with 8 uses left. Shearing it again drops Iron Wool (no normal wool), and it has 7 uses left.

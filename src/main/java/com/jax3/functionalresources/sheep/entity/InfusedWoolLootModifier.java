@@ -53,9 +53,10 @@ public final class InfusedWoolLootModifier extends LootModifier {
         if (!infusion.isInfused()) return loot;
         Optional<SheepResource> resource = SheepResourceRegistry.server().byId(infusion.resource().get());
         if (resource.isEmpty()) {
-            // Definition was removed by a data pack change: drop the stale infusion and leave vanilla loot alone.
-            ResourcefulSheep.LOGGER.debug("Clearing unknown infusion {} from {}", infusion.resource().get(), entity);
-            SheepInfusionEvents.setInfusion(entity, SheepInfusion.NONE);
+            // The wool type isn't loaded right now (its data pack was removed or disabled, or its mod is missing).
+            // Keep the infusion untouched so the sheep is infused again as soon as the definition comes back;
+            // until then it shears like a normal sheep. Feeding it a resource replaces the stale infusion.
+            ResourcefulSheep.LOGGER.debug("Infusion {} on {} is not loaded; shearing normally and keeping it", infusion.resource().get(), entity);
             return loot;
         }
 

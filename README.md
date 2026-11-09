@@ -375,6 +375,8 @@ Definitions live in `data/<namespace>/functionalresources/sheep_resources/<name>
 
 **Missing items.** A definition that references an item from a mod that isn't installed is skipped. The log gets one warning saying which file and which item; the rest of the reload is unaffected. Empty tags are skipped the same way.
 
+**Sheep keep their infusion even when its wool type is missing.** If a sheep's wool type isn't loaded (its data pack was removed or disabled, or its mod uninstalled), the sheep keeps the infusion stored. Until the wool type comes back it looks and shears like a normal sheep, without using up shearings. You can also feed it a new resource, which replaces the stale infusion.
+
 **Examples.** Ready-made definitions for **Tin, Lead, Silver, Nickel, Uranium, Osmium, Aluminium** and **Amethyst** are in `examples/resource_definitions/`. `examples/datapack/` is the same set packaged as a drop-in data pack, plus an example cobweb separating recipe. Copy the folder into `<world>/datapacks/`.
 
 #### Auto-generating resources for every material
@@ -410,7 +412,7 @@ How the generator chooses each value:
 
 Picking single items or materials adds one file without touching the others. It refuses anything an existing built-in or hand-written resource already covers (same feeding item or same name), so you can't create duplicates this way. A wool type made from an arbitrary item (not a storage block) lasts **1** shearing by default, because the mod can't know how many units the item holds. Edit `infusion_uses` in its JSON if you want more.
 
-Generated files are ordinary JSON in `<world>/datapacks/functionalresources_generated/`. You can edit them freely, but re-running `generate` overwrites that folder. In plain vanilla this adds Bone Meal, Dried Kelp, Slime and Wheat (Resin is skipped because the Resin Clump is not in an allowed creative tab).
+Generated files are ordinary JSON in `<world>/datapacks/functionalresources_generated/`. You can edit them freely. Re-running `generate` (or `generate all`) rewrites only the wool types it generates itself; other generated ones, such as those added with `generate item`/`hand`/`material`, stay until you delete them with `generate remove` or `generate dedupe`. Sheep infused with them keep their infusion. In plain vanilla this adds Bone Meal, Dried Kelp, Slime and Wheat (Resin is skipped because the Resin Clump is not in an allowed creative tab).
 
 #### Explicit separator recipes
 Use the recipe type `functionalresources:separating` to process any item, or to override how a particular wool is handled:

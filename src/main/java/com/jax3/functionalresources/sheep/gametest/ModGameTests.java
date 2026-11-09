@@ -18,6 +18,7 @@ import com.jax3.functionalresources.sheep.resource.SheepResourceRegistry;
 import com.jax3.functionalresources.sheep.resource.Separation;
 import com.mojang.serialization.JsonOps;
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
@@ -69,6 +70,7 @@ public final class ModGameTests {
     public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS = DeferredRegister.create(Registries.TEST_FUNCTION, ResourcefulSheep.MOD_ID);
     private static final Identifier STRUCTURE = ResourcefulSheep.id("test_platform");
     private static final Map<String, Consumer<GameTestHelper>> TESTS = new java.util.LinkedHashMap<>();
+    private static final java.util.Map<String, Consumer<GameTestHelper>> RELOAD_TESTS = new java.util.LinkedHashMap<>();
 
     static {
         TESTS.put("definitions_loaded", ModGameTests::definitionsLoaded);
@@ -80,6 +82,7 @@ public final class ModGameTests {
         TESTS.put("dispenser_shears_infused_sheep", ModGameTests::dispenserShears);
         TESTS.put("infusion_survives_save_and_load", ModGameTests::infusionPersists);
         TESTS.put("infusion_survives_eating_grass", ModGameTests::infusionSurvivesEatingGrass);
+        TESTS.put("unloaded_infusion_is_kept_but_replaceable", ModGameTests::unloadedInfusionKept);
         TESTS.put("automatic_shears_shear_sheep_in_front", ModGameTests::autoShearsShearsArea);
         TESTS.put("automatic_shears_stop_when_full", ModGameTests::autoShearsStopWhenFull);
         TESTS.put("automatic_shears_redstone_modes", ModGameTests::autoShearsRedstone);
@@ -101,7 +104,9 @@ public final class ModGameTests {
         TESTS.put("generator_pick_and_choose", ModGameTests::generatorPickAndChoose);
         TESTS.put("separator_output_rolls_two_to_four", ModGameTests::outputRange);
         TESTS.put("generator_filter_limits_tabs_and_stacking", ModGameTests::generatorFilter);
+        RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
+        RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
     }
 
     private ModGameTests() {}
@@ -111,6 +116,13 @@ public final class ModGameTests {
         for (String name : TESTS.keySet()) {
             ResourceKey<Consumer<GameTestHelper>> fn = ResourceKey.create(Registries.TEST_FUNCTION, ResourcefulSheep.id(name));
             event.registerTest(ResourcefulSheep.id(name), new FunctionGameTestInstance(fn, new TestData<>(env, STRUCTURE, 400, 0, true)));
+        }
+        // Tests that run /functionalresources generate (which reloads data packs) get their own batch, so the reload
+        // never happens in the middle of the other tests.
+        Holder<TestEnvironmentDefinition<?>> reloadEnv = event.registerEnvironment(ResourcefulSheep.id("sheep_reload"), new TestEnvironmentDefinition.AllOf());
+        for (String name : RELOAD_TESTS.keySet()) {
+            ResourceKey<Consumer<GameTestHelper>> fn = ResourceKey.create(Registries.TEST_FUNCTION, ResourcefulSheep.id(name));
+            event.registerTest(ResourcefulSheep.id(name), new FunctionGameTestInstance(fn, new TestData<>(reloadEnv, STRUCTURE, 1200, 0, true)));
         }
     }
 
@@ -407,6 +419,99 @@ public final class ModGameTests {
             h.assertTrue(countIn(hopperBe, s -> s.is(Items.WOOL.white())) >= 1, "hopper below pulls the wool out");
             h.assertTrue(mooshroom.isAlive() && mooshroom.getType() == EntityTypes.MOOSHROOM, "mooshroom is not auto-sheared into a cow");
         });
+    }
+
+    /**
+     * A wool type made by {@code /functionalresources generate} keeps the sheep's infusion through everything a normal
+     * one does: feeding, saving and loading the sheep, shearing, regrowing, and another data pack reload.
+     */
+    private static final Identifier AMETHYST_GEN = Identifier.fromNamespaceAndPath(
+            com.jax3.functionalresources.sheep.command.ResourceGenerator.NAMESPACE, "amethyst");
+    private static final SheepResourceRegistry[] REGISTRY_BEFORE = new SheepResourceRegistry[1];
+
+    private static void generatedResourceKeepsInfusion(GameTestHelper h) {
+        var server = h.getLevel().getServer();
+        Identifier slime = Identifier.fromNamespaceAndPath(com.jax3.functionalresources.sheep.command.ResourceGenerator.NAMESPACE, "slime");
+        Sheep[] sheep = new Sheep[1];
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "functionalresources generate material slime");
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(SheepResourceRegistry.server().byId(slime).isPresent(), "generated slime resource loaded"))
+                .thenExecute(() -> {
+                    sheep[0] = sheep(h);
+                    feed(playerHolding(h, new ItemStack(Items.SLIME_BLOCK)), sheep[0]);
+                    var infusion = SheepInfusionEvents.getInfusion(sheep[0]);
+                    ResourcefulSheep.LOGGER.info("[generated test] after feeding: {}", infusion);
+                    h.assertTrue(infusion.resource().map(slime::equals).orElse(false), "fed a slime block: infused with generated slime, got " + infusion);
+                    h.assertTrue(SheepInfusionEvents.getInfusedResource(sheep[0]).isPresent(), "infusion resolves to the loaded resource");
+
+                    TagValueOutput out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, h.getLevel().registryAccess());
+                    sheep[0].saveWithoutId(out);
+                    Sheep loaded = (Sheep) EntityType.create(EntityTypes.SHEEP, TagValueInput.create(ProblemReporter.DISCARDING,
+                            h.getLevel().registryAccess(), out.buildResult()), h.getLevel(), EntitySpawnReason.LOAD).orElseThrow();
+                    ResourcefulSheep.LOGGER.info("[generated test] after save/load: {}", SheepInfusionEvents.getInfusion(loaded));
+                    h.assertTrue(SheepInfusionEvents.getInfusion(loaded).equals(infusion), "save/load kept " + SheepInfusionEvents.getInfusion(loaded));
+
+                    List<ItemStack> drops = shear(h, sheep[0]);
+                    ResourcefulSheep.LOGGER.info("[generated test] first shear drops {}, infusion {}", drops, SheepInfusionEvents.getInfusion(sheep[0]));
+                    h.assertTrue(drops.stream().anyMatch(st -> slime.equals(ResourceWoolItem.getResourceId(st))), "slime wool dropped: " + drops);
+                    h.assertTrue(SheepInfusionEvents.getInfusion(sheep[0]).resource().isPresent(), "still infused after one shearing");
+                    sheep[0].ate(); // regrow (the same call grass-eating makes)
+                    h.assertTrue(SheepInfusionEvents.getInfusion(sheep[0]).resource().isPresent(), "still infused after regrowing");
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "reload");
+                })
+                .thenExecuteAfter(40, () -> {
+                    ResourcefulSheep.LOGGER.info("[generated test] after /reload: {} (resource loaded: {})",
+                            SheepInfusionEvents.getInfusion(sheep[0]), SheepResourceRegistry.server().byId(slime).isPresent());
+                    h.assertTrue(SheepResourceRegistry.server().byId(slime).isPresent(), "generated resource still loaded after /reload");
+                    h.assertTrue(SheepInfusionEvents.getInfusedResource(sheep[0]).isPresent(), "still infused after /reload");
+                    List<ItemStack> drops = shear(h, sheep[0]);
+                    ResourcefulSheep.LOGGER.info("[generated test] second shear drops {}, infusion {}", drops, SheepInfusionEvents.getInfusion(sheep[0]));
+                    h.assertTrue(drops.stream().anyMatch(st -> slime.equals(ResourceWoolItem.getResourceId(st))), "slime wool again: " + drops);
+                    // Now the case that used to break: a wool type added on its own with "generate item"...
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "functionalresources generate item minecraft:amethyst_block");
+                })
+                .thenWaitUntil(() -> h.assertTrue(SheepResourceRegistry.server().byId(AMETHYST_GEN).isPresent(), "generated amethyst loaded"))
+                .thenExecute(() -> {
+                    sheep[0] = sheepAt(h, 1, 5);
+                    feed(playerHolding(h, new ItemStack(Items.AMETHYST_BLOCK)), sheep[0]);
+                    h.assertTrue(SheepInfusionEvents.getInfusion(sheep[0]).resource().map(AMETHYST_GEN::equals).orElse(false),
+                            "infused with generated amethyst: " + SheepInfusionEvents.getInfusion(sheep[0]));
+                    // ...followed by a plain "generate", which used to delete every generated file it didn't plan itself.
+                    REGISTRY_BEFORE[0] = SheepResourceRegistry.server();
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "functionalresources generate");
+                })
+                .thenWaitUntil(() -> h.assertTrue(SheepResourceRegistry.server() != REGISTRY_BEFORE[0], "generate reloaded"))
+                .thenExecute(() -> {
+                    ResourcefulSheep.LOGGER.info("[generated test] after plain generate: amethyst loaded {}, infusion {}",
+                            SheepResourceRegistry.server().byId(AMETHYST_GEN).isPresent(), SheepInfusionEvents.getInfusion(sheep[0]));
+                    h.assertTrue(SheepResourceRegistry.server().byId(AMETHYST_GEN).isPresent(), "running generate again must keep the amethyst wool type");
+                    h.assertTrue(SheepResourceRegistry.server().byId(slime).isPresent(), "and slime");
+                    h.assertTrue(SheepInfusionEvents.getInfusedResource(sheep[0]).isPresent(), "the amethyst sheep is still infused");
+                    List<ItemStack> drops = shear(h, sheep[0]);
+                    h.assertTrue(drops.stream().anyMatch(st -> AMETHYST_GEN.equals(ResourceWoolItem.getResourceId(st))), "amethyst wool: " + drops);
+                    // Tidy up so later runs in the same world start clean.
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "functionalresources generate remove amethyst");
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * A sheep infused with a wool type that isn't loaded (pack removed, mod missing) keeps that infusion through
+     * shearing (it drops normal wool meanwhile), and can still be fed a different resource.
+     */
+    private static void unloadedInfusionKept(GameTestHelper h) {
+        Sheep sheep = sheep(h);
+        Identifier missing = Identifier.fromNamespaceAndPath("some_removed_pack", "tin");
+        SheepInfusionEvents.setInfusion(sheep, new SheepInfusion(Optional.of(missing), 5, 0));
+        List<ItemStack> drops = shear(h, sheep);
+        h.assertTrue(drops.stream().anyMatch(st -> st.is(Items.WOOL.white())), "unloaded wool type shears as normal wool: " + drops);
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).equals(new SheepInfusion(Optional.of(missing), 5, 0)),
+                "infusion kept untouched for when the wool type returns: " + SheepInfusionEvents.getInfusion(sheep));
+        sheep.ate();
+        feed(playerHolding(h, new ItemStack(Items.IRON_BLOCK)), sheep);
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).resource().map(IRON::equals).orElse(false),
+                "a stale infusion doesn't block feeding a new resource: " + SheepInfusionEvents.getInfusion(sheep));
+        h.succeed();
     }
 
     private static void shearPlain(GameTestHelper h) {
