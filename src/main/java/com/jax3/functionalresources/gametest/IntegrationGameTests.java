@@ -55,7 +55,7 @@ public final class IntegrationGameTests {
 
     static {
         TESTS.put("integration_mycelial_generator_powers_separator", IntegrationGameTests::mycelialGeneratorPowersSeparator);
-        TESTS.put("integration_mushroom_block_infuses_sheep", IntegrationGameTests::mushroomBlockInfusesSheep);
+        TESTS.put("integration_mushroom_infuses_sheep", IntegrationGameTests::mushroomInfusesSheep);
         TESTS.put("integration_mushroom_wool_fuels_generator", IntegrationGameTests::mushroomWoolFuelsGenerator);
         TESTS.put("integration_mycelial_generator_powers_automatic_shears", IntegrationGameTests::generatorPowersAutomaticShears);
         TESTS.put("shift_placing_faces_machines_away", IntegrationGameTests::shiftPlacingFacesAway);
@@ -174,8 +174,8 @@ public final class IntegrationGameTests {
         h.succeed();
     }
 
-    /** Mushroom blocks (which Mycelial Generators grow as huge mushrooms) are a built-in sheep resource. */
-    private static void mushroomBlockInfusesSheep(GameTestHelper h) {
+    /** Mushrooms (the Mycelial Generator's fuel) are a built-in sheep resource. */
+    private static void mushroomInfusesSheep(GameTestHelper h) {
         SheepResourceRegistry registry = SheepResourceRegistry.server();
         h.assertTrue(registry.byId(RED_MUSHROOM).isPresent(), "red mushroom resource should be loaded");
         h.assertTrue(registry.byId(BROWN_MUSHROOM).isPresent(), "brown mushroom resource should be loaded");
@@ -184,12 +184,12 @@ public final class IntegrationGameTests {
         sheep.setNoAi(true);
         sheep.setColor(DyeColor.WHITE);
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
-        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.RED_MUSHROOM_BLOCK, 2));
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.RED_MUSHROOM, 2));
         player.interactOn(sheep, InteractionHand.MAIN_HAND, sheep.position());
 
         h.assertTrue(SheepInfusionEvents.getInfusedResource(sheep).map(SheepResource::id).map(RED_MUSHROOM::equals).orElse(false),
-                "feeding a red mushroom block should infuse the sheep with red mushroom");
-        h.assertTrue(player.getMainHandItem().getCount() == 1, "one mushroom block should be consumed");
+                "feeding a red mushroom should infuse the sheep with red mushroom");
+        h.assertTrue(player.getMainHandItem().getCount() == 1, "one mushroom should be consumed");
         h.succeed();
     }
 

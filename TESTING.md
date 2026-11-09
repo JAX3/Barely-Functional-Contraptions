@@ -16,7 +16,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | Test | Verifies |
 |---|---|
 | `integration_mycelial_generator_powers_separator` | A Mycelial Generator placed against a Mechanical Separator's energy face, with no cables, powers it. The separator turns Iron Wool into Raw Iron + String on mycelial power alone. |
-| `integration_mushroom_block_infuses_sheep` | The built-in `red_mushroom` and `brown_mushroom` sheep resources load. Feeding a Red Mushroom Block infuses a sheep with Red Mushroom and consumes exactly one block. |
+| `integration_mushroom_infuses_sheep` | The built-in `red_mushroom` and `brown_mushroom` sheep resources load. Feeding a Red Mushroom infuses a sheep with Red Mushroom and consumes exactly one. |
 | `integration_mushroom_wool_fuels_generator` | The whole loop: Red Mushroom Wool goes through a separator powered by a Mycelial Generator, the 2–4 Red Mushrooms that come out are valid generator fuel, and a second generator fed with them starts running. |
 
 ### Automatic Shears
@@ -31,11 +31,14 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 
 In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): the block renders with its crossed-blade front, and the three sheep in front of it (gold, diamond and plain) are sheared bald. Its slate-style screen shows the energy gauge and readout (24,000 of 50,000 FE: it started with 30,000 and sheared 3 sheep at 2,000 each), the *Waiting for Sheep* status, the redstone button, and the Gold Wool, Diamond Wool and 2 White Wool it collected.
 
+### Feeding items (your "Infusion recipes" change)
+Built-in wool types are fed single items: Iron/Gold/Copper Ingot, Coal, Redstone Dust, Lapis Lazuli and Red/Brown Mushroom. Tests that fed storage blocks now feed those items, and `definitions_loaded` checks that an Iron Ingot maps to iron and an Iron Block no longer does. `tools/sheep/generate_data.py` writes the same feeding items, so regenerating keeps them.
+
 ### Shift-placing (`shift_placing_faces_machines_away`)
 The Mycelial Generator, Mechanical Separator and Automatic Shears are each placed twice, through the real block-item placement, by a player looking south. Placed normally they face north (towards the player). Placed while sneaking they face south (away). I checked that the test fails if sneaking is ignored. The "Hold Shift while placing…" tooltip line was not checked in the game client.
 
 ### 100 shearings per feeding by default (`infusionUsesOverride = 100`)
-Feeding an Iron Block gives 100 uses, and shearing counts down from there (99, 98…), including through eating grass and the Automatic Shears. `infusion_runs_out_after_uses` switches the override to `-1` while it runs: an Iron Block then gives its own 9 uses, and a Diamond (1 use) runs out after one shearing.
+Feeding an Iron Ingot gives 100 uses, and shearing counts down from there (99, 98…), including through eating grass and the Automatic Shears. `infusion_runs_out_after_uses` switches the override to `-1` while it runs: an Iron Ingot then gives iron's own 9 uses, and a Diamond (1 use) runs out after one shearing.
 
 ### Generated wool types keep their sheep (`generated_resource_keeps_infusion`, `unloaded_infusion_is_kept_but_replaceable`)
 This runs the real commands in their own test batch, because they reload data packs:

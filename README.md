@@ -26,7 +26,7 @@ A NeoForge mod for **Minecraft 26.3** (Java 25) that combines two systems, **Myc
 ## How the two halves work together
 
 ```
- huge mushrooms ──► mushroom blocks ──► feed a sheep ──► shear ──► Mushroom Wool
+ mushrooms ──────► feed a sheep ──► shear ──► Mushroom Wool (×100 shearings)
       ▲                                                                │
       │ mycelium spread                                                ▼
  Mycelial Generator ───────── FE (no cables needed) ──────────► Mechanical Separator
@@ -35,8 +35,8 @@ A NeoForge mod for **Minecraft 26.3** (Java 25) that combines two systems, **Myc
 ```
 
 1. **Generators power separators directly.** Both use NeoForge's standard energy capability, so a Mycelial Generator placed against any energy face of a Mechanical Separator (back, left, right, top or bottom) pushes FE into it. One generator makes 200–250 FE/t, which is exactly what a separator uses for most wool. FE cables from other mods work too.
-2. **Mushroom sheep.** Two new built-in sheep resources, **Red Mushroom** and **Brown Mushroom**, are infused with a **Red/Brown Mushroom Block** (100 shearings per feeding by default). The separator turns each Mushroom Wool into **2–4 mushrooms** + 2 String, with a 5% chance of a **Mycelium** block. Those mushrooms are the Mycelial Generator's fuel.
-3. **The loop closes.** Running generators spread mycelium and grow huge mushrooms, which give you mushroom blocks for the sheep. The sheep give you mushrooms for the generators, and the generators power the separators that process all your other resource wool.
+2. **Mushroom sheep.** Two new built-in sheep resources, **Red Mushroom** and **Brown Mushroom**, are infused with a **Red/Brown Mushroom** (100 shearings per feeding by default). The separator turns each Mushroom Wool into **2–4 mushrooms** + 2 String, with a 5% chance of a **Mycelium** block. Those mushrooms are the Mycelial Generator's fuel.
+3. **The loop closes.** Running generators spread mycelium and grow huge mushrooms, which give you mushrooms for the sheep. The sheep give you mushrooms for the generators, and the generators power the separators that process all your other resource wool.
 4. **One mod.** One creative tab (*Functional Resources*), one entry in the mod list, one config button listing all four config files, and one JEI and Jade plugin set.
 
 The integration is covered by GameTests, which run in [`IntegrationGameTests`](src/main/java/com/jax3/functionalresources/gametest/IntegrationGameTests.java). See [TESTING.md](TESTING.md).
@@ -139,12 +139,12 @@ Adding a modded fuel takes one line in `config/functionalresources-mycelial-sync
 ## Resourceful Sheep
 
 ### 1. Infuse a sheep
-Right-click an **adult** sheep while holding a resource, for example an **Iron Block**.
+Right-click an **adult** sheep while holding a resource, for example an **Iron Ingot**.
 
 - One item is consumed (this is configurable). You'll see coloured particles and hear a chime.
 - The sheep's fleece takes on the resource colour with glinting strands, and **the resource itself grows out of it the way mushrooms grow on a mooshroom**: two on its back and one on its head (Raw Iron on an iron sheep, Diamonds on a diamond sheep, Red Mushrooms on a red mushroom sheep). This applies to flat 2D items, which are drawn as crossed sprites like a mooshroom's mushrooms; they drop off one by one as the infusion is used up, and the head one goes last. Block-shaped resources (Cobblestone on a stone sheep, Oak Log on a wood sheep) keep the original look instead: a cluster of small blocks sunk into the fleece that shrinks as the infusion is sheared away.
 - Its dye colour still shows through slightly, so a blue diamond sheep looks different from a white one.
-- **Each infusion lasts 100 shearings by default**, whatever the resource (`infusionUsesOverride` in the config). Set that to `-1` to use each resource's own count instead: iron, gold, copper, redstone, lapis and coal blocks last **9** shearings (one block holds 9 items), and single items such as diamond, emerald, netherite scrap, cobblestone, oak log and quartz last **1**.
+- **Each infusion lasts 100 shearings by default**, whatever the resource (`infusionUsesOverride` in the config). Set that to `-1` to use each resource's own count instead: iron, gold, copper, redstone, lapis and coal last **9** shearings, and diamond, emerald, netherite scrap, cobblestone, oak log, quartz and the mushrooms last **1** or **3**.
 - Feeding an item that isn't a resource does nothing special, so wheat breeding, dyes and so on work as normal.
 - Sneak + right-click a sheep with an empty hand to see its infusion and how many shearings it has left.
 
@@ -161,7 +161,7 @@ Put the wool into a **Mechanical Separator** and supply Forge Energy (FE).
 | Time | 100 ticks (5 s) |
 | Output | **2–4** Raw Iron (random each time) + 2 String (+10% chance of 3 Iron Nuggets) |
 
-**Balance:** every wool separates into **2–4** of its resource (3 on average). With the default of 100 shearings per feeding, one Iron Block yields about 300 Raw Iron and one Diamond about 300 Diamonds, so infused sheep **multiply** resources a lot. (With `infusionUsesOverride = -1`, one Iron Block gives about 27 Raw Iron and one Diamond about 3 Diamonds.) The cost is the shearing time and the machine's energy. To tone it down, lower `primaryOutputMultiplier` (e.g. `0.34` brings it back to about 1 per wool), lower `infusionUsesOverride` (or set it to `-1`) or `infusionUsesMultiplier`, or set `primary_count` per resource.
+**Balance:** every wool separates into **2–4** of its resource (3 on average). With the default of 100 shearings per feeding, one Iron Ingot yields about 300 Raw Iron and one Diamond about 300 Diamonds, so infused sheep **multiply** resources a lot. (With `infusionUsesOverride = -1`, one Iron Ingot gives about 27 Raw Iron and one Diamond about 3 Diamonds.) The cost is the shearing time and the machine's energy. To tone it down, lower `primaryOutputMultiplier` (e.g. `0.34` brings it back to about 1 per wool), lower `infusionUsesOverride` (or set it to `-1`) or `infusionUsesMultiplier`, or set `primary_count` per resource.
 
 ### Crafting the separator
 ```
@@ -210,20 +210,20 @@ A creative-only block, found in the Resourceful Sheep creative tab. It has no re
 
 | Fed item | Wool | Separator output (per wool) | Own uses (`-1`) | FE / time |
 |---|---|---|---|---|
-| Iron Block | Iron Wool | 2–4 Raw Iron | 9 | 20,000 / 5 s |
-| Gold Block | Gold Wool | 2–4 Raw Gold | 9 | 20,000 / 5 s |
-| Copper Block | Copper Wool | 2–4 Raw Copper | 9 | 16,000 / 5 s |
+| Iron Ingot | Iron Wool | 2–4 Raw Iron | 9 | 20,000 / 5 s |
+| Gold Ingot | Gold Wool | 2–4 Raw Gold | 9 | 20,000 / 5 s |
+| Copper Ingot | Copper Wool | 2–4 Raw Copper | 9 | 16,000 / 5 s |
 | Diamond | Diamond Wool | 2–4 Diamond | 1 | 40,000 / 8 s |
 | Emerald | Emerald Wool | 2–4 Emerald | 1 | 40,000 / 8 s |
-| Redstone Block | Redstone Wool | 2–4 Redstone Dust | 9 | 12,000 / 4 s |
-| Lapis Lazuli Block | Lapis Wool | 2–4 Lapis Lazuli | 9 | 12,000 / 4 s |
-| Coal Block | Coal Wool | 2–4 Coal | 9 | 8,000 / 4 s |
+| Redstone Dust | Redstone Wool | 2–4 Redstone Dust | 9 | 12,000 / 4 s |
+| Lapis Lazuli | Lapis Wool | 2–4 Lapis Lazuli | 9 | 12,000 / 4 s |
+| Coal | Coal Wool | 2–4 Coal | 9 | 8,000 / 4 s |
 | Netherite Scrap | Netherite Wool | 2–4 Netherite Scrap | 1 | 80,000 / 10 s |
 | Cobblestone | Stone Wool | 2–4 Cobblestone | 1 | 4,000 / 2 s |
 | Oak Log | Wood Wool | 2–4 Oak Log | 1 | 4,000 / 2 s |
 | Quartz | Quartz Wool | 2–4 Nether Quartz | 1 | 16,000 / 5 s |
-| Red Mushroom Block | Red Mushroom Wool | 2–4 Red Mushroom (+5% Mycelium) | 3 | 8,000 / 4 s |
-| Brown Mushroom Block | Brown Mushroom Wool | 2–4 Brown Mushroom (+5% Mycelium) | 3 | 8,000 / 4 s |
+| Red Mushroom | Red Mushroom Wool | 2–4 Red Mushroom (+5% Mycelium) | 3 | 8,000 / 4 s |
+| Brown Mushroom | Brown Mushroom Wool | 2–4 Brown Mushroom (+5% Mycelium) | 3 | 8,000 / 4 s |
 
 Every resource also gives 2 String. Plain wool (`#minecraft:wool`) can be separated into 3 string through the bundled `functionalresources:separating` recipe.
 

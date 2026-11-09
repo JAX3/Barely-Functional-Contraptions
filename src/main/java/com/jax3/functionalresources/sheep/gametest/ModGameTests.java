@@ -185,9 +185,9 @@ public final class ModGameTests {
         for (String name : List.of("iron", "gold", "copper", "diamond", "emerald", "redstone", "lapis", "coal", "netherite", "stone", "wood", "quartz")) {
             h.assertTrue(reg.byId(ResourcefulSheep.id(name)).isPresent(), "missing built-in resource " + name);
         }
-        h.assertTrue(reg.byFeedingItem(new ItemStack(Items.IRON_BLOCK)).map(SheepResource::id).orElse(null) != null
-                && reg.byFeedingItem(new ItemStack(Items.IRON_BLOCK)).get().id().equals(IRON), "iron block should map to iron");
-        h.assertTrue(reg.byFeedingItem(new ItemStack(Items.IRON_INGOT)).isEmpty(), "iron ingot must not be a feeding item by default");
+        h.assertTrue(reg.byFeedingItem(new ItemStack(Items.IRON_INGOT)).map(SheepResource::id).orElse(null) != null
+                && reg.byFeedingItem(new ItemStack(Items.IRON_INGOT)).get().id().equals(IRON), "iron ingot should map to iron");
+        h.assertTrue(reg.byFeedingItem(new ItemStack(Items.IRON_BLOCK)).isEmpty(), "iron block is no longer a feeding item (ingots are)");
         Separation iron = reg.byId(IRON).get().separation();
         h.assertTrue(iron.primary().create().is(Items.RAW_IRON) && iron.primaryRange().equals(new com.jax3.functionalresources.sheep.resource.CountRange(2, 4)),
                 "iron separates to 2-4 raw iron, got " + iron.primaryRange());
@@ -198,12 +198,12 @@ public final class ModGameTests {
 
     private static void feedIronBlock(GameTestHelper h) {
         Sheep sheep = sheep(h);
-        Player player = playerHolding(h, new ItemStack(Items.IRON_BLOCK, 3));
+        Player player = playerHolding(h, new ItemStack(Items.IRON_INGOT, 3));
         feed(player, sheep);
         SheepInfusion infusion = SheepInfusionEvents.getInfusion(sheep);
         h.assertTrue(infusion.resource().map(IRON::equals).orElse(false), "sheep should be infused with iron, was " + infusion);
         h.assertTrue(infusion.usesRemaining() == 100, "infusions last 100 shearings by default (infusionUsesOverride), was " + infusion.usesRemaining());
-        h.assertTrue(player.getMainHandItem().getCount() == 2, "one iron block should be consumed");
+        h.assertTrue(player.getMainHandItem().getCount() == 2, "one iron ingot should be consumed");
         h.assertTrue(sheep.getColor() == DyeColor.WHITE, "dye colour must be preserved");
         // Feeding again at full uses is refused and does not consume.
         feed(player, sheep);
@@ -222,7 +222,7 @@ public final class ModGameTests {
 
     private static void shearInfused(GameTestHelper h) {
         Sheep sheep = sheep(h);
-        feed(playerHolding(h, new ItemStack(Items.IRON_BLOCK)), sheep);
+        feed(playerHolding(h, new ItemStack(Items.IRON_INGOT)), sheep);
         List<ItemStack> drops = shear(h, sheep);
         h.assertTrue(sheep.isSheared(), "sheep should be sheared");
         h.assertTrue(drops.stream().noneMatch(s -> s.is(Items.WOOL.white())), "infused sheep must not drop normal wool: " + drops);
@@ -242,7 +242,7 @@ public final class ModGameTests {
         Sheep sheep = sheep(h);
         BlockPos below = new BlockPos(3, 0, 3);
         h.setBlock(below, net.minecraft.world.level.block.Blocks.GRASS_BLOCK);
-        feed(playerHolding(h, new ItemStack(Items.IRON_BLOCK)), sheep);
+        feed(playerHolding(h, new ItemStack(Items.IRON_INGOT)), sheep);
         h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 100, "100 uses by default");
 
         List<ItemStack> first = shear(h, sheep);
@@ -308,7 +308,7 @@ public final class ModGameTests {
     private static void autoShearsShearsArea(GameTestHelper h) {
         var shears = autoShears(h);
         Sheep iron = sheepAt(h, 3, 2);
-        feed(playerHolding(h, new ItemStack(Items.IRON_BLOCK)), iron);
+        feed(playerHolding(h, new ItemStack(Items.IRON_INGOT)), iron);
         Sheep plain = sheepAt(h, 2, 3);
         Sheep cornerIn = sheepAt(h, 4, 1);
         Sheep beyond = sheepAt(h, 3, 5);   // 5 blocks out: past the 3x3
@@ -508,7 +508,7 @@ public final class ModGameTests {
         h.assertTrue(SheepInfusionEvents.getInfusion(sheep).equals(new SheepInfusion(Optional.of(missing), 5, 0)),
                 "infusion kept untouched for when the wool type returns: " + SheepInfusionEvents.getInfusion(sheep));
         sheep.ate();
-        feed(playerHolding(h, new ItemStack(Items.IRON_BLOCK)), sheep);
+        feed(playerHolding(h, new ItemStack(Items.IRON_INGOT)), sheep);
         h.assertTrue(SheepInfusionEvents.getInfusion(sheep).resource().map(IRON::equals).orElse(false),
                 "a stale infusion doesn't block feeding a new resource: " + SheepInfusionEvents.getInfusion(sheep));
         h.succeed();
@@ -527,8 +527,8 @@ public final class ModGameTests {
         ModConfigs.SERVER.infusionUsesOverride.set(-1);
         try {
             Sheep iron = sheep(h);
-            feed(playerHolding(h, new ItemStack(Items.IRON_BLOCK)), iron);
-            h.assertTrue(SheepInfusionEvents.getInfusion(iron).usesRemaining() == 9, "override off: iron block's own 9 uses");
+            feed(playerHolding(h, new ItemStack(Items.IRON_INGOT)), iron);
+            h.assertTrue(SheepInfusionEvents.getInfusion(iron).usesRemaining() == 9, "override off: iron's own 9 uses");
             Sheep sheep = sheep(h);
             feed(playerHolding(h, new ItemStack(Items.DIAMOND)), sheep); // diamond: 1 use
             List<ItemStack> first = shear(h, sheep);
@@ -546,7 +546,7 @@ public final class ModGameTests {
     private static void dispenserShears(GameTestHelper h) {
         Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(3, 1, 3));
         sheep.setNoAi(true);
-        feed(playerHolding(h, new ItemStack(Items.GOLD_BLOCK)), sheep);
+        feed(playerHolding(h, new ItemStack(Items.GOLD_INGOT)), sheep);
         BlockPos dispenserPos = new BlockPos(3, 1, 2);
         h.setBlock(dispenserPos, Blocks.DISPENSER.defaultBlockState().setValue(DispenserBlock.FACING, Direction.SOUTH));
         DispenserBlockEntity dispenser = h.getBlockEntity(dispenserPos, DispenserBlockEntity.class);
@@ -576,8 +576,8 @@ public final class ModGameTests {
 
     private static void replaceRefused(GameTestHelper h) {
         Sheep sheep = sheep(h);
-        feed(playerHolding(h, new ItemStack(Items.IRON_BLOCK)), sheep);
-        Player player = playerHolding(h, new ItemStack(Items.GOLD_BLOCK));
+        feed(playerHolding(h, new ItemStack(Items.IRON_INGOT)), sheep);
+        Player player = playerHolding(h, new ItemStack(Items.GOLD_INGOT));
         feed(player, sheep);
         h.assertTrue(SheepInfusionEvents.getInfusion(sheep).resource().map(IRON::equals).orElse(false), "iron infusion must not be replaced");
         h.assertTrue(player.getMainHandItem().getCount() == 1, "refused feeding must not consume");
