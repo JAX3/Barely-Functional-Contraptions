@@ -1,7 +1,7 @@
 {
   "values": [
-    "functionalresources:mycelial_generator",
-    "functionalresources:mechanical_separator",
-    "functionalresources:automatic_shears"
+    "barelyfunctionalcontraptions:mycelial_generator",
+    "barelyfunctionalcontraptions:mechanical_separator",
+    "barelyfunctionalcontraptions:automatic_shears"
   ]
 }

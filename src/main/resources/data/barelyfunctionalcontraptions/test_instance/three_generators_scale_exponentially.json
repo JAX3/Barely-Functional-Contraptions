@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:function",
+  "function": "barelyfunctionalcontraptions:three_generators_scale_exponentially",
+  "environment": "barelyfunctionalcontraptions:default",
+  "structure": "barelyfunctionalcontraptions:empty",
+  "max_ticks": 100,
+  "required": true
+}

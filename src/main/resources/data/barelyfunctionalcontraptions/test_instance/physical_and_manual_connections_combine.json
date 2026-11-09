@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:function",
+  "function": "barelyfunctionalcontraptions:physical_and_manual_connections_combine",
+  "environment": "barelyfunctionalcontraptions:default",
+  "structure": "barelyfunctionalcontraptions:empty",
+  "max_ticks": 100,
+  "required": true
+}

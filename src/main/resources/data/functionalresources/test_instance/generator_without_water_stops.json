@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:function",
-  "function": "functionalresources:generator_without_water_stops",
-  "environment": "functionalresources:default",
-  "structure": "functionalresources:empty",
-  "max_ticks": 100,
-  "required": true
-}

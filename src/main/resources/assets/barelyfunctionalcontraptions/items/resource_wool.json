@@ -1,0 +1,107 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "barelyfunctionalcontraptions:sheep_resource",
+    "cases": [
+      {
+        "when": "barelyfunctionalcontraptions:iron",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/iron_wool"
+        }
+      },
+      {
+        "when": "barelyfunctionalcontraptions:gold",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/gold_wool"
+        }
+      },
+      {
+        "when": "barelyfunctionalcontraptions:copper",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/copper_wool"
+        }
+      },
+      {
+        "when": "barelyfunctionalcontraptions:diamond",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/diamond_wool"
+        }
+      },
+      {
+        "when": "barelyfunctionalcontraptions:emerald",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/emerald_wool"
+        }
+      },
+      {
+        "when": "barelyfunctionalcontraptions:redstone",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/redstone_wool"
+        }
+      },
+      {
+        "when": "barelyfunctionalcontraptions:lapis",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/lapis_wool"
+        }
+      },
+      {
+        "when": "barelyfunctionalcontraptions:coal",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/coal_wool"
+        }
+      },
+      {
+        "when": "barelyfunctionalcontraptions:netherite",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/netherite_wool"
+        }
+      },
+      {
+        "when": "barelyfunctionalcontraptions:stone",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/stone_wool"
+        }
+      },
+      {
+        "when": "barelyfunctionalcontraptions:wood",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/wood_wool"
+        }
+      },
+      {
+        "when": "barelyfunctionalcontraptions:quartz",
+        "model": {
+          "type": "minecraft:model",
+          "model": "barelyfunctionalcontraptions:item/quartz_wool"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "barelyfunctionalcontraptions:item/resource_wool",
+      "tints": [
+        {
+          "type": "barelyfunctionalcontraptions:resource_wool",
+          "channel": "wool"
+        },
+        {
+          "type": "barelyfunctionalcontraptions:resource_wool",
+          "channel": "accent"
+        }
+      ]
+    }
+  }
+}

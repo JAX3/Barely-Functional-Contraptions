@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:function",
-  "function": "functionalresources:converted_block_sprouts_huge_mushroom",
-  "environment": "functionalresources:default",
-  "structure": "functionalresources:tall_empty",
-  "max_ticks": 400,
-  "required": true
-}

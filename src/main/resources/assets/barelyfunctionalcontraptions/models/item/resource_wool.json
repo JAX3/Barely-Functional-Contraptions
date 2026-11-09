@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "barelyfunctionalcontraptions:item/resource_wool_base",
+    "layer1": "barelyfunctionalcontraptions:item/resource_wool_overlay"
+  }
+}

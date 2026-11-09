@@ -1,4 +1,4 @@
-# Functional Resources: Mycelial Power (mod page text)
+# Barely Functional Contraptions: Mycelial Power (mod page text)
 
 **Turn mushrooms and water into Forge Energy, and watch your power grow exponentially as you build bigger generator farms.**
 
@@ -85,7 +85,7 @@ Each fuel can set its own **burn time, energy multiplier, water use, mycelium bo
 - Everything JEI shows comes from the server's config, so it always matches the server.
 
 ### ⚙️ Fully configurable
-Every number lives in `config/functionalresources-mycelial-synced.toml`, with comments explaining each setting:
+Every number lives in `config/barelyfunctionalcontraptions-mycelial-synced.toml`, with comments explaining each setting:
 
 - Base FE/t, scaling multiplier, maximum network size, optional FE/t cap, buffer size and transfer rate.
 - Whether idle generators count towards the boost, whether networks merge, and whether they share water and energy.

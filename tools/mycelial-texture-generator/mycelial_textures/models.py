@@ -49,12 +49,12 @@ def generator_model(active):
     model = {
         "parent": "minecraft:block/block",
         "textures": {
-            "particle": "functionalresources:block/generator_side",
-            "front": "functionalresources:block/generator_front",
-            "side": "functionalresources:block/generator_side",
-            "top": "functionalresources:block/generator_top",
-            "bottom": "functionalresources:block/generator_bottom",
-            "chamber": "functionalresources:block/generator_chamber_on" if active else "functionalresources:block/generator_chamber_off",
+            "particle": "barelyfunctionalcontraptions:block/generator_side",
+            "front": "barelyfunctionalcontraptions:block/generator_front",
+            "side": "barelyfunctionalcontraptions:block/generator_side",
+            "top": "barelyfunctionalcontraptions:block/generator_top",
+            "bottom": "barelyfunctionalcontraptions:block/generator_bottom",
+            "chamber": "barelyfunctionalcontraptions:block/generator_chamber_on" if active else "barelyfunctionalcontraptions:block/generator_chamber_off",
             "stem": "minecraft:block/mushroom_stem",
             "cap_red": "minecraft:block/red_mushroom_block",
             "cap_brown": "minecraft:block/brown_mushroom_block",
@@ -70,7 +70,7 @@ def blockstate():
     for facing, y in rotations.items():
         for active in (False, True):
             key = f"active={'true' if active else 'false'},facing={facing}"
-            entry = {"model": "functionalresources:block/mycelial_generator" + ("_on" if active else "")}
+            entry = {"model": "barelyfunctionalcontraptions:block/mycelial_generator" + ("_on" if active else "")}
             if y:
                 entry["y"] = y
             variants[key] = entry

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/automatic_shears_side",
+    "north": "barelyfunctionalcontraptions:block/automatic_shears_front",
+    "south": "barelyfunctionalcontraptions:block/automatic_shears_back",
+    "east": "barelyfunctionalcontraptions:block/automatic_shears_side",
+    "west": "barelyfunctionalcontraptions:block/automatic_shears_side",
+    "up": "barelyfunctionalcontraptions:block/automatic_shears_top",
+    "down": "barelyfunctionalcontraptions:block/automatic_shears_bottom"
+  }
+}

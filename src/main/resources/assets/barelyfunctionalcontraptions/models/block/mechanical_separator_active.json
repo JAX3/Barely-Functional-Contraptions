@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/mechanical_separator_side",
+    "north": "barelyfunctionalcontraptions:block/mechanical_separator_front_active",
+    "south": "barelyfunctionalcontraptions:block/mechanical_separator_back",
+    "east": "barelyfunctionalcontraptions:block/mechanical_separator_side",
+    "west": "barelyfunctionalcontraptions:block/mechanical_separator_side",
+    "up": "barelyfunctionalcontraptions:block/mechanical_separator_top",
+    "down": "barelyfunctionalcontraptions:block/mechanical_separator_bottom"
+  }
+}

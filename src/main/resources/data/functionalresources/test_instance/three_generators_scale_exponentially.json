@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:function",
-  "function": "functionalresources:three_generators_scale_exponentially",
-  "environment": "functionalresources:default",
-  "structure": "functionalresources:empty",
-  "max_ticks": 100,
-  "required": true
-}

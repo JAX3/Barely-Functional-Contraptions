@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:function",
+  "function": "barelyfunctionalcontraptions:adjacent_generators_form_one_network",
+  "environment": "barelyfunctionalcontraptions:default",
+  "structure": "barelyfunctionalcontraptions:empty",
+  "max_ticks": 100,
+  "required": true
+}

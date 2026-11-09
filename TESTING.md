@@ -1,4 +1,4 @@
-# Functional Resources: test report
+# Barely Functional Contraptions: test report
 
 Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.17.0.109, Jade 26.3.5, OpenJDK 25 on Linux. The client ran on Xvfb with Mesa lavapipe (software Vulkan).
 
@@ -6,12 +6,12 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 
 | Check | Command | Result |
 |---|---|---|
-| Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/functionalresources-1.0.0.jar` |
+| Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
 | In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 53 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 32 Resourceful Sheep, 5 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 13 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
-### Integration GameTests (`com.jax3.functionalresources.gametest.IntegrationGameTests`)
+### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
 | Test | Verifies |
 |---|---|
@@ -59,7 +59,7 @@ An iron-infused sheep (9 uses) is sheared: it drops Iron Wool and has 8 uses lef
 With the default `[generator]` config: Stone Bricks, Raw Iron and Bread are allowed outputs, while the Redstone Torch (wrong tab) and Mushroom Stew (doesn't stack) are not. Diamond Swords and Water Buckets are refused as feeding items. Every definition from `generate all` passes the filter and parses. In vanilla it keeps 13 materials (iron, gold, copper, coal, diamond, emerald, lapis, redstone, netherite, slime → slime ball, wheat, bone meal, dried kelp) and drops resin. An empty tab list allows any tab but still blacklists non-stacking items.
 
 ### What the real client run showed
-* One mod entry, **Functional Resources 1.0.0**, with one config button that lists all four config files.
+* One mod entry, **Barely Functional Contraptions 1.0.0**, with one config button that lists all four config files.
 * One creative tab that holds the generator, wrench, separator, creative generator and every wool type, including the two mushroom wools.
 * Infused sheep with a flat 2D resource grow it mooshroom style, with two crossed sprites on the back and one on the head: Raw Iron, Raw Gold, Diamonds and Red Mushrooms. A block-shaped resource keeps the original cluster of small blocks in the fleece (checked with Oak Log on a wood sheep) (`01_world_sheep.png`, `07_sheep_closeup.png`).
 * The Mycelial Generator GUI shows **+250 FE/t generated, 200 FE/t out**: it is feeding the separator next to it (`11_generator_gui.png`).
@@ -167,7 +167,7 @@ Run `./gradlew runClient -Puse_jei_runtime=false`. The game loads, and the gener
 
 # Resourceful Sheep module: report from the standalone mod
 
-> Recorded before the merge, when the mod id was `resourcefulsheep`. Commands are now `/functionalresources …` and the jar is `functionalresources-1.0.0.jar`. The test counts above are the current ones.
+> Recorded before the merge, when the mod id was `resourcefulsheep`. Commands are now `/barelyfunctionalcontraptions …` and the jar is `barelyfunctionalcontraptions-1.0.0.jar`. The test counts above are the current ones.
 
 
 Environment:
@@ -178,7 +178,7 @@ Environment:
 ### Build ✅
 - `./gradlew build`: **BUILD SUCCESSFUL**.
   - All dependencies resolve: NeoForge, JEI API, plus JEI and its config library at runtime.
-  - Produces `build/libs/functionalresources-1.0.0.jar`.
+  - Produces `build/libs/barelyfunctionalcontraptions-1.0.0.jar`.
 
 ### Unit tests ✅ (`./gradlew test`): 5/5 passed
 Relative side mapping for every facing, side-name parsing, redstone modes, infusion countdown and cooldown, and permanent infusions.
@@ -206,7 +206,7 @@ These run on a **dedicated-server** game test server, which also confirms the mo
 | `separating_recipe_handles_plain_wool` | The custom recipe type matches `#minecraft:wool` → 3 String. Dirt is not separable. |
 | `config_multipliers_affect_values` | Speed ×2 → 50 ticks and energy ×0.5 → 10,000 FE. Restored afterwards. |
 | `creative_generator_powers_separator` | Generator placed behind a separator pushes FE in, and the separator processes Iron Wool on that power alone. Any face allows unlimited extraction (5,000,000 FE pulled in one call). |
-| `generator_creates_valid_definitions` | `/functionalresources generate` logic: discovers slime, wheat and bone meal; skips already-defined iron, diamond and netherite and the raw ore blocks; slime block → 9 slime balls. Every generated JSON parses through the real codec, and writing produces one file per resource plus `pack.mcmeta`. |
+| `generator_creates_valid_definitions` | `/barelyfunctionalcontraptions generate` logic: discovers slime, wheat and bone meal; skips already-defined iron, diamond and netherite and the raw ore blocks; slime block → 9 slime balls. Every generated JSON parses through the real codec, and writing produces one file per resource plus `pack.mcmeta`. |
 | `generator_dedupe_removes_duplicate_wool` | After `generate all`: iron, gold, copper, redstone, lapis, coal, diamond, emerald and netherite are flagged as duplicates. Slime, wheat and bone meal are kept, and built-ins are never flagged. Only the duplicate files are deleted. |
 | `generator_pick_and_choose` | Material suggestions list slime but not raw ore blocks. An unknown material is rejected. `material slime` uses the storage tag ×9. `item amethyst_block` is fed directly, gives amethyst shard ×1 and parses. `item iron_block` uses the iron tag and is reported as already covered by the built-in. `writeOne` keeps the existing files. |
 | `separator_output_rolls_two_to_four` | Every resource's separator output is labelled 2-4 and the machine reserves room for 4. 1,000 rolls per resource stay within 2-4 and produce all of 2, 3 and 4. A plain number still means a fixed count, and min > max is rejected. |
@@ -221,7 +221,7 @@ The harness creates a world, stages the scene and saves screenshots to `run/scre
 - Client definitions are synced from the integrated server (12 received).
 
 #### Generator, end to end in the real client
-The harness ran `/functionalresources generate` in a live world:
+The harness ran `/barelyfunctionalcontraptions generate` in a live world:
 - The command wrote 5 definitions and reloaded automatically.
 - The server went from 12 to 17 loaded definitions, and all 17 synced to the client.
 - JEI showed 17 infusion recipes, including the generated Bone Meal resource with auto-tinted wool.

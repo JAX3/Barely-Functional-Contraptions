@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:function",
-  "function": "functionalresources:duplicate_links_rejected_and_chains_merge",
-  "environment": "functionalresources:default",
-  "structure": "functionalresources:empty",
-  "max_ticks": 100,
-  "required": true
-}

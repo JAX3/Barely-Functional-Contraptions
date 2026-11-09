@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:function",
+  "function": "barelyfunctionalcontraptions:mycelium_converts_dirt",
+  "environment": "barelyfunctionalcontraptions:default",
+  "structure": "barelyfunctionalcontraptions:empty",
+  "max_ticks": 400,
+  "required": true
+}

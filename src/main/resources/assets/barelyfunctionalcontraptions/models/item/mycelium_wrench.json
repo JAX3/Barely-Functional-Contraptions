@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "barelyfunctionalcontraptions:item/mycelium_wrench"
+  }
+}

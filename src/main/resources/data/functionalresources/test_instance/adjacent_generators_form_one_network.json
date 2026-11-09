@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:function",
-  "function": "functionalresources:adjacent_generators_form_one_network",
-  "environment": "functionalresources:default",
-  "structure": "functionalresources:empty",
-  "max_ticks": 100,
-  "required": true
-}

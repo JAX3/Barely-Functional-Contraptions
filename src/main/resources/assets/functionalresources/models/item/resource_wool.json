@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "functionalresources:item/resource_wool_base",
-    "layer1": "functionalresources:item/resource_wool_overlay"
-  }
-}

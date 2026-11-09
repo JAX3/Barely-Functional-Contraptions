@@ -1,6 +1,6 @@
-# Functional Resources
+# Barely Functional Contraptions
 
-A NeoForge mod for **Minecraft 26.3** (Java 25) that combines two systems, **Mycelial Power** and **Resourceful Sheep**, into one mod. They share one mod id (`functionalresources`), one jar, one creative tab and one config screen, and they are built to work together:
+A NeoForge mod for **Minecraft 26.3** (Java 25) that combines two systems, **Mycelial Power** and **Resourceful Sheep**, into one mod. They share one mod id (`barelyfunctionalcontraptions`), one jar, one creative tab and one config screen, and they are built to work together:
 
 * **Mycelial Power:** the **Mycelial Generator** burns mushrooms and water to make **Forge Energy (FE)**. Generators that touch, or are linked with the **Mycelium Wrench**, form networks whose output grows **exponentially**. Running generators slowly spread **mycelium** and sprout **huge mushrooms**.
 * **Resourceful Sheep:** feed sheep blocks, ingots and gems to **infuse** their wool, shear them for **resource wool**, and turn the wool back into resources in the FE-powered **Mechanical Separator**.
@@ -37,19 +37,21 @@ A NeoForge mod for **Minecraft 26.3** (Java 25) that combines two systems, **Myc
 1. **Generators power separators directly.** Both use NeoForge's standard energy capability, so a Mycelial Generator placed against any energy face of a Mechanical Separator (back, left, right, top or bottom) pushes FE into it. One generator makes 200–250 FE/t, which is exactly what a separator uses for most wool. FE cables from other mods work too.
 2. **Mushroom sheep.** Two new built-in sheep resources, **Red Mushroom** and **Brown Mushroom**, are infused with a **Red/Brown Mushroom** (100 shearings per feeding by default). The separator turns each Mushroom Wool into **2–4 mushrooms** + 2 String, with a 5% chance of a **Mycelium** block. Those mushrooms are the Mycelial Generator's fuel.
 3. **The loop closes.** Running generators spread mycelium and grow huge mushrooms, which give you mushrooms for the sheep. The sheep give you mushrooms for the generators, and the generators power the separators that process all your other resource wool.
-4. **One mod.** One creative tab (*Functional Resources*), one entry in the mod list, one config button listing all four config files, and one JEI and Jade plugin set.
+4. **One mod.** One creative tab (*Barely Functional Contraptions*), one entry in the mod list, one config button listing all four config files, and one JEI and Jade plugin set.
 
-The integration is covered by GameTests, which run in [`IntegrationGameTests`](src/main/java/com/jax3/functionalresources/gametest/IntegrationGameTests.java). See [TESTING.md](TESTING.md).
+The integration is covered by GameTests, which run in [`IntegrationGameTests`](src/main/java/com/jax3/barelyfunctionalcontraptions/gametest/IntegrationGameTests.java). See [TESTING.md](TESTING.md).
 
 ## Installation (players and servers)
 
 1. Install NeoForge 26.3.x for Minecraft 26.3.
-2. Put `functionalresources-1.0.0.jar` in the `mods/` folder of the client **and** the server.
+2. Put `barelyfunctionalcontraptions-1.0.0.jar` in the `mods/` folder of the client **and** the server.
 3. Optional: install JEI 31.x and/or Jade 26.3.x. The mod runs normally without them.
 
 **Placing machines:** the Mycelial Generator, Mechanical Separator and Automatic Shears place with their front facing you. **Hold Shift while placing** to make the front face away from you instead (handy for pointing the shears at a pen from outside it, or the separator's back at a cable).
 
-> Coming from the separate mods? Remove `mycelialpower-*.jar` and `resourcefulsheep-*.jar` first. Everything now lives in the `functionalresources` namespace (for example `functionalresources:mycelial_generator` and `functionalresources:mechanical_separator`), so blocks and items placed with the old standalone mods do not carry over into existing worlds. Data packs that add sheep resources must move from `data/<ns>/resourcefulsheep/sheep_resources/` to `data/<ns>/functionalresources/sheep_resources/`. Separator recipes now use the type `functionalresources:separating`.
+> **Renamed from "Functional Resources".** The mod ID changed from `functionalresources` to `barelyfunctionalcontraptions`. Blocks, items, wool and infused sheep from worlds made with the old builds don't carry over. Config files are now `config/barelyfunctionalcontraptions-*.toml`, and the command is `/barelyfunctionalcontraptions`. Wool types made with the old generate command live in the old `functionalresources_generated` pack; run `/barelyfunctionalcontraptions generate` again to recreate them.
+
+> Coming from the separate mods? Remove `mycelialpower-*.jar` and `resourcefulsheep-*.jar` first. Everything now lives in the `barelyfunctionalcontraptions` namespace (for example `barelyfunctionalcontraptions:mycelial_generator` and `barelyfunctionalcontraptions:mechanical_separator`), so blocks and items placed with the old standalone mods do not carry over into existing worlds. Data packs that add sheep resources must move from `data/<ns>/resourcefulsheep/sheep_resources/` to `data/<ns>/barelyfunctionalcontraptions/sheep_resources/`. Separator recipes now use the type `barelyfunctionalcontraptions:separating`.
 
 ---
 
@@ -123,11 +125,11 @@ With [Jade](https://www.curseforge.com/minecraft/mc-mods/jade) installed (26.3.x
 
 ![Jade on a Mycelial Generator](docs/screenshots/jade_generator.png)
 
-Each part can be switched off in Jade's settings under *Plugins → Functional Resources*. Jade is optional: the mod runs fine without it.
+Each part can be switched off in Jade's settings under *Plugins → Barely Functional Contraptions*. Jade is optional: the mod runs fine without it.
 
-Full configuration reference: [docs/CONFIGURATION-MYCELIAL.md](docs/CONFIGURATION-MYCELIAL.md). Defaults: [docs/functionalresources-mycelial-synced.toml](docs/functionalresources-mycelial-synced.toml).
+Full configuration reference: [docs/CONFIGURATION-MYCELIAL.md](docs/CONFIGURATION-MYCELIAL.md). Defaults: [docs/barelyfunctionalcontraptions-mycelial-synced.toml](docs/barelyfunctionalcontraptions-mycelial-synced.toml).
 
-Adding a modded fuel takes one line in `config/functionalresources-mycelial-synced.toml`:
+Adding a modded fuel takes one line in `config/barelyfunctionalcontraptions-mycelial-synced.toml`:
 
 [fuel]
 	fuels = ["minecraft:brown_mushroom;burn=400", "minecraft:red_mushroom;burn=600;energy=1.25", "#c:mushrooms;burn=400"]
@@ -186,7 +188,7 @@ An FE-powered machine that shears sheep for you and keeps the wool.
 - **Inventory:** 9 slots. Take the wool out by hand (shift-click works), or put a **hopper underneath** (or any pipe) to pull it out automatically. Nothing can be put *into* it. A comparator reads how full it is.
 - **When it's full:** it stops shearing until there is room again, so wool is never thrown away. If one sheep's drops only partly fit, the rest drop on the ground at the sheep.
 - **Redstone:** the same four modes as the separator, cycled with the button in the top-right corner: *Ignored* (default), *Active with Signal*, *Active without Signal*, *Disabled*.
-- **Which mobs:** only those in the entity tag `#functionalresources:auto_shearable`, which is sheep by default. It never turns a mooshroom into a cow or takes a snow golem's pumpkin.
+- **Which mobs:** only those in the entity tag `#barelyfunctionalcontraptions:auto_shearable`, which is sheep by default. It never turns a mooshroom into a cow or takes a snow golem's pumpkin.
 - Its shears never wear out. Mine it with a stone pickaxe or better. When broken it keeps its stored energy and redstone mode, like the separator, and its wool drops on the ground.
 
 ```
@@ -225,10 +227,10 @@ A creative-only block, found in the Resourceful Sheep creative tab. It has no re
 | Red Mushroom | Red Mushroom Wool | 2–4 Red Mushroom (+5% Mycelium) | 3 | 8,000 / 4 s |
 | Brown Mushroom | Brown Mushroom Wool | 2–4 Brown Mushroom (+5% Mycelium) | 3 | 8,000 / 4 s |
 
-Every resource also gives 2 String. Plain wool (`#minecraft:wool`) can be separated into 3 string through the bundled `functionalresources:separating` recipe.
+Every resource also gives 2 String. Plain wool (`#minecraft:wool`) can be separated into 3 string through the bundled `barelyfunctionalcontraptions:separating` recipe.
 
 ### JEI: every wool type the separator handles
-With JEI installed, click the Mechanical Separator in JEI (or press **U** over it) to open **Mechanical Separation**. It lists **every wool type that's loaded**: built-in, mushroom, command-generated and data-pack ones, sorted by name. Plain wool → string and other explicit recipes come after them. Each wool type is one compact row: wool → resource (cycling through 2–4) + string + bonus chance, with energy and time. Like the Resource Infusion page and the Mycelial Generator's fuel page, it uses the same dark slate style as the machine screens: slate panels, recessed slots, and the separator's purple arrow filling over the real processing time. Hover over things for the details. JEI updates by itself after `/reload` or `/functionalresources generate`. Press **U** on any resource wool to jump to its row (**R** shows how to make it: the infusion page).
+With JEI installed, click the Mechanical Separator in JEI (or press **U** over it) to open **Mechanical Separation**. It lists **every wool type that's loaded**: built-in, mushroom, command-generated and data-pack ones, sorted by name. Plain wool → string and other explicit recipes come after them. Each wool type is one compact row: wool → resource (cycling through 2–4) + string + bonus chance, with energy and time. Like the Resource Infusion page and the Mycelial Generator's fuel page, it uses the same dark slate style as the machine screens: slate panels, recessed slots, and the separator's purple arrow filling over the real processing time. Hover over things for the details. JEI updates by itself after `/reload` or `/barelyfunctionalcontraptions generate`. Press **U** on any resource wool to jump to its row (**R** shows how to make it: the infusion page).
 
 ![JEI Mechanical Separation](docs/screenshots/06_jei_separation.png)
 
@@ -253,7 +255,7 @@ With [Jade](https://www.curseforge.com/minecraft/mc-mods/jade) installed (26.3.x
 - **Infused sheep:** the resource (in its colour) and how many shearings are left. A permanent infusion or a resting cooldown is shown instead when that applies.
 - **Mechanical Separator:** its status (Processing, No Energy, Output Full...), the FE/t it is using, a non-default redstone mode, and a live progress bar. The energy bar and slot contents come from Jade's built-in support.
 
-Each part can be switched off in Jade's settings under *Plugins → Functional Resources*. Jade is optional: the mod runs fine without it.
+Each part can be switched off in Jade's settings under *Plugins → Barely Functional Contraptions*. Jade is optional: the mod runs fine without it.
 
 | Sheep | Mechanical Separator |
 |---|---|
@@ -264,7 +266,7 @@ Each part can be switched off in Jade's settings under *Plugins → Functional R
 ### Configuration
 
 #### Global config (per world, synced to clients)
-`config/functionalresources-sheep-synced.toml`, synced to every client. A copy placed in `<world>/syncedconfig/` overrides it for that world only. You can also edit it in-game from *Mods → Functional Resources → Config*.
+`config/barelyfunctionalcontraptions-sheep-synced.toml`, synced to every client. A copy placed in `<world>/syncedconfig/` overrides it for that world only. You can also edit it in-game from *Mods → Barely Functional Contraptions → Config*.
 
 **`[sheep]`**
 
@@ -324,7 +326,7 @@ Each part can be switched off in Jade's settings under *Plugins → Functional R
 |---|---|---|
 | `creativeGeneratorOutput` | 1000000 | FE pushed into each adjacent receiver per tick (0 = only allow pulling) |
 
-**`[generator]`** (limits for `/functionalresources generate`; see [What the generator may use](#what-the-generator-may-use))
+**`[generator]`** (limits for `/barelyfunctionalcontraptions generate`; see [What the generator may use](#what-the-generator-may-use))
 
 | Key | Default | Meaning |
 |---|---|---|
@@ -332,7 +334,7 @@ Each part can be switched off in Jade's settings under *Plugins → Functional R
 | `requireStackable` | true | Blacklist every item that doesn't stack (max stack size 1), both as a feeding item and as an output |
 
 #### Client config
-`config/functionalresources-sheep-client.toml`:
+`config/barelyfunctionalcontraptions-sheep-client.toml`:
 
 | Key | What it controls |
 |---|---|
@@ -347,7 +349,7 @@ Each part can be switched off in Jade's settings under *Plugins → Functional R
 
 ### Resource definitions (data packs)
 
-Definitions live in `data/<namespace>/functionalresources/sheep_resources/<name>.json`.
+Definitions live in `data/<namespace>/barelyfunctionalcontraptions/sheep_resources/<name>.json`.
 - The resource id is `<namespace>:<name>`.
 - They reload with `/reload` and are synced to clients automatically, so JEI and tooltips update too.
 - Feeding, shearing, the separator and JEI all read the same definition.
@@ -392,15 +394,15 @@ You don't have to write a definition for every metal by hand. In a world with ch
 
 | Command | What it does |
 |---|---|
-| `/functionalresources preview` | Lists what would be generated, without changing anything |
-| `/functionalresources generate` | Creates a resource for every material that doesn't have one yet, saves them into the world data pack `functionalresources_generated`, and reloads |
-| `/functionalresources generate all` | Same, but also regenerates materials that already have a definition |
-| `/functionalresources generate material <material>` | Adds just one material from the storage-block tags. Press Tab to pick one (`slime`, `tin`, `osmium`...) |
-| `/functionalresources generate item <item>` | Adds a wool type fed with **any** item you choose, e.g. `minecraft:amethyst_block`. If the item is a storage block, its whole `c:storage_blocks` tag is used. |
-| `/functionalresources generate hand` | Same as `item`, using the item in your main hand |
-| `/functionalresources generate remove <name>` | Deletes one generated wool type (press Tab to list them) |
-| `/functionalresources generate dedupe` | Deletes generated wool types that duplicate another one, then reloads. A duplicate has the same feeding block or the same name as another type, for example a generated Iron next to the built-in Iron after `generate all`. Built-in and hand-written definitions are never removed. Of two generated duplicates, the first by id is kept. |
-| `/functionalresources list` | Lists every loaded resource |
+| `/barelyfunctionalcontraptions preview` | Lists what would be generated, without changing anything |
+| `/barelyfunctionalcontraptions generate` | Creates a resource for every material that doesn't have one yet, saves them into the world data pack `barelyfunctionalcontraptions_generated`, and reloads |
+| `/barelyfunctionalcontraptions generate all` | Same, but also regenerates materials that already have a definition |
+| `/barelyfunctionalcontraptions generate material <material>` | Adds just one material from the storage-block tags. Press Tab to pick one (`slime`, `tin`, `osmium`...) |
+| `/barelyfunctionalcontraptions generate item <item>` | Adds a wool type fed with **any** item you choose, e.g. `minecraft:amethyst_block`. If the item is a storage block, its whole `c:storage_blocks` tag is used. |
+| `/barelyfunctionalcontraptions generate hand` | Same as `item`, using the item in your main hand |
+| `/barelyfunctionalcontraptions generate remove <name>` | Deletes one generated wool type (press Tab to list them) |
+| `/barelyfunctionalcontraptions generate dedupe` | Deletes generated wool types that duplicate another one, then reloads. A duplicate has the same feeding block or the same name as another type, for example a generated Iron next to the built-in Iron after `generate all`. Built-in and hand-written definitions are never removed. Of two generated duplicates, the first by id is kept. |
+| `/barelyfunctionalcontraptions list` | Lists every loaded resource |
 
 #### What the generator may use
 By default the generator only makes wool types whose resource is something from the **Building Blocks**, **Ingredients** or **Food & Drinks** creative tabs, and it **blacklists every item that doesn't stack** (tools, weapons, armour, buckets, potions, stews and so on). This applies to `generate`, `generate all`, `preview`, `material`, `item` and `hand`, and to tab-completion:
@@ -409,7 +411,7 @@ By default the generator only makes wool types whose resource is something from 
 - Modded items count when their mod adds them to one of the allowed tabs.
 - `generate item`/`hand` explain why an item is refused, for example *"Diamond Sword doesn't stack…"* or *"Redstone Torch isn't in the Building Blocks, Ingredients, Food & Drinks creative tabs…"*.
 - Definitions you already have, and hand-written or built-in ones, are never touched.
-- Change the tabs or switch the stack rule off in the `[generator]` section of `config/functionalresources-sheep-synced.toml`.
+- Change the tabs or switch the stack rule off in the `[generator]` section of `config/barelyfunctionalcontraptions-sheep-synced.toml`.
 
 How the generator chooses each value:
 - **Materials:** it scans the `c:storage_blocks/<material>` item tags that vanilla, NeoForge and nearly every content mod fill. With Mekanism, Thermal and similar mods installed, that covers tin, lead, osmium, uranium, silver and so on. Raw ore blocks (`raw_*`) and anything already defined are skipped.
@@ -420,13 +422,13 @@ How the generator chooses each value:
 
 Picking single items or materials adds one file without touching the others. It refuses anything an existing built-in or hand-written resource already covers (same feeding item or same name), so you can't create duplicates this way. A wool type made from an arbitrary item (not a storage block) has `infusion_uses` 1, because the mod can't know how many units the item holds. That only matters with `infusionUsesOverride = -1`; by default every wool type lasts 100 shearings.
 
-Generated files are ordinary JSON in `<world>/datapacks/functionalresources_generated/`. You can edit them freely. Re-running `generate` (or `generate all`) rewrites only the wool types it generates itself; other generated ones, such as those added with `generate item`/`hand`/`material`, stay until you delete them with `generate remove` or `generate dedupe`. Sheep infused with them keep their infusion. In plain vanilla this adds Bone Meal, Dried Kelp, Slime and Wheat (Resin is skipped because the Resin Clump is not in an allowed creative tab).
+Generated files are ordinary JSON in `<world>/datapacks/barelyfunctionalcontraptions_generated/`. You can edit them freely. Re-running `generate` (or `generate all`) rewrites only the wool types it generates itself; other generated ones, such as those added with `generate item`/`hand`/`material`, stay until you delete them with `generate remove` or `generate dedupe`. Sheep infused with them keep their infusion. In plain vanilla this adds Bone Meal, Dried Kelp, Slime and Wheat (Resin is skipped because the Resin Clump is not in an allowed creative tab).
 
 #### Explicit separator recipes
-Use the recipe type `functionalresources:separating` to process any item, or to override how a particular wool is handled:
+Use the recipe type `barelyfunctionalcontraptions:separating` to process any item, or to override how a particular wool is handled:
 ```json
 {
-  "type": "functionalresources:separating",
+  "type": "barelyfunctionalcontraptions:separating",
   "ingredient": "#minecraft:wool",
   "primary_output": { "id": "minecraft:string", "count": 3 },
   "secondary_output": "minecraft:white_dye",
@@ -440,16 +442,16 @@ An explicit recipe always takes priority over a resource definition. JEI shows o
 #### Tags
 | Tag | Default contents | Purpose |
 |---|---|---|
-| `#functionalresources:infusable` (entity type) | `minecraft:sheep` | Which mobs can be infused. Add modded sheep here. |
-| `#functionalresources:replaceable_wool` (item) | `#minecraft:wool` | Which drops infused wool replaces |
-| `#functionalresources:auto_shearable` (entity type) | `#functionalresources:infusable` | Which mobs the Automatic Shears shear |
+| `#barelyfunctionalcontraptions:infusable` (entity type) | `minecraft:sheep` | Which mobs can be infused. Add modded sheep here. |
+| `#barelyfunctionalcontraptions:replaceable_wool` (item) | `#minecraft:wool` | Which drops infused wool replaces |
+| `#barelyfunctionalcontraptions:auto_shearable` (entity type) | `#barelyfunctionalcontraptions:infusable` | Which mobs the Automatic Shears shear |
 
 Shearing drops are hooked through a global loot modifier on loot tables whose path starts with `shearing/`. That means hand shears, dispensers and modded shears are all covered, along with modded sheep that use their own `shearing/...` table. Infused-fleece rendering is applied to any entity whose renderer extends the vanilla `SheepRenderer`.
 
 #### Custom wool textures
 The 12 built-in wools have hand-made textures. Any other resource uses a greyscale wool texture tinted with its `wool_color` and `accent_color`, so it never shows a missing texture.
 
-To give a data-pack resource its own icon, ship a resource pack that overrides `assets/functionalresources/items/resource_wool.json` and adds a `case` for your resource id. The file is a `minecraft:select` on the `functionalresources:sheep_resource` component.
+To give a data-pack resource its own icon, ship a resource pack that overrides `assets/barelyfunctionalcontraptions/items/resource_wool.json` and adds a `case` for your resource id. The file is a `minecraft:select` on the `barelyfunctionalcontraptions:sheep_resource` component.
 
 ---
 
@@ -460,16 +462,16 @@ To give a data-pack resource its own icon, ship a resource pack that overrides `
 
 | File | Contents |
 |---|---|
-| `config/functionalresources-mycelial-synced.toml` | Mycelial Generator, networks, wrench, water, fuels and mycelium spread. Synced to clients; a copy in `<world>/syncedconfig/` overrides it per world. |
-| `config/functionalresources-mycelial-client.toml` | Generator particles and sounds. |
-| `config/functionalresources-sheep-synced.toml` | Sheep infusion, the Mechanical Separator and the Creative Generator. Synced to clients; a copy in `<world>/syncedconfig/` overrides it per world. |
-| `config/functionalresources-sheep-client.toml` | Sheep particles, tinting, overlays and tooltips. |
+| `config/barelyfunctionalcontraptions-mycelial-synced.toml` | Mycelial Generator, networks, wrench, water, fuels and mycelium spread. Synced to clients; a copy in `<world>/syncedconfig/` overrides it per world. |
+| `config/barelyfunctionalcontraptions-mycelial-client.toml` | Generator particles and sounds. |
+| `config/barelyfunctionalcontraptions-sheep-synced.toml` | Sheep infusion, the Mechanical Separator and the Creative Generator. Synced to clients; a copy in `<world>/syncedconfig/` overrides it per world. |
+| `config/barelyfunctionalcontraptions-sheep-client.toml` | Sheep particles, tinting, overlays and tooltips. |
 
-All four can be edited in-game from *Mods → Functional Resources → Config*.
+All four can be edited in-game from *Mods → Barely Functional Contraptions → Config*.
 
 ## Commands
 
-`/functionalresources preview | generate | list` (operator level 2). This is the Resourceful Sheep resource generator described above, which used to be `/resourcefulsheep`.
+`/barelyfunctionalcontraptions preview | generate | list` (operator level 2). This is the Resourceful Sheep resource generator described above, which used to be `/resourcefulsheep`.
 
 ---
 
@@ -478,7 +480,7 @@ All four can be edited in-game from *Mods → Functional Resources → Config*.
 Requires **JDK 25**. Gradle 9 is downloaded by the wrapper.
 
 ```bash
-./gradlew build                          # compiles, runs unit tests, outputs build/libs/functionalresources-1.0.0.jar
+./gradlew build                          # compiles, runs unit tests, outputs build/libs/barelyfunctionalcontraptions-1.0.0.jar
 ./gradlew runClient                      # dev client (with JEI and Jade)
 ./gradlew runServer                      # dev dedicated server
 ./gradlew runGameTestServer              # runs every GameTest (both modules + integration) headlessly, then exits
@@ -503,23 +505,23 @@ The build downloads from `maven.neoforged.net` (NeoForge), Mojang's servers (Min
 ## Project layout
 
 ```
-src/main/java/com/jax3/functionalresources/
-├── FunctionalResources.java        the single @Mod entry point; initialises both modules
-├── client/FunctionalResourcesClient the single client entry point (config screen + both modules' client code)
-├── registry/FunctionalResourcesTab the shared creative tab
+src/main/java/com/jax3/barelyfunctionalcontraptions/
+├── BarelyFunctionalContraptions.java        the single @Mod entry point; initialises both modules
+├── client/BarelyFunctionalContraptionsClient the single client entry point (config screen + both modules' client code)
+├── registry/ContraptionsCreativeTab the shared creative tab
 ├── gametest/IntegrationGameTests   tests for the parts where the modules meet
 ├── mycelial/                       Mycelial Power module (generator, wrench, networks, mycelium, JEI/Jade)
 └── sheep/                          Resourceful Sheep module (infusion, wool, separator, commands, JEI/Jade)
 
 src/main/resources/
-├── assets/functionalresources/     models, textures, sounds and the merged en_us.json for both modules
-└── data/functionalresources/
-    ├── functionalresources/sheep_resources/   built-in sheep resources (incl. red_mushroom, brown_mushroom)
+├── assets/barelyfunctionalcontraptions/     models, textures, sounds and the merged en_us.json for both modules
+└── data/barelyfunctionalcontraptions/
+    ├── barelyfunctionalcontraptions/sheep_resources/   built-in sheep resources (incl. red_mushroom, brown_mushroom)
     ├── recipe/, loot_table/, advancement/, loot_modifiers/
     └── structure/, test_environment/, test_instance/   GameTest data
 ```
 
-The modules keep their own registries, configs and networking. They share the mod id and namespace through `FunctionalResources.MOD_ID`, and each module's `init(...)` is called from the single entry point. History: [docs/PORTING-MYCELIAL.md](docs/PORTING-MYCELIAL.md) describes Mycelial Power's port from 1.21.1 to 26.3.
+The modules keep their own registries, configs and networking. They share the mod id and namespace through `BarelyFunctionalContraptions.MOD_ID`, and each module's `init(...)` is called from the single entry point. History: [docs/PORTING-MYCELIAL.md](docs/PORTING-MYCELIAL.md) describes Mycelial Power's port from 1.21.1 to 26.3.
 
 ## License
 

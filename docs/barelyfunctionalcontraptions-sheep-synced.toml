@@ -1,0 +1,155 @@
+#Resource infusion of sheep. Per-resource settings live in data/<namespace>/barelyfunctionalcontraptions/sheep_resources/*.json
+[sheep]
+	#Allow players to infuse sheep by right-clicking them with a resource.
+	feedingEnabled = true
+	#Items consumed per feeding. -1 uses each resource definition's 'feeding_amount'.
+	# Default: -1
+	# Range: -1 ~ 64
+	feedingAmountOverride = -1
+	#Allow lambs to be infused (their wool is only dropped once grown).
+	allowBabies = false
+	#Allow infusing a sheep that is currently sheared; its wool regrows infused.
+	allowFeedingShearedSheep = true
+	#Allow feeding a different resource to an already-infused sheep, replacing the old infusion (the old one is lost).
+	allowReplacingInfusion = false
+	#Feeding the same resource again tops the remaining shear count back up to full.
+	sameResourceRefreshesUses = true
+	#If true, each shearing uses up one 'use' of the infusion; when none remain the sheep returns to normal.
+	#If false, infusions are PERMANENT (turns sheep into an unlimited generator - not recommended for survival packs).
+	infusionConsumedByShearing = true
+	#Multiplier applied to each resource's 'infusion_uses' (number of shearings an infusion lasts). Result is rounded, minimum 1.
+	# Default: 1.0
+	# Range: 0.01 ~ 100.0
+	infusionUsesMultiplier = 1.0
+	#Infused wool items dropped per shearing. -1 uses each resource definition's 'wool_drop_count'.
+	# Default: -1
+	# Range: -1 ~ 64
+	woolDropCountOverride = -1
+	#Chance (0-1) for a shearing to drop bonus infused wool.
+	# Default: 0.0
+	# Range: 0.0 ~ 1.0
+	shearingBonusChance = 0.0
+	#Number of bonus infused wool items when the shearing bonus triggers.
+	# Default: 1
+	# Range: 0 ~ 64
+	shearingBonusAmount = 1
+	#If true an infused sheep's wool keeps a hint of its dye colour; if false it shows only the resource colour.
+	preserveWoolColour = true
+	#Show resource-coloured particles and play a sound when a sheep is infused.
+	feedingParticles = true
+	#Ticks after an infusion runs out before the sheep can be infused again. 0 disables.
+	# Default: 0
+	# Range: 0 ~ 240000
+	infusionCooldownTicks = 0
+	#Whether feeding consumes items for players in creative mode.
+	creativeConsumesItems = false
+	#Whether creative-mode players bypass the infusion cooldown and replacement restrictions.
+	creativeIgnoresCooldown = true
+	#Sneak + right-click a sheep with an empty hand to see its infusion in the action bar.
+	sneakToInspect = true
+	#Shearings every infusion lasts, for every wool type (built-in, generated and data-pack ones).
+	#-1 uses each resource definition's own 'infusion_uses' (9 for blocks, 1 for gems...). The multiplier below still applies.
+	# Default: 100
+	# Range: -1 ~ 1000000
+	infusionUsesOverride = 100
+
+#Mechanical Separator machine
+[separator]
+	#Internal FE buffer size.
+	# Default: 100000
+	# Range: > 1
+	energyCapacity = 100000
+	#Maximum FE accepted per tick (per insertion call).
+	# Default: 1000
+	# Range: > 1
+	maxEnergyInput = 1000
+	#Total FE to separate one wool when a resource/recipe does not specify 'energy_cost'.
+	# Default: 20000
+	# Range: > 0
+	defaultEnergyCost = 20000
+	#If > 0, the machine always uses exactly this much FE per tick (total = this x processing ticks),
+	#ignoring per-recipe energy costs. 0 = derive per-tick usage from each recipe's total energy cost.
+	# Default: 0
+	# Range: > 0
+	energyPerTickOverride = 0
+	#Processing time in ticks when a resource/recipe does not specify 'processing_ticks'.
+	# Default: 100
+	# Range: 1 ~ 72000
+	defaultProcessingTicks = 100
+	#String produced per wool when a resource does not specify 'secondary_count'.
+	# Default: 2
+	# Range: 0 ~ 64
+	defaultStringOutput = 2
+	#Multiplier on the primary (resource) output. Fractions are applied as a chance for one extra item.
+	# Default: 1.0
+	# Range: 0.0 ~ 64.0
+	primaryOutputMultiplier = 1.0
+	#Global chance (0-1) to produce one extra primary output per operation, in addition to any per-resource bonus.
+	# Default: 0.0
+	# Range: 0.0 ~ 1.0
+	bonusPrimaryChance = 0.0
+	#Efficiency multiplier on total energy cost. 0.5 = half the FE per operation.
+	# Default: 1.0
+	# Range: 0.0 ~ 100.0
+	energyCostMultiplier = 1.0
+	#Speed multiplier. 2.0 = operations take half as many ticks (total energy is unchanged).
+	# Default: 1.0
+	# Range: 0.01 ~ 100.0
+	processingSpeedMultiplier = 1.0
+	#If true, progress resets when the machine runs out of energy instead of pausing.
+	resetProgressWhenUnpowered = false
+	#Sides that accept FE.
+	#Valid values: FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM (relative to the machine's front face).
+	energyInputSides = ["BACK", "LEFT", "RIGHT", "TOP", "BOTTOM"]
+	#Sides through which hoppers/pipes may insert wool.
+	#Valid values: FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM (relative to the machine's front face).
+	itemInputSides = ["TOP", "BACK", "LEFT", "RIGHT"]
+	#Sides through which hoppers/pipes may extract outputs, and that outputs are auto-pushed into.
+	#Valid values: FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM (relative to the machine's front face).
+	itemOutputSides = ["BOTTOM"]
+	#Automatically push outputs into inventories adjacent to output sides.
+	autoPushOutputs = true
+	#Ticks between automatic output pushes.
+	# Default: 10
+	# Range: 1 ~ 1200
+	autoPushInterval = 10
+	#Allow players to change the redstone mode from the GUI. If false every machine uses defaultRedstoneMode.
+	redstoneControlEnabled = true
+	#Redstone mode for newly placed machines.
+	#Allowed Values: IGNORED, HIGH, LOW, DISABLED
+	defaultRedstoneMode = "IGNORED"
+
+#Creative Generator (creative-only infinite FE source for testing)
+[creative_generator]
+	#FE pushed into each adjacent energy receiver per tick (receivers still apply their own input limits). 0 disables pushing.
+	# Default: 1000000
+	# Range: > 0
+	creativeGeneratorOutput = 1000000
+
+#Which items /barelyfunctionalcontraptions generate may turn into wool types (feeding items and separator outputs).
+#Applies to generate, generate all, preview, material, item and hand. Existing definitions are not touched.
+[generator]
+	#Creative tabs an item must appear in. Default: Building Blocks, Ingredients and Food & Drinks.
+	#Modded items count when their mod adds them to one of these tabs. Empty = any creative tab.
+	allowedCreativeTabs = ["minecraft:building_blocks", "minecraft:ingredients", "minecraft:food_and_drinks"]
+	#Blacklist every item that does not stack (max stack size 1): tools, armour, buckets, potions, stews...
+	requireStackable = true
+
+#Automatic Shears (FE-powered; shears sheep in the 3x3 area in front of it into its inventory)
+[automatic_shears]
+	#Ticks between shearing sweeps (20 = once a second). Each sweep shears every ready sheep in the area.
+	# Default: 20
+	# Range: 1 ~ 72000
+	shearInterval = 20
+	#FE used for each sheep sheared. 0 = runs without power.
+	# Default: 2000
+	# Range: > 0
+	energyPerShear = 2000
+	#FE buffer.
+	# Default: 50000
+	# Range: > 1
+	energyCapacity = 50000
+	#FE accepted per tick (every face except the front).
+	# Default: 1000
+	# Range: > 1
+	maxEnergyInput = 1000

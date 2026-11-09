@@ -1,13 +1,13 @@
-# Functional Resources: Mycelial Power configuration reference
+# Barely Functional Contraptions: Mycelial Power configuration reference
 
 The Mycelial Power module uses two NeoForge TOML files. (The Resourceful Sheep module has its own two files, described in the [README](../README.md#resourceful-sheep-config).)
 
 | File | Type | Location | Contents |
 |---|---|---|---|
-| `functionalresources-mycelial-synced.toml` | **synced** | `config/` (a copy in `<world>/syncedconfig/` overrides it for that world) | All gameplay and balancing values. Synced to every client on join, so the GUI and JEI always show the server's numbers. |
-| `functionalresources-mycelial-client.toml` | client | `<instance>/config/` | Cosmetic effects only (particles, sound). |
+| `barelyfunctionalcontraptions-mycelial-synced.toml` | **synced** | `config/` (a copy in `<world>/syncedconfig/` overrides it for that world) | All gameplay and balancing values. Synced to every client on join, so the GUI and JEI always show the server's numbers. |
+| `barelyfunctionalcontraptions-mycelial-client.toml` | client | `<instance>/config/` | Cosmetic effects only (particles, sound). |
 
-To give every new world custom defaults, copy a finished `functionalresources-mycelial-synced.toml` to `<instance>/defaultconfigs/`. A copy of the defaults is in [`functionalresources-mycelial-synced.toml`](functionalresources-mycelial-synced.toml).
+To give every new world custom defaults, copy a finished `barelyfunctionalcontraptions-mycelial-synced.toml` to `<instance>/defaultconfigs/`. A copy of the defaults is in [`barelyfunctionalcontraptions-mycelial-synced.toml`](barelyfunctionalcontraptions-mycelial-synced.toml).
 
 ## Reload behaviour
 
@@ -77,7 +77,7 @@ Settings for the **Mycelium Wrench**, which links generators that are not touchi
 | `allow_network_merging` | `true` | | If `false`, a link that would join two different multi-generator networks is refused. A lone generator can still be linked into a network. |
 | `show_link_particles` | `true` | | Red and white particles along new links, and a purple outline on the selected generator. |
 
-Where links are stored: in the world's `data/functionalresources_generator_links.dat`, not in the generators. That's why breaking a generator removes its links from both ends without loading the other generator's chunk. A link to a generator in an unloaded chunk is kept, and counts again once both chunks are loaded.
+Where links are stored: in the world's `data/barelyfunctionalcontraptions_generator_links.dat`, not in the generators. That's why breaking a generator removes its links from both ends without loading the other generator's chunk. A link to a generator in an unloaded chunk is kept, and counts again once both chunks are loaded.
 
 ## `[fuel]`
 
@@ -190,7 +190,7 @@ The chance and the attempt timer are saved with each generator.
 | `fakePlayerName` | `[MycelialPower]` | Fake player name (max 16 characters) used for permission checks. |
 | `jeiExampleNetworkSize` | `10` | Rows in the JEI scaling tooltip. |
 
-## Client file (`functionalresources-mycelial-client.toml`)
+## Client file (`barelyfunctionalcontraptions-mycelial-client.toml`)
 
 | Key | Default | Range | Description |
 |---|---|---|---|

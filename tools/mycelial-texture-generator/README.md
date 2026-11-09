@@ -32,14 +32,14 @@ The output folder is laid out exactly like `src/main/resources`:
 
 ```
 output/
-├── assets/functionalresources/
+├── assets/barelyfunctionalcontraptions/
 │   ├── blockstates/mycelial_generator.json
 │   ├── models/block/mycelial_generator.json, mycelial_generator_on.json
 │   ├── models/item/mycelial_generator.json
 │   ├── items/mycelial_generator.json, mycelium_wrench.json   (item model definitions)
 │   ├── models/item/mycelium_wrench.json
 │   └── textures/block/*.png (+ .mcmeta), textures/gui/*.png, textures/item/mycelium_wrench.png
-├── data/functionalresources/structure/empty.nbt, tall_empty.nbt   (GameTest structures)
+├── data/barelyfunctionalcontraptions/structure/empty.nbt, tall_empty.nbt   (GameTest structures)
 ├── logo.png
 └── preview/blocks.png, gui.png, mycelium_wrench.png   (only with --preview)
 ```

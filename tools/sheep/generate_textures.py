@@ -3,7 +3,7 @@
 Generates every texture used by Resourceful Sheep as original pixel art.
 
 Run from the project root:  python3 tools/generate_textures.py
-Requires Pillow. Output goes to src/main/resources/assets/functionalresources/textures/.
+Requires Pillow. Output goes to src/main/resources/assets/barelyfunctionalcontraptions/textures/.
 
 All art is procedurally drawn here (no vanilla textures are read or copied); only
 the UV *layout* of the sheep fur model (64x32) is matched so the overlay wraps
@@ -13,7 +13,7 @@ import os
 import random
 from PIL import Image
 
-ROOT = os.path.join(os.path.dirname(__file__), "..", "..", "src", "main", "resources", "assets", "functionalresources", "textures")
+ROOT = os.path.join(os.path.dirname(__file__), "..", "..", "src", "main", "resources", "assets", "barelyfunctionalcontraptions", "textures")
 
 
 def out(path):

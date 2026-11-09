@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:function",
-  "function": "functionalresources:network_splits_when_generator_removed",
-  "environment": "functionalresources:default",
-  "structure": "functionalresources:empty",
-  "max_ticks": 100,
-  "required": true
-}

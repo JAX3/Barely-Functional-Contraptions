@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "barelyfunctionalcontraptions:block/automatic_shears"
+    },
+    "facing=east": {
+      "model": "barelyfunctionalcontraptions:block/automatic_shears",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "barelyfunctionalcontraptions:block/automatic_shears",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "barelyfunctionalcontraptions:block/automatic_shears",
+      "y": 270
+    }
+  }
+}

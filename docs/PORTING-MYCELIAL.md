@@ -82,11 +82,11 @@ This branch (`port/minecraft-26.1.2`) is the Mycelial Power 1.21.1 mod ported to
 
 **Items**
 - New `appendHoverText(..., TooltipDisplay, Consumer<Component>, ...)` and `inventoryTick(ItemStack, ServerLevel, Entity, EquipmentSlot)` signatures.
-- Item model definitions added under `assets/functionalresources/items/` (required since 1.21.4).
+- Item model definitions added under `assets/barelyfunctionalcontraptions/items/` (required since 1.21.4).
 - Recipe ingredients use the plain-string form (`"I": "minecraft:iron_ingot"`).
 
 **Saved data**
-- Wrench links use the codec-based `SavedDataType` and are stored in the server's global data storage (`data/functionalresources/generator_links.dat`), as the 26.1 guide recommends for data that spans dimensions.
+- Wrench links use the codec-based `SavedDataType` and are stored in the server's global data storage (`data/barelyfunctionalcontraptions/generator_links.dat`), as the 26.1 guide recommends for data that spans dimensions.
 
 **GUI (26.1 rendering rewrite)**
 - `GuiGraphics` → `GuiGraphicsExtractor`. `renderBg` → `extractBackground`, `renderLabels` → `extractLabels`, `renderTooltip` → `extractTooltip`, `drawString` → `text`. The pose is a 2D matrix stack, and `blit` takes a `RenderPipeline`.
@@ -99,7 +99,7 @@ This branch (`port/minecraft-26.1.2`) is the Mycelial Power 1.21.1 mod ported to
 - The client sends packets with `ClientPacketDistributor`.
 
 **GameTests (1.21.5 rewrite)**
-- `@GameTest` / `@GameTestHolder` are gone. The 15 tests are now registered functions (`ModGameTests`) plus JSON test instances in `data/functionalresources/test_instance/`, with a clear-weather environment in `test_environment/default.json`.
+- `@GameTest` / `@GameTestHolder` are gone. The 15 tests are now registered functions (`ModGameTests`) plus JSON test instances in `data/barelyfunctionalcontraptions/test_instance/`, with a clear-weather environment in `test_environment/default.json`.
 - `GameTestHelper#assertTrue` takes a `Component`, and `getBlockEntity` takes a class.
 
 **Models**

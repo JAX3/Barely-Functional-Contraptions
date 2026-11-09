@@ -7,7 +7,7 @@ import sys
 
 from . import blocks, blocks_realistic, gui, items, models, palette, structure
 
-MOD_ID = "functionalresources"
+MOD_ID = "barelyfunctionalcontraptions"
 DEFAULT_OUTPUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "output")
 GROUPS = ("textures", "models", "structure")
 

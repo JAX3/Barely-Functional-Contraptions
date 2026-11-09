@@ -1,0 +1,27 @@
+package com.jax3.barelyfunctionalcontraptions.mycelial.registry;
+
+import com.jax3.barelyfunctionalcontraptions.mycelial.MycelialPower;
+import com.jax3.barelyfunctionalcontraptions.mycelial.block.MycelialGeneratorBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+public final class ModBlocks {
+    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MycelialPower.MOD_ID);
+
+    // registerBlock supplies Properties with the block's registry id already set (required since 1.21.2).
+    public static final DeferredBlock<MycelialGeneratorBlock> MYCELIAL_GENERATOR = BLOCKS.registerBlock("mycelial_generator",
+            MycelialGeneratorBlock::new,
+            properties -> properties
+                    .mapColor(MapColor.COLOR_PURPLE)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.NETHERITE_BLOCK)
+                    .pushReaction(PushReaction.IMMOVEABLE)
+                    .lightLevel(state -> state.getValue(MycelialGeneratorBlock.LIGHT)));
+
+    private ModBlocks() {
+    }
+}
