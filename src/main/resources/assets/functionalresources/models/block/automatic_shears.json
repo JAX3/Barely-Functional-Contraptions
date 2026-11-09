@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "functionalresources:block/automatic_shears_side",
+    "north": "functionalresources:block/automatic_shears_front",
+    "south": "functionalresources:block/automatic_shears_back",
+    "east": "functionalresources:block/automatic_shears_side",
+    "west": "functionalresources:block/automatic_shears_side",
+    "up": "functionalresources:block/automatic_shears_top",
+    "down": "functionalresources:block/automatic_shears_bottom"
+  }
+}

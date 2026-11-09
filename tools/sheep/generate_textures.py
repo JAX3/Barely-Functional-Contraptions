@@ -907,12 +907,190 @@ def generate_logo():
     banner.resize((480, 160), Image.NEAREST).save(os.path.join(ROOT, "..", "..", "..", "banner.png"))
 
 
+# ---------------------------------------------------------------------------
+# Automatic Shears: same cartoon metal casing, a pair of open shears behind the front window.
+# ---------------------------------------------------------------------------
+SHEARS_PAL = dict(CARTOON)
+SHEARS_PAL.update({
+    "L": hexc("#f4f8fc"), "l": hexc("#b9c3d1"), "d": hexc("#6f7a8b"),  # blade shine / blade / blade edge
+    "Q": hexc("#e0443e"), "q": hexc("#8e2028"),                      # handle / handle shadow
+    "X": hexc("#ffd75e"),                                            # brass pivot
+})
+
+SHEARS_FRONT = [  # open shears in a dark window, wool tufts caught at the bottom
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHPPPPPPPPPPPPSO",
+    "OHPOOOOOOOOOOpSO",
+    "OHPOLKKKKKKLOpSO",
+    "OHPOlLKKKKLlOpSO",
+    "OHPOKdlKKldKOpSO",
+    "OHPOKKdXXdKKOpSO",
+    "OHPOKKqXXqKKOpSO",
+    "OHPOKqQKKQqKOpSO",
+    "OHPOqQKKKKQqOpSO",
+    "OHPOQqwWWwqQOpSO",
+    "OHPOOOOOOOOOOpSO",
+    "OwppppppppppppvO",
+    "OvwWwwvWwvwwWwvO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+SHEARS_SIDE = [  # storage hatch with a latch
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMMMMMMMbSSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHMOHHHHHHHHOMSO",
+    "OHMOHMMMMMMSOMSO",
+    "OHMOHMMXXMMSOMSO",
+    "OHMOHMMXXMMSOMSO",
+    "OHMOHMMMMMMSOMSO",
+    "OHMOSSSSSSSSOMSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHwWwMMMMMMwWwSO",
+    "OwWWWwMwMMwWWWwO",
+    "OvwWwwvWwvwwWwvO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+SHEARS_TOP = [  # lid with a blade emblem
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMMMMMMMbSSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHMMLMMMMMMLMMSO",
+    "OHMMlLMMMMLlMMSO",
+    "OHMMMdlMMldMMMSO",
+    "OHMMMMdXXdMMMMSO",
+    "OHMMMMqXXqMMMMSO",
+    "OHMMMqQMMQqMMMSO",
+    "OHMMqQMMMMQqMMSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+
+def generate_automatic_shears():
+    grid(SHEARS_FRONT, SHEARS_PAL).save(out("block/automatic_shears_front.png"))
+    grid(SHEARS_SIDE, SHEARS_PAL).save(out("block/automatic_shears_side.png"))
+    grid(SHEARS_TOP, SHEARS_PAL).save(out("block/automatic_shears_top.png"))
+    grid(SEP_BOTTOM, CARTOON).save(out("block/automatic_shears_bottom.png"))   # output chute, like the separator
+    grid(SHEARS_SIDE, SHEARS_PAL).save(out("block/automatic_shears_back.png"))
+
+
+# ---------------------------------------------------------------------------
+# Automatic Shears GUI (256x256), same slate theme and sprite positions as the separator's sheet.
+# ---------------------------------------------------------------------------
+SHEARS_OPEN = [
+    "................",
+    ".L............L.",
+    ".lL..........Ll.",
+    "..lL........Ll..",
+    "...dL......Ld...",
+    "....dL....Ld....",
+    ".....dl..ld.....",
+    "......dXXd......",
+    "......qXXq......",
+    ".....qQ..Qq.....",
+    "....qQ....Qq....",
+    "...QQq....qQQ...",
+    "..Q..Q....Q..Q..",
+    "..Q..Q....Q..Q..",
+    "...QQ......QQ...",
+    "................",
+]
+SHEARS_CLOSED = [
+    "................",
+    ".......LL.......",
+    ".......Ll.......",
+    ".......ll.......",
+    ".......ld.......",
+    ".......ld.......",
+    ".......dd.......",
+    "......dXXd......",
+    "......qXXq......",
+    ".....qQ..Qq.....",
+    "....qQ....Qq....",
+    "...QQq....qQQ...",
+    "..Q..Q....Q..Q..",
+    "..Q..Q....Q..Q..",
+    "...QQ......QQ...",
+    "................",
+]
+
+
+def generate_shears_gui():
+    for g in (SHEARS_OPEN, SHEARS_CLOSED):
+        assert len(g) == 16 and all(len(r) == 16 for r in g)
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+
+    # Energy gauge, exactly like the separator's (fill area 11..23 x 19..83), with its bolt.
+    inset(img, 10, 18, 25, 84, GUI["gauge"])
+    for ty in range(23, 83, 6):
+        for x in range(19, 23):
+            img.putpixel((x, ty), GUI["tick"])
+    for (x, y) in [(18, 9), (17, 10), (16, 11), (17, 11), (18, 11), (17, 12), (16, 13)]:
+        img.putpixel((x, y), CARTOON["E"])
+
+    # Machine window: shears icon, next-sweep bar and energy readout on the left, 3x3 storage on the right.
+    inset(img, 32, 16, 152, 78, GUI["panel"])
+    inset(img, 39, 21, 59, 41, GUI["gauge"])      # icon box (icon drawn at 41,23)
+    inset(img, 38, 46, 90, 52, GUI["gauge"])      # next-sweep bar (fill 39,47 50x4)
+    for x in range(61, 89, 3):                     # little "3x3 area" dots beside the icon
+        for y in (27, 31, 35):
+            if x < 70:
+                img.putpixel((x, y), hexc("#8d97bc"))
+    for row in range(3):
+        for col in range(3):
+            slot(img, 96 + col * 18, 20 + row * 18)
+    inset(img, 8, 86, 18, 96, GUI["gauge"])       # status lamp housing
+
+    # Player inventory (8,111) 3x9 and hotbar (8,169)
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+
+    # Decorations shared with the separator: the little sheep and the wool/grass fringe.
+    sheep_icon(img, 146, 5, hexc("#f2f2f2"))
+    rnd = random.Random(7)
+    for x in range(4, 172):
+        if rnd.random() < 0.18:
+            img.putpixel((x, 190), rnd.choice([hexc("#e3e1ea"), hexc("#b7b3c6"), hexc("#86c25a")]))
+
+    # ---- sprites ----
+    # Shared with the separator: redstone icons + button faces + energy fill (x 176+), status lamps (186,194).
+    img.paste(sep.crop((176, 0, 256, 194)), (176, 0))
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))
+    # Shears icon frames (0,194) open, (16,194) closed.
+    grid(SHEARS_OPEN, SHEARS_PAL, img, 0, 194)
+    grid(SHEARS_CLOSED, SHEARS_PAL, img, 16, 194)
+    # Next-sweep bar fill (0,212) 50x4: brushed steel with a bright top edge.
+    for x in range(50):
+        for y in range(4):
+            c = mix(hexc("#8d97bc"), hexc("#f4f8fc"), x / 49.0 * 0.6 + (0.4 if y == 0 else 0.0))
+            if y == 3:
+                c = shade(c, 0.7)
+            img.putpixel((x, 212 + y), c)
+    img.save(out("gui/automatic_shears.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
     generate_block()
     generate_creative_generator()
+    generate_automatic_shears()
     generate_gui()
+    generate_shears_gui()
     generate_jei()
     generate_logo()
     print("Textures written to", os.path.abspath(ROOT))

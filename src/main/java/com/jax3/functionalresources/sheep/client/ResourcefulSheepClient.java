@@ -51,6 +51,7 @@ public final class ResourcefulSheepClient {
 
     private static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenus.MECHANICAL_SEPARATOR.get(), MechanicalSeparatorScreen::new);
+        event.register(ModMenus.AUTOMATIC_SHEARS.get(), AutomaticShearsScreen::new);
     }
 
     private static void registerTintSources(RegisterColorHandlersEvent.ItemTintSources event) {
@@ -85,6 +86,10 @@ public final class ResourcefulSheepClient {
     private static void onItemTooltip(net.neoforged.neoforge.event.entity.player.ItemTooltipEvent event) {
         if (event.getItemStack().is(com.jax3.functionalresources.sheep.registry.ModItems.CREATIVE_GENERATOR.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.functionalresources.creative_generator")
+                    .withStyle(net.minecraft.ChatFormatting.GRAY));
+        }
+        if (event.getItemStack().is(com.jax3.functionalresources.sheep.registry.ModItems.AUTOMATIC_SHEARS.get())) {
+            event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.functionalresources.automatic_shears")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
     }

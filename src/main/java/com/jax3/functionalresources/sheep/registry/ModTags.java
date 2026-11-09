@@ -13,6 +13,9 @@ public final class ModTags {
     /** Items that infused wool replaces in shearing loot. Defaults to {@code #minecraft:wool}. */
     public static final TagKey<Item> REPLACEABLE_WOOL = TagKey.create(Registries.ITEM, ResourcefulSheep.id("replaceable_wool"));
 
+    /** Mobs the Automatic Shears will shear. Defaults to {@code #functionalresources:infusable} (sheep). */
+    public static final TagKey<EntityType<?>> AUTO_SHEARABLE = TagKey.create(Registries.ENTITY_TYPE, ResourcefulSheep.id("auto_shearable"));
+
     private ModTags() {}
 
     public static boolean isInfusable(net.minecraft.world.entity.Entity entity) {

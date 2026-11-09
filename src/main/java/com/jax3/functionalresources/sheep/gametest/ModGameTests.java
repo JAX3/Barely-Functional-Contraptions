@@ -2,6 +2,7 @@ package com.jax3.functionalresources.sheep.gametest;
 
 import com.google.gson.JsonParser;
 import com.jax3.functionalresources.sheep.ResourcefulSheep;
+import com.jax3.functionalresources.sheep.blockentity.RedstoneMode;
 import com.jax3.functionalresources.sheep.blockentity.MachineStatus;
 import com.jax3.functionalresources.sheep.blockentity.MechanicalSeparatorBlockEntity;
 import com.jax3.functionalresources.sheep.blockentity.SeparatorInventory;
@@ -79,6 +80,11 @@ public final class ModGameTests {
         TESTS.put("dispenser_shears_infused_sheep", ModGameTests::dispenserShears);
         TESTS.put("infusion_survives_save_and_load", ModGameTests::infusionPersists);
         TESTS.put("infusion_survives_eating_grass", ModGameTests::infusionSurvivesEatingGrass);
+        TESTS.put("automatic_shears_shear_sheep_in_front", ModGameTests::autoShearsShearsArea);
+        TESTS.put("automatic_shears_stop_when_full", ModGameTests::autoShearsStopWhenFull);
+        TESTS.put("automatic_shears_redstone_modes", ModGameTests::autoShearsRedstone);
+        TESTS.put("automatic_shears_need_power", ModGameTests::autoShearsNeedPower);
+        TESTS.put("automatic_shears_hopper_output_only_sheep", ModGameTests::autoShearsHopperAndTag);
         TESTS.put("replacing_infusion_is_refused_by_default", ModGameTests::replaceRefused);
         TESTS.put("separator_produces_raw_iron_and_string", ModGameTests::separatorProcesses);
         TESTS.put("separator_halts_without_energy", ModGameTests::separatorNoEnergy);
@@ -253,6 +259,154 @@ public final class ModGameTests {
         h.assertTrue(second.stream().anyMatch(s -> IRON.equals(ResourceWoolItem.getResourceId(s))), "regrown wool shears as iron wool: " + second);
         h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 7, "second shearing uses one more");
         h.succeed();
+    }
+
+    // ------------------------------------------------------------------ Automatic Shears
+
+    /** Automatic Shears on the north edge facing south: its 3x3 area is x 2-4, z 1-3 (relative), the middle of the platform. */
+    private static final BlockPos SHEARS_POS = new BlockPos(3, 1, 0);
+
+    /** Places the shears with a full energy buffer. */
+    private static com.jax3.functionalresources.sheep.blockentity.AutomaticShearsBlockEntity autoShears(GameTestHelper h) {
+        var be = unpoweredAutoShears(h);
+        be.getEnergy().set(be.getEnergy().getCapacityAsInt());
+        return be;
+    }
+
+    private static com.jax3.functionalresources.sheep.blockentity.AutomaticShearsBlockEntity unpoweredAutoShears(GameTestHelper h) {
+        h.setBlock(SHEARS_POS, ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.functionalresources.sheep.blocks.AutomaticShearsBlock.FACING, net.minecraft.core.Direction.SOUTH));
+        return h.getBlockEntity(SHEARS_POS, com.jax3.functionalresources.sheep.blockentity.AutomaticShearsBlockEntity.class);
+    }
+
+    private static Sheep sheepAt(GameTestHelper h, int x, int z) {
+        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(x, 1, z));
+        sheep.setNoAi(true);
+        sheep.setColor(DyeColor.WHITE);
+        return sheep;
+    }
+
+    private static int countIn(net.minecraft.world.Container c, java.util.function.Predicate<ItemStack> match) {
+        int n = 0;
+        for (int i = 0; i < c.getContainerSize(); i++) if (match.test(c.getItem(i))) n += c.getItem(i).getCount();
+        return n;
+    }
+
+    /** Shears every sheep in the 3x3 in front (infused ones give resource wool), and none outside it. */
+    private static void autoShearsShearsArea(GameTestHelper h) {
+        var shears = autoShears(h);
+        Sheep iron = sheepAt(h, 3, 2);
+        feed(playerHolding(h, new ItemStack(Items.IRON_BLOCK)), iron);
+        Sheep plain = sheepAt(h, 2, 3);
+        Sheep cornerIn = sheepAt(h, 4, 1);
+        Sheep beyond = sheepAt(h, 3, 5);   // 5 blocks out: past the 3x3
+        Sheep beside = sheepAt(h, 5, 2);   // one column too far to the side
+        h.runAfterDelay(5, () -> {
+            h.assertTrue(iron.isSheared() && plain.isSheared() && cornerIn.isSheared(), "all three sheep in the 3x3 should be sheared");
+            h.assertFalse(beyond.isSheared(), "sheep beyond the area must not be sheared");
+            h.assertFalse(beside.isSheared(), "sheep beside the area must not be sheared");
+            h.assertTrue(countIn(shears, s -> IRON.equals(ResourceWoolItem.getResourceId(s))) == 1, "1 iron wool stored");
+            h.assertTrue(countIn(shears, s -> s.is(Items.WOOL.white())) >= 2, "plain sheep's white wool stored");
+            h.assertTrue(SheepInfusionEvents.getInfusion(iron).usesRemaining() == 8, "infusion uses one shearing as usual");
+            h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, h.getBounds()).isEmpty(),
+                    "everything went into the inventory, nothing on the ground");
+            h.assertTrue(shears.getBlockState().getAnalogOutputSignal(h.getLevel(), h.absolutePos(SHEARS_POS), net.minecraft.core.Direction.NORTH) > 0,
+                    "comparator reads the stored wool");
+            h.succeed();
+        });
+    }
+
+    /** A full inventory stops it shearing; emptying a slot starts it again. */
+    private static void autoShearsStopWhenFull(GameTestHelper h) {
+        var shears = autoShears(h);
+        for (int i = 0; i < shears.getContainerSize(); i++) shears.setItem(i, new ItemStack(Items.COBBLESTONE, 64));
+        Sheep sheep = sheepAt(h, 3, 2);
+        h.startSequence()
+                .thenExecuteAfter(25, () -> h.assertFalse(sheep.isSheared(), "a full machine must not shear (and must not drop wool on the ground)"))
+                .thenExecute(() -> shears.setItem(4, ItemStack.EMPTY))
+                .thenWaitUntil(() -> h.assertTrue(sheep.isSheared(), "shears again once there is room"))
+                .thenExecute(() -> h.assertTrue(countIn(shears, s -> s.is(Items.WOOL.white())) >= 1, "wool stored in the freed slot"))
+                .thenSucceed();
+    }
+
+    /**
+     * Redstone modes work like the separator's: "Active without Signal" pauses while powered and resumes when the signal
+     * goes; "Disabled" never runs.
+     */
+    private static void autoShearsRedstone(GameTestHelper h) {
+        var shears = autoShears(h);
+        shears.setRedstoneMode(RedstoneMode.LOW);
+        BlockPos power = new BlockPos(4, 1, 0);
+        h.setBlock(power, net.minecraft.world.level.block.Blocks.REDSTONE_BLOCK);
+        Sheep sheep = sheepAt(h, 3, 2);
+        h.startSequence()
+                .thenExecuteAfter(25, () -> {
+                    h.assertFalse(sheep.isSheared(), "active-without-signal + powered: paused");
+                    h.assertTrue(shears.getStatus() == MachineStatus.REDSTONE_DISABLED, "status shows redstone, was " + shears.getStatus());
+                })
+                .thenExecute(() -> h.setBlock(power, net.minecraft.world.level.block.Blocks.AIR))
+                .thenWaitUntil(() -> h.assertTrue(sheep.isSheared(), "signal removed: shears"))
+                .thenExecute(() -> {
+                    shears.setRedstoneMode(RedstoneMode.DISABLED);
+                    sheep.setSheared(false); // wool back
+                })
+                .thenExecuteAfter(25, () -> h.assertFalse(sheep.isSheared(), "disabled: never shears"))
+                .thenSucceed();
+    }
+
+    /** No FE, no shearing; power fed in from the back is used at energyPerShear per sheep; the front takes no power. */
+    private static void autoShearsNeedPower(GameTestHelper h) {
+        var shears = unpoweredAutoShears(h);
+        Sheep a = sheepAt(h, 3, 2);
+        Sheep b = sheepAt(h, 2, 2);
+        int cost = shears.energyPerShear();
+        h.assertTrue(cost > 0, "default config needs power");
+        var back = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK,
+                h.absolutePos(SHEARS_POS), net.minecraft.core.Direction.NORTH);
+        var front = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK,
+                h.absolutePos(SHEARS_POS), net.minecraft.core.Direction.SOUTH);
+        h.assertTrue(back != null, "accepts FE from the back");
+        h.assertTrue(front == null, "the front (the blades) takes no FE");
+        h.startSequence()
+                .thenExecuteAfter(25, () -> {
+                    h.assertFalse(a.isSheared() || b.isSheared(), "no power: no shearing");
+                    h.assertTrue(shears.getStatus() == MachineStatus.NO_ENERGY, "status No Energy, was " + shears.getStatus());
+                })
+                // Exactly enough for one sheep: only one is sheared.
+                .thenExecute(() -> h.assertTrue(insertEnergy(back, cost) == cost, "back face accepts FE"))
+                .thenWaitUntil(() -> h.assertTrue(a.isSheared() || b.isSheared(), "one sheep sheared with one shear's worth of FE"))
+                .thenExecuteAfter(25, () -> {
+                    h.assertFalse(a.isSheared() && b.isSheared(), "the second sheep must wait for more power");
+                    h.assertTrue(shears.getEnergy().getEnergy() == 0, "used exactly " + cost + " FE, left " + shears.getEnergy().getEnergy());
+                })
+                .thenExecute(() -> insertEnergy(back, cost))
+                .thenWaitUntil(() -> h.assertTrue(a.isSheared() && b.isSheared(), "second sheep sheared once powered again"))
+                .thenSucceed();
+    }
+
+    /** A hopper below takes the wool out; nothing can be put in; mobs outside the tag (a mooshroom) are left alone. */
+    private static void autoShearsHopperAndTag(GameTestHelper h) {
+        var shears = autoShears(h);
+        BlockPos hopper = new BlockPos(3, 0, 0);
+        h.setBlock(hopper, net.minecraft.world.level.block.Blocks.HOPPER);
+        var mooshroom = h.spawn(EntityTypes.MOOSHROOM, new BlockPos(2, 1, 2));
+        mooshroom.setNoAi(true);
+        Sheep sheep = sheepAt(h, 4, 2);
+
+        var handler = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK, h.absolutePos(SHEARS_POS), net.minecraft.core.Direction.UP);
+        h.assertTrue(handler != null, "exposes an item handler for pipes");
+        try (Transaction tx = Transaction.openRoot()) {
+            int inserted = handler.insert(net.neoforged.neoforge.transfer.item.ItemResource.of(Items.DIRT), 1, tx);
+            h.assertTrue(inserted == 0, "output only: nothing can be inserted, got " + inserted);
+        }
+        h.assertFalse(shears.canPlaceItem(0, new ItemStack(Items.DIRT)), "hoppers above can't insert either");
+
+        h.succeedWhen(() -> {
+            h.assertTrue(sheep.isSheared(), "sheep sheared");
+            var hopperBe = h.getBlockEntity(hopper, net.minecraft.world.level.block.entity.HopperBlockEntity.class);
+            h.assertTrue(countIn(hopperBe, s -> s.is(Items.WOOL.white())) >= 1, "hopper below pulls the wool out");
+            h.assertTrue(mooshroom.isAlive() && mooshroom.getType() == EntityTypes.MOOSHROOM, "mooshroom is not auto-sheared into a cow");
+        });
     }
 
     private static void shearPlain(GameTestHelper h) {

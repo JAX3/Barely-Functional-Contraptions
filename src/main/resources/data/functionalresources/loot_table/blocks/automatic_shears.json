@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "functionalresources:automatic_shears",
+          "modifier": {
+            "type": "minecraft:copy_components",
+            "source": "block_entity",
+            "include": [
+              "minecraft:custom_name",
+              "functionalresources:machine_contents"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "random_sequence": "functionalresources:blocks/automatic_shears"
+}

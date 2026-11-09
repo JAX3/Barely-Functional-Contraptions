@@ -56,6 +56,7 @@ public final class IntegrationGameTests {
         TESTS.put("integration_mycelial_generator_powers_separator", IntegrationGameTests::mycelialGeneratorPowersSeparator);
         TESTS.put("integration_mushroom_block_infuses_sheep", IntegrationGameTests::mushroomBlockInfusesSheep);
         TESTS.put("integration_mushroom_wool_fuels_generator", IntegrationGameTests::mushroomWoolFuelsGenerator);
+        TESTS.put("integration_mycelial_generator_powers_automatic_shears", IntegrationGameTests::generatorPowersAutomaticShears);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
     }
 
@@ -106,6 +107,26 @@ public final class IntegrationGameTests {
             h.assertTrue(separator.getInventory().getStack(SeparatorInventory.PRIMARY).is(Items.RAW_IRON),
                     "separator should finish iron wool on mycelial power");
             h.assertTrue(separator.getInventory().getStack(SeparatorInventory.SECONDARY).is(Items.STRING), "string output expected");
+        });
+    }
+
+    /** A Mycelial Generator against the back of an unpowered Automatic Shears powers it, and it shears the sheep in front. */
+    private static void generatorPowersAutomaticShears(GameTestHelper h) {
+        BlockPos shearsPos = new BlockPos(3, 1, 1);
+        h.setBlock(shearsPos, com.jax3.functionalresources.sheep.registry.ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.functionalresources.sheep.blocks.AutomaticShearsBlock.FACING, net.minecraft.core.Direction.SOUTH));
+        var shears = h.getBlockEntity(shearsPos, com.jax3.functionalresources.sheep.blockentity.AutomaticShearsBlockEntity.class);
+        MycelialGeneratorBlockEntity generator = generator(h, new BlockPos(3, 1, 0), new ItemStack(Items.BROWN_MUSHROOM, 8), 4000);
+        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(3, 1, 3));
+        sheep.setNoAi(true);
+        sheep.setColor(DyeColor.WHITE);
+        h.assertTrue(shears.getEnergy().getEnergy() == 0, "starts unpowered");
+        h.succeedWhen(() -> {
+            h.assertTrue(generator.getState() == GeneratorState.RUNNING, "generator running, was " + generator.getState());
+            h.assertTrue(sheep.isSheared(), "sheep sheared on mycelial power");
+            boolean stored = false;
+            for (int i = 0; i < shears.getContainerSize(); i++) stored |= shears.getItem(i).is(Items.WOOL.white());
+            h.assertTrue(stored, "wool stored in the shears");
         });
     }
 

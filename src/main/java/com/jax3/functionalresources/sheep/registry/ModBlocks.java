@@ -1,6 +1,7 @@
 package com.jax3.functionalresources.sheep.registry;
 
 import com.jax3.functionalresources.sheep.ResourcefulSheep;
+import com.jax3.functionalresources.sheep.blocks.AutomaticShearsBlock;
 import com.jax3.functionalresources.sheep.blocks.CreativeGeneratorBlock;
 import com.jax3.functionalresources.sheep.blocks.MechanicalSeparatorBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -21,6 +22,14 @@ public final class ModBlocks {
                     .sound(SoundType.METAL)
                     .pushReaction(PushReaction.IMMOVEABLE)
                     .lightLevel(state -> state.getValue(MechanicalSeparatorBlock.ACTIVE) ? 7 : 0));
+
+    /** Shears sheep in the 3x3 area in front of it into a 9-slot inventory. Stone pickaxe, like a dispenser. */
+    public static final DeferredBlock<AutomaticShearsBlock> AUTOMATIC_SHEARS = REGISTER.registerBlock("automatic_shears",
+            AutomaticShearsBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL));
 
     /** Creative-only infinite FE source: unbreakable in survival, no recipe. */
     public static final DeferredBlock<CreativeGeneratorBlock> CREATIVE_GENERATOR = REGISTER.registerBlock("creative_generator",
