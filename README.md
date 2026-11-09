@@ -47,6 +47,10 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 2. Put `barelyfunctionalcontraptions-1.0.0.jar` in the `mods/` folder of the client **and** the server.
 3. Optional: install JEI 31.x and/or Jade 26.3.x. The mod runs normally without them.
 
+**Machine fronts:** all three machines share one look. Each has a purple-rimmed glass window on its front: a red mushroom in the generator, a wool block in the separator and a pair of shears in the Automatic Shears. The window is dark while the machine is idle and glows with a pulsing halo and sparkles while it runs. The separator and shears also give off a little light while running.
+
+![Machine fronts, idle and running](docs/screenshots/14_machine_fronts.png)
+
 **Placing machines:** the Mycelial Generator, Mechanical Separator and Automatic Shears place with their front facing you. **Hold Shift while placing** to make the front face away from you instead (handy for pointing the shears at a pen from outside it, or the separator's back at a cable).
 
 > **Renamed from "Functional Resources".** The mod ID changed from `functionalresources` to `barelyfunctionalcontraptions`. Blocks, items, wool and infused sheep from worlds made with the old builds don't carry over. Config files are now `config/barelyfunctionalcontraptions-*.toml`, and the command is `/barelyfunctionalcontraptions`. Wool types made with the old generate command live in the old `functionalresources_generated` pack; run `/barelyfunctionalcontraptions generate` again to recreate them.

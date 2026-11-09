@@ -166,7 +166,9 @@ public final class DevScreenshotHarness {
                         String.format(java.util.Locale.ROOT, "tp @a %d.5 %d %d.5 -99 24", origin.getX(), origin.getY() + 3, origin.getZ() + 1)));
             }
             case 660 -> shot(mc, "13_automatic_shears");
-            case 670 -> {
+            case 670 -> server.execute(() -> machineRow(server));
+            case 700 -> shot(mc, "14_machine_fronts");
+            case 710 -> {
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -186,6 +188,33 @@ public final class DevScreenshotHarness {
     private static void look(MinecraftServer server, float yaw, float pitch) {
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                 String.format(java.util.Locale.ROOT, "tp @a %d %d %d %.1f %.1f", origin.getX(), origin.getY(), origin.getZ(), yaw, pitch));
+    }
+
+    /** Generator, separator and shears side by side, each idle (left) and running (right), floating in the sky. */
+    private static void machineRow(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        BlockPos row = origin.offset(0, 12, -5);
+        var sepState = ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState().setValue(MechanicalSeparatorBlock.FACING, Direction.SOUTH);
+        var shearsState = ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.SOUTH);
+        var genState = com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.mycelial.block.MycelialGeneratorBlock.FACING, Direction.SOUTH);
+        BlockPos[] positions = {row.offset(-5, 0, 0), row.offset(-4, 0, 0), row.offset(-1, 0, 0), row.offset(0, 0, 0), row.offset(3, 0, 0), row.offset(4, 0, 0)};
+        var states = new net.minecraft.world.level.block.state.BlockState[]{genState, genState, sepState, sepState, shearsState, shearsState};
+        for (int i = 0; i < positions.length; i++) level.setBlock(positions[i], states[i], 3);
+        // Running copies: fuel for the generator, wool + a creative generator behind the separator, FE for the shears.
+        if (level.getBlockEntity(positions[1]) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity generator) {
+            generator.getInventory().setStackInSlot(com.jax3.barelyfunctionalcontraptions.mycelial.capability.GeneratorItemHandler.FUEL_SLOT,
+                    new ItemStack(Items.RED_MUSHROOM, 32));
+            generator.getTank().fillInternal(net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER), 8000);
+        }
+        level.setBlock(positions[3].north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+        if (level.getBlockEntity(positions[3]) instanceof MechanicalSeparatorBlockEntity be) fill(be, 64);
+        if (level.getBlockEntity(positions[5]) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity shearsBe) {
+            shearsBe.getEnergy().set(30_000);
+        }
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 8", row.getX() + 0.0, row.getY() + 1, row.getZ() + 6.2));
     }
 
     private static void setupScene(MinecraftServer server) {

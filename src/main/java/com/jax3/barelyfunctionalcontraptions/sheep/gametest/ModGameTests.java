@@ -383,9 +383,12 @@ public final class ModGameTests {
                 .thenExecuteAfter(25, () -> {
                     h.assertFalse(a.isSheared() || b.isSheared(), "no power: no shearing");
                     h.assertTrue(shears.getStatus() == MachineStatus.NO_ENERGY, "status No Energy, was " + shears.getStatus());
+                    h.assertBlockProperty(SHEARS_POS, com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.ACTIVE, false);
                 })
                 // Exactly enough for one sheep: only one is sheared.
                 .thenExecute(() -> h.assertTrue(insertEnergy(back, cost) == cost, "back face accepts FE"))
+                .thenExecuteAfter(1, () -> h.assertBlockProperty(SHEARS_POS,
+                        com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.ACTIVE, true))
                 .thenWaitUntil(() -> h.assertTrue(a.isSheared() || b.isSheared(), "one sheep sheared with one shear's worth of FE"))
                 .thenExecuteAfter(25, () -> {
                     h.assertFalse(a.isSheared() && b.isSheared(), "the second sheep must wait for more power");

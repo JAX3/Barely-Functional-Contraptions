@@ -1,18 +1,33 @@
 {
   "variants": {
-    "facing=north": {
+    "active=false,facing=north": {
       "model": "barelyfunctionalcontraptions:block/automatic_shears"
     },
-    "facing=east": {
+    "active=true,facing=north": {
+      "model": "barelyfunctionalcontraptions:block/automatic_shears_active"
+    },
+    "active=false,facing=east": {
       "model": "barelyfunctionalcontraptions:block/automatic_shears",
       "y": 90
     },
-    "facing=south": {
+    "active=true,facing=east": {
+      "model": "barelyfunctionalcontraptions:block/automatic_shears_active",
+      "y": 90
+    },
+    "active=false,facing=south": {
       "model": "barelyfunctionalcontraptions:block/automatic_shears",
       "y": 180
     },
-    "facing=west": {
+    "active=true,facing=south": {
+      "model": "barelyfunctionalcontraptions:block/automatic_shears_active",
+      "y": 180
+    },
+    "active=false,facing=west": {
       "model": "barelyfunctionalcontraptions:block/automatic_shears",
+      "y": 270
+    },
+    "active=true,facing=west": {
+      "model": "barelyfunctionalcontraptions:block/automatic_shears_active",
       "y": 270
     }
   }

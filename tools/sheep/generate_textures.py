@@ -384,7 +384,7 @@ SEP_BACK = [  # glowing FE input port with an energy bolt
     "OOOOOOOOOOOOOOOO",
 ]
 
-# Front: purple-rimmed processing window with a brass gear and a tuft of wool being pulled apart.
+# Front: the Mycelial Generator's purple rim; the window is transparent and the model's raised chamber fills it.
 SEP_FRONT_FRAME = [
     "OOOOOOOOOOOOOOOO",
     "OHHHHHHHHHHHHHMO",
@@ -421,27 +421,97 @@ def grid(rows, pal, img=None, ox=0, oy=0):
     return img
 
 
-def separator_front(frame, active):
-    img = grid(SEP_FRONT_FRAME, CARTOON)
-    window = {"K": CARTOON["K"]}
-    for y in range(4, 12):
-        for x in range(4, 12):
-            img.putpixel((x, y), CARTOON["K"] if (x + y) % 5 else CARTOON["k"])
-    pal = dict(CARTOON) if active else {
-        "C": hexc("#8a7a6a"), "c": hexc("#5e5248"), "Y": hexc("#a89a8a")}
-    grid(GEAR_POSES[frame % 2], pal, img, 4, 4)
-    if active:
-        # wool tufts being separated: drift across the window
-        for (wx, wy) in [((frame * 2) % 8 + 4, 10), ((frame * 2 + 4) % 8 + 4, 5)]:
-            img.putpixel((wx, wy), CARTOON["W"])
-            if wx + 1 < 12:
-                img.putpixel((wx + 1, wy), CARTOON["w"])
-        # glow rim
-        for x in range(3, 13):
-            img.putpixel((x, 2), CARTOON["g"] if frame % 2 else CARTOON["P"])
-    # status light on the right rim
-    img.putpixel((13, 6), CARTOON["R"] if active else CARTOON["r"])
-    img.putpixel((13, 7), CARTOON["R"] if active else CARTOON["r"])
+# ---- Front chambers, drawn the same way as the Mycelial Generator's: the front texture is the purple rim with a
+# transparent window, and the model's raised glass chamber shows a 10x10 cartoon at pixel 3,3 of a chamber texture.
+# Idle: the cartoon sits unlit on dark glass. Running: it glows on a pulsing halo with one sparkle at a time.
+CHAMBER_ORIGIN = 3
+
+WOOL_BLOCK = [  # puffy cartoon wool block with scalloped edges
+    "..OO..OO..",
+    ".OWWOOWWO.",
+    "OWLWWWWwWO",
+    "OWWLwWWwvO",
+    ".OWwWWLvO.",
+    ".OWWWLwvO.",
+    "OWLwWWWwvO",
+    "OWwWwvWvvO",
+    ".OvvOOvvO.",
+    "..OO..OO..",
+]
+WOOL_IDLE = {"O": hexc("#120d18"), "L": hexc("#a29cae"), "W": hexc("#8a8496"), "w": hexc("#6c6778"), "v": hexc("#4f4a5b")}
+WOOL_LIT = {"O": hexc("#3b1a5c"), "L": hexc("#ffffff"), "W": hexc("#f6f3fb"), "w": hexc("#d9d4e6"), "v": hexc("#ab9fc4")}
+
+SHEARS_ICON = [  # open shears, blades up, finger loops down
+    "L........L",
+    "lL......Ll",
+    ".dl....ld.",
+    "..dl..ld..",
+    "...dXXd...",
+    "...qXXq...",
+    "..qQ..Qq..",
+    ".QQ....QQ.",
+    ".Q.Q..Q.Q.",
+    "..QQ..QQ..",
+]
+SHEARS_IDLE = {"O": hexc("#120d18"), "L": hexc("#8f97a6"), "l": hexc("#6c7482"), "d": hexc("#4a5160"),
+               "X": hexc("#8a7a4a"), "Q": hexc("#7a3a3e"), "q": hexc("#552529")}
+SHEARS_LIT = {"O": hexc("#3b1a5c"), "L": hexc("#ffffff"), "l": hexc("#d4dce8"), "d": hexc("#8e99ab"),
+              "X": hexc("#ffd75e"), "Q": hexc("#ff4b4b"), "q": hexc("#c42a3a")}
+
+CHAMBER_SPARKLES = [(3, 3), (12, 4), (12, 11), (3, 11)]
+
+
+def _lerp(c1, c2, t):
+    return tuple(round(c1[i] + (c2[i] - c1[i]) * t) for i in range(4))
+
+
+def _chamber_frame(img, top, colour):
+    for i in range(16):
+        for (x, y) in ((i, top), (0, top + i), (i, top + 15), (15, top + i)):
+            img.putpixel((x, y), colour)
+
+
+def chamber_off(art, pal):
+    img = Image.new("RGBA", (16, 16), hexc("#1d1626"))
+    grid(art, pal, img, CHAMBER_ORIGIN, CHAMBER_ORIGIN)
+    for (x, y) in ((4, 4), (5, 4), (4, 5)):
+        if img.getpixel((x, y)) == hexc("#1d1626"):
+            img.putpixel((x, y), hexc("#4a3d5c"))
+    _chamber_frame(img, 0, hexc("#3a2d4a"))
+    return img
+
+
+def chamber_on(art, pal, inner, outer, frames=8):
+    import math
+    img = Image.new("RGBA", (16, 16 * frames))
+    for f in range(frames):
+        pulse = 0.5 + 0.5 * math.sin(f / frames * 2 * math.pi)
+        top = f * 16
+        for y in range(16):
+            for x in range(16):
+                r = math.hypot(x - 7.5, y - 7.0) / (7.0 + pulse)
+                img.putpixel((x, top + y), _lerp(inner, outer, min(1.0, r)))
+        grid(art, pal, img, CHAMBER_ORIGIN, top + CHAMBER_ORIGIN)
+        sx, sy = CHAMBER_SPARKLES[(f // 2) % len(CHAMBER_SPARKLES)]
+        for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)):
+            if 0 < sx + dx < 15 and 0 < sy + dy < 15:
+                img.putpixel((sx + dx, top + sy + dy), hexc("#ffffff") if (dx, dy) == (0, 0) else hexc("#fff3a8"))
+        _chamber_frame(img, top, hexc("#f6eeff"))
+    return img
+
+
+def save_chambers(prefix, art, idle, lit, inner, outer):
+    chamber_off(art, idle).save(out(f"block/{prefix}_chamber_off.png"))
+    chamber_on(art, lit, inner, outer).save(out(f"block/{prefix}_chamber_on.png"))
+    with open(out(f"block/{prefix}_chamber_on.png.mcmeta"), "w") as fh:
+        fh.write('{\n  "animation": {\n    "frametime": 4,\n    "interpolate": true\n  }\n}\n')
+
+
+def machine_front_preview(prefix):
+    """Front face as it looks running (rim + first lit chamber frame), for banners and docs."""
+    img = Image.open(out(f"block/{prefix}_front.png")).convert("RGBA")
+    chamber = Image.open(out(f"block/{prefix}_chamber_on.png")).convert("RGBA").crop((3, 3, 13, 13))
+    img.alpha_composite(chamber, (3, 3))
     return img
 
 
@@ -450,13 +520,12 @@ def generate_block():
     grid(SEP_TOP, CARTOON).save(out("block/mechanical_separator_top.png"))
     grid(SEP_BOTTOM, CARTOON).save(out("block/mechanical_separator_bottom.png"))
     grid(SEP_BACK, CARTOON).save(out("block/mechanical_separator_back.png"))
-    separator_front(0, False).save(out("block/mechanical_separator_front.png"))
-    strip = Image.new("RGBA", (16, 64), CLEAR)
-    for f in range(4):
-        strip.paste(separator_front(f, True), (0, f * 16))
-    strip.save(out("block/mechanical_separator_front_active.png"))
-    with open(out("block/mechanical_separator_front_active.png.mcmeta"), "w") as fh:
-        fh.write('{\n  "animation": {\n    "frametime": 3,\n    "interpolate": false\n  }\n}\n')
+    grid(SEP_FRONT_FRAME, CARTOON).save(out("block/mechanical_separator_front.png"))
+    for stale in ("mechanical_separator_front_active.png", "mechanical_separator_front_active.png.mcmeta"):
+        if os.path.exists(out("block/" + stale)):
+            os.remove(out("block/" + stale))
+    # violet halo: the separator pulls the wool apart
+    save_chambers("mechanical_separator", WOOL_BLOCK, WOOL_IDLE, WOOL_LIT, hexc("#f1dcff"), hexc("#b77cf5"))
 
 
 CREATIVE_GEN = [  # creative energy source: magenta-rimmed plate with a big glowing energy core
@@ -958,7 +1027,7 @@ def generate_logo():
         banner.putpixel((x, 20), CARTOON["G"])
     for i in range(3):
         banner.putpixel((90 - i, 20 - i - 1), CARTOON["G"]); banner.putpixel((90 - i, 20 + i + 1), CARTOON["G"])
-    front = Image.open(os.path.join(tex, "block", "mechanical_separator_front_active.png")).convert("RGBA").crop((0, 0, 16, 16))
+    front = machine_front_preview("mechanical_separator")
     banner.alpha_composite(front.resize((24, 24), Image.NEAREST), (93, 8))
     for (x, y) in [(40, 7), (78, 31), (112, 6)]:
         _star(banner, x, y, hexc("#ffffff"), hexc("#ff9af0"))
@@ -974,25 +1043,6 @@ SHEARS_PAL.update({
     "Q": hexc("#e0443e"), "q": hexc("#8e2028"),                      # handle / handle shadow
     "X": hexc("#ffd75e"),                                            # brass pivot
 })
-
-SHEARS_FRONT = [  # open shears in a dark window, wool tufts caught at the bottom
-    "OOOOOOOOOOOOOOOO",
-    "OHHHHHHHHHHHHHMO",
-    "OHPPPPPPPPPPPPSO",
-    "OHPOOOOOOOOOOpSO",
-    "OHPOLKKKKKKLOpSO",
-    "OHPOlLKKKKLlOpSO",
-    "OHPOKdlKKldKOpSO",
-    "OHPOKKdXXdKKOpSO",
-    "OHPOKKqXXqKKOpSO",
-    "OHPOKqQKKQqKOpSO",
-    "OHPOqQKKKKQqOpSO",
-    "OHPOQqwWWwqQOpSO",
-    "OHPOOOOOOOOOOpSO",
-    "OwppppppppppppvO",
-    "OvwWwwvWwvwwWwvO",
-    "OOOOOOOOOOOOOOOO",
-]
 
 SHEARS_SIDE = [  # storage hatch with a latch
     "OOOOOOOOOOOOOOOO",
@@ -1034,7 +1084,9 @@ SHEARS_TOP = [  # lid with a blade emblem
 
 
 def generate_automatic_shears():
-    grid(SHEARS_FRONT, SHEARS_PAL).save(out("block/automatic_shears_front.png"))
+    grid(SEP_FRONT_FRAME, CARTOON).save(out("block/automatic_shears_front.png"))
+    # pink halo, like the generator's
+    save_chambers("automatic_shears", SHEARS_ICON, SHEARS_IDLE, SHEARS_LIT, hexc("#ffd6de"), hexc("#ff7a92"))
     grid(SHEARS_SIDE, SHEARS_PAL).save(out("block/automatic_shears_side.png"))
     grid(SHEARS_TOP, SHEARS_PAL).save(out("block/automatic_shears_top.png"))
     grid(SEP_BOTTOM, CARTOON).save(out("block/automatic_shears_bottom.png"))   # output chute, like the separator

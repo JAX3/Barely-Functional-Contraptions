@@ -23,6 +23,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -126,6 +127,10 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity {
             cooldown = interval;
             if (shearArea(level, pos, state.getValue(AutomaticShearsBlock.FACING)) > 0) shearingDisplay = SHEARING_DISPLAY_TICKS;
             status = shearingDisplay > 0 ? MachineStatus.PROCESSING : MachineStatus.IDLE;
+        }
+        boolean active = status == MachineStatus.IDLE || status == MachineStatus.PROCESSING;
+        if (state.getValue(AutomaticShearsBlock.ACTIVE) != active) {
+            level.setBlock(pos, state.setValue(AutomaticShearsBlock.ACTIVE, active), Block.UPDATE_ALL);
         }
     }
 

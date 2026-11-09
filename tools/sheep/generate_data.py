@@ -113,49 +113,45 @@ def item_models():
           {"model": {"type": "minecraft:model", "model": f"{MOD}:block/automatic_shears"}})
 
 
-def block_models():
-    def model(front):
-        return {
-            "parent": "minecraft:block/cube",
-            "textures": {
-                "particle": f"{MOD}:block/mechanical_separator_side",
-                "north": f"{MOD}:block/{front}",
-                "south": f"{MOD}:block/mechanical_separator_back",
-                "east": f"{MOD}:block/mechanical_separator_side",
-                "west": f"{MOD}:block/mechanical_separator_side",
-                "up": f"{MOD}:block/mechanical_separator_top",
-                "down": f"{MOD}:block/mechanical_separator_bottom",
-            },
-        }
-    write(os.path.join(ASSETS, "models", "block", "mechanical_separator.json"), model("mechanical_separator_front"))
-    write(os.path.join(ASSETS, "models", "block", "mechanical_separator_active.json"), model("mechanical_separator_front_active"))
-    variants = {}
-    for facing, rot in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
-        for active in ("false", "true"):
-            v = {"model": f"{MOD}:block/mechanical_separator" + ("_active" if active == "true" else "")}
-            if rot:
-                v["y"] = rot
-            variants[f"active={active},facing={facing}"] = v
-    write(os.path.join(ASSETS, "blockstates", "mechanical_separator.json"), {"variants": variants})
-    write(os.path.join(ASSETS, "models", "block", "automatic_shears.json"), {
-        "parent": "minecraft:block/cube",
+def machine_model(prefix, chamber):
+    """Same shape as the Mycelial Generator: a casing cube plus a raised glass chamber over the front window."""
+    full = [0, 0, 16, 16]
+    casing = {}
+    for face, tex, cull in (("north", "#front", "north"), ("east", "#side", "east"), ("south", "#back", "south"),
+                            ("west", "#side", "west"), ("up", "#top", "up"), ("down", "#bottom", "down")):
+        casing[face] = {"texture": tex, "uv": full, "cullface": cull}
+    window = {face: {"texture": "#chamber", "uv": [3, 3, 13, 13]}
+              for face in ("north", "east", "south", "west", "up", "down")}
+    return {
+        "parent": "minecraft:block/block",
         "textures": {
-            "particle": f"{MOD}:block/automatic_shears_side",
-            "north": f"{MOD}:block/automatic_shears_front",
-            "south": f"{MOD}:block/automatic_shears_back",
-            "east": f"{MOD}:block/automatic_shears_side",
-            "west": f"{MOD}:block/automatic_shears_side",
-            "up": f"{MOD}:block/automatic_shears_top",
-            "down": f"{MOD}:block/automatic_shears_bottom",
+            "particle": f"{MOD}:block/{prefix}_side",
+            "front": f"{MOD}:block/{prefix}_front",
+            "back": f"{MOD}:block/{prefix}_back",
+            "side": f"{MOD}:block/{prefix}_side",
+            "top": f"{MOD}:block/{prefix}_top",
+            "bottom": f"{MOD}:block/{prefix}_bottom",
+            "chamber": f"{MOD}:block/{chamber}",
         },
-    })
-    shear_variants = {}
-    for facing, rot in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
-        v = {"model": f"{MOD}:block/automatic_shears"}
-        if rot:
-            v["y"] = rot
-        shear_variants[f"facing={facing}"] = v
-    write(os.path.join(ASSETS, "blockstates", "automatic_shears.json"), {"variants": shear_variants})
+        "elements": [
+            {"from": [0, 0, 0], "to": [16, 16, 16], "faces": casing},
+            {"from": [3, 3, -0.5], "to": [13, 13, 0], "faces": window},
+        ],
+    }
+
+
+def block_models():
+    for prefix in ("mechanical_separator", "automatic_shears"):
+        write(os.path.join(ASSETS, "models", "block", f"{prefix}.json"), machine_model(prefix, f"{prefix}_chamber_off"))
+        write(os.path.join(ASSETS, "models", "block", f"{prefix}_active.json"), machine_model(prefix, f"{prefix}_chamber_on"))
+        variants = {}
+        for facing, rot in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
+            for active in ("false", "true"):
+                v = {"model": f"{MOD}:block/{prefix}" + ("_active" if active == "true" else "")}
+                if rot:
+                    v["y"] = rot
+                variants[f"active={active},facing={facing}"] = v
+        write(os.path.join(ASSETS, "blockstates", f"{prefix}.json"), {"variants": variants})
     write(os.path.join(ASSETS, "models", "block", "creative_generator.json"),
           {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/creative_generator"}})
     write(os.path.join(ASSETS, "blockstates", "creative_generator.json"),

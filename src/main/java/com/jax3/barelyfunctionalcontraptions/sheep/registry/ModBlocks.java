@@ -29,7 +29,8 @@ public final class ModBlocks {
             p -> p.mapColor(MapColor.METAL)
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
-                    .sound(SoundType.METAL));
+                    .sound(SoundType.METAL)
+                    .lightLevel(state -> state.getValue(AutomaticShearsBlock.ACTIVE) ? 7 : 0));
 
     /** Creative-only infinite FE source: unbreakable in survival, no recipe. */
     public static final DeferredBlock<CreativeGeneratorBlock> CREATIVE_GENERATOR = REGISTER.registerBlock("creative_generator",

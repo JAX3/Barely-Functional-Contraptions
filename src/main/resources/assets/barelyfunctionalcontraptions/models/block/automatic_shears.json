@@ -1,12 +1,156 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "minecraft:block/block",
   "textures": {
     "particle": "barelyfunctionalcontraptions:block/automatic_shears_side",
-    "north": "barelyfunctionalcontraptions:block/automatic_shears_front",
-    "south": "barelyfunctionalcontraptions:block/automatic_shears_back",
-    "east": "barelyfunctionalcontraptions:block/automatic_shears_side",
-    "west": "barelyfunctionalcontraptions:block/automatic_shears_side",
-    "up": "barelyfunctionalcontraptions:block/automatic_shears_top",
-    "down": "barelyfunctionalcontraptions:block/automatic_shears_bottom"
-  }
+    "front": "barelyfunctionalcontraptions:block/automatic_shears_front",
+    "back": "barelyfunctionalcontraptions:block/automatic_shears_back",
+    "side": "barelyfunctionalcontraptions:block/automatic_shears_side",
+    "top": "barelyfunctionalcontraptions:block/automatic_shears_top",
+    "bottom": "barelyfunctionalcontraptions:block/automatic_shears_bottom",
+    "chamber": "barelyfunctionalcontraptions:block/automatic_shears_chamber_off"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "north"
+        },
+        "east": {
+          "texture": "#side",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "east"
+        },
+        "south": {
+          "texture": "#back",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#side",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#bottom",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        3,
+        -0.5
+      ],
+      "to": [
+        13,
+        13,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#chamber",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        },
+        "east": {
+          "texture": "#chamber",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        },
+        "south": {
+          "texture": "#chamber",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        },
+        "west": {
+          "texture": "#chamber",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        },
+        "up": {
+          "texture": "#chamber",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        },
+        "down": {
+          "texture": "#chamber",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        }
+      }
+    }
+  ]
 }
