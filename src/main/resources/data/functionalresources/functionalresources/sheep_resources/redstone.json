@@ -1,5 +1,5 @@
 {
-  "feeding_item": "minecraft:redstone_block",
+  "feeding_item": "minecraft:redstone",
   "feeding_amount": 1,
   "wool_color": "#9E1D1D",
   "accent_color": "#FF3B2B",
