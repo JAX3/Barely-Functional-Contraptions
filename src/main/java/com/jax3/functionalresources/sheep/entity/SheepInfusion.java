@@ -42,7 +42,7 @@ public record SheepInfusion(Optional<Identifier> resource, int usesRemaining, lo
     /** Uses up one shearing. Returns the cleared state once no uses remain (permanent infusions are unchanged). */
     public SheepInfusion afterShearing(long gameTime, int cooldownTicks) {
         if (usesRemaining < 0) return this;
-        int left = usesRemaining - 1;
+        int left = usesRemaining - 100;
         if (left <= 0) return new SheepInfusion(Optional.empty(), 0, cooldownTicks > 0 ? gameTime + cooldownTicks : 0L);
         return new SheepInfusion(resource, left, cooldownUntil);
     }
