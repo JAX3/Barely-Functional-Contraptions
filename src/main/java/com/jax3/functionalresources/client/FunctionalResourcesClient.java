@@ -18,5 +18,17 @@ public final class FunctionalResourcesClient {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         MycelialPowerClient.init(modBus, container);
         ResourcefulSheepClient.init(modBus, container);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FunctionalResourcesClient::onItemTooltip);
+    }
+
+    /** Machines with a front explain the Shift-to-reverse placement. */
+    private static void onItemTooltip(net.neoforged.neoforge.event.entity.player.ItemTooltipEvent event) {
+        var stack = event.getItemStack();
+        if (stack.is(com.jax3.functionalresources.mycelial.registry.ModItems.MYCELIAL_GENERATOR.get())
+                || stack.is(com.jax3.functionalresources.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get())
+                || stack.is(com.jax3.functionalresources.sheep.registry.ModItems.AUTOMATIC_SHEARS.get())) {
+            event.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.functionalresources.shift_place")
+                    .withStyle(net.minecraft.ChatFormatting.DARK_GRAY));
+        }
     }
 }

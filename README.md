@@ -47,6 +47,8 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 2. Put `functionalresources-1.0.0.jar` in the `mods/` folder of the client **and** the server.
 3. Optional: install JEI 31.x and/or Jade 26.3.x. The mod runs normally without them.
 
+**Placing machines:** the Mycelial Generator, Mechanical Separator and Automatic Shears place with their front facing you. **Hold Shift while placing** to make the front face away from you instead (handy for pointing the shears at a pen from outside it, or the separator's back at a cable).
+
 > Coming from the separate mods? Remove `mycelialpower-*.jar` and `resourcefulsheep-*.jar` first. Everything now lives in the `functionalresources` namespace (for example `functionalresources:mycelial_generator` and `functionalresources:mechanical_separator`), so blocks and items placed with the old standalone mods do not carry over into existing worlds. Data packs that add sheep resources must move from `data/<ns>/resourcefulsheep/sheep_resources/` to `data/<ns>/functionalresources/sheep_resources/`. Separator recipes now use the type `functionalresources:separating`.
 
 ---

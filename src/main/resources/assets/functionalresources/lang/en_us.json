@@ -378,5 +378,6 @@
   "gui.functionalresources.shears.status.invalid_input.desc": "",
   "gui.functionalresources.shears.status.redstone_disabled": "Disabled by Redstone",
   "gui.functionalresources.shears.status.redstone_disabled.desc": "Change the redstone signal or mode to run",
-  "functionalresources.configuration.energyPerShear": "Energy per shear"
+  "functionalresources.configuration.energyPerShear": "Energy per shear",
+  "tooltip.functionalresources.shift_place": "Hold Shift while placing to face it away from you"
 }

@@ -12,6 +12,7 @@ import com.jax3.functionalresources.sheep.items.ResourceWoolItem;
 import com.jax3.functionalresources.sheep.resource.SheepResource;
 import com.jax3.functionalresources.sheep.resource.SheepResourceRegistry;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
@@ -57,6 +58,7 @@ public final class IntegrationGameTests {
         TESTS.put("integration_mushroom_block_infuses_sheep", IntegrationGameTests::mushroomBlockInfusesSheep);
         TESTS.put("integration_mushroom_wool_fuels_generator", IntegrationGameTests::mushroomWoolFuelsGenerator);
         TESTS.put("integration_mycelial_generator_powers_automatic_shears", IntegrationGameTests::generatorPowersAutomaticShears);
+        TESTS.put("shift_placing_faces_machines_away", IntegrationGameTests::shiftPlacingFacesAway);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
     }
 
@@ -128,6 +130,48 @@ public final class IntegrationGameTests {
             for (int i = 0; i < shears.getContainerSize(); i++) stored |= shears.getItem(i).is(Items.WOOL.white());
             h.assertTrue(stored, "wool stored in the shears");
         });
+    }
+
+    /**
+     * Every machine with a front faces the player when placed normally, and away from them when placed while holding
+     * Shift. Placement goes through the real block item, the same path as a right-click.
+     */
+    private static void shiftPlacingFacesAway(GameTestHelper h) {
+        record Machine(net.minecraft.world.item.Item item, net.minecraft.world.level.block.Block block,
+                       net.minecraft.world.level.block.state.properties.EnumProperty<net.minecraft.core.Direction> facing) {}
+        List<Machine> machines = List.of(
+                new Machine(com.jax3.functionalresources.mycelial.registry.ModItems.MYCELIAL_GENERATOR.get(),
+                        com.jax3.functionalresources.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get(),
+                        com.jax3.functionalresources.mycelial.block.MycelialGeneratorBlock.FACING),
+                new Machine(com.jax3.functionalresources.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get(),
+                        com.jax3.functionalresources.sheep.registry.ModBlocks.MECHANICAL_SEPARATOR.get(),
+                        com.jax3.functionalresources.sheep.blocks.MechanicalSeparatorBlock.FACING),
+                new Machine(com.jax3.functionalresources.sheep.registry.ModItems.AUTOMATIC_SHEARS.get(),
+                        com.jax3.functionalresources.sheep.registry.ModBlocks.AUTOMATIC_SHEARS.get(),
+                        com.jax3.functionalresources.sheep.blocks.AutomaticShearsBlock.FACING));
+        int x = 1;
+        for (Machine machine : machines) {
+            for (boolean sneaking : new boolean[]{false, true}) {
+                BlockPos target = new BlockPos(x++, 1, 3);
+                h.setBlock(target.below(), net.minecraft.world.level.block.Blocks.STONE); // solid floor to click on
+                Player player = h.makeMockPlayer(GameType.SURVIVAL);
+                player.setYRot(0.0F); // looking south (+Z)
+                player.setShiftKeyDown(sneaking);
+                player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(machine.item()));
+                // Click the top of the block below the target, as a player placing it on the floor would.
+                BlockPos floor = h.absolutePos(target.below());
+                var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floor).add(0, 0.5, 0),
+                        net.minecraft.core.Direction.UP, floor, false);
+                var result = player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND, hit));
+                h.assertTrue(result.consumesAction(), machine.block() + " should be placed, got " + result);
+                h.assertBlockPresent(machine.block(), target);
+                var expected = sneaking ? net.minecraft.core.Direction.SOUTH : net.minecraft.core.Direction.NORTH;
+                var facing = h.getBlockState(target).getValue(machine.facing());
+                h.assertTrue(facing == expected, machine.block() + (sneaking ? " placed while sneaking" : " placed normally")
+                        + " should face " + expected + ", faces " + facing);
+            }
+        }
+        h.succeed();
     }
 
     /** Mushroom blocks (which Mycelial Generators grow as huge mushrooms) are a built-in sheep resource. */

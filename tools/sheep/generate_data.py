@@ -170,6 +170,7 @@ def lang():
         "block.functionalresources.mechanical_separator": "Mechanical Separator",
         "block.functionalresources.creative_generator": "Creative Generator",
         "block.functionalresources.automatic_shears": "Automatic Shears",
+        "tooltip.functionalresources.shift_place": "Hold Shift while placing to face it away from you",
         "tooltip.functionalresources.automatic_shears": "Uses FE to shear sheep in the 3x3 area in front of it and keeps the wool. Take it out by hand or with a hopper below.",
         "gui.functionalresources.shears.energy_stored": "%s FE",
         "gui.functionalresources.shears.energy_capacity": "of %s",

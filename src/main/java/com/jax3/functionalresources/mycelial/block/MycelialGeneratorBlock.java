@@ -68,7 +68,7 @@ public class MycelialGeneratorBlock extends BaseEntityBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        return defaultBlockState().setValue(FACING, com.jax3.functionalresources.util.PlacementFacing.horizontal(context));
     }
 
     @Override

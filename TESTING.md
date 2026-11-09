@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/functionalresources-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 52 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 32 Resourceful Sheep, 4 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 53 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 32 Resourceful Sheep, 5 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 13 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.functionalresources.gametest.IntegrationGameTests`)
@@ -30,6 +30,9 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | `automatic_shears_hopper_output_only_sheep` | A hopper below pulls the wool out. Neither the item capability (for pipes) nor hoppers can insert anything. A mooshroom in the area is not sheared into a cow. |
 
 In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): the block renders with its crossed-blade front, and the three sheep in front of it (gold, diamond and plain) are sheared bald. Its slate-style screen shows the energy gauge and readout (24,000 of 50,000 FE: it started with 30,000 and sheared 3 sheep at 2,000 each), the *Waiting for Sheep* status, the redstone button, and the Gold Wool, Diamond Wool and 2 White Wool it collected.
+
+### Shift-placing (`shift_placing_faces_machines_away`)
+The Mycelial Generator, Mechanical Separator and Automatic Shears are each placed twice, through the real block-item placement, by a player looking south. Placed normally they face north (towards the player). Placed while sneaking they face south (away). I checked that the test fails if sneaking is ignored. The "Hold Shift while placing…" tooltip line was not checked in the game client.
 
 ### 100 shearings per feeding by default (`infusionUsesOverride = 100`)
 Feeding an Iron Block gives 100 uses, and shearing counts down from there (99, 98…), including through eating grass and the Automatic Shears. `infusion_runs_out_after_uses` switches the override to `-1` while it runs: an Iron Block then gives its own 9 uses, and a Diamond (1 use) runs out after one shearing.
