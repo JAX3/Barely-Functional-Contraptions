@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/functionalresources-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 42 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 23 Resourceful Sheep, 3 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 43 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 24 Resourceful Sheep, 3 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 11 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.functionalresources.gametest.IntegrationGameTests`)
@@ -18,6 +18,9 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | `integration_mycelial_generator_powers_separator` | A Mycelial Generator placed against a Mechanical Separator's energy face, with no cables, powers it. The separator turns Iron Wool into Raw Iron + String on mycelial power alone. |
 | `integration_mushroom_block_infuses_sheep` | The built-in `red_mushroom` and `brown_mushroom` sheep resources load. Feeding a Red Mushroom Block infuses a sheep with Red Mushroom and consumes exactly one block. |
 | `integration_mushroom_wool_fuels_generator` | The whole loop: Red Mushroom Wool goes through a separator powered by a Mycelial Generator, the 2–4 Red Mushrooms that come out are valid generator fuel, and a second generator fed with them starts running. |
+
+### Generator filter (`generator_filter_limits_tabs_and_stacking`)
+With the default `[generator]` config: Stone Bricks, Raw Iron and Bread are allowed outputs, while the Redstone Torch (wrong tab) and Mushroom Stew (doesn't stack) are not. Diamond Swords and Water Buckets are refused as feeding items. Every definition from `generate all` passes the filter and parses. In vanilla it keeps 13 materials (iron, gold, copper, coal, diamond, emerald, lapis, redstone, netherite, slime → slime ball, wheat, bone meal, dried kelp) and drops resin. An empty tab list allows any tab but still blacklists non-stacking items.
 
 ### What the real client run showed
 * One mod entry, **Functional Resources 1.0.0**, with one config button that lists all four config files.

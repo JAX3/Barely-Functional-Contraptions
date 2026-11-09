@@ -281,6 +281,13 @@ Each part can be switched off in Jade's settings under *Plugins → Functional R
 |---|---|---|
 | `creativeGeneratorOutput` | 1000000 | FE pushed into each adjacent receiver per tick (0 = only allow pulling) |
 
+**`[generator]`** (limits for `/functionalresources generate`; see [What the generator may use](#what-the-generator-may-use))
+
+| Key | Default | Meaning |
+|---|---|---|
+| `allowedCreativeTabs` | `minecraft:building_blocks`, `minecraft:ingredients`, `minecraft:food_and_drinks` | A wool type's resource (its separator output) must be in one of these creative tabs. Empty list = any tab. |
+| `requireStackable` | true | Blacklist every item that doesn't stack (max stack size 1), both as a feeding item and as an output |
+
 #### Client config
 `config/functionalresources-sheep-client.toml`:
 
@@ -350,6 +357,15 @@ You don't have to write a definition for every metal by hand. In a world with ch
 | `/functionalresources generate dedupe` | Deletes generated wool types that duplicate another one, then reloads. A duplicate has the same feeding block or the same name as another type, for example a generated Iron next to the built-in Iron after `generate all`. Built-in and hand-written definitions are never removed. Of two generated duplicates, the first by id is kept. |
 | `/functionalresources list` | Lists every loaded resource |
 
+#### What the generator may use
+By default the generator only makes wool types whose resource is something from the **Building Blocks**, **Ingredients** or **Food & Drinks** creative tabs, and it **blacklists every item that doesn't stack** (tools, weapons, armour, buckets, potions, stews and so on). This applies to `generate`, `generate all`, `preview`, `material`, `item` and `hand`, and to tab-completion:
+- The **output** (the resource the separator gives back) must be in one of the allowed tabs and must stack. When a material's first choice isn't allowed, the generator tries the next candidate (raw material → ingot → gem → dust → same-named item → the block itself). If none is allowed, the material is skipped.
+- The **feeding item** must stack. Members of a storage-block tag that don't stack are left out; the definition then lists the allowed items instead of using the whole tag.
+- Modded items count when their mod adds them to one of the allowed tabs.
+- `generate item`/`hand` explain why an item is refused, for example *"Diamond Sword doesn't stack…"* or *"Redstone Torch isn't in the Building Blocks, Ingredients, Food & Drinks creative tabs…"*.
+- Definitions you already have, and hand-written or built-in ones, are never touched.
+- Change the tabs or switch the stack rule off in the `[generator]` section of `config/functionalresources-sheep-synced.toml`.
+
 How the generator chooses each value:
 - **Materials:** it scans the `c:storage_blocks/<material>` item tags that vanilla, NeoForge and nearly every content mod fill. With Mekanism, Thermal and similar mods installed, that covers tin, lead, osmium, uranium, silver and so on. Raw ore blocks (`raw_*`) and anything already defined are skipped.
 - **Feeding item:** the storage-block tag, so every mod's variant of the block works.
@@ -359,7 +375,7 @@ How the generator chooses each value:
 
 Picking single items or materials adds one file without touching the others. It refuses anything an existing built-in or hand-written resource already covers (same feeding item or same name), so you can't create duplicates this way. A wool type made from an arbitrary item (not a storage block) lasts **1** shearing by default, because the mod can't know how many units the item holds. Edit `infusion_uses` in its JSON if you want more.
 
-Generated files are ordinary JSON in `<world>/datapacks/functionalresources_generated/`. You can edit them freely, but re-running `generate` overwrites that folder. In plain vanilla this adds Bone Meal, Dried Kelp, Resin, Slime and Wheat.
+Generated files are ordinary JSON in `<world>/datapacks/functionalresources_generated/`. You can edit them freely, but re-running `generate` overwrites that folder. In plain vanilla this adds Bone Meal, Dried Kelp, Slime and Wheat (Resin is skipped because the Resin Clump is not in an allowed creative tab).
 
 #### Explicit separator recipes
 Use the recipe type `functionalresources:separating` to process any item, or to override how a particular wool is handled:

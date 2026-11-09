@@ -3,7 +3,9 @@ package com.jax3.functionalresources.sheep.command;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.jax3.functionalresources.sheep.resource.SheepResource;
 import com.jax3.functionalresources.sheep.resource.SheepResourceRegistry;
 import java.io.IOException;
@@ -61,6 +63,15 @@ public final class ResourceGenerator {
 
     /** Works out what would be generated, without writing anything. */
     public static List<Generated> plan(HolderLookup.Provider registries, SheepResourceRegistry existing, boolean includeExisting) {
+        return plan(registries, existing, includeExisting, GeneratorItemFilter.ANY);
+    }
+
+    /**
+     * Same, limited by {@code filter}: storage-block tag members that the filter blacklists are left out of the
+     * feeding items, and a material is skipped when no allowed output (or no allowed feeding item) exists.
+     */
+    public static List<Generated> plan(HolderLookup.Provider registries, SheepResourceRegistry existing, boolean includeExisting,
+                                       GeneratorItemFilter filter) {
         HolderLookup.RegistryLookup<Item> items = registries.lookupOrThrow(Registries.ITEM);
         Set<String> existingNames = existing.all().stream()
                 .filter(r -> !r.id().getNamespace().equals(NAMESPACE))
@@ -83,29 +94,64 @@ public final class ResourceGenerator {
                         .anyMatch(r -> r.feedingItem().test(new ItemStack(b))));
                 if (covered) continue;
             }
-            out.add(build(items, material, "#" + tag.key().location(), blocks.getFirst().value()));
+            fromStorageTag(items, material, tag.key().location(), blocks, filter).ifPresent(out::add);
         }
         return out;
     }
 
     /** Every material that has a {@code c:storage_blocks/<material>} tag (raw ore blocks excluded), sorted. */
     public static List<String> storageMaterials(HolderLookup.Provider registries) {
-        return registries.lookupOrThrow(Registries.ITEM).listTags()
+        return storageMaterials(registries, GeneratorItemFilter.ANY);
+    }
+
+    /** Storage-block materials that {@code filter} allows (used for tab completion). */
+    public static List<String> storageMaterials(HolderLookup.Provider registries, GeneratorItemFilter filter) {
+        List<String> all = registries.lookupOrThrow(Registries.ITEM).listTags()
                 .map(t -> t.key().location())
                 .filter(id -> id.getNamespace().equals("c") && id.getPath().startsWith(STORAGE_PREFIX))
                 .map(id -> id.getPath().substring(STORAGE_PREFIX.length()))
                 .filter(m -> !m.isEmpty() && !m.contains("/") && !m.startsWith("raw_"))
                 .sorted()
                 .toList();
+        if (filter == GeneratorItemFilter.ANY) return all;
+        return all.stream().filter(m -> forMaterial(registries, m, filter).isPresent()).toList();
     }
 
     /** Builds a definition for one storage-block material, e.g. {@code "tin"}. Empty if the tag is missing or empty. */
     public static Optional<Generated> forMaterial(HolderLookup.Provider registries, String material) {
+        return forMaterial(registries, material, GeneratorItemFilter.ANY);
+    }
+
+    /** Same, limited by {@code filter}. Empty if the tag is missing, or nothing in it passes the filter. */
+    public static Optional<Generated> forMaterial(HolderLookup.Provider registries, String material, GeneratorItemFilter filter) {
         HolderLookup.RegistryLookup<Item> items = registries.lookupOrThrow(Registries.ITEM);
         Identifier tag = Identifier.fromNamespaceAndPath("c", STORAGE_PREFIX + material);
         return items.get(TagKey.create(Registries.ITEM, tag))
-                .flatMap(set -> set.stream().sorted(VANILLA_FIRST).findFirst())
-                .map(block -> build(items, material, "#" + tag, block.value()));
+                .map(set -> set.stream().sorted(VANILLA_FIRST).toList())
+                .flatMap(blocks -> fromStorageTag(items, material, tag, blocks, filter));
+    }
+
+    /**
+     * A definition fed with the members of a storage-block tag. When the filter blacklists some members, the feeding
+     * item becomes an explicit list of the allowed ones instead of the tag.
+     */
+    private static Optional<Generated> fromStorageTag(HolderLookup.RegistryLookup<Item> items, String material, Identifier tag,
+                                                      List<Holder<Item>> members, GeneratorItemFilter filter) {
+        List<Holder<Item>> allowed = members.stream().filter(h -> filter.allowsFeeding(h.value())).toList();
+        if (allowed.isEmpty()) return Optional.empty();
+        String label;
+        JsonElement feeding;
+        if (allowed.size() == members.size()) {
+            label = "#" + tag;
+            feeding = new JsonPrimitive(label);
+        } else {
+            JsonArray list = new JsonArray();
+            allowed.forEach(h -> list.add(BuiltInRegistries.ITEM.getKey(h.value()).toString()));
+            label = allowed.stream().map(h -> BuiltInRegistries.ITEM.getKey(h.value()).toString()).collect(Collectors.joining(", "));
+            feeding = list;
+        }
+        Generated generated = build(items, material, label, feeding, true, allowed.getFirst().value(), filter);
+        return filter.allowsOutput(generated.output()) ? Optional.of(generated) : Optional.empty();
     }
 
     /**
@@ -121,7 +167,24 @@ public final class ResourceGenerator {
         boolean inStorageTag = items.get(TagKey.create(Registries.ITEM, tag))
                 .map(set -> set.stream().anyMatch(h -> h.value() == item)).orElse(false);
         String feeding = inStorageTag ? "#" + tag : BuiltInRegistries.ITEM.getKey(item).toString();
-        return build(items, material, feeding, item);
+        return build(items, material, feeding, new JsonPrimitive(feeding), inStorageTag, item, GeneratorItemFilter.ANY);
+    }
+
+    /**
+     * Same, limited by {@code filter}: the item itself must not be blacklisted, and the output is the first candidate
+     * the filter allows (raw material, ingot, gem, dust, a same-named item, then the item itself). Check the result's
+     * output with {@link GeneratorItemFilter#outputRejection} before using it.
+     */
+    public static Generated forItem(HolderLookup.Provider registries, Item item, GeneratorItemFilter filter) {
+        HolderLookup.RegistryLookup<Item> items = registries.lookupOrThrow(Registries.ITEM);
+        String path = BuiltInRegistries.ITEM.getKey(item).getPath();
+        String material = path.replaceFirst("^block_of_", "").replaceFirst("^block_", "").replaceFirst("_block$", "");
+        Identifier tag = Identifier.fromNamespaceAndPath("c", STORAGE_PREFIX + material);
+        boolean inStorageTag = items.get(TagKey.create(Registries.ITEM, tag))
+                .map(set -> set.stream().anyMatch(h -> h.value() == item)
+                        && set.stream().allMatch(h -> filter.allowsFeeding(h.value()))).orElse(false);
+        String feeding = inStorageTag ? "#" + tag : BuiltInRegistries.ITEM.getKey(item).toString();
+        return build(items, material, feeding, new JsonPrimitive(feeding), inStorageTag, item, filter);
     }
 
     /** A resource that is not generated and already accepts one of {@code generated}'s feeding items, if any. */
@@ -146,11 +209,12 @@ public final class ResourceGenerator {
             .comparing((Holder<Item> h) -> !BuiltInRegistries.ITEM.getKey(h.value()).getNamespace().equals("minecraft"))
             .thenComparing(h -> BuiltInRegistries.ITEM.getKey(h.value()).toString());
 
-    private static Generated build(HolderLookup.RegistryLookup<Item> items, String material, String feeding, Item block) {
+    private static Generated build(HolderLookup.RegistryLookup<Item> items, String material, String feeding, JsonElement feedingJson,
+                                   boolean storageBlock, Item block, GeneratorItemFilter filter) {
         Item output = null;
         SheepResource.Category category = SheepResource.Category.MATERIAL;
         for (String prefix : OUTPUT_TAGS) {
-            Optional<Item> found = firstOfTag(items, Identifier.fromNamespaceAndPath("c", prefix + material));
+            Optional<Item> found = firstOfTag(items, Identifier.fromNamespaceAndPath("c", prefix + material), filter);
             if (found.isPresent()) {
                 output = found.get();
                 category = switch (prefix) {
@@ -162,11 +226,12 @@ public final class ResourceGenerator {
                 break;
             }
         }
-        if (output == null) output = byName(material, BuiltInRegistries.ITEM.getKey(block).getNamespace(), block).orElse(null);
+        if (output == null) output = byName(material, BuiltInRegistries.ITEM.getKey(block).getNamespace(), block)
+                .filter(filter::allowsOutput).orElse(null);
         boolean brokenDown = output != null && output != block;
         if (output == null) output = block;
         // Only a real storage block (c:storage_blocks tag) is known to hold 9 units; anything else defaults to 1.
-        int uses = brokenDown && feeding.startsWith("#c:" + STORAGE_PREFIX) ? 9 : 1;
+        int uses = brokenDown && storageBlock ? 9 : 1;
         if (category == SheepResource.Category.MATERIAL && material.matches(".*(wheat|kelp|bone|slime|resin|wood|log|honey).*")) {
             category = SheepResource.Category.ORGANIC;
         }
@@ -179,7 +244,7 @@ public final class ResourceGenerator {
 
         JsonObject json = new JsonObject();
         json.addProperty("_generated", "by /functionalresources generate; safe to edit");
-        json.addProperty("feeding_item", feeding);
+        json.add("feeding_item", feedingJson);
         json.addProperty("feeding_amount", 1);
         json.addProperty("display_name", title(material));
         json.addProperty("wool_color", hex(color));
@@ -200,10 +265,9 @@ public final class ResourceGenerator {
         return new Generated(material, feeding, output, uses, category, json);
     }
 
-    private static Optional<Item> firstOfTag(HolderLookup.RegistryLookup<Item> items, Identifier tagId) {
+    private static Optional<Item> firstOfTag(HolderLookup.RegistryLookup<Item> items, Identifier tagId, GeneratorItemFilter filter) {
         return items.get(TagKey.create(Registries.ITEM, tagId))
-                .flatMap(set -> set.stream().sorted(VANILLA_FIRST).findFirst())
-                .map(Holder::value);
+                .flatMap(set -> set.stream().sorted(VANILLA_FIRST).map(Holder::value).filter(filter::allowsOutput).findFirst());
     }
 
     private static Optional<Item> byName(String material, String namespace, Item block) {

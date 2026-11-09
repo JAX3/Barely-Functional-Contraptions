@@ -26,7 +26,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * {@code /functionalresources} admin commands (operator level 2).
  * <ul>
  *     <li>{@code generate} - creates a sheep resource for every material found in {@code c:storage_blocks/*} tags
- *     that is not already defined, writes them to the world data pack {@code functionalresources_generated} and reloads.</li>
+ *     that is not already defined (limited by {@link GeneratorItemFilter}: outputs from the Building Blocks,
+ *     Ingredients and Food &amp; Drinks tabs, never a non-stacking item), writes them to the world data pack {@code functionalresources_generated} and reloads.</li>
  *     <li>{@code generate all} - same, but also regenerates materials that already have a definition.</li>
  *     <li>{@code generate dedupe} - deletes generated resources that duplicate another wool type (same feeding
  *     item or same name, e.g. a generated Iron next to the built-in Iron) and reloads. Built-in and hand-written
@@ -47,7 +48,8 @@ public final class ResourcefulSheepCommand {
     }
 
     private static final SuggestionProvider<CommandSourceStack> MATERIALS = (ctx, builder) ->
-            SharedSuggestionProvider.suggest(ResourceGenerator.storageMaterials(ctx.getSource().getServer().registryAccess()), builder);
+            SharedSuggestionProvider.suggest(ResourceGenerator.storageMaterials(ctx.getSource().getServer().registryAccess(),
+                    GeneratorItemFilter.fromConfig(ctx.getSource().getServer())), builder);
     private static final SuggestionProvider<CommandSourceStack> GENERATED = (ctx, builder) ->
             SharedSuggestionProvider.suggest(SheepResourceRegistry.server().all().stream()
                     .filter(ResourceGenerator::isGenerated).map(r -> r.id().getPath()), builder);
@@ -76,7 +78,9 @@ public final class ResourcefulSheepCommand {
 
     private static int preview(CommandContext<CommandSourceStack> ctx) {
         MinecraftServer server = ctx.getSource().getServer();
-        List<ResourceGenerator.Generated> plan = ResourceGenerator.plan(server.registryAccess(), SheepResourceRegistry.server(), false);
+        GeneratorItemFilter filter = GeneratorItemFilter.fromConfig(server);
+        List<ResourceGenerator.Generated> plan = ResourceGenerator.plan(server.registryAccess(), SheepResourceRegistry.server(), false, filter);
+        ctx.getSource().sendSuccess(() -> describe(filter), false);
         if (plan.isEmpty()) {
             ctx.getSource().sendSuccess(() -> Component.translatable("command.functionalresources.preview.none"), false);
             return 0;
@@ -92,7 +96,9 @@ public final class ResourcefulSheepCommand {
     private static int generate(CommandContext<CommandSourceStack> ctx, boolean all) {
         CommandSourceStack source = ctx.getSource();
         MinecraftServer server = source.getServer();
-        List<ResourceGenerator.Generated> plan = ResourceGenerator.plan(server.registryAccess(), SheepResourceRegistry.server(), all);
+        GeneratorItemFilter filter = GeneratorItemFilter.fromConfig(server);
+        List<ResourceGenerator.Generated> plan = ResourceGenerator.plan(server.registryAccess(), SheepResourceRegistry.server(), all, filter);
+        source.sendSuccess(() -> describe(filter), false);
         Path pack;
         try {
             pack = ResourceGenerator.write(server.getWorldPath(LevelResource.DATAPACK_DIR), plan);
@@ -112,9 +118,11 @@ public final class ResourcefulSheepCommand {
 
     private static int generateMaterial(CommandContext<CommandSourceStack> ctx, String material) {
         var registries = ctx.getSource().getServer().registryAccess();
-        var generated = ResourceGenerator.forMaterial(registries, material);
+        var generated = ResourceGenerator.forMaterial(registries, material, GeneratorItemFilter.fromConfig(ctx.getSource().getServer()));
         if (generated.isEmpty()) {
-            ctx.getSource().sendFailure(Component.translatable("command.functionalresources.material.unknown", material));
+            boolean exists = ResourceGenerator.forMaterial(registries, material).isPresent();
+            ctx.getSource().sendFailure(Component.translatable(exists ? "command.functionalresources.material.filtered"
+                    : "command.functionalresources.material.unknown", material));
             return 0;
         }
         return writeSingle(ctx.getSource(), generated.get());
@@ -129,7 +137,19 @@ public final class ResourcefulSheepCommand {
             ctx.getSource().sendFailure(Component.translatable("command.functionalresources.item.wool"));
             return 0;
         }
-        return writeSingle(ctx.getSource(), ResourceGenerator.forItem(ctx.getSource().getServer().registryAccess(), item));
+        GeneratorItemFilter filter = GeneratorItemFilter.fromConfig(ctx.getSource().getServer());
+        var feedingProblem = filter.feedingRejection(item);
+        if (feedingProblem.isPresent()) {
+            ctx.getSource().sendFailure(feedingProblem.get());
+            return 0;
+        }
+        ResourceGenerator.Generated generated = ResourceGenerator.forItem(ctx.getSource().getServer().registryAccess(), item, filter);
+        var outputProblem = filter.outputRejection(generated.output());
+        if (outputProblem.isPresent()) {
+            ctx.getSource().sendFailure(outputProblem.get());
+            return 0;
+        }
+        return writeSingle(ctx.getSource(), generated);
     }
 
     /** Adds one generated definition (replacing a generated one of the same name) unless a real definition already covers it. */
@@ -231,6 +251,23 @@ public final class ResourcefulSheepCommand {
                     .append(Component.literal("  " + r.id()).withStyle(ChatFormatting.DARK_GRAY)), false);
         }
         return all.size();
+    }
+
+    /** One line saying what the generator is limited to (from the [generator] config). */
+    private static Component describe(GeneratorItemFilter filter) {
+        var line = Component.translatable("command.functionalresources.filter.header").withStyle(ChatFormatting.GRAY);
+        if (filter.tabs().isEmpty()) {
+            line.append(Component.translatable("command.functionalresources.filter.any_tab"));
+        } else {
+            for (int i = 0; i < filter.tabs().size(); i++) {
+                if (i > 0) line.append(", ");
+                var id = filter.tabs().get(i);
+                line.append(BuiltInRegistries.CREATIVE_MODE_TAB.getOptional(id)
+                        .map(net.minecraft.world.item.CreativeModeTab::getDisplayName).orElse(Component.literal(id.toString())));
+            }
+        }
+        if (filter.requireStackable()) line.append(Component.translatable("command.functionalresources.filter.stackable_only"));
+        return line;
     }
 
     private static Component describe(ResourceGenerator.Generated g) {

@@ -120,3 +120,12 @@
 	# Default: 1000000
 	# Range: > 0
 	creativeGeneratorOutput = 1000000
+
+#Which items /functionalresources generate may turn into wool types (feeding items and separator outputs).
+#Applies to generate, generate all, preview, material, item and hand. Existing definitions are not touched.
+[generator]
+	#Creative tabs an item must appear in. Default: Building Blocks, Ingredients and Food & Drinks.
+	#Modded items count when their mod adds them to one of these tabs. Empty = any creative tab.
+	allowedCreativeTabs = ["minecraft:building_blocks", "minecraft:ingredients", "minecraft:food_and_drinks"]
+	#Blacklist every item that does not stack (max stack size 1): tools, armour, buckets, potions, stews...
+	requireStackable = true

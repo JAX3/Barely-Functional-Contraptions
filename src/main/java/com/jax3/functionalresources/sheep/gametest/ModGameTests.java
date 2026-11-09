@@ -93,6 +93,7 @@ public final class ModGameTests {
         TESTS.put("generator_dedupe_removes_duplicate_wool", ModGameTests::generatorDedupe);
         TESTS.put("generator_pick_and_choose", ModGameTests::generatorPickAndChoose);
         TESTS.put("separator_output_rolls_two_to_four", ModGameTests::outputRange);
+        TESTS.put("generator_filter_limits_tabs_and_stacking", ModGameTests::generatorFilter);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
     }
 
@@ -460,6 +461,55 @@ public final class ModGameTests {
             h.assertTrue(be.getEnergy().getEnergy() > 0, "generator should push FE into the separator");
             h.assertTrue(be.getInventory().getStack(SeparatorInventory.PRIMARY).is(Items.RAW_IRON), "separator runs on generator power");
         });
+    }
+
+    /** The default [generator] filter: outputs from Building Blocks / Ingredients / Food & Drinks, never a non-stacking item. */
+    private static void generatorFilter(GameTestHelper h) {
+        var server = h.getLevel().getServer();
+        var registries = server.registryAccess();
+        var filter = com.jax3.functionalresources.sheep.command.GeneratorItemFilter.fromConfig(server);
+        h.assertTrue(filter.requireStackable() && filter.tabs().size() == 3, "default filter: 3 tabs + stackable only, got " + filter);
+
+        // Tabs: one item from each allowed tab passes; a redstone-tab item does not.
+        h.assertTrue(filter.allowsOutput(Items.STONE_BRICKS), "building blocks allowed");
+        h.assertTrue(filter.allowsOutput(Items.RAW_IRON), "ingredients allowed");
+        h.assertTrue(filter.allowsOutput(Items.BREAD), "food allowed");
+        h.assertFalse(filter.allowsOutput(Items.REDSTONE_TORCH), "redstone tab is not allowed");
+        // Non-stacking items are blacklisted even inside an allowed tab (stew is food) and as feeding items.
+        h.assertFalse(filter.allowsOutput(Items.MUSHROOM_STEW), "stew doesn't stack");
+        h.assertTrue(filter.feedingRejection(Items.DIAMOND_SWORD).isPresent(), "swords can't be fed");
+        h.assertTrue(filter.feedingRejection(Items.WATER_BUCKET).isPresent(), "buckets can't be fed");
+        h.assertTrue(filter.feedingRejection(Items.IRON_BLOCK).isEmpty(), "iron blocks can be fed");
+
+        // generate / generate all: everything planned passes the filter.
+        var plan = com.jax3.functionalresources.sheep.command.ResourceGenerator.plan(registries, SheepResourceRegistry.server(), true, filter);
+        h.assertFalse(plan.isEmpty(), "filtered plan should still find storage-block materials");
+        var unfiltered = com.jax3.functionalresources.sheep.command.ResourceGenerator.plan(registries, SheepResourceRegistry.server(), true);
+        ResourcefulSheep.LOGGER.info("Generator filter: kept {}, dropped {}",
+                plan.stream().map(g -> g.name() + "->" + net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(g.output()).getPath()).toList(),
+                unfiltered.stream().map(g -> g.name()).filter(n -> plan.stream().noneMatch(g -> g.name().equals(n))).toList());
+        for (var g : plan) {
+            h.assertTrue(filter.allowsOutput(g.output()), g.name() + " output " + g.output() + " should pass the filter");
+            var parsed = SheepResource.DEFINITION_CODEC.parse(registries.createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE), g.json());
+            h.assertTrue(parsed.result().isPresent(), g.name() + " should parse: " + parsed.error().map(Object::toString).orElse(""));
+            for (var item : SheepResource.withId(com.jax3.functionalresources.FunctionalResources.id(g.name()), parsed.result().get()).feedingItems()) {
+                h.assertTrue(filter.allowsFeeding(item.value()), g.name() + " feeds with non-stacking " + item.value());
+            }
+        }
+        h.assertTrue(plan.stream().anyMatch(g -> g.name().equals("slime") && g.output() == Items.SLIME_BALL), "slime -> slime ball (ingredient) kept");
+        var materials = com.jax3.functionalresources.sheep.command.ResourceGenerator.storageMaterials(registries, filter);
+        h.assertTrue(materials.contains("iron") && materials.contains("slime"), "suggestions keep allowed materials: " + materials);
+
+        // generate item: food is fine, a redstone component is rejected for its output, a sword for feeding.
+        var bread = com.jax3.functionalresources.sheep.command.ResourceGenerator.forItem(registries, Items.BREAD, filter);
+        h.assertTrue(bread.output() == Items.BREAD && filter.outputRejection(bread.output()).isEmpty(), "bread wool gives bread");
+        var torch = com.jax3.functionalresources.sheep.command.ResourceGenerator.forItem(registries, Items.REDSTONE_TORCH, filter);
+        h.assertTrue(filter.outputRejection(torch.output()).isPresent(), "redstone torch rejected (not in an allowed tab)");
+
+        // An empty tab list allows any tab, but the stack rule still applies.
+        var anyTab = com.jax3.functionalresources.sheep.command.GeneratorItemFilter.create(registries, server.getWorldData().enabledFeatures(), List.of(), true);
+        h.assertTrue(anyTab.allowsOutput(Items.REDSTONE_TORCH) && !anyTab.allowsOutput(Items.DIAMOND_SWORD), "empty tab list = any stackable item");
+        h.succeed();
     }
 
     private static void generatorCreatesDefinitions(GameTestHelper h) {

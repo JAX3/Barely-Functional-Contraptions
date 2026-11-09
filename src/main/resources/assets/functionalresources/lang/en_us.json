@@ -345,5 +345,14 @@
   "functionalresources.configuration.section.functionalresources.sheep.client.toml": "Resourceful Sheep: client",
   "functionalresources.configuration.section.functionalresources.sheep.client.toml.title": "Resourceful Sheep: client",
   "resource.functionalresources.red_mushroom": "Red Mushroom",
-  "resource.functionalresources.brown_mushroom": "Brown Mushroom"
+  "resource.functionalresources.brown_mushroom": "Brown Mushroom",
+  "command.functionalresources.filter.header": "Generator limited to: ",
+  "command.functionalresources.filter.any_tab": "any creative tab",
+  "command.functionalresources.filter.stackable_only": " (non-stacking items blacklisted)",
+  "command.functionalresources.filter.not_stackable": "%s doesn't stack, so it can't become a wool type (non-stacking items are blacklisted; see [generator] requireStackable).",
+  "command.functionalresources.filter.wrong_tab": "%s isn't in the %s creative tabs, so it can't be a wool type's resource (see [generator] allowedCreativeTabs).",
+  "command.functionalresources.material.filtered": "The %s storage blocks only give items outside the allowed creative tabs, or items that don't stack (see the [generator] config).",
+  "functionalresources.configuration.generator": "Resource generator",
+  "functionalresources.configuration.allowedCreativeTabs": "Allowed creative tabs",
+  "functionalresources.configuration.requireStackable": "Require stackable items"
 }

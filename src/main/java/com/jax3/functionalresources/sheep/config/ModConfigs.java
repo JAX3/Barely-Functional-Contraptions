@@ -98,6 +98,10 @@ public final class ModConfigs {
         public final ModConfigSpec.EnumValue<RedstoneMode> defaultRedstoneMode;
         public final ModConfigSpec.IntValue creativeGeneratorOutput;
 
+        // ---------------------------------------------------------------- /functionalresources generate
+        public final ModConfigSpec.ConfigValue<List<? extends String>> generatorAllowedTabs;
+        public final ModConfigSpec.BooleanValue generatorRequireStackable;
+
         Server(ModConfigSpec.Builder b) {
             b.comment("Resource infusion of sheep. Per-resource settings live in data/<namespace>/functionalresources/sheep_resources/*.json")
                     .push("sheep");
@@ -182,6 +186,17 @@ public final class ModConfigs {
             b.comment("Creative Generator (creative-only infinite FE source for testing)").push("creative_generator");
             creativeGeneratorOutput = b.comment("FE pushed into each adjacent energy receiver per tick (receivers still apply their own input limits). 0 disables pushing.")
                     .defineInRange("creativeGeneratorOutput", 1_000_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Which items /functionalresources generate may turn into wool types (feeding items and separator outputs).",
+                    "Applies to generate, generate all, preview, material, item and hand. Existing definitions are not touched.").push("generator");
+            generatorAllowedTabs = b.comment("Creative tabs an item must appear in. Default: Building Blocks, Ingredients and Food & Drinks.",
+                            "Modded items count when their mod adds them to one of these tabs. Empty = any creative tab.")
+                    .defineListAllowEmpty("allowedCreativeTabs",
+                            List.of("minecraft:building_blocks", "minecraft:ingredients", "minecraft:food_and_drinks"),
+                            () -> "minecraft:ingredients", o -> o instanceof String str && net.minecraft.resources.Identifier.tryParse(str) != null);
+            generatorRequireStackable = b.comment("Blacklist every item that does not stack (max stack size 1): tools, armour, buckets, potions, stews...")
+                    .define("requireStackable", true);
             b.pop();
         }
 
