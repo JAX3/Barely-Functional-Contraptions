@@ -25,7 +25,7 @@ With the default `[generator]` config: Stone Bricks, Raw Iron and Bread are allo
 ### What the real client run showed
 * One mod entry, **Functional Resources 1.0.0**, with one config button that lists all four config files.
 * One creative tab that holds the generator, wrench, separator, creative generator and every wool type, including the two mushroom wools.
-* A red-mushroom-infused sheep renders red fleece with mushroom blocks growing out of it (`07_sheep_closeup.png`).
+* Infused sheep with a flat 2D resource grow it mooshroom style, with two crossed sprites on the back and one on the head: Raw Iron, Raw Gold, Diamonds and Red Mushrooms. A block-shaped resource keeps the original cluster of small blocks in the fleece (checked with Oak Log on a wood sheep) (`01_world_sheep.png`, `07_sheep_closeup.png`).
 * The Mycelial Generator GUI shows **+250 FE/t generated, 200 FE/t out**: it is feeding the separator next to it (`11_generator_gui.png`).
 * JEI shows the generator fuel category plus the infusion and separation categories, which now include the mushroom resources. Jade shows sheep and separator info (`09`, `10`).
 

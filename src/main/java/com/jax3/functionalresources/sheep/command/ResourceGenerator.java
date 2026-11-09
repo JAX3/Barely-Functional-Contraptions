@@ -261,7 +261,6 @@ public final class ResourceGenerator {
         sep.addProperty("secondary_output", "minecraft:string");
         sep.addProperty("secondary_count", 2);
         json.add("separator", sep);
-        json.addProperty("growth_item", BuiltInRegistries.ITEM.getKey(block).toString());
         return new Generated(material, feeding, output, uses, category, json);
     }
 

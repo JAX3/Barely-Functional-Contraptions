@@ -12,6 +12,7 @@ import net.minecraft.client.model.animal.sheep.SheepModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.SheepRenderState;
@@ -28,7 +29,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * Renders resource-infused wool on sheep.
+ * Renders resource-infused wool on sheep, and the resource's item growing out of it the way mushrooms grow on a
+ * mooshroom.
  *
  * <p>A render-state modifier ({@link #extract}) runs after vanilla extraction: for infused sheep that have wool it
  * stores the colours in the render state and marks the state as sheared so the vanilla wool layer is skipped. This
@@ -49,16 +51,37 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
     }
 
     /**
-     * What to draw: wool colours ({@code accent} is 0 when the sparkle overlay is disabled), the resource's block
-     * growths and how many of them are showing.
+     * What to draw: wool colours ({@code accent} is 0 when the sparkle overlay is disabled), the resource item that
+     * sprouts from the fleece, whether it is a flat 2D item (mooshroom style) or a block (clustered blocks), and how
+     * many are showing.
      */
-    public record Colors(int wool, int accent, ItemStackRenderState growth, int growthCount) {}
+    public record Colors(int wool, int accent, ItemStackRenderState growth, boolean flat, int growthCount) {}
+
+    // ---------------------------------------------------------------- flat 2D items: mooshroom style
 
     /**
-     * Where resource growths sprout on the fleece, in sheep model pixels (x across, z along the body), with a size,
+     * Where flat items sprout, like a mooshroom's mushrooms: two on the back and one on the head. Positions are in
+     * sheep model space (blocks, +Y down); yaws match the mooshroom's mushrooms. Ordered so the head item stays
+     * longest as the infusion is sheared away.
+     */
+    private record Spot(boolean onHead, float x, float y, float z, float yaw) {}
+    /** Top of the fleece (body top at 6 px minus the fur's 1.75 px inflation), in blocks, +Y down. */
+    private static final float FLEECE_TOP = 4.25F / 16.0F;
+    private static final Spot[] ITEM_SPOTS = {
+            new Spot(true, 0.0F, -4.6F / 16.0F, -0.15F, -78.0F),  // head, on top of the head wool
+            new Spot(false, 0.14F, FLEECE_TOP, 0.42F, -48.0F),     // back, rear right (the mooshroom's first mushroom)
+            new Spot(false, -0.12F, FLEECE_TOP, -0.1F, -6.0F),     // back, front left (its second, 42 - 48 degrees)
+    };
+    /** Size of a flat item sprite (a mooshroom mushroom is a full block; sheep are smaller). */
+    private static final float ITEM_SCALE = 0.5F;
+
+    // ---------------------------------------------------------------- blocks: small blocks clustered in the fleece
+
+    /**
+     * Where block growths sprout on the fleece, in sheep model pixels (x across, z along the body), with a size,
      * a yaw and a lean, ordered so the first ones stay while the infusion runs down.
      */
-    private static final float[][] GROWTH_SPOTS = {
+    private static final float[][] BLOCK_SPOTS = {
             // x,    z,    scale, yaw,  lean
             {-2.2F, -4.5F, 0.58F, 20F, 10F},
             {2.4F, 2.5F, 0.54F, -35F, -12F},
@@ -67,8 +90,8 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
             {0.2F, -0.8F, 0.38F, 70F, 6F},
             {3.6F, -2.6F, 0.32F, -15F, -20F},
     };
-    /** Top of the fleece in model pixels (body top 6 minus the fur's 1.75 inflation), sunk slightly into the wool. */
-    private static final float FLEECE_TOP = 4.25F + 0.3F;
+    /** Top of the fleece in model pixels, sunk slightly into the wool. */
+    private static final float BLOCK_FLEECE_TOP = 4.25F + 0.3F;
 
     static void extract(Sheep sheep, SheepRenderState state) {
         if (state.isSheared || state.isBaby) return;
@@ -82,19 +105,29 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
         int accent = ModConfigs.getBool(ModConfigs.CLIENT.showSheepSparkleOverlay) ? ARGB.opaque(resource.get().accentColor()) : 0;
 
         ItemStackRenderState growth = new ItemStackRenderState();
+        boolean flat = false;
         int count = 0;
         if (ModConfigs.getBool(ModConfigs.CLIENT.showResourceGrowths)) {
             ItemStack stack = resource.get().growthStack();
             if (!stack.isEmpty()) {
-                Minecraft.getInstance().getItemModelResolver().updateForTopItem(growth, stack, ItemDisplayContext.FIXED, sheep.level(), sheep, sheep.getId());
-                // More growths while the infusion is fresh; they dwindle as it is sheared away.
+                var resolver = Minecraft.getInstance().getItemModelResolver();
+                // NONE: the bare item model, one block across and centred, like the mooshroom's block model.
+                resolver.updateForTopItem(growth, stack, ItemDisplayContext.NONE, sheep.level(), sheep, sheep.getId());
+                // Flat 2D items (generated sprites) are not lit like blocks; anything block-shaped is.
+                flat = !growth.usesBlockLight();
+                if (!flat) {
+                    // Blocks keep the original look, which uses the item-frame (FIXED) transform.
+                    resolver.updateForTopItem(growth, stack, ItemDisplayContext.FIXED, sheep.level(), sheep, sheep.getId());
+                }
+                // More growths while the infusion is fresh; they drop off as it is sheared away.
+                int spots = flat ? ITEM_SPOTS.length : BLOCK_SPOTS.length;
+                int min = flat ? 1 : 2;
                 int uses = SheepInfusionEvents.getInfusion(sheep).usesRemaining();
                 int max = resource.get().effectiveInfusionUses();
-                count = uses < 0 || max <= 0 ? GROWTH_SPOTS.length
-                        : Mth.clamp(Mth.ceil(GROWTH_SPOTS.length * (float) uses / max), 2, GROWTH_SPOTS.length);
+                count = uses < 0 || max <= 0 ? spots : Mth.clamp(Mth.ceil(spots * (float) uses / max), min, spots);
             }
         }
-        state.setRenderData(INFUSED_WOOL, new Colors(wool, accent, growth, count));
+        state.setRenderData(INFUSED_WOOL, new Colors(wool, accent, growth, flat, count));
         state.isSheared = true; // hides the vanilla wool layer; the undercoat layer is unaffected
     }
 
@@ -107,15 +140,45 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
             coloredCutoutModelCopyLayerRender(model, ACCENT_TEXTURE, poseStack, collector, lightCoords, state, colors.accent(), 2);
         }
         if (state.isInvisible || colors.growthCount() <= 0 || colors.growth().isEmpty()) return;
+        if (colors.flat()) {
+            submitItems(poseStack, collector, lightCoords, state, colors);
+        } else {
+            submitBlocks(poseStack, collector, lightCoords, state, colors);
+        }
+    }
 
-        // Little blocks of the resource sprouting from the fleece. Model space has +Y pointing down, so items are
-        // flipped upright with a negative scale (as vanilla does for items worn on heads).
+    /**
+     * Flat items, drawn the way MushroomCowMushroomLayer draws mushrooms: each sprite twice at right angles (the
+     * mooshroom's crossed-plant look) so it reads as a solid object from every side.
+     */
+    private void submitItems(PoseStack poseStack, SubmitNodeCollector collector, int lightCoords, SheepRenderState state, Colors colors) {
+        int overlay = LivingEntityRenderer.getOverlayCoords(state, 0.0F); // red flash when hurt, as on the mooshroom
         for (int i = 0; i < colors.growthCount(); i++) {
-            float[] spot = GROWTH_SPOTS[i];
+            Spot spot = ITEM_SPOTS[i];
+            poseStack.pushPose();
+            getParentModel().root().translateAndRotate(poseStack);
+            if (spot.onHead()) getParentModel().root().getChild("head").translateAndRotate(poseStack);
+            // Stand the sprite on the surface: its centre sits half its height above it (+Y is down here).
+            poseStack.translate(spot.x(), spot.y() - ITEM_SCALE * 0.42F, spot.z());
+            poseStack.rotateDegrees(Axis.YP, spot.yaw());
+            poseStack.scale(-ITEM_SCALE, -ITEM_SCALE, ITEM_SCALE);
+            colors.growth().submit(poseStack, collector, lightCoords, overlay, state.outlineColor);
+            poseStack.rotateDegrees(Axis.YP, 90.0F);
+            colors.growth().submit(poseStack, collector, lightCoords, overlay, state.outlineColor);
+            poseStack.popPose();
+        }
+    }
+
+    /** Blocks: little blocks of the resource sprouting from the fleece (the original look). */
+    private void submitBlocks(PoseStack poseStack, SubmitNodeCollector collector, int lightCoords, SheepRenderState state, Colors colors) {
+        // Model space has +Y pointing down, so items are flipped upright with a negative scale (as vanilla does for
+        // items worn on heads).
+        for (int i = 0; i < colors.growthCount(); i++) {
+            float[] spot = BLOCK_SPOTS[i];
             float scale = spot[2];
             poseStack.pushPose();
             getParentModel().root().translateAndRotate(poseStack);
-            poseStack.translate(spot[0] / 16.0F, FLEECE_TOP / 16.0F - scale * 0.22F, (spot[1] + 2.0F) / 16.0F);
+            poseStack.translate(spot[0] / 16.0F, BLOCK_FLEECE_TOP / 16.0F - scale * 0.22F, (spot[1] + 2.0F) / 16.0F);
             poseStack.rotateDegrees(Axis.YP, spot[3]);
             poseStack.rotateDegrees(Axis.ZP, spot[4]);
             poseStack.scale(scale, -scale, -scale);

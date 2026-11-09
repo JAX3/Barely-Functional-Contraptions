@@ -16,6 +16,5 @@
     "secondary_count": 2,
     "energy_cost": 80000,
     "processing_ticks": 200
-  },
-  "growth_item": "minecraft:ancient_debris"
+  }
 }

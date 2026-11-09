@@ -140,7 +140,7 @@ Adding a modded fuel takes one line in `config/functionalresources-mycelial-sync
 Right-click an **adult** sheep while holding a resource, for example an **Iron Block**.
 
 - One item is consumed (this is configurable). You'll see coloured particles and hear a chime.
-- The sheep's fleece takes on the resource colour with glinting strands, and **small blocks of the resource grow out of its back** (iron blocks on an iron sheep, diamond blocks on a diamond sheep, logs on a wood sheep). The clusters shrink as the infusion is used up by shearing.
+- The sheep's fleece takes on the resource colour with glinting strands, and **the resource itself grows out of it the way mushrooms grow on a mooshroom**: two on its back and one on its head (Raw Iron on an iron sheep, Diamonds on a diamond sheep, Red Mushrooms on a red mushroom sheep). This applies to flat 2D items, which are drawn as crossed sprites like a mooshroom's mushrooms; they drop off one by one as the infusion is used up, and the head one goes last. Block-shaped resources (Cobblestone on a stone sheep, Oak Log on a wood sheep) keep the original look instead: a cluster of small blocks sunk into the fleece that shrinks as the infusion is sheared away.
 - Its dye colour still shows through slightly, so a blue diamond sheep looks different from a white one.
 - Each infusion lasts a set number of shearings. Iron, gold, copper, redstone, lapis and coal blocks last **9** shearings (one block holds 9 items). Single items such as diamond, emerald, netherite scrap, cobblestone, oak log and quartz last **1**.
 - Feeding an item that isn't a resource does nothing special, so wheat breeding, dyes and so on work as normal.
@@ -295,7 +295,7 @@ Each part can be switched off in Jade's settings under *Plugins → Functional R
 |---|---|
 | `ambientParticles` | Particles around infused sheep |
 | `dyeTintStrength` | How strongly the dye colour shows through infused wool |
-| `showResourceGrowths` | Resource blocks growing out of infused fleece |
+| `showResourceGrowths` | The resource growing out of infused fleece (2D items mooshroom style, blocks as small clusters) |
 | `showSheepSparkleOverlay` | The glinting overlay on infused fleece |
 | `detailedWoolTooltips` | Always show separator details in wool tooltips |
 | `detailedMachineTooltips` | Extra detail in the separator GUI tooltips |
@@ -332,7 +332,7 @@ Definitions live in `data/<namespace>/functionalresources/sheep_resources/<name>
     "energy_cost": 20000,                    // total FE; default: config
     "processing_ticks": 100                  // default: config
   },
-  "growth_item": "mekanism:block_tin"        // optional: block shown growing out of the fleece; default: the fed item
+  "growth_item": "mekanism:raw_tin"          // optional: item shown growing out of the fleece; default: the separator output, then the fed item
 }
 ```
 

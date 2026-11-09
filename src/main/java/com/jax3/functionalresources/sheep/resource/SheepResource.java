@@ -40,7 +40,7 @@ import net.minecraft.world.item.crafting.Ingredient;
  * @param woolDropCount infused wool dropped per shearing
  * @param infusionUses  number of shearings one feeding lasts (before the global multiplier)
  * @param separator     how the Mechanical Separator processes this resource's wool
- * @param growthItem    optional item/block shown growing out of the fleece; defaults to the first feeding item
+ * @param growthItem    optional item shown growing out of the fleece; defaults to the separator output, then the feeding item
  */
 public record SheepResource(
         Identifier id,
@@ -130,9 +130,13 @@ public record SheepResource(
     }
 
     /** Example item to show for the feeding input (first matching item). */
-    /** What grows out of an infused sheep's fleece: {@code growth_item}, or else the first feeding item. */
+    /**
+     * The physical item that sprouts from an infused sheep's fleece, mooshroom style: {@code growth_item} if set,
+     * else the separator's primary output (Raw Iron, Diamond, Red Mushroom...), else the first feeding item.
+     */
     public ItemStack growthStack() {
-        return growthItem.map(ItemStackTemplate::create)
+        return growthItem.or(separator::primaryOutput).map(ItemStackTemplate::create)
+                .map(stack -> stack.copyWithCount(1))
                 .orElseGet(() -> feedingItem.items().findFirst().map(h -> new ItemStack(h)).orElse(ItemStack.EMPTY));
     }
 
