@@ -107,6 +107,7 @@ public final class ModGameTests {
         TESTS.put("fluid_reservoir_fills_over_infinite_source", ModGameTests::reservoirFills);
         TESTS.put("fluid_reservoir_needs_infinite_source", ModGameTests::reservoirNeedsInfiniteSource);
         TESTS.put("fluid_reservoir_buckets_and_pipes", ModGameTests::reservoirBucketsAndPipes);
+        TESTS.put("fluid_reservoir_config_rate_and_size", ModGameTests::reservoirConfig);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -1065,5 +1066,38 @@ public final class ModGameTests {
                     h.assertTrue(tank.getAmount() == 500, "another 1,000 mB taken, left " + tank.getAmount());
                 })
                 .thenSucceed();
+    }
+
+    /**
+     * waterPerSecond and capacity apply straight away: 4,000 mB/s into a 2,000 mB tank, then the tank shrunk to 1,000.
+     * Ticks the reservoir by hand so the changed config never leaks into other tests running at the same time.
+     */
+    private static void reservoirConfig(GameTestHelper h) {
+        infinitePool(h);
+        var be = reservoir(h, RESERVOIR_POS);
+        var tank = be.getTank();
+        var level = h.getLevel();
+        BlockPos pos = h.absolutePos(RESERVOIR_POS);
+        int oldRate = ModConfigs.SERVER.reservoirWaterPerSecond.get();
+        int oldCapacity = ModConfigs.SERVER.reservoirCapacity.get();
+        Runnable tick = () -> com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity.serverTick(level, pos, level.getBlockState(pos), be);
+        try {
+            ModConfigs.SERVER.reservoirWaterPerSecond.set(4_000);
+            ModConfigs.SERVER.reservoirCapacity.set(2_000);
+            for (int i = 0; i < 5; i++) tick.run();
+            h.assertTrue(tank.getCapacity() == 2_000, "capacity follows the config, was " + tank.getCapacity());
+            h.assertTrue(tank.getAmount() == 1_000, "4,000 mB/s makes 1,000 mB in 5 ticks, made " + tank.getAmount());
+            for (int i = 0; i < 20; i++) tick.run();
+            h.assertTrue(tank.getAmount() == 2_000, "stops at the configured 2,000 mB, has " + tank.getAmount());
+            h.assertTrue(be.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ReservoirStatus.FULL, "status Full, was " + be.getStatus());
+            ModConfigs.SERVER.reservoirCapacity.set(1_000);
+            tick.run();
+            h.assertTrue(tank.getCapacity() == 1_000 && tank.getAmount() == 1_000, "a smaller tank drops the extra water: "
+                    + tank.getAmount() + " of " + tank.getCapacity());
+        } finally {
+            ModConfigs.SERVER.reservoirWaterPerSecond.set(oldRate);
+            ModConfigs.SERVER.reservoirCapacity.set(oldCapacity);
+        }
+        h.succeed();
     }
 }

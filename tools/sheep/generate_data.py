@@ -217,7 +217,7 @@ def lang():
         "barelyfunctionalcontraptions.configuration.requireInfiniteSource": "Require Infinite Source",
         "barelyfunctionalcontraptions.configuration.outputPerTick": "Push to Neighbours (mB/t)",
         "block.barelyfunctionalcontraptions.fluid_reservoir": "Fluid Reservoir",
-        "tooltip.barelyfunctionalcontraptions.fluid_reservoir": "Place it on top of an infinite water source to fill its 10-bucket tank. Fills buckets and pushes water into tanks beside it.",
+        "tooltip.barelyfunctionalcontraptions.fluid_reservoir": "Place it on top of an infinite water source to fill its water tank (10 buckets by default). Fills buckets and pushes water into tanks beside it.",
         "gui.barelyfunctionalcontraptions.reservoir.stored": "%s mB",
         "gui.barelyfunctionalcontraptions.reservoir.capacity": "of %s mB",
         "gui.barelyfunctionalcontraptions.reservoir.buckets": "%s buckets",

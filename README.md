@@ -358,6 +358,8 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `requireInfiniteSource` | true | Only work over a self-refilling water source (false = any water source) |
 | `outputPerTick` | 1000 | mB pushed into neighbouring tanks (sides and top) per tick; 0 = no pushing |
 
+Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already placed, straight away (the config screen works in-game). Shrinking the tank drops any water above the new size. The GUI gauge always has 10 marks, so with a different size each mark is a tenth of the tank instead of a bucket.
+
 **`[creative_generator]`**
 
 | Key | Default | Meaning |

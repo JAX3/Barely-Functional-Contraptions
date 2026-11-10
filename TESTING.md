@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 57 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 35 Resourceful Sheep, 6 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 58 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 36 Resourceful Sheep, 6 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 16 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
@@ -40,6 +40,7 @@ In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): t
 | `fluid_reservoir_fills_over_infinite_source` | On a 2x2 pool it holds 10,000 mB, has 1,500–2,500 mB after 2 seconds (status *Filling*), fills to exactly 10,000 mB and stops there (status *Full*, windows at fill 4). The water source below is still a source. |
 | `fluid_reservoir_needs_infinite_source` | No water is made over a lone source or over two sources in a line (each has only one source neighbour); both report *Source Not Infinite*. One on stone reports *No Water Source*. (Checked that this test fails if one neighbouring source is accepted.) |
 | `fluid_reservoir_buckets_and_pipes` | Two empty buckets in the input slot: one becomes a water bucket in the output slot, using 1,000 mB. Dirt is refused. The fluid capability refuses water poured in but lets 500 mB be taken out. Right-clicking with an empty bucket gives a water bucket and takes another 1,000 mB. |
+| `fluid_reservoir_config_rate_and_size` | With `waterPerSecond = 4000` and `capacity = 2000`, a placed reservoir makes exactly 1,000 mB in 5 ticks and stops at 2,000 mB (*Full*). Lowering `capacity` to 1,000 shrinks the tank to 1,000 mB. The old values are restored afterwards. |
 | `integration_fluid_reservoir_waters_generator` | A reservoir on a 2x2 pool fills a dry Mycelial Generator beside it with at least 2,000 mB of water. |
 
 In the real client (`15_fluid_reservoir.png`, `16_fluid_reservoir_gui.png`): the reservoir on its pool shows water in its side windows next to a running generator, and a second one on dry stone is half full. The GUI shows the water gauge with bucket marks, *8,610 mB of 10,000 mB*, *8.6 buckets*, *+1,000 mB/s*, the *Filling* lamp, and an empty bucket in the top slot already turned into a water bucket in the bottom slot.
