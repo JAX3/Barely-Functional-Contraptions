@@ -1472,6 +1472,28 @@ def cube_end(up=False, down=False, left=False, right=False):
     return img
 
 
+def cube_inner_corner(corner):
+    """
+    Transparent overlay with a 4x4 inside-corner frame piece, drawn where a face connects on two adjacent edges but
+    the diagonal block between them is not a cube (the inside of an L). The two frame strips meeting there turn the
+    corner as nested L-shaped bands: band k = min(depth into one strip, depth into the other).
+    """
+    img = Image.new("RGBA", (16, 16), CLEAR)
+    top = [CUBE_SIDE[y][6] for y in (3, 2, 1, 0)]          # top strip, inner to outer
+    bottom = [CUBE_SIDE[y][6] for y in (12, 13, 14, 15)]   # bottom strip, inner to outer
+    left = [CUBE_SIDE[6][x] for x in (3, 2, 1, 0)]         # left strip, inner to outer
+    right = [CUBE_SIDE[6][x] for x in (12, 13, 14, 15)]    # right strip, inner to outer
+    vertical_strip, horizontal_strip = (left if "l" in corner else right), (top if "t" in corner else bottom)
+    for v in range(4):          # depth into the horizontal strip (0 = inner)
+        for u in range(4):      # depth into the vertical strip
+            x = (3 - u) if "l" in corner else (12 + u)
+            y = (3 - v) if "t" in corner else (12 + v)
+            k = min(u, v)
+            ch = vertical_strip[k] if u <= v else horizontal_strip[k]
+            img.putpixel((x, y), CARTOON[ch])
+    return img
+
+
 def generate_energy_cube():
     for rows in (CUBE_SIDE, CUBE_TOP):
         assert len(rows) == 16 and all(len(r) == 16 for r in rows)
@@ -1481,6 +1503,8 @@ def generate_energy_cube():
     os.makedirs(out("block/hume_energy_cube"), exist_ok=True)
     for name in os.listdir(out("block/hume_energy_cube")):
         os.remove(out("block/hume_energy_cube/" + name))
+    for corner in ("tl", "tr", "bl", "br"):
+        cube_inner_corner(corner).save(out(f"block/hume_energy_cube/inner_{corner}.png"))
     for m in range(16):
         up, down, left, right = bool(m & 8), bool(m & 4), bool(m & 2), bool(m & 1)
         mask = _cube_mask_name(up, down, left, right)

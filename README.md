@@ -260,6 +260,10 @@ A Forge Energy battery. FE goes **in and out on every side**, and **cubes that t
 |---|---|
 | ![Hume Energy Cubes](docs/screenshots/21_energy_cubes.png) | ![Hume Energy Cubes from below](docs/screenshots/23_energy_cubes_below.png) |
 
+Any shape works, not just full boxes: L-shapes, rings and walls with bends get proper inside corners where the frame turns.
+
+![Inside corners](docs/screenshots/24_energy_cube_corners.png)
+
 - **One cube:** 1,000,000 FE buffer, 10,000 FE/t transfer rate (`capacityPerCube`, `transferPerCube`).
 - **A group of N touching cubes** (faces touching, in any shape) has **N x** the buffer and **N x** the transfer rate. A 2x2x2 block of 8 cubes holds 8,000,000 FE and moves 80,000 FE/t. Every cube in the group shares the same energy, so you can feed one end and take power out of the other.
 - **Output:** the group **pushes energy into any machine or cable touching it** (`autoOutput`), up to its transfer rate each tick. Machines and cables can also pull from it, and any generator or cable can charge it. It never pushes into other cubes.

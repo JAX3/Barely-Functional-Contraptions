@@ -4,13 +4,12 @@
   "key": {
     "I": "minecraft:iron_ingot",
     "R": "minecraft:redstone_block",
-    "A": "minecraft:amethyst_shard",
-    "F": "minecraft:furnace"
+    "A": "minecraft:amethyst_shard"
   },
   "pattern": [
     "IAI",
     "ARA",
-    "IFI"
+    "IAI"
   ],
   "result": {
     "id": "barelyfunctionalcontraptions:hume_energy_cube"

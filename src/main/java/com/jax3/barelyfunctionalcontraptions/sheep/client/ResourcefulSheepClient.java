@@ -37,6 +37,8 @@ public final class ResourcefulSheepClient {
     public static void init(IEventBus modBus, ModContainer container) {
 
         modBus.addListener(ResourcefulSheepClient::registerScreens);
+        modBus.addListener((net.neoforged.neoforge.client.event.RegisterBlockStateModels event) ->
+                event.registerModel(EnergyCubeCornersModel.TYPE, EnergyCubeCornersModel.Unbaked.MAP_CODEC));
         modBus.addListener(ResourcefulSheepClient::registerTintSources);
         modBus.addListener(ResourcefulSheepClient::registerRenderStateModifiers);
         modBus.addListener(ResourcefulSheepClient::addLayers);

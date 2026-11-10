@@ -7263,6 +7263,11 @@
       "apply": {
         "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_1111"
       }
+    },
+    {
+      "apply": {
+        "type": "barelyfunctionalcontraptions:energy_cube_corners"
+      }
     }
   ]
 }

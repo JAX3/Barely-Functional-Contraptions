@@ -228,7 +228,10 @@ public final class DevScreenshotHarness {
                         String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 160 -55", cubeBase.getX() + 14.5, cubeBase.getY() + 1, cubeBase.getZ() + 3.5)));
             }
             case 1145 -> shot(mc, "23_energy_cubes_below");
-            case 1150 -> {
+            case 1147 -> server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                    String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 75", cubeBase.getX() + 5.5, cubeBase.getY() + 7, cubeBase.getZ() + 9.5)));
+            case 1165 -> shot(mc, "24_energy_cube_corners");
+            case 1170 -> {
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -397,6 +400,12 @@ public final class DevScreenshotHarness {
         // A single empty cube and a single full one.
         placeCube(level, cubeBase.offset(7, 0, 0), 0);
         placeCube(level, cubeBase.offset(9, 0, 0), 1_000_000);
+        // An L (like a corner of a wall) and a 3x3 ring with no middle: their inside corners need the diagonal check.
+        for (int i = 0; i < 4; i++) placeCube(level, cubeBase.offset(1 + i, -1, 5), 500_000);
+        for (int i = 1; i < 4; i++) placeCube(level, cubeBase.offset(1, -1, 5 + i), 500_000);
+        for (int x = 0; x < 3; x++) for (int z = 0; z < 3; z++) {
+            if (x != 1 || z != 1) placeCube(level, cubeBase.offset(7 + x, -1, 5 + z), 500_000);
+        }
         // A floating 3x2 slab (to see the connected bottom faces from below).
         for (int x = 0; x < 3; x++) for (int z = 0; z < 2; z++) placeCube(level, cubeBase.offset(12 + x, 4, z), 500_000);
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),

@@ -217,6 +217,22 @@ def block_models():
                           face_model(face, f"{MOD}:block/hume_energy_cube/side_{mask}_{charge}"))
                     parts.append({"when": dict(when, charge=str(charge)),
                                   "apply": {"model": f"{MOD}:block/hume_energy_cube/{model}"}})
+    # Inside corners (where a face connects on two adjacent edges but the diagonal block is not a cube) need the
+    # diagonal neighbour, which block states don't have: a dynamic model part (EnergyCubeCornersModel) checks the
+    # world and adds these overlays, drawn a hair in front of the face.
+    offset = {"north": ([0, 0, -0.01], [16, 16, 16]), "south": ([0, 0, 0], [16, 16, 16.01]),
+              "west": ([-0.01, 0, 0], [16, 16, 16]), "east": ([0, 0, 0], [16.01, 16, 16]),
+              "down": ([0, -0.01, 0], [16, 16, 16]), "up": ([0, 0, 0], [16, 16.01, 16])}
+    for face in planes:
+        for corner in ("tl", "tr", "bl", "br"):
+            texture = f"{MOD}:block/hume_energy_cube/inner_{corner}"
+            frm, to = offset[face]
+            write(os.path.join(cube_dir, f"inner_{face}_{corner}.json"), {
+                "parent": "minecraft:block/block",
+                "textures": {"particle": texture, "face": texture},
+                "elements": [{"from": frm, "to": to, "faces": {face: {"texture": "#face", "cullface": face}}}],
+            })
+    parts.append({"apply": {"type": f"{MOD}:energy_cube_corners"}})
     write(os.path.join(ASSETS, "blockstates", "hume_energy_cube.json"), {"multipart": parts})
     # The item: a single, unconnected cube two thirds full.
     write(os.path.join(cube_dir, "item.json"), {

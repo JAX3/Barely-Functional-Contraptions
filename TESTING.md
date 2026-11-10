@@ -9,7 +9,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
 | In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 72 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 45 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 23 screenshots are in [`docs/screenshots/`](docs/screenshots) |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 24 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -47,7 +47,7 @@ In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): t
 | `energy_cube_stack_fills_bottom_up` | In a 2x2x2 group, each cube's connection properties match its neighbours (up and east connected, west not, and so on). At 75% the bottom layer shows level 8 and the top layer 4; at 25% the bottom shows 4 and the top 0. Removing a cube clears the connection on the cube below. |
 | `integration_generator_charges_energy_cube` | A running Mycelial Generator charges two cubes, and a separator on their far side finishes iron wool on that power. |
 
-In the real client (`21_energy_cubes.png`, `23_energy_cubes_below.png`): the 2x2x2 group renders as one large cube with a single window and one plain top plate, with no repeating ports. A 3-high tower at 60% shows the energy level running on from the bottom cube into the middle one. A floating 3x2 slab seen from below is one plain plate with its frame only around the outside, so the bottom faces are oriented correctly. The group's GUI (`22_energy_cube_gui.png`) still reads *x8 · 80,000 FE/t*. No missing-model warnings in the log.
+In the real client (`21_energy_cubes.png`, `23_energy_cubes_below.png`): the 2x2x2 group renders as one large cube with a single window and one plain top plate, with no repeating ports. A 3-high tower at 60% shows the energy level running on from the bottom cube into the middle one. A floating 3x2 slab seen from below is one plain plate with its frame only around the outside, so the bottom faces are oriented correctly. The group's GUI (`22_energy_cube_gui.png`) still reads *x8 · 80,000 FE/t*. No missing-model warnings in the log. `24_energy_cube_corners.png`: an L of seven cubes and a 3x3 ring with no middle, seen from above. Every inside corner is a continuous turn of the frame (outline, purple rim, steel) instead of the strips stopping short at the corner cube. The diagonal neighbour this needs isn't in the block state, so a dynamic model part looks it up when the chunk is built; this is checked visually only, since GameTests run without a renderer.
 
 ### Wireless power with the Barely Functional Wrench
 
