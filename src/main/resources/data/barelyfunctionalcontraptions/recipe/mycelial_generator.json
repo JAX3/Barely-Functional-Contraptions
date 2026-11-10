@@ -6,12 +6,13 @@
     "C": "minecraft:cauldron",
     "I": "minecraft:iron_ingot",
     "M": "barelyfunctionalcontraptions:functional_machine_block",
-    "R": "minecraft:red_mushroom"
+    "R": "minecraft:red_mushroom",
+    "T": "minecraft:copper_ingot"
   },
   "pattern": [
     "IRI",
     "BMB",
-    "ICI"
+    "TCT"
   ],
   "result": {
     "count": 1,
