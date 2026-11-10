@@ -64,6 +64,7 @@ public final class IntegrationGameTests {
         TESTS.put("integration_wrench_links_machines", IntegrationGameTests::wrenchLinksMachines);
         TESTS.put("integration_wireless_link_rules", IntegrationGameTests::wirelessLinkRules);
         TESTS.put("integration_generator_status_lists_wireless_links", IntegrationGameTests::statusListsWirelessLinks);
+        TESTS.put("integration_generator_charges_energy_cube", IntegrationGameTests::generatorChargesCube);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
     }
 
@@ -384,5 +385,21 @@ public final class IntegrationGameTests {
         h.assertTrue(decoded.equals(status), "status survives the trip to the client");
         h.assertTrue(buf.readableBytes() == 0, "nothing left unread");
         h.succeed();
+    }
+
+    /** A running Mycelial Generator touching a Hume Energy Cube charges it, and through it a separator on the far side. */
+    private static void generatorChargesCube(GameTestHelper h) {
+        MycelialGeneratorBlockEntity generator = generator(h, new BlockPos(1, 1, 3), new ItemStack(Items.BROWN_MUSHROOM, 8), 4000);
+        h.setBlock(new BlockPos(2, 1, 3), com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.HUME_ENERGY_CUBE.get());
+        h.setBlock(new BlockPos(3, 1, 3), com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.HUME_ENERGY_CUBE.get());
+        var cubeEnd = h.getBlockEntity(new BlockPos(3, 1, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
+        MechanicalSeparatorBlockEntity separator = separator(h, new BlockPos(4, 1, 3));
+        separator.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(IRON, 1));
+        h.succeedWhen(() -> {
+            h.assertTrue(generator.getState() == GeneratorState.RUNNING, "generator running, was " + generator.getState());
+            h.assertTrue(cubeEnd.group().size() == 2, "two cubes, one group");
+            h.assertTrue(separator.getInventory().getStack(SeparatorInventory.PRIMARY).is(Items.RAW_IRON),
+                    "the separator finishes iron wool on power passed through the cubes");
+        });
     }
 }

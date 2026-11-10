@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "charge=0": {
+      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_0"
+    },
+    "charge=1": {
+      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_1"
+    },
+    "charge=2": {
+      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_2"
+    },
+    "charge=3": {
+      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_3"
+    },
+    "charge=4": {
+      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_4"
+    }
+  }
+}

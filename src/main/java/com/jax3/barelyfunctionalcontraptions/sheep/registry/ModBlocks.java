@@ -40,6 +40,15 @@ public final class ModBlocks {
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.METAL));
 
+    /** Stores FE; touching cubes form one battery whose buffer and transfer rate grow with every cube. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock> HUME_ENERGY_CUBE = REGISTER.registerBlock("hume_energy_cube",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock::new,
+            p -> p.mapColor(MapColor.COLOR_PURPLE)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL)
+                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock.CHARGE) * 2));
+
     /** Creative-only infinite FE source: unbreakable in survival, no recipe. */
     public static final DeferredBlock<CreativeGeneratorBlock> CREATIVE_GENERATOR = REGISTER.registerBlock("creative_generator",
             CreativeGeneratorBlock::new,

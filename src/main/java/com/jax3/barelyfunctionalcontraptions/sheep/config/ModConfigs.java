@@ -106,6 +106,10 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue reservoirCapacity;
         public final ModConfigSpec.BooleanValue reservoirRequireInfinite;
         public final ModConfigSpec.IntValue reservoirOutputPerTick;
+        public final ModConfigSpec.IntValue energyCubeCapacityPerCube;
+        public final ModConfigSpec.IntValue energyCubeTransferPerCube;
+        public final ModConfigSpec.IntValue energyCubeMaxGroupSize;
+        public final ModConfigSpec.BooleanValue energyCubeAutoOutput;
 
         // ---------------------------------------------------------------- /barelyfunctionalcontraptions generate
         public final ModConfigSpec.ConfigValue<List<? extends String>> generatorAllowedTabs;
@@ -221,6 +225,17 @@ public final class ModConfigs {
                     .define("requireInfiniteSource", true);
             reservoirOutputPerTick = b.comment("mB pushed each tick into neighbouring tanks (sides and top), e.g. a Mycelial Generator. 0 = no pushing.")
                     .defineInRange("outputPerTick", 1_000, 0, 1_000_000);
+            b.pop();
+
+            b.comment("Hume Energy Cube (FE storage; touching cubes join into one battery)").push("energy_cube");
+            energyCubeCapacityPerCube = b.comment("FE each cube adds to its group's buffer.")
+                    .defineInRange("capacityPerCube", 1_000_000, 1_000, Integer.MAX_VALUE);
+            energyCubeTransferPerCube = b.comment("FE/t each cube adds to its group's transfer rate (in, out and pushing).")
+                    .defineInRange("transferPerCube", 10_000, 1, Integer.MAX_VALUE);
+            energyCubeMaxGroupSize = b.comment("Most cubes that join one group. Cubes beyond this form another group.")
+                    .defineInRange("maxGroupSize", 64, 1, 4096);
+            energyCubeAutoOutput = b.comment("Push energy into machines and cables touching the group every tick. false = they must pull it.")
+                    .define("autoOutput", true);
             b.pop();
 
             b.comment("Which items /barelyfunctionalcontraptions generate may turn into wool types (feeding items and separator outputs).",

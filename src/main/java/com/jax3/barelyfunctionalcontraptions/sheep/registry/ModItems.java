@@ -21,6 +21,8 @@ public final class ModItems {
 
     public static final DeferredItem<BlockItem> FLUID_RESERVOIR = REGISTER.registerSimpleBlockItem(ModBlocks.FLUID_RESERVOIR);
 
+    public static final DeferredItem<BlockItem> HUME_ENERGY_CUBE = REGISTER.registerSimpleBlockItem(ModBlocks.HUME_ENERGY_CUBE);
+
     public static final DeferredItem<BlockItem> CREATIVE_GENERATOR = REGISTER.registerSimpleBlockItem(ModBlocks.CREATIVE_GENERATOR,
             p -> p.rarity(net.minecraft.world.item.Rarity.EPIC));
 

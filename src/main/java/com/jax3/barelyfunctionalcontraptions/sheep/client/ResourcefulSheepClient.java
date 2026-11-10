@@ -89,6 +89,15 @@ public final class ResourcefulSheepClient {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.creative_generator")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
+        if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get())) {
+            event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.hume_energy_cube")
+                    .withStyle(net.minecraft.ChatFormatting.GRAY));
+            var contents = event.getItemStack().get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_CONTENTS.get());
+            if (contents != null && contents.energy() > 0) {
+                event.getToolTip().add(2, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.hume_energy_cube.stored",
+                        String.format(java.util.Locale.ROOT, "%,d", contents.energy())).withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE));
+            }
+        }
         if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_RESERVOIR.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.fluid_reservoir")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));

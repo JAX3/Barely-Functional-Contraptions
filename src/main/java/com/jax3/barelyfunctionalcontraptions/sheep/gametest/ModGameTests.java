@@ -109,6 +109,11 @@ public final class ModGameTests {
         TESTS.put("fluid_reservoir_buckets_and_pipes", ModGameTests::reservoirBucketsAndPipes);
         TESTS.put("fluid_reservoir_config_rate_and_size", ModGameTests::reservoirConfig);
         TESTS.put("infused_sheep_grow_resource_blocks", ModGameTests::growthBlocks);
+        TESTS.put("energy_cube_single", ModGameTests::cubeSingle);
+        TESTS.put("energy_cube_group_scales", ModGameTests::cubeGroupScales);
+        TESTS.put("energy_cube_break_splits_group", ModGameTests::cubeBreakSplits);
+        TESTS.put("energy_cube_pushes_into_machines", ModGameTests::cubePushes);
+        TESTS.put("energy_cube_max_group_size", ModGameTests::cubeMaxGroup);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -1123,6 +1128,123 @@ public final class ModGameTests {
                 // Only allowed when the resource's item has no block form at all.
                 h.assertTrue(SheepResource.blockForm(growth.getItem()).isEmpty(), resource.id() + " grows a flat item " + growth);
             }
+        }
+        h.succeed();
+    }
+
+    // ------------------------------------------------------------------ Hume Energy Cube
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity cube(GameTestHelper h, BlockPos pos) {
+        h.setBlock(pos, ModBlocks.HUME_ENERGY_CUBE.get());
+        return h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
+    }
+
+    private static EnergyHandler cubeFace(GameTestHelper h, BlockPos pos, net.minecraft.core.Direction side) {
+        return h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, h.absolutePos(pos), side);
+    }
+
+    private static int cubeInsert(EnergyHandler handler, int amount) {
+        try (Transaction tx = Transaction.openRoot()) {
+            int moved = handler.insert(amount, tx);
+            tx.commit();
+            return moved;
+        }
+    }
+
+    private static int cubeExtract(EnergyHandler handler, int amount) {
+        try (Transaction tx = Transaction.openRoot()) {
+            int moved = handler.extract(amount, tx);
+            tx.commit();
+            return moved;
+        }
+    }
+
+    /** One cube: 1,000,000 FE buffer, 10,000 FE/t in and out, on every side. */
+    private static void cubeSingle(GameTestHelper h) {
+        BlockPos pos = new BlockPos(3, 1, 3);
+        cube(h, pos);
+        for (var side : net.minecraft.core.Direction.values()) {
+            h.assertTrue(cubeFace(h, pos, side) != null, "energy on the " + side + " face");
+        }
+        EnergyHandler top = cubeFace(h, pos, net.minecraft.core.Direction.UP);
+        h.assertTrue(top.getCapacityAsLong() == 1_000_000, "1,000,000 FE buffer, was " + top.getCapacityAsLong());
+        h.assertTrue(cubeInsert(top, 50_000) == 10_000, "takes 10,000 FE per transfer");
+        h.assertTrue(cubeExtract(cubeFace(h, pos, net.minecraft.core.Direction.WEST), 50_000) == 10_000, "gives 10,000 FE per transfer, from another side");
+        h.assertTrue(top.getAmountAsLong() == 0, "empty again");
+        h.succeed();
+    }
+
+    /** Three cubes in a row are one battery with 3x the buffer and rate; a fourth touching one joins; a separate cube doesn't. */
+    private static void cubeGroupScales(GameTestHelper h) {
+        BlockPos a = new BlockPos(1, 1, 3), b = new BlockPos(2, 1, 3), c = new BlockPos(3, 1, 3), lone = new BlockPos(5, 1, 3);
+        cube(h, a);
+        cube(h, b);
+        var last = cube(h, c);
+        var separate = cube(h, lone);
+        h.assertTrue(last.group().size() == 3 && separate.group().size() == 1, "groups of 3 and 1, got " + last.group().size() + " and " + separate.group().size());
+        EnergyHandler first = cubeFace(h, a, net.minecraft.core.Direction.WEST);
+        h.assertTrue(first.getCapacityAsLong() == 3_000_000, "3x buffer, was " + first.getCapacityAsLong());
+        h.assertTrue(cubeInsert(first, 100_000) == 30_000, "3x transfer rate in");
+        h.assertTrue(cubeFace(h, c, net.minecraft.core.Direction.EAST).getAmountAsLong() == 30_000, "the energy is seen from the far end");
+        h.assertTrue(cubeExtract(cubeFace(h, c, net.minecraft.core.Direction.UP), 100_000) == 30_000, "and taken out there, at 3x the rate");
+
+        cube(h, new BlockPos(2, 2, 3)); // on top of the middle one
+        h.assertTrue(last.group().size() == 4, "a fourth cube joins, size " + last.group().size());
+        h.assertTrue(cubeFace(h, a, net.minecraft.core.Direction.WEST).getCapacityAsLong() == 4_000_000, "4x buffer");
+        h.assertTrue(separate.group().size() == 1, "the cube two blocks away stays separate");
+        h.succeed();
+    }
+
+    /** Breaking the middle cube splits the group; the ends keep their energy and the broken cube's item keeps its share. */
+    private static void cubeBreakSplits(GameTestHelper h) {
+        BlockPos a = new BlockPos(1, 1, 3), b = new BlockPos(2, 1, 3), c = new BlockPos(3, 1, 3);
+        var ca = cube(h, a);
+        var cb = cube(h, b);
+        var cc = cube(h, c);
+        ca.storage().set(100_000);
+        cb.storage().set(200_000);
+        cc.storage().set(300_000);
+        h.assertTrue(ca.group().amount() == 600_000, "600,000 FE in the group");
+        var components = cb.collectComponents();
+        var contents = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_CONTENTS.get());
+        h.assertTrue(contents != null && contents.energy() == 200_000, "the middle cube's item would keep its 200,000 FE");
+        h.setBlock(b, net.minecraft.world.level.block.Blocks.AIR);
+        h.assertTrue(ca.group().size() == 1 && cc.group().size() == 1, "split into two single cubes");
+        h.assertTrue(ca.group().amount() == 100_000 && cc.group().amount() == 300_000, "each end keeps its own energy");
+        h.succeed();
+    }
+
+    /** A charged cube pushes FE into a machine touching it, at the group's rate. */
+    private static void cubePushes(GameTestHelper h) {
+        BlockPos cubePos = new BlockPos(2, 1, 3);
+        var energyCube = cube(h, cubePos);
+        cube(h, new BlockPos(1, 1, 3)); // a second cube: its neighbours are not push targets
+        energyCube.storage().set(500_000);
+        BlockPos machinePos = new BlockPos(3, 1, 3);
+        h.setBlock(machinePos, ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, net.minecraft.core.Direction.EAST));
+        var shears = h.getBlockEntity(machinePos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.class);
+        h.succeedWhen(() -> {
+            h.assertTrue(shears.getEnergy().getEnergy() >= 5_000, "shears charged by the cube, has " + shears.getEnergy().getEnergy());
+            h.assertTrue(energyCube.group().amount() == 500_000 - shears.getEnergy().getEnergy(), "energy only moved, none made or lost");
+        });
+    }
+
+    /** With maxGroupSize = 2, three cubes in a row form a group of 2 and a group of 1. */
+    private static void cubeMaxGroup(GameTestHelper h) {
+        int old = ModConfigs.SERVER.energyCubeMaxGroupSize.get();
+        try {
+            ModConfigs.SERVER.energyCubeMaxGroupSize.set(2);
+            var ca = cube(h, new BlockPos(1, 1, 3));
+            var cb = cube(h, new BlockPos(2, 1, 3));
+            var cc = cube(h, new BlockPos(3, 1, 3));
+            for (var cube : List.of(ca, cb, cc)) cube.invalidateGroup();
+            int sizeA = ca.group().size();
+            int sizeC = cc.group().size();
+            h.assertTrue(sizeA == 2 && sizeC == 1, "groups of 2 and 1, got " + sizeA + " and " + sizeC);
+            h.assertTrue(ca.group().rate() == 20_000, "2 cubes, 20,000 FE/t, was " + ca.group().rate());
+        } finally {
+            ModConfigs.SERVER.energyCubeMaxGroupSize.set(old);
         }
         h.succeed();
     }

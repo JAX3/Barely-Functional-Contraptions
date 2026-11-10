@@ -206,6 +206,12 @@ public final class DevScreenshotHarness {
             case 1030 -> shot(mc, "20_generator_wireless_tooltip");
             case 1040 -> {
                 mc.player.closeContainer();
+                server.execute(() -> cubeScene(server));
+            }
+            case 1075 -> server.execute(() -> cubeMessage(server));
+            case 1080 -> { setHudHidden(mc, false); }
+            case 1085 -> shot(mc, "21_energy_cubes");
+            case 1095 -> {
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -339,6 +345,53 @@ public final class DevScreenshotHarness {
         BlockPos pos = wirelessBase.offset(4, 0, 0);
         if (player.level().getBlockEntity(pos) instanceof MechanicalSeparatorBlockEntity be) {
             player.openMenu(be, pos);
+        }
+    }
+
+    private static BlockPos cubeBase;
+
+    /**
+     * Hume Energy Cubes: a 2x2x2 group charged by a running generator, a single empty cube, and a full single one,
+     * so the window levels can be compared.
+     */
+    private static void cubeScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        cubeBase = origin.offset(-14, 30, -4);
+        for (int x = -1; x <= 9; x++) {
+            for (int z = -1; z <= 2; z++) level.setBlock(cubeBase.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+        }
+        level.setBlock(cubeBase, com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.mycelial.block.MycelialGeneratorBlock.FACING, Direction.SOUTH), 3);
+        if (level.getBlockEntity(cubeBase) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity generator) {
+            generator.getInventory().setStackInSlot(com.jax3.barelyfunctionalcontraptions.mycelial.capability.GeneratorItemHandler.FUEL_SLOT, new ItemStack(Items.RED_MUSHROOM, 32));
+            generator.getTank().fillInternal(net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER), 8000);
+        }
+        for (int x = 1; x <= 2; x++) for (int y = 0; y <= 1; y++) for (int z = 0; z <= 1; z++) {
+            level.setBlock(cubeBase.offset(x, y, z), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        }
+        if (level.getBlockEntity(cubeBase.offset(1, 0, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity be) {
+            be.storage().set(1_000_000);
+            if (level.getBlockEntity(cubeBase.offset(2, 0, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity b2) b2.storage().set(1_000_000);
+            if (level.getBlockEntity(cubeBase.offset(1, 1, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity b3) b3.storage().set(1_000_000);
+            if (level.getBlockEntity(cubeBase.offset(2, 1, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity b4) b4.storage().set(1_000_000);
+        }
+        level.setBlock(cubeBase.offset(5, 0, 0), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        level.setBlock(cubeBase.offset(7, 0, 0), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        if (level.getBlockEntity(cubeBase.offset(7, 0, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity full) {
+            full.storage().set(1_000_000);
+        }
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 18", cubeBase.getX() + 4.0, cubeBase.getY() + 2, cubeBase.getZ() + 7.5));
+    }
+
+    /** The same readout a right-click on the 2x2x2 group gives. */
+    private static void cubeMessage(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        if (player.level().getBlockEntity(cubeBase.offset(1, 0, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity be) {
+            var group = be.group();
+            player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("message.barelyfunctionalcontraptions.energy_cube.info",
+                    group.size(), String.format(java.util.Locale.ROOT, "%,d", group.amount()), String.format(java.util.Locale.ROOT, "%,d", group.capacity()),
+                    String.format(java.util.Locale.ROOT, "%,d", group.rate())).withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE));
         }
     }
 

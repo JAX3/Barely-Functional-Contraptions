@@ -251,6 +251,25 @@ G B G      B = Bucket
 I C I      C = Cauldron
 ```
 
+### Hume Energy Cube
+A Forge Energy battery. FE goes **in and out on every side**, and **cubes that touch join into one bigger battery**: every cube adds to the group's buffer and its transfer rate.
+
+![Hume Energy Cubes](docs/screenshots/21_energy_cubes.png)
+
+- **One cube:** 1,000,000 FE buffer, 10,000 FE/t transfer rate (`capacityPerCube`, `transferPerCube`).
+- **A group of N touching cubes** (faces touching, in any shape) has **N x** the buffer and **N x** the transfer rate. A 2x2x2 block of 8 cubes holds 8,000,000 FE and moves 80,000 FE/t. Every cube in the group shares the same energy, so you can feed one end and take power out of the other.
+- **Output:** the group **pushes energy into any machine or cable touching it** (`autoOutput`), up to its transfer rate each tick. Machines and cables can also pull from it, and any generator or cable can charge it. It never pushes into other cubes.
+- **Breaking a cube** splits the group if it was holding it together. Each cube keeps its own share of the energy, and a broken cube keeps its share in the item (shown in its tooltip), so no energy is lost.
+- **Window:** the purple window on every side shows how full the whole group is, and the cubes glow brighter as they charge. **Right-click** a cube for its group's size, stored energy, buffer and transfer rate. A comparator reads how full the group is.
+- **Wireless:** a Mycelial Generator can charge a cube from a distance with the Mycelium Wrench, like the other machines.
+- Groups are limited to 64 cubes (`maxGroupSize`); extra cubes form another group. Mine it with a stone pickaxe or better.
+
+```
+I A I      I = Iron Ingot
+A R A      A = Amethyst Shard
+I A I      R = Block of Redstone
+```
+
 ### Creative Generator (testing)
 A creative-only block, found in the Resourceful Sheep creative tab. It has no recipe and can't be broken in survival.
 - Produces **unlimited Forge Energy**.
@@ -378,6 +397,15 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `capacity` | 10000 | Tank size in mB (10 buckets) |
 | `requireInfiniteSource` | true | Only work over a self-refilling water source (false = any water source) |
 | `outputPerTick` | 1000 | mB pushed into neighbouring tanks (sides and top) per tick; 0 = no pushing |
+
+**`[energy_cube]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `capacityPerCube` | 1000000 | FE each cube adds to its group's buffer |
+| `transferPerCube` | 10000 | FE/t each cube adds to its group's transfer rate (in, out and pushing) |
+| `maxGroupSize` | 64 | Most cubes in one group; extra cubes form another group |
+| `autoOutput` | true | Push energy into touching machines and cables every tick |
 
 Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already placed, straight away (the config screen works in-game). Shrinking the tank drops any water above the new size. The GUI gauge always has 10 marks, so with a different size each mark is a tenth of the tank instead of a bucket.
 

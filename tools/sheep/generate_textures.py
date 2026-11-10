@@ -1353,6 +1353,64 @@ def generate_reservoir_gui():
     img.save(out("gui/fluid_reservoir.png"))
 
 
+# ---------------------------------------------------------------------------
+# Hume Energy Cube: the cartoon casing with a purple energy window that fills with charge (0..4) and a bolt.
+# ---------------------------------------------------------------------------
+CUBE_FRAME = [
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbPPPPPPPPBbSO",
+    "OHbOOOOOOOOOObSO",
+    "OHPO........OpSO",
+    "OHPO........OpSO",
+    "OHPO........OpSO",
+    "OHPO........OpSO",
+    "OHPO........OpSO",
+    "OHPO........OpSO",
+    "OHPO........OpSO",
+    "OHPO........OpSO",
+    "OHbOOOOOOOOOObSO",
+    "OHBbppppppppBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+CUBE_BOLT = [  # 8x8, drawn over the window
+    "....EE..",
+    "...EE...",
+    "..EEe...",
+    ".EEEEEe.",
+    "...eEE..",
+    "...EE...",
+    "..Ee....",
+    "..e.....",
+]
+
+
+def energy_cube(charge):
+    img = grid(CUBE_FRAME, CARTOON)
+    filled = charge * 2
+    for y in range(4, 12):
+        for x in range(4, 12):
+            depth = y - (12 - filled)
+            if depth < 0:
+                c = CARTOON["K"] if (x + y) % 5 else CARTOON["k"]
+            elif depth == 0:
+                c = CARTOON["G"]
+            else:
+                c = CARTOON["g"] if (x + y) % 3 else CARTOON["P"]
+            img.putpixel((x, y), c)
+    bolt = {"E": CARTOON["E"], "e": CARTOON["e"]} if charge else {"E": hexc("#6b6250"), "e": hexc("#4a4436")}
+    grid(CUBE_BOLT, bolt, img, 4, 4)
+    return img
+
+
+def generate_energy_cube():
+    for rows in (CUBE_FRAME, CUBE_BOLT):
+        assert all(len(r) == len(rows[0]) for r in rows)
+    for charge in range(5):
+        energy_cube(charge).save(out(f"block/hume_energy_cube_{charge}.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -1363,6 +1421,7 @@ def main():
     generate_shears_gui()
     generate_fluid_reservoir()
     generate_reservoir_gui()
+    generate_energy_cube()
     generate_jei()
     generate_logo()
     print("Textures written to", os.path.abspath(ROOT))

@@ -428,5 +428,13 @@
   "gui.barelyfunctionalcontraptions.tooltip.wireless.unknown": "Machine",
   "gui.barelyfunctionalcontraptions.tooltip.wireless.unloaded": "(not loaded)",
   "gui.barelyfunctionalcontraptions.tooltip.wireless.inactive": "(inactive: out of range or wrench disabled)",
-  "gui.barelyfunctionalcontraptions.tooltip.wireless.howto": "Link with the Mycelium Wrench: this generator, then a Mechanical Separator or Automatic Shears"
+  "gui.barelyfunctionalcontraptions.tooltip.wireless.howto": "Link with the Mycelium Wrench: this generator, then a Mechanical Separator or Automatic Shears",
+  "block.barelyfunctionalcontraptions.hume_energy_cube": "Hume Energy Cube",
+  "tooltip.barelyfunctionalcontraptions.hume_energy_cube": "Stores Forge Energy, in and out on every side. Touching cubes join into one battery: every cube adds to the buffer and the transfer rate.",
+  "tooltip.barelyfunctionalcontraptions.hume_energy_cube.stored": "Holds %s FE",
+  "message.barelyfunctionalcontraptions.energy_cube.info": "Hume Energy Cube x%s: %s / %s FE, %s FE/t",
+  "barelyfunctionalcontraptions.configuration.energy_cube": "Hume Energy Cube",
+  "barelyfunctionalcontraptions.configuration.capacityPerCube": "Buffer per Cube (FE)",
+  "barelyfunctionalcontraptions.configuration.transferPerCube": "Transfer Rate per Cube (FE/t)",
+  "barelyfunctionalcontraptions.configuration.maxGroupSize": "Max Cubes per Group"
 }

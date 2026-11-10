@@ -17,6 +17,8 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.FLUID_RESERVOIR.get(), (be, side) -> be.getFluidHandler(side));
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.FLUID_RESERVOIR.get(),
                 (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
+        // Hume Energy Cube: the whole connected group, in and out, on every face.
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.HUME_ENERGY_CUBE.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.CREATIVE_GENERATOR.get(), (be, side) -> be.getEnergyHandler());
     }
 }

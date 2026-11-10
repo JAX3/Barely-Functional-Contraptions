@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "barelyfunctionalcontraptions:hume_energy_cube",
+          "modifier": {
+            "type": "minecraft:copy_components",
+            "source": "block_entity",
+            "include": [
+              "minecraft:custom_name",
+              "barelyfunctionalcontraptions:machine_contents"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "random_sequence": "barelyfunctionalcontraptions:blocks/hume_energy_cube"
+}

@@ -111,6 +111,8 @@ def item_models():
           {"model": {"type": "minecraft:model", "model": f"{MOD}:block/mechanical_separator"}})
     write(os.path.join(ASSETS, "items", "automatic_shears.json"),
           {"model": {"type": "minecraft:model", "model": f"{MOD}:block/automatic_shears"}})
+    write(os.path.join(ASSETS, "items", "hume_energy_cube.json"),
+          {"model": {"type": "minecraft:model", "model": f"{MOD}:block/hume_energy_cube_3"}})
     # The item shows the reservoir full of water.
     write(os.path.join(ASSETS, "items", "fluid_reservoir.json"),
           {"model": {"type": "minecraft:model", "model": f"{MOD}:block/fluid_reservoir_4"}})
@@ -169,6 +171,11 @@ def block_models():
                 "down": f"{MOD}:block/fluid_reservoir_bottom",
             },
         })
+    for charge in range(5):
+        write(os.path.join(ASSETS, "models", "block", f"hume_energy_cube_{charge}.json"),
+              {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/hume_energy_cube_{charge}"}})
+    write(os.path.join(ASSETS, "blockstates", "hume_energy_cube.json"),
+          {"variants": {f"charge={c}": {"model": f"{MOD}:block/hume_energy_cube_{c}"} for c in range(5)}})
     write(os.path.join(ASSETS, "blockstates", "fluid_reservoir.json"),
           {"variants": {f"fill={fill}": {"model": f"{MOD}:block/fluid_reservoir_{fill}"} for fill in range(5)}})
     write(os.path.join(ASSETS, "models", "block", "creative_generator.json"),
@@ -217,6 +224,14 @@ def lang():
         "barelyfunctionalcontraptions.configuration.requireInfiniteSource": "Require Infinite Source",
         "barelyfunctionalcontraptions.configuration.outputPerTick": "Push to Neighbours (mB/t)",
         "block.barelyfunctionalcontraptions.fluid_reservoir": "Fluid Reservoir",
+        "block.barelyfunctionalcontraptions.hume_energy_cube": "Hume Energy Cube",
+        "tooltip.barelyfunctionalcontraptions.hume_energy_cube": "Stores Forge Energy, in and out on every side. Touching cubes join into one battery: every cube adds to the buffer and the transfer rate.",
+        "tooltip.barelyfunctionalcontraptions.hume_energy_cube.stored": "Holds %s FE",
+        "message.barelyfunctionalcontraptions.energy_cube.info": "Hume Energy Cube x%s: %s / %s FE, %s FE/t",
+        "barelyfunctionalcontraptions.configuration.energy_cube": "Hume Energy Cube",
+        "barelyfunctionalcontraptions.configuration.capacityPerCube": "Buffer per Cube (FE)",
+        "barelyfunctionalcontraptions.configuration.transferPerCube": "Transfer Rate per Cube (FE/t)",
+        "barelyfunctionalcontraptions.configuration.maxGroupSize": "Max Cubes per Group",
         "tooltip.barelyfunctionalcontraptions.fluid_reservoir": "Place it on top of an infinite water source to fill its water tank (10 buckets by default). Fills buckets and pushes water into tanks beside it.",
         "gui.barelyfunctionalcontraptions.reservoir.stored": "%s mB",
         "gui.barelyfunctionalcontraptions.reservoir.capacity": "of %s mB",
@@ -383,6 +398,17 @@ def recipes_loot_tags():
         "pattern": ["ISI", "SRS", "ICI"],
         "result": {"id": f"{MOD}:automatic_shears"},
     })
+    write(os.path.join(DATA, MOD, "recipe", "hume_energy_cube.json"), {
+        "type": "minecraft:crafting_shaped",
+        "category": "redstone",
+        "key": {
+            "I": "minecraft:iron_ingot",
+            "R": "minecraft:redstone_block",
+            "A": "minecraft:amethyst_shard",
+        },
+        "pattern": ["IAI", "ARA", "IAI"],
+        "result": {"id": f"{MOD}:hume_energy_cube"},
+    })
     write(os.path.join(DATA, MOD, "recipe", "fluid_reservoir.json"), {
         "type": "minecraft:crafting_shaped",
         "category": "misc",
@@ -434,6 +460,20 @@ def recipes_loot_tags():
         }],
         "random_sequence": f"{MOD}:blocks/automatic_shears",
     })
+    write(os.path.join(DATA, MOD, "loot_table", "blocks", "hume_energy_cube.json"), {
+        "type": "minecraft:block",
+        "pools": [{
+            "rolls": 1,
+            "condition": {"type": "minecraft:survives_explosion"},
+            "entries": [{
+                "type": "minecraft:item",
+                "name": f"{MOD}:hume_energy_cube",
+                "modifier": {"type": "minecraft:copy_components", "source": "block_entity",
+                             "include": ["minecraft:custom_name", f"{MOD}:machine_contents"]},
+            }],
+        }],
+        "random_sequence": f"{MOD}:blocks/hume_energy_cube",
+    })
     write(os.path.join(DATA, MOD, "loot_table", "blocks", "fluid_reservoir.json"), {
         "type": "minecraft:block",
         "pools": [{
@@ -456,9 +496,9 @@ def recipes_loot_tags():
     write(os.path.join(DATA, MOD, "tags", "item", "replaceable_wool.json"), {"values": ["#minecraft:wool"]})
     # Machines a Mycelial Generator can power wirelessly through a Mycelium Wrench link.
     write(os.path.join(DATA, MOD, "tags", "block", "wireless_power_receivers.json"),
-          {"values": [f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir"]})
+          {"values": [f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:hume_energy_cube"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube"]})
 
 
 if __name__ == "__main__":

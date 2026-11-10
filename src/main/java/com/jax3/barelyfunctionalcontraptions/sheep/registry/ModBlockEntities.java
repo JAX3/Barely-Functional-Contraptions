@@ -24,5 +24,8 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity>> FLUID_RESERVOIR = REGISTER.register("fluid_reservoir",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity::new, ModBlocks.FLUID_RESERVOIR.get()));
 
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity>> HUME_ENERGY_CUBE = REGISTER.register("hume_energy_cube",
+            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity::new, ModBlocks.HUME_ENERGY_CUBE.get()));
+
     private ModBlockEntities() {}
 }
