@@ -105,6 +105,22 @@ Generators connect automatically in all six directions. By default only **runnin
 * Links are saved with the world. Breaking a generator removes its links. A link to a generator in an unloaded chunk is kept, and only counts while both chunks are loaded; the mod never loads chunks to keep a link working.
 * The generator GUI's status line shows how it is connected (*Physical*, *Manual*, *Physical + manual* or *Standalone*) and its link count.
 
+#### Wireless power to machines
+The wrench can also power a **Mechanical Separator** or **Automatic Shears** from a generator that isn't touching it.
+
+* **Right-click the generator, then the machine** (or the machine first, then the generator). The same red and white particles run between them.
+* The generator sends the machine FE as if it were touching it. This comes out of the generator's normal output (`outputTransferRate` per tick), after any machines it actually touches. When it powers several machines, it shares the energy evenly between them.
+* One generator can power up to **8** machines (`max_power_links_per_generator`), within the usual **64 block** limit (`max_link_distance`), in the same dimension. A machine can be powered by several generators.
+* Machines don't join the generator's network, so they don't count towards its boost.
+* **Shift + right-click a machine** to remove its wireless links. Shift + right-clicking a generator removes all its links, including wireless ones.
+* Right-clicking a machine with the wrench selects it instead of opening its GUI.
+* Breaking the machine or the generator removes the link. Links are saved with the world, and they only carry power while both blocks are loaded.
+* Which machines can be powered is the block tag `#barelyfunctionalcontraptions:wireless_power_receivers`. A data pack can add other mods' FE machines to it.
+
+| Linking a generator to two machines | The separator running on wireless power only |
+|---|---|
+| ![Wireless power](docs/screenshots/17_wireless_power.png) | ![Separator on wireless power](docs/screenshots/18_wireless_separator_gui.png) |
+
 ### Mycelium
 
 Converted blocks at least 3 blocks from the generator have a 5% chance to sprout a **huge red or brown mushroom**, if there's room. It only grows into empty space and never loads chunks.

@@ -44,6 +44,7 @@ public final class ServerConfig {
     public static final ModConfigSpec.BooleanValue WRENCH_ENABLED;
     public static final ModConfigSpec.IntValue MAX_LINK_DISTANCE;
     public static final ModConfigSpec.IntValue MAX_MANUAL_CONNECTIONS;
+    public static final ModConfigSpec.IntValue MAX_POWER_LINKS;
     public static final ModConfigSpec.BooleanValue ALLOW_CROSS_DIMENSION_LINKS;
     public static final ModConfigSpec.BooleanValue REQUIRE_SAME_DIMENSION;
     public static final ModConfigSpec.IntValue WRENCH_DURABILITY;
@@ -166,6 +167,10 @@ public final class ServerConfig {
                 .defineInRange("max_link_distance", 64, 1, 4096);
         MAX_MANUAL_CONNECTIONS = b.comment("Maximum manual links per generator (touching neighbours do not count).")
                 .defineInRange("max_manual_connections_per_generator", 8, 1, 64);
+        MAX_POWER_LINKS = b.comment("Maximum machines (Mechanical Separator, Automatic Shears, anything in the block tag",
+                        "#barelyfunctionalcontraptions:wireless_power_receivers) one generator can power wirelessly.",
+                        "Uses max_link_distance and always stays within one dimension.")
+                .defineInRange("max_power_links_per_generator", 8, 1, 64);
         ALLOW_CROSS_DIMENSION_LINKS = b.comment("Allow linking generators in different dimensions (distance is ignored for such links).",
                         "Only takes effect when require_same_dimension = false.")
                 .define("allow_cross_dimension_links", false);

@@ -175,6 +175,15 @@ public final class DevScreenshotHarness {
             case 790 -> shot(mc, "16_fluid_reservoir_gui");
             case 800 -> {
                 mc.player.closeContainer();
+                setHudHidden(mc, true);
+                server.execute(() -> wirelessScene(server));
+            }
+            case 860 -> server.execute(() -> linkWireless(server));
+            case 866 -> shot(mc, "17_wireless_power");
+            case 960 -> server.execute(() -> openWirelessSeparator(server));
+            case 990 -> shot(mc, "18_wireless_separator_gui");
+            case 1000 -> {
+                mc.player.closeContainer();
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -265,6 +274,49 @@ public final class DevScreenshotHarness {
         ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
         if (player.level().getBlockEntity(reservoirPos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity be) {
             player.openMenu(be, reservoirPos);
+        }
+    }
+
+    private static BlockPos wirelessBase;
+
+    /** A running generator on one stone pad, and a separator and Automatic Shears on others a few blocks away. */
+    private static void wirelessScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        wirelessBase = origin.offset(12, 30, -4);
+        for (int x = -1; x <= 9; x++) {
+            for (int z = -1; z <= 1; z++) {
+                level.setBlock(wirelessBase.offset(x, -1, z), (x <= 1 || x >= 7 || x == 4) ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(), 3);
+            }
+        }
+        level.setBlock(wirelessBase, com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.mycelial.block.MycelialGeneratorBlock.FACING, Direction.SOUTH), 3);
+        if (level.getBlockEntity(wirelessBase) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity generator) {
+            generator.getInventory().setStackInSlot(com.jax3.barelyfunctionalcontraptions.mycelial.capability.GeneratorItemHandler.FUEL_SLOT, new ItemStack(Items.RED_MUSHROOM, 32));
+            generator.getTank().fillInternal(net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER), 8000);
+        }
+        level.setBlock(wirelessBase.offset(4, 0, 0), ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState().setValue(MechanicalSeparatorBlock.FACING, Direction.SOUTH), 3);
+        if (level.getBlockEntity(wirelessBase.offset(4, 0, 0)) instanceof MechanicalSeparatorBlockEntity be) {
+            // Wool but no FE: everything it runs on comes over the wireless link.
+            be.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 16));
+        }
+        level.setBlock(wirelessBase.offset(8, 0, 0), ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.SOUTH), 3);
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 22", wirelessBase.getX() + 4.5, wirelessBase.getY() + 2, wirelessBase.getZ() + 7.5));
+    }
+
+    private static void linkWireless(MinecraftServer server) {
+        var dim = server.overworld().dimension();
+        var gen = net.minecraft.core.GlobalPos.of(dim, wirelessBase);
+        com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, gen, net.minecraft.core.GlobalPos.of(dim, wirelessBase.offset(4, 0, 0)));
+        com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, gen, net.minecraft.core.GlobalPos.of(dim, wirelessBase.offset(8, 0, 0)));
+    }
+
+    private static void openWirelessSeparator(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        BlockPos pos = wirelessBase.offset(4, 0, 0);
+        if (player.level().getBlockEntity(pos) instanceof MechanicalSeparatorBlockEntity be) {
+            player.openMenu(be, pos);
         }
     }
 

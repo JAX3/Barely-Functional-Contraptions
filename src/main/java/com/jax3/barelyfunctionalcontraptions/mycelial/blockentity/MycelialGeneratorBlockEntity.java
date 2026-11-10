@@ -366,6 +366,8 @@ public class MycelialGeneratorBlockEntity extends BlockEntity implements MenuPro
                 budget -= accepted;
             }
         }
+        // Then machines linked wirelessly with the Mycelium Wrench share what is left of this interval's budget.
+        com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.push(level, worldPosition, energy, budget);
     }
 
     private BlockCapabilityCache<EnergyHandler, Direction> energyCache(ServerLevel level, Direction direction) {

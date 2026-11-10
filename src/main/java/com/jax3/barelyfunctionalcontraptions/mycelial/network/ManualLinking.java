@@ -121,6 +121,7 @@ public final class ManualLinking {
     /** Called when a generator block is permanently removed (broken, replaced), not on chunk unload. */
     public static void onGeneratorDestroyed(ServerLevel level, BlockPos pos) {
         unlinkAll(level.getServer(), GlobalPos.of(level.dimension(), pos));
+        PowerLinking.unlinkAll(level.getServer(), GlobalPos.of(level.dimension(), pos));
     }
 
     /**
@@ -152,7 +153,7 @@ public final class ManualLinking {
     }
 
     /** Red and white particles along the new link, plus a chime. Visual only; sent to nearby players. */
-    private static void showLinkEffect(ServerLevel level, BlockPos from, BlockPos to) {
+    public static void showLinkEffect(ServerLevel level, BlockPos from, BlockPos to) {
         level.playSound(null, to, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 1.0F, 0.8F);
         if (!ServerConfig.get(ServerConfig.SHOW_LINK_PARTICLES)) {
             return;

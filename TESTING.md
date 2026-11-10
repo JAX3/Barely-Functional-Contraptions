@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 59 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 37 Resourceful Sheep, 6 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 16 screenshots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 62 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 37 Resourceful Sheep, 9 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 18 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -32,6 +32,16 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 In the real client (`14_machine_fronts.png`): the generator, separator and shears stand side by side, each idle and running. All three have the same raised glass window. The idle separator shows a dim wool block and the idle shears show dim shears on dark glass. The running separator (wool inside, Creative Generator behind) glows violet, and the powered shears glow pink like the running generator. `automatic_shears_need_power` also checks that the shears' `active` state (which lights the window) is off without FE and turns on once it has enough to shear.
 
 In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): the block renders with the shears in its front window, and the three sheep in front of it (gold, diamond and plain) are sheared bald. Its slate-style screen shows the energy gauge and readout (24,000 of 50,000 FE: it started with 30,000 and sheared 3 sheep at 2,000 each), the *Waiting for Sheep* status, the redstone button, and the Gold Wool, Diamond Wool and 2 White Wool it collected.
+
+### Wireless power with the Mycelium Wrench
+
+| Test | What it checks |
+|---|---|
+| `integration_wireless_power_to_separator_and_shears` | A running generator in one corner, linked to a separator and an Automatic Shears that it doesn't touch, powers both: the separator turns iron wool into Raw Iron and the shears shear a sheep. The links work in either order. (The first version of this test caught a bug: the first machine took the whole buffer and the shears got nothing. Energy is now shared evenly.) |
+| `integration_wrench_links_machines` | With the wrench item: clicking the separator selects it (handled before its GUI would open), clicking the generator links them, the selection clears, and no generator-network link is made. Shift-clicking the separator removes the link. |
+| `integration_wireless_link_rules` | Two machines can't be linked. A machine 8.5 blocks away is *too far* with `max_link_distance = 4`. Duplicate links are refused, and `max_power_links_per_generator = 1` blocks a second machine. Breaking the linked separator removes the link the next time the generator sends power. |
+
+In the real client (`17_wireless_power.png`, `18_wireless_separator_gui.png`): a running generator on its own pad is linked to a separator and an Automatic Shears on other pads, and the link particles run to both. The separator started with wool and 0 FE. Five seconds later its screen shows it processing iron wool with 3 Raw Iron already made, all on wireless power.
 
 ### Fluid Reservoir
 
