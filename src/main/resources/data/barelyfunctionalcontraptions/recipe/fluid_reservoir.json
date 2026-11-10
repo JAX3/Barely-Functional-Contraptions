@@ -5,11 +5,12 @@
     "I": "minecraft:iron_ingot",
     "G": "#c:glass_blocks",
     "B": "minecraft:bucket",
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
     "C": "minecraft:cauldron"
   },
   "pattern": [
-    "IGI",
-    "GBG",
+    "IBI",
+    "GMG",
     "ICI"
   ],
   "result": {

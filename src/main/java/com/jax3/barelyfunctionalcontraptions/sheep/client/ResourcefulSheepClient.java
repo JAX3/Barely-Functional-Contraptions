@@ -105,6 +105,10 @@ public final class ResourcefulSheepClient {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.fluid_reservoir")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
+        if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FUNCTIONAL_MACHINE_BLOCK.get())) {
+            event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.functional_machine_block")
+                    .withStyle(net.minecraft.ChatFormatting.GRAY));
+        }
         if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.AUTOMATIC_SHEARS.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.automatic_shears")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));

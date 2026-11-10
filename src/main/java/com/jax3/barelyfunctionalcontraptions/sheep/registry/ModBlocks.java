@@ -49,6 +49,13 @@ public final class ModBlocks {
                     .sound(SoundType.METAL)
                     .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock.CHARGE)));
 
+    /** Crafting component for every machine: the blue-steel casing on its own. Stone pickaxe, like the machines. */
+    public static final DeferredBlock<net.minecraft.world.level.block.Block> FUNCTIONAL_MACHINE_BLOCK = REGISTER.registerSimpleBlock("functional_machine_block",
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL));
+
     /** Creative-only infinite FE source: unbreakable in survival, no recipe. */
     public static final DeferredBlock<CreativeGeneratorBlock> CREATIVE_GENERATOR = REGISTER.registerBlock("creative_generator",
             CreativeGeneratorBlock::new,

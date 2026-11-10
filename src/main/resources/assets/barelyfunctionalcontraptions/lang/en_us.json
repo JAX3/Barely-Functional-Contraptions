@@ -457,5 +457,7 @@
   "gui.barelyfunctionalcontraptions.cube.status.empty.desc": "No energy stored",
   "gui.barelyfunctionalcontraptions.cube.status.idle": "Idle",
   "gui.barelyfunctionalcontraptions.cube.status.idle.desc": "No energy is moving in or out",
-  "itemGroup.barelyfunctionalcontraptions.resource_wool": "Resource Wool"
+  "itemGroup.barelyfunctionalcontraptions.resource_wool": "Resource Wool",
+  "block.barelyfunctionalcontraptions.functional_machine_block": "Functional Machine Block",
+  "tooltip.barelyfunctionalcontraptions.functional_machine_block": "The casing every machine is built around."
 }

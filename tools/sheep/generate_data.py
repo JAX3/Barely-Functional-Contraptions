@@ -243,6 +243,12 @@ def block_models():
     })
     write(os.path.join(ASSETS, "blockstates", "fluid_reservoir.json"),
           {"variants": {f"fill={fill}": {"model": f"{MOD}:block/fluid_reservoir_{fill}"} for fill in range(5)}})
+    write(os.path.join(ASSETS, "models", "block", "functional_machine_block.json"),
+          {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/functional_machine_block"}})
+    write(os.path.join(ASSETS, "blockstates", "functional_machine_block.json"),
+          {"variants": {"": {"model": f"{MOD}:block/functional_machine_block"}}})
+    write(os.path.join(ASSETS, "items", "functional_machine_block.json"),
+          {"model": {"type": "minecraft:model", "model": f"{MOD}:block/functional_machine_block"}})
     write(os.path.join(ASSETS, "models", "block", "creative_generator.json"),
           {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/creative_generator"}})
     write(os.path.join(ASSETS, "blockstates", "creative_generator.json"),
@@ -291,6 +297,8 @@ def lang():
         "barelyfunctionalcontraptions.configuration.outputPerTick": "Push to Neighbours (mB/t)",
         "block.barelyfunctionalcontraptions.fluid_reservoir": "Fluid Reservoir",
         "block.barelyfunctionalcontraptions.hume_energy_cube": "Hume Energy Cube",
+        "block.barelyfunctionalcontraptions.functional_machine_block": "Functional Machine Block",
+        "tooltip.barelyfunctionalcontraptions.functional_machine_block": "The casing every machine is built around.",
         "tooltip.barelyfunctionalcontraptions.hume_energy_cube": "Stores Forge Energy, in and out on every side. Touching cubes join into one battery: every cube adds to the buffer and the transfer rate.",
         "tooltip.barelyfunctionalcontraptions.hume_energy_cube.stored": "Holds %s FE",
         "gui.barelyfunctionalcontraptions.cube.stored": "%s FE",
@@ -457,6 +465,18 @@ def lang():
 
 
 def recipes_loot_tags():
+    # The casing every machine recipe uses.
+    write(os.path.join(DATA, MOD, "recipe", "functional_machine_block.json"), {
+        "type": "minecraft:crafting_shaped",
+        "category": "redstone",
+        "key": {
+            "I": "minecraft:iron_ingot",
+            "C": "minecraft:copper_ingot",
+            "R": "minecraft:redstone",
+        },
+        "pattern": ["ICI", "CRC", "ICI"],
+        "result": {"id": f"{MOD}:functional_machine_block"},
+    })
     write(os.path.join(DATA, MOD, "recipe", "mechanical_separator.json"), {
         "type": "minecraft:crafting_shaped",
         "category": "redstone",
@@ -465,10 +485,10 @@ def recipes_loot_tags():
             "C": "minecraft:copper_ingot",
             "H": "minecraft:hopper",
             "P": "minecraft:piston",
-            "R": "minecraft:redstone",
+            "M": f"{MOD}:functional_machine_block",
             "S": "minecraft:shears",
         },
-        "pattern": ["IHI", "PSP", "CRC"],
+        "pattern": ["IHI", "PMP", "CSC"],
         "result": {"id": f"{MOD}:mechanical_separator"},
     })
     write(os.path.join(DATA, MOD, "recipe", "automatic_shears.json"), {
@@ -477,10 +497,10 @@ def recipes_loot_tags():
         "key": {
             "I": "minecraft:iron_ingot",
             "S": "minecraft:shears",
-            "R": "minecraft:redstone",
+            "M": f"{MOD}:functional_machine_block",
             "C": "minecraft:chest",
         },
-        "pattern": ["ISI", "SRS", "ICI"],
+        "pattern": ["ISI", "SMS", "ICI"],
         "result": {"id": f"{MOD}:automatic_shears"},
     })
     write(os.path.join(DATA, MOD, "recipe", "hume_energy_cube.json"), {
@@ -490,9 +510,9 @@ def recipes_loot_tags():
             "I": "minecraft:iron_ingot",
             "R": "minecraft:redstone_block",
             "A": "minecraft:amethyst_shard",
-            "F": "minecraft:furnace",
+            "M": f"{MOD}:functional_machine_block",
         },
-        "pattern": ["IAI", "ARA", "IFI"],
+        "pattern": ["IAI", "ARA", "IMI"],
         "result": {"id": f"{MOD}:hume_energy_cube"},
     })
     write(os.path.join(DATA, MOD, "recipe", "fluid_reservoir.json"), {
@@ -502,9 +522,10 @@ def recipes_loot_tags():
             "I": "minecraft:iron_ingot",
             "G": "#c:glass_blocks",
             "B": "minecraft:bucket",
+            "M": f"{MOD}:functional_machine_block",
             "C": "minecraft:cauldron",
         },
-        "pattern": ["IGI", "GBG", "ICI"],
+        "pattern": ["IBI", "GMG", "ICI"],
         "result": {"id": f"{MOD}:fluid_reservoir"},
     })
     # Example explicit separating recipe: plain wool back into string.
@@ -560,6 +581,12 @@ def recipes_loot_tags():
         }],
         "random_sequence": f"{MOD}:blocks/hume_energy_cube",
     })
+    write(os.path.join(DATA, MOD, "loot_table", "blocks", "functional_machine_block.json"), {
+        "type": "minecraft:block",
+        "pools": [{"rolls": 1, "condition": {"type": "minecraft:survives_explosion"},
+                   "entries": [{"type": "minecraft:item", "name": f"{MOD}:functional_machine_block"}]}],
+        "random_sequence": f"{MOD}:blocks/functional_machine_block",
+    })
     write(os.path.join(DATA, MOD, "loot_table", "blocks", "fluid_reservoir.json"), {
         "type": "minecraft:block",
         "pools": [{
@@ -586,8 +613,8 @@ def recipes_loot_tags():
     # Machines a Mycelial Generator can power wirelessly through a Barely Functional Wrench link.
     write(os.path.join(DATA, MOD, "tags", "block", "wireless_power_receivers.json"),
           {"values": [f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:hume_energy_cube"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block"]})
 
 
 if __name__ == "__main__":

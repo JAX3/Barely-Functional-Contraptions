@@ -119,6 +119,7 @@ public final class ModGameTests {
         TESTS.put("energy_cube_stack_fills_bottom_up", ModGameTests::cubeStack);
         TESTS.put("creative_tabs_split_wool", ModGameTests::creativeTabs);
         TESTS.put("killing_infused_sheep_drops_more_than_shearing", ModGameTests::killInfused);
+        TESTS.put("machines_are_built_from_functional_machine_block", ModGameTests::machineBlockRecipes);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -246,6 +247,28 @@ public final class ModGameTests {
 
     private static int count(List<ItemStack> drops, java.util.function.Predicate<ItemStack> filter) {
         return drops.stream().filter(filter).mapToInt(ItemStack::getCount).sum();
+    }
+
+    private static void machineBlockRecipes(GameTestHelper h) {
+        var recipes = h.getLevel().getServer().getRecipeManager();
+        var casing = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FUNCTIONAL_MACHINE_BLOCK.get();
+        var own = recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
+                ResourcefulSheep.id("functional_machine_block"))).orElse(null);
+        h.assertTrue(own != null && own.value() instanceof net.minecraft.world.item.crafting.ShapedRecipe,
+                "the Functional Machine Block has a shaped recipe");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FUNCTIONAL_MACHINE_BLOCK.get().defaultBlockState()
+                .is(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE), "mined with a pickaxe");
+        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube")) {
+            var holder = recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
+                    ResourcefulSheep.id(machine))).orElse(null);
+            h.assertTrue(holder != null && holder.value() instanceof net.minecraft.world.item.crafting.ShapedRecipe, "missing recipe " + machine);
+            var shaped = (net.minecraft.world.item.crafting.ShapedRecipe) holder.value();
+            @SuppressWarnings("deprecation")
+            long uses = shaped.getIngredients().stream()
+                    .filter(i -> i.isPresent() && i.get().items().anyMatch(it -> it.value() == casing)).count();
+            h.assertTrue(uses == 1, machine + " should take exactly one Functional Machine Block, takes " + uses);
+        }
+        h.succeed();
     }
 
     private static void killInfused(GameTestHelper h) {

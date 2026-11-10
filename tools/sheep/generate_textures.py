@@ -548,6 +548,31 @@ CREATIVE_GEN = [  # creative energy source: magenta-rimmed plate with a big glow
 ]
 
 
+MACHINE_BLOCK = [  # bare blue-steel casing: the machines' frame and corner bolts around an empty, unlit port socket
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMMMMMMMbSSO",
+    "OHMMSOOOOOOSMMSO",
+    "OHMMOkkkkkkOMMSO",
+    "OHMMOkpPPpkOMMSO",
+    "OHMMOkPKKPkOMMSO",
+    "OHMMOkPKKPkOMMSO",
+    "OHMMOkpPPpkOMMSO",
+    "OHMMOkkkkkkOMMSO",
+    "OHMMHOOOOOOHMMSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+
+def generate_machine_block():
+    assert len(MACHINE_BLOCK) == 16 and all(len(r) == 16 for r in MACHINE_BLOCK)
+    grid(MACHINE_BLOCK, CARTOON).save(out("block/functional_machine_block.png"))
+
+
 def generate_creative_generator():
     """4-frame pulsing glow animation, same on every face."""
     strip = Image.new("RGBA", (16, 64), CLEAR)
@@ -1700,6 +1725,7 @@ def main():
     generate_gui()
     generate_shears_gui()
     generate_fluid_reservoir()
+    generate_machine_block()
     generate_reservoir_gui()
     generate_energy_cube()
     generate_cube_gui()
