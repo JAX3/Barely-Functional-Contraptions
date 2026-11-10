@@ -49,7 +49,7 @@ In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): t
 
 In the real client (`21_energy_cubes.png`, `23_energy_cubes_below.png`): the 2x2x2 group renders as one large cube with a single window and one plain top plate, with no repeating ports. A 3-high tower at 60% shows the energy level running on from the bottom cube into the middle one. A floating 3x2 slab seen from below is one plain plate with its frame only around the outside, so the bottom faces are oriented correctly. The group's GUI (`22_energy_cube_gui.png`) still reads *x8 · 80,000 FE/t*. No missing-model warnings in the log.
 
-### Wireless power with the Mycelium Wrench
+### Wireless power with the Barely Functional Wrench
 
 | Test | What it checks |
 |---|---|
@@ -112,7 +112,7 @@ With the default `[generator]` config: Stone Bricks, Raw Iron and Bread are allo
 ## Not verified here
 * Dedicated multiplayer with two real clients. The networking code is unchanged from the standalone mods, but only the payload ids were renamed.
 * Running without JEI (`-Puse_jei_runtime=false`). Both modules load JEI code only through `@JeiPlugin`, as before.
-* The manual Mycelium Wrench checklist below, which is interactive.
+* The manual Barely Functional Wrench checklist below, which is interactive.
 
 ---
 
@@ -127,7 +127,7 @@ There are three layers of tests. Run them in this order after any change.
 ./gradlew test
 ```
 
-These cover the pure logic: the network formula and its overflow guards, energy rounding, the mycelium chance table, the fuel config parser, number formatting, and the Mycelium Wrench link rules (distance, dimension rules, link limits, durability). That's 31 tests in `src/test/java`.
+These cover the pure logic: the network formula and its overflow guards, energy rounding, the mycelium chance table, the fuel config parser, number formatting, and the Barely Functional Wrench link rules (distance, dimension rules, link limits, durability). That's 31 tests in `src/test/java`.
 
 ### 2. Automated in-game tests (GameTests)
 
@@ -173,7 +173,7 @@ Run `./gradlew runClient` and create a **creative, superflat** world with cheats
 4. Dirt within 2 blocks of the generator turns into mycelium but never sprouts one.
 5. Put a stone ceiling 3 blocks above some dirt. Those blocks convert, but no mushroom grows (no room).
 
-#### Mycelium Wrench
+#### Barely Functional Wrench
 | # | Action | Expected |
 |---|---|---|
 | W1 | Right-click generator A with the wrench | Action bar: *Selected generator at …*. A has a purple outline while you hold the wrench, and the wrench glints. Its tooltip shows the selected position. |

@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 /**
- * Highlights the generator selected by the Mycelium Wrench the player is holding, with purple particles
+ * Highlights the generator selected by the Barely Functional Wrench the player is holding, with purple particles
  * tracing the block's edges. Client-only and purely visual; the selection itself is synced as an item
  * data component.
  */

@@ -21,7 +21,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Mycelial Power module of Barely Functional Contraptions (the Mycelial Generator and Mycelium Wrench). */
+/** Mycelial Power module of Barely Functional Contraptions (the Mycelial Generator and Barely Functional Wrench). */
 public final class MycelialPower {
     public static final String MOD_ID = BarelyFunctionalContraptions.MOD_ID;
     public static final Logger LOGGER = LoggerFactory.getLogger("MycelialPower");

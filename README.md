@@ -2,7 +2,7 @@
 
 A NeoForge mod for **Minecraft 26.3** (Java 25) that combines two systems, **Mycelial Power** and **Resourceful Sheep**, into one mod. They share one mod id (`barelyfunctionalcontraptions`), one jar, one creative tab and one config screen, and they are built to work together:
 
-* **Mycelial Power:** the **Mycelial Generator** burns mushrooms and water to make **Forge Energy (FE)**. Generators that touch, or are linked with the **Mycelium Wrench**, form networks whose output grows **exponentially**. Running generators slowly spread **mycelium** and sprout **huge mushrooms**.
+* **Mycelial Power:** the **Mycelial Generator** burns mushrooms and water to make **Forge Energy (FE)**. Generators that touch, or are linked with the **Barely Functional Wrench**, form networks whose output grows **exponentially**. Running generators slowly spread **mycelium** and sprout **huge mushrooms**.
 * **Resourceful Sheep:** feed sheep blocks, ingots and gems to **infuse** their wool, shear them for **resource wool**, and turn the wool back into resources in the FE-powered **Mechanical Separator**. The **Fluid Reservoir** draws water from an infinite source to keep generators supplied.
 
 ![Infused sheep](docs/screenshots/01_world_sheep.png)
@@ -89,7 +89,9 @@ A generator stops when it runs out of fuel or water. When its buffer is full it 
 
 Generators connect automatically in all six directions. By default only **running** generators count towards `N`, so a network grows as more members are fed. Networks update instantly when generators are placed, broken, loaded or unloaded. Generators in unloaded chunks simply stop counting, and **no chunk is ever loaded by the mod**. Networks are capped at 64 members by default.
 
-### Mycelium Wrench (wireless links)
+### Barely Functional Wrench (wireless links)
+
+*Previously called the Mycelium Wrench. Only the name changed: its item ID is still `barelyfunctionalcontraptions:mycelium_wrench`, so existing wrenches, recipes and commands keep working.*
 
 ```
  . I A      I = Iron Ingot     A = Amethyst Shard
@@ -272,7 +274,7 @@ A Forge Energy battery. FE goes **in and out on every side**, and **cubes that t
   It shows the whole group, whichever cube you open. Hover over things for details.
 
   ![Hume Energy Cube GUI](docs/screenshots/22_energy_cube_gui.png)
-- **Wireless:** a Mycelial Generator can charge a cube from a distance with the Mycelium Wrench, like the other machines.
+- **Wireless:** a Mycelial Generator can charge a cube from a distance with the Barely Functional Wrench, like the other machines.
 - Groups are limited to 64 cubes (`maxGroupSize`); extra cubes form another group. Mine it with a stone pickaxe or better.
 
 ```

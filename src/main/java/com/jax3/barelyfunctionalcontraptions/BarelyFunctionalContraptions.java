@@ -16,7 +16,7 @@ import org.slf4j.Logger;
  *
  * <p>The mod is made of two modules that share one mod id, one namespace and one creative tab:</p>
  * <ul>
- *     <li>{@link MycelialPower}: the Mycelial Generator (mushrooms + water → Forge Energy) and the Mycelium Wrench.</li>
+ *     <li>{@link MycelialPower}: the Mycelial Generator (mushrooms + water → Forge Energy) and the Barely Functional Wrench.</li>
  *     <li>{@link ResourcefulSheep}: resource-infused sheep, resource wool and the FE-powered Mechanical Separator.</li>
  * </ul>
  *

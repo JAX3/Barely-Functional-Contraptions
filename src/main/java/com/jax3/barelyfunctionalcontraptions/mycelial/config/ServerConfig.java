@@ -156,10 +156,10 @@ public final class ServerConfig {
                         "tanks) and energy (production that does not fit in a full buffer flows into members with space).")
                 .define("shareResources", false);
 
-        b.comment("Mycelium Wrench: manual (wireless) links between generators that are not touching.",
+        b.comment("Barely Functional Wrench: manual (wireless) links between generators that are not touching.",
                 "Linked generators join one network and count towards the same exponential formula as touching ones.",
                 "Each generator keeps its own fuel, water and energy unless shareResources = true.").push("wrench");
-        WRENCH_ENABLED = b.comment("Enable the Mycelium Wrench. When false, the wrench cannot create links and existing manual links",
+        WRENCH_ENABLED = b.comment("Enable the Barely Functional Wrench. When false, the wrench cannot create links and existing manual links",
                         "stop counting (they are kept and come back when re-enabled).")
                 .define("enabled", true);
         MAX_LINK_DISTANCE = b.comment("Maximum straight-line distance in blocks between two linked generators.",

@@ -35,8 +35,8 @@ Generators touching on **any of their six faces** automatically form a network. 
 - Capped at 64 generators per network by default, with all calculations protected against overflow.
 - Never loads chunks: generators in unloaded chunks simply stop counting.
 
-### 🔧 Mycelium Wrench: wireless links
-Can't fit your generators side by side? Link them with the **Mycelium Wrench**.
+### 🔧 Barely Functional Wrench: wireless links
+Can't fit your generators side by side? Link them with the **Barely Functional Wrench**.
 
 - **Right-click** a generator to select it, then **right-click another** to link them. Red and white particles show the connection.
 - Linked generators form **one network** and share the full exponential boost, just like touching ones.
@@ -105,7 +105,7 @@ Every number lives in `config/barelyfunctionalcontraptions-mycelial-synced.toml`
 ```
 Mine it with any pickaxe.
 
-**Mycelium Wrench**
+**Barely Functional Wrench**
 ```
  (empty)       Iron Ingot      Amethyst Shard
  (empty)       Redstone Dust   Iron Ingot

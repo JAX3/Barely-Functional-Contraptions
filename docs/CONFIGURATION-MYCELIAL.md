@@ -64,7 +64,7 @@ Each generator produces `baseGeneration × fuelEnergy × (scalingMultiplier + fu
 
 ## `[network.wrench]`
 
-Settings for the **Mycelium Wrench**, which links generators that are not touching. A manual link counts exactly like a touching face: both generators join one network and count towards `N` in the exponential formula. Each generator still keeps its own mushrooms, water and energy unless `shareResources = true`.
+Settings for the **Barely Functional Wrench**, which links generators that are not touching. A manual link counts exactly like a touching face: both generators join one network and count towards `N` in the exponential formula. Each generator still keeps its own mushrooms, water and energy unless `shareResources = true`.
 
 | Key | Default | Range | Description |
 |---|---|---|---|

@@ -3,7 +3,7 @@ from PIL import Image
 
 from .palette import hexc
 
-# Original (realistic) Mycelium Wrench, used with --style realistic.
+# Original (realistic) Barely Functional Wrench, used with --style realistic.
 WRENCH_PALETTE = {
     "K": hexc("#1d1626"),  # outline
     "s": hexc("#e3dde8"), "S": hexc("#aaa3b6"), "d": hexc("#6f6879"),  # silver light / mid / dark
@@ -45,7 +45,7 @@ def from_grid(grid, palette):
     return img
 
 
-# Cartoon Mycelium Wrench (default): chunky silver open-jaw head with a purple gem, a wooden handle with a
+# Cartoon Barely Functional Wrench (default): chunky silver open-jaw head with a purple gem, a wooden handle with a
 # red mushroom sprouting from it, a bit of moss and a gold ring at the end.
 WRENCH_CARTOON_PALETTE = {
     "O": hexc("#231c35"),  # outline

@@ -196,7 +196,7 @@ public final class GeneratorGameTests {
         helper.succeed();
     }
 
-    // ------------------------------------------------------------------ Mycelium Wrench (manual links)
+    // ------------------------------------------------------------------ Barely Functional Wrench (manual links)
 
     private static GlobalPos global(GameTestHelper helper, BlockPos relative) {
         return GlobalPos.of(helper.getLevel().dimension(), helper.absolutePos(relative));

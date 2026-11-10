@@ -16,7 +16,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
 /**
- * Wireless power links made with the Mycelium Wrench: each one sends a generator's FE to a machine (a block in
+ * Wireless power links made with the Barely Functional Wrench: each one sends a generator's FE to a machine (a block in
  * {@code #barelyfunctionalcontraptions:wireless_power_receivers}). Stored once for the whole world in
  * {@code data/barelyfunctionalcontraptions/power_links.dat}, separately from generator-to-generator links, so machines
  * never become part of a generator network.

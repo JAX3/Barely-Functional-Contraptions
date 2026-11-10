@@ -26,7 +26,7 @@ import java.util.function.Consumer;
  * Tracks every <em>loaded</em> Mycelial Generator on the server and groups them into networks.
  * <p>
  * Two generators are connected when they touch on one of their six faces (automatic connection) or when they
- * are linked with the Mycelium Wrench (manual connection, see {@link ManualLinkData}). Both kinds of
+ * are linked with the Barely Functional Wrench (manual connection, see {@link ManualLinkData}). Both kinds of
  * connection feed the same connected-component search, so a network built from any mix of them is one
  * network for the exponential formula, and every generator belongs to exactly one network.
  * <ul>

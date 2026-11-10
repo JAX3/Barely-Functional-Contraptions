@@ -20,7 +20,7 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Wireless power with the Mycelium Wrench: a generator linked to a machine sends it FE as if it were touching it.
+ * Wireless power with the Barely Functional Wrench: a generator linked to a machine sends it FE as if it were touching it.
  * Which blocks can receive power this way is the block tag {@link #RECEIVERS} (the Mechanical Separator and the
  * Automatic Shears by default). Links use the wrench's distance limit, stay in one dimension, and are limited per
  * generator by {@code max_power_links_per_generator}.

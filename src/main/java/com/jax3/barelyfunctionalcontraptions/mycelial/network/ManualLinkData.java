@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Every manual (Mycelium Wrench) link of the world, stored once in the server's global saved data
+ * Every manual (Barely Functional Wrench) link of the world, stored once in the server's global saved data
  * ({@code data/barelyfunctionalcontraptions/generator_links.dat}).
  * <p>
  * Keeping links in one world-level store instead of in each block entity means a destroyed generator's links

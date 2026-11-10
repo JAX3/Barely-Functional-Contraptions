@@ -1,7 +1,7 @@
 package com.jax3.barelyfunctionalcontraptions.mycelial.network;
 
 /**
- * Pure rules for manual (Mycelium Wrench) links. No Minecraft classes, so the rules are unit-tested.
+ * Pure rules for manual (Barely Functional Wrench) links. No Minecraft classes, so the rules are unit-tested.
  */
 public final class LinkRules {
     private LinkRules() {

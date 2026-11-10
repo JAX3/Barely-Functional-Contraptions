@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Server-authoritative operations behind the Mycelium Wrench. All checks run here; the client only sends the
+ * Server-authoritative operations behind the Barely Functional Wrench. All checks run here; the client only sends the
  * ordinary "use item on block" interaction.
  */
 public final class ManualLinking {

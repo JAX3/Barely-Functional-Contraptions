@@ -246,7 +246,7 @@ public final class IntegrationGameTests {
                 .thenSucceed();
     }
 
-    // ------------------------------------------------------------------ wireless power (Mycelium Wrench)
+    // ------------------------------------------------------------------ wireless power (Barely Functional Wrench)
 
     private static net.minecraft.core.GlobalPos global(GameTestHelper h, BlockPos pos) {
         return net.minecraft.core.GlobalPos.of(h.getLevel().dimension(), h.absolutePos(pos));

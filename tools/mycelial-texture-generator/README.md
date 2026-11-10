@@ -68,7 +68,7 @@ With the default settings (cartoon style, seed `1337`), the tool reproduces the 
 | `mycelial_textures/blocks.py` | Cartoon 16×16 block textures as editable character grids, including the front window's red mushroom (dim when idle, pulsing with sparkles when running) |
 | `mycelial_textures/blocks_realistic.py` | The earlier noisy-metal block textures (`--style realistic`) |
 | `mycelial_textures/gui.py` | Machine GUI (256×256), JEI background, logo |
-| `mycelial_textures/items.py` | Hand-placed Mycelium Wrench icons (cartoon and realistic), editable as character grids |
+| `mycelial_textures/items.py` | Hand-placed Barely Functional Wrench icons (cartoon and realistic), editable as character grids |
 | `mycelial_textures/models.py` | Block/item models (with mushroom and fungus elements) and the blockstate |
 | `mycelial_textures/structure.py` | Tiny NBT writer for the GameTest structure |
 | `mycelial_textures/__main__.py` | Command line interface |

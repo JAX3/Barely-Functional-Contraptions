@@ -241,7 +241,7 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
                         Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.links", s.manualLinks(), s.maxManualLinks(),
                                 s.activeManualLinks()).withStyle(ChatFormatting.GRAY)));
 
-        // Wireless power (Mycelium Wrench links to machines): shown by hovering the button under the state lamp
+        // Wireless power (Barely Functional Wrench links to machines): shown by hovering the button under the state lamp
         List<Component> wirelessTooltip = new ArrayList<>();
         wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.section.wireless").withStyle(ChatFormatting.AQUA));
         wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.count", s.powerLinks().size(), s.maxPowerLinks())

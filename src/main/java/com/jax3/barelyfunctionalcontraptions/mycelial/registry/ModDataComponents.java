@@ -13,14 +13,14 @@ public final class ModDataComponents {
     public static final DeferredRegister<DataComponentType<?>> COMPONENTS =
             DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, MycelialPower.MOD_ID);
 
-    /** The generator a Mycelium Wrench has selected as the first end of a link. */
+    /** The generator a Barely Functional Wrench has selected as the first end of a link. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<GlobalPos>> SELECTED_GENERATOR =
             COMPONENTS.register("selected_generator", () -> DataComponentType.<GlobalPos>builder()
                     .persistent(GlobalPos.CODEC)
                     .networkSynchronized(GlobalPos.STREAM_CODEC)
                     .build());
 
-    /** Successful links made with a Mycelium Wrench (for the configurable durability). */
+    /** Successful links made with a Barely Functional Wrench (for the configurable durability). */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> WRENCH_USES =
             COMPONENTS.register("wrench_uses", () -> DataComponentType.<Integer>builder()
                     .persistent(Codec.INT)
@@ -28,7 +28,7 @@ public final class ModDataComponents {
                     .build());
 
     /**
-     * Game time until which a Mycelium Wrench shows the enchantment glint after a successful link.
+     * Game time until which a Barely Functional Wrench shows the enchantment glint after a successful link.
      * Not saved to disk (a short visual effect), but synced so the client renders the glint.
      */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> LINK_GLOW_UNTIL =
