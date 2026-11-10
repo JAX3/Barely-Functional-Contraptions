@@ -120,6 +120,7 @@ public final class ModGameTests {
         TESTS.put("creative_tabs_split_wool", ModGameTests::creativeTabs);
         TESTS.put("killing_infused_sheep_drops_more_than_shearing", ModGameTests::killInfused);
         TESTS.put("machines_are_built_from_functional_machine_block", ModGameTests::machineBlockRecipes);
+        TESTS.put("all_blocks_use_iron_block_sounds", ModGameTests::ironSounds);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -247,6 +248,22 @@ public final class ModGameTests {
 
     private static int count(List<ItemStack> drops, java.util.function.Predicate<ItemStack> filter) {
         return drops.stream().filter(filter).mapToInt(ItemStack::getCount).sum();
+    }
+
+    /** Every block in the mod places, breaks and steps with the vanilla Iron Block's sounds. */
+    private static void ironSounds(GameTestHelper h) {
+        var ironPlace = net.minecraft.world.level.block.Blocks.IRON_BLOCK.defaultBlockState().getSoundType().getPlaceSound();
+        int checked = 0;
+        for (var block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
+            var id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
+            if (!id.getNamespace().equals(ResourcefulSheep.MOD_ID)) continue;
+            var sound = block.defaultBlockState().getSoundType();
+            h.assertTrue(sound == net.minecraft.world.level.block.SoundType.IRON && sound.getPlaceSound() == ironPlace,
+                    id + " should use the iron block sound type");
+            checked++;
+        }
+        h.assertTrue(checked >= 7, "expected all 7 blocks, checked " + checked);
+        h.succeed();
     }
 
     private static void machineBlockRecipes(GameTestHelper h) {

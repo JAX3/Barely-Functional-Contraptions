@@ -19,7 +19,7 @@ public final class ModBlocks {
             p -> p.mapColor(MapColor.METAL)
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
-                    .sound(SoundType.METAL)
+                    .sound(SoundType.IRON)
                     .pushReaction(PushReaction.IMMOVEABLE)
                     .lightLevel(state -> state.getValue(MechanicalSeparatorBlock.ACTIVE) ? 7 : 0));
 
@@ -29,7 +29,7 @@ public final class ModBlocks {
             p -> p.mapColor(MapColor.METAL)
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
-                    .sound(SoundType.METAL)
+                    .sound(SoundType.IRON)
                     .lightLevel(state -> state.getValue(AutomaticShearsBlock.ACTIVE) ? 7 : 0));
 
     /** Makes water while sitting on an infinite water source; 10-bucket tank. Stone pickaxe, like the other machines. */
@@ -38,7 +38,7 @@ public final class ModBlocks {
             p -> p.mapColor(MapColor.METAL)
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
-                    .sound(SoundType.METAL));
+                    .sound(SoundType.IRON));
 
     /** Stores FE; touching cubes form one battery whose buffer and transfer rate grow with every cube. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock> HUME_ENERGY_CUBE = REGISTER.registerBlock("hume_energy_cube",
@@ -46,7 +46,7 @@ public final class ModBlocks {
             p -> p.mapColor(MapColor.COLOR_PURPLE)
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
-                    .sound(SoundType.METAL)
+                    .sound(SoundType.IRON)
                     .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock.CHARGE)));
 
     /** Crafting component for every machine: the blue-steel casing on its own. Stone pickaxe, like the machines. */
@@ -54,7 +54,7 @@ public final class ModBlocks {
             p -> p.mapColor(MapColor.METAL)
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
-                    .sound(SoundType.METAL));
+                    .sound(SoundType.IRON));
 
     /** Creative-only infinite FE source: unbreakable in survival, no recipe. */
     public static final DeferredBlock<CreativeGeneratorBlock> CREATIVE_GENERATOR = REGISTER.registerBlock("creative_generator",
@@ -62,7 +62,7 @@ public final class ModBlocks {
             p -> p.mapColor(MapColor.COLOR_PURPLE)
                     .strength(-1.0F, 3_600_000.0F)
                     .noLootTable()
-                    .sound(SoundType.METAL)
+                    .sound(SoundType.IRON)
                     .lightLevel(state -> 10));
 
     private ModBlocks() {}

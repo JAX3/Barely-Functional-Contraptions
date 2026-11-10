@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 75 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 48 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 76 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 49 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 28 screenshots and 7 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
@@ -74,6 +74,10 @@ In the real client (`17_wireless_power.png`, `18_wireless_separator_gui.png`): a
 | `integration_fluid_reservoir_waters_generator` | A reservoir on a 2x2 pool fills a dry Mycelial Generator beside it with at least 2,000 mB of water. |
 
 In the real client (`15_fluid_reservoir.png`, `16_fluid_reservoir_gui.png`): the reservoir on its pool shows water in its side windows next to a running generator, and a second one on dry stone is half full. The GUI shows the water gauge with bucket marks, *8,610 mB of 10,000 mB*, *8.6 buckets*, *+1,000 mB/s*, the *Filling* lamp, and an empty bucket in the top slot already turned into a water bucket in the bottom slot.
+
+### Block sounds (`all_blocks_use_iron_block_sounds`)
+
+Every block in the mod (the Functional Machine Block, all five machines and the Creative Generator) uses the vanilla Iron Block's sound type, so placing, breaking, stepping on and hitting them sound like an Iron Block. The test checks every registered block in the mod's namespace against `Blocks.IRON_BLOCK`.
 
 ### Functional Machine Block (`machines_are_built_from_functional_machine_block`)
 

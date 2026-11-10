@@ -18,7 +18,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.COLOR_PURPLE)
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
-                    .sound(SoundType.NETHERITE_BLOCK)
+                    .sound(SoundType.IRON)
                     .pushReaction(PushReaction.IMMOVEABLE)
                     .lightLevel(state -> state.getValue(MycelialGeneratorBlock.LIGHT)));
 

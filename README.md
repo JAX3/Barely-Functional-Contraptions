@@ -63,7 +63,7 @@ Every machine is built around a **Functional Machine Block**: the blue-steel cas
 
 ![Functional Machine Block recipe: iron ingots in the corners, copper ingots on each side, redstone in the centre](docs/screenshots/recipe_functional_machine_block.png)
 
-**Placing machines:** the Mycelial Generator, Mechanical Separator and Automatic Shears place with their front facing you. **Hold Shift while placing** to make the front face away from you instead (handy for pointing the shears at a pen from outside it, or the separator's back at a cable).
+**Placing machines:** every block in the mod sounds like an Iron Block when placed, broken or walked on. the Mycelial Generator, Mechanical Separator and Automatic Shears place with their front facing you. **Hold Shift while placing** to make the front face away from you instead (handy for pointing the shears at a pen from outside it, or the separator's back at a cable).
 
 ---
 
