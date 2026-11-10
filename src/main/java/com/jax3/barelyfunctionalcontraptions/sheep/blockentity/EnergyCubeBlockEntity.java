@@ -120,8 +120,8 @@ public class EnergyCubeBlockEntity extends BlockEntity implements net.minecraft.
             be.outRate = (int) Math.min(Integer.MAX_VALUE, out / 20);
         }
         if (be.ticks % DISPLAY_INTERVAL == 0) {
-            int charge = group.chargeLevel();
             for (EnergyCubeBlockEntity cube : group.members()) {
+                int charge = group.chargeLevel(cube);
                 BlockState current = cube.getBlockState();
                 if (current.getValue(EnergyCubeBlock.CHARGE) != charge) {
                     level.setBlock(cube.getBlockPos(), current.setValue(EnergyCubeBlock.CHARGE, charge), Block.UPDATE_CLIENTS);

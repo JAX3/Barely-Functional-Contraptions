@@ -1,0 +1,27 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/hume_energy_cube/side_1000_4",
+    "face": "barelyfunctionalcontraptions:block/hume_energy_cube/side_1000_4"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "west": {
+          "texture": "#face",
+          "cullface": "west"
+        }
+      }
+    }
+  ]
+}

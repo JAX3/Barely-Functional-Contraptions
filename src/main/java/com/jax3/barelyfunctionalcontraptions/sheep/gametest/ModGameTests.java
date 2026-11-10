@@ -116,6 +116,7 @@ public final class ModGameTests {
         TESTS.put("energy_cube_max_group_size", ModGameTests::cubeMaxGroup);
         TESTS.put("energy_cube_window_shows_charge", ModGameTests::cubeWindow);
         TESTS.put("energy_cube_gui_values", ModGameTests::cubeGui);
+        TESTS.put("energy_cube_stack_fills_bottom_up", ModGameTests::cubeStack);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -1294,6 +1295,41 @@ public final class ModGameTests {
                     h.assertTrue(menu.getInRate() == 0 && menu.getOutRate() == 3_000, "0 in, 3,000 FE/t out; got " + menu.getInRate() + " / " + menu.getOutRate());
                     h.assertTrue(menu.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CubeStatus.DISCHARGING, "Discharging, got " + menu.getStatus());
                 })
+                .thenSucceed();
+    }
+
+    /**
+     * Touching cubes connect (their shared faces lose the frame), and a stack fills like one tank: two layers at 75%
+     * show a full bottom layer and a half-full top layer; at 25% a half-full bottom and an empty top.
+     */
+    private static void cubeStack(GameTestHelper h) {
+        var charge = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock.CHARGE;
+        var connected = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock.CONNECTED;
+        BlockPos bottomL = new BlockPos(2, 1, 3), bottomR = new BlockPos(3, 1, 3), topL = new BlockPos(2, 2, 3), topR = new BlockPos(3, 2, 3);
+        var a = cube(h, bottomL);
+        var b = cube(h, bottomR);
+        var c = cube(h, topL);
+        var d = cube(h, topR);
+        h.assertBlockProperty(bottomL, connected.get(net.minecraft.core.Direction.UP), true);
+        h.assertBlockProperty(bottomL, connected.get(net.minecraft.core.Direction.EAST), true);
+        h.assertBlockProperty(bottomL, connected.get(net.minecraft.core.Direction.WEST), false);
+        h.assertBlockProperty(topR, connected.get(net.minecraft.core.Direction.DOWN), true);
+        h.assertBlockProperty(topR, connected.get(net.minecraft.core.Direction.UP), false);
+        for (var cube : List.of(a, b, c, d)) cube.storage().set(750_000); // 75% of 4,000,000
+        h.startSequence()
+                .thenWaitUntil(() -> {
+                    h.assertBlockProperty(bottomL, charge, 8);
+                    h.assertBlockProperty(bottomR, charge, 8);
+                    h.assertBlockProperty(topL, charge, 4);
+                    h.assertBlockProperty(topR, charge, 4);
+                })
+                .thenExecute(() -> { for (var cube : List.of(a, b, c, d)) cube.storage().set(250_000); }) // 25%
+                .thenWaitUntil(() -> {
+                    h.assertBlockProperty(bottomL, charge, 4);
+                    h.assertBlockProperty(topR, charge, 0);
+                })
+                .thenExecute(() -> h.setBlock(topL, net.minecraft.world.level.block.Blocks.AIR))
+                .thenExecute(() -> h.assertBlockProperty(bottomL, connected.get(net.minecraft.core.Direction.UP), false))
                 .thenSucceed();
     }
 }

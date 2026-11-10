@@ -1403,24 +1403,69 @@ ENERGY_DEEP, ENERGY_MID, ENERGY_LIGHT = hexc("#5c2aa6"), hexc("#9a52f0"), hexc("
 ENERGY_SURFACE, ENERGY_SPARK = hexc("#ffd2fb"), hexc("#ffffff")
 
 
-def cube_side_frame(level, frame):
-    img = grid(CUBE_SIDE, CARTOON)
-    for y in range(4, 12):
-        for x in range(4, 12):
-            depth = y - (12 - level)          # 0 at the surface row
-            if depth < 0:
+def _cube_mask_name(up, down, left, right):
+    """Connection mask as used in file names: '1' where a cube touches that edge (so it has no frame)."""
+    return "".join("1" if c else "0" for c in (up, down, left, right))
+
+
+def _cube_frame(img, up, down, left, right):
+    """Frame strips on the unconnected edges, and the bolted corners where two framed edges meet."""
+    src = CUBE_SIDE
+    for i in range(16):
+        if not up:
+            for y in range(4):
+                img.putpixel((i, y), CARTOON[src[y][6]])
+        if not down:
+            for y in range(12, 16):
+                img.putpixel((i, y), CARTOON[src[y][6]])
+        if not left:
+            for x in range(4):
+                img.putpixel((x, i), CARTOON[src[6][x]])
+        if not right:
+            for x in range(12, 16):
+                img.putpixel((x, i), CARTOON[src[6][x]])
+    for (framed_v, framed_h, ys, xs) in ((not up, not left, range(4), range(4)), (not up, not right, range(4), range(12, 16)),
+                                         (not down, not left, range(12, 16), range(4)), (not down, not right, range(12, 16), range(12, 16))):
+        if framed_v and framed_h:
+            for y in ys:
+                for x in xs:
+                    img.putpixel((x, y), CARTOON[src[y][x]])
+
+
+def cube_side_frame(level, frame, up=False, down=False, left=False, right=False):
+    """One animation frame of a side face. Unconnected edges get the frame; the window runs to connected edges."""
+    img = Image.new("RGBA", (16, 16), CLEAR)
+    top_i, bottom_i = (0 if up else 4), (15 if down else 11)
+    rows = bottom_i - top_i + 1
+    filled = round(level / CUBE_LEVELS * rows)
+    surface = bottom_i - filled + 1                       # first filled row
+    for y in range(16):
+        for x in range(16):
+            if y < surface or y < top_i:
                 c = CARTOON["K"] if (x + y) % 5 else CARTOON["k"]
-            elif depth == 0:
+            elif y == surface and not (up and level == CUBE_LEVELS):
+                # the shimmering surface line (not at the top of a full cube whose energy carries on above)
                 c = ENERGY_SPARK if (x + frame * 2) % 8 == 0 else ENERGY_SURFACE
             else:
-                # diagonal bands that drift upward one row per frame
-                band = (x + y + frame) % 4
-                c = (ENERGY_LIGHT, ENERGY_MID, ENERGY_MID, ENERGY_DEEP)[band]
+                c = (ENERGY_LIGHT, ENERGY_MID, ENERGY_MID, ENERGY_DEEP)[(x + y + frame) % 4]
             img.putpixel((x, y), c)
-    # glass glint, over the empty glass only
-    for (x, y) in ((5, 5), (4, 6), (6, 5)):
-        if y < 12 - level:
-            img.putpixel((x, y), hexc("#4a3d5c"))
+    if not up and not left:
+        for (x, y) in ((5, 5), (4, 6), (6, 5)):
+            if y < surface:
+                img.putpixel((x, y), hexc("#4a3d5c"))
+    _cube_frame(img, up, down, left, right)
+    return img
+
+
+def cube_end(up=False, down=False, left=False, right=False):
+    """Top or bottom face: a metal plate with the purple bolt port, framed on unconnected edges."""
+    img = Image.new("RGBA", (16, 16), CARTOON["M"])
+    for y in range(3, 13):
+        for x in range(3, 13):
+            ch = CUBE_TOP[y][x]
+            if ch not in "HMBbS":
+                img.putpixel((x, y), CARTOON[ch])
+    _cube_frame(img, up, down, left, right)
     return img
 
 
@@ -1428,16 +1473,23 @@ def generate_energy_cube():
     for rows in (CUBE_SIDE, CUBE_TOP):
         assert len(rows) == 16 and all(len(r) == 16 for r in rows)
     for name in os.listdir(out("block")):
-        if name.startswith("hume_energy_cube_"):
+        if name.startswith("hume_energy_cube"):
             os.remove(out("block/" + name))
-    for level in range(CUBE_LEVELS + 1):
-        strip = Image.new("RGBA", (16, 16 * CUBE_FRAMES), CLEAR)
-        for f in range(CUBE_FRAMES):
-            strip.paste(cube_side_frame(level, f), (0, f * 16))
-        strip.save(out(f"block/hume_energy_cube_side_{level}.png"))
-        with open(out(f"block/hume_energy_cube_side_{level}.png.mcmeta"), "w") as fh:
-            fh.write('{\n  "animation": {\n    "frametime": 4,\n    "interpolate": true\n  }\n}\n')
-    grid(CUBE_TOP, CARTOON).save(out("block/hume_energy_cube_top.png"))
+    os.makedirs(out("block/hume_energy_cube"), exist_ok=True)
+    for name in os.listdir(out("block/hume_energy_cube")):
+        os.remove(out("block/hume_energy_cube/" + name))
+    for m in range(16):
+        up, down, left, right = bool(m & 8), bool(m & 4), bool(m & 2), bool(m & 1)
+        mask = _cube_mask_name(up, down, left, right)
+        cube_end(up, down, left, right).save(out(f"block/hume_energy_cube/end_{mask}.png"))
+        for level in range(CUBE_LEVELS + 1):
+            strip = Image.new("RGBA", (16, 16 * CUBE_FRAMES), CLEAR)
+            for f in range(CUBE_FRAMES):
+                strip.paste(cube_side_frame(level, f, up, down, left, right), (0, f * 16))
+            name = f"block/hume_energy_cube/side_{mask}_{level}.png"
+            strip.save(out(name))
+            with open(out(name + ".mcmeta"), "w") as fh:
+                fh.write('{\n  "animation": {\n    "frametime": 4,\n    "interpolate": true\n  }\n}\n')
 
 
 def generate_cube_gui():

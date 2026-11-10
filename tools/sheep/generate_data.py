@@ -112,7 +112,7 @@ def item_models():
     write(os.path.join(ASSETS, "items", "automatic_shears.json"),
           {"model": {"type": "minecraft:model", "model": f"{MOD}:block/automatic_shears"}})
     write(os.path.join(ASSETS, "items", "hume_energy_cube.json"),
-          {"model": {"type": "minecraft:model", "model": f"{MOD}:block/hume_energy_cube_6"}})
+          {"model": {"type": "minecraft:model", "model": f"{MOD}:block/hume_energy_cube/item"}})
     # The item shows the reservoir full of water.
     write(os.path.join(ASSETS, "items", "fluid_reservoir.json"),
           {"model": {"type": "minecraft:model", "model": f"{MOD}:block/fluid_reservoir_4"}})
@@ -171,20 +171,59 @@ def block_models():
                 "down": f"{MOD}:block/fluid_reservoir_bottom",
             },
         })
-    # Hume Energy Cube: one model per charge level (0..8), the side windows showing how full the group is.
+    # Hume Energy Cube: connected textures. Each face is its own small model, picked by a multipart blockstate from
+    # the four neighbours in that face's plane (no frame on edges where another cube touches) and, for the sides,
+    # the cube's charge (its share of the group's energy level).
     models_dir = os.path.join(ASSETS, "models", "block")
+    cube_dir = os.path.join(models_dir, "hume_energy_cube")
     for name in os.listdir(models_dir):
-        if name.startswith("hume_energy_cube_"):
-            os.remove(os.path.join(models_dir, name))
-    for charge in range(9):
-        side = f"{MOD}:block/hume_energy_cube_side_{charge}"
-        write(os.path.join(models_dir, f"hume_energy_cube_{charge}.json"), {
-            "parent": "minecraft:block/cube_bottom_top",
-            "textures": {"particle": side, "side": side, "top": f"{MOD}:block/hume_energy_cube_top",
-                         "bottom": f"{MOD}:block/hume_energy_cube_top"},
-        })
-    write(os.path.join(ASSETS, "blockstates", "hume_energy_cube.json"),
-          {"variants": {f"charge={c}": {"model": f"{MOD}:block/hume_energy_cube_{c}"} for c in range(9)}})
+        if name.startswith("hume_energy_cube"):
+            path = os.path.join(models_dir, name)
+            if os.path.isfile(path):
+                os.remove(path)
+    os.makedirs(cube_dir, exist_ok=True)
+    for name in os.listdir(cube_dir):
+        os.remove(os.path.join(cube_dir, name))
+    # face -> which block sides are the texture's (up, down, left, right), seen from outside the face
+    planes = {
+        "north": ("up", "down", "east", "west"),
+        "south": ("up", "down", "west", "east"),
+        "east": ("up", "down", "south", "north"),
+        "west": ("up", "down", "north", "south"),
+        "up": ("north", "south", "west", "east"),
+        "down": ("south", "north", "west", "east"),
+    }
+
+    def face_model(face, texture):
+        return {"parent": "minecraft:block/block",
+                "textures": {"particle": texture, "face": texture},
+                "elements": [{"from": [0, 0, 0], "to": [16, 16, 16],
+                              "faces": {face: {"texture": "#face", "cullface": face}}}]}
+
+    parts = []
+    for face, sides in planes.items():
+        for m in range(16):
+            bits = [bool(m & 8), bool(m & 4), bool(m & 2), bool(m & 1)]
+            mask = "".join("1" if b else "0" for b in bits)
+            when = {side: "true" if b else "false" for side, b in zip(sides, bits)}
+            if face in ("up", "down"):
+                model = f"{face}_{mask}"
+                write(os.path.join(cube_dir, model + ".json"), face_model(face, f"{MOD}:block/hume_energy_cube/end_{mask}"))
+                parts.append({"when": when, "apply": {"model": f"{MOD}:block/hume_energy_cube/{model}"}})
+            else:
+                for charge in range(9):
+                    model = f"{face}_{mask}_{charge}"
+                    write(os.path.join(cube_dir, model + ".json"),
+                          face_model(face, f"{MOD}:block/hume_energy_cube/side_{mask}_{charge}"))
+                    parts.append({"when": dict(when, charge=str(charge)),
+                                  "apply": {"model": f"{MOD}:block/hume_energy_cube/{model}"}})
+    write(os.path.join(ASSETS, "blockstates", "hume_energy_cube.json"), {"multipart": parts})
+    # The item: a single, unconnected cube two thirds full.
+    write(os.path.join(cube_dir, "item.json"), {
+        "parent": "minecraft:block/cube_bottom_top",
+        "textures": {"side": f"{MOD}:block/hume_energy_cube/side_0000_6", "top": f"{MOD}:block/hume_energy_cube/end_0000",
+                     "bottom": f"{MOD}:block/hume_energy_cube/end_0000"},
+    })
     write(os.path.join(ASSETS, "blockstates", "fluid_reservoir.json"),
           {"variants": {f"fill={fill}": {"model": f"{MOD}:block/fluid_reservoir_{fill}"} for fill in range(5)}})
     write(os.path.join(ASSETS, "models", "block", "creative_generator.json"),

@@ -1,31 +1,7268 @@
 {
-  "variants": {
-    "charge=0": {
-      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_0"
+  "multipart": [
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0000_0"
+      }
     },
-    "charge=1": {
-      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_1"
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0000_1"
+      }
     },
-    "charge=2": {
-      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_2"
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0000_2"
+      }
     },
-    "charge=3": {
-      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_3"
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0000_3"
+      }
     },
-    "charge=4": {
-      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_4"
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0000_4"
+      }
     },
-    "charge=5": {
-      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_5"
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0000_5"
+      }
     },
-    "charge=6": {
-      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_6"
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0000_6"
+      }
     },
-    "charge=7": {
-      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_7"
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0000_7"
+      }
     },
-    "charge=8": {
-      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_8"
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0000_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0001_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0001_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0001_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0001_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0001_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0001_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0001_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0001_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0001_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0010_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0010_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0010_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0010_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0010_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0010_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0010_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0010_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0010_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0011_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0011_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0011_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0011_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0011_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0011_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0011_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0011_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0011_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0100_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0100_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0100_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0100_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0100_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0100_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0100_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0100_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0100_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0101_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0101_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0101_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0101_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0101_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0101_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0101_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0101_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0101_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0110_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0110_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0110_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0110_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0110_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0110_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0110_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0110_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0110_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0111_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0111_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0111_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0111_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0111_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0111_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0111_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0111_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_0111_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1000_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1000_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1000_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1000_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1000_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1000_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1000_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1000_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1000_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1001_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1001_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1001_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1001_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1001_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1001_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1001_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1001_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "false",
+        "west": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1001_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1010_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1010_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1010_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1010_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1010_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1010_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1010_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1010_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1010_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1011_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1011_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1011_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1011_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1011_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1011_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1011_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1011_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "east": "true",
+        "west": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1011_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1100_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1100_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1100_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1100_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1100_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1100_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1100_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1100_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1100_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1101_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1101_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1101_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1101_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1101_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1101_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1101_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1101_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "false",
+        "west": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1101_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1110_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1110_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1110_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1110_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1110_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1110_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1110_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1110_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1110_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1111_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1111_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1111_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1111_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1111_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1111_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1111_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1111_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "east": "true",
+        "west": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/north_1111_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0000_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0000_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0000_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0000_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0000_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0000_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0000_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0000_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0000_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0001_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0001_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0001_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0001_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0001_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0001_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0001_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0001_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0001_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0010_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0010_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0010_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0010_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0010_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0010_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0010_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0010_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0010_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0011_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0011_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0011_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0011_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0011_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0011_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0011_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0011_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0011_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0100_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0100_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0100_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0100_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0100_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0100_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0100_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0100_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0100_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0101_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0101_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0101_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0101_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0101_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0101_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0101_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0101_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0101_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0110_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0110_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0110_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0110_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0110_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0110_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0110_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0110_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0110_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0111_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0111_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0111_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0111_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0111_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0111_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0111_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0111_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_0111_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1000_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1000_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1000_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1000_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1000_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1000_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1000_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1000_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1000_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1001_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1001_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1001_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1001_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1001_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1001_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1001_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1001_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "false",
+        "east": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1001_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1010_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1010_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1010_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1010_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1010_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1010_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1010_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1010_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1010_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1011_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1011_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1011_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1011_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1011_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1011_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1011_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1011_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "west": "true",
+        "east": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1011_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1100_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1100_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1100_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1100_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1100_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1100_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1100_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1100_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1100_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1101_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1101_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1101_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1101_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1101_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1101_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1101_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1101_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "false",
+        "east": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1101_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1110_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1110_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1110_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1110_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1110_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1110_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1110_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1110_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1110_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1111_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1111_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1111_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1111_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1111_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1111_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1111_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1111_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "west": "true",
+        "east": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/south_1111_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0000_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0000_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0000_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0000_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0000_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0000_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0000_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0000_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0000_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0001_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0001_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0001_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0001_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0001_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0001_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0001_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0001_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0001_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0010_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0010_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0010_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0010_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0010_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0010_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0010_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0010_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0010_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0011_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0011_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0011_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0011_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0011_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0011_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0011_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0011_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0011_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0100_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0100_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0100_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0100_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0100_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0100_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0100_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0100_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0100_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0101_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0101_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0101_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0101_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0101_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0101_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0101_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0101_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0101_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0110_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0110_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0110_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0110_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0110_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0110_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0110_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0110_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0110_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0111_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0111_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0111_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0111_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0111_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0111_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0111_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0111_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_0111_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1000_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1000_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1000_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1000_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1000_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1000_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1000_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1000_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1000_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1001_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1001_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1001_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1001_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1001_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1001_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1001_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1001_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "false",
+        "north": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1001_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1010_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1010_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1010_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1010_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1010_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1010_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1010_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1010_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1010_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1011_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1011_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1011_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1011_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1011_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1011_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1011_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1011_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "south": "true",
+        "north": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1011_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1100_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1100_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1100_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1100_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1100_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1100_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1100_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1100_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1100_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1101_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1101_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1101_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1101_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1101_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1101_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1101_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1101_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "false",
+        "north": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1101_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1110_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1110_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1110_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1110_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1110_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1110_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1110_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1110_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1110_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1111_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1111_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1111_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1111_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1111_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1111_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1111_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1111_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "south": "true",
+        "north": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/east_1111_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0000_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0000_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0000_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0000_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0000_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0000_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0000_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0000_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0000_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0001_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0001_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0001_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0001_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0001_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0001_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0001_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0001_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0001_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0010_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0010_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0010_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0010_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0010_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0010_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0010_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0010_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0010_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0011_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0011_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0011_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0011_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0011_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0011_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0011_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0011_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0011_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0100_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0100_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0100_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0100_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0100_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0100_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0100_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0100_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0100_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0101_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0101_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0101_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0101_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0101_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0101_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0101_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0101_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0101_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0110_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0110_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0110_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0110_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0110_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0110_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0110_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0110_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0110_8"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0111_0"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0111_1"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0111_2"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0111_3"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0111_4"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0111_5"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0111_6"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0111_7"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_0111_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1000_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1000_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1000_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1000_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1000_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1000_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1000_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1000_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1000_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1001_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1001_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1001_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1001_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1001_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1001_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1001_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1001_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "false",
+        "south": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1001_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1010_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1010_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1010_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1010_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1010_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1010_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1010_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1010_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1010_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1011_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1011_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1011_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1011_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1011_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1011_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1011_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1011_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "false",
+        "north": "true",
+        "south": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1011_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1100_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1100_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1100_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1100_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1100_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1100_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1100_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1100_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1100_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1101_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1101_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1101_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1101_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1101_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1101_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1101_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1101_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "false",
+        "south": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1101_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1110_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1110_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1110_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1110_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1110_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1110_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1110_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1110_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "false",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1110_8"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "0"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1111_0"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "1"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1111_1"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "2"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1111_2"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "3"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1111_3"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "4"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1111_4"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "5"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1111_5"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "6"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1111_6"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "7"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1111_7"
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "down": "true",
+        "north": "true",
+        "south": "true",
+        "charge": "8"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/west_1111_8"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "south": "false",
+        "west": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_0000"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "south": "false",
+        "west": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_0001"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "south": "false",
+        "west": "true",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_0010"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "south": "false",
+        "west": "true",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_0011"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "south": "true",
+        "west": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_0100"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "south": "true",
+        "west": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_0101"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "south": "true",
+        "west": "true",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_0110"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "south": "true",
+        "west": "true",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_0111"
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "south": "false",
+        "west": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_1000"
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "south": "false",
+        "west": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_1001"
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "south": "false",
+        "west": "true",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_1010"
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "south": "false",
+        "west": "true",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_1011"
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "south": "true",
+        "west": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_1100"
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "south": "true",
+        "west": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_1101"
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "south": "true",
+        "west": "true",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_1110"
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "south": "true",
+        "west": "true",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/up_1111"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "north": "false",
+        "west": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_0000"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "north": "false",
+        "west": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_0001"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "north": "false",
+        "west": "true",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_0010"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "north": "false",
+        "west": "true",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_0011"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "north": "true",
+        "west": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_0100"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "north": "true",
+        "west": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_0101"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "north": "true",
+        "west": "true",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_0110"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "north": "true",
+        "west": "true",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_0111"
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "north": "false",
+        "west": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_1000"
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "north": "false",
+        "west": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_1001"
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "north": "false",
+        "west": "true",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_1010"
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "north": "false",
+        "west": "true",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_1011"
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "north": "true",
+        "west": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_1100"
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "north": "true",
+        "west": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_1101"
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "north": "true",
+        "west": "true",
+        "east": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_1110"
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "north": "true",
+        "west": "true",
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/hume_energy_cube/down_1111"
+      }
     }
-  }
+  ]
 }

@@ -219,8 +219,14 @@ public final class DevScreenshotHarness {
                 }
             });
             case 1125 -> shot(mc, "22_energy_cube_gui");
-            case 1130 -> {
+            case 1127 -> {
                 mc.player.closeContainer();
+                setHudHidden(mc, true);
+                server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 160 -55", cubeBase.getX() + 14.5, cubeBase.getY() + 1, cubeBase.getZ() + 3.5)));
+            }
+            case 1145 -> shot(mc, "23_energy_cubes_below");
+            case 1150 -> {
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -376,7 +382,7 @@ public final class DevScreenshotHarness {
             generator.getTank().fillInternal(net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER), 8000);
         }
         for (int x = 1; x <= 2; x++) for (int y = 0; y <= 1; y++) for (int z = 0; z <= 1; z++) {
-            level.setBlock(cubeBase.offset(x, y, z), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+            placeCube(level, cubeBase.offset(x, y, z), 0);
         }
         if (level.getBlockEntity(cubeBase.offset(1, 0, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity be) {
             be.storage().set(1_000_000);
@@ -384,13 +390,23 @@ public final class DevScreenshotHarness {
             if (level.getBlockEntity(cubeBase.offset(1, 1, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity b3) b3.storage().set(1_000_000);
             if (level.getBlockEntity(cubeBase.offset(2, 1, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity b4) b4.storage().set(1_000_000);
         }
-        level.setBlock(cubeBase.offset(5, 0, 0), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
-        level.setBlock(cubeBase.offset(7, 0, 0), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
-        if (level.getBlockEntity(cubeBase.offset(7, 0, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity full) {
-            full.storage().set(1_000_000);
-        }
+        // A 3-high tower at 60%: the energy level runs on through all three windows.
+        for (int y = 0; y < 3; y++) placeCube(level, cubeBase.offset(5, y, 0), 600_000);
+        // A single empty cube and a single full one.
+        placeCube(level, cubeBase.offset(7, 0, 0), 0);
+        placeCube(level, cubeBase.offset(9, 0, 0), 1_000_000);
+        // A floating 3x2 slab (to see the connected bottom faces from below).
+        for (int x = 0; x < 3; x++) for (int z = 0; z < 2; z++) placeCube(level, cubeBase.offset(12 + x, 4, z), 500_000);
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
-                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 18", cubeBase.getX() + 4.0, cubeBase.getY() + 2, cubeBase.getZ() + 7.5));
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 18", cubeBase.getX() + 5.5, cubeBase.getY() + 3, cubeBase.getZ() + 9.5));
+    }
+
+    private static void placeCube(ServerLevel level, BlockPos pos, int energy) {
+        level.setBlock(pos, ModBlocks.HUME_ENERGY_CUBE.get().getStateForPlacement(
+                new net.minecraft.world.item.context.DirectionalPlaceContext(level, pos, Direction.DOWN, ItemStack.EMPTY, Direction.UP)), 3);
+        if (level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity be) {
+            be.storage().set(energy);
+        }
     }
 
     /** The same readout a right-click on the 2x2x2 group gives. */

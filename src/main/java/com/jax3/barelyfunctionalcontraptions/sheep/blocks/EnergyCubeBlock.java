@@ -28,18 +28,42 @@ import org.jspecify.annotations.Nullable;
  * touches into one bigger battery. Right-click to open its GUI.
  */
 public class EnergyCubeBlock extends BaseEntityBlock {
-    /** How full the cube's group is, 0..8 (one step per window row), drawn as the energy level in its side windows. */
+    /**
+     * How full this cube's part of its group's "tank" is, 0..8 (one step per two pixel rows). The group fills from its
+     * bottom layer up, so a stack shows one continuous energy level across its windows.
+     */
     public static final int MAX_CHARGE = 8;
     public static final IntegerProperty CHARGE = IntegerProperty.create("charge", 0, MAX_CHARGE);
+    /** Whether another cube touches each face: those edges drop their frame, so touching cubes look like one casing. */
+    public static final java.util.Map<Direction, net.minecraft.world.level.block.state.properties.BooleanProperty> CONNECTED =
+            net.minecraft.world.level.block.PipeBlock.PROPERTY_BY_DIRECTION;
 
     public EnergyCubeBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(CHARGE, 0));
+        BlockState state = stateDefinition.any().setValue(CHARGE, 0);
+        for (var property : CONNECTED.values()) state = state.setValue(property, false);
+        registerDefaultState(state);
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(CHARGE);
+        CONNECTED.values().forEach(builder::add);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+        BlockState state = defaultBlockState();
+        for (Direction dir : Direction.values()) {
+            state = state.setValue(CONNECTED.get(dir), context.getLevel().getBlockState(context.getClickedPos().relative(dir)).is(this));
+        }
+        return state;
+    }
+
+    @Override
+    protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks,
+                                     BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, net.minecraft.util.RandomSource random) {
+        return state.setValue(CONNECTED.get(direction), neighborState.is(this));
     }
 
     @Override

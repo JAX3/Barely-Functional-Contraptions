@@ -102,13 +102,24 @@ public final class EnergyCubeGroup {
         return (int) Math.min(Integer.MAX_VALUE, rate);
     }
 
-    /** 0..8 for the charge shown in the side windows: 0 only when empty, 8 only when full. */
-    public int chargeLevel() {
+    /**
+     * 0..8 for the energy shown in {@code cube}'s side windows. The group is drawn as one tank that fills from its
+     * lowest layer up: with H layers there are H x 8 steps, and each cube shows its layer's share. Any energy shows at
+     * least one step and only a full group reaches the top.
+     */
+    public int chargeLevel(EnergyCubeBlockEntity cube) {
         long capacity = capacity(), amount = amount();
         if (amount <= 0 || capacity <= 0) return 0;
-        if (amount >= capacity) return EnergyCubeBlock.MAX_CHARGE;
-        int steps = EnergyCubeBlock.MAX_CHARGE;
-        return (int) Math.max(1, Math.min(steps - 1, Math.round(amount * (double) steps / capacity)));
+        int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
+        for (EnergyCubeBlockEntity member : members) {
+            minY = Math.min(minY, member.getBlockPos().getY());
+            maxY = Math.max(maxY, member.getBlockPos().getY());
+        }
+        int steps = EnergyCubeBlock.MAX_CHARGE * (maxY - minY + 1);
+        int filled = amount >= capacity ? steps
+                : (int) Math.max(1, Math.min(steps - 1, Math.round(amount * (double) steps / capacity)));
+        int layer = cube.getBlockPos().getY() - minY;
+        return Math.max(0, Math.min(EnergyCubeBlock.MAX_CHARGE, filled - layer * EnergyCubeBlock.MAX_CHARGE));
     }
 
     public int insert(int amount, TransactionContext transaction) {

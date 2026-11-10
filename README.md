@@ -254,13 +254,15 @@ I C I      C = Cauldron
 ### Hume Energy Cube
 A Forge Energy battery. FE goes **in and out on every side**, and **cubes that touch join into one bigger battery**: every cube adds to the group's buffer and its transfer rate.
 
-![Hume Energy Cubes](docs/screenshots/21_energy_cubes.png)
+| Groups connect into one casing | From below |
+|---|---|
+| ![Hume Energy Cubes](docs/screenshots/21_energy_cubes.png) | ![Hume Energy Cubes from below](docs/screenshots/23_energy_cubes_below.png) |
 
 - **One cube:** 1,000,000 FE buffer, 10,000 FE/t transfer rate (`capacityPerCube`, `transferPerCube`).
 - **A group of N touching cubes** (faces touching, in any shape) has **N x** the buffer and **N x** the transfer rate. A 2x2x2 block of 8 cubes holds 8,000,000 FE and moves 80,000 FE/t. Every cube in the group shares the same energy, so you can feed one end and take power out of the other.
 - **Output:** the group **pushes energy into any machine or cable touching it** (`autoOutput`), up to its transfer rate each tick. Machines and cables can also pull from it, and any generator or cable can charge it. It never pushes into other cubes.
 - **Breaking a cube** splits the group if it was holding it together. Each cube keeps its own share of the energy, and a broken cube keeps its share in the item (shown in its tooltip), so no energy is lost.
-- **Windows:** like the Fluid Reservoir, each side has a glass window that fills with swirling purple energy as the group charges. It shows the whole group's fill in eighths (one window row each): empty only at 0 FE and full only at 100%. The top and bottom have a purple port with the energy bolt, and the cubes glow brighter as they charge. A comparator reads how full the group is.
+- **Looks like one big block:** touching cubes connect. Their frames only run around the outside of the group, so a 2x2x2 group looks like a single large cube with one big window, and a tower looks like one tall tank. The windows fill with swirling purple energy **from the bottom layer up**, like a tank of liquid: a 2-high stack at 75% shows a full bottom layer and a half-full top layer. The top and bottom are metal plates with a purple bolt port on each cube, and the cubes glow brighter as they charge. A comparator reads how full the group is.
 - **GUI:** right-click a cube to open it. It's in the same slate style as the other machines:
   - an energy gauge with a mark for every eighth;
   - the stored energy and buffer (*4,020,500 FE of 8,000,000 FE*);
