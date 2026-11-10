@@ -174,6 +174,8 @@ Right-click an **adult** sheep while holding a resource, for example an **Iron I
 ### 2. Shear it
 Shears and dispensers both work. An infused sheep drops **resource wool** (e.g. *Iron Wool*) **instead of** its normal wool. When the infusion runs out the sheep goes back to normal.
 
+**Or kill it.** An infused sheep that still has its wool drops a little more when it dies than one shearing gives: **one extra resource wool** (2 Iron Wool instead of 1) **plus the resource itself**, one separator's worth of it (2–4 Raw Iron for an iron sheep, 2–4 Diamonds for a diamond sheep). Its mutton still drops. Shearing is still the better deal over time, since a living sheep can be sheared again and again; killing gets you a bigger payout once. A sheep that has just been sheared has no wool, so killing it gives only normal loot. Any death counts, including mob farms. Turn it off or tune it with `killDropsEnabled`, `killWoolBonus` and `killDropsResource`.
+
 ### 3. Separate the wool
 Put the wool into a **Mechanical Separator** and supply Forge Energy (FE).
 
@@ -357,6 +359,9 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `infusionUsesMultiplier` | 1.0 | Scales every resource's `infusion_uses` |
 | `woolDropCountOverride` | -1 | Wool dropped per shearing |
 | `shearingBonusChance` / `shearingBonusAmount` | 0.0 / 1 | Chance of extra wool per shearing |
+| `killDropsEnabled` | true | Killing an infused sheep with its wool drops resource wool and the resource |
+| `killWoolBonus` | 1 | Extra resource wool from a kill, on top of one shearing's amount |
+| `killDropsResource` | true | Whether a kill also drops one separator roll of the resource (e.g. 2–4 Raw Iron) |
 | `preserveWoolColour` | true | Blend the dye colour into infused wool |
 | `feedingParticles` | true | Particles and sound when feeding |
 | `infusionCooldownTicks` | 0 | Rest time after an infusion runs out |

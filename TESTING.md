@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 73 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 46 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 74 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 47 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 28 screenshots and 6 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
@@ -244,6 +244,7 @@ These run on a **dedicated-server** game test server, which also confirms the mo
 | `feed_iron_block_infuses_sheep` | Feeding an Iron Block infuses the sheep (9 uses), consumes exactly 1 block and keeps the dye colour. Re-feeding at full uses consumes nothing. |
 | `unrecognised_item_is_ignored` | Dirt neither infuses nor is consumed. |
 | `shearing_infused_sheep_drops_resource_wool` | Exactly 1 Iron Wool and no white wool. Uses go 9 → 8. A sheared sheep can't be sheared again (no duplication). |
+| `killing_infused_sheep_drops_more_than_shearing` | Runs the sheep's real death loot table as a player kill. An iron-infused sheep with its wool drops 2 Iron Wool (one more than shearing), 2–4 Raw Iron, mutton, and no white wool; the infusion is cleared. A sheared infused sheep drops neither Iron Wool nor Raw Iron, so shearing and then killing doesn't pay twice. A plain sheep still drops its white wool. |
 | `shearing_plain_sheep_drops_normal_wool` | Uninfused sheep still drop white wool. |
 | `infusion_runs_out_after_uses` | A Diamond infusion (1 use) clears after shearing, and the next shearing gives normal wool. |
 | `dispenser_shears_infused_sheep` | A powered dispenser with shears drops Gold Wool and no plain wool. |

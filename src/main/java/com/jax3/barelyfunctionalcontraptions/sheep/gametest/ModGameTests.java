@@ -118,6 +118,7 @@ public final class ModGameTests {
         TESTS.put("energy_cube_gui_values", ModGameTests::cubeGui);
         TESTS.put("energy_cube_stack_fills_bottom_up", ModGameTests::cubeStack);
         TESTS.put("creative_tabs_split_wool", ModGameTests::creativeTabs);
+        TESTS.put("killing_infused_sheep_drops_more_than_shearing", ModGameTests::killInfused);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -231,6 +232,46 @@ public final class ModGameTests {
         feed(player, sheep);
         h.assertFalse(SheepInfusionEvents.getInfusion(sheep).isInfused(), "dirt must not infuse");
         h.assertTrue(player.getMainHandItem().getCount() == 5, "dirt must not be consumed");
+        h.succeed();
+    }
+
+    /** Runs the sheep's own death loot table as if a player killed it, collecting the drops. */
+    private static List<ItemStack> killDrops(GameTestHelper h, Sheep sheep) {
+        List<ItemStack> drops = new java.util.ArrayList<>();
+        Player killer = h.makeMockPlayer(GameType.SURVIVAL);
+        sheep.dropFromLootTable(h.getLevel(), h.getLevel().damageSources().playerAttack(killer), true,
+                sheep.getLootTable().orElseThrow(), drops::add);
+        return drops;
+    }
+
+    private static int count(List<ItemStack> drops, java.util.function.Predicate<ItemStack> filter) {
+        return drops.stream().filter(filter).mapToInt(ItemStack::getCount).sum();
+    }
+
+    private static void killInfused(GameTestHelper h) {
+        java.util.function.Predicate<ItemStack> ironWool = st -> IRON.equals(ResourceWoolItem.getResourceId(st));
+        // Infused with its wool: shearing's 1 Iron Wool + 1, plus one separator roll of Raw Iron (2-4), no white wool.
+        Sheep infused = sheep(h);
+        feed(playerHolding(h, new ItemStack(Items.IRON_INGOT)), infused);
+        List<ItemStack> drops = killDrops(h, infused);
+        h.assertTrue(count(drops, ironWool) == 2, "killed iron sheep drops 2 iron wool (1 more than shearing): " + drops);
+        int raw = count(drops, st -> st.is(Items.RAW_IRON));
+        h.assertTrue(raw >= 2 && raw <= 4, "killed iron sheep drops 2-4 raw iron: " + drops);
+        h.assertTrue(count(drops, st -> st.is(Items.WOOL.white())) == 0, "no plain wool from an infused sheep: " + drops);
+        h.assertTrue(count(drops, st -> st.is(Items.MUTTON) || st.is(Items.COOKED_MUTTON)) > 0, "mutton still drops: " + drops);
+        h.assertFalse(SheepInfusionEvents.getInfusion(infused).isInfused(), "the infusion is used up by the kill");
+
+        // Already sheared: nothing extra, so shearing and then killing does not pay twice.
+        Sheep sheared = sheep(h);
+        feed(playerHolding(h, new ItemStack(Items.IRON_INGOT)), sheared);
+        shear(h, sheared);
+        List<ItemStack> shearedDrops = killDrops(h, sheared);
+        h.assertTrue(count(shearedDrops, ironWool) == 0 && count(shearedDrops, st -> st.is(Items.RAW_IRON)) == 0,
+                "a sheared infused sheep drops only its normal loot: " + shearedDrops);
+
+        // A plain sheep keeps its vanilla wool.
+        List<ItemStack> plain = killDrops(h, sheep(h));
+        h.assertTrue(count(plain, st -> st.is(Items.WOOL.white())) == 1 && count(plain, ironWool) == 0, "plain sheep drops white wool: " + plain);
         h.succeed();
     }
 

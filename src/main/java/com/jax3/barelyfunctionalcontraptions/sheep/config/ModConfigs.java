@@ -71,6 +71,9 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue woolDropCountOverride;
         public final ModConfigSpec.DoubleValue shearingBonusChance;
         public final ModConfigSpec.IntValue shearingBonusAmount;
+        public final ModConfigSpec.BooleanValue killDropsEnabled;
+        public final ModConfigSpec.IntValue killWoolBonus;
+        public final ModConfigSpec.BooleanValue killDropsResource;
         public final ModConfigSpec.BooleanValue preserveWoolColour;
         public final ModConfigSpec.BooleanValue feedingParticles;
         public final ModConfigSpec.IntValue infusionCooldownTicks;
@@ -144,6 +147,12 @@ public final class ModConfigs {
                     .defineInRange("shearingBonusChance", 0.0, 0.0, 1.0);
             shearingBonusAmount = b.comment("Number of bonus infused wool items when the shearing bonus triggers.")
                     .defineInRange("shearingBonusAmount", 1, 0, 64);
+            killDropsEnabled = b.comment("Killing an infused sheep that still has its wool drops its resource wool and the resource itself, a little more than shearing it.")
+                    .define("killDropsEnabled", true);
+            killWoolBonus = b.comment("Extra resource wool a killed infused sheep drops on top of what one shearing gives.")
+                    .defineInRange("killWoolBonus", 1, 0, 64);
+            killDropsResource = b.comment("Whether a killed infused sheep also drops the resource itself (one Mechanical Separator roll of its primary output, e.g. 2-4 Raw Gold).")
+                    .define("killDropsResource", true);
             preserveWoolColour = b.comment("If true an infused sheep's wool keeps a hint of its dye colour; if false it shows only the resource colour.")
                     .define("preserveWoolColour", true);
             feedingParticles = b.comment("Show resource-coloured particles and play a sound when a sheep is infused.")
