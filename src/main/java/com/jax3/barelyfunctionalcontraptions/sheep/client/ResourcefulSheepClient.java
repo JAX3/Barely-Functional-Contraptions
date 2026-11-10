@@ -53,6 +53,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.MECHANICAL_SEPARATOR.get(), MechanicalSeparatorScreen::new);
         event.register(ModMenus.AUTOMATIC_SHEARS.get(), AutomaticShearsScreen::new);
         event.register(ModMenus.FLUID_RESERVOIR.get(), FluidReservoirScreen::new);
+        event.register(ModMenus.HUME_ENERGY_CUBE.get(), EnergyCubeScreen::new);
     }
 
     private static void registerTintSources(RegisterColorHandlersEvent.ItemTintSources event) {

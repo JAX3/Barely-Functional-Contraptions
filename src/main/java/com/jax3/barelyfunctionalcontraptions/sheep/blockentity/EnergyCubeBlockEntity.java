@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
  * face is a view of the whole {@link EnergyCubeGroup} it is connected to, so FE can go in and out on any side of any
  * cube and the group's buffer and transfer rate grow with every cube added.
  */
-public class EnergyCubeBlockEntity extends BlockEntity {
+public class EnergyCubeBlockEntity extends BlockEntity implements net.minecraft.world.MenuProvider {
     /** Ticks between updates of the charge shown on the blocks. */
     private static final int DISPLAY_INTERVAL = 10;
 
@@ -31,6 +31,42 @@ public class EnergyCubeBlockEntity extends BlockEntity {
     private @Nullable EnergyCubeGroup group;
     private final EnergyHandler view = new GroupView();
     private int ticks;
+    /** FE that went into / out of this cube since the last rate update (committed changes only). */
+    private long inWindow, outWindow;
+    /** Leader only: the group's average FE/t in and out over the last second. */
+    private int inRate, outRate;
+    /** Number of synced GUI values: amount (4 x 16 bit), capacity (4), rate (2), size, in (2), out (2), status. */
+    public static final int DATA_COUNT = 16;
+
+    private final net.minecraft.world.inventory.ContainerData data = new net.minecraft.world.inventory.ContainerData() {
+        @Override
+        public int get(int index) {
+            EnergyCubeGroup g = group();
+            EnergyCubeBlockEntity leader = g.leader();
+            long amount = g.amount(), capacity = g.capacity();
+            return switch (index) {
+                case 0, 1, 2, 3 -> (int) (amount >>> (16 * index)) & 0xFFFF;
+                case 4, 5, 6, 7 -> (int) (capacity >>> (16 * (index - 4))) & 0xFFFF;
+                case 8 -> g.rate() & 0xFFFF;
+                case 9 -> g.rate() >>> 16;
+                case 10 -> g.size();
+                case 11 -> leader.inRate & 0xFFFF;
+                case 12 -> leader.inRate >>> 16;
+                case 13 -> leader.outRate & 0xFFFF;
+                case 14 -> leader.outRate >>> 16;
+                case 15 -> CubeStatus.of(amount, capacity, leader.inRate, leader.outRate).ordinal();
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int index, int value) {}
+
+        @Override
+        public int getCount() {
+            return DATA_COUNT;
+        }
+    };
 
     public EnergyCubeBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.HUME_ENERGY_CUBE.get(), pos, state);
@@ -72,7 +108,18 @@ public class EnergyCubeBlockEntity extends BlockEntity {
         EnergyCubeGroup group = be.group();
         if (group.leader() != be) return;
         if (ModConfigs.getBool(ModConfigs.SERVER.energyCubeAutoOutput)) group.push(level);
-        if (++be.ticks % DISPLAY_INTERVAL == 0) {
+        if (++be.ticks % 20 == 0) {
+            long in = 0, out = 0;
+            for (EnergyCubeBlockEntity cube : group.members()) {
+                in += cube.inWindow;
+                out += cube.outWindow;
+                cube.inWindow = 0;
+                cube.outWindow = 0;
+            }
+            be.inRate = (int) Math.min(Integer.MAX_VALUE, in / 20);
+            be.outRate = (int) Math.min(Integer.MAX_VALUE, out / 20);
+        }
+        if (be.ticks % DISPLAY_INTERVAL == 0) {
             int charge = group.chargeLevel();
             for (EnergyCubeBlockEntity cube : group.members()) {
                 BlockState current = cube.getBlockState();
@@ -95,12 +142,33 @@ public class EnergyCubeBlockEntity extends BlockEntity {
         invalidateGroup();
     }
 
+    /** The group's average FE/t in and out over the last second (read from the leader). */
+    public int inRate() {
+        return group().leader().inRate;
+    }
+
+    public int outRate() {
+        return group().leader().outRate;
+    }
+
+    @Override
+    public net.minecraft.network.chat.Component getDisplayName() {
+        return net.minecraft.network.chat.Component.translatable("block.barelyfunctionalcontraptions.hume_energy_cube");
+    }
+
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int containerId, net.minecraft.world.entity.player.Inventory inventory,
+                                                                         net.minecraft.world.entity.player.Player player) {
+        return new com.jax3.barelyfunctionalcontraptions.sheep.menu.EnergyCubeMenu(containerId, inventory, getBlockPos(), data);
+    }
+
     // ------------------------------------------------------------------ persistence
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         storage.set(Math.min(input.getIntOr("energy", 0), storage.capacity()));
+        inWindow = outWindow = 0; // loading is not energy flowing in
     }
 
     @Override
@@ -123,6 +191,7 @@ public class EnergyCubeBlockEntity extends BlockEntity {
         super.applyImplicitComponents(components);
         MachineContents contents = components.get(ModDataComponents.MACHINE_CONTENTS.get());
         if (contents != null) storage.set(Math.min(contents.energy(), storage.capacity()));
+        inWindow = outWindow = 0;
     }
 
     @Override
@@ -153,6 +222,9 @@ public class EnergyCubeBlockEntity extends BlockEntity {
 
         @Override
         protected void onEnergyChanged(int previousAmount) {
+            int delta = energy - previousAmount;
+            if (delta > 0) inWindow += delta;
+            else outWindow -= delta;
             setChanged();
         }
     }

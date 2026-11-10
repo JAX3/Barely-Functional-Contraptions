@@ -1440,6 +1440,63 @@ def generate_energy_cube():
     grid(CUBE_TOP, CARTOON).save(out("block/hume_energy_cube_top.png"))
 
 
+def generate_cube_gui():
+    """Hume Energy Cube GUI: the Fluid Reservoir's layout with an energy gauge instead of water, and no slots."""
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    # Energy gauge (fill 11..40 x 19..82, 30x64) with a mark for every eighth, like the cube's window rows.
+    inset(img, 10, 18, 42, 84, GUI["gauge"])
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 48, 16, 168, 78, GUI["panel"])        # info window
+    for x in range(52, 164):                          # divider between totals and flow
+        img.putpixel((x, 54), hexc("#2c2e36"))
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    grid(CUBE_BOLT_ICON, CARTOON, img, 152, 4)
+    rnd = random.Random(13)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice([ENERGY_SURFACE, ENERGY_LIGHT, ENERGY_MID]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))      # status lamps shared with the other machines
+    for y in range(64):                                         # energy fill (176,0) 30x64
+        for x in range(30):
+            c = mix(ENERGY_LIGHT, ENERGY_DEEP, y / 63.0)
+            if (x + y) % 4 == 0:
+                c = mix(c, ENERGY_SURFACE, 0.25)
+            img.putpixel((176 + x, y), c)
+    for k in range(1, 8):
+        ty = round(64 * k / 8)
+        for x in range(25, 30):
+            img.putpixel((176 + x, ty), mix(img.getpixel((176 + x, ty)), ENERGY_SURFACE, 0.5))
+    for f in range(4):                                          # surface shimmer (176,66), 4 frames of 30x2
+        for x in range(30):
+            img.putpixel((176 + x, 66 + f * 2), ENERGY_SPARK if (x + f * 2) % 8 == 0 else ENERGY_SURFACE)
+            img.putpixel((176 + x, 67 + f * 2), ENERGY_LIGHT)
+    img.save(out("gui/hume_energy_cube.png"))
+
+
+CUBE_BOLT_ICON = [  # 9x9 GUI icon
+    "....OOO..",
+    "...OEEO..",
+    "..OEEO...",
+    ".OEEEOOO.",
+    "OEEEEEEO.",
+    ".OOOEEO..",
+    "...OEO...",
+    "..OEO....",
+    "..OO.....",
+]
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -1451,6 +1508,7 @@ def main():
     generate_fluid_reservoir()
     generate_reservoir_gui()
     generate_energy_cube()
+    generate_cube_gui()
     generate_jei()
     generate_logo()
     print("Textures written to", os.path.abspath(ROOT))

@@ -25,7 +25,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * The Hume Energy Cube: stores Forge Energy, takes it in and gives it out on every face, and joins every cube it
- * touches into one bigger battery. Right-click to see the group's charge.
+ * touches into one bigger battery. Right-click to open its GUI.
  */
 public class EnergyCubeBlock extends BaseEntityBlock {
     /** How full the cube's group is, 0..8 (one step per window row), drawn as the energy level in its side windows. */
@@ -64,12 +64,11 @@ public class EnergyCubeBlock extends BaseEntityBlock {
         }
     }
 
+    /** Opens the cube's GUI: the group's energy, buffer, size and transfer rates. */
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof EnergyCubeBlockEntity be) {
-            EnergyCubeGroup group = be.group();
-            player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.energy_cube.info",
-                    group.size(), fe(group.amount()), fe(group.capacity()), fe(group.rate())).withStyle(ChatFormatting.LIGHT_PURPLE));
+            player.openMenu(be, pos);
         }
         return InteractionResult.SUCCESS;
     }

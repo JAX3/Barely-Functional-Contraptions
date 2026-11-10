@@ -21,5 +21,8 @@ public final class ModMenus {
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.FluidReservoirMenu>> FLUID_RESERVOIR = REGISTER.register("fluid_reservoir",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.FluidReservoirMenu::new));
 
+    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.EnergyCubeMenu>> HUME_ENERGY_CUBE = REGISTER.register("hume_energy_cube",
+            () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.EnergyCubeMenu::new));
+
     private ModMenus() {}
 }

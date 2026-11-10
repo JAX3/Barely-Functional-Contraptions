@@ -115,6 +115,7 @@ public final class ModGameTests {
         TESTS.put("energy_cube_pushes_into_machines", ModGameTests::cubePushes);
         TESTS.put("energy_cube_max_group_size", ModGameTests::cubeMaxGroup);
         TESTS.put("energy_cube_window_shows_charge", ModGameTests::cubeWindow);
+        TESTS.put("energy_cube_gui_values", ModGameTests::cubeGui);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -1265,5 +1266,34 @@ public final class ModGameTests {
                 h.assertBlockProperty(spots[i], charge, expected);
             }
         });
+    }
+
+    /**
+     * The GUI's numbers, read through a real menu: two cubes' buffer and rate, the stored energy, and the measured
+     * flow in (5,000 FE every tick) and its Charging status, then Discharging once energy is only taken out.
+     */
+    private static void cubeGui(GameTestHelper h) {
+        BlockPos a = new BlockPos(2, 1, 3), b = new BlockPos(3, 1, 3);
+        var cubeA = cube(h, a);
+        cube(h, b);
+        Player player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var menu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.EnergyCubeMenu) cubeA.createMenu(0, player.getInventory(), player);
+        EnergyHandler face = cubeFace(h, a, net.minecraft.core.Direction.WEST);
+        h.startSequence()
+                .thenExecuteFor(45, () -> cubeInsert(face, 5_000))
+                .thenExecute(() -> {
+                    h.assertTrue(menu.getCubes() == 2, "2 cubes, got " + menu.getCubes());
+                    h.assertTrue(menu.getCapacity() == 2_000_000L, "2,000,000 FE buffer, got " + menu.getCapacity());
+                    h.assertTrue(menu.getRate() == 20_000, "20,000 FE/t, got " + menu.getRate());
+                    h.assertTrue(menu.getAmount() == cubeA.group().amount() && menu.getAmount() >= 200_000, "stored energy, got " + menu.getAmount());
+                    h.assertTrue(menu.getInRate() == 5_000 && menu.getOutRate() == 0, "5,000 FE/t in, 0 out; got " + menu.getInRate() + " / " + menu.getOutRate());
+                    h.assertTrue(menu.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CubeStatus.CHARGING, "Charging, got " + menu.getStatus());
+                })
+                .thenExecuteFor(45, () -> cubeExtract(face, 3_000))
+                .thenExecute(() -> {
+                    h.assertTrue(menu.getInRate() == 0 && menu.getOutRate() == 3_000, "0 in, 3,000 FE/t out; got " + menu.getInRate() + " / " + menu.getOutRate());
+                    h.assertTrue(menu.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CubeStatus.DISCHARGING, "Discharging, got " + menu.getStatus());
+                })
+                .thenSucceed();
     }
 }

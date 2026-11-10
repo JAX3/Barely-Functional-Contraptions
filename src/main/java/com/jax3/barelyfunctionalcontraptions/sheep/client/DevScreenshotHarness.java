@@ -211,7 +211,16 @@ public final class DevScreenshotHarness {
             case 1075 -> server.execute(() -> cubeMessage(server));
             case 1080 -> { setHudHidden(mc, false); }
             case 1085 -> shot(mc, "21_energy_cubes");
-            case 1095 -> {
+            case 1090 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                BlockPos pos = cubeBase.offset(1, 0, 0);
+                if (player.level().getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity be) {
+                    player.openMenu(be, pos);
+                }
+            });
+            case 1125 -> shot(mc, "22_energy_cube_gui");
+            case 1130 -> {
+                mc.player.closeContainer();
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
