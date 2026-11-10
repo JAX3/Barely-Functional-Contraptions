@@ -4,13 +4,12 @@
   "key": {
     "A": "minecraft:amethyst_shard",
     "I": "minecraft:iron_ingot",
-    "R": "minecraft:red_mushroom",
     "X": "minecraft:redstone"
   },
   "pattern": [
     " IA",
     " XI",
-    "R  "
+    "I  "
   ],
   "result": {
     "count": 1,
