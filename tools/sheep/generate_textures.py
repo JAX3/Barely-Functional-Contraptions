@@ -1004,33 +1004,148 @@ def _glow(img, cx, cy, r):
                 img.putpixel((x, y), mix(CARTOON["P"], CARTOON["M"], min(1.0, d / r) ** 1.5))
 
 
+# 5x7 pixel font for the banner title (only the letters it needs).
+FONT = {
+    "A": ["01110", "10001", "10001", "11111", "10001", "10001", "10001"],
+    "B": ["11110", "10001", "10001", "11110", "10001", "10001", "11110"],
+    "C": ["01110", "10001", "10000", "10000", "10000", "10001", "01110"],
+    "E": ["11111", "10000", "10000", "11110", "10000", "10000", "11111"],
+    "F": ["11111", "10000", "10000", "11110", "10000", "10000", "10000"],
+    "I": ["11111", "00100", "00100", "00100", "00100", "00100", "11111"],
+    "L": ["10000", "10000", "10000", "10000", "10000", "10000", "11111"],
+    "N": ["10001", "11001", "10101", "10011", "10001", "10001", "10001"],
+    "O": ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
+    "P": ["11110", "10001", "10001", "11110", "10000", "10000", "10000"],
+    "R": ["11110", "10001", "10001", "11110", "10100", "10010", "10001"],
+    "S": ["01111", "10000", "10000", "01110", "00001", "00001", "11110"],
+    "T": ["11111", "00100", "00100", "00100", "00100", "00100", "00100"],
+    "U": ["10001", "10001", "10001", "10001", "10001", "10001", "01110"],
+    "Y": ["10001", "10001", "01010", "00100", "00100", "00100", "00100"],
+    " ": ["000", "000", "000", "000", "000", "000", "000"],
+}
+
+
+def _text(img, x, y, text, scale, top, bottom, shadow=None):
+    """Pixel-font text with a dark outline, a vertical colour gradient and an optional drop shadow."""
+    w = sum((len(FONT[c][0]) + 1) * scale for c in text) - scale
+    h = 7 * scale
+    layer = Image.new("RGBA", (w + 4, h + 4), CLEAR)
+    cx = 2
+    for c in text:
+        glyph = FONT[c]
+        for gy, row in enumerate(glyph):
+            for gx, bit in enumerate(row):
+                if bit == "1":
+                    for sy in range(scale):
+                        for sx in range(scale):
+                            layer.putpixel((cx + gx * scale + sx, 2 + gy * scale + sy),
+                                           mix(top, bottom, (gy * scale + sy) / max(1, h - 1)))
+        cx += (len(glyph[0]) + 1) * scale
+    filled = {(px, py) for py in range(layer.height) for px in range(layer.width) if layer.getpixel((px, py))[3]}
+    for (px, py) in [(px + dx, py + dy) for (px, py) in filled for dx in (-1, 0, 1) for dy in (-1, 0, 1)]:
+        if (px, py) not in filled and 0 <= px < layer.width and 0 <= py < layer.height:
+            layer.putpixel((px, py), CARTOON["O"])
+    if shadow:
+        sh = Image.new("RGBA", layer.size, CLEAR)
+        for py in range(layer.height):
+            for px in range(layer.width):
+                if layer.getpixel((px, py))[3]:
+                    sh.putpixel((px, py), shadow)
+        img.alpha_composite(sh, (x - 2 + 1, y - 2 + 2))
+    img.alpha_composite(layer, (x - 2, y - 2))
+    return w
+
+
+def _logo_emblem():
+    """64x64: the four contraptions in a 2x2 machine grid with the crowbar wrench across them."""
+    tex = ROOT
+    def face(front, chamber, frame=0):
+        img = Image.open(os.path.join(tex, "block", front + ".png")).convert("RGBA").crop((0, 0, 16, 16))
+        ch = Image.open(os.path.join(tex, "block", chamber + ".png")).convert("RGBA").crop((3, 3 + 16 * frame, 13, 13 + 16 * frame))
+        img.alpha_composite(ch, (3, 3))
+        return img
+    tiles = [
+        face("generator_front", "generator_chamber_on", 2),
+        face("mechanical_separator_front", "mechanical_separator_chamber_on", 2),
+        face("automatic_shears_front", "automatic_shears_chamber_on", 2),
+        Image.open(os.path.join(tex, "block", "hume_energy_cube", "side_0000_6.png")).convert("RGBA").crop((0, 0, 16, 16)),
+    ]
+    emblem = Image.new("RGBA", (64, 64), CLEAR)
+    for i, t in enumerate(tiles):
+        emblem.alpha_composite(t.resize((32, 32), Image.NEAREST), ((i % 2) * 32, (i // 2) * 32))
+    # The crowbar across the middle, where the four machines meet, so each machine's window stays visible.
+    crowbar = Image.open(os.path.join(tex, "item", "mycelium_wrench.png")).convert("RGBA").resize((32, 32), Image.NEAREST)
+    halo = Image.new("RGBA", (36, 36), CLEAR)   # a dark halo so it reads against the machines
+    for y in range(32):
+        for x in range(32):
+            if crowbar.getpixel((x, y))[3]:
+                for dx in range(-2, 3):
+                    for dy in range(-2, 3):
+                        halo.putpixel((x + 2 + dx, y + 2 + dy), (35, 28, 53, 170))
+    emblem.alpha_composite(halo, (14, 14))
+    emblem.alpha_composite(crowbar, (16, 16))
+    return emblem
+
+
+def _spark(img, x, y):
+    """A little electrical spark: a bright plus with yellow arms and a stray pixel."""
+    img.putpixel((x, y), hexc("#ffffff"))
+    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        img.putpixel((x + dx, y + dy), CARTOON["E"])
+    img.putpixel((x + 2, y - 2), CARTOON["e"])
+    img.putpixel((x - 2, y + 2), CARTOON["e"])
+
+
+def _barely_functional_plate(w, h):
+    """The slate plate, but not quite right: one corner bolt has fallen out (and lies loose), a hairline crack runs
+    in from an edge, and a strip of tape holds the opposite corner on."""
+    img = _plate(w, h)
+    # missing top-right bolt: an empty hole where it was
+    hx, hy = w - 5, 3
+    for (x, y) in ((hx, hy), (hx + 1, hy), (hx, hy + 1), (hx + 1, hy + 1)):
+        img.putpixel((x, y), CARTOON["k"])
+    # the loose bolt, lying near the bottom edge
+    bx, by = w - 14, h - 5
+    for (x, y, c) in ((bx, by, "B"), (bx + 1, by, "b"), (bx, by + 1, "b"), (bx + 1, by + 1, "S"), (bx + 2, by + 1, "O")):
+        img.putpixel((x, y), CARTOON[c])
+    # crack from the bottom edge
+    x, y = w // 3, h - 2
+    for step in range(7):
+        img.putpixel((x, y), CARTOON["O"])
+        y -= 1
+        x += (1, 0, -1, 0)[step % 4]
+    # tape over the bottom-left corner
+    for i in range(9):
+        for t in range(4):
+            px, py = 1 + i + t, h - 2 - i + t - 3
+            if 0 <= px < w and 0 <= py < h:
+                img.putpixel((px, py), hexc("#c9c3b4") if t in (1, 2) else hexc("#9e9886"))
+    return img
+
+
 def generate_logo():
-    # Square icon: 36x36 art, scaled x4 -> 144x144
-    icon = _plate(36, 36)
-    _glow(icon, 18, 18, 15)
-    icon.alpha_composite(_sheep_head(32), (2, 2))
-    _star(icon, 5, 6, hexc("#ffffff"), hexc("#ffe58a"))
-    _star(icon, 30, 29, hexc("#ffffff"), hexc("#ff9af0"))
+    # Square icon: 72x72 art, scaled x2 -> 144x144. The emblem on a slightly broken plate, with sparks.
+    icon = _barely_functional_plate(72, 72)
+    _glow(icon, 36, 36, 30)
+    icon.alpha_composite(_logo_emblem(), (4, 4))
+    _spark(icon, 62, 10)
+    _spark(icon, 9, 60)
     icon.resize((144, 144), Image.NEAREST).save(os.path.join(ROOT, "..", "..", "..", "icon.png"))
 
-    # Banner: 120x40 art, scaled x4 -> 480x160. Sheep, an arrow of wool, and the separator.
-    banner = _plate(120, 40)
-    _glow(banner, 22, 20, 17)
-    banner.alpha_composite(_sheep_head(32), (6, 4))
-    tex = os.path.join(ROOT)
-    woolx = 44
-    for i, name in enumerate(["iron", "gold", "diamond"]):
-        w = Image.open(os.path.join(tex, "item", f"{name}_wool.png")).convert("RGBA")
-        banner.alpha_composite(w, (woolx + i * 13, 12 + (4 if i == 1 else 0)))
-    # little arrow toward the machine
-    for x in range(85, 91):
-        banner.putpixel((x, 20), CARTOON["G"])
-    for i in range(3):
-        banner.putpixel((90 - i, 20 - i - 1), CARTOON["G"]); banner.putpixel((90 - i, 20 + i + 1), CARTOON["G"])
-    front = machine_front_preview("mechanical_separator")
-    banner.alpha_composite(front.resize((24, 24), Image.NEAREST), (93, 8))
-    for (x, y) in [(40, 7), (78, 31), (112, 6)]:
-        _star(banner, x, y, hexc("#ffffff"), hexc("#ff9af0"))
+    # Banner: 240x80 art, scaled x2 -> 480x160. Emblem on the left, the mod title on the right.
+    banner = _barely_functional_plate(240, 80)
+    _glow(banner, 40, 40, 34)
+    banner.alpha_composite(_logo_emblem(), (8, 8))
+    _text(banner, 88, 17, "BARELY FUNCTIONAL", 1, hexc("#f4f8fc"), hexc("#b9c3d1"), shadow=(35, 28, 53, 255))
+    _text(banner, 85, 34, "CONTRAPTIONS", 2, hexc("#ff9af0"), hexc("#7b3be0"), shadow=(35, 28, 53, 255))
+    # underline "wire" with a spark where it has come loose
+    for x in range(86, 212):
+        banner.putpixel((x, 56), CARTOON["p"])
+        banner.putpixel((x, 57), CARTOON["P"] if x % 6 else CARTOON["g"])
+    for i, x in enumerate(range(212, 220)):
+        banner.putpixel((x, 57 + i // 3), CARTOON["P"])
+    _spark(banner, 222, 61)
+    _spark(banner, 76, 12)
     banner.resize((480, 160), Image.NEAREST).save(os.path.join(ROOT, "..", "..", "..", "banner.png"))
 
 

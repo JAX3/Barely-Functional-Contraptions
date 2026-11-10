@@ -147,6 +147,15 @@ public final class DevScreenshotHarness {
                 setHudHidden(mc, false);
                 mc.gui.setScreen(net.neoforged.neoforge.client.gui.modlist.ModListScreen.create(null));
             }
+            case 553 -> {
+                // Click the first entry (this mod, sorted A-Z) so the info panel shows its banner.
+                var handle = mc.getWindow().handle();
+                double scale = mc.getWindow().getGuiScale();
+                mc.mouseHandler.onMove(handle, 70 * scale, 45 * scale, 0, 0);
+                mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(0, 0), 1);
+                mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(0, 0), 0);
+                mc.mouseHandler.onMove(handle, 2, 2, 0, 0);
+            }
             case 560 -> shot(mc, "08_mod_list");
             case 565 -> {
                 mc.gui.setScreen(null);
