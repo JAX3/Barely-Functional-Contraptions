@@ -47,7 +47,7 @@ In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): t
 | `energy_cube_stack_fills_bottom_up` | In a 2x2x2 group, each cube's connection properties match its neighbours (up and east connected, west not, and so on). At 75% the bottom layer shows level 8 and the top layer 4; at 25% the bottom shows 4 and the top 0. Removing a cube clears the connection on the cube below. |
 | `integration_generator_charges_energy_cube` | A running Mycelial Generator charges two cubes, and a separator on their far side finishes iron wool on that power. |
 
-In the real client (`21_energy_cubes.png`, `23_energy_cubes_below.png`): the 2x2x2 group renders as one large cube with a single window and one top plate (four ports). A 3-high tower at 60% shows the energy level running on from the bottom cube into the middle one. A floating 3x2 slab seen from below has its frame only around the outside, so the bottom faces are oriented correctly. The group's GUI (`22_energy_cube_gui.png`) still reads *x8 · 80,000 FE/t*. No missing-model warnings in the log.
+In the real client (`21_energy_cubes.png`, `23_energy_cubes_below.png`): the 2x2x2 group renders as one large cube with a single window and one plain top plate, with no repeating ports. A 3-high tower at 60% shows the energy level running on from the bottom cube into the middle one. A floating 3x2 slab seen from below is one plain plate with its frame only around the outside, so the bottom faces are oriented correctly. The group's GUI (`22_energy_cube_gui.png`) still reads *x8 · 80,000 FE/t*. No missing-model warnings in the log.
 
 ### Wireless power with the Mycelium Wrench
 

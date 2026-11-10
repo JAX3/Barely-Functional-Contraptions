@@ -1458,9 +1458,12 @@ def cube_side_frame(level, frame, up=False, down=False, left=False, right=False)
 
 
 def cube_end(up=False, down=False, left=False, right=False):
-    """Top or bottom face: a metal plate with the purple bolt port, framed on unconnected edges."""
+    """
+    Top or bottom face: a plain metal plate framed on unconnected edges, so a group's top is one seamless plate.
+    Only a face with no neighbours at all (a lone cube, or the top of a one-wide tower) shows the purple bolt port.
+    """
     img = Image.new("RGBA", (16, 16), CARTOON["M"])
-    for y in range(3, 13):
+    for y in range(3, 13) if not (up or down or left or right) else ():
         for x in range(3, 13):
             ch = CUBE_TOP[y][x]
             if ch not in "HMBbS":
@@ -1473,7 +1476,7 @@ def generate_energy_cube():
     for rows in (CUBE_SIDE, CUBE_TOP):
         assert len(rows) == 16 and all(len(r) == 16 for r in rows)
     for name in os.listdir(out("block")):
-        if name.startswith("hume_energy_cube"):
+        if name.startswith("hume_energy_cube") and os.path.isfile(out("block/" + name)):
             os.remove(out("block/" + name))
     os.makedirs(out("block/hume_energy_cube"), exist_ok=True)
     for name in os.listdir(out("block/hume_energy_cube")):
