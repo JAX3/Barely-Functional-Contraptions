@@ -45,35 +45,33 @@ def from_grid(grid, palette):
     return img
 
 
-# Cartoon Barely Functional Wrench (default): chunky silver open-jaw head with a purple gem, a wooden handle with a
-# red mushroom sprouting from it, a bit of moss and a gold ring at the end.
+# Cartoon Barely Functional Wrench (default): a stylized crowbar in the blocks' art style. Thick dark outline,
+# a shaft in the machines' purple rim paint with one magenta glint, and slate-steel ends: a hooked, notched claw at the
+# top and a flattened chisel tip at the bottom.
 WRENCH_CARTOON_PALETTE = {
-    "O": hexc("#231c35"),  # outline
-    "s": hexc("#ffffff"), "S": hexc("#c8cee2"), "d": hexc("#8a91ad"),  # silver highlight / base / shadow
-    "P": hexc("#b25cff"), "p": hexc("#7031c9"),  # gem
-    "W": hexc("#e0924e"), "w": hexc("#a65a2c"),  # wood / wood shadow
-    "R": hexc("#ff4b4b"), "r": hexc("#c42a3a"), "X": hexc("#ffffff"), "t": hexc("#fff1d6"),  # cap / spots / stem
-    "y": hexc("#ffc94a"), "Y": hexc("#c98a1e"),  # gold ring
-    "G": hexc("#8ae25c"),  # moss
+    "O": hexc("#231c35"),  # outline (same as the blocks)
+    "s": hexc("#f4f8fc"), "S": hexc("#b9c3d1"), "d": hexc("#6f7a8b"),  # steel highlight / steel / steel shadow
+    "L": hexc("#d39bff"), "P": hexc("#9a52f0"), "p": hexc("#5c2aa6"),  # purple paint highlight / paint / shadow
+    "g": hexc("#ff6ae6"),  # glint
 }
 
 WRENCH_CARTOON = [
-    ".........OO..OO.",
-    "........OssO.OsO",
-    ".......OssSO.OSO",
-    ".OOOO..OsSSSOSSO",
-    "ORXRRO.OsSPPSSdO",
-    "ORRRXrOOSSPpSSdO",
-    "OrrrrrOdSSSSddO.",
-    ".OOtOOWwdOOOOO..",
-    "..OtOWwO........",
-    "..OtWwO.........",
-    "..OWwGO.........",
-    ".OyWwOO.........",
-    "Oy.yO...........",
-    "OyYYO...........",
-    ".OOO............",
-    "................",
+"..........OOOO..",
+".........OsSSSO.",
+"........OsSOOSdO",
+"........OSdOOSdO",
+"........OLPpOOdO",
+".......OLPpO.OdO",
+"......OLPpO..ddO",
+".....OLgpO...O.O",
+"....OLPpO.......",
+"...OLPpO........",
+"..OLPpO.........",
+".OsPpO..........",
+".OsSdO..........",
+"OsSdO...........",
+"OSdO............",
+".OO.............",
 ]
 
 

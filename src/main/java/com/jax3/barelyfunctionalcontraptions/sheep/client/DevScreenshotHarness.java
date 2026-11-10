@@ -214,6 +214,8 @@ public final class DevScreenshotHarness {
             case 1090 -> server.execute(() -> {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                 BlockPos pos = cubeBase.offset(1, 0, 0);
+                // Stand next to the cube first: menus close when the player is too far away to use the block.
+                player.teleportTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 3.5);
                 if (player.level().getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity be) {
                     player.openMenu(be, pos);
                 }

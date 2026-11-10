@@ -91,7 +91,7 @@ Generators connect automatically in all six directions. By default only **runnin
 
 ### Barely Functional Wrench (wireless links)
 
-*Previously called the Mycelium Wrench. Only the name changed: its item ID is still `barelyfunctionalcontraptions:mycelium_wrench`, so existing wrenches, recipes and commands keep working.*
+A stylized crowbar, in the same art style as the blocks: purple-painted shaft, steel claw and chisel tip. *Previously called the Mycelium Wrench. Only the name changed: its item ID is still `barelyfunctionalcontraptions:mycelium_wrench`, so existing wrenches, recipes and commands keep working.*
 
 ```
  . I A      I = Iron Ingot     A = Amethyst Shard
