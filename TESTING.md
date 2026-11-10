@@ -75,6 +75,10 @@ In the real client (`17_wireless_power.png`, `18_wireless_separator_gui.png`): a
 
 In the real client (`15_fluid_reservoir.png`, `16_fluid_reservoir_gui.png`): the reservoir on its pool shows water in its side windows next to a running generator, and a second one on dry stone is half full. The GUI shows the water gauge with bucket marks, *8,610 mB of 10,000 mB*, *8.6 buckets*, *+1,000 mB/s*, the *Filling* lamp, and an empty bucket in the top slot already turned into a water bucket in the bottom slot.
 
+### JEI: no tag pages for this mod's own tags
+
+JEI shows every tag as a page in its *Block Tags* / *Item Tags* tabs, so looking up a machine used to show this mod's internal tags, such as `#barelyfunctionalcontraptions:wireless_power_receivers`. The JEI plugin now hides the pages of every tag in this mod's namespace. In the real client the harness logs `own tag pages visible=[]`, and the Mechanical Separator's tag pages are only the vanilla mining tags: `mineable/pickaxe`, `needs_stone_tool`, `incorrect_for_gold_tool` and `incorrect_for_wooden_tool`. Those are shared by every pickaxe block, so they stay; JEI's own `showTagRecipesEnabled` setting turns all tag pages off.
+
 ### JEI: Mechanical Separation lists every wool type
 In the real client, the harness compares JEI with the loaded wool types: `wool types loaded=15, resource wool in JEI list=15, separation recipes=16 (with resource wool input=15), missing from JEI list=[]`. That's the 14 built-in types plus the Amethyst type the harness generates, and the extra recipe is plain wool → string. The category now uses one compact row per wool type, sorted by name, with explicit recipes last. In the 1280×720 test client that's 4 per page (4 pages) instead of 1 per page (16 pages); see `06_jei_separation.png`.
 

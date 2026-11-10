@@ -92,6 +92,29 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
     @Override
     public void onRuntimeAvailable(mezz.jei.api.runtime.IJeiRuntime jeiRuntime) {
         JeiDevHook.runtime = jeiRuntime;
+        hideOwnTagPages(jeiRuntime.getRecipeManager());
+    }
+
+    /**
+     * JEI lists every tag as a "tag recipe" page (Block Tags, Item Tags...), so looking up a machine showed this mod's
+     * internal tags, such as {@code #barelyfunctionalcontraptions:wireless_power_receivers}. Those are configuration
+     * for data packs, not something players need, so their pages are hidden. Vanilla and other mods' tags (like
+     * {@code minecraft:mineable/pickaxe}) are shared by many blocks and are left alone.
+     */
+    static void hideOwnTagPages(mezz.jei.api.recipe.IRecipeManager recipes) {
+        recipes.createRecipeCategoryLookup().includeHidden().get()
+                .filter(category -> category.getRecipeType().getUid().getPath().startsWith("tag_recipes/"))
+                .forEach(category -> hideOwnTags(recipes, category));
+    }
+
+    private static <T> void hideOwnTags(mezz.jei.api.recipe.IRecipeManager recipes, mezz.jei.api.recipe.category.IRecipeCategory<T> category) {
+        java.util.List<T> own = recipes.createRecipeLookup(category.getRecipeType()).get()
+                .filter(recipe -> {
+                    net.minecraft.resources.Identifier id = category.getIdentifier(recipe); // the tag's id
+                    return id != null && ResourcefulSheep.MOD_ID.equals(id.getNamespace());
+                })
+                .toList();
+        if (!own.isEmpty()) recipes.hideRecipes(category.getRecipeType(), own);
     }
 
     @Override

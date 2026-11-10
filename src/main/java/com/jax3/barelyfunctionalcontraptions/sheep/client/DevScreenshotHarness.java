@@ -125,6 +125,7 @@ public final class DevScreenshotHarness {
                 shot(mc, "06_jei_separation");
                 if (ModList.get().isLoaded("jei")) {
                     ResourcefulSheep.LOGGER.warn("Harness JEI report: {}", com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.separatorReport());
+                    ResourcefulSheep.LOGGER.warn("Harness JEI tag report: {}", com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.tagReport());
                 }
             }
             case 470 -> {
