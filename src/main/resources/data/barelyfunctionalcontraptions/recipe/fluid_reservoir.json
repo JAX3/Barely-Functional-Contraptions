@@ -6,7 +6,7 @@
     "G": "#c:glass_blocks",
     "B": "minecraft:bucket",
     "M": "barelyfunctionalcontraptions:functional_machine_block",
-    "C": "minecraft:cauldron"
+    "C": "minecraft:hopper"
   },
   "pattern": [
     "IBI",

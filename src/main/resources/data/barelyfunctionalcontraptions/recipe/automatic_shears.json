@@ -5,10 +5,12 @@
     "I": "minecraft:iron_ingot",
     "S": "minecraft:shears",
     "M": "barelyfunctionalcontraptions:functional_machine_block",
-    "C": "minecraft:chest"
+    "C": "minecraft:chest",
+    "R": "minecraft:redstone",
+    "T": "minecraft:copper_ingot"
   },
   "pattern": [
-    "ISI",
+    "TRT",
     "SMS",
     "ICI"
   ],
