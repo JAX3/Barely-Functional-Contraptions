@@ -102,11 +102,13 @@ public final class EnergyCubeGroup {
         return (int) Math.min(Integer.MAX_VALUE, rate);
     }
 
-    /** 0..4 for the charge shown on the blocks. */
+    /** 0..8 for the charge shown in the side windows: 0 only when empty, 8 only when full. */
     public int chargeLevel() {
         long capacity = capacity(), amount = amount();
         if (amount <= 0 || capacity <= 0) return 0;
-        return (int) Math.max(1, Math.min(4, Math.round(amount * 4.0 / capacity)));
+        if (amount >= capacity) return EnergyCubeBlock.MAX_CHARGE;
+        int steps = EnergyCubeBlock.MAX_CHARGE;
+        return (int) Math.max(1, Math.min(steps - 1, Math.round(amount * (double) steps / capacity)));
     }
 
     public int insert(int amount, TransactionContext transaction) {

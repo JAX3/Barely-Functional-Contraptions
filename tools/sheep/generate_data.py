@@ -112,7 +112,7 @@ def item_models():
     write(os.path.join(ASSETS, "items", "automatic_shears.json"),
           {"model": {"type": "minecraft:model", "model": f"{MOD}:block/automatic_shears"}})
     write(os.path.join(ASSETS, "items", "hume_energy_cube.json"),
-          {"model": {"type": "minecraft:model", "model": f"{MOD}:block/hume_energy_cube_3"}})
+          {"model": {"type": "minecraft:model", "model": f"{MOD}:block/hume_energy_cube_6"}})
     # The item shows the reservoir full of water.
     write(os.path.join(ASSETS, "items", "fluid_reservoir.json"),
           {"model": {"type": "minecraft:model", "model": f"{MOD}:block/fluid_reservoir_4"}})
@@ -171,11 +171,20 @@ def block_models():
                 "down": f"{MOD}:block/fluid_reservoir_bottom",
             },
         })
-    for charge in range(5):
-        write(os.path.join(ASSETS, "models", "block", f"hume_energy_cube_{charge}.json"),
-              {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/hume_energy_cube_{charge}"}})
+    # Hume Energy Cube: one model per charge level (0..8), the side windows showing how full the group is.
+    models_dir = os.path.join(ASSETS, "models", "block")
+    for name in os.listdir(models_dir):
+        if name.startswith("hume_energy_cube_"):
+            os.remove(os.path.join(models_dir, name))
+    for charge in range(9):
+        side = f"{MOD}:block/hume_energy_cube_side_{charge}"
+        write(os.path.join(models_dir, f"hume_energy_cube_{charge}.json"), {
+            "parent": "minecraft:block/cube_bottom_top",
+            "textures": {"particle": side, "side": side, "top": f"{MOD}:block/hume_energy_cube_top",
+                         "bottom": f"{MOD}:block/hume_energy_cube_top"},
+        })
     write(os.path.join(ASSETS, "blockstates", "hume_energy_cube.json"),
-          {"variants": {f"charge={c}": {"model": f"{MOD}:block/hume_energy_cube_{c}"} for c in range(5)}})
+          {"variants": {f"charge={c}": {"model": f"{MOD}:block/hume_energy_cube_{c}"} for c in range(9)}})
     write(os.path.join(ASSETS, "blockstates", "fluid_reservoir.json"),
           {"variants": {f"fill={fill}": {"model": f"{MOD}:block/fluid_reservoir_{fill}"} for fill in range(5)}})
     write(os.path.join(ASSETS, "models", "block", "creative_generator.json"),

@@ -28,8 +28,9 @@ import org.jspecify.annotations.Nullable;
  * touches into one bigger battery. Right-click to see the group's charge.
  */
 public class EnergyCubeBlock extends BaseEntityBlock {
-    /** How full the cube's group is, 0..4, drawn as the energy level in its window. */
-    public static final IntegerProperty CHARGE = IntegerProperty.create("charge", 0, 4);
+    /** How full the cube's group is, 0..8 (one step per window row), drawn as the energy level in its side windows. */
+    public static final int MAX_CHARGE = 8;
+    public static final IntegerProperty CHARGE = IntegerProperty.create("charge", 0, MAX_CHARGE);
 
     public EnergyCubeBlock(Properties properties) {
         super(properties);

@@ -1,6 +1,9 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "all": "barelyfunctionalcontraptions:block/hume_energy_cube_0"
+    "particle": "barelyfunctionalcontraptions:block/hume_energy_cube_side_0",
+    "side": "barelyfunctionalcontraptions:block/hume_energy_cube_side_0",
+    "top": "barelyfunctionalcontraptions:block/hume_energy_cube_top",
+    "bottom": "barelyfunctionalcontraptions:block/hume_energy_cube_top"
   }
 }

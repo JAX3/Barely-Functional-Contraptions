@@ -47,7 +47,7 @@ public final class ModBlocks {
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.METAL)
-                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock.CHARGE) * 2));
+                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock.CHARGE)));
 
     /** Creative-only infinite FE source: unbreakable in survival, no recipe. */
     public static final DeferredBlock<CreativeGeneratorBlock> CREATIVE_GENERATOR = REGISTER.registerBlock("creative_generator",

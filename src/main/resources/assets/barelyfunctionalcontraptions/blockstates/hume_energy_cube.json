@@ -14,6 +14,18 @@
     },
     "charge=4": {
       "model": "barelyfunctionalcontraptions:block/hume_energy_cube_4"
+    },
+    "charge=5": {
+      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_5"
+    },
+    "charge=6": {
+      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_6"
+    },
+    "charge=7": {
+      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_7"
+    },
+    "charge=8": {
+      "model": "barelyfunctionalcontraptions:block/hume_energy_cube_8"
     }
   }
 }

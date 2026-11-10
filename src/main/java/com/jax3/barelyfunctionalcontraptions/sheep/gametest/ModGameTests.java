@@ -114,6 +114,7 @@ public final class ModGameTests {
         TESTS.put("energy_cube_break_splits_group", ModGameTests::cubeBreakSplits);
         TESTS.put("energy_cube_pushes_into_machines", ModGameTests::cubePushes);
         TESTS.put("energy_cube_max_group_size", ModGameTests::cubeMaxGroup);
+        TESTS.put("energy_cube_window_shows_charge", ModGameTests::cubeWindow);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -1247,5 +1248,22 @@ public final class ModGameTests {
             ModConfigs.SERVER.energyCubeMaxGroupSize.set(old);
         }
         h.succeed();
+    }
+
+    /** The side windows follow the group's fill in eighths: empty 0, a quarter 2, half 4, nearly full 7, full 8. */
+    private static void cubeWindow(GameTestHelper h) {
+        var charge = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock.CHARGE;
+        int[][] cases = {{0, 0}, {250_000, 2}, {500_000, 4}, {990_000, 7}, {1_000_000, 8}, {1_000, 1}};
+        BlockPos[] spots = new BlockPos[cases.length];
+        for (int i = 0; i < cases.length; i++) {
+            spots[i] = new BlockPos(i, 1, i % 2 == 0 ? 1 : 4); // apart, so each is its own group
+            cube(h, spots[i]).storage().set(cases[i][0]);
+        }
+        h.succeedWhen(() -> {
+            for (int i = 0; i < cases.length; i++) {
+                int expected = cases[i][1];
+                h.assertBlockProperty(spots[i], charge, expected);
+            }
+        });
     }
 }

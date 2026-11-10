@@ -1354,9 +1354,14 @@ def generate_reservoir_gui():
 
 
 # ---------------------------------------------------------------------------
-# Hume Energy Cube: the cartoon casing with a purple energy window that fills with charge (0..4) and a bolt.
+# Hume Energy Cube: like the Fluid Reservoir, a glass window on each side shows how full the group is, here in
+# eight steps (one per window row) with the energy animated: it swirls upward and a bright surface line shimmers.
+# The top and bottom carry a purple port with the energy bolt.
 # ---------------------------------------------------------------------------
-CUBE_FRAME = [
+CUBE_LEVELS = 8
+CUBE_FRAMES = 4
+
+CUBE_SIDE = [  # '.' is the 8x8 window
     "OOOOOOOOOOOOOOOO",
     "OHHHHHHHHHHHHHMO",
     "OHBbPPPPPPPPBbSO",
@@ -1374,41 +1379,65 @@ CUBE_FRAME = [
     "OHbSSSSSSSSSbSSO",
     "OOOOOOOOOOOOOOOO",
 ]
-CUBE_BOLT = [  # 8x8, drawn over the window
-    "....EE..",
-    "...EE...",
-    "..EEe...",
-    ".EEEEEe.",
-    "...eEE..",
-    "...EE...",
-    "..Ee....",
-    "..e.....",
+
+CUBE_TOP = [  # purple port with the energy bolt
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMOOOOMMbSSO",
+    "OHMMMOPPPPOMMMSO",
+    "OHMMOPpgEepPOMSO",
+    "OHMOPpgEEgpPOMSO",
+    "OHMOPgEEEEEPOMSO",
+    "OHMOPggeEEgPOMSO",
+    "OHMOPpgEEgpPOMSO",
+    "OHMMOPpEegpPOMSO",
+    "OHMMMOPPPPOMMMSO",
+    "OHMMMMOOOOMMMMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
 ]
 
+ENERGY_DEEP, ENERGY_MID, ENERGY_LIGHT = hexc("#5c2aa6"), hexc("#9a52f0"), hexc("#ff6ae6")
+ENERGY_SURFACE, ENERGY_SPARK = hexc("#ffd2fb"), hexc("#ffffff")
 
-def energy_cube(charge):
-    img = grid(CUBE_FRAME, CARTOON)
-    filled = charge * 2
+
+def cube_side_frame(level, frame):
+    img = grid(CUBE_SIDE, CARTOON)
     for y in range(4, 12):
         for x in range(4, 12):
-            depth = y - (12 - filled)
+            depth = y - (12 - level)          # 0 at the surface row
             if depth < 0:
                 c = CARTOON["K"] if (x + y) % 5 else CARTOON["k"]
             elif depth == 0:
-                c = CARTOON["G"]
+                c = ENERGY_SPARK if (x + frame * 2) % 8 == 0 else ENERGY_SURFACE
             else:
-                c = CARTOON["g"] if (x + y) % 3 else CARTOON["P"]
+                # diagonal bands that drift upward one row per frame
+                band = (x + y + frame) % 4
+                c = (ENERGY_LIGHT, ENERGY_MID, ENERGY_MID, ENERGY_DEEP)[band]
             img.putpixel((x, y), c)
-    bolt = {"E": CARTOON["E"], "e": CARTOON["e"]} if charge else {"E": hexc("#6b6250"), "e": hexc("#4a4436")}
-    grid(CUBE_BOLT, bolt, img, 4, 4)
+    # glass glint, over the empty glass only
+    for (x, y) in ((5, 5), (4, 6), (6, 5)):
+        if y < 12 - level:
+            img.putpixel((x, y), hexc("#4a3d5c"))
     return img
 
 
 def generate_energy_cube():
-    for rows in (CUBE_FRAME, CUBE_BOLT):
-        assert all(len(r) == len(rows[0]) for r in rows)
-    for charge in range(5):
-        energy_cube(charge).save(out(f"block/hume_energy_cube_{charge}.png"))
+    for rows in (CUBE_SIDE, CUBE_TOP):
+        assert len(rows) == 16 and all(len(r) == 16 for r in rows)
+    for name in os.listdir(out("block")):
+        if name.startswith("hume_energy_cube_"):
+            os.remove(out("block/" + name))
+    for level in range(CUBE_LEVELS + 1):
+        strip = Image.new("RGBA", (16, 16 * CUBE_FRAMES), CLEAR)
+        for f in range(CUBE_FRAMES):
+            strip.paste(cube_side_frame(level, f), (0, f * 16))
+        strip.save(out(f"block/hume_energy_cube_side_{level}.png"))
+        with open(out(f"block/hume_energy_cube_side_{level}.png.mcmeta"), "w") as fh:
+            fh.write('{\n  "animation": {\n    "frametime": 4,\n    "interpolate": true\n  }\n}\n')
+    grid(CUBE_TOP, CARTOON).save(out("block/hume_energy_cube_top.png"))
 
 
 def main():

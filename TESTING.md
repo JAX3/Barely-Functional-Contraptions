@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 69 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 42 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 70 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 43 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 21 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
@@ -42,9 +42,10 @@ In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): t
 | `energy_cube_break_splits_group` | With 100k/200k/300k FE in a row of three (600k total), the middle cube's item would keep its 200,000 FE. Breaking it leaves two single cubes with 100,000 and 300,000 FE. |
 | `energy_cube_pushes_into_machines` | A charged cube pushes FE into Automatic Shears touching it, and the total is conserved (what left the cubes is exactly what the shears hold). |
 | `energy_cube_max_group_size` | With `maxGroupSize = 2`, three cubes form groups of 2 and 1, and the group of 2 moves 20,000 FE/t. |
+| `energy_cube_window_shows_charge` | Separate cubes holding 0, 1,000, 250,000, 500,000, 990,000 and 1,000,000 FE show window levels 0, 1, 2, 4, 7 and 8. Any energy shows at least one row, and only a completely full group shows all 8. |
 | `integration_generator_charges_energy_cube` | A running Mycelial Generator charges two cubes, and a separator on their far side finishes iron wool on that power. |
 
-In the real client (`21_energy_cubes.png`): a 2x2x2 group charged by a generator shows half-full windows, and its right-click readout is *Hume Energy Cube x8: 4,008,750 / 8,000,000 FE, 80,000 FE/t*. A single empty cube has a dark window and a dim bolt; a single full one is full.
+In the real client (`21_energy_cubes.png`): a 2x2x2 group charged by a generator shows its glass windows half full of animated energy, and its right-click readout is *Hume Energy Cube x8: 4,008,750 / 8,000,000 FE, 80,000 FE/t*. A single empty cube has an empty window; a single full one is full to the top.
 
 ### Wireless power with the Mycelium Wrench
 
