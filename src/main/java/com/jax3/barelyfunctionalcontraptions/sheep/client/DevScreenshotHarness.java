@@ -258,13 +258,32 @@ public final class DevScreenshotHarness {
                 server.execute(() -> creativeScene(server));
             }
             case 1385 -> shot(mc, "26_creative_generator");
-            case 1390 -> {
+            case 1388 -> command(server, "gamemode creative @a");
+            case 1395 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get());
+            case 1410 -> shot(mc, "27_creative_tab_wool");
+            case 1415 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.MAIN.get());
+            case 1430 -> shot(mc, "28_creative_tab_main");
+            case 1435 -> {
+                mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
             }
             default -> {}
         }
+    }
+
+    /** Opens the creative inventory on {@code tab} (set before opening, so the screen also turns to that tab's page). */
+    private static void openCreativeTab(Minecraft mc, net.minecraft.world.item.CreativeModeTab tab) {
+        try {
+            var field = net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.class.getDeclaredField("selectedTab");
+            field.setAccessible(true);
+            field.set(null, tab);
+        } catch (ReflectiveOperationException e) {
+            ResourcefulSheep.LOGGER.warn("Harness: could not preselect the creative tab", e);
+        }
+        mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen(
+                mc.player, mc.player.connection.enabledFeatures(), true));
     }
 
     private static void setHudHidden(Minecraft mc, boolean hidden) {

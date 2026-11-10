@@ -13,7 +13,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/** The single creative tab shared by both modules. */
+/** The mod's creative tabs: machines and tools, then all the resource wool. */
 public final class ContraptionsCreativeTab {
     public static final DeferredRegister<CreativeModeTab> REGISTER = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, BarelyFunctionalContraptions.MOD_ID);
 
@@ -35,7 +35,18 @@ public final class ContraptionsCreativeTab {
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_RESERVOIR.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CREATIVE_GENERATOR.get());
-                // Resource wool
+            })
+            .build());
+
+    /**
+     * Every resource wool type in its own tab, right after the main one, so the machines and tools aren't buried
+     * under dozens of wools (more with data packs and the generate command).
+     */
+    public static final Supplier<CreativeModeTab> RESOURCE_WOOL = REGISTER.register("resource_wool", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup." + BarelyFunctionalContraptions.MOD_ID + ".resource_wool"))
+            .withTabsBefore(BarelyFunctionalContraptions.id("main"))
+            .icon(() -> ResourceWoolItem.create(BarelyFunctionalContraptions.id("gold"), 1))
+            .displayItems((params, output) -> {
                 SheepResourceRegistry loaded = SheepResourceRegistry.client();
                 if (loaded.isEmpty()) {
                     BUILT_IN_WOOL.forEach(name -> output.accept(ResourceWoolItem.create(BarelyFunctionalContraptions.id(name), 1)));

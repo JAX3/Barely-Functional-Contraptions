@@ -456,5 +456,6 @@
   "gui.barelyfunctionalcontraptions.cube.status.empty": "Empty",
   "gui.barelyfunctionalcontraptions.cube.status.empty.desc": "No energy stored",
   "gui.barelyfunctionalcontraptions.cube.status.idle": "Idle",
-  "gui.barelyfunctionalcontraptions.cube.status.idle.desc": "No energy is moving in or out"
+  "gui.barelyfunctionalcontraptions.cube.status.idle.desc": "No energy is moving in or out",
+  "itemGroup.barelyfunctionalcontraptions.resource_wool": "Resource Wool"
 }

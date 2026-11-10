@@ -254,6 +254,7 @@ def block_models():
 def lang():
     en = {
         "itemGroup.barelyfunctionalcontraptions": "Barely Functional Contraptions",
+        "itemGroup.barelyfunctionalcontraptions.resource_wool": "Resource Wool",
         "block.barelyfunctionalcontraptions.mechanical_separator": "Mechanical Separator",
         "block.barelyfunctionalcontraptions.creative_generator": "Creative Generator",
         "block.barelyfunctionalcontraptions.automatic_shears": "Automatic Shears",

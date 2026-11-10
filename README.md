@@ -2,7 +2,7 @@
 
 ![Barely Functional Contraptions](docs/banner.png)
 
-A NeoForge mod for **Minecraft 26.3** (Java 25) that combines two systems, **Mycelial Power** and **Resourceful Sheep**, into one mod. They share one mod id (`barelyfunctionalcontraptions`), one jar, one creative tab and one config screen, and they are built to work together:
+A NeoForge mod for **Minecraft 26.3** (Java 25) that combines two systems, **Mycelial Power** and **Resourceful Sheep**, into one mod. They share one mod id (`barelyfunctionalcontraptions`), one jar, one config screen and two creative tabs (machines and tools, and resource wool), and they are built to work together:
 
 * **Mycelial Power:** the **Mycelial Generator** burns mushrooms and water to make **Forge Energy (FE)**. Generators that touch, or are linked with the **Barely Functional Wrench**, form networks whose output grows **exponentially**. Running generators slowly spread **mycelium** and sprout **huge mushrooms**.
 * **Resourceful Sheep:** feed sheep blocks, ingots and gems to **infuse** their wool, shear them for **resource wool**, and turn the wool back into resources in the FE-powered **Mechanical Separator**. The **Fluid Reservoir** draws water from an infinite source to keep generators supplied.
@@ -39,7 +39,7 @@ A NeoForge mod for **Minecraft 26.3** (Java 25) that combines two systems, **Myc
 1. **Generators power separators directly.** Both use NeoForge's standard energy capability, so a Mycelial Generator placed against any energy face of a Mechanical Separator (back, left, right, top or bottom) pushes FE into it. One generator makes 200–250 FE/t, which is exactly what a separator uses for most wool. FE cables from other mods work too.
 2. **Mushroom sheep.** Two new built-in sheep resources, **Red Mushroom** and **Brown Mushroom**, are infused with a **Red/Brown Mushroom** (100 shearings per feeding by default). The separator turns each Mushroom Wool into **2–4 mushrooms** + 2 String, with a 5% chance of a **Mycelium** block. Those mushrooms are the Mycelial Generator's fuel.
 3. **The loop closes.** Running generators spread mycelium and grow huge mushrooms, which give you mushrooms for the sheep. The sheep give you mushrooms for the generators, and the generators power the separators that process all your other resource wool.
-4. **One mod.** One creative tab (*Barely Functional Contraptions*), one entry in the mod list, one config button listing all four config files, and one JEI and Jade plugin set.
+4. **One mod.** Two creative tabs side by side (*Barely Functional Contraptions* for the machines and tools, *Resource Wool* for every wool type, including ones added by data packs and the generate command), one entry in the mod list, one config button listing all four config files, and one JEI and Jade plugin set.
 
 The integration is covered by GameTests, which run in [`IntegrationGameTests`](src/main/java/com/jax3/barelyfunctionalcontraptions/gametest/IntegrationGameTests.java). See [TESTING.md](TESTING.md).
 
@@ -52,6 +52,10 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 **Machine fronts:** all three machines share one look. Each has a purple-rimmed glass window on its front: a red mushroom in the generator, a wool block in the separator and a pair of shears in the Automatic Shears. The window is dark while the machine is idle and glows with a pulsing halo and sparkles while it runs. The separator and shears also give off a little light while running.
 
 ![Machine fronts, idle and running](docs/screenshots/14_machine_fronts.png)
+
+| Creative tab: machines and tools | Creative tab: Resource Wool |
+|---|---|
+| ![Main creative tab](docs/screenshots/28_creative_tab_main.png) | ![Resource Wool creative tab](docs/screenshots/27_creative_tab_wool.png) |
 
 **Placing machines:** the Mycelial Generator, Mechanical Separator and Automatic Shears place with their front facing you. **Hold Shift while placing** to make the front face away from you instead (handy for pointing the shears at a pen from outside it, or the separator's back at a cable).
 
@@ -272,7 +276,7 @@ An endless power source for creative mode, for testing builds without setting up
 
 *Above: one Creative Generator running a Mechanical Separator (left), an Automatic Shears (right) and a stack of two Hume Energy Cubes (charging, on top), all at once.*
 
-- **Where to get it:** the mod's creative tab, or `/give @s barelyfunctionalcontraptions:creative_generator`. It has no crafting recipe, can't be broken in survival and drops nothing.
+- **Where to get it:** the mod's *Barely Functional Contraptions* creative tab, or `/give @s barelyfunctionalcontraptions:creative_generator`. It has no crafting recipe, can't be broken in survival and drops nothing.
 - **Unlimited Forge Energy:** it never runs out and needs no fuel or water.
 - **Pushes power out:** every tick it pushes FE into every energy receiver touching it, on all six sides: machines, Hume Energy Cubes, other mods' cables. The rate is `creativeGeneratorOutput` (1,000,000 FE/t by default), but each receiver still takes only what its own input limit allows. Set the rate to `0` to stop it pushing.
 - **Can be pulled from:** cables and machines can also pull unlimited FE from any side.
@@ -598,7 +602,7 @@ The build downloads from `maven.neoforged.net` (NeoForge), Mojang's servers (Min
 src/main/java/com/jax3/barelyfunctionalcontraptions/
 ├── BarelyFunctionalContraptions.java        the single @Mod entry point; initialises both modules
 ├── client/BarelyFunctionalContraptionsClient the single client entry point (config screen + both modules' client code)
-├── registry/ContraptionsCreativeTab the shared creative tab
+├── registry/ContraptionsCreativeTab the two creative tabs (machines and tools, resource wool)
 ├── gametest/IntegrationGameTests   tests for the parts where the modules meet
 ├── mycelial/                       Mycelial Power module (generator, wrench, networks, mycelium, JEI/Jade)
 └── sheep/                          Resourceful Sheep module (infusion, wool, separator, commands, JEI/Jade)

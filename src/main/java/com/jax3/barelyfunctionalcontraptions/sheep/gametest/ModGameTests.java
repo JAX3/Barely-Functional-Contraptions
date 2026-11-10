@@ -117,6 +117,7 @@ public final class ModGameTests {
         TESTS.put("energy_cube_window_shows_charge", ModGameTests::cubeWindow);
         TESTS.put("energy_cube_gui_values", ModGameTests::cubeGui);
         TESTS.put("energy_cube_stack_fills_bottom_up", ModGameTests::cubeStack);
+        TESTS.put("creative_tabs_split_wool", ModGameTests::creativeTabs);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -1331,5 +1332,20 @@ public final class ModGameTests {
                 .thenExecute(() -> h.setBlock(topL, net.minecraft.world.level.block.Blocks.AIR))
                 .thenExecute(() -> h.assertBlockProperty(bottomL, connected.get(net.minecraft.core.Direction.UP), false))
                 .thenSucceed();
+    }
+
+    /** The main tab holds the machines and tools only; every resource wool is in the Resource Wool tab. */
+    private static void creativeTabs(GameTestHelper h) {
+        var level = h.getLevel();
+        net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(level.enabledFeatures(), true, level.registryAccess());
+        var main = com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.MAIN.get().getDisplayItems();
+        var wool = com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get().getDisplayItems();
+        h.assertTrue(main.stream().noneMatch(s -> s.is(ModItems.RESOURCE_WOOL.get())), "no resource wool in the main tab");
+        h.assertTrue(main.stream().anyMatch(s -> s.is(ModItems.MECHANICAL_SEPARATOR.get()))
+                && main.stream().anyMatch(s -> s.is(ModItems.HUME_ENERGY_CUBE.get())), "machines stay in the main tab");
+        h.assertTrue(!wool.isEmpty() && wool.stream().allMatch(s -> s.is(ModItems.RESOURCE_WOOL.get())), "the wool tab holds only resource wool");
+        h.assertTrue(wool.size() >= com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.BUILT_IN_WOOL.size(),
+                "every built-in wool type, got " + wool.size());
+        h.succeed();
     }
 }
