@@ -489,8 +489,9 @@ def recipes_loot_tags():
             "I": "minecraft:iron_ingot",
             "R": "minecraft:redstone_block",
             "A": "minecraft:amethyst_shard",
+            "F": "minecraft:furnace",
         },
-        "pattern": ["IAI", "ARA", "IAI"],
+        "pattern": ["IAI", "ARA", "IFI"],
         "result": {"id": f"{MOD}:hume_energy_cube"},
     })
     write(os.path.join(DATA, MOD, "recipe", "fluid_reservoir.json"), {

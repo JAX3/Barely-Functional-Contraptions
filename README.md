@@ -288,7 +288,7 @@ Any shape works, not just full boxes. L-shapes, rings and walls with bends get p
 ```
 I A I      I = Iron Ingot
 A R A      A = Amethyst Shard
-I A I      R = Block of Redstone
+I F I      R = Block of Redstone   F = Furnace
 ```
 
 ### Creative Generator (testing)
