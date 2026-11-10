@@ -85,7 +85,7 @@ Generators connect automatically in all six directions. By default only **runnin
 
 ### Barely Functional Wrench (wireless links)
 
-A stylized crowbar, in the same art style as the blocks: purple-painted shaft, steel claw and chisel tip. *Previously called the Mycelium Wrench. Only the name changed: its item ID is still `barelyfunctionalcontraptions:mycelium_wrench`, so existing wrenches, recipes and commands keep working.*
+A stylized crowbar, in the same art style as the blocks: purple-painted shaft, steel claw and chisel tip.
 
 ![Barely Functional Wrench recipe: an amethyst shard top right, iron ingots beside and below it, redstone in the centre, a red mushroom bottom left](docs/screenshots/recipe_mycelium_wrench.png)
 
@@ -266,11 +266,17 @@ Any shape works, not just full boxes. L-shapes, rings and walls with bends get p
 ![Hume Energy Cube recipe: iron ingots in the corners, amethyst shards on the top and sides, a block of redstone in the centre, a furnace bottom middle](docs/screenshots/recipe_hume_energy_cube.png)
 
 ### Creative Generator (testing)
-A creative-only block, found in the Resourceful Sheep creative tab. It has no recipe and can't be broken in survival.
-- Produces **unlimited Forge Energy**.
-- Every tick it pushes FE into all adjacent energy receivers. The rate is `creativeGeneratorOutput` (1,000,000 FE/t by default); receivers still apply their own input limits.
-- Cables and machines can also **pull** unlimited FE from any side.
-- Place it against any energy face of a Mechanical Separator to test without building a power setup.
+An endless power source for creative mode, for testing builds without setting up mushroom farms. It's a slate block with a pulsing magenta energy core on every side, and it glows in the dark.
+
+![Creative Generator powering a separator, Automatic Shears and two energy cubes](docs/screenshots/26_creative_generator.png)
+
+*Above: one Creative Generator running a Mechanical Separator (left), an Automatic Shears (right) and a stack of two Hume Energy Cubes (charging, on top), all at once.*
+
+- **Where to get it:** the mod's creative tab, or `/give @s barelyfunctionalcontraptions:creative_generator`. It has no crafting recipe, can't be broken in survival and drops nothing.
+- **Unlimited Forge Energy:** it never runs out and needs no fuel or water.
+- **Pushes power out:** every tick it pushes FE into every energy receiver touching it, on all six sides: machines, Hume Energy Cubes, other mods' cables. The rate is `creativeGeneratorOutput` (1,000,000 FE/t by default), but each receiver still takes only what its own input limit allows. Set the rate to `0` to stop it pushing.
+- **Can be pulled from:** cables and machines can also pull unlimited FE from any side.
+- **Typical uses:** put it against a Mechanical Separator to test wool processing, next to Automatic Shears to test a sheep pen, or under a stack of Hume Energy Cubes to fill them quickly.
 
 ### Built-in resources
 

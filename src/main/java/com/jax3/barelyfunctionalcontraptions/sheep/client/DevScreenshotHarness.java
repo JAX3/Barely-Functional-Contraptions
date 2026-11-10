@@ -254,6 +254,11 @@ public final class DevScreenshotHarness {
             case 1210, 1235, 1260, 1285, 1310, 1335 -> shot(mc, "recipe_" + RECIPES[(tick - 1210) / 25]);
             case 1340 -> {
                 mc.player.closeContainer();
+                setHudHidden(mc, true);
+                server.execute(() -> creativeScene(server));
+            }
+            case 1385 -> shot(mc, "26_creative_generator");
+            case 1390 -> {
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -383,6 +388,27 @@ public final class DevScreenshotHarness {
             }
         }
         menu.broadcastChanges();
+    }
+
+    /**
+     * The Creative Generator powering three contraptions at once: a separator with wool on one side, Automatic Shears
+     * on the other and two Hume Energy Cubes stacked on top (charging).
+     */
+    private static void creativeScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        BlockPos base = origin.offset(30, 30, -4);
+        for (int x = -2; x <= 2; x++) for (int z = -1; z <= 1; z++) level.setBlock(base.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+        level.setBlock(base.west(), ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState().setValue(MechanicalSeparatorBlock.FACING, Direction.SOUTH), 3);
+        if (level.getBlockEntity(base.west()) instanceof MechanicalSeparatorBlockEntity separator) {
+            separator.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(ResourcefulSheep.id("gold"), 16));
+        }
+        level.setBlock(base.east(), ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.SOUTH), 3);
+        level.setBlock(base, ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+        placeCube(level, base.above(), 0);
+        placeCube(level, base.above(2), 0);
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 20", base.getX() + 0.5, base.getY() + 2, base.getZ() + 5.0));
     }
 
     private static BlockPos wirelessBase;
