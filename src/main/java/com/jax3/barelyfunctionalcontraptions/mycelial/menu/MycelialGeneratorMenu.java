@@ -38,7 +38,7 @@ public class MycelialGeneratorMenu extends AbstractContainerMenu {
     public static final int CONTAINER_OUT_X = 52;
     public static final int CONTAINER_OUT_Y = 89;
     public static final int PLAYER_INV_X = 48;
-    public static final int PLAYER_INV_Y = 161;
+    public static final int PLAYER_INV_Y = 150;
 
     @Nullable
     private final MycelialGeneratorBlockEntity generator;

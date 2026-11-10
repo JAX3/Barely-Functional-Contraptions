@@ -54,7 +54,7 @@ def mushroom_icon(img, x, y, cap):
 def gui_texture():
     img = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    panel(d, 0, 0, 256, 243)
+    panel(d, 0, 0, 256, 232)
 
     # Energy bar and water tank (inner 14x70 at (9,19) and (29,19))
     for bx in (8, 28):
@@ -79,27 +79,27 @@ def gui_texture():
                    (60, 64), (61, 64), (58, 65), (61, 65), (58, 66), (59, 66), (60, 66), (61, 66)]:
         px[x, y] = hexc("#3b4a5c")
 
-    # Info panel (11 rows of 11px starting at y=19): fuel/water | energy | network + wireless | mycelium
-    inset(d, 76, 16, 251, 142, PANEL_FILL)
-    for sep in (40, 62, 106):
+    # Info panel (rows of 11px starting at y=19)
+    inset(d, 76, 16, 251, 131, PANEL_FILL)
+    for sep in (40, 62, 95):
         d.line([79, sep, 247, sep], fill=hexc("#2c2e36"))
 
     # Player inventory
     for row in range(3):
         for col in range(9):
-            slot(d, 48 + col * 18, 161 + row * 18)
+            slot(d, 48 + col * 18, 150 + row * 18)
     for col in range(9):
-        slot(d, 48 + col * 18, 219)
+        slot(d, 48 + col * 18, 208)
 
     # Decorations: mushrooms on the casing corners and mycelium creeping along the bottom edge
     mushroom_icon(img, 236, 8, hexc("#c23b2e"))
     mushroom_icon(img, 246, 9, hexc("#9a6b45"))
-    mushroom_icon(img, 10, 235, hexc("#9a6b45"))
+    mushroom_icon(img, 10, 224, hexc("#9a6b45"))
     for x in range(3, 253):
         if rng.random() < 0.35:
-            px[x, 240] = MYCELIUM if rng.random() < 0.5 else GREEN
+            px[x, 229] = MYCELIUM if rng.random() < 0.5 else GREEN
         if rng.random() < 0.12:
-            px[x, 239] = MYCELIUM_LIGHT
+            px[x, 228] = MYCELIUM_LIGHT
     return img
 
 

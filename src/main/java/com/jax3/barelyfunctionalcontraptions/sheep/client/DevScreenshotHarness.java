@@ -194,14 +194,13 @@ public final class DevScreenshotHarness {
             case 1005 -> mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // park the cursor in a corner
             case 1015 -> shot(mc, "19_generator_wireless_status");
             case 1020 -> {
-                // Hover the new Wireless row so its tooltip (the list of linked machines) shows.
+                // Hover the wireless button so its tooltip (the list of linked machines) shows.
                 var window = mc.getWindow();
                 int scale = window.getGuiScale();
                 int left = (window.getGuiScaledWidth() - com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.IMAGE_WIDTH) / 2;
                 int top = (window.getGuiScaledHeight() - com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.IMAGE_HEIGHT) / 2;
-                double mx = (left + com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.PANEL_X + 40) * scale;
-                double my = (top + com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.PANEL_Y
-                        + 7 * com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.ROW_H + 4) * scale;
+                double mx = (left + com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.WIRELESS_X + 8) * scale;
+                double my = (top + com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.WIRELESS_Y + 8) * scale;
                 mc.mouseHandler.onMove(window.handle(), mx, my, 0, 0);
             }
             case 1030 -> shot(mc, "20_generator_wireless_tooltip");

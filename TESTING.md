@@ -43,7 +43,7 @@ In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): t
 
 | `integration_generator_status_lists_wireless_links` | The generator's GUI status lists no machines at first, then both linked machines in order, with their block ids and positions, all active, max 8. With `max_link_distance = 4` the far one is reported inactive. The status (now carrying the machine list) round-trips through its network codec unchanged, with nothing left unread. |
 
-In the real client (`19_generator_wireless_status.png`, `20_generator_wireless_tooltip.png`): the generator screen is one row taller. Its new *Wireless* row reads *2/2 powered (max 8), 250 FE/t*, and hovering it lists *Mechanical Separator at 20, 34, -12* and *Automatic Shears at 24, 34, -12*. The inventory slots still line up with the taller texture. An unlinked generator (`11_generator_gui.png`) shows *no machines (0/8)*.
+In the real client (`19_generator_wireless_status.png`, `20_generator_wireless_tooltip.png`): the generator screen keeps its original size. Under the *Running* lamp is the wireless button with purple signal bars and *2/2* beside it. Hovering it shows *Wireless: 2/2 powered (max 8), 250 FE/t* and lists *Mechanical Separator at 6, 34, -2* and *Automatic Shears at 10, 34, -2*.
 
 In the real client (`17_wireless_power.png`, `18_wireless_separator_gui.png`): a running generator on its own pad is linked to a separator and an Automatic Shears on other pads, and the link particles run to both. The separator started with wool and 0 FE. Five seconds later its screen shows it processing iron wool with 3 Raw Iron already made, all on wireless power.
 

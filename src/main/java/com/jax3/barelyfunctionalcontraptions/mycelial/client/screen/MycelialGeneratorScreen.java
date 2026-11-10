@@ -37,6 +37,8 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
     public static final int TANK_X = 29, TANK_Y = 19;
     public static final int BURN_X = 52, BURN_Y = 38, BURN_W = 16, BURN_H = 14;
     public static final int LAMP_X = 8, LAMP_Y = 112;
+    /** The wireless-power button under the state lamp; hover it for the machines this generator powers. */
+    public static final int WIRELESS_X = 8, WIRELESS_Y = 124, WIRELESS_SIZE = 16;
     public static final int PANEL_X = 78, PANEL_Y = 19, PANEL_W = 170, ROW_H = 11;
     private static final float TEXT_SCALE = 0.75F;
     private static final boolean JEI_LOADED = ModList.get().isLoaded("jei");
@@ -48,7 +50,7 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
     private final List<HoverArea> hoverAreas = new ArrayList<>();
 
     public static final int IMAGE_WIDTH = 256;
-    public static final int IMAGE_HEIGHT = 243;
+    public static final int IMAGE_HEIGHT = 232;
 
     public MycelialGeneratorScreen(MycelialGeneratorMenu menu, Inventory playerInventory, Component title) {
         // Since 26.1 the background size is passed to the constructor (imageWidth/imageHeight are final).
@@ -109,9 +111,24 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
         graphics.fill(x + LAMP_X, y + LAMP_Y, x + LAMP_X + 8, y + LAMP_Y + 8, 0xFF111214);
         graphics.fill(x + LAMP_X + 1, y + LAMP_Y + 1, x + LAMP_X + 7, y + LAMP_Y + 7, lamp);
 
+        // Wireless power button: signal bars, purple while machines are powered, yellow when every link is idle.
+        boolean hovered = mouseX >= x + WIRELESS_X && mouseX < x + WIRELESS_X + WIRELESS_SIZE
+                && mouseY >= y + WIRELESS_Y && mouseY < y + WIRELESS_Y + WIRELESS_SIZE;
+        int bx = x + WIRELESS_X, by = y + WIRELESS_Y;
+        graphics.fill(bx, by, bx + WIRELESS_SIZE, by + WIRELESS_SIZE, 0xFF111214);
+        graphics.fill(bx + 1, by + 1, bx + WIRELESS_SIZE - 1, by + WIRELESS_SIZE - 1, 0xFF202228);
+        graphics.fill(bx + 1, by + 1, bx + WIRELESS_SIZE - 2, by + WIRELESS_SIZE - 2, 0xFF5F6470);
+        graphics.fill(bx + 2, by + 2, bx + WIRELESS_SIZE - 2, by + WIRELESS_SIZE - 2, hovered ? 0xFF4C505B : 0xFF3A3D45);
+        int signal = s.powerLinks().isEmpty() ? 0xFF6A6F7C : s.activePowerLinks() > 0 ? 0xFFB98CFF : 0xFFE3D459;
+        for (int i = 0; i < 3; i++) {
+            int barHeight = 3 + i * 3;
+            int left = bx + 3 + i * 4;
+            graphics.fill(left, by + 13 - barHeight, left + 2, by + 13, signal);
+        }
+
         // Mycelium attempt progress bar
         int barX = x + PANEL_X + 92;
-        int barY = y + PANEL_Y + ROW_H * 9 + 1;
+        int barY = y + PANEL_Y + ROW_H * 8 + 1;
         int barW = PANEL_W - 96;
         graphics.fill(barX, barY, barX + barW, barY + 5, 0xFF111214);
         if (s.myceliumEnabled()) {
@@ -224,7 +241,7 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
                         Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.links", s.manualLinks(), s.maxManualLinks(),
                                 s.activeManualLinks()).withStyle(ChatFormatting.GRAY)));
 
-        // Wireless power (Mycelium Wrench links to machines)
+        // Wireless power (Mycelium Wrench links to machines): shown by hovering the button under the state lamp
         List<Component> wirelessTooltip = new ArrayList<>();
         wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.section.wireless").withStyle(ChatFormatting.AQUA));
         wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.count", s.powerLinks().size(), s.maxPowerLinks())
@@ -249,7 +266,13 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
                 ? Component.translatable("gui.barelyfunctionalcontraptions.wireless.none", s.maxPowerLinks())
                 : Component.translatable("gui.barelyfunctionalcontraptions.wireless.line", s.activePowerLinks(), s.powerLinks().size(),
                         s.maxPowerLinks(), NumberFormatting.compact(Math.round(s.wirelessRate())));
-        row(graphics, 7, "gui.barelyfunctionalcontraptions.section.wireless", wirelessLine, wirelessTooltip);
+        wirelessTooltip.set(0, Component.translatable("gui.barelyfunctionalcontraptions.section.wireless").withStyle(ChatFormatting.AQUA)
+                .append(" ").append(wirelessLine.copy().withStyle(ChatFormatting.WHITE)));
+        hoverAreas.add(new HoverArea(WIRELESS_X, WIRELESS_Y, WIRELESS_SIZE, WIRELESS_SIZE, wirelessTooltip));
+        if (!s.powerLinks().isEmpty()) {
+            drawSmall(graphics, Component.literal(s.activePowerLinks() + "/" + s.powerLinks().size()), WIRELESS_X + WIRELESS_SIZE + 3,
+                    WIRELESS_Y + 5, COLOR_DIM);
+        }
 
         // Mycelium
         List<Component> myceliumTooltip = List.of(
@@ -263,15 +286,15 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
                 Component.translatable("gui.barelyfunctionalcontraptions.tooltip.mycelium.rule").withStyle(ChatFormatting.DARK_GRAY),
                 Component.translatable("gui.barelyfunctionalcontraptions.tooltip.mycelium.huge").withStyle(ChatFormatting.DARK_GRAY));
         if (s.myceliumEnabled()) {
-            row(graphics, 8, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.line",
+            row(graphics, 7, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.line",
                     NumberFormatting.percent(s.chance()), NumberFormatting.percent(s.chanceIncrease())), myceliumTooltip);
-            row(graphics, 9, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.next"), myceliumTooltip);
+            row(graphics, 8, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.next"), myceliumTooltip);
             if (s.trackConversions()) {
-                row(graphics, 10, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.converted_huge",
+                row(graphics, 9, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.converted_huge",
                         NumberFormatting.grouped(s.converted()), NumberFormatting.grouped(s.hugeMushrooms())), myceliumTooltip);
             }
         } else {
-            row(graphics, 8, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.disabled"),
+            row(graphics, 7, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.disabled"),
                     myceliumTooltip);
         }
     }
