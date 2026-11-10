@@ -108,6 +108,7 @@ public final class ModGameTests {
         TESTS.put("fluid_reservoir_needs_infinite_source", ModGameTests::reservoirNeedsInfiniteSource);
         TESTS.put("fluid_reservoir_buckets_and_pipes", ModGameTests::reservoirBucketsAndPipes);
         TESTS.put("fluid_reservoir_config_rate_and_size", ModGameTests::reservoirConfig);
+        TESTS.put("infused_sheep_grow_resource_blocks", ModGameTests::growthBlocks);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -1097,6 +1098,31 @@ public final class ModGameTests {
         } finally {
             ModConfigs.SERVER.reservoirWaterPerSecond.set(oldRate);
             ModConfigs.SERVER.reservoirCapacity.set(oldCapacity);
+        }
+        h.succeed();
+    }
+
+    /** Infused sheep show blocks of their resource in the fleece, not flat items. */
+    private static void growthBlocks(GameTestHelper h) {
+        var registry = SheepResourceRegistry.server();
+        java.util.Map<String, net.minecraft.world.item.Item> expected = java.util.Map.ofEntries(
+                java.util.Map.<String, net.minecraft.world.item.Item>entry("iron", Items.IRON_BLOCK), java.util.Map.<String, net.minecraft.world.item.Item>entry("gold", Items.GOLD_BLOCK),
+                java.util.Map.<String, net.minecraft.world.item.Item>entry("copper", net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace("copper_block"))), java.util.Map.<String, net.minecraft.world.item.Item>entry("diamond", Items.DIAMOND_BLOCK),
+                java.util.Map.<String, net.minecraft.world.item.Item>entry("emerald", Items.EMERALD_BLOCK), java.util.Map.<String, net.minecraft.world.item.Item>entry("redstone", Items.REDSTONE_BLOCK),
+                java.util.Map.<String, net.minecraft.world.item.Item>entry("lapis", Items.LAPIS_BLOCK), java.util.Map.<String, net.minecraft.world.item.Item>entry("coal", Items.COAL_BLOCK),
+                java.util.Map.<String, net.minecraft.world.item.Item>entry("netherite", Items.ANCIENT_DEBRIS), java.util.Map.<String, net.minecraft.world.item.Item>entry("stone", Items.COBBLESTONE),
+                java.util.Map.<String, net.minecraft.world.item.Item>entry("wood", Items.OAK_LOG), java.util.Map.<String, net.minecraft.world.item.Item>entry("quartz", Items.QUARTZ_BLOCK),
+                java.util.Map.<String, net.minecraft.world.item.Item>entry("red_mushroom", Items.RED_MUSHROOM_BLOCK), java.util.Map.<String, net.minecraft.world.item.Item>entry("brown_mushroom", Items.BROWN_MUSHROOM_BLOCK));
+        expected.forEach((name, item) -> {
+            ItemStack growth = registry.byId(ResourcefulSheep.id(name)).orElseThrow().growthStack();
+            h.assertTrue(growth.is(item), name + " should grow " + item + ", grows " + growth);
+        });
+        for (SheepResource resource : registry.all()) {
+            ItemStack growth = resource.growthStack();
+            if (!growth.isEmpty() && !(growth.getItem() instanceof net.minecraft.world.item.BlockItem)) {
+                // Only allowed when the resource's item has no block form at all.
+                h.assertTrue(SheepResource.blockForm(growth.getItem()).isEmpty(), resource.id() + " grows a flat item " + growth);
+            }
         }
         h.succeed();
     }

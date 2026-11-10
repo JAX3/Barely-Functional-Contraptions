@@ -40,7 +40,7 @@ import net.minecraft.world.item.crafting.Ingredient;
  * @param woolDropCount infused wool dropped per shearing
  * @param infusionUses  number of shearings one feeding lasts (before the global multiplier)
  * @param separator     how the Mechanical Separator processes this resource's wool
- * @param growthItem    optional item shown growing out of the fleece; defaults to the separator output, then the feeding item
+ * @param growthItem    optional item shown growing out of the fleece; defaults to the storage block of the feeding item or output
  */
 public record SheepResource(
         Identifier id,
@@ -131,15 +131,44 @@ public record SheepResource(
         return Math.max(1, (int) Math.round(base * mult));
     }
 
-    /** Example item to show for the feeding input (first matching item). */
     /**
-     * The physical item that sprouts from an infused sheep's fleece, mooshroom style: {@code growth_item} if set,
-     * else the separator's primary output (Raw Iron, Diamond, Red Mushroom...), else the first feeding item.
+     * What grows out of an infused sheep's fleece, as a cluster of small blocks: {@code growth_item} if set, else the
+     * storage block of the feeding item or the separator output (Iron Ingot -> Block of Iron, Lapis Lazuli -> Block of
+     * Lapis, Raw Iron -> Block of Raw Iron...), else the feeding item or output itself if it is a block (Cobblestone,
+     * Oak Log), else the first feeding item.
      */
     public ItemStack growthStack() {
-        return growthItem.or(separator::primaryOutput).map(ItemStackTemplate::create)
-                .map(stack -> stack.copyWithCount(1))
-                .orElseGet(() -> feedingItem.items().findFirst().map(h -> new ItemStack(h)).orElse(ItemStack.EMPTY));
+        if (growthItem.isPresent()) return growthItem.get().create().copyWithCount(1);
+        Optional<Item> feeding = feedingItem.items().findFirst().map(Holder::value);
+        Optional<Item> output = separator.primaryOutput().map(t -> t.create().getItem());
+        for (Optional<Item> candidate : List.of(feeding, output)) {
+            Optional<Item> block = candidate.flatMap(SheepResource::blockForm);
+            if (block.isPresent()) return new ItemStack(block.get());
+        }
+        return feeding.or(() -> output).map(ItemStack::new).orElse(ItemStack.EMPTY);
+    }
+
+    /** Suffixes dropped when looking for an item's storage block ({@code copper_ingot -> copper_block}). */
+    private static final List<String> BLOCK_SUFFIXES = List.of("_ingot", "_gem", "_dust", "_lazuli", "_scrap", "_ball", "_shard", "_crystal");
+    private static final java.util.Map<Item, Optional<Item>> BLOCK_FORMS = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** The item's {@code <name>_block} storage block if one exists, else the item itself if it places a block. */
+    public static Optional<Item> blockForm(Item item) {
+        return BLOCK_FORMS.computeIfAbsent(item, i -> {
+            Identifier id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(i);
+            java.util.List<String> names = new java.util.ArrayList<>();
+            names.add(id.getPath() + "_block");
+            for (String suffix : BLOCK_SUFFIXES) {
+                if (id.getPath().endsWith(suffix)) names.add(id.getPath().substring(0, id.getPath().length() - suffix.length()) + "_block");
+            }
+            for (String name : names) {
+                Optional<Item> found = net.minecraft.core.registries.BuiltInRegistries.ITEM.getOptional(Identifier.fromNamespaceAndPath(id.getNamespace(), name));
+                if (found.isPresent() && found.get() instanceof net.minecraft.world.item.BlockItem) return found;
+            }
+            // No storage block: the item itself if it places a block (Cobblestone, Oak Log). Checked last because
+            // some dusts place blocks too (Redstone places wire) while still having a proper storage block.
+            return i instanceof net.minecraft.world.item.BlockItem ? Optional.of(i) : Optional.empty();
+        });
     }
 
     public ItemStack exampleFeedingStack() {

@@ -43,7 +43,7 @@ RESOURCES = {
                   wool="#2F55B5", accent="#9DB8FF", energy=12000, ticks=80),
     "coal": dict(display="Coal", feed="minecraft:coal", out="minecraft:coal", cat="material", uses=9,
                  wool="#3A3A3E", accent="#8C8C96", energy=8000, ticks=80),
-    "netherite": dict(display="Netherite", feed="minecraft:netherite_scrap", out="minecraft:netherite_scrap", cat="material", uses=1,
+    "netherite": dict(display="Netherite", growth="minecraft:ancient_debris", feed="minecraft:netherite_scrap", out="minecraft:netherite_scrap", cat="material", uses=1,
                       wool="#4A3E44", accent="#9B6FB0", energy=80000, ticks=200),
     "stone": dict(display="Stone", feed="minecraft:cobblestone", out="minecraft:cobblestone", cat="material", uses=1,
                   wool="#8E8E8E", accent="#B5B5B5", energy=4000, ticks=40),
