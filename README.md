@@ -97,7 +97,7 @@ Generators connect automatically in all six directions. By default only **runnin
 
 A stylized crowbar, in the same art style as the blocks: purple-painted shaft, steel claw and chisel tip.
 
-![Barely Functional Wrench recipe: an amethyst shard top right, iron ingots beside and below it, redstone in the centre, a red mushroom bottom left](docs/screenshots/recipe_mycelium_wrench.png)
+![Barely Functional Wrench recipe: an amethyst shard top right, iron ingots beside and below it, redstone in the centre, an iron ingot bottom left](docs/screenshots/recipe_mycelium_wrench.png)
 
 * **Right-click** a generator to select it. It gets a purple outline while you hold the wrench, and the wrench glints.
 * **Right-click another generator** to link them. Red and white particles run between the two, the action bar confirms the link, and the wrench flashes with the enchantment glint for 2 seconds.
