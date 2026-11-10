@@ -5,13 +5,13 @@
     "B": "minecraft:brown_mushroom",
     "C": "minecraft:cauldron",
     "I": "minecraft:iron_ingot",
-    "R": "minecraft:red_mushroom",
-    "X": "minecraft:redstone"
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
+    "R": "minecraft:red_mushroom"
   },
   "pattern": [
     "IRI",
-    "BCB",
-    "IXI"
+    "BMB",
+    "ICI"
   ],
   "result": {
     "count": 1,

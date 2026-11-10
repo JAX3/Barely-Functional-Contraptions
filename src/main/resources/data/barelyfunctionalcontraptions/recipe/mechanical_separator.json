@@ -6,13 +6,13 @@
     "C": "minecraft:copper_ingot",
     "H": "minecraft:hopper",
     "P": "minecraft:piston",
-    "R": "minecraft:redstone",
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
     "S": "minecraft:shears"
   },
   "pattern": [
     "IHI",
-    "PSP",
-    "CRC"
+    "PMP",
+    "CSC"
   ],
   "result": {
     "id": "barelyfunctionalcontraptions:mechanical_separator"

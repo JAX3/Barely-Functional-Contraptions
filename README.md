@@ -57,6 +57,12 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 |---|---|
 | ![Main creative tab](docs/screenshots/28_creative_tab_main.png) | ![Resource Wool creative tab](docs/screenshots/27_creative_tab_wool.png) |
 
+### Functional Machine Block
+
+Every machine is built around a **Functional Machine Block**: the blue-steel casing of the machines on its own, with corner bolts and an empty, unlit port in the middle. Craft it from 4 iron ingots, 4 copper ingots and 1 redstone, then put one in the recipe of the Mycelial Generator, Mechanical Separator, Automatic Shears, Fluid Reservoir or Hume Energy Cube. It can also be placed as a decorative block (stone pickaxe, drops itself).
+
+![Functional Machine Block recipe: iron ingots in the corners, copper ingots on each side, redstone in the centre](docs/screenshots/recipe_functional_machine_block.png)
+
 **Placing machines:** the Mycelial Generator, Mechanical Separator and Automatic Shears place with their front facing you. **Hold Shift while placing** to make the front face away from you instead (handy for pointing the shears at a pen from outside it, or the separator's back at a cable).
 
 ---
@@ -65,7 +71,7 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 
 ### Crafting
 
-![Mycelial Generator recipe: iron ingots in the corners, a red mushroom top middle, brown mushrooms left and right, a cauldron in the centre, redstone bottom middle](docs/screenshots/recipe_mycelial_generator.png)
+![Mycelial Generator recipe: iron ingots in the corners, a red mushroom top middle, brown mushrooms left and right, a Functional Machine Block in the centre, a cauldron bottom middle](docs/screenshots/recipe_mycelial_generator.png)
 
 The generator is mined with any pickaxe and drops itself. Its inventory is dropped when it is broken.
 
@@ -189,7 +195,7 @@ Put the wool into a **Mechanical Separator** and supply Forge Energy (FE).
 **Balance:** every wool separates into **2–4** of its resource (3 on average). With the default of 100 shearings per feeding, one Iron Ingot yields about 300 Raw Iron and one Diamond about 300 Diamonds, so infused sheep **multiply** resources a lot. (With `infusionUsesOverride = -1`, one Iron Ingot gives about 27 Raw Iron and one Diamond about 3 Diamonds.) The cost is the shearing time and the machine's energy. To tone it down, lower `primaryOutputMultiplier` (e.g. `0.34` brings it back to about 1 per wool), lower `infusionUsesOverride` (or set it to `-1`) or `infusionUsesMultiplier`, or set `primary_count` per resource.
 
 ### Crafting the separator
-![Mechanical Separator recipe: iron ingots and a hopper on top, pistons either side of shears in the middle, copper ingots and redstone along the bottom](docs/screenshots/recipe_mechanical_separator.png)
+![Mechanical Separator recipe: iron ingots and a hopper on top, pistons either side of a Functional Machine Block in the middle, copper ingots either side of shears along the bottom](docs/screenshots/recipe_mechanical_separator.png)
 - Requires a stone pickaxe or better.
 - Hardness 3.5, blast resistance 6.
 - When broken, it keeps its stored energy and redstone mode.
@@ -210,7 +216,7 @@ An FE-powered machine that shears sheep for you and keeps the wool.
 - **Which mobs:** only those in the entity tag `#barelyfunctionalcontraptions:auto_shearable`, which is sheep by default. It never turns a mooshroom into a cow or takes a snow golem's pumpkin.
 - Its shears never wear out. Mine it with a stone pickaxe or better. When broken it keeps its stored energy and redstone mode, like the separator, and its wool drops on the ground.
 
-![Automatic Shears recipe: iron ingots in the corners, shears top, left and right, redstone in the centre, a chest bottom middle](docs/screenshots/recipe_automatic_shears.png)
+![Automatic Shears recipe: iron ingots in the corners, shears top, left and right, a Functional Machine Block in the centre, a chest bottom middle](docs/screenshots/recipe_automatic_shears.png)
 
 | GUI |
 |---|
@@ -235,7 +241,7 @@ A water source for your machines. Put it **directly on top of an infinite water 
 - **GUI:** right-click with an empty hand. It shows a water gauge with a mark per bucket, the stored amount, the bucket slots, and a status lamp: *Filling*, *Tank Full*, *Source Not Infinite* or *No Water Source*. Hover over things for details.
 - Mine it with a stone pickaxe or better. The water in it is lost when it's broken.
 
-![Fluid Reservoir recipe: iron ingots in the corners, glass on the top and sides, a bucket in the centre, a cauldron bottom middle](docs/screenshots/recipe_fluid_reservoir.png)
+![Fluid Reservoir recipe: iron ingots in the corners, a bucket top middle, glass either side of a Functional Machine Block, a cauldron bottom middle](docs/screenshots/recipe_fluid_reservoir.png)
 
 Any glass block works.
 
@@ -269,7 +275,7 @@ Any shape works, not just full boxes. L-shapes, rings and walls with bends get p
 - **Wireless:** a Mycelial Generator can charge a cube from a distance with the Barely Functional Wrench, like the other machines.
 - Groups are limited to 64 cubes (`maxGroupSize`); extra cubes form another group. Mine it with a stone pickaxe or better.
 
-![Hume Energy Cube recipe: iron ingots in the corners, amethyst shards on the top and sides, a block of redstone in the centre, a furnace bottom middle](docs/screenshots/recipe_hume_energy_cube.png)
+![Hume Energy Cube recipe: iron ingots in the corners, amethyst shards on the top and sides, a block of redstone in the centre, a Functional Machine Block bottom middle](docs/screenshots/recipe_hume_energy_cube.png)
 
 ### Creative Generator (testing)
 An endless power source for creative mode, for testing builds without setting up mushroom farms. It's a slate block with a pulsing magenta energy core on every side, and it glows in the dark.

@@ -15,6 +15,8 @@ public final class ModItems {
      */
     public static final DeferredItem<ResourceWoolItem> RESOURCE_WOOL = REGISTER.registerItem("resource_wool", ResourceWoolItem::new);
 
+    public static final DeferredItem<BlockItem> FUNCTIONAL_MACHINE_BLOCK = REGISTER.registerSimpleBlockItem(ModBlocks.FUNCTIONAL_MACHINE_BLOCK);
+
     public static final DeferredItem<BlockItem> MECHANICAL_SEPARATOR = REGISTER.registerSimpleBlockItem(ModBlocks.MECHANICAL_SEPARATOR);
 
     public static final DeferredItem<BlockItem> AUTOMATIC_SHEARS = REGISTER.registerSimpleBlockItem(ModBlocks.AUTOMATIC_SHEARS);

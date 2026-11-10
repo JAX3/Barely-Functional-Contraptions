@@ -4,12 +4,12 @@
   "key": {
     "I": "minecraft:iron_ingot",
     "S": "minecraft:shears",
-    "R": "minecraft:redstone",
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
     "C": "minecraft:chest"
   },
   "pattern": [
     "ISI",
-    "SRS",
+    "SMS",
     "ICI"
   ],
   "result": {

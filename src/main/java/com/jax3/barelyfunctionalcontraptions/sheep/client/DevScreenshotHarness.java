@@ -245,25 +245,25 @@ public final class DevScreenshotHarness {
                     String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 150 35", cubeBase.getX() + 7.0, cubeBase.getY() + 3, cubeBase.getZ() + 17.0)));
             case 1185 -> shot(mc, "25_energy_cube_folds");
             // Crafting recipes, shown in a real crafting table: one every 25 ticks.
-            case 1190, 1215, 1240, 1265, 1290, 1315 -> {
+            case 1190, 1215, 1240, 1265, 1290, 1315, 1340 -> {
                 int index = (tick - 1190) / 25;
                 if (index > 0) mc.player.closeContainer();
                 setHudHidden(mc, false);
                 server.execute(() -> showRecipe(server, RECIPES[index]));
             }
-            case 1210, 1235, 1260, 1285, 1310, 1335 -> shot(mc, "recipe_" + RECIPES[(tick - 1210) / 25]);
-            case 1340 -> {
+            case 1210, 1235, 1260, 1285, 1310, 1335, 1360 -> shot(mc, "recipe_" + RECIPES[(tick - 1210) / 25]);
+            case 1365 -> {
                 mc.player.closeContainer();
                 setHudHidden(mc, true);
                 server.execute(() -> creativeScene(server));
             }
-            case 1385 -> shot(mc, "26_creative_generator");
-            case 1388 -> command(server, "gamemode creative @a");
-            case 1395 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get());
-            case 1410 -> shot(mc, "27_creative_tab_wool");
-            case 1415 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.MAIN.get());
-            case 1430 -> shot(mc, "28_creative_tab_main");
-            case 1435 -> {
+            case 1410 -> shot(mc, "26_creative_generator");
+            case 1413 -> command(server, "gamemode creative @a");
+            case 1420 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get());
+            case 1435 -> shot(mc, "27_creative_tab_wool");
+            case 1440 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.MAIN.get());
+            case 1455 -> shot(mc, "28_creative_tab_main");
+            case 1460 -> {
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
@@ -372,7 +372,7 @@ public final class DevScreenshotHarness {
     }
 
     /** The crafted contraptions, in the order the README shows them. */
-    private static final String[] RECIPES = {"mycelial_generator", "mycelium_wrench", "mechanical_separator",
+    private static final String[] RECIPES = {"functional_machine_block", "mycelial_generator", "mycelium_wrench", "mechanical_separator",
             "automatic_shears", "fluid_reservoir", "hume_energy_cube"};
 
     /**

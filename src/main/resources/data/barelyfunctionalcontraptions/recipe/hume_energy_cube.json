@@ -5,12 +5,12 @@
     "I": "minecraft:iron_ingot",
     "R": "minecraft:redstone_block",
     "A": "minecraft:amethyst_shard",
-    "F": "minecraft:furnace"
+    "M": "barelyfunctionalcontraptions:functional_machine_block"
   },
   "pattern": [
     "IAI",
     "ARA",
-    "IFI"
+    "IMI"
   ],
   "result": {
     "id": "barelyfunctionalcontraptions:hume_energy_cube"
