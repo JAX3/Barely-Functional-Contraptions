@@ -48,7 +48,7 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
     private final List<HoverArea> hoverAreas = new ArrayList<>();
 
     public static final int IMAGE_WIDTH = 256;
-    public static final int IMAGE_HEIGHT = 232;
+    public static final int IMAGE_HEIGHT = 243;
 
     public MycelialGeneratorScreen(MycelialGeneratorMenu menu, Inventory playerInventory, Component title) {
         // Since 26.1 the background size is passed to the constructor (imageWidth/imageHeight are final).
@@ -111,7 +111,7 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
 
         // Mycelium attempt progress bar
         int barX = x + PANEL_X + 92;
-        int barY = y + PANEL_Y + ROW_H * 8 + 1;
+        int barY = y + PANEL_Y + ROW_H * 9 + 1;
         int barW = PANEL_W - 96;
         graphics.fill(barX, barY, barX + barW, barY + 5, 0xFF111214);
         if (s.myceliumEnabled()) {
@@ -224,6 +224,33 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
                         Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.links", s.manualLinks(), s.maxManualLinks(),
                                 s.activeManualLinks()).withStyle(ChatFormatting.GRAY)));
 
+        // Wireless power (Mycelium Wrench links to machines)
+        List<Component> wirelessTooltip = new ArrayList<>();
+        wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.section.wireless").withStyle(ChatFormatting.AQUA));
+        wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.count", s.powerLinks().size(), s.maxPowerLinks())
+                .withStyle(ChatFormatting.GRAY));
+        if (!s.powerLinks().isEmpty()) {
+            wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.rate", NumberFormatting.decimal(s.wirelessRate()))
+                    .withStyle(ChatFormatting.GRAY));
+        }
+        for (GeneratorStatus.PowerLink link : s.powerLinks()) {
+            Component name = link.blockId().isEmpty() ? Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.unknown")
+                    : blockName(link.blockId());
+            Component where = Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.machine", name,
+                    link.pos().getX(), link.pos().getY(), link.pos().getZ());
+            wirelessTooltip.add(link.active()
+                    ? Component.literal(" \u2022 ").append(where).withStyle(ChatFormatting.WHITE)
+                    : Component.literal(" \u2022 ").append(where).append(" ")
+                            .append(Component.translatable(link.blockId().isEmpty() ? "gui.barelyfunctionalcontraptions.tooltip.wireless.unloaded"
+                                    : "gui.barelyfunctionalcontraptions.tooltip.wireless.inactive")).withStyle(ChatFormatting.DARK_GRAY));
+        }
+        wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.howto").withStyle(ChatFormatting.DARK_GRAY));
+        Component wirelessLine = s.powerLinks().isEmpty()
+                ? Component.translatable("gui.barelyfunctionalcontraptions.wireless.none", s.maxPowerLinks())
+                : Component.translatable("gui.barelyfunctionalcontraptions.wireless.line", s.activePowerLinks(), s.powerLinks().size(),
+                        s.maxPowerLinks(), NumberFormatting.compact(Math.round(s.wirelessRate())));
+        row(graphics, 7, "gui.barelyfunctionalcontraptions.section.wireless", wirelessLine, wirelessTooltip);
+
         // Mycelium
         List<Component> myceliumTooltip = List.of(
                 Component.translatable("gui.barelyfunctionalcontraptions.section.mycelium").withStyle(ChatFormatting.DARK_GREEN),
@@ -236,15 +263,15 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
                 Component.translatable("gui.barelyfunctionalcontraptions.tooltip.mycelium.rule").withStyle(ChatFormatting.DARK_GRAY),
                 Component.translatable("gui.barelyfunctionalcontraptions.tooltip.mycelium.huge").withStyle(ChatFormatting.DARK_GRAY));
         if (s.myceliumEnabled()) {
-            row(graphics, 7, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.line",
+            row(graphics, 8, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.line",
                     NumberFormatting.percent(s.chance()), NumberFormatting.percent(s.chanceIncrease())), myceliumTooltip);
-            row(graphics, 8, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.next"), myceliumTooltip);
+            row(graphics, 9, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.next"), myceliumTooltip);
             if (s.trackConversions()) {
-                row(graphics, 9, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.converted_huge",
+                row(graphics, 10, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.converted_huge",
                         NumberFormatting.grouped(s.converted()), NumberFormatting.grouped(s.hugeMushrooms())), myceliumTooltip);
             }
         } else {
-            row(graphics, 7, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.disabled"),
+            row(graphics, 8, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.disabled"),
                     myceliumTooltip);
         }
     }
@@ -306,6 +333,11 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
         }
         Item item = BuiltInRegistries.ITEM.getValue(id);
         return new ItemStack(item).getHoverName();
+    }
+
+    private static Component blockName(String blockId) {
+        Identifier id = Identifier.tryParse(blockId);
+        return id == null ? Component.literal(blockId) : BuiltInRegistries.BLOCK.getValue(id).getName();
     }
 
     private static Component fluidName(String fluidId) {

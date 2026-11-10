@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 62 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 37 Resourceful Sheep, 9 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 18 screenshots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 63 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 37 Resourceful Sheep, 10 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 20 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -40,6 +40,10 @@ In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): t
 | `integration_wireless_power_to_separator_and_shears` | A running generator in one corner, linked to a separator and an Automatic Shears that it doesn't touch, powers both: the separator turns iron wool into Raw Iron and the shears shear a sheep. The links work in either order. (The first version of this test caught a bug: the first machine took the whole buffer and the shears got nothing. Energy is now shared evenly.) |
 | `integration_wrench_links_machines` | With the wrench item: clicking the separator selects it (handled before its GUI would open), clicking the generator links them, the selection clears, and no generator-network link is made. Shift-clicking the separator removes the link. |
 | `integration_wireless_link_rules` | Two machines can't be linked. A machine 8.5 blocks away is *too far* with `max_link_distance = 4`. Duplicate links are refused, and `max_power_links_per_generator = 1` blocks a second machine. Breaking the linked separator removes the link the next time the generator sends power. |
+
+| `integration_generator_status_lists_wireless_links` | The generator's GUI status lists no machines at first, then both linked machines in order, with their block ids and positions, all active, max 8. With `max_link_distance = 4` the far one is reported inactive. The status (now carrying the machine list) round-trips through its network codec unchanged, with nothing left unread. |
+
+In the real client (`19_generator_wireless_status.png`, `20_generator_wireless_tooltip.png`): the generator screen is one row taller. Its new *Wireless* row reads *2/2 powered (max 8), 250 FE/t*, and hovering it lists *Mechanical Separator at 20, 34, -12* and *Automatic Shears at 24, 34, -12*. The inventory slots still line up with the taller texture. An unlinked generator (`11_generator_gui.png`) shows *no machines (0/8)*.
 
 In the real client (`17_wireless_power.png`, `18_wireless_separator_gui.png`): a running generator on its own pad is linked to a separator and an Automatic Shears on other pads, and the link particles run to both. The separator started with wool and 0 FE. Five seconds later its screen shows it processing iron wool with 3 Raw Iron already made, all on wireless power.
 

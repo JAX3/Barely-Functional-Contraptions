@@ -116,10 +116,15 @@ The wrench can also power a **Mechanical Separator** or **Automatic Shears** fro
 * Right-clicking a machine with the wrench selects it instead of opening its GUI.
 * Breaking the machine or the generator removes the link. Links are saved with the world, and they only carry power while both blocks are loaded.
 * Which machines can be powered is the block tag `#barelyfunctionalcontraptions:wireless_power_receivers`. A data pack can add other mods' FE machines to it.
+* **Generator screen:** a **Wireless** row in the status panel shows how many machines the generator powers, how many of them are getting power right now, the limit, and the FE/t it is sending them, e.g. *2/2 powered (max 8), 250 FE/t*. Hover over it for the list of machines with their positions. Machines in unloaded chunks are marked *(not loaded)*, and links a lowered range limit no longer allows are marked *(inactive)*.
 
 | Linking a generator to two machines | The separator running on wireless power only |
 |---|---|
 | ![Wireless power](docs/screenshots/17_wireless_power.png) | ![Separator on wireless power](docs/screenshots/18_wireless_separator_gui.png) |
+
+| The generator's Wireless row | Hovering it lists the machines |
+|---|---|
+| ![Generator status](docs/screenshots/19_generator_wireless_status.png) | ![Wireless tooltip](docs/screenshots/20_generator_wireless_tooltip.png) |
 
 ### Mycelium
 

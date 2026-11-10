@@ -182,7 +182,30 @@ public final class DevScreenshotHarness {
             case 866 -> shot(mc, "17_wireless_power");
             case 960 -> server.execute(() -> openWirelessSeparator(server));
             case 990 -> shot(mc, "18_wireless_separator_gui");
-            case 1000 -> {
+            case 995 -> {
+                mc.player.closeContainer();
+                server.execute(() -> {
+                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                    if (player.level().getBlockEntity(wirelessBase) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity be) {
+                        player.openMenu(be, buf -> buf.writeBlockPos(wirelessBase));
+                    }
+                });
+            }
+            case 1005 -> mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // park the cursor in a corner
+            case 1015 -> shot(mc, "19_generator_wireless_status");
+            case 1020 -> {
+                // Hover the new Wireless row so its tooltip (the list of linked machines) shows.
+                var window = mc.getWindow();
+                int scale = window.getGuiScale();
+                int left = (window.getGuiScaledWidth() - com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.IMAGE_WIDTH) / 2;
+                int top = (window.getGuiScaledHeight() - com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.IMAGE_HEIGHT) / 2;
+                double mx = (left + com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.PANEL_X + 40) * scale;
+                double my = (top + com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.PANEL_Y
+                        + 7 * com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.ROW_H + 4) * scale;
+                mc.mouseHandler.onMove(window.handle(), mx, my, 0, 0);
+            }
+            case 1030 -> shot(mc, "20_generator_wireless_tooltip");
+            case 1040 -> {
                 mc.player.closeContainer();
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());

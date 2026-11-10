@@ -1,5 +1,8 @@
 package com.jax3.barelyfunctionalcontraptions.mycelial.menu;
 
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
@@ -15,10 +18,23 @@ public record GeneratorStatus(
         boolean myceliumEnabled, double chance, double chanceIncrease, int attemptProgress, int attemptInterval,
         int converted, boolean trackConversions,
         int state, int manualLinks, int activeManualLinks, int maxManualLinks, int connectionType,
-        int hugeMushrooms) {
+        int hugeMushrooms,
+        List<PowerLink> powerLinks, int maxPowerLinks, double wirelessRate) {
+
+    /**
+     * One machine this generator powers wirelessly: its block id ("" when its chunk is not loaded), position, and
+     * whether the link carries power right now (loaded, still a machine, within range).
+     */
+    public record PowerLink(String blockId, BlockPos pos, boolean active) {}
 
     public static final GeneratorStatus EMPTY = new GeneratorStatus(0, 1, 0, false, 0, "", 0, 1, 0, 20, "", 0, 0,
-            1, 0, 1, 0, 1, 64, false, 0, 0, 0, 100, 0, false, 1, 0, 0, 8, 0, 0);
+            1, 0, 1, 0, 1, 64, false, 0, 0, 0, 100, 0, false, 1, 0, 0, 8, 0, 0, List.of(), 8, 0);
+
+    public int activePowerLinks() {
+        int count = 0;
+        for (PowerLink link : powerLinks) if (link.active()) count++;
+        return count;
+    }
 
     public static final StreamCodec<FriendlyByteBuf, GeneratorStatus> STREAM_CODEC = StreamCodec.of(
             (buf, s) -> s.write(buf), GeneratorStatus::read);
@@ -56,9 +72,18 @@ public record GeneratorStatus(
         buf.writeVarInt(maxManualLinks);
         buf.writeVarInt(connectionType);
         buf.writeVarInt(hugeMushrooms);
+        buf.writeVarInt(powerLinks.size());
+        for (PowerLink link : powerLinks) {
+            buf.writeUtf(link.blockId(), 256);
+            buf.writeBlockPos(link.pos());
+            buf.writeBoolean(link.active());
+        }
+        buf.writeVarInt(maxPowerLinks);
+        buf.writeDouble(wirelessRate);
     }
 
     private static GeneratorStatus read(FriendlyByteBuf buf) {
+        // Arguments are evaluated left to right, so the fields are read in the order they were written.
         return new GeneratorStatus(
                 buf.readVarInt(), buf.readVarInt(), buf.readDouble(), buf.readBoolean(), buf.readDouble(),
                 buf.readUtf(256), buf.readVarInt(), buf.readVarInt(), buf.readDouble(), buf.readVarInt(),
@@ -67,6 +92,16 @@ public record GeneratorStatus(
                 buf.readBoolean(), buf.readDouble(), buf.readDouble(), buf.readVarInt(), buf.readVarInt(),
                 buf.readVarInt(), buf.readBoolean(),
                 buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
-                buf.readVarInt());
+                buf.readVarInt(),
+                readPowerLinks(buf), buf.readVarInt(), buf.readDouble());
+    }
+
+    private static List<PowerLink> readPowerLinks(FriendlyByteBuf buf) {
+        int count = Math.min(buf.readVarInt(), 256);
+        List<PowerLink> links = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            links.add(new PowerLink(buf.readUtf(256), buf.readBlockPos(), buf.readBoolean()));
+        }
+        return List.copyOf(links);
     }
 }

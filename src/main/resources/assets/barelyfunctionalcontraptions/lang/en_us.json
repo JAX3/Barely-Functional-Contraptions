@@ -418,5 +418,15 @@
   "message.barelyfunctionalcontraptions.power.unlinked": "Removed %s wireless power link(s)",
   "message.barelyfunctionalcontraptions.power.no_links": "This machine has no wireless power links",
   "item.barelyfunctionalcontraptions.mycelium_wrench.help.power": "Generator, then a Mechanical Separator or Automatic Shears (or the other way round): powers it wirelessly",
-  "barelyfunctionalcontraptions.configuration.max_power_links_per_generator": "Max machines powered per generator"
+  "barelyfunctionalcontraptions.configuration.max_power_links_per_generator": "Max machines powered per generator",
+  "gui.barelyfunctionalcontraptions.section.wireless": "Wireless:",
+  "gui.barelyfunctionalcontraptions.wireless.none": "no machines (0/%s)",
+  "gui.barelyfunctionalcontraptions.wireless.line": "%s/%s powered (max %s), %s FE/t",
+  "gui.barelyfunctionalcontraptions.tooltip.wireless.count": "Powers %s of up to %s machines wirelessly",
+  "gui.barelyfunctionalcontraptions.tooltip.wireless.rate": "Sending %s FE/t over wireless links",
+  "gui.barelyfunctionalcontraptions.tooltip.wireless.machine": "%s at %s, %s, %s",
+  "gui.barelyfunctionalcontraptions.tooltip.wireless.unknown": "Machine",
+  "gui.barelyfunctionalcontraptions.tooltip.wireless.unloaded": "(not loaded)",
+  "gui.barelyfunctionalcontraptions.tooltip.wireless.inactive": "(inactive: out of range or wrench disabled)",
+  "gui.barelyfunctionalcontraptions.tooltip.wireless.howto": "Link with the Mycelium Wrench: this generator, then a Mechanical Separator or Automatic Shears"
 }

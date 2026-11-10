@@ -84,6 +84,12 @@ public final class PowerLinking {
                 ServerConfig.get(ServerConfig.MAX_LINK_DISTANCE));
     }
 
+    /** Whether a link would carry power right now: wrench enabled, same dimension, loaded, still a machine, in range. */
+    public static boolean isActive(ServerLevel level, GlobalPos generator, GlobalPos machine) {
+        return ServerConfig.get(ServerConfig.WRENCH_ENABLED) && machine.dimension().equals(level.dimension())
+                && level.isLoaded(machine.pos()) && isReceiver(level, machine.pos()) && withinDistance(generator, machine);
+    }
+
     /** Removes every wireless power link of a generator or machine. Returns how many were removed. */
     public static int unlinkAll(MinecraftServer server, GlobalPos pos) {
         return PowerLinkData.get(server).removeAll(pos);
