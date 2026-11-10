@@ -244,7 +244,16 @@ public final class DevScreenshotHarness {
             case 1167 -> server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                     String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 150 35", cubeBase.getX() + 7.0, cubeBase.getY() + 3, cubeBase.getZ() + 17.0)));
             case 1185 -> shot(mc, "25_energy_cube_folds");
-            case 1190 -> {
+            // Crafting recipes, shown in a real crafting table: one every 25 ticks.
+            case 1190, 1215, 1240, 1265, 1290, 1315 -> {
+                int index = (tick - 1190) / 25;
+                if (index > 0) mc.player.closeContainer();
+                setHudHidden(mc, false);
+                server.execute(() -> showRecipe(server, RECIPES[index]));
+            }
+            case 1210, 1235, 1260, 1285, 1310, 1335 -> shot(mc, "recipe_" + RECIPES[(tick - 1210) / 25]);
+            case 1340 -> {
+                mc.player.closeContainer();
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -336,6 +345,44 @@ public final class DevScreenshotHarness {
         if (player.level().getBlockEntity(reservoirPos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity be) {
             player.openMenu(be, reservoirPos);
         }
+    }
+
+    /** The crafted contraptions, in the order the README shows them. */
+    private static final String[] RECIPES = {"mycelial_generator", "mycelium_wrench", "mechanical_separator",
+            "automatic_shears", "fluid_reservoir", "hume_energy_cube"};
+
+    /**
+     * Opens a crafting table and lays a recipe's ingredients out in its grid from the recipe's own pattern, so the
+     * result slot shows what it makes (exactly what a player would see).
+     */
+    private static void showRecipe(MinecraftServer server, String name) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        player.getInventory().clearContent();
+        BlockPos table = player.blockPosition().above(2);
+        level.setBlock(table, Blocks.CRAFTING_TABLE.defaultBlockState(), 3);
+        var key = net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, ResourcefulSheep.id(name));
+        var holder = server.getRecipeManager().byKey(key).orElse(null);
+        if (holder == null || !(holder.value() instanceof net.minecraft.world.item.crafting.ShapedRecipe recipe)) {
+            ResourcefulSheep.LOGGER.warn("Harness: no shaped recipe {}", key);
+            return;
+        }
+        player.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inventory, p) -> new net.minecraft.world.inventory.CraftingMenu(
+                id, inventory, net.minecraft.world.inventory.ContainerLevelAccess.create(level, table)),
+                net.minecraft.network.chat.Component.translatable("container.crafting")));
+        if (!(player.containerMenu instanceof net.minecraft.world.inventory.CraftingMenu menu)) return;
+        var ingredients = recipe.getIngredients();
+        for (int row = 0; row < recipe.getHeight(); row++) {
+            for (int col = 0; col < recipe.getWidth(); col++) {
+                var ingredient = ingredients.get(row * recipe.getWidth() + col);
+                if (ingredient.isEmpty()) continue;
+                @SuppressWarnings("deprecation")
+                var item = ingredient.get().items().findFirst();
+                int slot = 1 + row * 3 + col; // slot 0 is the result
+                item.ifPresent(holderItem -> menu.getSlot(slot).set(new ItemStack(holderItem)));
+            }
+        }
+        menu.broadcastChanges();
     }
 
     private static BlockPos wirelessBase;

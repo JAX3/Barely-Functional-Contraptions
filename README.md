@@ -46,7 +46,7 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 ## Installation (players and servers)
 
 1. Install NeoForge 26.3.x for Minecraft 26.3.
-2. Put `barelyfunctionalcontraptions-1.0.0.jar` in the `mods/` folder of the client **and** the server.
+2. Put `barelyfunctionalcontraptions-1.5.0.jar` in the `mods/` folder of the client **and** the server.
 3. Optional: install JEI 31.x and/or Jade 26.3.x. The mod runs normally without them.
 
 **Machine fronts:** all three machines share one look. Each has a purple-rimmed glass window on its front: a red mushroom in the generator, a wool block in the separator and a pair of shears in the Automatic Shears. The window is dark while the machine is idle and glows with a pulsing halo and sparkles while it runs. The separator and shears also give off a little light while running.
@@ -55,21 +55,13 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 
 **Placing machines:** the Mycelial Generator, Mechanical Separator and Automatic Shears place with their front facing you. **Hold Shift while placing** to make the front face away from you instead (handy for pointing the shears at a pen from outside it, or the separator's back at a cable).
 
-> **Renamed from "Functional Resources".** The mod ID changed from `functionalresources` to `barelyfunctionalcontraptions`. Blocks, items, wool and infused sheep from worlds made with the old builds don't carry over. Config files are now `config/barelyfunctionalcontraptions-*.toml`, and the command is `/barelyfunctionalcontraptions`. Wool types made with the old generate command live in the old `functionalresources_generated` pack; run `/barelyfunctionalcontraptions generate` again to recreate them.
-
-> Coming from the separate mods? Remove `mycelialpower-*.jar` and `resourcefulsheep-*.jar` first. Everything now lives in the `barelyfunctionalcontraptions` namespace (for example `barelyfunctionalcontraptions:mycelial_generator` and `barelyfunctionalcontraptions:mechanical_separator`), so blocks and items placed with the old standalone mods do not carry over into existing worlds. Data packs that add sheep resources must move from `data/<ns>/resourcefulsheep/sheep_resources/` to `data/<ns>/barelyfunctionalcontraptions/sheep_resources/`. Separator recipes now use the type `barelyfunctionalcontraptions:separating`.
-
 ---
 
 ## Mycelial Power
 
 ### Crafting
 
-```
- I R I      I = Iron Ingot      R = Red Mushroom
- B C B      B = Brown Mushroom  C = Cauldron
- I X I      X = Redstone
-```
+![Mycelial Generator recipe: iron ingots in the corners, a red mushroom top middle, brown mushrooms left and right, a cauldron in the centre, redstone bottom middle](docs/screenshots/recipe_mycelial_generator.png)
 
 The generator is mined with any pickaxe and drops itself. Its inventory is dropped when it is broken.
 
@@ -95,11 +87,7 @@ Generators connect automatically in all six directions. By default only **runnin
 
 A stylized crowbar, in the same art style as the blocks: purple-painted shaft, steel claw and chisel tip. *Previously called the Mycelium Wrench. Only the name changed: its item ID is still `barelyfunctionalcontraptions:mycelium_wrench`, so existing wrenches, recipes and commands keep working.*
 
-```
- . I A      I = Iron Ingot     A = Amethyst Shard
- . X I      X = Redstone Dust  R = Red Mushroom
- R . .
-```
+![Barely Functional Wrench recipe: an amethyst shard top right, iron ingots beside and below it, redstone in the centre, a red mushroom bottom left](docs/screenshots/recipe_mycelium_wrench.png)
 
 * **Right-click** a generator to select it. It gets a purple outline while you hold the wrench, and the wrench glints.
 * **Right-click another generator** to link them. Red and white particles run between the two, the action bar confirms the link, and the wrench flashes with the enchantment glint for 2 seconds.
@@ -195,11 +183,7 @@ Put the wool into a **Mechanical Separator** and supply Forge Energy (FE).
 **Balance:** every wool separates into **2–4** of its resource (3 on average). With the default of 100 shearings per feeding, one Iron Ingot yields about 300 Raw Iron and one Diamond about 300 Diamonds, so infused sheep **multiply** resources a lot. (With `infusionUsesOverride = -1`, one Iron Ingot gives about 27 Raw Iron and one Diamond about 3 Diamonds.) The cost is the shearing time and the machine's energy. To tone it down, lower `primaryOutputMultiplier` (e.g. `0.34` brings it back to about 1 per wool), lower `infusionUsesOverride` (or set it to `-1`) or `infusionUsesMultiplier`, or set `primary_count` per resource.
 
 ### Crafting the separator
-```
-I H I      I = Iron Ingot     H = Hopper
-P S P      P = Piston         S = Shears
-C R C      C = Copper Ingot   R = Redstone
-```
+![Mechanical Separator recipe: iron ingots and a hopper on top, pistons either side of shears in the middle, copper ingots and redstone along the bottom](docs/screenshots/recipe_mechanical_separator.png)
 - Requires a stone pickaxe or better.
 - Hardness 3.5, blast resistance 6.
 - When broken, it keeps its stored energy and redstone mode.
@@ -220,11 +204,7 @@ An FE-powered machine that shears sheep for you and keeps the wool.
 - **Which mobs:** only those in the entity tag `#barelyfunctionalcontraptions:auto_shearable`, which is sheep by default. It never turns a mooshroom into a cow or takes a snow golem's pumpkin.
 - Its shears never wear out. Mine it with a stone pickaxe or better. When broken it keeps its stored energy and redstone mode, like the separator, and its wool drops on the ground.
 
-```
-I S I      I = Iron Ingot
-S R S      S = Shears
-I C I      R = Redstone Dust   C = Chest
-```
+![Automatic Shears recipe: iron ingots in the corners, shears top, left and right, redstone in the centre, a chest bottom middle](docs/screenshots/recipe_automatic_shears.png)
 
 | GUI |
 |---|
@@ -249,11 +229,9 @@ A water source for your machines. Put it **directly on top of an infinite water 
 - **GUI:** right-click with an empty hand. It shows a water gauge with a mark per bucket, the stored amount, the bucket slots, and a status lamp: *Filling*, *Tank Full*, *Source Not Infinite* or *No Water Source*. Hover over things for details.
 - Mine it with a stone pickaxe or better. The water in it is lost when it's broken.
 
-```
-I G I      I = Iron Ingot     G = Glass (any)
-G B G      B = Bucket
-I C I      C = Cauldron
-```
+![Fluid Reservoir recipe: iron ingots in the corners, glass on the top and sides, a bucket in the centre, a cauldron bottom middle](docs/screenshots/recipe_fluid_reservoir.png)
+
+Any glass block works.
 
 ### Hume Energy Cube
 A Forge Energy battery. FE goes **in and out on every side**, and **cubes that touch join into one bigger battery**: every cube adds to the group's buffer and its transfer rate.
@@ -285,11 +263,7 @@ Any shape works, not just full boxes. L-shapes, rings and walls with bends get p
 - **Wireless:** a Mycelial Generator can charge a cube from a distance with the Barely Functional Wrench, like the other machines.
 - Groups are limited to 64 cubes (`maxGroupSize`); extra cubes form another group. Mine it with a stone pickaxe or better.
 
-```
-I A I      I = Iron Ingot
-A R A      A = Amethyst Shard
-I F I      R = Block of Redstone   F = Furnace
-```
+![Hume Energy Cube recipe: iron ingots in the corners, amethyst shards on the top and sides, a block of redstone in the centre, a furnace bottom middle](docs/screenshots/recipe_hume_energy_cube.png)
 
 ### Creative Generator (testing)
 A creative-only block, found in the Resourceful Sheep creative tab. It has no recipe and can't be broken in survival.
@@ -590,7 +564,7 @@ All four can be edited in-game from *Mods → Barely Functional Contraptions →
 Requires **JDK 25**. Gradle 9 is downloaded by the wrapper.
 
 ```bash
-./gradlew build                          # compiles, runs unit tests, outputs build/libs/barelyfunctionalcontraptions-1.0.0.jar
+./gradlew build                          # compiles, runs unit tests, outputs build/libs/barelyfunctionalcontraptions-1.5.0.jar
 ./gradlew runClient                      # dev client (with JEI and Jade)
 ./gradlew runServer                      # dev dedicated server
 ./gradlew runGameTestServer              # runs every GameTest (both modules + integration) headlessly, then exits

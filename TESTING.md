@@ -6,10 +6,10 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 
 | Check | Command | Result |
 |---|---|---|
-| Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.0.0.jar` |
+| Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
 | In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 72 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 45 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 25 screenshots are in [`docs/screenshots/`](docs/screenshots) |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 25 screenshots and 6 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -107,7 +107,7 @@ An iron-infused sheep (9 uses) is sheared: it drops Iron Wool and has 8 uses lef
 With the default `[generator]` config: Stone Bricks, Raw Iron and Bread are allowed outputs, while the Redstone Torch (wrong tab) and Mushroom Stew (doesn't stack) are not. Diamond Swords and Water Buckets are refused as feeding items. Every definition from `generate all` passes the filter and parses. In vanilla it keeps 13 materials (iron, gold, copper, coal, diamond, emerald, lapis, redstone, netherite, slime → slime ball, wheat, bone meal, dried kelp) and drops resin. An empty tab list allows any tab but still blacklists non-stacking items.
 
 ### What the real client run showed
-* One mod entry, **Barely Functional Contraptions 1.0.0**, with one config button that lists all four config files.
+* One mod entry, **Barely Functional Contraptions 1.5.0**, with one config button that lists all four config files.
 * One creative tab that holds the generator, wrench, separator, creative generator and every wool type, including the two mushroom wools.
 * Infused sheep grow a cluster of small blocks of their resource in the fleece again (the mooshroom-style flat items were reverted): Blocks of Iron, Gold and Diamond, and Red Mushroom Blocks (`01_world_sheep.png`, `07_sheep_closeup.png`). `infused_sheep_grow_resource_blocks` checks the block each built-in resource grows (Iron Ingot → Block of Iron, Lapis Lazuli → Block of Lapis, Redstone → Block of Redstone rather than the wire, Netherite → Ancient Debris, Cobblestone and Oak Log as themselves), and that no loaded resource grows a flat item when a block form exists.
 * The Mycelial Generator GUI shows **+250 FE/t generated, 200 FE/t out**: it is feeding the separator next to it (`11_generator_gui.png`).
@@ -215,7 +215,7 @@ Run `./gradlew runClient -Puse_jei_runtime=false`. The game loads, and the gener
 
 # Resourceful Sheep module: report from the standalone mod
 
-> Recorded before the merge, when the mod id was `resourcefulsheep`. Commands are now `/barelyfunctionalcontraptions …` and the jar is `barelyfunctionalcontraptions-1.0.0.jar`. The test counts above are the current ones.
+> Recorded before the merge, when the mod id was `resourcefulsheep`. Commands are now `/barelyfunctionalcontraptions …` and the jar is `barelyfunctionalcontraptions-1.5.0.jar`. The test counts above are the current ones.
 
 
 Environment:
