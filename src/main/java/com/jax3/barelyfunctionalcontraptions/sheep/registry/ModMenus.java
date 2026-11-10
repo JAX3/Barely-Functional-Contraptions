@@ -18,5 +18,8 @@ public final class ModMenus {
     public static final Supplier<MenuType<AutomaticShearsMenu>> AUTOMATIC_SHEARS = REGISTER.register("automatic_shears",
             () -> IMenuTypeExtension.create(AutomaticShearsMenu::new));
 
+    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.FluidReservoirMenu>> FLUID_RESERVOIR = REGISTER.register("fluid_reservoir",
+            () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.FluidReservoirMenu::new));
+
     private ModMenus() {}
 }

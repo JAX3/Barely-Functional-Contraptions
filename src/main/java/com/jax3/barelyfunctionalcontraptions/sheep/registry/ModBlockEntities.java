@@ -21,5 +21,8 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<CreativeGeneratorBlockEntity>> CREATIVE_GENERATOR = REGISTER.register("creative_generator",
             () -> new BlockEntityType<>(CreativeGeneratorBlockEntity::new, ModBlocks.CREATIVE_GENERATOR.get()));
 
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity>> FLUID_RESERVOIR = REGISTER.register("fluid_reservoir",
+            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity::new, ModBlocks.FLUID_RESERVOIR.get()));
+
     private ModBlockEntities() {}
 }

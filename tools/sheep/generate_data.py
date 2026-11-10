@@ -111,6 +111,9 @@ def item_models():
           {"model": {"type": "minecraft:model", "model": f"{MOD}:block/mechanical_separator"}})
     write(os.path.join(ASSETS, "items", "automatic_shears.json"),
           {"model": {"type": "minecraft:model", "model": f"{MOD}:block/automatic_shears"}})
+    # The item shows the reservoir full of water.
+    write(os.path.join(ASSETS, "items", "fluid_reservoir.json"),
+          {"model": {"type": "minecraft:model", "model": f"{MOD}:block/fluid_reservoir_4"}})
 
 
 def machine_model(prefix, chamber):
@@ -152,6 +155,22 @@ def block_models():
                     v["y"] = rot
                 variants[f"active={active},facing={facing}"] = v
         write(os.path.join(ASSETS, "blockstates", f"{prefix}.json"), {"variants": variants})
+    # Fluid Reservoir: one model per fill level (0..4), the side windows showing the water level.
+    for fill in range(5):
+        write(os.path.join(ASSETS, "models", "block", f"fluid_reservoir_{fill}.json"), {
+            "parent": "minecraft:block/cube",
+            "textures": {
+                "particle": f"{MOD}:block/fluid_reservoir_side_{fill}",
+                "north": f"{MOD}:block/fluid_reservoir_side_{fill}",
+                "south": f"{MOD}:block/fluid_reservoir_side_{fill}",
+                "east": f"{MOD}:block/fluid_reservoir_side_{fill}",
+                "west": f"{MOD}:block/fluid_reservoir_side_{fill}",
+                "up": f"{MOD}:block/fluid_reservoir_top",
+                "down": f"{MOD}:block/fluid_reservoir_bottom",
+            },
+        })
+    write(os.path.join(ASSETS, "blockstates", "fluid_reservoir.json"),
+          {"variants": {f"fill={fill}": {"model": f"{MOD}:block/fluid_reservoir_{fill}"} for fill in range(5)}})
     write(os.path.join(ASSETS, "models", "block", "creative_generator.json"),
           {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/creative_generator"}})
     write(os.path.join(ASSETS, "blockstates", "creative_generator.json"),
@@ -192,6 +211,29 @@ def lang():
         "gui.barelyfunctionalcontraptions.shears.status.redstone_disabled.desc": "Change the redstone signal or mode to run",
         "barelyfunctionalcontraptions.configuration.energyPerShear": "Energy per shear",
         "barelyfunctionalcontraptions.configuration.automatic_shears": "Automatic Shears",
+        "barelyfunctionalcontraptions.configuration.fluid_reservoir": "Fluid Reservoir",
+        "barelyfunctionalcontraptions.configuration.waterPerSecond": "Water per Second (mB)",
+        "barelyfunctionalcontraptions.configuration.capacity": "Tank Capacity (mB)",
+        "barelyfunctionalcontraptions.configuration.requireInfiniteSource": "Require Infinite Source",
+        "barelyfunctionalcontraptions.configuration.outputPerTick": "Push to Neighbours (mB/t)",
+        "block.barelyfunctionalcontraptions.fluid_reservoir": "Fluid Reservoir",
+        "tooltip.barelyfunctionalcontraptions.fluid_reservoir": "Place it on top of an infinite water source to fill its 10-bucket tank. Fills buckets and pushes water into tanks beside it.",
+        "gui.barelyfunctionalcontraptions.reservoir.stored": "%s mB",
+        "gui.barelyfunctionalcontraptions.reservoir.capacity": "of %s mB",
+        "gui.barelyfunctionalcontraptions.reservoir.buckets": "%s buckets",
+        "gui.barelyfunctionalcontraptions.reservoir.rate": "+%s mB/s",
+        "gui.barelyfunctionalcontraptions.reservoir.tank": "Water: %s / %s mB",
+        "gui.barelyfunctionalcontraptions.reservoir.tank.desc": "Take it out with a bucket, pipes, or a tank placed beside or on top",
+        "gui.barelyfunctionalcontraptions.reservoir.buckets_slot": "Empty buckets in the top slot are filled into the bottom slot",
+        "gui.barelyfunctionalcontraptions.reservoir.status.filling": "Filling",
+        "gui.barelyfunctionalcontraptions.reservoir.status.filling.desc": "Drawing water from the infinite source below",
+        "gui.barelyfunctionalcontraptions.reservoir.status.full": "Tank Full",
+        "gui.barelyfunctionalcontraptions.reservoir.status.full.desc": "Take water out to keep filling",
+        "gui.barelyfunctionalcontraptions.reservoir.status.not_infinite": "Source Not Infinite",
+        "gui.barelyfunctionalcontraptions.reservoir.status.not_infinite.desc": "The water below needs at least two water source neighbours (e.g. a 2x2 pool)",
+        "gui.barelyfunctionalcontraptions.reservoir.status.no_source": "No Water Source",
+        "gui.barelyfunctionalcontraptions.reservoir.status.no_source.desc": "Place it directly on top of a water source block",
+        "jade.barelyfunctionalcontraptions.reservoir.water": "Water: %s / %s mB",
         "barelyfunctionalcontraptions.configuration.shearInterval": "Shear interval",
         "tooltip.barelyfunctionalcontraptions.creative_generator": "Infinite Forge Energy for testing. Pushes FE into adjacent machines; cables can also pull from any side.",
         "jei.barelyfunctionalcontraptions.info.creative_generator": "Creative-only. Produces unlimited Forge Energy (FE): every tick it pushes power into all adjacent energy receivers (rate set by creativeGeneratorOutput in the server config), and cables or machines can pull unlimited FE from any side. Place it next to a Mechanical Separator to test without a power setup.",
@@ -341,6 +383,18 @@ def recipes_loot_tags():
         "pattern": ["ISI", "SRS", "ICI"],
         "result": {"id": f"{MOD}:automatic_shears"},
     })
+    write(os.path.join(DATA, MOD, "recipe", "fluid_reservoir.json"), {
+        "type": "minecraft:crafting_shaped",
+        "category": "misc",
+        "key": {
+            "I": "minecraft:iron_ingot",
+            "G": "#c:glass_blocks",
+            "B": "minecraft:bucket",
+            "C": "minecraft:cauldron",
+        },
+        "pattern": ["IGI", "GBG", "ICI"],
+        "result": {"id": f"{MOD}:fluid_reservoir"},
+    })
     # Example explicit separating recipe: plain wool back into string.
     write(os.path.join(DATA, MOD, "recipe", "separating", "wool_to_string.json"), {
         "type": f"{MOD}:separating",
@@ -380,6 +434,19 @@ def recipes_loot_tags():
         }],
         "random_sequence": f"{MOD}:blocks/automatic_shears",
     })
+    write(os.path.join(DATA, MOD, "loot_table", "blocks", "fluid_reservoir.json"), {
+        "type": "minecraft:block",
+        "pools": [{
+            "rolls": 1,
+            "condition": {"type": "minecraft:survives_explosion"},
+            "entries": [{
+                "type": "minecraft:item",
+                "name": f"{MOD}:fluid_reservoir",
+                "modifier": {"type": "minecraft:copy_components", "source": "block_entity", "include": ["minecraft:custom_name"]},
+            }],
+        }],
+        "random_sequence": f"{MOD}:blocks/fluid_reservoir",
+    })
     write(os.path.join(DATA, MOD, "loot_modifiers", "infused_wool.json"), {
         "type": f"{MOD}:infused_wool",
         "table_prefix": "shearing/",
@@ -387,8 +454,8 @@ def recipes_loot_tags():
     write(os.path.join(DATA, MOD, "tags", "entity_type", "infusable.json"), {"values": ["minecraft:sheep"]})
     write(os.path.join(DATA, MOD, "tags", "entity_type", "auto_shearable.json"), {"values": [f"#{MOD}:infusable"]})
     write(os.path.join(DATA, MOD, "tags", "item", "replaceable_wool.json"), {"values": ["#minecraft:wool"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir"]})
 
 
 if __name__ == "__main__":

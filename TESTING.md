@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.0.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 53 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 32 Resourceful Sheep, 5 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 13 screenshots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 57 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 35 Resourceful Sheep, 6 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 16 screenshots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -32,6 +32,17 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 In the real client (`14_machine_fronts.png`): the generator, separator and shears stand side by side, each idle and running. All three have the same raised glass window. The idle separator shows a dim wool block and the idle shears show dim shears on dark glass. The running separator (wool inside, Creative Generator behind) glows violet, and the powered shears glow pink like the running generator. `automatic_shears_need_power` also checks that the shears' `active` state (which lights the window) is off without FE and turns on once it has enough to shear.
 
 In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): the block renders with the shears in its front window, and the three sheep in front of it (gold, diamond and plain) are sheared bald. Its slate-style screen shows the energy gauge and readout (24,000 of 50,000 FE: it started with 30,000 and sheared 3 sheep at 2,000 each), the *Waiting for Sheep* status, the redstone button, and the Gold Wool, Diamond Wool and 2 White Wool it collected.
+
+### Fluid Reservoir
+
+| Test | What it checks |
+|---|---|
+| `fluid_reservoir_fills_over_infinite_source` | On a 2x2 pool it holds 10,000 mB, has 1,500–2,500 mB after 2 seconds (status *Filling*), fills to exactly 10,000 mB and stops there (status *Full*, windows at fill 4). The water source below is still a source. |
+| `fluid_reservoir_needs_infinite_source` | No water is made over a lone source or over two sources in a line (each has only one source neighbour); both report *Source Not Infinite*. One on stone reports *No Water Source*. (Checked that this test fails if one neighbouring source is accepted.) |
+| `fluid_reservoir_buckets_and_pipes` | Two empty buckets in the input slot: one becomes a water bucket in the output slot, using 1,000 mB. Dirt is refused. The fluid capability refuses water poured in but lets 500 mB be taken out. Right-clicking with an empty bucket gives a water bucket and takes another 1,000 mB. |
+| `integration_fluid_reservoir_waters_generator` | A reservoir on a 2x2 pool fills a dry Mycelial Generator beside it with at least 2,000 mB of water. |
+
+In the real client (`15_fluid_reservoir.png`, `16_fluid_reservoir_gui.png`): the reservoir on its pool shows water in its side windows next to a running generator, and a second one on dry stone is half full. The GUI shows the water gauge with bucket marks, *8,610 mB of 10,000 mB*, *8.6 buckets*, *+1,000 mB/s*, the *Filling* lamp, and an empty bucket in the top slot already turned into a water bucket in the bottom slot.
 
 ### JEI: Mechanical Separation lists every wool type
 In the real client, the harness compares JEI with the loaded wool types: `wool types loaded=15, resource wool in JEI list=15, separation recipes=16 (with resource wool input=15), missing from JEI list=[]`. That's the 14 built-in types plus the Amethyst type the harness generates, and the extra recipe is plain wool → string. The category now uses one compact row per wool type, sorted by name, with explicit recipes last. In the 1280×720 test client that's 4 per page (4 pages) instead of 1 per page (16 pages); see `06_jei_separation.png`.

@@ -59,6 +59,7 @@ public final class IntegrationGameTests {
         TESTS.put("integration_mushroom_wool_fuels_generator", IntegrationGameTests::mushroomWoolFuelsGenerator);
         TESTS.put("integration_mycelial_generator_powers_automatic_shears", IntegrationGameTests::generatorPowersAutomaticShears);
         TESTS.put("shift_placing_faces_machines_away", IntegrationGameTests::shiftPlacingFacesAway);
+        TESTS.put("integration_fluid_reservoir_waters_generator", IntegrationGameTests::reservoirWatersGenerator);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
     }
 
@@ -216,6 +217,27 @@ public final class IntegrationGameTests {
                 })
                 .thenWaitUntil(() -> h.assertTrue(consumer.getState() == GeneratorState.RUNNING,
                         "generator fuelled with separated mushrooms should run, was " + consumer.getState()))
+                .thenSucceed();
+    }
+
+    /** A Fluid Reservoir on a 2x2 pool pushes its water straight into a Mycelial Generator placed beside it. */
+    private static void reservoirWatersGenerator(GameTestHelper h) {
+        for (int x = 0; x <= 3; x++) {
+            for (int z = 0; z <= 3; z++) {
+                boolean inside = x >= 1 && x <= 2 && z >= 1 && z <= 2;
+                h.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.STONE);
+                h.setBlock(new BlockPos(x, 1, z), inside ? net.minecraft.world.level.block.Blocks.WATER : net.minecraft.world.level.block.Blocks.STONE);
+            }
+        }
+        BlockPos reservoirPos = new BlockPos(1, 2, 1);
+        h.setBlock(reservoirPos, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FLUID_RESERVOIR.get());
+        BlockPos generatorPos = new BlockPos(1, 2, 0);
+        h.setBlock(generatorPos, com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get());
+        var generator = h.getBlockEntity(generatorPos, com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity.class);
+        h.assertTrue(generator.getTank().getFluidAmount() == 0, "generator starts dry");
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(generator.getTank().getFluidAmount() >= 2_000,
+                        "the generator fills with water from the reservoir, at " + generator.getTank().getFluidAmount()))
                 .thenSucceed();
     }
 }

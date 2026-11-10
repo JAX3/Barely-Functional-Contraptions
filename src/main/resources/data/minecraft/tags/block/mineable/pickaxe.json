@@ -2,6 +2,7 @@
   "values": [
     "barelyfunctionalcontraptions:mycelial_generator",
     "barelyfunctionalcontraptions:mechanical_separator",
-    "barelyfunctionalcontraptions:automatic_shears"
+    "barelyfunctionalcontraptions:automatic_shears",
+    "barelyfunctionalcontraptions:fluid_reservoir"
   ]
 }

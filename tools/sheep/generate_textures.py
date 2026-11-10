@@ -1193,6 +1193,166 @@ def generate_shears_gui():
     img.save(out("gui/automatic_shears.png"))
 
 
+# ---------------------------------------------------------------------------
+# Fluid Reservoir: the same cartoon casing, with a glass window on each side showing how full it is (fill 0..4),
+# a purple-ringed water port on top and a water intake grate underneath.
+# ---------------------------------------------------------------------------
+RES_PAL = dict(CARTOON)
+RES_PAL.update({
+    "A": hexc("#bff0ff"),   # water surface highlight
+    "U": hexc("#3f8cf0"),   # water
+    "u": hexc("#2a5fc0"),   # deep water
+    "Z": hexc("#1b2233"),   # empty glass
+    "z": hexc("#4a5a78"),   # glass glint
+})
+
+RES_SIDE = [  # '.' is the 8x8 window, filled in by reservoir_side()
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbOOOOOOOOOObSO",
+    "OHMO........OMSO",
+    "OHMO........OMSO",
+    "OHMO........OMSO",
+    "OHMO........OMSO",
+    "OHMO........OMSO",
+    "OHMO........OMSO",
+    "OHMO........OMSO",
+    "OHMO........OMSO",
+    "OHbOOOOOOOOOObSO",
+    "OHBbPPPPPPPPBbSO",
+    "OHbSppppppppbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+RES_TOP = [
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMOOOOMMbSSO",
+    "OHMMMOPPPPOMMMSO",
+    "OHMMOPpUUpPOMMSO",
+    "OHMOPpUAUUpPOMSO",
+    "OHMOPUAUUUuPOMSO",
+    "OHMOPUUUUUuPOMSO",
+    "OHMOPpUUUupPOMSO",
+    "OHMMOPpuupPOMMSO",
+    "OHMMMOPPPPOMMMSO",
+    "OHMMMMOOOOMMMMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+RES_BOTTOM = [row.replace("K", "U").replace("k", "u") for row in SEP_BOTTOM]  # intake grate over the water
+
+
+def reservoir_side(fill):
+    img = grid(RES_SIDE, RES_PAL)
+    water_rows = fill * 2                      # 0, 2, 4, 6 or 8 of the 8 window rows
+    for y in range(4, 12):
+        for x in range(4, 12):
+            depth = y - (12 - water_rows)      # 0 at the surface row
+            if depth < 0:
+                c = RES_PAL["Z"]
+            elif depth == 0:
+                c = RES_PAL["A"] if (x + fill) % 3 else RES_PAL["U"]
+            elif y == 11:
+                c = RES_PAL["u"]
+            else:
+                c = RES_PAL["U"] if (x * 3 + y) % 7 else RES_PAL["u"]
+            img.putpixel((x, y), c)
+    # glass glint in the top-left corner (over glass or water alike)
+    for (x, y) in ((5, 5), (4, 6), (6, 5)):
+        if water_rows < 12 - y:
+            img.putpixel((x, y), RES_PAL["z"])
+        else:
+            img.putpixel((x, y), RES_PAL["A"])
+    return img
+
+
+def generate_fluid_reservoir():
+    for rows in (RES_SIDE, RES_TOP, RES_BOTTOM):
+        assert len(rows) == 16 and all(len(r) == 16 for r in rows)
+    for fill in range(5):
+        reservoir_side(fill).save(out(f"block/fluid_reservoir_side_{fill}.png"))
+    grid(RES_TOP, RES_PAL).save(out("block/fluid_reservoir_top.png"))
+    grid(RES_BOTTOM, RES_PAL).save(out("block/fluid_reservoir_bottom.png"))
+
+
+WATER_DROP = [  # 7x9 GUI icon
+    "...O...",
+    "..OAO..",
+    "..OUO..",
+    ".OAUUO.",
+    ".OAUUO.",
+    "OAUUUuO",
+    "OUUUUuO",
+    ".OUuuO.",
+    "..OOO..",
+]
+
+
+def generate_reservoir_gui():
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+
+    # Water tank (fill area 11..40 x 19..82, 30x64) with a tick mark for every bucket of the 10.
+    inset(img, 10, 18, 42, 84, GUI["gauge"])
+    for k in range(1, 10):
+        ty = 19 + round(64 * k / 10)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    # Info window, bucket slots with an arrow between them, status lamp housing.
+    inset(img, 48, 16, 124, 78, GUI["panel"])
+    slot(img, 134, 22)
+    slot(img, 134, 56)
+    for i, y in enumerate(range(42, 52)):
+        for x in range(140, 146):
+            img.putpixel((x, y), hexc("#8d97bc"))
+    for i in range(5):
+        for x in range(138 + i, 148 - i):
+            img.putpixel((x, 50 + i), hexc("#8d97bc"))
+    for y in range(42, 50):
+        img.putpixel((139, y), GUI["outline"]); img.putpixel((146, y), GUI["outline"])
+    inset(img, 8, 86, 18, 96, GUI["gauge"])
+
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+
+    grid(WATER_DROP, RES_PAL, img, 150, 4)
+    rnd = random.Random(11)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice([RES_PAL["A"], RES_PAL["U"], RES_PAL["u"]]))
+
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))      # status lamps, shared with the other machines
+    # Water fill (176,0) 30x64: bright near the top, deeper below, with the bucket ticks showing through.
+    for y in range(64):
+        for x in range(30):
+            t = y / 63.0
+            c = mix(hexc("#5fb0ff"), hexc("#1f4fae"), t)
+            if (x * 5 + y * 3) % 23 == 0:
+                c = mix(c, hexc("#bff0ff"), 0.35)
+            img.putpixel((176 + x, y), c)
+    for k in range(1, 10):
+        ty = round(64 * k / 10)
+        for x in range(25, 30):
+            img.putpixel((176 + x, ty), mix(img.getpixel((176 + x, ty)), hexc("#dff6ff"), 0.45))
+    # Surface shimmer (176,66), 4 frames of 30x2: a light band with sparkles drifting right.
+    for f in range(4):
+        for x in range(30):
+            top = mix(hexc("#bff0ff"), hexc("#ffffff"), 1.0 if (x + f * 2) % 8 == 0 else 0.0)
+            img.putpixel((176 + x, 66 + f * 2), top)
+            img.putpixel((176 + x, 67 + f * 2), hexc("#7cc8ff"))
+    img.save(out("gui/fluid_reservoir.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -1201,6 +1361,8 @@ def main():
     generate_automatic_shears()
     generate_gui()
     generate_shears_gui()
+    generate_fluid_reservoir()
+    generate_reservoir_gui()
     generate_jei()
     generate_logo()
     print("Textures written to", os.path.abspath(ROOT))

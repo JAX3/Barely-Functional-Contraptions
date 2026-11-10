@@ -32,6 +32,14 @@ public final class ModBlocks {
                     .sound(SoundType.METAL)
                     .lightLevel(state -> state.getValue(AutomaticShearsBlock.ACTIVE) ? 7 : 0));
 
+    /** Makes water while sitting on an infinite water source; 10-bucket tank. Stone pickaxe, like the other machines. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.FluidReservoirBlock> FLUID_RESERVOIR = REGISTER.registerBlock("fluid_reservoir",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.FluidReservoirBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL));
+
     /** Creative-only infinite FE source: unbreakable in survival, no recipe. */
     public static final DeferredBlock<CreativeGeneratorBlock> CREATIVE_GENERATOR = REGISTER.registerBlock("creative_generator",
             CreativeGeneratorBlock::new,

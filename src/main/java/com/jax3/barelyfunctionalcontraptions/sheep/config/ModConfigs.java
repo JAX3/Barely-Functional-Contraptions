@@ -102,6 +102,10 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue automaticShearsEnergyPerShear;
         public final ModConfigSpec.IntValue automaticShearsEnergyCapacity;
         public final ModConfigSpec.IntValue automaticShearsMaxEnergyInput;
+        public final ModConfigSpec.IntValue reservoirWaterPerSecond;
+        public final ModConfigSpec.IntValue reservoirCapacity;
+        public final ModConfigSpec.BooleanValue reservoirRequireInfinite;
+        public final ModConfigSpec.IntValue reservoirOutputPerTick;
 
         // ---------------------------------------------------------------- /barelyfunctionalcontraptions generate
         public final ModConfigSpec.ConfigValue<List<? extends String>> generatorAllowedTabs;
@@ -205,6 +209,18 @@ public final class ModConfigs {
                     .defineInRange("energyCapacity", 50_000, 1, Integer.MAX_VALUE);
             automaticShearsMaxEnergyInput = b.comment("FE accepted per tick (every face except the front).")
                     .defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Fluid Reservoir (makes water while placed directly on top of an infinite water source)").push("fluid_reservoir");
+            reservoirWaterPerSecond = b.comment("mB of water made per second (1000 = one bucket a second).")
+                    .defineInRange("waterPerSecond", 1_000, 1, 1_000_000);
+            reservoirCapacity = b.comment("Internal tank size in mB (10000 = 10 buckets).")
+                    .defineInRange("capacity", 10_000, 1_000, 1_000_000);
+            reservoirRequireInfinite = b.comment("Only make water over an infinite source: a water source with at least two neighbouring",
+                            "water sources and something solid (or more water) under it, i.e. one that refills itself. false = any water source works.")
+                    .define("requireInfiniteSource", true);
+            reservoirOutputPerTick = b.comment("mB pushed each tick into neighbouring tanks (sides and top), e.g. a Mycelial Generator. 0 = no pushing.")
+                    .defineInRange("outputPerTick", 1_000, 0, 1_000_000);
             b.pop();
 
             b.comment("Which items /barelyfunctionalcontraptions generate may turn into wool types (feeding items and separator outputs).",

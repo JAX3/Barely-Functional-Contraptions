@@ -104,6 +104,9 @@ public final class ModGameTests {
         TESTS.put("generator_pick_and_choose", ModGameTests::generatorPickAndChoose);
         TESTS.put("separator_output_rolls_two_to_four", ModGameTests::outputRange);
         TESTS.put("generator_filter_limits_tabs_and_stacking", ModGameTests::generatorFilter);
+        TESTS.put("fluid_reservoir_fills_over_infinite_source", ModGameTests::reservoirFills);
+        TESTS.put("fluid_reservoir_needs_infinite_source", ModGameTests::reservoirNeedsInfiniteSource);
+        TESTS.put("fluid_reservoir_buckets_and_pipes", ModGameTests::reservoirBucketsAndPipes);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -951,5 +954,116 @@ public final class ModGameTests {
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.resource.CountRange.CODEC.parse(ops, JsonParser.parseString("{\"min\":5,\"max\":2}")).error().isPresent(),
                 "min > max rejected");
         h.succeed();
+    }
+
+    // ------------------------------------------------------------------ Fluid Reservoir
+
+    private static final BlockPos RESERVOIR_POS = new BlockPos(1, 2, 1);
+
+    /** A 2x2 pool of water sources at y=1 (x,z 1..2) inside a stone rim, on the stone floor: an infinite source. */
+    private static void infinitePool(GameTestHelper h) {
+        for (int x = 0; x <= 3; x++) {
+            for (int z = 0; z <= 3; z++) {
+                boolean inside = x >= 1 && x <= 2 && z >= 1 && z <= 2;
+                h.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.STONE);
+                h.setBlock(new BlockPos(x, 1, z), inside ? net.minecraft.world.level.block.Blocks.WATER : net.minecraft.world.level.block.Blocks.STONE);
+            }
+        }
+    }
+
+    private static String debugPool(GameTestHelper h) {
+        BlockPos src = h.absolutePos(RESERVOIR_POS.below());
+        StringBuilder sb = new StringBuilder();
+        for (var d : net.minecraft.core.Direction.Plane.HORIZONTAL) sb.append(d).append('=').append(h.getLevel().getFluidState(src.relative(d))).append(' ');
+        sb.append("under=").append(h.getLevel().getBlockState(src.below()));
+        return sb.toString();
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity reservoir(GameTestHelper h, BlockPos pos) {
+        h.setBlock(pos, ModBlocks.FLUID_RESERVOIR.get());
+        return h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity.class);
+    }
+
+    /** Over a 2x2 pool it makes 1 bucket a second until its 10 buckets are full, without using up the source. */
+    private static void reservoirFills(GameTestHelper h) {
+        infinitePool(h);
+        var be = reservoir(h, RESERVOIR_POS);
+        var tank = be.getTank();
+        h.assertTrue(tank.getCapacity() == 10_000, "holds 10 buckets, was " + tank.getCapacity());
+        h.startSequence()
+                .thenExecuteAfter(40, () -> {
+                    h.assertTrue(tank.getAmount() >= 1_500 && tank.getAmount() <= 2_500, "about 2 buckets after 2 seconds, was " + tank.getAmount() + " status " + be.getStatus() + " debug " + debugPool(h));
+                    h.assertTrue(be.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ReservoirStatus.FILLING, "status Filling, was " + be.getStatus());
+                })
+                .thenWaitUntil(() -> h.assertTrue(tank.getAmount() >= 10_000, "fills up, at " + tank.getAmount()))
+                .thenExecuteAfter(25, () -> {
+                    h.assertTrue(tank.getAmount() == 10_000, "never goes over 10,000 mB, was " + tank.getAmount());
+                    h.assertTrue(be.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ReservoirStatus.FULL, "status Full, was " + be.getStatus());
+                    h.assertBlockProperty(RESERVOIR_POS, com.jax3.barelyfunctionalcontraptions.sheep.blocks.FluidReservoirBlock.FILL, 4);
+                    h.assertTrue(h.getLevel().getFluidState(h.absolutePos(RESERVOIR_POS.below())).isSource(), "the water source below is not used up");
+                })
+                .thenSucceed();
+    }
+
+    /** A lone water source (no neighbouring sources) or no water at all: nothing is made. */
+    private static void reservoirNeedsInfiniteSource(GameTestHelper h) {
+        for (int x = 4; x <= 6; x++) {
+            for (int z = 4; z <= 6; z++) {
+                h.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.STONE);
+                h.setBlock(new BlockPos(x, 1, z), x == 5 && z == 5 ? net.minecraft.world.level.block.Blocks.WATER : net.minecraft.world.level.block.Blocks.STONE);
+            }
+        }
+        var lone = reservoir(h, new BlockPos(5, 2, 5));
+        var dry = reservoir(h, new BlockPos(1, 1, 1));
+        // Two sources in a line: each has only one source neighbour, so neither refills itself.
+        h.setBlock(new BlockPos(1, 1, 4), net.minecraft.world.level.block.Blocks.STONE);
+        for (int x = 0; x <= 3; x++) {
+            for (int z = 3; z <= 5; z++) h.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.STONE);
+            h.setBlock(new BlockPos(x, 1, 3), net.minecraft.world.level.block.Blocks.STONE);
+            h.setBlock(new BlockPos(x, 1, 5), net.minecraft.world.level.block.Blocks.STONE);
+            h.setBlock(new BlockPos(x, 1, 4), x == 1 || x == 2 ? net.minecraft.world.level.block.Blocks.WATER : net.minecraft.world.level.block.Blocks.STONE);
+        }
+        var pair = reservoir(h, new BlockPos(1, 2, 4));
+        h.startSequence()
+                .thenExecuteAfter(30, () -> {
+                    h.assertTrue(lone.getTank().getAmount() == 0 && dry.getTank().getAmount() == 0 && pair.getTank().getAmount() == 0,
+                            "no water without an infinite source: " + lone.getTank().getAmount() + ", " + dry.getTank().getAmount() + ", " + pair.getTank().getAmount());
+                    h.assertTrue(lone.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ReservoirStatus.NOT_INFINITE, "lone source: " + lone.getStatus());
+                    h.assertTrue(pair.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ReservoirStatus.NOT_INFINITE, "two in a line: " + pair.getStatus());
+                    h.assertTrue(dry.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ReservoirStatus.NO_SOURCE, "on stone: " + dry.getStatus());
+                    h.assertBlockProperty(new BlockPos(5, 2, 5), com.jax3.barelyfunctionalcontraptions.sheep.blocks.FluidReservoirBlock.FILL, 0);
+                })
+                .thenSucceed();
+    }
+
+    /** Empty buckets in its slot are filled, pipes can take water but not put any in, and right-clicking with a bucket fills it. */
+    private static void reservoirBucketsAndPipes(GameTestHelper h) {
+        var be = reservoir(h, new BlockPos(3, 1, 3)); // on stone: makes nothing, so the amounts below are exact
+        var tank = be.getTank();
+        tank.generate(3_000);
+        be.setItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity.SLOT_INPUT, new ItemStack(Items.BUCKET, 2));
+        h.assertFalse(be.canPlaceItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity.SLOT_INPUT, new ItemStack(Items.DIRT)), "only buckets go in");
+        h.startSequence()
+                .thenExecuteAfter(2, () -> {
+                    h.assertTrue(be.getItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity.SLOT_OUTPUT).is(Items.WATER_BUCKET), "a water bucket comes out");
+                    h.assertTrue(be.getItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity.SLOT_INPUT).getCount() == 1, "one empty bucket used");
+                    h.assertTrue(tank.getAmount() == 2_000, "1,000 mB per bucket, left " + tank.getAmount());
+
+                    var fluid = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, h.absolutePos(new BlockPos(3, 1, 3)), net.minecraft.core.Direction.EAST);
+                    h.assertTrue(fluid != null, "exposes a fluid handler for pipes");
+                    var water = net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER);
+                    try (Transaction tx = Transaction.openRoot()) {
+                        h.assertTrue(fluid.insert(water, 1_000, tx) == 0, "nothing can be poured in");
+                        h.assertTrue(fluid.extract(water, 500, tx) == 500, "pipes can take water out");
+                        tx.commit();
+                    }
+                    h.assertTrue(tank.getAmount() == 1_500, "500 mB taken, left " + tank.getAmount());
+
+                    Player player = playerHolding(h, new ItemStack(Items.BUCKET));
+                    h.useBlock(new BlockPos(3, 1, 3), player);
+                    h.assertTrue(player.getMainHandItem().is(Items.WATER_BUCKET), "right-click with a bucket fills it, holding " + player.getMainHandItem());
+                    h.assertTrue(tank.getAmount() == 500, "another 1,000 mB taken, left " + tank.getAmount());
+                })
+                .thenSucceed();
     }
 }

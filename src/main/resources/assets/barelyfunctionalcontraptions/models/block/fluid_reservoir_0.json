@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/fluid_reservoir_side_0",
+    "north": "barelyfunctionalcontraptions:block/fluid_reservoir_side_0",
+    "south": "barelyfunctionalcontraptions:block/fluid_reservoir_side_0",
+    "east": "barelyfunctionalcontraptions:block/fluid_reservoir_side_0",
+    "west": "barelyfunctionalcontraptions:block/fluid_reservoir_side_0",
+    "up": "barelyfunctionalcontraptions:block/fluid_reservoir_top",
+    "down": "barelyfunctionalcontraptions:block/fluid_reservoir_bottom"
+  }
+}

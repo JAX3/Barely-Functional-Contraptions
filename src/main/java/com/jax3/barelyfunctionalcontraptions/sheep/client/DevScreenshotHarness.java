@@ -168,7 +168,13 @@ public final class DevScreenshotHarness {
             case 660 -> shot(mc, "13_automatic_shears");
             case 670 -> server.execute(() -> machineRow(server));
             case 700 -> shot(mc, "14_machine_fronts");
-            case 710 -> {
+            case 705 -> server.execute(() -> reservoirScene(server));
+            case 745 -> shot(mc, "15_fluid_reservoir");
+            case 750 -> server.execute(() -> openReservoir(server));
+            case 775 -> { setHudHidden(mc, false); }
+            case 790 -> shot(mc, "16_fluid_reservoir_gui");
+            case 800 -> {
+                mc.player.closeContainer();
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -215,6 +221,51 @@ public final class DevScreenshotHarness {
         }
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 8", row.getX() + 0.0, row.getY() + 1, row.getZ() + 6.2));
+    }
+
+    private static BlockPos reservoirPos;
+
+    /** A Fluid Reservoir on a 2x2 pool in the sky, watering a Mycelial Generator beside it, plus one on dry stone. */
+    private static void reservoirScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        BlockPos base = origin.offset(-1, 20, -6);
+        for (int x = -1; x <= 4; x++) {
+            for (int z = -1; z <= 3; z++) {
+                level.setBlock(base.offset(x, 0, z), Blocks.STONE.defaultBlockState(), 3);
+                boolean pool = x >= 0 && x <= 1 && z >= 0 && z <= 1;
+                level.setBlock(base.offset(x, 1, z), pool ? Blocks.WATER.defaultBlockState()
+                        : x <= 2 ? Blocks.STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(), 3);
+            }
+        }
+        reservoirPos = base.offset(0, 2, 0);
+        level.setBlock(reservoirPos, ModBlocks.FLUID_RESERVOIR.get().defaultBlockState(), 3);
+        if (level.getBlockEntity(reservoirPos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity be) {
+            be.getTank().generate(5_500);
+            be.setItem(0, new ItemStack(Items.BUCKET, 3));
+        }
+        BlockPos generatorPos = reservoirPos.west();
+        level.setBlock(generatorPos, com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.mycelial.block.MycelialGeneratorBlock.FACING, Direction.SOUTH), 3);
+        if (level.getBlockEntity(generatorPos) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity generator) {
+            generator.getInventory().setStackInSlot(com.jax3.barelyfunctionalcontraptions.mycelial.capability.GeneratorItemHandler.FUEL_SLOT,
+                    new ItemStack(Items.RED_MUSHROOM, 32));
+            generator.getTank().fillInternal(net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER), 100_000);
+        }
+        // A second reservoir on dry stone, half full, to show the water level in its windows.
+        BlockPos dry = base.offset(3, 1, 1);
+        level.setBlock(dry, ModBlocks.FLUID_RESERVOIR.get().defaultBlockState(), 3);
+        if (level.getBlockEntity(dry) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity be) {
+            be.getTank().generate(5_000);
+        }
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 150 32", base.getX() + 3.5, base.getY() + 4, base.getZ() + 5.5));
+    }
+
+    private static void openReservoir(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        if (player.level().getBlockEntity(reservoirPos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity be) {
+            player.openMenu(be, reservoirPos);
+        }
     }
 
     private static void setupScene(MinecraftServer server) {

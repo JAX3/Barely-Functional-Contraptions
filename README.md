@@ -3,7 +3,7 @@
 A NeoForge mod for **Minecraft 26.3** (Java 25) that combines two systems, **Mycelial Power** and **Resourceful Sheep**, into one mod. They share one mod id (`barelyfunctionalcontraptions`), one jar, one creative tab and one config screen, and they are built to work together:
 
 * **Mycelial Power:** the **Mycelial Generator** burns mushrooms and water to make **Forge Energy (FE)**. Generators that touch, or are linked with the **Mycelium Wrench**, form networks whose output grows **exponentially**. Running generators slowly spread **mycelium** and sprout **huge mushrooms**.
-* **Resourceful Sheep:** feed sheep blocks, ingots and gems to **infuse** their wool, shear them for **resource wool**, and turn the wool back into resources in the FE-powered **Mechanical Separator**.
+* **Resourceful Sheep:** feed sheep blocks, ingots and gems to **infuse** their wool, shear them for **resource wool**, and turn the wool back into resources in the FE-powered **Mechanical Separator**. The **Fluid Reservoir** draws water from an infinite source to keep generators supplied.
 
 ![Infused sheep](docs/screenshots/01_world_sheep.png)
 
@@ -205,6 +205,31 @@ I C I      R = Redstone Dust   C = Chest
 |---|
 | ![Automatic Shears GUI](docs/screenshots/12_automatic_shears_gui.png) |
 
+### Fluid Reservoir
+A water source for your machines. Put it **directly on top of an infinite water source** and it fills its **10-bucket tank** with water.
+
+| In the world | GUI |
+|---|---|
+| ![Fluid Reservoir](docs/screenshots/15_fluid_reservoir.png) | ![Fluid Reservoir GUI](docs/screenshots/16_fluid_reservoir_gui.png) |
+
+- **Infinite source:** the water block under it must refill itself, by vanilla's rule: it needs **at least two neighbouring water sources** and something solid (or more water) under it. A 2×2 pool, or the middle of a 3-long line, works. A lone source, or two sources side by side, does not. The source is never used up. Set `requireInfiniteSource = false` to allow any water source.
+- **Speed:** 1 bucket (1,000 mB) a second by default (`waterPerSecond`), so it fills in 10 seconds. It then stops until water is taken out.
+- **Getting water out:**
+  - Right-click it with an empty bucket (or any other fluid container) to fill it.
+  - Put empty buckets in the top slot of its GUI; it fills them into the bottom slot. Hoppers and pipes can also feed in empty buckets and take water buckets out.
+  - Pipes can pull water from any side.
+  - It **pushes water into tanks beside it or on top** (up to 1,000 mB/t, `outputPerTick`). A **Mycelial Generator placed next to it never runs dry**.
+- Nothing can be poured *into* it. It's a water source, not a storage tank.
+- **Windows:** the glass on its sides shows the water level. A comparator reads how full it is.
+- **GUI:** right-click with an empty hand. It shows a water gauge with a mark per bucket, the stored amount, the bucket slots, and a status lamp: *Filling*, *Tank Full*, *Source Not Infinite* or *No Water Source*. Hover over things for details.
+- Mine it with a stone pickaxe or better. The water in it is lost when it's broken.
+
+```
+I G I      I = Iron Ingot     G = Glass (any)
+G B G      B = Bucket
+I C I      C = Cauldron
+```
+
 ### Creative Generator (testing)
 A creative-only block, found in the Resourceful Sheep creative tab. It has no recipe and can't be broken in survival.
 - Produces **unlimited Forge Energy**.
@@ -323,6 +348,15 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `energyPerShear` | 2000 | FE used per sheep sheared (0 = runs without power) |
 | `energyCapacity` | 50000 | FE buffer |
 | `maxEnergyInput` | 1000 | FE accepted per tick (every face except the front) |
+
+**`[fluid_reservoir]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `waterPerSecond` | 1000 | mB of water made per second |
+| `capacity` | 10000 | Tank size in mB (10 buckets) |
+| `requireInfiniteSource` | true | Only work over a self-refilling water source (false = any water source) |
+| `outputPerTick` | 1000 | mB pushed into neighbouring tanks (sides and top) per tick; 0 = no pushing |
 
 **`[creative_generator]`**
 
