@@ -231,7 +231,10 @@ public final class DevScreenshotHarness {
             case 1147 -> server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                     String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 75", cubeBase.getX() + 5.5, cubeBase.getY() + 7, cubeBase.getZ() + 9.5)));
             case 1165 -> shot(mc, "24_energy_cube_corners");
-            case 1170 -> {
+            case 1167 -> server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                    String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 150 35", cubeBase.getX() + 7.0, cubeBase.getY() + 3, cubeBase.getZ() + 17.0)));
+            case 1185 -> shot(mc, "25_energy_cube_folds");
+            case 1190 -> {
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -406,6 +409,10 @@ public final class DevScreenshotHarness {
         for (int x = 0; x < 3; x++) for (int z = 0; z < 3; z++) {
             if (x != 1 || z != 1) placeCube(level, cubeBase.offset(7 + x, -1, 5 + z), 500_000);
         }
+        // Odd shapes with inward folds: a 2x2 base with a wall on its back row, and a three-step staircase.
+        for (int x = 0; x < 2; x++) for (int z = 0; z < 2; z++) placeCube(level, cubeBase.offset(1 + x, -1, 11 + z), 500_000);
+        for (int x = 0; x < 2; x++) placeCube(level, cubeBase.offset(1 + x, 0, 11), 500_000);
+        for (int step = 0; step < 3; step++) for (int h = 0; h <= step; h++) placeCube(level, cubeBase.offset(6 + step, -1 + h, 11), 500_000);
         // A floating 3x2 slab (to see the connected bottom faces from below).
         for (int x = 0; x < 3; x++) for (int z = 0; z < 2; z++) placeCube(level, cubeBase.offset(12 + x, 4, z), 500_000);
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),

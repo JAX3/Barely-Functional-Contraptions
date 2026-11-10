@@ -260,9 +260,11 @@ A Forge Energy battery. FE goes **in and out on every side**, and **cubes that t
 |---|---|
 | ![Hume Energy Cubes](docs/screenshots/21_energy_cubes.png) | ![Hume Energy Cubes from below](docs/screenshots/23_energy_cubes_below.png) |
 
-Any shape works, not just full boxes: L-shapes, rings and walls with bends get proper inside corners where the frame turns.
+Any shape works, not just full boxes. L-shapes, rings and walls with bends get proper inside corners where the frame turns. Where the structure folds inward (a wall standing on a slab, a staircase), each face keeps its frame along the fold, so a window never runs into the plate beside it.
 
-![Inside corners](docs/screenshots/24_energy_cube_corners.png)
+| Inside corners | Folds (wall on a slab, staircase) |
+|---|---|
+| ![Inside corners](docs/screenshots/24_energy_cube_corners.png) | ![Folds](docs/screenshots/25_energy_cube_folds.png) |
 
 - **One cube:** 1,000,000 FE buffer, 10,000 FE/t transfer rate (`capacityPerCube`, `transferPerCube`).
 - **A group of N touching cubes** (faces touching, in any shape) has **N x** the buffer and **N x** the transfer rate. A 2x2x2 block of 8 cubes holds 8,000,000 FE and moves 80,000 FE/t. Every cube in the group shares the same energy, so you can feed one end and take power out of the other.
