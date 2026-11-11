@@ -707,6 +707,9 @@ def recipes_loot_tags():
     write(os.path.join(DATA, MOD, "loot_modifiers", "infused_sheep_kill.json"), {
         "type": f"{MOD}:infused_sheep_kill",
     })
+    write(os.path.join(DATA, MOD, "loot_modifiers", "zero_point_beam_looting.json"), {
+        "type": f"{MOD}:zero_point_beam_looting",
+    })
     write(os.path.join(DATA, MOD, "tags", "entity_type", "infusable.json"), {"values": ["minecraft:sheep"]})
     write(os.path.join(DATA, MOD, "tags", "entity_type", "auto_shearable.json"), {"values": [f"#{MOD}:infusable"]})
     write(os.path.join(DATA, MOD, "tags", "item", "replaceable_wool.json"), {"values": ["#minecraft:wool"]})

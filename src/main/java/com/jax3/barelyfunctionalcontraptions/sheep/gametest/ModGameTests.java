@@ -123,6 +123,7 @@ public final class ModGameTests {
         TESTS.put("all_blocks_use_iron_block_sounds", ModGameTests::ironSounds);
         TESTS.put("zero_point_modules_generate_across_a_gap", ModGameTests::zeroPointModules);
         TESTS.put("zero_point_beam_burns_what_touches_it", ModGameTests::zeroPointBeamBurns);
+        TESTS.put("zero_point_beam_kills_have_looting", ModGameTests::zeroPointBeamLooting);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -1002,6 +1003,46 @@ public final class ModGameTests {
             h.assertTrue(golem.getRemainingFireTicks() > 0, "the golem is set on fire");
             h.assertTrue(pig.getHealth() == pig.getMaxHealth() && pig.getRemainingFireTicks() <= 0, "the pig beside the beam is untouched");
         });
+    }
+
+    /**
+     * Mobs the beam kills drop as if killed with Looting {@code beamLooting}. A pig's death loot (1-3 porkchops) is
+     * rolled 300 times with the beam as the cause and 300 times with plain fire: with the beam the most porkchops go up
+     * by the looting level and the total goes up; with fire it stays at most 3.
+     */
+    private static void zeroPointBeamLooting(GameTestHelper h) {
+        int looting = ModConfigs.getInt(ModConfigs.SERVER.zpeBeamLooting);
+        h.assertTrue(looting >= 1, "default beamLooting is at least 1, got " + looting);
+        var pig = h.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(3, 1, 3));
+        var level = h.getLevel();
+        var beam = level.damageSources().source(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_DAMAGE);
+        var fire = level.damageSources().inFire();
+        int beamTotal = 0, fireTotal = 0, beamMax = 0, fireMax = 0;
+        for (int i = 0; i < 300; i++) {
+            List<ItemStack> withBeam = new java.util.ArrayList<>(), withFire = new java.util.ArrayList<>();
+            pig.dropFromLootTable(level, beam, false, pig.getLootTable().orElseThrow(), withBeam::add);
+            pig.dropFromLootTable(level, fire, false, pig.getLootTable().orElseThrow(), withFire::add);
+            int b = count(withBeam, st -> st.is(Items.PORKCHOP)), f = count(withFire, st -> st.is(Items.PORKCHOP));
+            beamTotal += b;
+            fireTotal += f;
+            beamMax = Math.max(beamMax, b);
+            fireMax = Math.max(fireMax, f);
+        }
+        h.assertTrue(fireMax <= 3, "normal pig drops are at most 3 porkchops, got " + fireMax);
+        h.assertTrue(beamMax == 3 + looting, "beam kills drop up to " + (3 + looting) + " porkchops, got " + beamMax);
+        h.assertTrue(beamTotal > fireTotal, "beam kills drop more in total: " + beamTotal + " vs " + fireTotal);
+
+        // The looting helper itself: level 0 changes nothing, and overflowing stacks are split.
+        var random = net.minecraft.util.RandomSource.create(1);
+        var one = it.unimi.dsi.fastutil.objects.ObjectArrayList.of(new ItemStack(Items.BEEF, 2));
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.ZeroPointBeamLootingModifier.applyLooting(one, 0, random)
+                .getFirst().getCount() == 2, "looting 0 adds nothing");
+        var full = it.unimi.dsi.fastutil.objects.ObjectArrayList.of(new ItemStack(Items.BEEF, 64));
+        var split = com.jax3.barelyfunctionalcontraptions.sheep.entity.ZeroPointBeamLootingModifier.applyLooting(full, 10, random);
+        h.assertTrue(split.stream().mapToInt(ItemStack::getCount).sum() >= 64 && split.stream().allMatch(st -> st.getCount() <= 64),
+                "extra items over a full stack go into a new stack");
+        pig.discard();
+        h.succeed();
     }
 
     private static void creativeGeneratorPowers(GameTestHelper h) {

@@ -16,5 +16,8 @@ public final class ModLootModifiers {
     public static final Supplier<MapCodec<InfusedWoolLootModifier>> INFUSED_WOOL = REGISTER.register("infused_wool", () -> InfusedWoolLootModifier.CODEC);
     public static final Supplier<MapCodec<InfusedSheepKillLootModifier>> INFUSED_SHEEP_KILL = REGISTER.register("infused_sheep_kill", () -> InfusedSheepKillLootModifier.CODEC);
 
+    public static final Supplier<MapCodec<com.jax3.barelyfunctionalcontraptions.sheep.entity.ZeroPointBeamLootingModifier>> ZERO_POINT_BEAM_LOOTING =
+            REGISTER.register("zero_point_beam_looting", () -> com.jax3.barelyfunctionalcontraptions.sheep.entity.ZeroPointBeamLootingModifier.CODEC);
+
     private ModLootModifiers() {}
 }

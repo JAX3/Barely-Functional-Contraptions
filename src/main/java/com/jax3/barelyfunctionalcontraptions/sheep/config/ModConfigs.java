@@ -120,6 +120,7 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue zpeMaxOutput;
         public final ModConfigSpec.DoubleValue zpeBeamDamage;
         public final ModConfigSpec.IntValue zpeBeamBurnSeconds;
+        public final ModConfigSpec.IntValue zpeBeamLooting;
 
         // ---------------------------------------------------------------- /barelyfunctionalcontraptions generate
         public final ModConfigSpec.ConfigValue<List<? extends String>> generatorAllowedTabs;
@@ -274,6 +275,9 @@ public final class ModConfigs {
                     .defineInRange("beamDamage", 4.0, 0.0, 1_000.0);
             zpeBeamBurnSeconds = b.comment("Seconds the beam sets things on fire for. 0 = no fire, only the beam's own damage.")
                     .defineInRange("beamBurnSeconds", 5, 0, 600);
+            zpeBeamLooting = b.comment("Looting level for mobs the beam kills: each stack they drop gets 0 to this many extra items,",
+                            "like a Looting sword. 0 = normal drops.")
+                    .defineInRange("beamLooting", 1, 0, 10);
             b.pop();
 
             b.comment("Which items /barelyfunctionalcontraptions generate may turn into wool types (feeding items and separator outputs).",
