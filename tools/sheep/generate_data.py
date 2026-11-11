@@ -283,8 +283,8 @@ def block_models():
     write(os.path.join(ASSETS, "blockstates", "zero_point_energy_module.json"), {"variants": variants})
     write(os.path.join(ASSETS, "items", "zero_point_energy_module.json"),
           {"model": {"type": "minecraft:model", "model": zpe + "on"}})
-    # Energy Cable and Fluid Pipe share their models; only the textures differ.
-    for conduit, kind in (("energy_cable", "cable"), ("fluid_pipe", "pipe")):
+    # Energy Cable, Fluid Pipe and Item Pipe share their models; only the textures differ.
+    for conduit, kind in (("energy_cable", "cable"), ("fluid_pipe", "pipe"), ("item_pipe", "pipe")):
         # Energy Cable: multipart. A junction box in the middle, an arm towards each connected side, and a plug plate
         # on each side joined to a machine. Automatic UVs pick the right part of each texture (see generate_textures.py).
         cable_dir = os.path.join(ASSETS, "models", "block", conduit)
@@ -381,7 +381,11 @@ def lang():
         "block.barelyfunctionalcontraptions.fluid_pipe": "Fluid Pipe",
         "tooltip.barelyfunctionalcontraptions.fluid_pipe": "Carries water and other fluids from the Fluid Reservoir and other tanks to the blocks it is plugged into. Touching pipes form one network that moves up to %s mB/t.",
         "barelyfunctionalcontraptions.configuration.fluid_pipe": "Fluid Pipe",
-        "config.jade.plugin_barelyfunctionalcontraptions.fluid_pipe": "Fluid Pipe",
+        "config.jade.plugin_barelyfunctionalcontraptions.pipes": "Fluid and Item Pipes",
+        "block.barelyfunctionalcontraptions.item_pipe": "Item Pipe",
+        "tooltip.barelyfunctionalcontraptions.item_pipe": "Carries items from the Automatic Shears, the Mechanical Separator, hoppers and other inventories to the blocks it is plugged into. Touching pipes form one network that moves up to %s items a tick.",
+        "barelyfunctionalcontraptions.configuration.item_pipe": "Item Pipe",
+        "jade.barelyfunctionalcontraptions.item_pipe.rate": "Moving %s / %s items/t",
         "jade.barelyfunctionalcontraptions.pipe.network": "Network: %s pipes, %s blocks plugged in",
         "jade.barelyfunctionalcontraptions.pipe.rate": "Moving %s / %s mB/t",
         "tooltip.barelyfunctionalcontraptions.energy_cable": "Carries Forge Energy from generators and Hume Energy Cubes to the machines it is plugged into. Touching cables form one network that moves up to %s FE/t.",
@@ -697,6 +701,24 @@ def recipes_loot_tags():
         "pattern": ["CCC", "GBG", "CCC"],
         "result": {"id": f"{MOD}:fluid_pipe", "count": 8},
     })
+    # Item Pipe: copper around glass and a hopper. Makes 8.
+    write(os.path.join(DATA, MOD, "recipe", "item_pipe.json"), {
+        "type": "minecraft:crafting_shaped",
+        "category": "redstone",
+        "key": {
+            "C": "minecraft:copper_ingot",
+            "G": "#c:glass_blocks",
+            "H": "minecraft:hopper",
+        },
+        "pattern": ["CCC", "GHG", "CCC"],
+        "result": {"id": f"{MOD}:item_pipe", "count": 8},
+    })
+    write(os.path.join(DATA, MOD, "loot_table", "blocks", "item_pipe.json"), {
+        "type": "minecraft:block",
+        "pools": [{"rolls": 1, "condition": {"type": "minecraft:survives_explosion"},
+                   "entries": [{"type": "minecraft:item", "name": f"{MOD}:item_pipe"}]}],
+        "random_sequence": f"{MOD}:blocks/item_pipe",
+    })
     write(os.path.join(DATA, MOD, "loot_table", "blocks", "fluid_pipe.json"), {
         "type": "minecraft:block",
         "pools": [{"rolls": 1, "condition": {"type": "minecraft:survives_explosion"},
@@ -811,7 +833,7 @@ def recipes_loot_tags():
     # Machines a Mycelial Generator can power wirelessly through a Barely Functional Wrench link.
     write(os.path.join(DATA, MOD, "tags", "block", "wireless_power_receivers.json"),
           {"values": [f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:hume_energy_cube"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block", f"{MOD}:zero_point_energy_module", f"{MOD}:energy_cable", f"{MOD}:fluid_pipe"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block", f"{MOD}:zero_point_energy_module", f"{MOD}:energy_cable", f"{MOD}:fluid_pipe", f"{MOD}:item_pipe"]})
     write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block", f"{MOD}:zero_point_energy_module"]})
 
 
@@ -831,6 +853,7 @@ ADVANCEMENTS = [
     ("zero_point_death", "zero_point_energy_module", "zero_point_energy_module", "challenge", None),
     ("energy_cable", "root", "energy_cable", "task", "energy_cable"),
     ("fluid_pipe", "root", "fluid_pipe", "task", "fluid_pipe"),
+    ("item_pipe", "root", "item_pipe", "task", "item_pipe"),
 ]
 ADVANCEMENT_TEXT = {
     "root": ("Barely Functional Contraptions", "Make a Functional Machine Block, the casing every machine is built around"),
@@ -846,6 +869,7 @@ ADVANCEMENT_TEXT = {
     "zero_point_death": ("Don't Cross the Streams", "Get vaporised by a Zero Point beam"),
     "energy_cable": ("Plugged In", "Craft some Energy Cables"),
     "fluid_pipe": ("Pipe Dreams", "Craft some Fluid Pipes"),
+    "item_pipe": ("Special Delivery", "Craft some Item Pipes"),
 }
 
 

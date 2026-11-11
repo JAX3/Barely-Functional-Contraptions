@@ -10,19 +10,20 @@ import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
-/** Fluid Pipe: the network it belongs to and how much fluid that network is moving. */
-public enum FluidPipeProvider implements IBlockComponentProvider {
+/** Fluid and Item Pipes: the network a pipe belongs to and how much that network is moving (mB/t or items/t). */
+public enum PipeProvider implements IBlockComponentProvider {
     INSTANCE;
 
-    public static final Identifier UID = ResourcefulSheep.id("fluid_pipe");
+    public static final Identifier UID = ResourcefulSheep.id("pipes");
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-        FluidPipeDataProvider.Data data = FluidPipeDataProvider.INSTANCE.decodeFromData(accessor).orElse(null);
+        PipeDataProvider.Data data = PipeDataProvider.INSTANCE.decodeFromData(accessor).orElse(null);
         if (data == null) return;
         tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.pipe.network", data.cables(), data.endpoints())
                 .withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.pipe.rate", fe(data.rate()), fe(data.maxRate()))
+        tooltip.add(Component.translatable(accessor.getBlock() instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.ItemPipeBlock
+                        ? "jade.barelyfunctionalcontraptions.item_pipe.rate" : "jade.barelyfunctionalcontraptions.pipe.rate", fe(data.rate()), fe(data.maxRate()))
                 .withColor(data.rate() > 0 ? 0x3FC8FF : 0xAAAAAA));
     }
 

@@ -25,7 +25,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(SeparatorStatusDataProvider.INSTANCE, MechanicalSeparatorBlockEntity.class);
         registration.registerProgress(SeparatorProgressProvider.INSTANCE, MechanicalSeparatorBlockEntity.class);
         registration.registerBlockDataProvider(EnergyCableDataProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCableBlockEntity.class);
-        registration.registerBlockDataProvider(FluidPipeDataProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidPipeBlockEntity.class);
+        registration.registerBlockDataProvider(PipeDataProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeBlockEntity.class);
     }
 
     @Override
@@ -35,6 +35,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerProgressClient(SeparatorProgressProvider.INSTANCE);
         registration.registerBlockComponent(ZeroPointModuleProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.class);
         registration.registerBlockComponent(EnergyCableProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCableBlock.class);
-        registration.registerBlockComponent(FluidPipeProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.FluidPipeBlock.class);
+        registration.registerBlockComponent(PipeProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.FluidPipeBlock.class);
+        registration.registerBlockComponent(PipeProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ItemPipeBlock.class);
     }
 }

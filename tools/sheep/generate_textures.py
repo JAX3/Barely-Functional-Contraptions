@@ -703,9 +703,14 @@ def generate_conduit(name, pal):
 PIPE_BLUE = {"P": hexc("#3fc8ff"), "p": hexc("#1b5fa8"), "G": hexc("#ffffff"), "g": hexc("#a8ecff")}
 
 
+# Item Pipe: the same tube with yellow collars and a yellow port ring with a pale gold glow.
+PIPE_YELLOW = {"P": hexc("#ffe14a"), "p": hexc("#c98a12"), "G": hexc("#ffffff"), "g": hexc("#ffe58a")}
+
+
 def generate_energy_cable():
     generate_conduit("energy_cable", CARTOON)
     generate_conduit("fluid_pipe", dict(CARTOON, **PIPE_BLUE))
+    generate_conduit("item_pipe", dict(CARTOON, **PIPE_YELLOW))
 
 def generate_creative_generator():
     """4-frame pulsing glow animation, same on every face."""

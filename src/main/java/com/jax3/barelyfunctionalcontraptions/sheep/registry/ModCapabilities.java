@@ -25,6 +25,8 @@ public final class ModCapabilities {
         // Energy Cable: takes energy in on every face and passes it straight on through its network.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.ENERGY_CABLE.get(), (be, side) -> be.getEnergyHandler(side));
         // Fluid Pipe: takes fluid in on every face and passes it straight on through its network.
-        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.FLUID_PIPE.get(), (be, side) -> be.getFluidHandler(side));
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.FLUID_PIPE.get(), (be, side) -> be.getHandler(side));
+        // Item Pipe: takes items in on every face and passes them straight on through its network.
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.ITEM_PIPE.get(), (be, side) -> be.getHandler(side));
     }
 }

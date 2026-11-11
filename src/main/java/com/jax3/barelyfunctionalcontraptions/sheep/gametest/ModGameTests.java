@@ -130,6 +130,10 @@ public final class ModGameTests {
         TESTS.put("energy_cable_respects_transfer_rate", ModGameTests::cableRate);
         TESTS.put("energy_cable_break_splits_network", ModGameTests::cableBreakSplits);
         TESTS.put("energy_cable_carries_zero_point_power", ModGameTests::cableZeroPoint);
+        TESTS.put("item_pipe_connects_to_pipes_and_inventories", ModGameTests::itemPipeConnects);
+        TESTS.put("item_pipe_shears_to_separator_to_chest", ModGameTests::itemPipeChain);
+        TESTS.put("item_pipe_hopper_pushes_but_chests_are_not_drained", ModGameTests::itemPipePushAndChests);
+        TESTS.put("item_pipe_respects_transfer_rate", ModGameTests::itemPipeRate);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -273,6 +277,112 @@ public final class ModGameTests {
         });
         h.runAfterDelay(8, () -> {
             h.assertTrue(target.group().amount() == stopped[0], "no energy crosses the gap");
+            h.succeed();
+        });
+    }
+
+    // ------------------------------------------------------------------ item pipes
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ItemPipeBlockEntity itemPipe(GameTestHelper h, BlockPos pos) {
+        var block = ModBlocks.ITEM_PIPE.get();
+        h.setBlock(pos, block.withConnections(block.defaultBlockState(), h.getLevel(), h.absolutePos(pos)));
+        return h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ItemPipeBlockEntity.class);
+    }
+
+    private static int countIn(net.minecraft.world.Container container, net.minecraft.world.item.Item item) {
+        int n = 0;
+        for (int i = 0; i < container.getContainerSize(); i++) if (container.getItem(i).is(item)) n += container.getItem(i).getCount();
+        return n;
+    }
+
+    private static net.minecraft.world.Container chest(GameTestHelper h, BlockPos pos) {
+        h.setBlock(pos, Blocks.CHEST);
+        return (net.minecraft.world.Container) h.getBlockEntity(pos, BlockEntity.class);
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity shearsAt(GameTestHelper h, BlockPos pos, Direction facing) {
+        h.setBlock(pos, ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, facing));
+        return h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.class);
+    }
+
+    /** Item pipes join item pipes, plug into inventories, and ignore Fluid Pipes, Energy Cables and stone. */
+    private static void itemPipeConnects(GameTestHelper h) {
+        var CABLE = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.CABLE;
+        var MACHINE = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.MACHINE;
+        var NONE = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.NONE;
+        chest(h, new BlockPos(1, 1, 2));
+        h.setBlock(new BlockPos(2, 2, 2), Blocks.STONE);
+        cable(h, new BlockPos(2, 1, 1));
+        var fluid = ModBlocks.FLUID_PIPE.get();
+        h.setBlock(new BlockPos(2, 1, 3), fluid.withConnections(fluid.defaultBlockState(), h.getLevel(), h.absolutePos(new BlockPos(2, 1, 3))));
+        var a = itemPipe(h, new BlockPos(2, 1, 2));
+        var b = itemPipe(h, new BlockPos(3, 1, 2));
+        h.assertTrue(side(h, new BlockPos(2, 1, 2), Direction.WEST) == MACHINE, "plugs into the chest");
+        h.assertTrue(side(h, new BlockPos(2, 1, 2), Direction.EAST) == CABLE, "joins the next item pipe");
+        h.assertTrue(side(h, new BlockPos(2, 1, 2), Direction.UP) == NONE, "ignores stone");
+        h.assertTrue(side(h, new BlockPos(2, 1, 2), Direction.NORTH) == NONE && side(h, new BlockPos(2, 1, 2), Direction.SOUTH) == NONE,
+                "doesn't join an Energy Cable or a Fluid Pipe");
+        h.assertTrue(a.network() == b.network() && a.network().size() == 2 && a.network().endpoints().size() == 1,
+                "one network of 2 pipes with the chest plugged in");
+        shearsAt(h, new BlockPos(4, 1, 2), Direction.EAST);
+        h.assertTrue(side(h, new BlockPos(3, 1, 2), Direction.EAST) == MACHINE && a.network().endpoints().size() == 2,
+                "plugs into Automatic Shears placed later");
+        h.succeed();
+    }
+
+    /**
+     * Automatic Shears full of Iron Wool -> pipes -> a powered Mechanical Separator's side, and its bottom output ->
+     * pipes -> a chest: the separator gets the wool and the chest ends up with Raw Iron.
+     */
+    private static void itemPipeChain(GameTestHelper h) {
+        var shears = shearsAt(h, new BlockPos(0, 1, 2), Direction.WEST);
+        shears.setItem(0, ResourceWoolItem.create(IRON, 4));
+        MechanicalSeparatorBlockEntity separator = separator(h, new BlockPos(2, 2, 2));
+        insertEnergy(separator.getEnergy(), 200_000);
+        var chest = chest(h, new BlockPos(4, 1, 2));
+        for (BlockPos pos : List.of(new BlockPos(1, 1, 2), new BlockPos(1, 2, 2), new BlockPos(2, 1, 2), new BlockPos(3, 1, 2))) itemPipe(h, pos);
+        h.succeedWhen(() -> {
+            h.assertTrue(shears.isEmpty(), "the pipes emptied the shears");
+            h.assertTrue(countIn(chest, Items.RAW_IRON) >= 2, "Raw Iron from the separator reached the chest, has " + countIn(chest, Items.RAW_IRON));
+        });
+    }
+
+    /** A hopper pushes into a pipe that carries the items on to a chest; the pipes never drain that chest into another. */
+    private static void itemPipePushAndChests(GameTestHelper h) {
+        h.setBlock(new BlockPos(1, 2, 2), Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, Direction.DOWN));
+        HopperBlockEntity hopper = h.getBlockEntity(new BlockPos(1, 2, 2), HopperBlockEntity.class);
+        hopper.setItem(0, new ItemStack(Items.COBBLESTONE, 5));
+        var first = chest(h, new BlockPos(3, 1, 2));
+        first.setItem(0, new ItemStack(Items.DIAMOND, 10));
+        var second = chest(h, new BlockPos(3, 1, 4));
+        itemPipe(h, new BlockPos(1, 1, 2));
+        itemPipe(h, new BlockPos(2, 1, 2));
+        itemPipe(h, new BlockPos(2, 1, 3));
+        itemPipe(h, new BlockPos(2, 1, 4));
+        h.succeedWhen(() -> {
+            h.assertTrue(countIn(first, Items.COBBLESTONE) + countIn(second, Items.COBBLESTONE) == 5, "the hopper's 5 cobblestone reached the chests");
+            h.assertTrue(countIn(first, Items.DIAMOND) == 10 && countIn(second, Items.DIAMOND) == 0, "the pipes don't move diamonds between chests");
+        });
+    }
+
+    /** With transferRate = 1 an item network never moves more than one item a tick. */
+    private static void itemPipeRate(GameTestHelper h) {
+        int old = ModConfigs.SERVER.itemPipeTransferRate.get();
+        ModConfigs.SERVER.itemPipeTransferRate.set(1);
+        var shears = shearsAt(h, new BlockPos(1, 1, 2), Direction.WEST);
+        shears.setItem(0, new ItemStack(Items.WOOL.white(), 64));
+        var chest = chest(h, new BlockPos(3, 1, 2));
+        itemPipe(h, new BlockPos(2, 1, 2));
+        int[] start = new int[1];
+        h.runAfterDelay(2, () -> start[0] = countIn(chest, Items.WOOL.white()));
+        h.runAfterDelay(12, () -> {
+            try {
+                int moved = countIn(chest, Items.WOOL.white()) - start[0];
+                h.assertTrue(moved > 0 && moved <= 10, "10 ticks at 1 item a tick, moved " + moved);
+            } finally {
+                ModConfigs.SERVER.itemPipeTransferRate.set(old);
+            }
             h.succeed();
         });
     }

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "G": "#c:glass_blocks",
+    "H": "minecraft:hopper"
+  },
+  "pattern": [
+    "CCC",
+    "GHG",
+    "CCC"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:item_pipe",
+    "count": 8
+  }
+}

@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 91 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 58 Resourceful Sheep, 17 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 40 screenshots and 10 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 95 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 62 Resourceful Sheep, 17 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 42 screenshots and 11 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -88,7 +88,7 @@ In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `reci
 
 ### Advancements (`integration_advancements`)
 
-All 13 advancements in the *Barely Functional Contraptions* tab load, each shows in the tab, and each has the right parent (the root has none). The three special ones are earned through the real code paths, with a server player that never logs in (so it sends no network traffic):
+All 14 advancements in the *Barely Functional Contraptions* tab load, each shows in the tab, and each has the right parent (the root has none). The three special ones are earned through the real code paths, with a server player that never logs in (so it sends no network traffic):
 - **Fungal Network:** the player clicks two Mycelial Generators with a Barely Functional Wrench (`useOn`), which links them and grants it.
 - **Don't Cross the Streams:** a death by ordinary fire doesn't grant it; a death by the Zero Point beam's damage type does.
 - **Shear Genius:** powered Automatic Shears shear a sheep while the player stands next to them (the player is added to the level's player list just for that shearing run), which grants it. Another player 40 blocks away who watches a second sheep being sheared doesn't get it.
@@ -119,6 +119,19 @@ In the real client (`37_energy_cables.png`), a running Mycelial Generator feeds 
 | `fluid_pipe_break_splits_network` | Breaking the middle of three pipes splits the network, and the generator at the far end stops filling. |
 
 In the real client (`39_fluid_pipes.png`), a reservoir on a pool feeds 9 blue pipes: a straight run to one generator and a branch up a riser to a second one on a ledge. Jade on a pipe (`40_fluid_pipe_jade.png`) reads *Network: 9 pipes, 3 blocks plugged in* and *Moving 50 / 4,000 mB/t* (the reservoir's 1,000 mB a second). Jade shows no tank for the pipe, since it holds nothing. `recipe_fluid_pipe.png` shows the recipe making 8.
+
+### Item Pipes
+
+Fluid and Item Pipes share one network implementation (`PipeNetwork`), so the fluid pipe tests above cover it as well.
+
+| Test | What it checks |
+|---|---|
+| `item_pipe_connects_to_pipes_and_inventories` | A pipe beside a chest plugs into it and joins the next item pipe. It ignores stone and doesn't join an Energy Cable or a Fluid Pipe. Automatic Shears placed later plug in, and the network sees them. |
+| `item_pipe_shears_to_separator_to_chest` | Automatic Shears holding 4 Iron Wool → pipes → the side of a powered Mechanical Separator, whose bottom output is on the same network as a chest. The pipes empty the shears (an output-only inventory, so the network pulls from it), and at least 2 Raw Iron reach the chest. |
+| `item_pipe_hopper_pushes_but_chests_are_not_drained` | A hopper pushes 5 cobblestone down into a pipe and all 5 reach the two chests on the network. 10 diamonds already in one chest stay put: the pipes never move items from one chest to another. (The first version of this test caught two bugs: hoppers wouldn't push into a pipe that reported no room, and the shears' output-only slots, which report no room for wool, were taken for full and never pulled from.) |
+| `item_pipe_respects_transfer_rate` | With `transferRate = 1`, at most 10 wool leaves a stack of 64 in the shears in 10 ticks. |
+
+In the real client (`41_item_pipes.png`), yellow pipes run from Automatic Shears full of Iron Wool up into the side of a separator powered by a Creative Generator, and from its bottom along to a chest. Jade on a pipe (`42_item_pipe_jade.png`) reads *Network: 3 pipes, 2 blocks plugged in*. The shears' wool had already moved into the separator by then, so it reads *Moving 0 / 16 items/t*. `recipe_item_pipe.png` shows the recipe making 8.
 
 ### Zero Point hum (real client, recorded)
 

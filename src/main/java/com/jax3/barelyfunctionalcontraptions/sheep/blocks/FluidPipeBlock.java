@@ -17,7 +17,7 @@ import org.jspecify.annotations.Nullable;
  * Fluid Pipe. Works like the Energy Cable, for fluids: pipes join every pipe they touch into one network and plug into
  * any block with a fluid connection (the Fluid Reservoir, the Mycelial Generator's tank, other mods' tanks). Fluid
  * pushed into the network goes straight out to the blocks plugged into it, and the network pulls from blocks that
- * only give fluid out. See {@link com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidPipeNetwork}.
+ * only give fluid out. See {@link com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeNetwork}.
  */
 public class FluidPipeBlock extends ConduitBlock {
     public FluidPipeBlock(Properties properties) {

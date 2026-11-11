@@ -360,6 +360,22 @@ public final class DevScreenshotHarness {
             case 1907 -> shot(mc, "recipe_fluid_pipe");
             case 1910 -> {
                 mc.player.closeContainer();
+                setHudHidden(mc, true);
+                server.execute(() -> itemPipeScene(server));
+            }
+            case 1955 -> shot(mc, "41_item_pipes");
+            case 1957 -> {
+                setHudHidden(mc, false);
+                command(server, "clear @a");
+                // In front of the pipe beside the shears, looking down at it, so Jade shows the network.
+                server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 29", itemPipeBase.getX() + 1.5, itemPipeBase.getY(), itemPipeBase.getZ() + 2.5)));
+            }
+            case 1980 -> shot(mc, "42_item_pipe_jade");
+            case 1982 -> server.execute(() -> showRecipe(server, "item_pipe"));
+            case 2002 -> shot(mc, "recipe_item_pipe");
+            case 2005 -> {
+                mc.player.closeContainer();
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
@@ -614,6 +630,38 @@ public final class DevScreenshotHarness {
         }
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 200 25", base.getX() + 0.5, base.getY() + 2, base.getZ() + 8.0));
+    }
+
+    private static BlockPos itemPipeBase;
+
+    /**
+     * Automatic Shears full of Iron Wool, piped into the side of a powered Mechanical Separator, whose bottom output is
+     * piped on into a chest.
+     */
+    private static void itemPipeScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        BlockPos base = origin.offset(96, 30, -4);
+        itemPipeBase = base;
+        for (int x = -3; x <= 7; x++) for (int z = -3; z <= 5; z++) {
+            level.setBlock(base.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+            for (int y = 0; y <= 4; y++) level.setBlock(base.offset(x, y, z), Blocks.AIR.defaultBlockState(), 3);
+        }
+        level.setBlock(base, ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.SOUTH), 3);
+        if (level.getBlockEntity(base) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity shears) {
+            shears.setItem(0, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 64));
+            shears.setItem(1, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 64));
+        }
+        BlockPos separatorPos = base.offset(3, 1, 0);
+        level.setBlock(separatorPos, ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState().setValue(MechanicalSeparatorBlock.FACING, Direction.SOUTH), 3);
+        level.setBlock(separatorPos.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+        level.setBlock(base.offset(6, 0, 0), Blocks.CHEST.defaultBlockState(), 3);
+        var pipe = ModBlocks.ITEM_PIPE.get();
+        for (BlockPos pos : java.util.List.of(base.east(1), base.offset(1, 1, 0), base.offset(2, 1, 0), base.east(3), base.east(4), base.east(5))) {
+            level.setBlock(pos, pipe.withConnections(pipe.defaultBlockState(), level, pos), 3);
+        }
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 200 25", base.getX() + 2.0, base.getY() + 2, base.getZ() + 7.5));
     }
 
     /** Opens the floor module's GUI for the player. */

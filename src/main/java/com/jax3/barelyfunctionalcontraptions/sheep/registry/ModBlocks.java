@@ -84,6 +84,15 @@ public final class ModBlocks {
                     .noOcclusion()
                     .forceSolidOff());
 
+    /** Carries items between inventories: the Energy Cable's twin. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.ItemPipeBlock> ITEM_PIPE = REGISTER.registerBlock("item_pipe",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.ItemPipeBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(0.7F, 6.0F)
+                    .sound(SoundType.IRON)
+                    .noOcclusion()
+                    .forceSolidOff());
+
     /** Creative-only infinite FE source: unbreakable in survival, no recipe. */
     public static final DeferredBlock<CreativeGeneratorBlock> CREATIVE_GENERATOR = REGISTER.registerBlock("creative_generator",
             CreativeGeneratorBlock::new,

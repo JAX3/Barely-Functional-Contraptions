@@ -536,5 +536,12 @@
   "jade.barelyfunctionalcontraptions.pipe.network": "Network: %s pipes, %s blocks plugged in",
   "jade.barelyfunctionalcontraptions.pipe.rate": "Moving %s / %s mB/t",
   "advancements.barelyfunctionalcontraptions.fluid_pipe.title": "Pipe Dreams",
-  "advancements.barelyfunctionalcontraptions.fluid_pipe.description": "Craft some Fluid Pipes"
+  "advancements.barelyfunctionalcontraptions.fluid_pipe.description": "Craft some Fluid Pipes",
+  "config.jade.plugin_barelyfunctionalcontraptions.pipes": "Fluid and Item Pipes",
+  "block.barelyfunctionalcontraptions.item_pipe": "Item Pipe",
+  "tooltip.barelyfunctionalcontraptions.item_pipe": "Carries items from the Automatic Shears, the Mechanical Separator, hoppers and other inventories to the blocks it is plugged into. Touching pipes form one network that moves up to %s items a tick.",
+  "barelyfunctionalcontraptions.configuration.item_pipe": "Item Pipe",
+  "jade.barelyfunctionalcontraptions.item_pipe.rate": "Moving %s / %s items/t",
+  "advancements.barelyfunctionalcontraptions.item_pipe.title": "Special Delivery",
+  "advancements.barelyfunctionalcontraptions.item_pipe.description": "Craft some Item Pipes"
 }

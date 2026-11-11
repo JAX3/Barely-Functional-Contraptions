@@ -126,6 +126,8 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue cableMaxNetworkSize;
         public final ModConfigSpec.IntValue pipeTransferRate;
         public final ModConfigSpec.IntValue pipeMaxNetworkSize;
+        public final ModConfigSpec.IntValue itemPipeTransferRate;
+        public final ModConfigSpec.IntValue itemPipeMaxNetworkSize;
 
         // ---------------------------------------------------------------- /barelyfunctionalcontraptions generate
         public final ModConfigSpec.ConfigValue<List<? extends String>> generatorAllowedTabs;
@@ -301,6 +303,14 @@ public final class ModConfigs {
                     .defineInRange("transferRate", 4_000, 1, Integer.MAX_VALUE);
             pipeMaxNetworkSize = b.comment("Most pipes in one network. Longer runs split into separate networks, which only pass",
                             "fluid along through the blocks plugged into both.")
+                    .defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
+            b.pop();
+
+            b.comment("Item Pipe (touching pipes form one network that carries items between inventories)").push("item_pipe");
+            itemPipeTransferRate = b.comment("Most items per tick one pipe network carries in total, however many pipes and blocks are on it.")
+                    .defineInRange("transferRate", 16, 1, Integer.MAX_VALUE);
+            itemPipeMaxNetworkSize = b.comment("Most pipes in one network. Longer runs split into separate networks, which only pass",
+                            "items along through the blocks plugged into both.")
                     .defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
             b.pop();
 

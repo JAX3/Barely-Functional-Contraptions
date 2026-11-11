@@ -86,6 +86,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | ⭐ **Don't Cross the Streams** (challenge, hidden) | Get vaporised by a Zero Point beam. It stays hidden until you earn it and gives 50 experience. |
 | Plugged In | Craft some Energy Cables |
 | Pipe Dreams | Craft some Fluid Pipes |
+| Special Delivery | Craft some Item Pipes |
 
 The crafting advancements are earned by getting the item into your inventory however you make it (crafting table, autocrafter or a friend handing it over).
 
@@ -380,6 +381,27 @@ The Energy Cable's twin for fluids, in **blue** instead of purple. Pipes carry w
 
 ![Fluid Pipe recipe: copper ingots across the top and bottom rows, glass, a bucket and glass across the middle, making 8](docs/screenshots/recipe_fluid_pipe.png)
 
+### Item Pipe
+The third of the set: the same pipe for **items**, in **yellow**. It moves wool, separator outputs and anything else between inventories.
+
+![Automatic Shears full of Iron Wool piped up into the side of a Mechanical Separator, whose bottom output is piped on into a chest](docs/screenshots/41_item_pipes.png)
+
+- **Placing and networks:** these work like cables and fluid pipes. Item pipes join every item pipe they touch and plug into any block with an **item connection**: chests, barrels, hoppers, the Mechanical Separator, the Automatic Shears, the Fluid Reservoir and other mods' inventories. They never join Energy Cables or Fluid Pipes.
+- **Flow:** items pushed into any pipe come straight out at the other blocks plugged into the network, shared evenly, and never back into the block they came from. Pipes hold nothing themselves.
+- **Push and pull:**
+  - Hoppers and the separator's bottom output push items into pipes on their own.
+  - Each tick the network also **pulls** from slots holding items that block won't take back in. That covers the **Automatic Shears** (their inventory is output-only) and the separator's **output slots** (Raw Iron, String...).
+  - Chests, barrels and the separator's wool input are **never emptied** by the pipes, so two chests on one network don't pass items back and forth.
+- **Example:** shears → pipe → the side of a separator, then the separator's bottom → pipe → chest. Wool goes straight from the shears into the separator, and the resources come out into the chest. Separator sides follow its `itemInputSides`/`itemOutputSides` config: wool in at the top, back and sides, outputs out of the bottom.
+- **Speed:** a network moves up to **16 items a tick** in total (`transferRate` in `[item_pipe]`).
+- **Breaking** a pipe splits the network straight away.
+- **Jade** on a pipe shows the network size, how many blocks are plugged in and how many items a tick it is moving.
+
+  ![Jade on an Item Pipe: Network: 3 pipes, 2 blocks plugged in; Moving 0 / 16 items/t](docs/screenshots/42_item_pipe_jade.png)
+- The recipe makes **8** pipes: copper ingots across the top and bottom, glass, a hopper and glass across the middle.
+
+![Item Pipe recipe: copper ingots across the top and bottom rows, glass, a hopper and glass across the middle, making 8](docs/screenshots/recipe_item_pipe.png)
+
 ### Creative Generator (testing)
 An endless power source for creative mode, for testing builds without setting up mushroom farms. It's a slate block with a pulsing magenta energy core on every side, and it glows in the dark.
 
@@ -561,6 +583,13 @@ Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already 
 |---|---|---|
 | `transferRate` | 4000 | Most mB per tick one pipe network carries in total, however many pipes and blocks are on it |
 | `maxNetworkSize` | 4096 | Most pipes in one network. A longer run splits into separate networks, which only pass fluid on through blocks plugged into both |
+
+**`[item_pipe]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `transferRate` | 16 | Most items per tick one pipe network carries in total, however many pipes and blocks are on it |
+| `maxNetworkSize` | 4096 | Most pipes in one network. A longer run splits into separate networks, which only pass items on through blocks plugged into both |
 
 **`[generator]`** (limits for `/barelyfunctionalcontraptions generate`; see [What the generator may use](#what-the-generator-may-use))
 

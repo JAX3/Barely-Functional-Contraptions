@@ -1,7 +1,7 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.integration.jade;
 
-import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidPipeNetwork;
-import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidPipeBlockEntity;
+import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeNetwork;
+import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeBlockEntity;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -10,8 +10,8 @@ import org.jspecify.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.StreamServerDataProvider;
 
-/** Server half of the Fluid Pipe tooltip: the network's size, how many blocks are plugged in and its mB/t. */
-public enum FluidPipeDataProvider implements StreamServerDataProvider<BlockAccessor, FluidPipeDataProvider.Data> {
+/** Server half of the Fluid and Item Pipe tooltip: the network's size, how many blocks are plugged in and its rate. */
+public enum PipeDataProvider implements StreamServerDataProvider<BlockAccessor, PipeDataProvider.Data> {
     INSTANCE;
 
     public record Data(int cables, int endpoints, int rate, int maxRate) {
@@ -25,9 +25,9 @@ public enum FluidPipeDataProvider implements StreamServerDataProvider<BlockAcces
 
     @Override
     public @Nullable Data streamData(BlockAccessor accessor) {
-        if (!(accessor.getBlockEntity() instanceof FluidPipeBlockEntity be)) return null;
-        FluidPipeNetwork network = be.network();
-        return new Data(network.size(), network.endpoints().size(), network.rate(), FluidPipeNetwork.transferRate());
+        if (!(accessor.getBlockEntity() instanceof PipeBlockEntity<?> be)) return null;
+        PipeNetwork<?> network = be.network();
+        return new Data(network.size(), network.endpoints().size(), network.rate(), network.transferRate());
     }
 
     @Override
@@ -37,6 +37,6 @@ public enum FluidPipeDataProvider implements StreamServerDataProvider<BlockAcces
 
     @Override
     public Identifier getUid() {
-        return FluidPipeProvider.UID;
+        return PipeProvider.UID;
     }
 }
