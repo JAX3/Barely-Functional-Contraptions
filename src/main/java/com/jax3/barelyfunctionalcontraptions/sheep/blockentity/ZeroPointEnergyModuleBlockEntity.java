@@ -36,7 +36,9 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  * colour sections and syncs them too.</p>
  *
  * <p>The beam is dangerous: the floor module hurts every living thing touching it ({@code beamDamage}, with its own
- * "vaporised by a Zero Point beam" death message) and sets it on fire for {@code beamBurnSeconds}.</p>
+ * "vaporised by a Zero Point beam" death message) and sets it on fire for {@code beamBurnSeconds}. With
+ * {@code beamCountsAsPlayerKill} each hit also marks the mob as hurt by a fake player, so a beam kill drops experience
+ * and player-only loot as if a player had killed it.</p>
  */
 public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net.minecraft.world.MenuProvider {
     private static final int SCAN_INTERVAL = 5;
@@ -185,9 +187,24 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
                 e -> e.isAlive() && !e.isSpectator());
         if (targets.isEmpty()) return;
         var source = level.damageSources().source(BEAM_DAMAGE);
+        net.minecraft.world.entity.player.Player killer = ModConfigs.getBool(ModConfigs.SERVER.zpeBeamPlayerKill) ? beamPlayer(level, pos) : null;
         for (var target : targets) {
+            // Like a player's hit: if this blow (or the fire after it) kills, the mob drops experience and player-only loot.
+            if (killer != null && !(target instanceof net.minecraft.world.entity.player.Player)) target.setLastHurtByPlayer(killer, 100);
             if (target.hurtServer(level, source, damage) && burnSeconds > 0) target.igniteForSeconds(burnSeconds);
         }
+    }
+
+    /** Name of the fake player beam kills are credited to. */
+    public static final String BEAM_PLAYER_NAME = "[Zero Point Beam]";
+
+    /** The fake player beam kills are credited to, so they count as player kills; one per level, at this module. */
+    public static net.neoforged.neoforge.common.util.FakePlayer beamPlayer(ServerLevel level, BlockPos pos) {
+        java.util.UUID uuid = java.util.UUID.nameUUIDFromBytes(("barelyfunctionalcontraptions:" + BEAM_PLAYER_NAME)
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        var player = net.neoforged.neoforge.common.util.FakePlayerFactory.get(level, new com.mojang.authlib.GameProfile(uuid, BEAM_PLAYER_NAME));
+        player.setPos(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+        return player;
     }
 
     /** The beam's default colour, used until it passes through stained glass. */

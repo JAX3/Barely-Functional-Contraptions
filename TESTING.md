@@ -88,7 +88,7 @@ In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `reci
 
 ### Zero Point beam damage (`zero_point_beam_burns_what_touches_it`)
 
-An iron golem with no AI stands on the floor module of a linked pair, inside the beam, and a pig stands two blocks away. The golem's health drops, its last damage is the beam's own `barelyfunctionalcontraptions:zero_point_beam` damage type, and it is set on fire. The pig keeps full health and isn't burning. In the real client (`35_zero_point_beam_burns.png`), a pig placed in the beam is on fire and flashing red a few ticks later.
+An iron golem with no AI stands on the floor module of a linked pair, inside the beam, and a pig stands two blocks away. The golem's health drops, its last damage is the beam's own `barelyfunctionalcontraptions:zero_point_beam` damage type, and it is set on fire. The pig keeps full health and isn't burning. The golem's last attacking player is the beam's fake player, *[Zero Point Beam]*. A cow in a second beam burns to death and drops experience orbs, which only player kills do. A blaze credited to the beam's fake player drops blaze rods, which are player-only loot, over 40 rolls of its loot, and none without the player credit. In the real client (`35_zero_point_beam_burns.png`), a pig placed in the beam is on fire and flashing red a few ticks later.
 
 ### Zero Point beam looting (`zero_point_beam_kills_have_looting`)
 

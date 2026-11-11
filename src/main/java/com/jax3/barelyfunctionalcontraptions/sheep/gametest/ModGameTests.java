@@ -996,7 +996,40 @@ public final class ModGameTests {
         var golem = h.spawnWithNoFreeWill(EntityTypes.IRON_GOLEM, new BlockPos(3, 2, 3));
         var pig = h.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(5, 1, 3));
         var beamKey = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_DAMAGE;
+        String beamPlayer = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_PLAYER_NAME;
+
+        // A second beam with a cow in it: the cow burns to death and, as a player kill, drops experience.
+        BlockPos cowFloor = new BlockPos(1, 1, 1), cowCeiling = new BlockPos(1, 4, 1);
+        h.setBlock(cowFloor, zpe(Direction.UP));
+        h.setBlock(cowCeiling, zpe(Direction.DOWN));
+        zpeAt(h, cowFloor);
+        zpeAt(h, cowCeiling);
+        var cow = h.spawnWithNoFreeWill(EntityTypes.COW, new BlockPos(1, 2, 1));
+        var cowArea = new net.minecraft.world.phys.AABB(h.absolutePos(cowFloor)).inflate(2, 3, 2);
+
+        // Player-only loot: blaze rods only drop for player kills. Credited to the beam's fake player, they do.
+        var blaze = h.spawnWithNoFreeWill(EntityTypes.BLAZE, new BlockPos(5, 2, 5));
+        var beamSource = h.getLevel().damageSources().source(beamKey);
+        blaze.setLastHurtByPlayer(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity
+                .beamPlayer(h.getLevel(), h.absolutePos(cowFloor)), 100);
+        int rods = 0, rodsWithoutPlayer = 0;
+        for (int i = 0; i < 40; i++) {
+            List<ItemStack> asPlayerKill = new java.util.ArrayList<>(), notPlayerKill = new java.util.ArrayList<>();
+            blaze.dropFromLootTable(h.getLevel(), beamSource, true, blaze.getLootTable().orElseThrow(), asPlayerKill::add);
+            blaze.dropFromLootTable(h.getLevel(), beamSource, false, blaze.getLootTable().orElseThrow(), notPlayerKill::add);
+            rods += count(asPlayerKill, st -> st.is(Items.BLAZE_ROD));
+            rodsWithoutPlayer += count(notPlayerKill, st -> st.is(Items.BLAZE_ROD));
+        }
+        blaze.discard();
+        h.assertTrue(rods > 0 && rodsWithoutPlayer == 0, "blaze rods drop only as a player kill: " + rods + " vs " + rodsWithoutPlayer);
+
         h.succeedWhen(() -> {
+            var lastPlayer = golem.getLastHurtByPlayer();
+            h.assertTrue(lastPlayer != null && lastPlayer.getGameProfile().name().equals(beamPlayer),
+                    "the golem was last hurt by the beam's fake player, got " + lastPlayer);
+            h.assertFalse(cow.isAlive(), "the cow in the beam dies");
+            h.assertFalse(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.ExperienceOrb.class, cowArea).isEmpty(),
+                    "the beam kill drops experience");
             h.assertTrue(golem.getHealth() < golem.getMaxHealth(), "the golem in the beam is hurt, health " + golem.getHealth());
             h.assertTrue(golem.getLastDamageSource() != null && golem.getLastDamageSource().is(beamKey),
                     "hurt by the beam's own damage type, got " + golem.getLastDamageSource());
