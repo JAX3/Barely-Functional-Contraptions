@@ -22,18 +22,19 @@ OUT = os.path.join(os.path.dirname(__file__), "..", "..", "src", "main", "resour
 def zero_point_hum(seconds=4.0):
     t = np.arange(int(RATE * seconds)) / RATE
     two_pi = 2 * np.pi
-    # Body: a low electrical drone with odd harmonics, two slightly detuned voices beating twice every 4 s.
-    body = (np.sin(two_pi * 110 * t) + 0.55 * np.sin(two_pi * 110.5 * t)
-            + 0.35 * np.sin(two_pi * 220 * t) + 0.22 * np.sin(two_pi * 330 * t + 0.6)
-            + 0.10 * np.sin(two_pi * 550 * t + 1.1))
-    # Throb: a slow swell of the body, once a second.
-    body *= 0.85 + 0.15 * np.sin(two_pi * 1.0 * t)
-    # Shimmer: a soft high whine that rises and falls every 2 seconds, like charged air.
-    shimmer = (np.sin(two_pi * 1760 * t) + 0.5 * np.sin(two_pi * 2640.25 * t)) * (0.5 + 0.5 * np.sin(two_pi * 0.5 * t)) ** 2
-    # Crackle: a faint wobble on a mid tone, four times a second.
-    crackle = np.sin(two_pi * 880 * t + 2.0 * np.sin(two_pi * 4.0 * t)) * 0.5
-    mix = body + 0.12 * shimmer + 0.06 * crackle
-    return mix / np.max(np.abs(mix)) * 0.7
+    # Body: a deep 55 Hz electrical drone. Two slightly detuned voices beat once every 4 s; the harmonics up to
+    # 275 Hz carry the low note on small speakers and earbuds that can't play 55 Hz itself.
+    body = (np.sin(two_pi * 55 * t) + 0.6 * np.sin(two_pi * 55.25 * t)
+            + 0.7 * np.sin(two_pi * 110 * t + 0.3) + 0.45 * np.sin(two_pi * 165 * t + 0.6)
+            + 0.25 * np.sin(two_pi * 220 * t + 0.9) + 0.12 * np.sin(two_pi * 275 * t + 1.2))
+    # Throb: a slow, heavy swell of the body, twice every 4 seconds.
+    body *= 0.8 + 0.2 * np.sin(two_pi * 0.5 * t)
+    # Shimmer: a faint, lower whine that rises and falls every 2 seconds, like charged air.
+    shimmer = (np.sin(two_pi * 880 * t) + 0.5 * np.sin(two_pi * 1320.25 * t)) * (0.5 + 0.5 * np.sin(two_pi * 0.5 * t)) ** 2
+    # Crackle: a faint wobble on a low-mid tone, four times a second.
+    crackle = np.sin(two_pi * 440 * t + 2.0 * np.sin(two_pi * 4.0 * t)) * 0.5
+    mix = body + 0.06 * shimmer + 0.04 * crackle
+    return mix / np.max(np.abs(mix)) * 0.75
 
 
 def write_ogg(samples, path):

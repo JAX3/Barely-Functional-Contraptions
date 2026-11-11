@@ -19,7 +19,7 @@ import net.minecraft.util.RandomSource;
  */
 public final class ZeroPointHumSound extends AbstractTickableSoundInstance {
     private static final Map<BlockPos, ZeroPointHumSound> PLAYING = new HashMap<>();
-    private static final float VOLUME = 0.6F;
+    private static final float VOLUME = 0.75F;
     private static final float FADE_PER_TICK = 0.05F;
 
     private final ZeroPointEnergyModuleBlockEntity module;

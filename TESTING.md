@@ -90,11 +90,10 @@ In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `reci
 
 The screenshot run normally has no audio device. For this check, OpenAL Soft's *wave* output (`ALSOFT_DRIVERS=wave` and an `alsoft.conf` naming the file) recorded everything the game played to a WAV file. The game loads the sound with no missing-sound warnings, and the recording is analysed against the screenshot times in the log:
 - Before the Zero Point scene: no hum.
-- When the linked pair (6 blocks apart) appears: the hum starts. Its strongest frequencies are 98, 196, 294 and 490 Hz plus a 1,566 Hz shimmer, which is the hum's 110 / 220 / 330 / 550 / 1,760 Hz at the expected pitch of 0.89 for that gap.
-- When stone breaks the beam: the hum fades out while sliding down (98 → 80 Hz).
-- When the beam relinks: it comes back at 98 Hz.
+- When the linked pair (6 blocks apart) appears: the hum starts. Its strongest frequencies are 49, 98, 147, 196 and 245 Hz, which is the deep hum's 55 / 110 / 165 / 220 / 275 Hz at the expected pitch of 0.89 for that gap.
+- An earlier recording, made with the first, higher version of the hum, also showed the beam-break behaviour: when stone broke the beam, the hum faded out while sliding down in pitch, and it came back when the beam relinked.
 
-The loop itself is checked for clicks: the jump from its last sample to its first (0.033) is smaller than the largest step anywhere inside it (0.038).
+The loop itself is checked for clicks: the jump from its last sample to its first (0.017) is no bigger than the largest step anywhere inside it (0.018).
 
 ### Zero Point beam damage (`zero_point_beam_burns_what_touches_it`)
 
