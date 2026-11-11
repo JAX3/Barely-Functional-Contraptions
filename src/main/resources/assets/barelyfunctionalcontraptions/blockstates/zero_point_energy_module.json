@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "linked=false,vertical_direction=up": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/off"
+    },
+    "linked=true,vertical_direction=up": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on"
+    },
+    "linked=false,vertical_direction=down": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/off",
+      "x": 180
+    },
+    "linked=true,vertical_direction=down": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on",
+      "x": 180
+    }
+  }
+}

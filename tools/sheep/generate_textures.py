@@ -573,6 +573,80 @@ def generate_machine_block():
     grid(MACHINE_BLOCK, CARTOON).save(out("block/functional_machine_block.png"))
 
 
+# ---------------------------------------------------------------------------
+# Zero Point Energy Module: a 4px blue-steel base plate with a crystal emitter on top. Each texture comes "off"
+# (dull, unlinked) and "on" (bright blue, linked; the emitter pulses). The model only uses parts of each 16x16:
+#   plate: whole texture is the plate's top face (the emitter hides the middle 8x8)
+#   plate_side: rows 12-15 are the plate's edge
+#   emitter: rows 0-3, columns 4-11 are the emitter's sides; the middle 8x8 is its top
+# ---------------------------------------------------------------------------
+ZPE_PLATE = [
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSXXXXXXXXbSSO",
+    "OHMXOOOOOOOOXMSO",
+    "OHMXOkkkkkkOXMSO",
+    "OHMXOkkkkkkOXMSO",
+    "OHMXOkkkkkkOXMSO",
+    "OHMXOkkkkkkOXMSO",
+    "OHMXOkkkkkkOXMSO",
+    "OHMXOkkkkkkOXMSO",
+    "OHMXOOOOOOOOXMSO",
+    "OHMSXXXXXXXXSMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+ZPE_PLATE_SIDE = ["OHHHHHHHHHHHHHMO"] * 12 + [
+    "OOOOOOOOOOOOOOOO",
+    "OBbMMMXXXXMMMBbO",
+    "OSSSSSSSSSSSSSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+ZPE_EMITTER = [
+    "....OOOOOOOO....",
+    "....OnQQQQnO....",
+    "....ONnnnnNO....",
+    "....OOOOOOOO....",
+    "....OOOOOOOO....",
+    "....ONnnnnNO....",
+    "....OnQQQQnO....",
+    "....OnQqqQnO....",
+    "....OnQqqQnO....",
+    "....OnQQQQnO....",
+    "....ONnnnnNO....",
+    "....OOOOOOOO....",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+ZPE_OFF = {"X": hexc("#2a2238"), "N": hexc("#2a2238"), "n": hexc("#3f4766"), "Q": hexc("#5d6687"), "q": hexc("#8d97bc")}
+ZPE_ON = {"X": hexc("#3fc8ff"), "N": hexc("#1b5fa8"), "n": hexc("#3fc8ff"), "Q": hexc("#a8ecff"), "q": hexc("#ffffff")}
+
+
+def generate_zero_point_module():
+    for rows in (ZPE_PLATE, ZPE_PLATE_SIDE, ZPE_EMITTER):
+        assert len(rows) == 16 and all(len(r) == 16 for r in rows)
+    base = "block/zero_point_energy_module/"
+    for state, extra in (("off", ZPE_OFF), ("on", ZPE_ON)):
+        pal = dict(CARTOON, **extra)
+        grid(ZPE_PLATE, pal).save(out(base + f"plate_{state}.png"))
+        grid(ZPE_PLATE_SIDE, pal).save(out(base + f"plate_side_{state}.png"))
+    grid(ZPE_EMITTER, dict(CARTOON, **ZPE_OFF)).save(out(base + "emitter_off.png"))
+    # Linked: the emitter pulses between bright blue and white.
+    strip = Image.new("RGBA", (16, 64), CLEAR)
+    for f, t in enumerate([0.0, 0.4, 0.8, 0.4]):
+        pal = dict(CARTOON, **ZPE_ON)
+        pal["n"] = mix(hexc("#3fc8ff"), hexc("#a8ecff"), t)
+        pal["Q"] = mix(hexc("#a8ecff"), hexc("#ffffff"), t)
+        strip.paste(grid(ZPE_EMITTER, pal), (0, f * 16))
+    strip.save(out(base + "emitter_on.png"))
+    with open(out(base + "emitter_on.png.mcmeta"), "w") as fh:
+        fh.write('{\n  "animation": {\n    "frametime": 3,\n    "interpolate": true\n  }\n}\n')
+
+
 def generate_creative_generator():
     """4-frame pulsing glow animation, same on every face."""
     strip = Image.new("RGBA", (16, 64), CLEAR)
@@ -1726,6 +1800,7 @@ def main():
     generate_shears_gui()
     generate_fluid_reservoir()
     generate_machine_block()
+    generate_zero_point_module()
     generate_reservoir_gui()
     generate_energy_cube()
     generate_cube_gui()

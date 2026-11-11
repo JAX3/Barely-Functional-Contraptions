@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "E": "minecraft:ender_pearl",
+    "A": "minecraft:amethyst_shard",
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
+    "R": "minecraft:redstone_block"
+  },
+  "pattern": [
+    "IEI",
+    "AMA",
+    "IRI"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:zero_point_energy_module",
+    "count": 2
+  }
+}

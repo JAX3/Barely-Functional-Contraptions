@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 76 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 49 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 28 screenshots and 7 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 77 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 50 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 30 screenshots and 8 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -75,17 +75,26 @@ In the real client (`17_wireless_power.png`, `18_wireless_separator_gui.png`): a
 
 In the real client (`15_fluid_reservoir.png`, `16_fluid_reservoir_gui.png`): the reservoir on its pool shows water in its side windows next to a running generator, and a second one on dry stone is half full. The GUI shows the water gauge with bucket marks, *8,610 mB of 10,000 mB*, *8.6 buckets*, *+1,000 mB/s*, the *Filling* lamp, and an empty bucket in the top slot already turned into a water bucket in the bottom slot.
 
+### Zero Point Energy Module (`zero_point_modules_generate_across_a_gap`)
+
+A module pointing up on the floor and one pointing down three blocks above it link at distance 3. Their output is 2 x `energyPerBlock` (a 2-block gap), and the two modules' shares add up to it. Both blockstates switch to `linked=true`. Glass in the gap keeps the link. Stone in the gap breaks it: both modules go back to `linked=false` and make nothing. Two modules both pointing up don't link, and nor do two touching modules (no gap). A Hume Energy Cube beside the floor module fills with the module's energy, the ceiling module charges its own buffer, and inserting FE into a module is refused.
+
+In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `recipe_zero_point_energy_module.png`):
+- a floor module and a ceiling module under a stone overhang, 6 blocks apart, are joined by the blue beam, with both emitters lit;
+- Jade on the floor module reads *Linked to the module above (5 block gap)* and *+25 FE/t (pair: 50 FE/t)*, with an empty buffer because it is pushing everything into the Hume Energy Cube next to it;
+- the recipe makes 2.
+
 ### Block sounds (`all_blocks_use_iron_block_sounds`)
 
-Every block in the mod (the Functional Machine Block, all five machines and the Creative Generator) uses the vanilla Iron Block's sound type, so placing, breaking, stepping on and hitting them sound like an Iron Block. The test checks every registered block in the mod's namespace against `Blocks.IRON_BLOCK`.
+Every block in the mod (the Functional Machine Block, all six machines and the Creative Generator) uses the vanilla Iron Block's sound type, so placing, breaking, stepping on and hitting them sound like an Iron Block. The test checks every registered block in the mod's namespace against `Blocks.IRON_BLOCK`.
 
 ### Functional Machine Block (`machines_are_built_from_functional_machine_block`)
 
-The Functional Machine Block has a shaped recipe and is mined with a pickaxe, and each of the five machine recipes (generator, separator, shears, reservoir, energy cube) takes exactly one. In the real client (`recipe_functional_machine_block.png` and the other `recipe_*.png` shots) each recipe is laid out in a crafting table and its result slot shows the item, so the recipes load and match.
+The Functional Machine Block has a shaped recipe and is mined with a pickaxe, and each of the six machine recipes (generator, separator, shears, reservoir, energy cube, Zero Point Energy Module) takes exactly one. In the real client (`recipe_functional_machine_block.png` and the other `recipe_*.png` shots) each recipe is laid out in a crafting table and its result slot shows the item, so the recipes load and match.
 
 ### Creative tabs (`creative_tabs_split_wool`)
 
-The machines and tools are in the *Barely Functional Contraptions* tab, and every resource wool type is in its own *Resource Wool* tab right after it. The test rebuilds the creative tabs and checks that the main tab has no resource wool but does have the machines, and that the wool tab holds only resource wool, at least every built-in type. In the real client (`28_creative_tab_main.png`, `27_creative_tab_wool.png`) the main tab shows the Functional Machine Block and the seven machines and tools, and the wool tab shows all 15 wool types, including the three made by the harness's generate commands.
+The machines and tools are in the *Barely Functional Contraptions* tab, and every resource wool type is in its own *Resource Wool* tab right after it. The test rebuilds the creative tabs and checks that the main tab has no resource wool but does have the machines, and that the wool tab holds only resource wool, at least every built-in type. In the real client (`28_creative_tab_main.png`, `27_creative_tab_wool.png`) the main tab shows the Functional Machine Block and the eight machines and tools, and the wool tab shows all 15 wool types, including the three made by the harness's generate commands.
 
 ### JEI: no tag pages for this mod's own tags
 

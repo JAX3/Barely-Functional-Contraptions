@@ -56,6 +56,16 @@ public final class ModBlocks {
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.IRON));
 
+    /** Generates FE in pairs: one on the floor, one on the ceiling above it. Stone pickaxe; glows while linked. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock> ZERO_POINT_ENERGY_MODULE = REGISTER.registerBlock("zero_point_energy_module",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.IRON)
+                    .noOcclusion()
+                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.LINKED) ? 9 : 0));
+
     /** Creative-only infinite FE source: unbreakable in survival, no recipe. */
     public static final DeferredBlock<CreativeGeneratorBlock> CREATIVE_GENERATOR = REGISTER.registerBlock("creative_generator",
             CreativeGeneratorBlock::new,

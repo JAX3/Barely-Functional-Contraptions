@@ -277,6 +277,27 @@ Any shape works, not just full boxes. L-shapes, rings and walls with bends get p
 
 ![Hume Energy Cube recipe: iron ingots in the corners, amethyst shards on the top and sides, a block of redstone in the centre, a Functional Machine Block bottom middle](docs/screenshots/recipe_hume_energy_cube.png)
 
+### Zero Point Energy Module
+A generator that comes in pairs. Put one module on the floor and another on the ceiling **directly above it**, with open space between them. The two link with a **blue beam** and make Forge Energy out of the gap: **the farther apart they are, the more power they make**.
+
+| A linked pair, 5 blocks apart | Jade on the floor module |
+|---|---|
+| ![Two Zero Point Energy Modules, one on the floor and one under a stone overhang, joined by a blue beam, charging a Hume Energy Cube](docs/screenshots/29_zero_point_modules.png) | ![Jade: linked to the module above (5 block gap), +25 FE/t (pair: 50 FE/t)](docs/screenshots/30_zero_point_jade.png) |
+
+- **Placing:** it goes on like an end rod. Placed on top of a block, the emitter points **up**; placed on the underside of a block (a ceiling), it points **down**. Placed against a wall, it points the opposite way to the way you're looking (look down to make it point up).
+- **Linking:** a module pointing up links with the **nearest module above it in the same column** that points down. The two must:
+  - face each other (two modules pointing the same way never link);
+  - have at least one block of open space between them (`minGap`), and be no more than 64 blocks apart (`maxRange`);
+  - have nothing solid in the way. The beam passes through air, glass, panes, leaves and anything else see-through, so you can build a glass tube around it. Any solid block breaks the link.
+  Modules check for their partner a few times a second, so breaking a block in the way, or one of the modules, switches the beam off almost straight away.
+- **Power:** a linked pair makes **10 FE/t for every block of gap** (`energyPerBlock`), split between the two modules. A 5-block gap makes 50 FE/t (25 each), and a 63-block gap, the largest, makes 630 FE/t.
+- **Output:** each module has a 50,000 FE buffer and **pushes energy into every machine or cable touching it**, up to 10,000 FE/t (`maxOutput`). Cables can also pull from it. Modules don't accept energy and never push into each other. Use both ends: the floor module can power your machines while the ceiling module charges a Hume Energy Cube.
+- **Looks:** while linked, the emitters glow bright blue, pulse and give off light, and blue sparks drift around them. Unlinked modules are dull grey-blue.
+- **Jade** shows whether a module is linked, the gap to its partner and how much it and the pair make. If it isn't linked, it tells you it needs a module facing it in the same column.
+- The recipe makes **two** modules, one pair. Mine them with a stone pickaxe or better.
+
+![Zero Point Energy Module recipe: iron ingots in the corners, an ender pearl top middle, amethyst shards on the sides, a Functional Machine Block in the centre and a block of redstone bottom middle, making 2](docs/screenshots/recipe_zero_point_energy_module.png)
+
 ### Creative Generator (testing)
 An endless power source for creative mode, for testing builds without setting up mushroom farms. It's a slate block with a pulsing magenta energy core on every side, and it glows in the dark.
 
@@ -430,6 +451,16 @@ Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already 
 | Key | Default | Meaning |
 |---|---|---|
 | `creativeGeneratorOutput` | 1000000 | FE pushed into each adjacent receiver per tick (0 = only allow pulling) |
+
+**`[zero_point_energy_module]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `energyPerBlock` | 10 | FE/t a linked pair makes for every block of open space between the modules, split between the two |
+| `minGap` | 1 | Fewest blocks of open space needed between the modules before they link |
+| `maxRange` | 64 | Furthest apart (in blocks) two modules can be and still link |
+| `energyCapacity` | 50000 | FE buffer of each module |
+| `maxOutput` | 10000 | Most FE/t each module pushes into, or lets be pulled by, its neighbours |
 
 **`[generator]`** (limits for `/barelyfunctionalcontraptions generate`; see [What the generator may use](#what-the-generator-may-use))
 

@@ -121,6 +121,7 @@ public final class ModGameTests {
         TESTS.put("killing_infused_sheep_drops_more_than_shearing", ModGameTests::killInfused);
         TESTS.put("machines_are_built_from_functional_machine_block", ModGameTests::machineBlockRecipes);
         TESTS.put("all_blocks_use_iron_block_sounds", ModGameTests::ironSounds);
+        TESTS.put("zero_point_modules_generate_across_a_gap", ModGameTests::zeroPointModules);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -275,7 +276,7 @@ public final class ModGameTests {
                 "the Functional Machine Block has a shaped recipe");
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FUNCTIONAL_MACHINE_BLOCK.get().defaultBlockState()
                 .is(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE), "mined with a pickaxe");
-        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube")) {
+        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "zero_point_energy_module")) {
             var holder = recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
                     ResourcefulSheep.id(machine))).orElse(null);
             h.assertTrue(holder != null && holder.value() instanceof net.minecraft.world.item.crafting.ShapedRecipe, "missing recipe " + machine);
@@ -851,6 +852,73 @@ public final class ModGameTests {
         h.assertTrue(SheepResource.DEFINITION_CODEC.parse(ops, JsonParser.parseString(bad)).error().isPresent(), "missing items are reported as errors");
         h.assertTrue(ModItems.RESOURCE_WOOL.get() != null, "items registered");
         h.succeed();
+    }
+
+    private static net.minecraft.world.level.block.state.BlockState zpe(Direction facing) {
+        return ModBlocks.ZERO_POINT_ENERGY_MODULE.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.FACING, facing);
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity zpeAt(GameTestHelper h, BlockPos pos) {
+        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.class);
+        be.updateLink(h.getLevel(), h.absolutePos(pos), h.getLevel().getBlockState(h.absolutePos(pos)));
+        return be;
+    }
+
+    /**
+     * Zero Point Energy Modules: a floor module (up) and a ceiling module (down) in one column link across open space
+     * or glass and make energyPerBlock FE/t per block of gap, split between them, which they push into neighbours.
+     * A solid block in the way, two modules facing the same way, or modules with no gap don't link.
+     */
+    private static void zeroPointModules(GameTestHelper h) {
+        var linkedProp = com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.LINKED;
+        int perBlock = ModConfigs.getInt(ModConfigs.SERVER.zpeEnergyPerBlock);
+        BlockPos floor = new BlockPos(1, 1, 1), ceiling = new BlockPos(1, 4, 1);
+        h.setBlock(floor, zpe(Direction.UP));
+        h.setBlock(ceiling, zpe(Direction.DOWN));
+        var low = zpeAt(h, floor);
+        var high = zpeAt(h, ceiling);
+        h.assertTrue(low.getLinkDistance() == 3 && high.getLinkDistance() == 3, "pair 3 apart links, got " + low.getLinkDistance() + "/" + high.getLinkDistance());
+        h.assertTrue(low.getPairOutput() == 2 * perBlock, "2-block gap makes " + 2 * perBlock + " FE/t, got " + low.getPairOutput());
+        h.assertTrue(low.getGenerating() + high.getGenerating() == low.getPairOutput(), "the two halves add up to the pair's output");
+        h.assertBlockProperty(floor, linkedProp, true);
+        h.assertBlockProperty(ceiling, linkedProp, true);
+
+        // Glass doesn't block the beam; stone does.
+        h.setBlock(floor.above(2), Blocks.GLASS);
+        h.assertTrue(zpeAt(h, floor).getLinkDistance() == 3, "glass in the gap keeps the link");
+        h.setBlock(floor.above(2), Blocks.STONE);
+        h.assertTrue(zpeAt(h, floor).getLinkDistance() == 0 && zpeAt(h, ceiling).getLinkDistance() == 0, "stone in the gap breaks the link");
+        h.assertBlockProperty(floor, linkedProp, false);
+        h.assertTrue(zpeAt(h, floor).getGenerating() == 0, "unlinked modules make nothing");
+        h.setBlock(floor.above(2), Blocks.AIR);
+
+        // Both pointing up: no link.
+        BlockPos sameA = new BlockPos(5, 1, 1), sameB = new BlockPos(5, 4, 1);
+        h.setBlock(sameA, zpe(Direction.UP));
+        h.setBlock(sameB, zpe(Direction.UP));
+        h.assertTrue(zpeAt(h, sameA).getLinkDistance() == 0, "modules must face each other");
+        // Touching (no gap): no link.
+        BlockPos touchA = new BlockPos(5, 1, 5), touchB = new BlockPos(5, 2, 5);
+        h.setBlock(touchA, zpe(Direction.UP));
+        h.setBlock(touchB, zpe(Direction.DOWN));
+        h.assertTrue(zpeAt(h, touchA).getLinkDistance() == 0, "modules need open space between them");
+
+        // A Hume Energy Cube touching the floor module fills up; the pair keeps making power over time.
+        BlockPos cubePos = new BlockPos(1, 1, 2);
+        h.setBlock(cubePos, ModBlocks.HUME_ENERGY_CUBE.get());
+        h.succeedWhen(() -> {
+            var cube = h.getBlockEntity(cubePos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
+            int stored = cube.storage().getAmountAsInt();
+            h.assertTrue(stored >= 20 * low.getGenerating(), "cube should receive the floor module's FE, has " + stored);
+            h.assertTrue(high.getEnergyStored() > 0, "the ceiling module charges its own buffer");
+            // The module only gives energy; nothing can be pushed into it.
+            EnergyHandler handler = h.getLevel().getCapability(Capabilities.Energy.BLOCK, h.absolutePos(floor), Direction.NORTH);
+            h.assertTrue(handler != null, "module exposes FE");
+            try (Transaction tx = Transaction.openRoot()) {
+                h.assertTrue(handler.insert(1000, tx) == 0, "modules don't accept FE");
+            }
+        });
     }
 
     private static void creativeGeneratorPowers(GameTestHelper h) {

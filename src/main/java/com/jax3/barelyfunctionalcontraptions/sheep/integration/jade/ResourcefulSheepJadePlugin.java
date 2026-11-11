@@ -31,5 +31,6 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerEntityComponent(SheepInfusionProvider.INSTANCE, LivingEntity.class);
         registration.registerBlockComponent(SeparatorStatusProvider.INSTANCE, MechanicalSeparatorBlock.class);
         registration.registerProgressClient(SeparatorProgressProvider.INSTANCE);
+        registration.registerBlockComponent(ZeroPointModuleProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.class);
     }
 }

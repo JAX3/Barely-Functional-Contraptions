@@ -113,6 +113,11 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue energyCubeTransferPerCube;
         public final ModConfigSpec.IntValue energyCubeMaxGroupSize;
         public final ModConfigSpec.BooleanValue energyCubeAutoOutput;
+        public final ModConfigSpec.IntValue zpeEnergyPerBlock;
+        public final ModConfigSpec.IntValue zpeMinGap;
+        public final ModConfigSpec.IntValue zpeMaxRange;
+        public final ModConfigSpec.IntValue zpeCapacity;
+        public final ModConfigSpec.IntValue zpeMaxOutput;
 
         // ---------------------------------------------------------------- /barelyfunctionalcontraptions generate
         public final ModConfigSpec.ConfigValue<List<? extends String>> generatorAllowedTabs;
@@ -245,6 +250,20 @@ public final class ModConfigs {
                     .defineInRange("maxGroupSize", 64, 1, 4096);
             energyCubeAutoOutput = b.comment("Push energy into machines and cables touching the group every tick. false = they must pull it.")
                     .define("autoOutput", true);
+            b.pop();
+
+            b.comment("Zero Point Energy Module (two modules in one column, facing each other, generate FE across the gap)").push("zero_point_energy_module");
+            zpeEnergyPerBlock = b.comment("FE/t a linked pair makes for every block of open space between the modules, split between the two.",
+                            "Default: a 10-block gap makes 100 FE/t.")
+                    .defineInRange("energyPerBlock", 10, 0, 1_000_000);
+            zpeMinGap = b.comment("Fewest blocks of open space needed between the two modules before they link.")
+                    .defineInRange("minGap", 1, 1, 256);
+            zpeMaxRange = b.comment("Furthest apart (in blocks) two modules can be and still link.")
+                    .defineInRange("maxRange", 64, 2, 384);
+            zpeCapacity = b.comment("FE buffer of each module.")
+                    .defineInRange("energyCapacity", 50_000, 1, Integer.MAX_VALUE);
+            zpeMaxOutput = b.comment("Most FE/t each module pushes into the machines and cables touching it (and that they can pull).")
+                    .defineInRange("maxOutput", 10_000, 1, Integer.MAX_VALUE);
             b.pop();
 
             b.comment("Which items /barelyfunctionalcontraptions generate may turn into wool types (feeding items and separator outputs).",

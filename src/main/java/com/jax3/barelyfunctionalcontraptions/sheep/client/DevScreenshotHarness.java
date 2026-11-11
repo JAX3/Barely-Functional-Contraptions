@@ -245,25 +245,37 @@ public final class DevScreenshotHarness {
                     String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 150 35", cubeBase.getX() + 7.0, cubeBase.getY() + 3, cubeBase.getZ() + 17.0)));
             case 1185 -> shot(mc, "25_energy_cube_folds");
             // Crafting recipes, shown in a real crafting table: one every 25 ticks.
-            case 1190, 1215, 1240, 1265, 1290, 1315, 1340 -> {
+            case 1190, 1215, 1240, 1265, 1290, 1315, 1340, 1365 -> {
                 int index = (tick - 1190) / 25;
                 if (index > 0) mc.player.closeContainer();
                 setHudHidden(mc, false);
                 server.execute(() -> showRecipe(server, RECIPES[index]));
             }
-            case 1210, 1235, 1260, 1285, 1310, 1335, 1360 -> shot(mc, "recipe_" + RECIPES[(tick - 1210) / 25]);
-            case 1365 -> {
+            case 1210, 1235, 1260, 1285, 1310, 1335, 1360, 1385 -> shot(mc, "recipe_" + RECIPES[(tick - 1210) / 25]);
+            case 1390 -> {
                 mc.player.closeContainer();
                 setHudHidden(mc, true);
                 server.execute(() -> creativeScene(server));
             }
-            case 1410 -> shot(mc, "26_creative_generator");
-            case 1413 -> command(server, "gamemode creative @a");
-            case 1420 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get());
-            case 1435 -> shot(mc, "27_creative_tab_wool");
-            case 1440 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.MAIN.get());
-            case 1455 -> shot(mc, "28_creative_tab_main");
-            case 1460 -> {
+            case 1435 -> shot(mc, "26_creative_generator");
+            case 1438 -> command(server, "gamemode creative @a");
+            case 1445 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get());
+            case 1460 -> shot(mc, "27_creative_tab_wool");
+            case 1465 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.MAIN.get());
+            case 1480 -> shot(mc, "28_creative_tab_main");
+            case 1485 -> {
+                mc.gui.setScreen(null);
+                server.execute(() -> zeroPointScene(server));
+            }
+            case 1530 -> shot(mc, "29_zero_point_modules");
+            case 1532 -> {
+                setHudHidden(mc, false);
+                command(server, "clear @a");
+                server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 27", zeroPointBase.getX() + 0.5, zeroPointBase.getY(), zeroPointBase.getZ() + 3.0)));
+            }
+            case 1555 -> shot(mc, "30_zero_point_jade");
+            case 1560 -> {
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
@@ -373,7 +385,7 @@ public final class DevScreenshotHarness {
 
     /** The crafted contraptions, in the order the README shows them. */
     private static final String[] RECIPES = {"functional_machine_block", "mycelial_generator", "mycelium_wrench", "mechanical_separator",
-            "automatic_shears", "fluid_reservoir", "hume_energy_cube"};
+            "automatic_shears", "fluid_reservoir", "hume_energy_cube", "zero_point_energy_module"};
 
     /**
      * Opens a crafting table and lays a recipe's ingredients out in its grid from the recipe's own pattern, so the
@@ -428,6 +440,29 @@ public final class DevScreenshotHarness {
         placeCube(level, base.above(2), 0);
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 20", base.getX() + 0.5, base.getY() + 2, base.getZ() + 5.0));
+    }
+
+    private static BlockPos zeroPointBase;
+
+    /**
+     * A linked pair of Zero Point Energy Modules: one on a stone floor pointing up, one under a stone overhang six
+     * blocks above pointing down, with the beam between them, charging a Hume Energy Cube beside the floor module.
+     */
+    private static void zeroPointScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        BlockPos base = origin.offset(48, 30, -4);
+        zeroPointBase = base;
+        for (int x = -3; x <= 3; x++) for (int z = -2; z <= 2; z++) level.setBlock(base.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+        // A pillar behind and an overhang over the floor module.
+        for (int y = 0; y <= 6; y++) level.setBlock(base.offset(0, y, -2), Blocks.STONE_BRICKS.defaultBlockState(), 3);
+        for (int x = -1; x <= 1; x++) for (int z = -2; z <= 0; z++) level.setBlock(base.offset(x, 7, z), Blocks.STONE_BRICKS.defaultBlockState(), 3);
+        var module = ModBlocks.ZERO_POINT_ENERGY_MODULE.get().defaultBlockState();
+        var facing = com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.FACING;
+        level.setBlock(base, module.setValue(facing, Direction.UP), 3);
+        level.setBlock(base.above(6), module.setValue(facing, Direction.DOWN), 3);
+        placeCube(level, base.east(), 0);
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 -12", base.getX() + 0.5, base.getY() + 1, base.getZ() + 8.5));
     }
 
     private static BlockPos wirelessBase;

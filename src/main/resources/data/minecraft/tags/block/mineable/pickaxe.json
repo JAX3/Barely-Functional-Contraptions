@@ -5,6 +5,7 @@
     "barelyfunctionalcontraptions:automatic_shears",
     "barelyfunctionalcontraptions:fluid_reservoir",
     "barelyfunctionalcontraptions:hume_energy_cube",
-    "barelyfunctionalcontraptions:functional_machine_block"
+    "barelyfunctionalcontraptions:functional_machine_block",
+    "barelyfunctionalcontraptions:zero_point_energy_module"
   ]
 }

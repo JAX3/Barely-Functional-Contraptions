@@ -459,5 +459,13 @@
   "gui.barelyfunctionalcontraptions.cube.status.idle.desc": "No energy is moving in or out",
   "itemGroup.barelyfunctionalcontraptions.resource_wool": "Resource Wool",
   "block.barelyfunctionalcontraptions.functional_machine_block": "Functional Machine Block",
-  "tooltip.barelyfunctionalcontraptions.functional_machine_block": "The casing every machine is built around."
+  "tooltip.barelyfunctionalcontraptions.functional_machine_block": "The casing every machine is built around.",
+  "block.barelyfunctionalcontraptions.zero_point_energy_module": "Zero Point Energy Module",
+  "tooltip.barelyfunctionalcontraptions.zero_point_energy_module": "Generates Forge Energy in pairs: place one on the floor and one on the ceiling directly above it, with open space between. The bigger the gap, the more power.",
+  "jade.barelyfunctionalcontraptions.zpe.unlinked": "No partner: needs a module facing it in the same column",
+  "jade.barelyfunctionalcontraptions.zpe.linked_above": "Linked to the module above (%s block gap)",
+  "jade.barelyfunctionalcontraptions.zpe.linked_below": "Linked to the module below (%s block gap)",
+  "jade.barelyfunctionalcontraptions.zpe.output": "+%s FE/t (pair: %s FE/t)",
+  "config.jade.plugin_barelyfunctionalcontraptions.zero_point_module": "Zero Point Energy Module",
+  "barelyfunctionalcontraptions.configuration.zero_point_energy_module": "Zero Point Energy Module"
 }

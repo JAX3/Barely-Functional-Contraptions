@@ -27,5 +27,8 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity>> HUME_ENERGY_CUBE = REGISTER.register("hume_energy_cube",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity::new, ModBlocks.HUME_ENERGY_CUBE.get()));
 
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity>> ZERO_POINT_ENERGY_MODULE = REGISTER.register("zero_point_energy_module",
+            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity::new, ModBlocks.ZERO_POINT_ENERGY_MODULE.get()));
+
     private ModBlockEntities() {}
 }
