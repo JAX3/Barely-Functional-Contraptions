@@ -255,7 +255,7 @@ public final class ModConfigs {
             b.comment("Zero Point Energy Module (two modules in one column, facing each other, generate FE across the gap)").push("zero_point_energy_module");
             zpeEnergyPerBlock = b.comment("FE/t a linked pair makes for every block of open space between the modules.",
                             "The two modules share one pool, so all of it can be taken from either module.",
-                            "Default: a 10-block gap makes 100 FE/t.")
+                            "Default: a 10-block gap makes 10,000 FE/t.")
                     .defineInRange("energyPerBlock", 1000, 0, 1_000_000);
             zpeMinGap = b.comment("Fewest blocks of open space needed between the two modules before they link.")
                     .defineInRange("minGap", 1, 1, 256);

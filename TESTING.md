@@ -81,9 +81,9 @@ A module pointing up on the floor and one pointing down three blocks above it li
 
 In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `recipe_zero_point_energy_module.png`):
 - a floor module and a ceiling module under a stone overhang, 6 blocks apart, are joined by the blue beam, with both emitters lit. Looking up from underneath (`33_zero_point_beam_top.png`), the beam runs right into the ceiling module's emitter: it goes from the floor emitter's tip, half a block up, to the ceiling emitter's tip, half a block into its block, so it is exactly as long as the distance between the modules (it used to stop a block short). With red stained glass 2 blocks up and yellow 4 up (`34_zero_point_coloured_beam.png`), the beam is blue to the red glass, red to the yellow glass and orange from there to the ceiling module;
-- Jade on the floor module reads *Linked to the module above (5 block gap)* and *+50 FE/t, from either module*, with a 100 kFE pooled buffer that stays nearly empty because the floor module pushes the whole pool into the Hume Energy Cube next to it;
+- Jade on the floor module reads *Linked to the module above (5 block gap)* and *+5,000 FE/t, from either module*, with a 100 kFE pooled buffer that stays nearly empty because the floor module pushes the whole pool into the Hume Energy Cube next to it;
 - the recipe makes 2;
-- the GUI (`31_zero_point_gui.png`) shows the beam diagram with both modules lit and the beam between them, *of 100,000 FE*, *+50 FE/t*, *Shared pool*, *Out: 50 FE/t* (the full output, through the floor module alone) and a green *Linked: 5 block gap*;
+- the GUI (`31_zero_point_gui.png`) shows the beam diagram with both modules lit and the beam between them, *of 100,000 FE*, *+5,000 FE/t*, *Shared pool*, *Out: 5,000 FE/t* (the full output, through the floor module alone) and a green *Linked: 5 block gap*;
 - after a stone block is put in the gap (`32_zero_point_gui_blocked.png`), the GUI shows the blocking block on a dotted line above the module, *+0 FE/t* and a red *Beam blocked 3 above*.
 
 ### Block sounds (`all_blocks_use_iron_block_sounds`)

@@ -282,7 +282,7 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 
 | A linked pair, 5 blocks apart | Jade on the floor module |
 |---|---|
-| ![Two Zero Point Energy Modules, one on the floor and one under a stone overhang, joined by a blue beam, charging a Hume Energy Cube](docs/screenshots/29_zero_point_modules.png) | ![Jade: linked to the module above (5 block gap), +50 FE/t from either module, 25 FE of 100 kFE](docs/screenshots/30_zero_point_jade.png) |
+| ![Two Zero Point Energy Modules, one on the floor and one under a stone overhang, joined by a blue beam, charging a Hume Energy Cube](docs/screenshots/29_zero_point_modules.png) | ![Jade: linked to the module above (5 block gap), +5,000 FE/t from either module, 2.5 kFE of 100 kFE](docs/screenshots/30_zero_point_jade.png) |
 
 - **Placing:** it goes on like an end rod. Placed on top of a block, the emitter points **up**; placed on the underside of a block (a ceiling), it points **down**. Placed against a wall, it points the opposite way to the way you're looking (look down to make it point up).
 - **Linking:** a module pointing up links with the **nearest module above it in the same column** that points down. The two must:
@@ -290,9 +290,9 @@ A generator that comes in pairs. Put one module on the floor and another on the 
   - have at least one block of open space between them (`minGap`), and be no more than 64 blocks apart (`maxRange`);
   - have nothing solid in the way. The beam passes through air, glass, panes, leaves and anything else see-through, so you can build a glass tube around it. Any solid block breaks the link.
   Modules check for their partner a few times a second, so breaking a block in the way, or one of the modules, switches the beam off almost straight away.
-- **Power:** a linked pair makes **10 FE/t for every block of gap** (`energyPerBlock`). A 5-block gap makes 50 FE/t, and a 63-block gap, the largest, makes 630 FE/t.
-- **Take it from either end:** the two modules share **one pool of energy**, so **the pair's full output can be taken from either module**. You only need to connect one of them: a machine on the floor module gets all 50 FE/t, not half. Each module adds a 50,000 FE buffer to the pool (100,000 FE for the pair).
-- **Output:** each module **pushes energy from the pool into every machine or cable touching it**, up to 10,000 FE/t (`maxOutput`). Cables can also pull from it. If both ends have machines, they share what the pair makes. Modules don't accept energy and never push into each other.
+- **Power:** a linked pair makes **1,000 FE/t for every block of gap** (`energyPerBlock`). A 5-block gap makes 5,000 FE/t, and a 63-block gap, the largest, makes 63,000 FE/t.
+- **Take it from either end:** the two modules share **one pool of energy**, so **the pair's full output can be taken from either module**. You only need to connect one of them: a machine on the floor module gets all 5,000 FE/t, not half. Each module adds a 50,000 FE buffer to the pool (100,000 FE for the pair).
+- **Output:** each module **pushes energy from the pool into every machine or cable touching it**, up to 10,000 FE/t (`maxOutput`). Cables can also pull from it. If both ends have machines, they share what the pair makes. A pair with a gap of more than 10 blocks makes more than one module can give out, so use both ends (or raise `maxOutput`) to take all of it. Modules don't accept energy and never push into each other.
 - **Looks:** while linked, the emitters glow bright blue, pulse and give off light, and blue sparks drift around them. Unlinked modules are dull grey-blue.
 - **Coloured beams:** stained glass colours the beam just like a beacon beam. Put stained glass (blocks or panes) in the gap and the beam takes that colour from the glass upwards. Each further pane of a different colour mixes with the colour so far, so red then yellow gives orange. Glass of the same colour in a row changes nothing. The colour is only for looks: the power is the same.
 
@@ -300,13 +300,13 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 - **GUI:** right-click a module to open it. It's in the same slate style as the other machines:
   - an energy gauge for the pair's shared pool;
   - a **beam diagram**: the column with this module marked by a pointer, and at the far end what it found. When linked, both modules are lit with the animated beam between them. Otherwise it shows why: a blocking block (with a red cross) part of the way along, a partner that points the wrong way, a partner too close, or a dashed outline where a partner should go;
-  - the pair's pooled energy (*of 100,000 FE*), what the pair makes (*+50 FE/t*, *Shared pool*) and the energy leaving the pool through either module, averaged over the last second;
+  - the pair's pooled energy (*of 100,000 FE*), what the pair makes (*+5,000 FE/t*, *Shared pool*) and the energy leaving the pool through either module, averaged over the last second;
   - a status lamp: *Linked: 5 block gap* (green), *Linked: buffer full* (orange, nothing is taking the energy), or in red *Beam blocked 3 above*, *Partner faces wrong way*, *Partner too close*, or grey *No module above*.
   Hover over the diagram or the lamp for what to do about it.
 
   | Linked | Beam blocked |
   |---|---|
-  | ![Zero Point Energy Module GUI, linked: beam between two lit modules, +50 FE/t, shared pool, out 50 FE/t](docs/screenshots/31_zero_point_gui.png) | ![Zero Point Energy Module GUI with the beam blocked 3 blocks above by a solid block](docs/screenshots/32_zero_point_gui_blocked.png) |
+  | ![Zero Point Energy Module GUI, linked: beam between two lit modules, +5,000 FE/t, shared pool, out 5,000 FE/t](docs/screenshots/31_zero_point_gui.png) | ![Zero Point Energy Module GUI with the beam blocked 3 blocks above by a solid block](docs/screenshots/32_zero_point_gui_blocked.png) |
 - **Jade** shows whether a module is linked, the gap to its partner and how much it and the pair make. If it isn't linked, it tells you it needs a module facing it in the same column.
 - The recipe makes **two** modules, one pair. Mine them with a stone pickaxe or better.
 
@@ -470,7 +470,7 @@ Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already 
 
 | Key | Default | Meaning |
 |---|---|---|
-| `energyPerBlock` | 10 | FE/t a linked pair makes for every block of open space between the modules. The two share one pool, so all of it can be taken from either module |
+| `energyPerBlock` | 1000 | FE/t a linked pair makes for every block of open space between the modules. The two share one pool, so all of it can be taken from either module |
 | `minGap` | 1 | Fewest blocks of open space needed between the modules before they link |
 | `maxRange` | 64 | Furthest apart (in blocks) two modules can be and still link |
 | `energyCapacity` | 50000 | FE each module adds to the pair's shared buffer (a linked pair holds twice this) |
