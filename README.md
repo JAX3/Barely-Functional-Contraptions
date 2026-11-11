@@ -307,7 +307,7 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 - **Jade** shows whether a module is linked, the gap to its partner and how much it and the pair make. If it isn't linked, it tells you it needs a module facing it in the same column.
 - The recipe makes **two** modules, one pair. Mine them with a stone pickaxe or better.
 
-![Zero Point Energy Module recipe: iron ingots in the corners, an ender pearl top middle, amethyst shards on the sides, a Functional Machine Block in the centre and a block of redstone bottom middle, making 2](docs/screenshots/recipe_zero_point_energy_module.png)
+![Zero Point Energy Module recipe: iron ingots top left and right, a nether star top middle, amethyst shards on the sides, a Functional Machine Block in the centre, copper ingots bottom left and right and a block of redstone bottom middle, making 2](docs/screenshots/recipe_zero_point_energy_module.png)
 
 ### Creative Generator (testing)
 An endless power source for creative mode, for testing builds without setting up mushroom farms. It's a slate block with a pulsing magenta energy core on every side, and it glows in the dark.

@@ -603,12 +603,13 @@ def recipes_loot_tags():
         "category": "redstone",
         "key": {
             "I": "minecraft:iron_ingot",
-            "E": "minecraft:ender_pearl",
+            "C": "minecraft:copper_ingot",
+            "S": "minecraft:nether_star",
             "A": "minecraft:amethyst_shard",
             "M": f"{MOD}:functional_machine_block",
             "R": "minecraft:redstone_block",
         },
-        "pattern": ["IEI", "AMA", "IRI"],
+        "pattern": ["ISI", "AMA", "CRC"],
         "result": {"id": f"{MOD}:zero_point_energy_module", "count": 2},
     })
     write(os.path.join(DATA, MOD, "loot_table", "blocks", "zero_point_energy_module.json"), {
