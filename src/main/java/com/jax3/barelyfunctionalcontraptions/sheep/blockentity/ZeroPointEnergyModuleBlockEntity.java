@@ -30,10 +30,10 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  * module's buffer. The two buffers act as one pool: the energy capability of either module reaches both, and each
  * module pushes from the pool into its neighbours, so the pair's full output can be taken from either end.
  *
- * <p>The link distance and rate are synced to the client, which draws the beam and shows them in Jade. Like a beacon
- * beam, the beam is coloured by stained glass (blocks or panes) in its path: the first one sets its colour, and every
- * different one after that mixes with the colour so far. The floor module, which draws the beam, works out these
- * colour sections and syncs them too.</p>
+ * <p>The link distance and rate are synced to the client, which draws the beam and shows them in Jade. Stained glass
+ * (blocks or panes) in the gap colours the whole beam, mixed like a beacon beam's: the first one sets the colour, and
+ * every different one after that mixes with the colour so far. The floor module, which draws the beam, works out the
+ * colour sections and syncs them too; the beam is drawn in the last (fully mixed) one.</p>
  *
  * <p>The beam is dangerous: the floor module hurts every living thing touching it ({@code beamDamage}, with its own
  * "vaporised by a Zero Point beam" death message) and sets it on fire for {@code beamBurnSeconds}. With
@@ -333,6 +333,14 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
 
     public ZeroPointLink getLink() {
         return link;
+    }
+
+    /**
+     * The colour the whole beam is drawn in: the blended colour of all the stained glass in the gap (the last colour
+     * section), or {@link #BEAM_COLOR} with none.
+     */
+    public int getBeamColor() {
+        return beamSections.length >= 2 ? beamSections[beamSections.length - 1] : BEAM_COLOR;
     }
 
     /** The beam's colour sections as (start, colour) pairs; see {@link #beamSections}. */

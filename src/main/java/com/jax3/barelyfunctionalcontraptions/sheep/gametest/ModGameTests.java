@@ -914,6 +914,7 @@ public final class ModGameTests {
         int[] mixed = zpeAt(h, floor).getBeamSections();
         int[] expected = {0, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_COLOR, 1, red, 2, net.minecraft.util.ARGB.average(red, yellow)};
         h.assertTrue(java.util.Arrays.equals(mixed, expected), "red then yellow glass: " + java.util.Arrays.toString(mixed));
+        h.assertTrue(zpeAt(h, floor).getBeamColor() == net.minecraft.util.ARGB.average(red, yellow), "the whole beam is drawn in the mixed colour");
         h.setBlock(floor.above(2), Blocks.STAINED_GLASS_PANE.red());
         int[] same = zpeAt(h, floor).getBeamSections();
         h.assertTrue(java.util.Arrays.equals(same, new int[] {0, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_COLOR, 1, red}), "the same colour twice is one section: " + java.util.Arrays.toString(same));
@@ -921,8 +922,10 @@ public final class ModGameTests {
         h.assertTrue(zpeAt(h, ceiling).getBeamSections().length == 0, "only the floor module keeps the colours");
         h.setBlock(floor.above(1), Blocks.AIR);
         h.assertTrue(java.util.Arrays.equals(zpeAt(h, floor).getBeamSections(), new int[] {0, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_COLOR, 2, red}), "a lone pane higher up starts there");
+        h.assertTrue(zpeAt(h, floor).getBeamColor() == red, "a lone pane high up still colours the whole beam");
         h.setBlock(floor.above(2), Blocks.AIR);
         h.assertTrue(java.util.Arrays.equals(zpeAt(h, floor).getBeamSections(), new int[] {0, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_COLOR}), "no glass: all blue");
+        h.assertTrue(zpeAt(h, floor).getBeamColor() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_COLOR, "no glass: blue beam");
         h.setBlock(floor.above(2), Blocks.STONE);
         h.assertTrue(zpeAt(h, floor).getLinkDistance() == 0 && zpeAt(h, ceiling).getLinkDistance() == 0, "stone in the gap breaks the link");
         h.assertTrue(zpeAt(h, floor).getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.BLOCKED, "the floor module reports the beam is blocked");

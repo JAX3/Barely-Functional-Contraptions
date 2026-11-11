@@ -18,7 +18,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Draws the beam between a linked pair of Zero Point Energy Modules. Only the floor module (facing up) draws it,
  * from the tip of its emitter to the tip of the ceiling module's, using the beacon beam's geometry and texture. It is
- * blue, recoloured by stained glass in its path like a beacon beam (one piece per colour section).
+ * blue; stained glass anywhere in its path colours the whole beam, mixing colours like a beacon beam does.
  */
 public class ZeroPointBeamRenderer implements BlockEntityRenderer<ZeroPointEnergyModuleBlockEntity, ZeroPointBeamRenderer.State> {
     public static final int BEAM_COLOR = ZeroPointEnergyModuleBlockEntity.BEAM_COLOR;
@@ -53,17 +53,8 @@ public class ZeroPointBeamRenderer implements BlockEntityRenderer<ZeroPointEnerg
         // Both emitter tips are half a block into their blocks (the floor one at +0.5, the ceiling one at
         // distance + 0.5), so the beam is exactly as long as the distance between the two modules.
         float beamTop = distance + EMITTER_TIP;
-        int[] sections = be.getBeamSections();
-        if (sections.length < 2) {
-            state.pieces.add(new Piece(EMITTER_TIP, beamTop, BEAM_COLOR));
-            return;
-        }
-        // Stained glass recolours the beam from the glass block up, like a beacon beam.
-        for (int i = 0; i < sections.length; i += 2) {
-            float bottom = i == 0 ? EMITTER_TIP : sections[i];
-            float top = i + 2 < sections.length ? sections[i + 2] : beamTop;
-            if (top > bottom) state.pieces.add(new Piece(bottom, top, sections[i + 1]));
-        }
+        // Stained glass anywhere in the gap colours the whole beam, end to end, in the glass's (blended) colour.
+        state.pieces.add(new Piece(EMITTER_TIP, beamTop, be.getBeamColor()));
     }
 
     @Override
