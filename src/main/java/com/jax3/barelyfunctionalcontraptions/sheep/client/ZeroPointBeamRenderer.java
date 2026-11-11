@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  */
 public class ZeroPointBeamRenderer implements BlockEntityRenderer<ZeroPointEnergyModuleBlockEntity, ZeroPointBeamRenderer.State> {
     public static final int BEAM_COLOR = 0xFF3FC8FF;
-    /** Height of the emitter tip above the bottom of the module's block (and below the top of the ceiling module's). */
+    /** Height of the emitter tip above the bottom of the module's block, for both modules (8 px: plate plus emitter). */
     private static final float EMITTER_TIP = 0.5F;
 
     public static final class State extends BlockEntityRenderState {
@@ -40,7 +40,9 @@ public class ZeroPointBeamRenderer implements BlockEntityRenderer<ZeroPointEnerg
         BlockEntityRenderer.super.extractRenderState(be, state, partialTicks, cameraPosition, breakProgress);
         boolean floorModule = be.getBlockState().hasProperty(ZeroPointEnergyModuleBlock.FACING)
                 && be.getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING) == Direction.UP;
-        state.length = floorModule && be.getLinkDistance() > 0 ? be.getLinkDistance() - 2 * EMITTER_TIP : 0;
+        // Both emitter tips are half a block into their blocks (the floor one at +0.5, the ceiling one at
+        // distance + 0.5), so the beam is exactly as long as the distance between the two modules.
+        state.length = floorModule && be.getLinkDistance() > 0 ? be.getLinkDistance() : 0;
         state.animationTime = be.getLevel() != null ? Math.floorMod(be.getLevel().getGameTime(), 40) + partialTicks : 0;
     }
 

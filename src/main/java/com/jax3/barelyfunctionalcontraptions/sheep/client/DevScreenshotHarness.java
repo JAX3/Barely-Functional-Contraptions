@@ -288,7 +288,14 @@ public final class DevScreenshotHarness {
                 mc.player.closeContainer();
                 server.execute(() -> server.overworld().setBlock(zeroPointBase.above(3), Blocks.AIR.defaultBlockState(), 3));
             }
-            case 1625 -> {
+            case 1619 -> {
+                // Looking up at the ceiling module, to check the beam reaches its emitter.
+                setHudHidden(mc, true);
+                server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 -50", zeroPointBase.getX() + 0.5, zeroPointBase.getY() + 2, zeroPointBase.getZ() + 3.5)));
+            }
+            case 1640 -> shot(mc, "33_zero_point_beam_top");
+            case 1645 -> {
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
