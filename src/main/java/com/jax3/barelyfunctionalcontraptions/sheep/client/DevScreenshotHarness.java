@@ -283,7 +283,12 @@ public final class DevScreenshotHarness {
             }
             case 1595 -> server.execute(() -> openZeroPointGui(server));
             case 1615 -> shot(mc, "32_zero_point_gui_blocked");
-            case 1620 -> {
+            case 1617 -> {
+                // Leave the saved test world with a working pair.
+                mc.player.closeContainer();
+                server.execute(() -> server.overworld().setBlock(zeroPointBase.above(3), Blocks.AIR.defaultBlockState(), 3));
+            }
+            case 1625 -> {
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
