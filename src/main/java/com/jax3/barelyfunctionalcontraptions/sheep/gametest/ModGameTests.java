@@ -882,6 +882,13 @@ public final class ModGameTests {
         h.assertTrue(low.getPairOutput() == 2 * perBlock, "2-block gap makes " + 2 * perBlock + " FE/t, got " + low.getPairOutput());
         h.assertTrue(low.getGenerating() + high.getGenerating() == low.getPairOutput(), "the two halves add up to the pair's output");
         h.assertTrue(low.getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.LINKED, "linked reason");
+        // Output limit: maxOutput, raised to the pair's whole output when that is bigger.
+        int maxOutput = ModConfigs.getInt(ModConfigs.SERVER.zpeMaxOutput);
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.outputLimit(0) == maxOutput,
+                "an unlinked module gives out up to maxOutput");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.outputLimit(maxOutput + 12_345) == maxOutput + 12_345,
+                "a pair making more than maxOutput can give all of it out of one module");
+        h.assertTrue(low.getOutputLimit() >= low.getPairOutput(), "the limit always covers the pair's output");
 
         // The GUI menu receives the module's numbers.
         var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
@@ -962,7 +969,7 @@ public final class ModGameTests {
             h.assertTrue(pool != null && pool.getAmountAsLong() == own + other, "the ceiling module shows the whole pool");
             try (Transaction tx = Transaction.openRoot()) {
                 int taken = pool.extract(Integer.MAX_VALUE, tx);
-                h.assertTrue(taken == Math.min(own + other, ModConfigs.getInt(ModConfigs.SERVER.zpeMaxOutput)),
+                h.assertTrue(taken == Math.min(own + other, pHigh.getOutputLimit()),
                         "all of the pool can be taken from one module, took " + taken + " of " + (own + other));
             } // not committed
             // The module only gives energy; nothing can be pushed into it.

@@ -263,8 +263,10 @@ public final class ModConfigs {
                     .defineInRange("maxRange", 64, 2, 384);
             zpeCapacity = b.comment("FE each module adds to the pair's shared buffer (a linked pair holds twice this).")
                     .defineInRange("energyCapacity", 50_000, 1, Integer.MAX_VALUE);
-            zpeMaxOutput = b.comment("Most FE/t each module pushes into the machines and cables touching it (and that they can pull).")
-                    .defineInRange("maxOutput", 10_000, 1, Integer.MAX_VALUE);
+            zpeMaxOutput = b.comment("Most FE/t each module pushes into the machines and cables touching it (and that they can pull).",
+                            "A linked module can always give out at least its pair's whole output, even when that is more than this,",
+                            "so all of the pair's power can be taken from either module.")
+                    .defineInRange("maxOutput", 100_000, 1, Integer.MAX_VALUE);
             b.pop();
 
             b.comment("Which items /barelyfunctionalcontraptions generate may turn into wool types (feeding items and separator outputs).",

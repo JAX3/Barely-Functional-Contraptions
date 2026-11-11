@@ -182,6 +182,19 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         return out.toIntArray();
     }
 
+    /**
+     * Most FE a module gives out per tick (pushed and pulled): {@code maxOutput}, raised to the pair's whole output
+     * when that is larger, so one module can always deliver everything the pair makes.
+     */
+    public static int outputLimit(int pairOutput) {
+        return Math.max(ModConfigs.getInt(ModConfigs.SERVER.zpeMaxOutput), pairOutput);
+    }
+
+    /** This module's output limit; see {@link #outputLimit(int)}. */
+    public int getOutputLimit() {
+        return outputLimit(getPairOutput());
+    }
+
     /** FE/t a pair this far apart makes in total (0 when not linked). */
     public static int pairOutput(int distance) {
         if (distance <= 0) return 0;
@@ -191,7 +204,7 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
 
     /** Pushes from the pair's pool (this buffer first, then the partner's) into every neighbouring receiver. */
     private void pushEnergy(ServerLevel level, BlockPos pos) {
-        int budget = Math.min(pairEnergy.getAmountAsInt(), ModConfigs.getInt(ModConfigs.SERVER.zpeMaxOutput));
+        int budget = Math.min(pairEnergy.getAmountAsInt(), getOutputLimit());
         long pushed = 0;
         for (Direction dir : Direction.values()) {
             if (budget <= 0) break;
@@ -318,12 +331,12 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
     /** Output-only buffer: neighbours may pull up to {@code maxOutput} FE/t, nothing can be inserted from outside. */
     private final class Storage extends SimpleEnergyHandler {
         Storage() {
-            super(ModConfigs.getInt(ModConfigs.SERVER.zpeCapacity), 0, ModConfigs.getInt(ModConfigs.SERVER.zpeMaxOutput));
+            // Only reached through PairEnergy, which applies the output limit; no limit of its own on taking energy.
+            super(ModConfigs.getInt(ModConfigs.SERVER.zpeCapacity), 0, Integer.MAX_VALUE);
         }
 
         void refreshLimits() {
             this.capacity = ModConfigs.getInt(ModConfigs.SERVER.zpeCapacity);
-            this.maxExtract = ModConfigs.getInt(ModConfigs.SERVER.zpeMaxOutput);
             if (this.energy > this.capacity) set(this.capacity);
         }
 
@@ -367,7 +380,7 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
 
         @Override
         public int extract(int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext transaction) {
-            int limit = Math.min(amount, ModConfigs.getInt(ModConfigs.SERVER.zpeMaxOutput));
+            int limit = Math.min(amount, getOutputLimit());
             if (limit <= 0) return 0;
             int taken = energy.extract(limit, transaction);
             ZeroPointEnergyModuleBlockEntity p = partner();
