@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/automatic_shears",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:automatic_shears"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.auto_shear.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.auto_shear.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

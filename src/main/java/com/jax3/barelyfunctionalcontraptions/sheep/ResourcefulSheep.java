@@ -51,6 +51,7 @@ public final class ResourcefulSheep {
         com.jax3.barelyfunctionalcontraptions.sheep.registry.ModSounds.REGISTER.register(modBus);
 
         modBus.addListener(ModCapabilities::register);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements::onLivingDeath);
         modBus.addListener(ModNetwork::register);
 
         // Game tests (only active when the game test framework is enabled, e.g. ./gradlew runGameTestServer).

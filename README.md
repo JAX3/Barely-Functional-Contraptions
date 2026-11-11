@@ -67,6 +67,28 @@ Every machine is built around a **Functional Machine Block**: the blue-steel cas
 
 ---
 
+### Advancements
+
+The mod has its own advancement tab, **Barely Functional Contraptions**, with one advancement for making each machine and three special ones:
+
+| Advancement | How to get it |
+|---|---|
+| **Barely Functional Contraptions** | Make a Functional Machine Block (opens the tab) |
+| It's Alive... Ish | Craft a Mycelial Generator |
+| Some Assembly Required | Craft a Barely Functional Wrench |
+| ⭐ **Fungal Network** (goal) | Link two Mycelial Generators together with the Barely Functional Wrench |
+| Separation Anxiety | Craft a Mechanical Separator |
+| Hands-Free Haircut | Craft Automatic Shears |
+| ⭐ **Shear Genius** (goal) | Be within 16 blocks of Automatic Shears when they shear a sheep |
+| Bottomless Bucket | Craft a Fluid Reservoir |
+| Hume Sweet Hume | Craft a Hume Energy Cube |
+| Something From Nothing | Craft a Zero Point Energy Module |
+| ⭐ **Don't Cross the Streams** (challenge, hidden) | Get vaporised by a Zero Point beam. It stays hidden until you earn it and gives 50 experience. |
+
+The crafting advancements are earned by getting the item into your inventory however you make it (crafting table, autocrafter or a friend handing it over).
+
+![The Barely Functional Contraptions advancement tab](docs/screenshots/36_advancements.png)
+
 ## Mycelial Power
 
 ### Crafting
@@ -316,7 +338,7 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 - **Jade** shows whether a module is linked, the gap to its partner and how much it and the pair make. If it isn't linked, it tells you it needs a module facing it in the same column.
 - The recipe makes **two** modules, one pair. Mine them with a stone pickaxe or better.
 
-![Zero Point Energy Module recipe: iron ingots top left and right, a nether star top middle, amethyst shards on the sides, a Functional Machine Block in the centre, copper ingots bottom left and right and a block of redstone bottom middle, making 2](docs/screenshots/recipe_zero_point_energy_module.png)
+![Zero Point Energy Module recipe: iron ingots top left and right, a beacon top middle, amethyst shards on the sides, a Functional Machine Block in the centre, copper ingots bottom left and right and a block of redstone bottom middle, making 2](docs/screenshots/recipe_zero_point_energy_module.png)
 
 ### Creative Generator (testing)
 An endless power source for creative mode, for testing builds without setting up mushroom farms. It's a slate block with a pulsing magenta energy core on every side, and it glows in the dark.

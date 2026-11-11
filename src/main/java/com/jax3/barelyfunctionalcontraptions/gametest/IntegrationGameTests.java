@@ -55,6 +55,7 @@ public final class IntegrationGameTests {
 
     static {
         TESTS.put("integration_mycelial_generator_powers_separator", IntegrationGameTests::mycelialGeneratorPowersSeparator);
+        TESTS.put("integration_advancements", IntegrationGameTests::advancements);
         TESTS.put("integration_mushroom_infuses_sheep", IntegrationGameTests::mushroomInfusesSheep);
         TESTS.put("integration_mushroom_wool_fuels_generator", IntegrationGameTests::mushroomWoolFuelsGenerator);
         TESTS.put("integration_mycelial_generator_powers_automatic_shears", IntegrationGameTests::generatorPowersAutomaticShears);
@@ -177,6 +178,99 @@ public final class IntegrationGameTests {
                         + " should face " + expected + ", faces " + facing);
             }
         }
+        h.succeed();
+    }
+
+    /**
+     * The advancement tab: every advancement loads with the right parent, and the three special ones are granted by
+     * linking two generators with the wrench, by Automatic Shears shearing a sheep near you, and by dying to a Zero
+     * Point beam (and not by dying any other way).
+     */
+    private static void advancements(GameTestHelper h) {
+        var server = h.getLevel().getServer();
+        String[][] tree = {
+                {"root", null}, {"mycelial_generator", "root"}, {"mycelium_wrench", "mycelial_generator"},
+                {"link_generators", "mycelium_wrench"}, {"mechanical_separator", "root"}, {"automatic_shears", "root"},
+                {"auto_shear", "automatic_shears"}, {"fluid_reservoir", "root"}, {"hume_energy_cube", "root"},
+                {"zero_point_energy_module", "root"}, {"zero_point_death", "zero_point_energy_module"}};
+        for (String[] entry : tree) {
+            var advancement = server.getAdvancements().get(com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep.id("contraptions/" + entry[0]));
+            h.assertTrue(advancement != null, "advancement " + entry[0] + " is loaded");
+            var parent = advancement.value().parent();
+            h.assertTrue(entry[1] == null ? parent.isEmpty()
+                            : parent.map(id -> id.equals(com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep.id("contraptions/" + entry[1]))).orElse(false),
+                    entry[0] + " has parent " + entry[1] + ", got " + parent);
+            h.assertTrue(advancement.value().display().isPresent(), entry[0] + " shows in the tab");
+        }
+
+        // A server player that never logs in (so no network traffic) and ignores the wrench's chat messages.
+        var player = new net.minecraft.server.level.ServerPlayer(server, h.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "adv-test"), net.minecraft.server.level.ClientInformation.createDefault()) {
+            @Override
+            public void sendSystemMessage(net.minecraft.network.chat.Component message, boolean overlay) {}
+
+            @Override
+            public void sendSystemMessage(net.minecraft.network.chat.Component message) {}
+        };
+        BlockPos shearsPos = new BlockPos(3, 1, 0);
+        player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(shearsPos.above())));
+        String link = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.LINK_GENERATORS;
+        String shear = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.AUTO_SHEAR;
+        String death = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.ZERO_POINT_DEATH;
+        h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, link), "a new player hasn't linked generators");
+
+        // Fungal Network: link two generators with the wrench.
+        BlockPos genA = new BlockPos(0, 1, 4), genB = new BlockPos(6, 1, 4);
+        generator(h, genA, ItemStack.EMPTY, 0);
+        generator(h, genB, ItemStack.EMPTY, 0);
+        ItemStack wrench = new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get());
+        player.setItemInHand(InteractionHand.MAIN_HAND, wrench);
+        for (BlockPos pos : new BlockPos[] {genA, genB}) {
+            wrench.getItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND,
+                    new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(pos)),
+                            net.minecraft.core.Direction.UP, h.absolutePos(pos), false)));
+        }
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, link), "linking generators grants Fungal Network");
+
+        // Don't Cross the Streams: only a Zero Point beam death counts.
+        var beam = h.getLevel().damageSources().source(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_DAMAGE);
+        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.onDeath(player, h.getLevel().damageSources().inFire());
+        h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, death), "an ordinary fire death doesn't count");
+        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.onDeath(player, beam);
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, death), "a beam death grants Don't Cross the Streams");
+
+        // Shear Genius: powered Automatic Shears shear a sheep while the player stands next to them.
+        h.setBlock(shearsPos, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, net.minecraft.core.Direction.SOUTH));
+        var shears = h.getBlockEntity(shearsPos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.class);
+        shears.getEnergy().set(shears.getEnergy().getCapacityAsInt());
+        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(3, 1, 2));
+        sheep.setNoAi(true);
+        h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, shear), "not before the shears run");
+        // The shears look for players in the level's player list; add ours (without logging in) until the shears run.
+        h.getLevel().players().add(player);
+        try {
+            shears.shearArea(h.getLevel(), h.absolutePos(shearsPos), net.minecraft.core.Direction.SOUTH);
+        } finally {
+            h.getLevel().players().remove(player);
+        }
+        h.assertTrue(sheep.isSheared(), "the shears shear the sheep");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, shear), "watching it grants Shear Genius");
+
+        // Someone far away doesn't get it.
+        var farAway = new net.minecraft.server.level.ServerPlayer(server, h.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "adv-test-far"), net.minecraft.server.level.ClientInformation.createDefault());
+        farAway.setPos(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(shearsPos)).add(40, 0, 0));
+        Sheep sheep2 = h.spawn(EntityTypes.SHEEP, new BlockPos(4, 1, 2));
+        sheep2.setNoAi(true);
+        h.getLevel().players().add(farAway);
+        try {
+            shears.shearArea(h.getLevel(), h.absolutePos(shearsPos), net.minecraft.core.Direction.SOUTH);
+        } finally {
+            h.getLevel().players().remove(farAway);
+        }
+        h.assertTrue(sheep2.isSheared(), "the second sheep is sheared");
+        h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(farAway, shear), "40 blocks away is too far");
         h.succeed();
     }
 

@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 79 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 52 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 35 screenshots and 8 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 80 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 52 Resourceful Sheep, 12 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 36 screenshots and 8 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -85,6 +85,15 @@ In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `reci
 - the recipe makes 2;
 - the GUI (`31_zero_point_gui.png`) shows the beam diagram with both modules lit and the beam between them, *of 100,000 FE*, *+5,000 FE/t*, *Shared pool*, *Out: 5,000 FE/t* (the full output, through the floor module alone) and a green *Linked: 5 block gap*;
 - after a stone block is put in the gap (`32_zero_point_gui_blocked.png`), the GUI shows the blocking block on a dotted line above the module, *+0 FE/t* and a red *Beam blocked 3 above*.
+
+### Advancements (`integration_advancements`)
+
+All 11 advancements in the *Barely Functional Contraptions* tab load, each shows in the tab, and each has the right parent (the root has none). The three special ones are earned through the real code paths, with a server player that never logs in (so it sends no network traffic):
+- **Fungal Network:** the player clicks two Mycelial Generators with a Barely Functional Wrench (`useOn`), which links them and grants it.
+- **Don't Cross the Streams:** a death by ordinary fire doesn't grant it; a death by the Zero Point beam's damage type does.
+- **Shear Genius:** powered Automatic Shears shear a sheep while the player stands next to them (the player is added to the level's player list just for that shearing run), which grants it. Another player 40 blocks away who watches a second sheep being sheared doesn't get it.
+
+In the real client (`36_advancements.png`), after `/advancement grant … from …contraptions/root` (with the hidden death advancement revoked again), the advancement screen shows the mod's tab: a dim blue-steel background, the Functional Machine Block as the root and the machines' icons with gold "done" frames. Hovering over one shows *Shear Genius: Watch Automatic Shears shear a sheep for you*.
 
 ### Zero Point hum (real client, recorded)
 

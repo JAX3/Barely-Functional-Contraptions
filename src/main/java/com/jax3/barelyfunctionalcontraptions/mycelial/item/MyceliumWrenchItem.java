@@ -167,6 +167,10 @@ public class MyceliumWrenchItem extends Item {
             stack.remove(ModDataComponents.SELECTED_GENERATOR.get());
             stack.set(ModDataComponents.LINK_GLOW_UNTIL.get(), level.getGameTime() + LINK_GLOW_TICKS);
             ok(player, Component.translatable(result.translationKey(), formatPos(selected), formatPos(clicked)));
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.award(serverPlayer,
+                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.LINK_GENERATORS);
+            }
             consumeUse(stack, player, context.getHand());
         } else {
             if (result == LinkRules.Result.SAME_GENERATOR) {

@@ -1,0 +1,29 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/zero_point_energy_module",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:zero_point_energy_module"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.zero_point_death.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.zero_point_death.description"
+    },
+    "frame": "challenge",
+    "hidden": true
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "rewards": {
+    "experience": 50
+  }
+}

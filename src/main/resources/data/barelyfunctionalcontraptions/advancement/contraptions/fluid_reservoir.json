@@ -1,0 +1,32 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:fluid_reservoir"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.fluid_reservoir.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.fluid_reservoir.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "obtained": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:fluid_reservoir"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtained"
+    ]
+  ]
+}

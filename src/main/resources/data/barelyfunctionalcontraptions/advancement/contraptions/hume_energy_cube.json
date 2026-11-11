@@ -1,0 +1,32 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:hume_energy_cube"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.hume_energy_cube.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.hume_energy_cube.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "obtained": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:hume_energy_cube"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtained"
+    ]
+  ]
+}

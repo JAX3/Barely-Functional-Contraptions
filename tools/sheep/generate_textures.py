@@ -1880,6 +1880,31 @@ def generate_zero_point_gui():
     img.save(out("gui/zero_point_energy_module.png"))
 
 
+ADVANCEMENT_BACKGROUND = [  # dim blue-steel floor plate, tiled behind the advancement tab
+    "SMMMMMMMMMMMMMMS",
+    "MbMMMMMMMMMMMMbM",
+    "MMMMMMMMMMMMMMMM",
+    "MMMMMMMMMMMMMMMM",
+    "MMMMMMSSSSMMMMMM",
+    "MMMMMSMMMMSMMMMM",
+    "MMMMSMMMMMMSMMMM",
+    "MMMMSMMMMMMSMMMM",
+    "MMMMSMMMMMMSMMMM",
+    "MMMMSMMMMMMSMMMM",
+    "MMMMMSMMMMSMMMMM",
+    "MMMMMMSSSSMMMMMM",
+    "MMMMMMMMMMMMMMMM",
+    "MMMMMMMMMMMMMMMM",
+    "MbMMMMMMMMMMMMbM",
+    "SMMMMMMMMMMMMMMS",
+]
+
+
+def generate_advancement_background():
+    pal = {"M": shade(CARTOON["M"], 0.45), "S": shade(CARTOON["S"], 0.45), "b": shade(CARTOON["b"], 0.45)}
+    grid(ADVANCEMENT_BACKGROUND, pal).save(out("gui/advancements/backgrounds/contraptions.png"))
+
+
 CUBE_BOLT_ICON = [  # 9x9 GUI icon
     "....OOO..",
     "...OEEO..",
@@ -1908,6 +1933,7 @@ def main():
     generate_energy_cube()
     generate_cube_gui()
     generate_zero_point_gui()
+    generate_advancement_background()
     generate_jei()
     generate_logo()
     print("Textures written to", os.path.abspath(ROOT))

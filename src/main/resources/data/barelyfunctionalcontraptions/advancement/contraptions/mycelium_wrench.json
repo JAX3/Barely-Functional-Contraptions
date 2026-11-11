@@ -1,0 +1,32 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/mycelial_generator",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:mycelium_wrench"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.mycelium_wrench.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.mycelium_wrench.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "obtained": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:mycelium_wrench"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtained"
+    ]
+  ]
+}
