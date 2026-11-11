@@ -541,8 +541,10 @@ def recipes_loot_tags():
             "S": "minecraft:shears",
             "M": f"{MOD}:functional_machine_block",
             "C": "minecraft:chest",
+            "R": "minecraft:redstone",
+            "T": "minecraft:copper_ingot",
         },
-        "pattern": ["ISI", "SMS", "ICI"],
+        "pattern": ["TRT", "SMS", "ICI"],
         "result": {"id": f"{MOD}:automatic_shears"},
     })
     write(os.path.join(DATA, MOD, "recipe", "hume_energy_cube.json"), {
@@ -565,7 +567,7 @@ def recipes_loot_tags():
             "G": "#c:glass_blocks",
             "B": "minecraft:bucket",
             "M": f"{MOD}:functional_machine_block",
-            "C": "minecraft:cauldron",
+            "C": "minecraft:hopper",
         },
         "pattern": ["IBI", "GMG", "ICI"],
         "result": {"id": f"{MOD}:fluid_reservoir"},

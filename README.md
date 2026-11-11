@@ -71,7 +71,7 @@ Every machine is built around a **Functional Machine Block**: the blue-steel cas
 
 ### Crafting
 
-![Mycelial Generator recipe: iron ingots in the corners, a red mushroom top middle, brown mushrooms left and right, a Functional Machine Block in the centre, a cauldron bottom middle](docs/screenshots/recipe_mycelial_generator.png)
+![Mycelial Generator recipe: iron ingots top left and right, a red mushroom top middle, brown mushrooms left and right, a Functional Machine Block in the centre, copper ingots bottom left and right, a cauldron bottom middle](docs/screenshots/recipe_mycelial_generator.png)
 
 The generator is mined with any pickaxe and drops itself. Its inventory is dropped when it is broken.
 
@@ -216,7 +216,7 @@ An FE-powered machine that shears sheep for you and keeps the wool.
 - **Which mobs:** only those in the entity tag `#barelyfunctionalcontraptions:auto_shearable`, which is sheep by default. It never turns a mooshroom into a cow or takes a snow golem's pumpkin.
 - Its shears never wear out. Mine it with a stone pickaxe or better. When broken it keeps its stored energy and redstone mode, like the separator, and its wool drops on the ground.
 
-![Automatic Shears recipe: iron ingots in the corners, shears top, left and right, a Functional Machine Block in the centre, a chest bottom middle](docs/screenshots/recipe_automatic_shears.png)
+![Automatic Shears recipe: copper ingots top left and right, redstone top middle, shears left and right, a Functional Machine Block in the centre, iron ingots bottom left and right, a chest bottom middle](docs/screenshots/recipe_automatic_shears.png)
 
 | GUI |
 |---|
@@ -241,7 +241,7 @@ A water source for your machines. Put it **directly on top of an infinite water 
 - **GUI:** right-click with an empty hand. It shows a water gauge with a mark per bucket, the stored amount, the bucket slots, and a status lamp: *Filling*, *Tank Full*, *Source Not Infinite* or *No Water Source*. Hover over things for details.
 - Mine it with a stone pickaxe or better. The water in it is lost when it's broken.
 
-![Fluid Reservoir recipe: iron ingots in the corners, a bucket top middle, glass either side of a Functional Machine Block, a cauldron bottom middle](docs/screenshots/recipe_fluid_reservoir.png)
+![Fluid Reservoir recipe: iron ingots in the corners, a bucket top middle, glass either side of a Functional Machine Block, a hopper bottom middle](docs/screenshots/recipe_fluid_reservoir.png)
 
 Any glass block works.
 
