@@ -1,0 +1,36 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/energy_cable/cable",
+    "cable": "barelyfunctionalcontraptions:block/energy_cable/cable",
+    "plug": "barelyfunctionalcontraptions:block/energy_cable/cable_plug"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        6,
+        6
+      ],
+      "to": [
+        5,
+        10,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cable"
+        },
+        "south": {
+          "texture": "#cable"
+        },
+        "down": {
+          "texture": "#cable"
+        },
+        "up": {
+          "texture": "#cable"
+        }
+      }
+    }
+  ]
+}

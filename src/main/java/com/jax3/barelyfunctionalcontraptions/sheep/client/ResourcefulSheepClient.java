@@ -100,6 +100,11 @@ public final class ResourcefulSheepClient {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.zero_point_energy_module")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
+        if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ENERGY_CABLE.get())) {
+            event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.energy_cable",
+                    String.format(java.util.Locale.ROOT, "%,d", com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CableNetwork.transferRate()))
+                    .withStyle(net.minecraft.ChatFormatting.GRAY));
+        }
         if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.hume_energy_cube")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));

@@ -66,6 +66,15 @@ public final class ModBlocks {
                     .noOcclusion()
                     .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.LINKED) ? 9 : 0));
 
+    /** Carries FE between generators, cubes and machines. Breaks quickly with a pickaxe, like a rail. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCableBlock> ENERGY_CABLE = REGISTER.registerBlock("energy_cable",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCableBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(0.7F, 6.0F)
+                    .sound(SoundType.IRON)
+                    .noOcclusion()
+                    .forceSolidOff());
+
     /** Creative-only infinite FE source: unbreakable in survival, no recipe. */
     public static final DeferredBlock<CreativeGeneratorBlock> CREATIVE_GENERATOR = REGISTER.registerBlock("creative_generator",
             CreativeGeneratorBlock::new,

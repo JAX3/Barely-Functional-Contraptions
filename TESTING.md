@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 80 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 52 Resourceful Sheep, 12 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 36 screenshots and 8 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 87 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 58 Resourceful Sheep, 13 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 38 screenshots and 9 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -88,12 +88,26 @@ In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `reci
 
 ### Advancements (`integration_advancements`)
 
-All 11 advancements in the *Barely Functional Contraptions* tab load, each shows in the tab, and each has the right parent (the root has none). The three special ones are earned through the real code paths, with a server player that never logs in (so it sends no network traffic):
+All 12 advancements in the *Barely Functional Contraptions* tab load, each shows in the tab, and each has the right parent (the root has none). The three special ones are earned through the real code paths, with a server player that never logs in (so it sends no network traffic):
 - **Fungal Network:** the player clicks two Mycelial Generators with a Barely Functional Wrench (`useOn`), which links them and grants it.
 - **Don't Cross the Streams:** a death by ordinary fire doesn't grant it; a death by the Zero Point beam's damage type does.
 - **Shear Genius:** powered Automatic Shears shear a sheep while the player stands next to them (the player is added to the level's player list just for that shearing run), which grants it. Another player 40 blocks away who watches a second sheep being sheared doesn't get it.
 
 In the real client (`36_advancements.png`), after `/advancement grant … from …contraptions/root` (with the hidden death advancement revoked again), the advancement screen shows the mod's tab: a dim blue-steel background, the Functional Machine Block as the root and the machines' icons with gold "done" frames. Hovering over one shows *Shear Genius: Watch Automatic Shears shear a sheep for you*.
+
+### Energy Cables
+
+| Test | What it checks |
+|---|---|
+| `energy_cable_connects_to_cables_and_machines` | A cable beside a Hume Energy Cube plugs into it, joins the cable next to it and ignores stone and air. The two cables are one network with one block plugged in. A separator placed next to the end later plugs in and the network sees it; removing the cube unplugs that side and the network forgets it. |
+| `energy_cable_carries_generator_power` | Creative Generator → 3 cables → Hume Energy Cube: the cube charges past 200,000 FE, the network has 3 cables and 2 blocks plugged in, the cables hold no energy and the network reports the FE/t it moves. |
+| `energy_cable_carries_zero_point_power` | A linked Zero Point pair charges a cube through two cables. |
+| `integration_mycelial_generator_powers_separator_through_cables` | A running Mycelial Generator three cables away from a Mechanical Separator powers it, and the separator turns Iron Wool into Raw Iron. |
+| `energy_cable_cube_powers_machines_not_cubes` | A charged cube on a network with Automatic Shears and a second, empty cube charges the shears, the second cube stays empty, and no energy is made or lost. |
+| `energy_cable_respects_transfer_rate` | With `transferRate = 1000`, a Creative Generator (1,000,000 FE/t) moves at most 10,000 FE through a cable in 10 ticks. |
+| `energy_cable_break_splits_network` | Breaking the middle of three cables splits the network into two, and the cube at the far end stops charging. |
+
+In the real client (`37_energy_cables.png`), a running Mycelial Generator feeds 8 cables: a straight run into a Hume Energy Cube, a branch turning off to a Mechanical Separator and a riser up into Automatic Shears. The arms join at each corner and T-junction, and a plug plate shows on every machine side. Jade on a cable (`38_energy_cable_jade.png`) reads *Network: 8 cables, 4 blocks plugged in* and *Moving 250 / 100,000 FE/t*: the generator's 250 FE/t passing through. `recipe_energy_cable.png` shows the recipe in a crafting table, making 8. The creative tab (`28_creative_tab_main.png`) lists the cable after the Zero Point Energy Module, and the advancement tab (`36_advancements.png`) shows *Plugged In*.
 
 ### Zero Point hum (real client, recorded)
 

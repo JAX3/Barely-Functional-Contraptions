@@ -1,0 +1,105 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/core"
+      }
+    },
+    {
+      "when": {
+        "north": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/arm_north"
+      }
+    },
+    {
+      "when": {
+        "north": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/plug_north"
+      }
+    },
+    {
+      "when": {
+        "south": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/arm_south"
+      }
+    },
+    {
+      "when": {
+        "south": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/plug_south"
+      }
+    },
+    {
+      "when": {
+        "west": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/arm_west"
+      }
+    },
+    {
+      "when": {
+        "west": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/plug_west"
+      }
+    },
+    {
+      "when": {
+        "east": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/arm_east"
+      }
+    },
+    {
+      "when": {
+        "east": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/plug_east"
+      }
+    },
+    {
+      "when": {
+        "down": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/arm_down"
+      }
+    },
+    {
+      "when": {
+        "down": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/plug_down"
+      }
+    },
+    {
+      "when": {
+        "up": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/arm_up"
+      }
+    },
+    {
+      "when": {
+        "up": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_cable/plug_up"
+      }
+    }
+  ]
+}

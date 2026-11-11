@@ -647,6 +647,58 @@ def generate_zero_point_module():
         fh.write('{\n  "animation": {\n    "frametime": 3,\n    "interpolate": true\n  }\n}\n')
 
 
+# ---------------------------------------------------------------------------
+# Energy Cable: a 4px outlined tube with a glowing blue core line, a 6px blue-steel junction box in the middle and an
+# 8px plug plate where it meets a machine. The models use automatic UVs, so each texture is drawn where its element
+# sits in the block:
+#   cable: the tube runs along columns 6-9 and rows 6-9 (arms on any axis land on one of the bands); the 6x6 junction
+#          box is at 5..10. Collars at 2 and 13 mark the arm ends.
+#   cable_plug: the plate's face is the middle 8x8 (4..11); its 2px edges are the strips round the border.
+# ---------------------------------------------------------------------------
+CABLE_CORE = [
+    "OOOOOO",
+    "OHHHMO",
+    "OHXXSO",
+    "OHXXSO",
+    "OMSSSO",
+    "OOOOOO",
+]
+CABLE_PLUG_FACE = [
+    "OOOOOOOO",
+    "OHHHHHHO",
+    "OHOOOOSO",
+    "OHOXXOSO",
+    "OHOXXOSO",
+    "OHOOOOSO",
+    "OSSSSSSO",
+    "OOOOOOOO",
+]
+CABLE_ON = {"X": hexc("#3fc8ff"), "Q": hexc("#a8ecff")}
+
+
+def generate_energy_cable():
+    pal = dict(CARTOON, **CABLE_ON)
+    img = Image.new("RGBA", (16, 16), CLEAR)
+    across = "OXQO"
+    collar = "OHMO"
+    for i in range(16):
+        pattern = collar if i in (2, 13) else across
+        for k, ch in enumerate(pattern):
+            img.putpixel((6 + k, i), pal[ch])   # vertical band
+            img.putpixel((i, 6 + k), pal[ch])   # horizontal band
+    grid(CABLE_CORE, pal, img, 5, 5)
+    img.save(out("block/energy_cable/cable.png"))
+    plug = Image.new("RGBA", (16, 16), CLEAR)
+    edge = "OMMMMMMO"
+    for k, ch in enumerate(edge):
+        for d in (0, 1, 14, 15):
+            c = pal["O"] if d in (0, 15) else pal[ch]
+            plug.putpixel((4 + k, d), c)  # top and bottom strips
+            plug.putpixel((d, 4 + k), c)  # left and right strips
+    grid(CABLE_PLUG_FACE, pal, plug, 4, 4)
+    plug.save(out("block/energy_cable/cable_plug.png"))
+
+
 def generate_creative_generator():
     """4-frame pulsing glow animation, same on every face."""
     strip = Image.new("RGBA", (16, 64), CLEAR)
@@ -1929,6 +1981,7 @@ def main():
     generate_fluid_reservoir()
     generate_machine_block()
     generate_zero_point_module()
+    generate_energy_cable()
     generate_reservoir_gui()
     generate_energy_cube()
     generate_cube_gui()

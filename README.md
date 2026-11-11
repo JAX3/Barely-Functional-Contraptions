@@ -84,6 +84,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Hume Sweet Hume | Craft a Hume Energy Cube |
 | Something From Nothing | Craft a Zero Point Energy Module |
 | ⭐ **Don't Cross the Streams** (challenge, hidden) | Get vaporised by a Zero Point beam. It stays hidden until you earn it and gives 50 experience. |
+| Plugged In | Craft some Energy Cables |
 
 The crafting advancements are earned by getting the item into your inventory however you make it (crafting table, autocrafter or a friend handing it over).
 
@@ -340,6 +341,27 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 
 ![Zero Point Energy Module recipe: iron ingots top left and right, a beacon top middle, amethyst shards on the sides, a Functional Machine Block in the centre, copper ingots bottom left and right and a block of redstone bottom middle, making 2](docs/screenshots/recipe_zero_point_energy_module.png)
 
+### Energy Cable
+Cables carry Forge Energy from the **power generators** (Mycelial Generator, Zero Point Energy Module, Creative Generator) and the **Hume Energy Cube** to the machines that use it, so a machine no longer has to touch its power source.
+
+![A Mycelial Generator feeding a run of Energy Cables: one branch goes on into a Hume Energy Cube, one turns off to a Mechanical Separator and one rises up into Automatic Shears](docs/screenshots/37_energy_cables.png)
+
+- **Placing:** cables join up with every cable they touch, and **plug into any block with a Forge Energy connection** on the side facing them: generators, cubes, the separator, the shears and other mods' energy blocks. A plugged-in side shows a square plug plate. Blocks with no energy connection (or a side that has none, like the front of the Automatic Shears) are ignored, so cables can run straight past them.
+- **Networks:** every cable that touches another forms **one network**. Energy put into any cable comes straight out at the blocks plugged in anywhere else on that network, however long it is, shared evenly between them. Cables don't store energy themselves.
+- **Where energy goes:**
+  - Energy from a **generator** goes to the **machines first**, and anything they can't take charges the **Hume Energy Cubes** on the network. Put a cube on the network as a battery, and it fills up while the generator makes more than the machines use.
+  - Energy from a **Hume Energy Cube** only goes to **machines**, never into another cube, so two cubes on one network don't pass the same energy back and forth.
+  - Energy never goes back into the block it came from.
+- **Push and pull:** generators and cubes push into cables on their own, and each tick the network also **pulls** from any plugged-in block that has energy to give. A cube with `autoOutput = false`, or another mod's generator that doesn't push, still powers the network.
+- **Speed:** a network moves up to **100,000 FE/t** in total (`transferRate`). That is enough for the biggest Zero Point pair.
+- **Breaking** a cable splits the network in two right away, and each half only connects what is plugged into it.
+- **Jade** on a cable shows the network's size, how many blocks are plugged into it and how much it is moving (averaged over the last second).
+
+  ![Jade on an Energy Cable: Network: 8 cables, 4 blocks plugged in; Moving 250 / 100,000 FE/t](docs/screenshots/38_energy_cable_jade.png)
+- The recipe makes **8** cables: copper wire with redstone, wrapped in wool. Any colour of wool works. Cables break quickly with any tool (a pickaxe is fastest) and always drop themselves.
+
+![Energy Cable recipe: wool across the top and bottom rows, a copper ingot, redstone and a copper ingot across the middle, making 8](docs/screenshots/recipe_energy_cable.png)
+
 ### Creative Generator (testing)
 An endless power source for creative mode, for testing builds without setting up mushroom farms. It's a slate block with a pulsing magenta energy core on every side, and it glows in the dark.
 
@@ -507,6 +529,13 @@ Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already 
 | `beamCountsAsPlayerKill` | true | Mobs the beam kills drop experience and player-only loot, credited to a fake player called [Zero Point Beam] |
 | `beamLooting` | 1 | Looting level for mobs the beam kills: each stack they drop gets 0 to this many extra items. 0 = normal drops |
 | `maxOutput` | 100000 | Most FE/t each module pushes into, or lets be pulled by, its neighbours. A linked module can always give out at least its pair's whole output, even when that is more than this |
+
+**`[energy_cable]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `transferRate` | 100000 | Most FE/t one cable network carries in total, however many cables and blocks are on it |
+| `maxNetworkSize` | 4096 | Most cables in one network. A longer run splits into separate networks, which only pass energy on through blocks plugged into both |
 
 **`[generator]`** (limits for `/barelyfunctionalcontraptions generate`; see [What the generator may use](#what-the-generator-may-use))
 

@@ -328,6 +328,23 @@ public final class DevScreenshotHarness {
             case 1715 -> shot(mc, "36_advancements");
             case 1720 -> {
                 mc.gui.setScreen(null);
+                server.execute(() -> cableScene(server));
+            }
+            case 1765 -> shot(mc, "37_energy_cables");
+            case 1767 -> {
+                setHudHidden(mc, false);
+                mc.gui.hud.getChat().clearMessages(false); // the advancement announcements from earlier
+                command(server, "clear @a");
+                // Standing in front of the first cable, looking down at it, so Jade shows the network.
+                server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 29", cableBase.getX() + 1.5, cableBase.getY(), cableBase.getZ() + 2.5)));
+            }
+            case 1790 -> shot(mc, "38_energy_cable_jade");
+            case 1792 -> server.execute(() -> showRecipe(server, "energy_cable"));
+            case 1812 -> shot(mc, "recipe_energy_cable");
+            case 1815 -> {
+                mc.player.closeContainer();
+                mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -514,6 +531,42 @@ public final class DevScreenshotHarness {
         placeCube(level, base.east(), 0);
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 -12", base.getX() + 0.5, base.getY() + 1, base.getZ() + 8.5));
+    }
+
+    private static BlockPos cableBase;
+
+    /**
+     * A running Mycelial Generator feeding a run of Energy Cables: straight on into a Hume Energy Cube, branching off
+     * to a Mechanical Separator, and up a riser into Automatic Shears.
+     */
+    private static void cableScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        BlockPos base = origin.offset(64, 30, -4);
+        cableBase = base;
+        for (int x = -2; x <= 7; x++) for (int z = -3; z <= 4; z++) {
+            level.setBlock(base.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+            for (int y = 0; y <= 4; y++) level.setBlock(base.offset(x, y, z), Blocks.AIR.defaultBlockState(), 3);
+        }
+        level.setBlock(base, com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.mycelial.block.MycelialGeneratorBlock.FACING, Direction.SOUTH), 3);
+        if (level.getBlockEntity(base) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity generator) {
+            generator.getInventory().setStackInSlot(com.jax3.barelyfunctionalcontraptions.mycelial.capability.GeneratorItemHandler.FUEL_SLOT, new ItemStack(Items.RED_MUSHROOM, 32));
+            generator.getTank().fillInternal(net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER), 8000);
+        }
+        placeCube(level, base.east(5), 0);
+        level.setBlock(base.offset(3, 0, 3), ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState().setValue(MechanicalSeparatorBlock.FACING, Direction.SOUTH), 3);
+        if (level.getBlockEntity(base.offset(3, 0, 3)) instanceof MechanicalSeparatorBlockEntity be) {
+            be.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 16));
+        }
+        level.setBlock(base.offset(1, 3, 0), ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.SOUTH), 3);
+        var cable = ModBlocks.ENERGY_CABLE.get();
+        for (BlockPos pos : java.util.List.of(base.east(1), base.east(2), base.east(3), base.east(4), base.offset(3, 0, 1), base.offset(3, 0, 2),
+                base.offset(1, 1, 0), base.offset(1, 2, 0))) {
+            level.setBlock(pos, cable.withConnections(cable.defaultBlockState(), level, pos), 3);
+        }
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 200 25", base.getX() + 0.5, base.getY() + 2, base.getZ() + 7.0));
     }
 
     /** Opens the floor module's GUI for the player. */

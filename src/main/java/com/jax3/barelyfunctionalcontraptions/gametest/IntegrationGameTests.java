@@ -56,6 +56,7 @@ public final class IntegrationGameTests {
     static {
         TESTS.put("integration_mycelial_generator_powers_separator", IntegrationGameTests::mycelialGeneratorPowersSeparator);
         TESTS.put("integration_advancements", IntegrationGameTests::advancements);
+        TESTS.put("integration_mycelial_generator_powers_separator_through_cables", IntegrationGameTests::generatorThroughCables);
         TESTS.put("integration_mushroom_infuses_sheep", IntegrationGameTests::mushroomInfusesSheep);
         TESTS.put("integration_mushroom_wool_fuels_generator", IntegrationGameTests::mushroomWoolFuelsGenerator);
         TESTS.put("integration_mycelial_generator_powers_automatic_shears", IntegrationGameTests::generatorPowersAutomaticShears);
@@ -116,6 +117,23 @@ public final class IntegrationGameTests {
             h.assertTrue(separator.getInventory().getStack(SeparatorInventory.PRIMARY).is(Items.RAW_IRON),
                     "separator should finish iron wool on mycelial power");
             h.assertTrue(separator.getInventory().getStack(SeparatorInventory.SECONDARY).is(Items.STRING), "string output expected");
+        });
+    }
+
+    /** A Mycelial Generator runs a Mechanical Separator three Energy Cables away. */
+    private static void generatorThroughCables(GameTestHelper h) {
+        MycelialGeneratorBlockEntity generator = generator(h, new BlockPos(0, 1, 2), new ItemStack(Items.BROWN_MUSHROOM, 8), 4000);
+        MechanicalSeparatorBlockEntity separator = separator(h, new BlockPos(4, 1, 2));
+        var cableBlock = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.ENERGY_CABLE.get();
+        for (int x = 1; x <= 3; x++) {
+            BlockPos pos = new BlockPos(x, 1, 2);
+            h.setBlock(pos, cableBlock.withConnections(cableBlock.defaultBlockState(), h.getLevel(), h.absolutePos(pos)));
+        }
+        separator.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(IRON, 1));
+        h.succeedWhen(() -> {
+            h.assertTrue(generator.getState() == GeneratorState.RUNNING, "generator should be running, was " + generator.getState());
+            h.assertTrue(separator.getInventory().getStack(SeparatorInventory.PRIMARY).is(Items.RAW_IRON),
+                    "separator should finish iron wool on power carried by the cables");
         });
     }
 
@@ -192,7 +210,7 @@ public final class IntegrationGameTests {
                 {"root", null}, {"mycelial_generator", "root"}, {"mycelium_wrench", "mycelial_generator"},
                 {"link_generators", "mycelium_wrench"}, {"mechanical_separator", "root"}, {"automatic_shears", "root"},
                 {"auto_shear", "automatic_shears"}, {"fluid_reservoir", "root"}, {"hume_energy_cube", "root"},
-                {"zero_point_energy_module", "root"}, {"zero_point_death", "zero_point_energy_module"}};
+                {"zero_point_energy_module", "root"}, {"zero_point_death", "zero_point_energy_module"}, {"energy_cable", "root"}};
         for (String[] entry : tree) {
             var advancement = server.getAdvancements().get(com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep.id("contraptions/" + entry[0]));
             h.assertTrue(advancement != null, "advancement " + entry[0] + " is loaded");

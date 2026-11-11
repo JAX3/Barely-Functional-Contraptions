@@ -30,5 +30,8 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity>> ZERO_POINT_ENERGY_MODULE = REGISTER.register("zero_point_energy_module",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity::new, ModBlocks.ZERO_POINT_ENERGY_MODULE.get()));
 
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCableBlockEntity>> ENERGY_CABLE = REGISTER.register("energy_cable",
+            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCableBlockEntity::new, ModBlocks.ENERGY_CABLE.get()));
+
     private ModBlockEntities() {}
 }

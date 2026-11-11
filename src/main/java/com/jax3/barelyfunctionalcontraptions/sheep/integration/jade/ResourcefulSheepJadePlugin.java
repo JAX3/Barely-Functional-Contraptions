@@ -24,6 +24,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
     public void register(IWailaCommonRegistration registration) {
         registration.registerBlockDataProvider(SeparatorStatusDataProvider.INSTANCE, MechanicalSeparatorBlockEntity.class);
         registration.registerProgress(SeparatorProgressProvider.INSTANCE, MechanicalSeparatorBlockEntity.class);
+        registration.registerBlockDataProvider(EnergyCableDataProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCableBlockEntity.class);
     }
 
     @Override
@@ -32,5 +33,6 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(SeparatorStatusProvider.INSTANCE, MechanicalSeparatorBlock.class);
         registration.registerProgressClient(SeparatorProgressProvider.INSTANCE);
         registration.registerBlockComponent(ZeroPointModuleProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.class);
+        registration.registerBlockComponent(EnergyCableProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCableBlock.class);
     }
 }

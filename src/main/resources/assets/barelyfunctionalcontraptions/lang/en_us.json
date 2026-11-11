@@ -95,7 +95,7 @@
   "barelyfunctionalcontraptions.configuration.rounding": "Rounding",
   "barelyfunctionalcontraptions.configuration.scalingEnabled": "Scaling enabled",
   "barelyfunctionalcontraptions.configuration.scalingMultiplier": "Scaling multiplier",
-  "barelyfunctionalcontraptions.configuration.maxNetworkSize": "Max network size",
+  "barelyfunctionalcontraptions.configuration.maxNetworkSize": "Max Cables per Network",
   "barelyfunctionalcontraptions.configuration.countInactiveGenerators": "Count inactive generators",
   "barelyfunctionalcontraptions.configuration.mergeNetworks": "Merge networks",
   "barelyfunctionalcontraptions.configuration.shareResources": "Share resources",
@@ -519,5 +519,14 @@
   "advancements.barelyfunctionalcontraptions.zero_point_energy_module.title": "Something From Nothing",
   "advancements.barelyfunctionalcontraptions.zero_point_energy_module.description": "Craft a Zero Point Energy Module",
   "advancements.barelyfunctionalcontraptions.zero_point_death.title": "Don't Cross the Streams",
-  "advancements.barelyfunctionalcontraptions.zero_point_death.description": "Get vaporised by a Zero Point beam"
+  "advancements.barelyfunctionalcontraptions.zero_point_death.description": "Get vaporised by a Zero Point beam",
+  "block.barelyfunctionalcontraptions.energy_cable": "Energy Cable",
+  "tooltip.barelyfunctionalcontraptions.energy_cable": "Carries Forge Energy from generators and Hume Energy Cubes to the machines it is plugged into. Touching cables form one network that moves up to %s FE/t.",
+  "barelyfunctionalcontraptions.configuration.energy_cable": "Energy Cable",
+  "barelyfunctionalcontraptions.configuration.transferRate": "Transfer Rate per Network (FE/t)",
+  "config.jade.plugin_barelyfunctionalcontraptions.energy_cable": "Energy Cable",
+  "jade.barelyfunctionalcontraptions.cable.network": "Network: %s cables, %s blocks plugged in",
+  "jade.barelyfunctionalcontraptions.cable.rate": "Moving %s / %s FE/t",
+  "advancements.barelyfunctionalcontraptions.energy_cable.title": "Plugged In",
+  "advancements.barelyfunctionalcontraptions.energy_cable.description": "Craft some Energy Cables"
 }

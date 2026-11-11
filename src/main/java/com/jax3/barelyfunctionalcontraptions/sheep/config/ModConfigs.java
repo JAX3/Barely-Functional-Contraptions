@@ -122,6 +122,8 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue zpeBeamBurnSeconds;
         public final ModConfigSpec.IntValue zpeBeamLooting;
         public final ModConfigSpec.BooleanValue zpeBeamPlayerKill;
+        public final ModConfigSpec.IntValue cableTransferRate;
+        public final ModConfigSpec.IntValue cableMaxNetworkSize;
 
         // ---------------------------------------------------------------- /barelyfunctionalcontraptions generate
         public final ModConfigSpec.ConfigValue<List<? extends String>> generatorAllowedTabs;
@@ -282,6 +284,14 @@ public final class ModConfigs {
             zpeBeamPlayerKill = b.comment("Mobs the beam kills count as killed by a player: they drop experience and player-only loot",
                             "(like a zombie's rare iron ingot). The kill is credited to a fake player called [Zero Point Beam].")
                     .define("beamCountsAsPlayerKill", true);
+            b.pop();
+
+            b.comment("Energy Cable (touching cables form one network that carries FE between generators, cubes and machines)").push("energy_cable");
+            cableTransferRate = b.comment("Most FE/t one cable network carries in total, however many cables and blocks are on it.")
+                    .defineInRange("transferRate", 100_000, 1, Integer.MAX_VALUE);
+            cableMaxNetworkSize = b.comment("Most cables in one network. Longer runs split into separate networks, which still pass",
+                            "energy along only through the blocks plugged into both.")
+                    .defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
             b.pop();
 
             b.comment("Which items /barelyfunctionalcontraptions generate may turn into wool types (feeding items and separator outputs).",

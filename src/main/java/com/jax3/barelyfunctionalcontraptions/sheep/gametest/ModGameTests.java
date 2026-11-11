@@ -124,6 +124,12 @@ public final class ModGameTests {
         TESTS.put("zero_point_modules_generate_across_a_gap", ModGameTests::zeroPointModules);
         TESTS.put("zero_point_beam_burns_what_touches_it", ModGameTests::zeroPointBeamBurns);
         TESTS.put("zero_point_beam_kills_have_looting", ModGameTests::zeroPointBeamLooting);
+        TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
+        TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
+        TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
+        TESTS.put("energy_cable_respects_transfer_rate", ModGameTests::cableRate);
+        TESTS.put("energy_cable_break_splits_network", ModGameTests::cableBreakSplits);
+        TESTS.put("energy_cable_carries_zero_point_power", ModGameTests::cableZeroPoint);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -144,6 +150,131 @@ public final class ModGameTests {
             ResourceKey<Consumer<GameTestHelper>> fn = ResourceKey.create(Registries.TEST_FUNCTION, ResourcefulSheep.id(name));
             event.registerTest(ResourcefulSheep.id(name), new FunctionGameTestInstance(fn, new TestData<>(reloadEnv, STRUCTURE, 1200, 0, true)));
         }
+    }
+
+
+    // ------------------------------------------------------------------ energy cables
+
+    /** Places a cable the way a player would: every side worked out from what is around it. */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCableBlockEntity cable(GameTestHelper h, BlockPos pos) {
+        var block = ModBlocks.ENERGY_CABLE.get();
+        h.setBlock(pos, block.withConnections(block.defaultBlockState(), h.getLevel(), h.absolutePos(pos)));
+        return h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCableBlockEntity.class);
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection side(GameTestHelper h, BlockPos pos, net.minecraft.core.Direction dir) {
+        return h.getBlockState(pos).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCableBlock.SIDES.get(dir));
+    }
+
+    /** Cables join cables, plug into blocks with an energy connection, ignore everything else, and follow changes. */
+    private static void cableConnects(GameTestHelper h) {
+        var CABLE = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.CABLE;
+        var MACHINE = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.MACHINE;
+        var NONE = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.NONE;
+        var E = net.minecraft.core.Direction.EAST;
+        var W = net.minecraft.core.Direction.WEST;
+        var U = net.minecraft.core.Direction.UP;
+        cube(h, new BlockPos(1, 1, 2));
+        h.setBlock(new BlockPos(3, 2, 2), net.minecraft.world.level.block.Blocks.STONE);
+        var a = cable(h, new BlockPos(2, 1, 2));
+        var b = cable(h, new BlockPos(3, 1, 2));
+        h.assertTrue(side(h, new BlockPos(2, 1, 2), W) == MACHINE, "plugs into the cube");
+        h.assertTrue(side(h, new BlockPos(2, 1, 2), E) == CABLE && side(h, new BlockPos(3, 1, 2), W) == CABLE, "joins the next cable");
+        h.assertTrue(side(h, new BlockPos(3, 1, 2), U) == NONE && side(h, new BlockPos(3, 1, 2), E) == NONE, "ignores stone and air");
+        h.assertTrue(a.network() == b.network() && a.network().size() == 2 && a.network().endpoints().size() == 1,
+                "one network of 2 cables with the cube plugged in");
+        // A machine placed next to a cable later plugs in; removing it unplugs.
+        h.setBlock(new BlockPos(4, 1, 2), ModBlocks.MECHANICAL_SEPARATOR.get());
+        h.assertTrue(side(h, new BlockPos(3, 1, 2), E) == MACHINE, "plugs into a separator placed beside it");
+        h.assertTrue(a.network().endpoints().size() == 2, "the network sees the new machine");
+        h.setBlock(new BlockPos(1, 1, 2), net.minecraft.world.level.block.Blocks.AIR);
+        h.assertTrue(side(h, new BlockPos(2, 1, 2), W) == NONE, "unplugs from a removed cube");
+        h.assertTrue(a.network().endpoints().size() == 1, "the network forgets the removed cube");
+        h.succeed();
+    }
+
+    /** Creative Generator -> 3 cables -> Hume Energy Cube: the cube charges, and the cables hold nothing themselves. */
+    private static void cableCarriesPower(GameTestHelper h) {
+        h.setBlock(new BlockPos(0, 1, 2), ModBlocks.CREATIVE_GENERATOR.get());
+        var first = cable(h, new BlockPos(1, 1, 2));
+        cable(h, new BlockPos(2, 1, 2));
+        cable(h, new BlockPos(3, 1, 2));
+        var target = cube(h, new BlockPos(4, 1, 2));
+        // Re-place the end cables so they plug into the blocks placed after them.
+        cable(h, new BlockPos(3, 1, 2));
+        cable(h, new BlockPos(1, 1, 2));
+        h.succeedWhen(() -> {
+            h.assertTrue(first.network().size() == 3 && first.network().endpoints().size() == 2, "3 cables, generator and cube plugged in");
+            h.assertTrue(target.group().amount() >= 200_000, "the cube charged through the cables, has " + target.group().amount());
+            h.assertTrue(first.getEnergyHandler(null).getAmountAsLong() == 0, "cables hold no energy");
+            h.assertTrue(first.network().rate() > 0, "the network reports the FE/t it moves");
+        });
+    }
+
+    /** A charged cube powers the shears through cables, but never fills the other cube on the same network. */
+    private static void cableCubeToMachine(GameTestHelper h) {
+        var source = cube(h, new BlockPos(0, 1, 2));
+        source.storage().set(500_000);
+        var other = cube(h, new BlockPos(2, 2, 2));
+        h.setBlock(new BlockPos(4, 1, 2), ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, net.minecraft.core.Direction.EAST));
+        var shears = h.getBlockEntity(new BlockPos(4, 1, 2), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.class);
+        for (int x = 1; x <= 3; x++) cable(h, new BlockPos(x, 1, 2));
+        h.succeedWhen(() -> {
+            h.assertTrue(shears.getEnergy().getEnergy() >= 5_000, "shears charged through the cables, has " + shears.getEnergy().getEnergy());
+            h.assertTrue(other.group().amount() == 0, "the second cube must not be filled from the first, has " + other.group().amount());
+            h.assertTrue(source.group().amount() == 500_000 - shears.getEnergy().getEnergy(), "energy only moved, none made or lost");
+        });
+    }
+
+    /** With transferRate = 1,000 a network never moves more than 1,000 FE in a tick. */
+    private static void cableRate(GameTestHelper h) {
+        int old = ModConfigs.SERVER.cableTransferRate.get();
+        ModConfigs.SERVER.cableTransferRate.set(1_000);
+        h.setBlock(new BlockPos(0, 1, 2), ModBlocks.CREATIVE_GENERATOR.get());
+        var target = cube(h, new BlockPos(2, 1, 2));
+        cable(h, new BlockPos(1, 1, 2));
+        long[] start = new long[1];
+        h.runAfterDelay(2, () -> start[0] = target.group().amount());
+        h.runAfterDelay(12, () -> {
+            try {
+                long gained = target.group().amount() - start[0];
+                h.assertTrue(gained > 0 && gained <= 10 * 1_000, "10 ticks at 1,000 FE/t, gained " + gained);
+            } finally {
+                ModConfigs.SERVER.cableTransferRate.set(old);
+            }
+            h.succeed();
+        });
+    }
+
+    /** A linked Zero Point pair charges a Hume Energy Cube through cables. */
+    private static void cableZeroPoint(GameTestHelper h) {
+        h.setBlock(new BlockPos(1, 1, 1), zpe(Direction.UP));
+        h.setBlock(new BlockPos(1, 4, 1), zpe(Direction.DOWN));
+        var target = cube(h, new BlockPos(4, 1, 1));
+        for (int x = 2; x <= 3; x++) cable(h, new BlockPos(x, 1, 1));
+        h.succeedWhen(() -> h.assertTrue(target.group().amount() >= 20_000,
+                "the cube charged from the Zero Point pair through the cables, has " + target.group().amount()));
+    }
+
+    /** Breaking the middle cable splits the network: the cube stops charging. */
+    private static void cableBreakSplits(GameTestHelper h) {
+        h.setBlock(new BlockPos(0, 1, 2), ModBlocks.CREATIVE_GENERATOR.get());
+        var target = cube(h, new BlockPos(4, 1, 2));
+        var first = cable(h, new BlockPos(1, 1, 2));
+        cable(h, new BlockPos(2, 1, 2));
+        var last = cable(h, new BlockPos(3, 1, 2));
+        long[] stopped = new long[1];
+        h.runAfterDelay(3, () -> {
+            h.assertTrue(target.group().amount() > 0, "charging before the break");
+            h.setBlock(new BlockPos(2, 1, 2), net.minecraft.world.level.block.Blocks.AIR);
+            h.assertTrue(first.network() != last.network() && first.network().size() == 1, "split into two networks of 1");
+            stopped[0] = target.group().amount();
+        });
+        h.runAfterDelay(8, () -> {
+            h.assertTrue(target.group().amount() == stopped[0], "no energy crosses the gap");
+            h.succeed();
+        });
     }
 
     // ------------------------------------------------------------------ helpers

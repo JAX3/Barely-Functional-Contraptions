@@ -283,6 +283,48 @@ def block_models():
     write(os.path.join(ASSETS, "blockstates", "zero_point_energy_module.json"), {"variants": variants})
     write(os.path.join(ASSETS, "items", "zero_point_energy_module.json"),
           {"model": {"type": "minecraft:model", "model": zpe + "on"}})
+    # Energy Cable: multipart. A junction box in the middle, an arm towards each connected side, and a plug plate
+    # on each side joined to a machine. Automatic UVs pick the right part of each texture (see generate_textures.py).
+    cable_dir = os.path.join(ASSETS, "models", "block", "energy_cable")
+    ec = f"{MOD}:block/energy_cable/"
+    tex = {"particle": ec + "cable", "cable": ec + "cable", "plug": ec + "cable_plug"}
+
+    def faces(names, texture, cull=None):
+        return {n: ({"texture": texture, "cullface": n} if n == cull else {"texture": texture}) for n in names}
+
+    write(os.path.join(cable_dir, "core.json"), {"parent": "minecraft:block/block", "textures": tex, "elements": [
+        {"from": [5, 5, 5], "to": [11, 11, 11], "faces": faces(["north", "south", "east", "west", "up", "down"], "#cable")}]})
+    arm_boxes = {
+        "north": ([6, 6, 0], [10, 10, 5]), "south": ([6, 6, 11], [10, 10, 16]),
+        "west": ([0, 6, 6], [5, 10, 10]), "east": ([11, 6, 6], [16, 10, 10]),
+        "down": ([6, 0, 6], [10, 5, 10]), "up": ([6, 11, 6], [10, 16, 10]),
+    }
+    plug_boxes = {
+        "north": ([4, 4, 0], [12, 12, 2]), "south": ([4, 4, 14], [12, 12, 16]),
+        "west": ([0, 4, 4], [2, 12, 12]), "east": ([14, 4, 4], [16, 12, 12]),
+        "down": ([4, 0, 4], [12, 2, 12]), "up": ([4, 14, 4], [12, 16, 12]),
+    }
+    opposite = {"north": "south", "south": "north", "east": "west", "west": "east", "up": "down", "down": "up"}
+    parts = [{"apply": {"model": ec + "core"}}]
+    for side, (frm, to) in arm_boxes.items():
+        # The arm's two ends are never seen (inside the junction box, against the next cable or the plug).
+        sides = [n for n in arm_boxes if n not in (side, opposite[side])]
+        write(os.path.join(cable_dir, "arm_" + side + ".json"), {"parent": "minecraft:block/block", "textures": tex,
+              "elements": [{"from": frm, "to": to, "faces": faces(sides, "#cable")}]})
+        frm, to = plug_boxes[side]
+        write(os.path.join(cable_dir, "plug_" + side + ".json"), {"parent": "minecraft:block/block", "textures": tex,
+              "elements": [{"from": frm, "to": to, "faces": faces(list(arm_boxes), "#plug", cull=side)}]})
+        parts.append({"when": {side: "cable|machine"}, "apply": {"model": ec + "arm_" + side}})
+        parts.append({"when": {side: "machine"}, "apply": {"model": ec + "plug_" + side}})
+    write(os.path.join(ASSETS, "blockstates", "energy_cable.json"), {"multipart": parts})
+    # In the hand: a straight length of cable.
+    write(os.path.join(cable_dir, "item.json"), {"parent": "minecraft:block/block", "textures": tex, "elements": [
+        {"from": [5, 5, 5], "to": [11, 11, 11], "faces": faces(["north", "south", "east", "west", "up", "down"], "#cable")},
+        {"from": [6, 6, 0], "to": [10, 10, 5], "faces": faces(["east", "west", "up", "down", "north"], "#cable")},
+        {"from": [6, 6, 11], "to": [10, 10, 16], "faces": faces(["east", "west", "up", "down", "south"], "#cable")},
+    ]})
+    write(os.path.join(ASSETS, "items", "energy_cable.json"),
+          {"model": {"type": "minecraft:model", "model": ec + "item"}})
     write(os.path.join(ASSETS, "models", "block", "creative_generator.json"),
           {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/creative_generator"}})
     write(os.path.join(ASSETS, "blockstates", "creative_generator.json"),
@@ -333,6 +375,14 @@ def lang():
         "block.barelyfunctionalcontraptions.hume_energy_cube": "Hume Energy Cube",
         "block.barelyfunctionalcontraptions.functional_machine_block": "Functional Machine Block",
         "block.barelyfunctionalcontraptions.zero_point_energy_module": "Zero Point Energy Module",
+        "block.barelyfunctionalcontraptions.energy_cable": "Energy Cable",
+        "tooltip.barelyfunctionalcontraptions.energy_cable": "Carries Forge Energy from generators and Hume Energy Cubes to the machines it is plugged into. Touching cables form one network that moves up to %s FE/t.",
+        "barelyfunctionalcontraptions.configuration.energy_cable": "Energy Cable",
+        "barelyfunctionalcontraptions.configuration.transferRate": "Transfer Rate per Network (FE/t)",
+        "barelyfunctionalcontraptions.configuration.maxNetworkSize": "Max Cables per Network",
+        "config.jade.plugin_barelyfunctionalcontraptions.energy_cable": "Energy Cable",
+        "jade.barelyfunctionalcontraptions.cable.network": "Network: %s cables, %s blocks plugged in",
+        "jade.barelyfunctionalcontraptions.cable.rate": "Moving %s / %s FE/t",
         "tooltip.barelyfunctionalcontraptions.zero_point_energy_module": "Generates Forge Energy in pairs: place one on the floor and one on the ceiling directly above it, with open space between. The bigger the gap, the more power, and all of it can be taken from either module. Right-click to see the beam connection.",
         "gui.barelyfunctionalcontraptions.zpe.generating": "+%s FE/t",
         "gui.barelyfunctionalcontraptions.zpe.shared": "Shared pool",
@@ -615,6 +665,24 @@ def recipes_loot_tags():
         "pattern": ["IBI", "AMA", "CRC"],
         "result": {"id": f"{MOD}:zero_point_energy_module", "count": 2},
     })
+    # Energy Cable: copper wire wrapped in wool, around redstone. Makes 8.
+    write(os.path.join(DATA, MOD, "recipe", "energy_cable.json"), {
+        "type": "minecraft:crafting_shaped",
+        "category": "redstone",
+        "key": {
+            "W": "#minecraft:wool",
+            "C": "minecraft:copper_ingot",
+            "R": "minecraft:redstone",
+        },
+        "pattern": ["WWW", "CRC", "WWW"],
+        "result": {"id": f"{MOD}:energy_cable", "count": 8},
+    })
+    write(os.path.join(DATA, MOD, "loot_table", "blocks", "energy_cable.json"), {
+        "type": "minecraft:block",
+        "pools": [{"rolls": 1, "condition": {"type": "minecraft:survives_explosion"},
+                   "entries": [{"type": "minecraft:item", "name": f"{MOD}:energy_cable"}]}],
+        "random_sequence": f"{MOD}:blocks/energy_cable",
+    })
     # The beam's damage: burning hurt sound, no knockback (it has no source to be pushed away from).
     write(os.path.join(DATA, MOD, "damage_type", "zero_point_beam.json"), {
         "effects": "burning",
@@ -717,7 +785,7 @@ def recipes_loot_tags():
     # Machines a Mycelial Generator can power wirelessly through a Barely Functional Wrench link.
     write(os.path.join(DATA, MOD, "tags", "block", "wireless_power_receivers.json"),
           {"values": [f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:hume_energy_cube"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block", f"{MOD}:zero_point_energy_module"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block", f"{MOD}:zero_point_energy_module", f"{MOD}:energy_cable"]})
     write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block", f"{MOD}:zero_point_energy_module"]})
 
 
@@ -735,6 +803,7 @@ ADVANCEMENTS = [
     ("hume_energy_cube", "root", "hume_energy_cube", "task", "hume_energy_cube"),
     ("zero_point_energy_module", "root", "zero_point_energy_module", "task", "zero_point_energy_module"),
     ("zero_point_death", "zero_point_energy_module", "zero_point_energy_module", "challenge", None),
+    ("energy_cable", "root", "energy_cable", "task", "energy_cable"),
 ]
 ADVANCEMENT_TEXT = {
     "root": ("Barely Functional Contraptions", "Make a Functional Machine Block, the casing every machine is built around"),
@@ -748,6 +817,7 @@ ADVANCEMENT_TEXT = {
     "hume_energy_cube": ("Hume Sweet Hume", "Craft a Hume Energy Cube"),
     "zero_point_energy_module": ("Something From Nothing", "Craft a Zero Point Energy Module"),
     "zero_point_death": ("Don't Cross the Streams", "Get vaporised by a Zero Point beam"),
+    "energy_cable": ("Plugged In", "Craft some Energy Cables"),
 }
 
 
