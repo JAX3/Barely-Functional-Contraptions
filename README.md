@@ -300,9 +300,9 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 - **Counts as a player kill:** mobs the beam kills **drop experience** and **player-only loot** (blaze rods, a zombie's rare iron ingot, a wither skeleton's skull), just as if you had killed them yourself (`beamCountsAsPlayerKill`). The kill is credited to a fake player called *[Zero Point Beam]*, so it works even when nobody is nearby. A beam-and-hopper mob farm needs no player.
 
   ![A pig standing in a Zero Point beam, on fire and flashing red](docs/screenshots/35_zero_point_beam_burns.png)
-- **Coloured beams:** stained glass colours the beam just like a beacon beam. Put stained glass (blocks or panes) in the gap and the beam takes that colour from the glass upwards. Each further pane of a different colour mixes with the colour so far, so red then yellow gives orange. Glass of the same colour in a row changes nothing. The colour is only for looks: the power is the same.
+- **Coloured beams:** stained glass colours the beam. Put a stained glass block or pane anywhere in the gap and the **whole beam**, from one module to the other, takes its colour. Several colours mix the way a beacon beam's do (each different colour blends with the colour so far), so red and then yellow make an orange beam. Glass of the same colour in a row changes nothing. The colour is only for looks: the power is the same.
 
-  ![A Zero Point beam going blue, then red through red stained glass, then orange through yellow stained glass](docs/screenshots/34_zero_point_coloured_beam.png)
+  ![A Zero Point beam coloured orange from end to end by red and yellow stained glass in the gap](docs/screenshots/34_zero_point_coloured_beam.png)
 - **GUI:** right-click a module to open it. It's in the same slate style as the other machines:
   - an energy gauge for the pair's shared pool;
   - a **beam diagram**: the column with this module marked by a pointer, and at the far end what it found. When linked, both modules are lit with the animated beam between them. Otherwise it shows why: a blocking block (with a red cross) part of the way along, a partner that points the wrong way, a partner too close, or a dashed outline where a partner should go;
