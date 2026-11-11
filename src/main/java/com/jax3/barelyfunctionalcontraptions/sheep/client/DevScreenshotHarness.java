@@ -314,7 +314,19 @@ public final class DevScreenshotHarness {
                 }
             });
             case 1679 -> shot(mc, "35_zero_point_beam_burns");
-            case 1685 -> {
+            case 1681 -> {
+                // The advancement tab: everything earned except the hidden "Don't Cross the Streams".
+                command(server, "advancement grant @a from barelyfunctionalcontraptions:contraptions/root");
+                command(server, "advancement revoke @a only barelyfunctionalcontraptions:contraptions/zero_point_death");
+            }
+            case 1695 -> {
+                var advancements = mc.player.connection.getAdvancements();
+                mc.gui.setScreen(new net.minecraft.client.gui.screens.advancements.AdvancementsScreen(advancements));
+                advancements.setSelectedTab(advancements.get(ResourcefulSheep.id("contraptions/root")), true);
+            }
+            case 1712 -> mc.gui.toastManager().clear();
+            case 1715 -> shot(mc, "36_advancements");
+            case 1720 -> {
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());

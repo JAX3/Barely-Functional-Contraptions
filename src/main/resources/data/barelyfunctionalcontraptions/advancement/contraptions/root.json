@@ -1,0 +1,34 @@
+{
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:functional_machine_block"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.root.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.root.description"
+    },
+    "frame": "task",
+    "background": "barelyfunctionalcontraptions:gui/advancements/backgrounds/contraptions",
+    "show_toast": false,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "obtained": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:functional_machine_block"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtained"
+    ]
+  ]
+}

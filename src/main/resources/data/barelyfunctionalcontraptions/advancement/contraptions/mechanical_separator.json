@@ -1,0 +1,32 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:mechanical_separator"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.mechanical_separator.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.mechanical_separator.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "obtained": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:mechanical_separator"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtained"
+    ]
+  ]
+}

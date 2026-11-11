@@ -173,7 +173,12 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity {
             sheared++;
             if (!hasSpace()) break;
         }
-        if (sheared > 0) setChanged();
+        if (sheared > 0) {
+            setChanged();
+            com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.awardNearby(level, pos,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.AUTO_SHEAR_RADIUS,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.AUTO_SHEAR);
+        }
         return sheared;
     }
 

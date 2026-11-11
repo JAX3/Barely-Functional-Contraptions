@@ -607,12 +607,12 @@ def recipes_loot_tags():
         "key": {
             "I": "minecraft:iron_ingot",
             "C": "minecraft:copper_ingot",
-            "S": "minecraft:nether_star",
+            "B": "minecraft:beacon",
             "A": "minecraft:amethyst_shard",
             "M": f"{MOD}:functional_machine_block",
             "R": "minecraft:redstone_block",
         },
-        "pattern": ["ISI", "AMA", "CRC"],
+        "pattern": ["IBI", "AMA", "CRC"],
         "result": {"id": f"{MOD}:zero_point_energy_module", "count": 2},
     })
     # The beam's damage: burning hurt sound, no knockback (it has no source to be pushed away from).
@@ -721,12 +721,82 @@ def recipes_loot_tags():
     write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block", f"{MOD}:zero_point_energy_module"]})
 
 
+# The mod's advancement tab: (path, parent, icon item, frame, criterion) where criterion is an item to obtain, or None
+# for the special ones the mod grants from code (ModAdvancements). Titles and descriptions are in ADVANCEMENT_TEXT.
+ADVANCEMENTS = [
+    ("root", None, "functional_machine_block", "task", "functional_machine_block"),
+    ("mycelial_generator", "root", "mycelial_generator", "task", "mycelial_generator"),
+    ("mycelium_wrench", "mycelial_generator", "mycelium_wrench", "task", "mycelium_wrench"),
+    ("link_generators", "mycelium_wrench", "mycelium_wrench", "goal", None),
+    ("mechanical_separator", "root", "mechanical_separator", "task", "mechanical_separator"),
+    ("automatic_shears", "root", "automatic_shears", "task", "automatic_shears"),
+    ("auto_shear", "automatic_shears", "automatic_shears", "goal", None),
+    ("fluid_reservoir", "root", "fluid_reservoir", "task", "fluid_reservoir"),
+    ("hume_energy_cube", "root", "hume_energy_cube", "task", "hume_energy_cube"),
+    ("zero_point_energy_module", "root", "zero_point_energy_module", "task", "zero_point_energy_module"),
+    ("zero_point_death", "zero_point_energy_module", "zero_point_energy_module", "challenge", None),
+]
+ADVANCEMENT_TEXT = {
+    "root": ("Barely Functional Contraptions", "Make a Functional Machine Block, the casing every machine is built around"),
+    "mycelial_generator": ("It's Alive... Ish", "Craft a Mycelial Generator"),
+    "mycelium_wrench": ("Some Assembly Required", "Craft a Barely Functional Wrench"),
+    "link_generators": ("Fungal Network", "Link two Mycelial Generators together with the Barely Functional Wrench"),
+    "mechanical_separator": ("Separation Anxiety", "Craft a Mechanical Separator"),
+    "automatic_shears": ("Hands-Free Haircut", "Craft Automatic Shears"),
+    "auto_shear": ("Shear Genius", "Watch Automatic Shears shear a sheep for you"),
+    "fluid_reservoir": ("Bottomless Bucket", "Craft a Fluid Reservoir"),
+    "hume_energy_cube": ("Hume Sweet Hume", "Craft a Hume Energy Cube"),
+    "zero_point_energy_module": ("Something From Nothing", "Craft a Zero Point Energy Module"),
+    "zero_point_death": ("Don't Cross the Streams", "Get vaporised by a Zero Point beam"),
+}
+
+
+def advancements():
+    folder = os.path.join(DATA, MOD, "advancement", "contraptions")
+    for name in os.listdir(folder) if os.path.isdir(folder) else []:
+        os.remove(os.path.join(folder, name))
+    for path, parent, icon, frame, item in ADVANCEMENTS:
+        if item:
+            criteria = {"obtained": {"trigger": "minecraft:inventory_changed",
+                                     "conditions": {"items": [{"items": f"{MOD}:{item}"}]}}}
+            requirements = [["obtained"]]
+        else:
+            criteria = {"done": {"trigger": "minecraft:impossible"}}  # granted from code (ModAdvancements)
+            requirements = [["done"]]
+        display = {
+            "icon": {"id": f"{MOD}:{icon}"},
+            "title": {"translate": f"advancements.{MOD}.{path}.title"},
+            "description": {"translate": f"advancements.{MOD}.{path}.description"},
+            "frame": frame,
+        }
+        if parent is None:
+            display["background"] = f"{MOD}:gui/advancements/backgrounds/contraptions"
+            display["show_toast"] = False
+            display["announce_to_chat"] = False
+        if path == "zero_point_death":
+            display["hidden"] = True
+        adv = {"display": display, "criteria": criteria, "requirements": requirements}
+        if parent:
+            adv = {"parent": f"{MOD}:contraptions/{parent}", **adv}
+        if frame == "challenge":
+            adv["rewards"] = {"experience": 50}
+        write(os.path.join(folder, path + ".json"), adv)
+    lang_path = os.path.join(ASSETS, "lang", "en_us.json")
+    with open(lang_path, encoding="utf-8") as f:
+        merged = json.load(f)
+    for path, (title, description) in ADVANCEMENT_TEXT.items():
+        merged[f"advancements.{MOD}.{path}.title"] = title
+        merged[f"advancements.{MOD}.{path}.description"] = description
+    write(lang_path, merged)
+
+
 if __name__ == "__main__":
     resource_definitions()
     item_models()
     block_models()
     lang()
     recipes_loot_tags()
+    advancements()
     print("Data written to", os.path.abspath(RES))
 
 

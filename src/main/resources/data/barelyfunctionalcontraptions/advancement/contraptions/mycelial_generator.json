@@ -1,0 +1,32 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:mycelial_generator"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.mycelial_generator.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.mycelial_generator.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "obtained": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:mycelial_generator"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtained"
+    ]
+  ]
+}

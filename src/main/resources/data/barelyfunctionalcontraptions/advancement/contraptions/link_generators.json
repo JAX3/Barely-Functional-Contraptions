@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/mycelium_wrench",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:mycelium_wrench"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.link_generators.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.link_generators.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

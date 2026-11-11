@@ -1,0 +1,32 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:zero_point_energy_module"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.zero_point_energy_module.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.zero_point_energy_module.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "obtained": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:zero_point_energy_module"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtained"
+    ]
+  ]
+}
