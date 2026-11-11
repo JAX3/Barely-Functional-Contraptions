@@ -18,7 +18,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 /**
  * GUI of the Zero Point Energy Module, in the slate style of the other machines (laid out like the Hume Energy Cube's).
- * Left: the module's FE buffer. Middle: a diagram of the beam connection, with this module marked, its partner, and
+ * Left: the pair's pooled FE buffer (this module's plus its partner's). Middle: a diagram of the beam connection, with this module marked, its partner, and
  * whatever is stopping the link. Right: stored energy, generation and output. Bottom: a status lamp with the link
  * state. Art: {@code textures/gui/zero_point_energy_module.png}; see {@code tools/sheep/generate_textures.py}.
  */
@@ -158,8 +158,9 @@ public class ZeroPointModuleScreen extends AbstractContainerScreen<ZeroPointModu
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
         centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", fe(menu.getAmount())), 21, ENERGY_TEXT);
         centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", fe(menu.getCapacity())), 31, TEXT_DIM);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.generating", fe(menu.getGenerating())), 48, GEN_COLOR);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.pair", fe(menu.getPairOutput())), 58, TEXT_DIM);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.generating", fe(menu.getPairOutput())), 48, GEN_COLOR);
+        centred(graphics, Component.translatable(menu.getLink() == ZeroPointLink.LINKED
+                ? "gui.barelyfunctionalcontraptions.zpe.shared" : "gui.barelyfunctionalcontraptions.zpe.not_linked"), 58, TEXT_DIM);
         centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.out", fe(menu.getOutRate())), 68, OUT_COLOR);
         graphics.text(font, statusText(), LAMP_X + 13, LAMP_Y + 1, statusLamp().color, false);
     }

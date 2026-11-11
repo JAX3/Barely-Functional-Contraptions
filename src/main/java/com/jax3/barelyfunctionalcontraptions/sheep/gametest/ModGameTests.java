@@ -888,7 +888,7 @@ public final class ModGameTests {
         var menu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.ZeroPointModuleMenu) low.createMenu(0, player.getInventory(), player);
         h.assertTrue(menu.getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.LINKED && menu.getLinkDistance() == 3 && menu.facesUp(), "menu shows the link");
         h.assertTrue(menu.getGenerating() == low.getGenerating() && menu.getPairOutput() == low.getPairOutput(), "menu shows generation");
-        h.assertTrue(menu.getCapacity() == ModConfigs.getInt(ModConfigs.SERVER.zpeCapacity), "menu shows the buffer size");
+        h.assertTrue(menu.getCapacity() == 2 * ModConfigs.getInt(ModConfigs.SERVER.zpeCapacity), "menu shows the pair's pooled buffer");
         var highMenu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.ZeroPointModuleMenu) high.createMenu(1, player.getInventory(), player);
         h.assertFalse(highMenu.facesUp(), "ceiling module's menu knows it points down");
         h.assertBlockProperty(floor, linkedProp, true);
@@ -920,14 +920,34 @@ public final class ModGameTests {
         h.assertTrue(zpeAt(h, touchA).getLinkDistance() == 0, "modules need open space between them");
         h.assertTrue(zpeAt(h, touchA).getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.TOO_CLOSE, "reported as too close");
 
-        // A Hume Energy Cube touching the floor module fills up; the pair keeps making power over time.
+        // A second pair with nothing attached, to check the pool: either module reaches both buffers.
+        BlockPos poolLow = new BlockPos(3, 1, 5), poolHigh = new BlockPos(3, 4, 5);
+        h.setBlock(poolLow, zpe(Direction.UP));
+        h.setBlock(poolHigh, zpe(Direction.DOWN));
+        var pLow = zpeAt(h, poolLow);
+        var pHigh = zpeAt(h, poolHigh);
+
+        // A Hume Energy Cube touching only the floor module gets the pair's whole output, drawing the ceiling
+        // module's half through the pool, so the ceiling module's buffer never builds up.
         BlockPos cubePos = new BlockPos(1, 1, 2);
         h.setBlock(cubePos, ModBlocks.HUME_ENERGY_CUBE.get());
         h.succeedWhen(() -> {
             var cube = h.getBlockEntity(cubePos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
             int stored = cube.storage().getAmountAsInt();
-            h.assertTrue(stored >= 20 * low.getGenerating(), "cube should receive the floor module's FE, has " + stored);
-            h.assertTrue(high.getEnergyStored() > 0, "the ceiling module charges its own buffer");
+            h.assertTrue(stored >= 20 * low.getPairOutput(), "cube should receive the pair's full output, has " + stored);
+            h.assertTrue(high.getEnergyStored() <= 2 * high.getGenerating(),
+                    "the ceiling module's half is drawn through the floor module, still holds " + high.getEnergyStored());
+
+            // The unattached pair: the ceiling module's capability holds and gives out both buffers.
+            int own = pHigh.getEnergyStored(), other = pLow.getEnergyStored();
+            h.assertTrue(own > 0 && other > 0, "both buffers of the idle pair charge");
+            EnergyHandler pool = h.getLevel().getCapability(Capabilities.Energy.BLOCK, h.absolutePos(poolHigh), Direction.NORTH);
+            h.assertTrue(pool != null && pool.getAmountAsLong() == own + other, "the ceiling module shows the whole pool");
+            try (Transaction tx = Transaction.openRoot()) {
+                int taken = pool.extract(Integer.MAX_VALUE, tx);
+                h.assertTrue(taken == Math.min(own + other, ModConfigs.getInt(ModConfigs.SERVER.zpeMaxOutput)),
+                        "all of the pool can be taken from one module, took " + taken + " of " + (own + other));
+            } // not committed
             // The module only gives energy; nothing can be pushed into it.
             EnergyHandler handler = h.getLevel().getCapability(Capabilities.Energy.BLOCK, h.absolutePos(floor), Direction.NORTH);
             h.assertTrue(handler != null, "module exposes FE");

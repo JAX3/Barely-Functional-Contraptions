@@ -26,8 +26,9 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 /**
  * A Zero Point Energy Module. Every few ticks it looks along its facing (up or down) for a partner: the nearest module
  * in the same column that faces back at it, with only see-through blocks in between and at least {@code minGap}
- * blocks of open space. A linked pair makes {@code energyPerBlock} FE/t for every block of gap; the floor module
- * keeps the larger half, the ceiling module the rest. Each module pushes its buffer into neighbouring receivers.
+ * blocks of open space. A linked pair makes {@code energyPerBlock} FE/t for every block of gap, half going into each
+ * module's buffer. The two buffers act as one pool: the energy capability of either module reaches both, and each
+ * module pushes from the pool into its neighbours, so the pair's full output can be taken from either end.
  *
  * <p>The link distance and rate are synced to the client, which draws the beam and shows them in Jade.</p>
  */
@@ -35,6 +36,8 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
     private static final int SCAN_INTERVAL = 5;
 
     private final Storage energy = new Storage();
+    /** What neighbours see on every face: this module's buffer plus its partner's. */
+    private final PairEnergy pairEnergy = new PairEnergy();
     /** Distance in blocks to the partner (2 = one block of gap), or 0 when not linked. */
     private int linkDistance;
     /** FE this module adds to its own buffer every tick (its half of the pair's output). */
@@ -43,25 +46,24 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
     private ZeroPointLink link = ZeroPointLink.NO_MODULE;
     /** How far along the column the last scan stopped (the partner, the blocking block or the range limit). */
     private int stoppedAt;
-    /** FE that left the buffer since the last tick (pushed by it or pulled by neighbours), and the 1-second average. */
-    private int energyAfterLastTick;
+    /** FE that left this module's buffer this second (through either module), and the last second's average. */
     private int outThisSecond;
     private int outRate;
     private final net.minecraft.world.inventory.ContainerData data = new net.minecraft.world.inventory.ContainerData() {
         @Override
         public int get(int index) {
             return switch (index) {
-                case 0 -> energy.getAmountAsInt() & 0xFFFF;
-                case 1 -> energy.getAmountAsInt() >>> 16;
-                case 2 -> energy.getCapacityAsInt() & 0xFFFF;
-                case 3 -> energy.getCapacityAsInt() >>> 16;
+                case 0 -> pairEnergy.getAmountAsInt() & 0xFFFF;
+                case 1 -> pairEnergy.getAmountAsInt() >>> 16;
+                case 2 -> pairEnergy.getCapacityAsInt() & 0xFFFF;
+                case 3 -> pairEnergy.getCapacityAsInt() >>> 16;
                 case 4 -> generating & 0xFFFF;
                 case 5 -> generating >>> 16;
                 case 6 -> getPairOutput() & 0xFFFF;
                 case 7 -> getPairOutput() >>> 16;
                 case 8 -> linkDistance;
-                case 9 -> outRate & 0xFFFF;
-                case 10 -> outRate >>> 16;
+                case 9 -> getPairOutRate() & 0xFFFF;
+                case 10 -> getPairOutRate() >>> 16;
                 case 11 -> getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING) == Direction.UP ? 1 : 0;
                 case 12 -> link.ordinal();
                 case 13 -> stoppedAt;
@@ -89,11 +91,8 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         if (Math.floorMod(level.getGameTime() + pos.asLong(), SCAN_INTERVAL) == 0) {
             updateLink(level, pos, state);
         }
-        int pulled = Math.max(0, energyAfterLastTick - energy.getAmountAsInt()); // taken by neighbours since last tick
         if (generating > 0) energy.generate(generating);
         pushEnergy(level, pos);
-        outThisSecond += pulled + (int) lastTickPushed;
-        energyAfterLastTick = energy.getAmountAsInt();
         if (level.getGameTime() % 20 == 0) {
             outRate = outThisSecond / 20;
             outThisSecond = 0;
@@ -155,8 +154,9 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         return (int) Math.min(Integer.MAX_VALUE, rate);
     }
 
+    /** Pushes from the pair's pool (this buffer first, then the partner's) into every neighbouring receiver. */
     private void pushEnergy(ServerLevel level, BlockPos pos) {
-        int budget = Math.min(energy.getAmountAsInt(), ModConfigs.getInt(ModConfigs.SERVER.zpeMaxOutput));
+        int budget = Math.min(pairEnergy.getAmountAsInt(), ModConfigs.getInt(ModConfigs.SERVER.zpeMaxOutput));
         long pushed = 0;
         for (Direction dir : Direction.values()) {
             if (budget <= 0) break;
@@ -166,26 +166,36 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
             if (handler == null) continue;
             try (Transaction tx = Transaction.openRoot()) {
                 int inserted = handler.insert(budget, tx);
+                if (inserted <= 0) continue;
+                int taken = pairEnergy.extract(inserted, tx);
+                if (taken != inserted) continue; // should not happen: budget never exceeds the pool; roll back
                 tx.commit();
-                if (inserted > 0) {
-                    energy.drain(inserted);
-                    budget -= inserted;
-                    pushed += inserted;
-                }
+                budget -= inserted;
+                pushed += inserted;
             }
         }
         lastTickPushed = pushed;
     }
 
+    /** The linked partner's block entity, or null when unlinked, unloaded, or the partner doesn't see this link. */
+    public @org.jspecify.annotations.Nullable ZeroPointEnergyModuleBlockEntity partner() {
+        if (linkDistance <= 0 || level == null) return null;
+        Direction facing = getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING);
+        BlockPos other = worldPosition.relative(facing, linkDistance);
+        if (!level.isLoaded(other)) return null;
+        return level.getBlockEntity(other) instanceof ZeroPointEnergyModuleBlockEntity p && p.linkDistance == linkDistance ? p : null;
+    }
+
+    /** The energy capability on every face: the pair's pooled energy, output only. */
     public EnergyHandler getEnergyHandler() {
-        return energy;
+        return pairEnergy;
     }
 
     public int getLinkDistance() {
         return linkDistance;
     }
 
-    /** This module's share of the pair's FE/t. */
+    /** FE/t this module adds to its own buffer (half the pair's output). */
     public int getGenerating() {
         return generating;
     }
@@ -195,8 +205,14 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         return pairOutput(linkDistance);
     }
 
+    /** FE in this module's own buffer (not counting the partner's). */
     public int getEnergyStored() {
         return energy.getAmountAsInt();
+    }
+
+    /** FE in the pair's pool: this buffer plus the partner's. */
+    public int getPairEnergyStored() {
+        return pairEnergy.getAmountAsInt();
     }
 
     public long getLastTickPushed() {
@@ -207,9 +223,15 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         return link;
     }
 
-    /** FE/t that left the buffer, averaged over the last second. */
+    /** FE/t that left this module's buffer, averaged over the last second. */
     public int getOutRate() {
         return outRate;
+    }
+
+    /** FE/t that left the whole pair's pool, averaged over the last second. */
+    public int getPairOutRate() {
+        ZeroPointEnergyModuleBlockEntity p = partner();
+        return p == null ? outRate : outRate + p.outRate;
     }
 
     @Override
@@ -273,7 +295,42 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
 
         @Override
         protected void onEnergyChanged(int previousAmount) {
+            if (energy < previousAmount) outThisSecond += previousAmount - energy; // pushed or pulled, by either module
             setChanged();
+        }
+    }
+
+    /**
+     * Both buffers of a linked pair as one output-only handler, so the pair's full output can be taken from either
+     * module. Takes from this module's buffer first, then the partner's, at most {@code maxOutput} FE per call.
+     * Unlinked, it is just this module's buffer.
+     */
+    private final class PairEnergy implements EnergyHandler {
+        @Override
+        public long getAmountAsLong() {
+            ZeroPointEnergyModuleBlockEntity p = partner();
+            return energy.getAmountAsLong() + (p == null ? 0 : p.energy.getAmountAsLong());
+        }
+
+        @Override
+        public long getCapacityAsLong() {
+            ZeroPointEnergyModuleBlockEntity p = partner();
+            return energy.getCapacityAsLong() + (p == null ? 0 : p.energy.getCapacityAsLong());
+        }
+
+        @Override
+        public int insert(int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext transaction) {
+            return 0;
+        }
+
+        @Override
+        public int extract(int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext transaction) {
+            int limit = Math.min(amount, ModConfigs.getInt(ModConfigs.SERVER.zpeMaxOutput));
+            if (limit <= 0) return 0;
+            int taken = energy.extract(limit, transaction);
+            ZeroPointEnergyModuleBlockEntity p = partner();
+            if (taken < limit && p != null) taken += p.energy.extract(limit - taken, transaction);
+            return taken;
         }
     }
 }

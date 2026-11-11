@@ -14,7 +14,7 @@ import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
 /**
- * Zero Point Energy Module: whether it is linked, how far away its partner is and the FE/t it makes. Uses the link
+ * Zero Point Energy Module: whether it is linked, how far away its partner is and the FE/t the pair makes (all of it available from either module). Uses the link
  * data the block entity already syncs for the beam; stored FE comes from Jade's own energy capability support.
  */
 public enum ZeroPointModuleProvider implements IBlockComponentProvider {
@@ -34,7 +34,6 @@ public enum ZeroPointModuleProvider implements IBlockComponentProvider {
         tooltip.add(Component.translatable(up ? "jade.barelyfunctionalcontraptions.zpe.linked_above" : "jade.barelyfunctionalcontraptions.zpe.linked_below",
                 distance - 1).withColor(0x3FC8FF));
         tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.zpe.output",
-                String.format(Locale.ROOT, "%,d", be.getGenerating()),
                 String.format(Locale.ROOT, "%,d", be.getPairOutput())).withStyle(ChatFormatting.GRAY));
     }
 
