@@ -110,6 +110,17 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         }
     }
 
+    /**
+     * Client-side tick handler, set by the client entry point (the hum is a client-only sound instance, so this class
+     * mustn't refer to it directly). Does nothing on a dedicated server.
+     */
+    public static java.util.function.Consumer<ZeroPointEnergyModuleBlockEntity> clientTickHandler = be -> {};
+
+    /** Called every client tick: starts the energy hum while linked (see ZeroPointHumSound). */
+    public void clientTick() {
+        clientTickHandler.accept(this);
+    }
+
     /** Rescans the column and stores the result, syncing it to clients when it changes. */
     public void updateLink(ServerLevel level, BlockPos pos, BlockState state) {
         Direction facing = state.getValue(ZeroPointEnergyModuleBlock.FACING);

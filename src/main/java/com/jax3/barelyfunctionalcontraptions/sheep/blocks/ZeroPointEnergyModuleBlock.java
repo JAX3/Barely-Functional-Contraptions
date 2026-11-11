@@ -73,7 +73,10 @@ public class ZeroPointEnergyModuleBlock extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (!(level instanceof ServerLevel serverLevel)) return null;
+        if (!(level instanceof ServerLevel serverLevel)) {
+            // Client: keeps the energy hum playing while the module is linked.
+            return createTickerHelper(type, ModBlockEntities.ZERO_POINT_ENERGY_MODULE.get(), (l, pos, s, be) -> be.clientTick());
+        }
         return createTickerHelper(type, ModBlockEntities.ZERO_POINT_ENERGY_MODULE.get(),
                 (l, pos, s, be) -> be.serverTick(serverLevel, pos, s));
     }

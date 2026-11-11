@@ -496,5 +496,6 @@
   "gui.barelyfunctionalcontraptions.zpe.shared": "Shared pool",
   "gui.barelyfunctionalcontraptions.zpe.not_linked": "Not linked",
   "death.attack.barelyfunctionalcontraptions.zero_point_beam": "%1$s was vaporised by a Zero Point beam",
-  "death.attack.barelyfunctionalcontraptions.zero_point_beam.player": "%1$s was vaporised by a Zero Point beam while fighting %2$s"
+  "death.attack.barelyfunctionalcontraptions.zero_point_beam.player": "%1$s was vaporised by a Zero Point beam while fighting %2$s",
+  "subtitles.barelyfunctionalcontraptions.zero_point_hum": "Zero Point Energy Module hums"
 }

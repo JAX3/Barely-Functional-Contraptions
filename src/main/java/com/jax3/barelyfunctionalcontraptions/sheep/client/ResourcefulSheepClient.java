@@ -50,6 +50,7 @@ public final class ResourcefulSheepClient {
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onEntityTick);
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onItemTooltip);
 
+        com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.clientTickHandler = ZeroPointHumSound::tick;
         DevScreenshotHarness.registerIfEnabled();
     }
 

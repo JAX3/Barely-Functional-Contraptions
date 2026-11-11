@@ -9,5 +9,14 @@
         "attenuation_distance": 10
       }
     ]
+  },
+  "block.zero_point_energy_module.hum": {
+    "subtitle": "subtitles.barelyfunctionalcontraptions.zero_point_hum",
+    "sounds": [
+      {
+        "name": "barelyfunctionalcontraptions:block/zero_point_hum",
+        "attenuation_distance": 16
+      }
+    ]
   }
 }

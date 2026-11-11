@@ -360,6 +360,7 @@ def lang():
         "gui.barelyfunctionalcontraptions.zpe.desc.no_module.below": "No module within %s blocks below. Place one on the floor directly below, pointing up.",
         "gui.barelyfunctionalcontraptions.zpe.generation.tooltip": "Generation",
         "gui.barelyfunctionalcontraptions.zpe.generation.desc": "A linked pair makes more power the further apart the modules are. The two modules share one pool of energy, so all of it can be taken from either one. The gauge shows the whole pool. Out: energy leaving the pool through either module, averaged over a second.",
+        "subtitles.barelyfunctionalcontraptions.zero_point_hum": "Zero Point Energy Module hums",
         "death.attack.barelyfunctionalcontraptions.zero_point_beam": "%1$s was vaporised by a Zero Point beam",
         "death.attack.barelyfunctionalcontraptions.zero_point_beam.player": "%1$s was vaporised by a Zero Point beam while fighting %2$s",
         "jade.barelyfunctionalcontraptions.zpe.unlinked": "No partner: needs a module facing it in the same column",

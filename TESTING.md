@@ -86,6 +86,16 @@ In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `reci
 - the GUI (`31_zero_point_gui.png`) shows the beam diagram with both modules lit and the beam between them, *of 100,000 FE*, *+5,000 FE/t*, *Shared pool*, *Out: 5,000 FE/t* (the full output, through the floor module alone) and a green *Linked: 5 block gap*;
 - after a stone block is put in the gap (`32_zero_point_gui_blocked.png`), the GUI shows the blocking block on a dotted line above the module, *+0 FE/t* and a red *Beam blocked 3 above*.
 
+### Zero Point hum (real client, recorded)
+
+The screenshot run normally has no audio device. For this check, OpenAL Soft's *wave* output (`ALSOFT_DRIVERS=wave` and an `alsoft.conf` naming the file) recorded everything the game played to a WAV file. The game loads the sound with no missing-sound warnings, and the recording is analysed against the screenshot times in the log:
+- Before the Zero Point scene: no hum.
+- When the linked pair (6 blocks apart) appears: the hum starts. Its strongest frequencies are 98, 196, 294 and 490 Hz plus a 1,566 Hz shimmer, which is the hum's 110 / 220 / 330 / 550 / 1,760 Hz at the expected pitch of 0.89 for that gap.
+- When stone breaks the beam: the hum fades out while sliding down (98 → 80 Hz).
+- When the beam relinks: it comes back at 98 Hz.
+
+The loop itself is checked for clicks: the jump from its last sample to its first (0.033) is smaller than the largest step anywhere inside it (0.038).
+
 ### Zero Point beam damage (`zero_point_beam_burns_what_touches_it`)
 
 An iron golem with no AI stands on the floor module of a linked pair, inside the beam, and a pig stands two blocks away. The golem's health drops, its last damage is the beam's own `barelyfunctionalcontraptions:zero_point_beam` damage type, and it is set on fire. The pig keeps full health and isn't burning. The golem's last attacking player is the beam's fake player, *[Zero Point Beam]*. A cow in a second beam burns to death and drops experience orbs, which only player kills do. A blaze credited to the beam's fake player drops blaze rods, which are player-only loot, over 40 rolls of its loot, and none without the player credit. In the real client (`35_zero_point_beam_burns.png`), a pig placed in the beam is on fire and flashing red a few ticks later.
