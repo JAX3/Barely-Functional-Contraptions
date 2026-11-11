@@ -253,14 +253,15 @@ public final class ModConfigs {
             b.pop();
 
             b.comment("Zero Point Energy Module (two modules in one column, facing each other, generate FE across the gap)").push("zero_point_energy_module");
-            zpeEnergyPerBlock = b.comment("FE/t a linked pair makes for every block of open space between the modules, split between the two.",
+            zpeEnergyPerBlock = b.comment("FE/t a linked pair makes for every block of open space between the modules.",
+                            "The two modules share one pool, so all of it can be taken from either module.",
                             "Default: a 10-block gap makes 100 FE/t.")
                     .defineInRange("energyPerBlock", 1000, 0, 1_000_000);
             zpeMinGap = b.comment("Fewest blocks of open space needed between the two modules before they link.")
                     .defineInRange("minGap", 1, 1, 256);
             zpeMaxRange = b.comment("Furthest apart (in blocks) two modules can be and still link.")
                     .defineInRange("maxRange", 64, 2, 384);
-            zpeCapacity = b.comment("FE buffer of each module.")
+            zpeCapacity = b.comment("FE each module adds to the pair's shared buffer (a linked pair holds twice this).")
                     .defineInRange("energyCapacity", 50_000, 1, Integer.MAX_VALUE);
             zpeMaxOutput = b.comment("Most FE/t each module pushes into the machines and cables touching it (and that they can pull).")
                     .defineInRange("maxOutput", 10_000, 1, Integer.MAX_VALUE);

@@ -30,7 +30,10 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  * module's buffer. The two buffers act as one pool: the energy capability of either module reaches both, and each
  * module pushes from the pool into its neighbours, so the pair's full output can be taken from either end.
  *
- * <p>The link distance and rate are synced to the client, which draws the beam and shows them in Jade.</p>
+ * <p>The link distance and rate are synced to the client, which draws the beam and shows them in Jade. Like a beacon
+ * beam, the beam is coloured by stained glass (blocks or panes) in its path: the first one sets its colour, and every
+ * different one after that mixes with the colour so far. The floor module, which draws the beam, works out these
+ * colour sections and syncs them too.</p>
  */
 public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net.minecraft.world.MenuProvider {
     private static final int SCAN_INTERVAL = 5;
@@ -44,6 +47,8 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
     private int generating;
     private long lastTickPushed;
     private ZeroPointLink link = ZeroPointLink.NO_MODULE;
+    /** The beam's colour sections, as pairs of (start, in blocks above this module; ARGB colour). Floor module only. */
+    private int[] beamSections = new int[0];
     /** How far along the column the last scan stopped (the partner, the blocking block or the range limit). */
     private int stoppedAt;
     /** FE that left this module's buffer this second (through either module), and the last second's average. */
@@ -109,9 +114,11 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         int pairRate = pairOutput(distance);
         // The floor module (facing up) keeps the odd FE so the pair adds up to exactly pairRate.
         int share = facing == Direction.UP ? (pairRate + 1) / 2 : pairRate / 2;
-        if (distance == linkDistance && share == generating) return;
+        int[] sections = facing == Direction.UP ? beamSections(level, pos, distance) : new int[0];
+        if (distance == linkDistance && share == generating && java.util.Arrays.equals(sections, beamSections)) return;
         linkDistance = distance;
         generating = share;
+        beamSections = sections;
         boolean linked = distance > 0;
         if (state.getValue(ZeroPointEnergyModuleBlock.LINKED) != linked) {
             level.setBlock(pos, state.setValue(ZeroPointEnergyModuleBlock.LINKED, linked), Block.UPDATE_ALL);
@@ -145,6 +152,34 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
             if (state.canOcclude()) return new ZeroPointLink.Scan(0, ZeroPointLink.BLOCKED, i);
         }
         return new ZeroPointLink.Scan(0, ZeroPointLink.NO_MODULE, maxRange);
+    }
+
+    /** The beam's default colour, used until it passes through stained glass. */
+    public static final int BEAM_COLOR = 0xFF3FC8FF;
+
+    /**
+     * Colour sections of a beam going {@code distance} blocks up from {@code pos}, with a beacon's rules: the beam
+     * starts {@link #BEAM_COLOR}; the first block with a beacon colour (stained glass or panes, or a modded block that
+     * colours beacon beams) replaces it, and each later one with a different colour starts a section with the average
+     * of the two. Returned as (start, colour) pairs; empty when not linked.
+     */
+    public static int[] beamSections(Level level, BlockPos pos, int distance) {
+        if (distance <= 0) return new int[0];
+        it.unimi.dsi.fastutil.ints.IntArrayList out = new it.unimi.dsi.fastutil.ints.IntArrayList();
+        out.add(0);
+        out.add(BEAM_COLOR);
+        boolean tinted = false;
+        int color = BEAM_COLOR;
+        for (int i = 1; i < distance; i++) {
+            BlockPos at = pos.above(i);
+            Integer glass = level.getBlockState(at).getBeaconColorMultiplier(level, at, pos);
+            if (glass == null || (tinted && glass == color)) continue;
+            color = tinted ? net.minecraft.util.ARGB.average(color, glass) : glass;
+            tinted = true;
+            out.add(i);
+            out.add(color);
+        }
+        return out.toIntArray();
     }
 
     /** FE/t a pair this far apart makes in total (0 when not linked). */
@@ -223,6 +258,11 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         return link;
     }
 
+    /** The beam's colour sections as (start, colour) pairs; see {@link #beamSections}. */
+    public int[] getBeamSections() {
+        return beamSections;
+    }
+
     /** FE/t that left this module's buffer, averaged over the last second. */
     public int getOutRate() {
         return outRate;
@@ -253,6 +293,7 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         input.child("energy").ifPresent(energy::deserialize);
         linkDistance = Math.max(0, input.getIntOr("LinkDistance", 0));
         generating = Math.max(0, input.getIntOr("Generating", 0));
+        beamSections = input.getIntArray("BeamSections").filter(a -> a.length % 2 == 0).orElse(new int[0]);
     }
 
     @Override
@@ -261,6 +302,7 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         energy.serialize(output.child("energy"));
         output.putInt("LinkDistance", linkDistance);
         output.putInt("Generating", generating);
+        output.putIntArray("BeamSections", beamSections);
     }
 
     @Override

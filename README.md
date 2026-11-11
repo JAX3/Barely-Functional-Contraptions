@@ -294,6 +294,9 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 - **Take it from either end:** the two modules share **one pool of energy**, so **the pair's full output can be taken from either module**. You only need to connect one of them: a machine on the floor module gets all 50 FE/t, not half. Each module adds a 50,000 FE buffer to the pool (100,000 FE for the pair).
 - **Output:** each module **pushes energy from the pool into every machine or cable touching it**, up to 10,000 FE/t (`maxOutput`). Cables can also pull from it. If both ends have machines, they share what the pair makes. Modules don't accept energy and never push into each other.
 - **Looks:** while linked, the emitters glow bright blue, pulse and give off light, and blue sparks drift around them. Unlinked modules are dull grey-blue.
+- **Coloured beams:** stained glass colours the beam just like a beacon beam. Put stained glass (blocks or panes) in the gap and the beam takes that colour from the glass upwards. Each further pane of a different colour mixes with the colour so far, so red then yellow gives orange. Glass of the same colour in a row changes nothing. The colour is only for looks: the power is the same.
+
+  ![A Zero Point beam going blue, then red through red stained glass, then orange through yellow stained glass](docs/screenshots/34_zero_point_coloured_beam.png)
 - **GUI:** right-click a module to open it. It's in the same slate style as the other machines:
   - an energy gauge for the pair's shared pool;
   - a **beam diagram**: the column with this module marked by a pointer, and at the far end what it found. When linked, both modules are lit with the animated beam between them. Otherwise it shows why: a blocking block (with a red cross) part of the way along, a partner that points the wrong way, a partner too close, or a dashed outline where a partner should go;
@@ -467,10 +470,10 @@ Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already 
 
 | Key | Default | Meaning |
 |---|---|---|
-| `energyPerBlock` | 10 | FE/t a linked pair makes for every block of open space between the modules, split between the two |
+| `energyPerBlock` | 10 | FE/t a linked pair makes for every block of open space between the modules. The two share one pool, so all of it can be taken from either module |
 | `minGap` | 1 | Fewest blocks of open space needed between the modules before they link |
 | `maxRange` | 64 | Furthest apart (in blocks) two modules can be and still link |
-| `energyCapacity` | 50000 | FE buffer of each module |
+| `energyCapacity` | 50000 | FE each module adds to the pair's shared buffer (a linked pair holds twice this) |
 | `maxOutput` | 10000 | Most FE/t each module pushes into, or lets be pulled by, its neighbours |
 
 **`[generator]`** (limits for `/barelyfunctionalcontraptions generate`; see [What the generator may use](#what-the-generator-may-use))

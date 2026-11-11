@@ -295,7 +295,16 @@ public final class DevScreenshotHarness {
                         String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 -50", zeroPointBase.getX() + 0.5, zeroPointBase.getY() + 2, zeroPointBase.getZ() + 3.5)));
             }
             case 1640 -> shot(mc, "33_zero_point_beam_top");
-            case 1645 -> {
+            case 1642 -> server.execute(() -> {
+                // Stained glass recolours the beam like a beacon's: red, then yellow mixing in to make orange.
+                ServerLevel level = server.overworld();
+                level.setBlock(zeroPointBase.above(2), Blocks.STAINED_GLASS.red().defaultBlockState(), 3);
+                level.setBlock(zeroPointBase.above(4), Blocks.STAINED_GLASS.yellow().defaultBlockState(), 3);
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), String.format(java.util.Locale.ROOT,
+                        "tp @a %.1f %d %.1f 180 -12", zeroPointBase.getX() + 0.5, zeroPointBase.getY() + 1, zeroPointBase.getZ() + 8.5));
+            });
+            case 1670 -> shot(mc, "34_zero_point_coloured_beam");
+            case 1675 -> {
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());

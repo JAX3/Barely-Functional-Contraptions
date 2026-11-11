@@ -897,6 +897,23 @@ public final class ModGameTests {
         // Glass doesn't block the beam; stone does.
         h.setBlock(floor.above(2), Blocks.GLASS);
         h.assertTrue(zpeAt(h, floor).getLinkDistance() == 3, "glass in the gap keeps the link");
+        // Stained glass colours the beam like a beacon's: the first sets the colour, a different one mixes in.
+        int red = net.minecraft.world.item.DyeColor.RED.getTextureDiffuseColor();
+        int yellow = net.minecraft.world.item.DyeColor.YELLOW.getTextureDiffuseColor();
+        h.setBlock(floor.above(1), Blocks.STAINED_GLASS.red());
+        h.setBlock(floor.above(2), Blocks.STAINED_GLASS_PANE.yellow());
+        int[] mixed = zpeAt(h, floor).getBeamSections();
+        int[] expected = {0, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_COLOR, 1, red, 2, net.minecraft.util.ARGB.average(red, yellow)};
+        h.assertTrue(java.util.Arrays.equals(mixed, expected), "red then yellow glass: " + java.util.Arrays.toString(mixed));
+        h.setBlock(floor.above(2), Blocks.STAINED_GLASS_PANE.red());
+        int[] same = zpeAt(h, floor).getBeamSections();
+        h.assertTrue(java.util.Arrays.equals(same, new int[] {0, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_COLOR, 1, red}), "the same colour twice is one section: " + java.util.Arrays.toString(same));
+        h.assertTrue(zpeAt(h, floor).getPairOutput() == 2 * perBlock, "coloured beams make the same power");
+        h.assertTrue(zpeAt(h, ceiling).getBeamSections().length == 0, "only the floor module keeps the colours");
+        h.setBlock(floor.above(1), Blocks.AIR);
+        h.assertTrue(java.util.Arrays.equals(zpeAt(h, floor).getBeamSections(), new int[] {0, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_COLOR, 2, red}), "a lone pane higher up starts there");
+        h.setBlock(floor.above(2), Blocks.AIR);
+        h.assertTrue(java.util.Arrays.equals(zpeAt(h, floor).getBeamSections(), new int[] {0, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_COLOR}), "no glass: all blue");
         h.setBlock(floor.above(2), Blocks.STONE);
         h.assertTrue(zpeAt(h, floor).getLinkDistance() == 0 && zpeAt(h, ceiling).getLinkDistance() == 0, "stone in the gap breaks the link");
         h.assertTrue(zpeAt(h, floor).getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.BLOCKED, "the floor module reports the beam is blocked");
