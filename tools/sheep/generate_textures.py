@@ -648,39 +648,38 @@ def generate_zero_point_module():
 
 
 # ---------------------------------------------------------------------------
-# Energy Cable: a 4px outlined tube with a glowing blue core line, a 6px blue-steel junction box in the middle and an
-# 8px plug plate where it meets a machine. The models use automatic UVs, so each texture is drawn where its element
-# sits in the block:
+# Energy Cable: a 4px blue-steel tube with purple collars, in the machines' colours: a 6px junction box in the middle
+# with a purple port ring and pink glow like the machines' ports, and an 8px plug plate (the same port) where it meets
+# a machine. The models use automatic UVs, so each texture is drawn where its element sits in the block:
 #   cable: the tube runs along columns 6-9 and rows 6-9 (arms on any axis land on one of the bands); the 6x6 junction
 #          box is at 5..10. Collars at 2 and 13 mark the arm ends.
 #   cable_plug: the plate's face is the middle 8x8 (4..11); its 2px edges are the strips round the border.
 # ---------------------------------------------------------------------------
 CABLE_CORE = [
     "OOOOOO",
-    "OHHHMO",
-    "OHXXSO",
-    "OHXXSO",
-    "OMSSSO",
+    "OHPPMO",
+    "OPGgpO",
+    "OPggpO",
+    "OMppSO",
     "OOOOOO",
 ]
 CABLE_PLUG_FACE = [
     "OOOOOOOO",
-    "OHHHHHHO",
-    "OHOOOOSO",
-    "OHOXXOSO",
-    "OHOXXOSO",
-    "OHOOOOSO",
-    "OSSSSSSO",
+    "OHHHHHMO",
+    "OHPPPPSO",
+    "OHPGgpSO",
+    "OHPggpSO",
+    "OHppppSO",
+    "OMSSSSSO",
     "OOOOOOOO",
 ]
-CABLE_ON = {"X": hexc("#3fc8ff"), "Q": hexc("#a8ecff")}
 
 
 def generate_energy_cable():
-    pal = dict(CARTOON, **CABLE_ON)
+    pal = CARTOON
     img = Image.new("RGBA", (16, 16), CLEAR)
-    across = "OXQO"
-    collar = "OHMO"
+    across = "OHSO"
+    collar = "OPpO"
     for i in range(16):
         pattern = collar if i in (2, 13) else across
         for k, ch in enumerate(pattern):
