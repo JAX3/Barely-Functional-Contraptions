@@ -85,6 +85,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Something From Nothing | Craft a Zero Point Energy Module |
 | ⭐ **Don't Cross the Streams** (challenge, hidden) | Get vaporised by a Zero Point beam. It stays hidden until you earn it and gives 50 experience. |
 | Plugged In | Craft some Energy Cables |
+| Pipe Dreams | Craft some Fluid Pipes |
 
 The crafting advancements are earned by getting the item into your inventory however you make it (crafting table, autocrafter or a friend handing it over).
 
@@ -362,6 +363,23 @@ Cables carry Forge Energy from the **power generators** (Mycelial Generator, Zer
 
 ![Energy Cable recipe: wool across the top and bottom rows, a copper ingot, redstone and a copper ingot across the middle, making 8](docs/screenshots/recipe_energy_cable.png)
 
+### Fluid Pipe
+The Energy Cable's twin for fluids, in **blue** instead of purple. Pipes carry water (and any other fluid) from the **Fluid Reservoir** and other tanks to the blocks that need it, such as the Mycelial Generator's water tank.
+
+![A Fluid Reservoir on a small pool piping water to two Mycelial Generators: one straight ahead and one up a riser on a stone ledge](docs/screenshots/39_fluid_pipes.png)
+
+- **Placing and networks:** they work the same way as cables. Pipes join every pipe they touch into one network and plug into any block with a **fluid connection** on the side facing them. Pipes and cables never join each other, so the two can run side by side.
+- **Flow:** fluid pushed into any pipe comes straight out at the other blocks plugged into the network, shared evenly between them and never back into the block it came from. Pipes hold no fluid themselves.
+- **Push and pull:** the Fluid Reservoir pushes its water into the pipes on its own. Each tick the network also **pulls** from any plugged-in block that only gives fluid out (like another mod's pump). Tanks that take fluid in as well, like the Mycelial Generator, are never drained by the pipes, so two tanks on one network don't pass the same fluid back and forth.
+- **Speed:** a network moves up to **4,000 mB/t** (4 buckets a tick) in total (`transferRate` in `[fluid_pipe]`).
+- **Breaking** a pipe splits the network straight away.
+- **Jade** on a pipe shows the network's size, how many blocks are plugged in and how much it is moving.
+
+  ![Jade on a Fluid Pipe: Network: 9 pipes, 3 blocks plugged in; Moving 50 / 4,000 mB/t](docs/screenshots/40_fluid_pipe_jade.png)
+- The recipe makes **8** pipes: copper ingots across the top and bottom, glass, a bucket and glass across the middle. Pipes break quickly and always drop themselves.
+
+![Fluid Pipe recipe: copper ingots across the top and bottom rows, glass, a bucket and glass across the middle, making 8](docs/screenshots/recipe_fluid_pipe.png)
+
 ### Creative Generator (testing)
 An endless power source for creative mode, for testing builds without setting up mushroom farms. It's a slate block with a pulsing magenta energy core on every side, and it glows in the dark.
 
@@ -536,6 +554,13 @@ Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already 
 |---|---|---|
 | `transferRate` | 100000 | Most FE/t one cable network carries in total, however many cables and blocks are on it |
 | `maxNetworkSize` | 4096 | Most cables in one network. A longer run splits into separate networks, which only pass energy on through blocks plugged into both |
+
+**`[fluid_pipe]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `transferRate` | 4000 | Most mB per tick one pipe network carries in total, however many pipes and blocks are on it |
+| `maxNetworkSize` | 4096 | Most pipes in one network. A longer run splits into separate networks, which only pass fluid on through blocks plugged into both |
 
 **`[generator]`** (limits for `/barelyfunctionalcontraptions generate`; see [What the generator may use](#what-the-generator-may-use))
 

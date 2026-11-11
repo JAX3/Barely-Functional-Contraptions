@@ -56,6 +56,10 @@ public final class IntegrationGameTests {
     static {
         TESTS.put("integration_mycelial_generator_powers_separator", IntegrationGameTests::mycelialGeneratorPowersSeparator);
         TESTS.put("integration_advancements", IntegrationGameTests::advancements);
+        TESTS.put("fluid_pipe_connects_to_pipes_and_tanks", IntegrationGameTests::pipeConnects);
+        TESTS.put("fluid_pipe_reservoir_waters_two_generators", IntegrationGameTests::pipeWatersGenerators);
+        TESTS.put("fluid_pipe_respects_transfer_rate", IntegrationGameTests::pipeRate);
+        TESTS.put("fluid_pipe_break_splits_network", IntegrationGameTests::pipeBreakSplits);
         TESTS.put("integration_mycelial_generator_powers_separator_through_cables", IntegrationGameTests::generatorThroughCables);
         TESTS.put("integration_mushroom_infuses_sheep", IntegrationGameTests::mushroomInfusesSheep);
         TESTS.put("integration_mushroom_wool_fuels_generator", IntegrationGameTests::mushroomWoolFuelsGenerator);
@@ -210,7 +214,7 @@ public final class IntegrationGameTests {
                 {"root", null}, {"mycelial_generator", "root"}, {"mycelium_wrench", "mycelial_generator"},
                 {"link_generators", "mycelium_wrench"}, {"mechanical_separator", "root"}, {"automatic_shears", "root"},
                 {"auto_shear", "automatic_shears"}, {"fluid_reservoir", "root"}, {"hume_energy_cube", "root"},
-                {"zero_point_energy_module", "root"}, {"zero_point_death", "zero_point_energy_module"}, {"energy_cable", "root"}};
+                {"zero_point_energy_module", "root"}, {"zero_point_death", "zero_point_energy_module"}, {"energy_cable", "root"}, {"fluid_pipe", "root"}};
         for (String[] entry : tree) {
             var advancement = server.getAdvancements().get(com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep.id("contraptions/" + entry[0]));
             h.assertTrue(advancement != null, "advancement " + entry[0] + " is loaded");
@@ -356,6 +360,119 @@ public final class IntegrationGameTests {
                 .thenWaitUntil(() -> h.assertTrue(generator.getTank().getFluidAmount() >= 2_000,
                         "the generator fills with water from the reservoir, at " + generator.getTank().getFluidAmount()))
                 .thenSucceed();
+    }
+
+    // ------------------------------------------------------------------ fluid pipes
+
+    /** Places a conduit the way a player would: every side worked out from what is around it. */
+    private static void conduit(GameTestHelper h, BlockPos pos, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock block) {
+        h.setBlock(pos, block.withConnections(block.defaultBlockState(), h.getLevel(), h.absolutePos(pos)));
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidPipeBlockEntity pipe(GameTestHelper h, BlockPos pos) {
+        conduit(h, pos, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FLUID_PIPE.get());
+        return h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidPipeBlockEntity.class);
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection side(GameTestHelper h, BlockPos pos, net.minecraft.core.Direction dir) {
+        return h.getBlockState(pos).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.SIDES.get(dir));
+    }
+
+    /** A 2x2 water pool with a Fluid Reservoir on one corner of it, at (1, 2, 1). */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity reservoirOnPool(GameTestHelper h) {
+        for (int x = 0; x <= 3; x++) {
+            for (int z = 0; z <= 3; z++) {
+                boolean inside = x >= 1 && x <= 2 && z >= 1 && z <= 2;
+                h.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.STONE);
+                h.setBlock(new BlockPos(x, 1, z), inside ? net.minecraft.world.level.block.Blocks.WATER : net.minecraft.world.level.block.Blocks.STONE);
+            }
+        }
+        BlockPos reservoirPos = new BlockPos(1, 2, 1);
+        h.setBlock(reservoirPos, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FLUID_RESERVOIR.get());
+        return h.getBlockEntity(reservoirPos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity.class);
+    }
+
+    /** Pipes join pipes, plug into tanks, and ignore Energy Cables, Hume Energy Cubes and stone. */
+    private static void pipeConnects(GameTestHelper h) {
+        var CABLE = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.CABLE;
+        var MACHINE = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.MACHINE;
+        var NONE = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.NONE;
+        var E = net.minecraft.core.Direction.EAST;
+        var W = net.minecraft.core.Direction.WEST;
+        var U = net.minecraft.core.Direction.UP;
+        var N = net.minecraft.core.Direction.NORTH;
+        h.setBlock(new BlockPos(1, 1, 2), com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FLUID_RESERVOIR.get());
+        h.setBlock(new BlockPos(2, 2, 2), com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.HUME_ENERGY_CUBE.get());
+        conduit(h, new BlockPos(2, 1, 1), com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.ENERGY_CABLE.get());
+        var a = pipe(h, new BlockPos(2, 1, 2));
+        var b = pipe(h, new BlockPos(3, 1, 2));
+        h.assertTrue(side(h, new BlockPos(2, 1, 2), W) == MACHINE, "plugs into the reservoir");
+        h.assertTrue(side(h, new BlockPos(2, 1, 2), E) == CABLE && side(h, new BlockPos(3, 1, 2), W) == CABLE, "joins the next pipe");
+        h.assertTrue(side(h, new BlockPos(2, 1, 2), U) == NONE, "ignores the energy cube (no fluid connection)");
+        h.assertTrue(side(h, new BlockPos(2, 1, 2), N) == NONE, "doesn't join the energy cable");
+        h.assertTrue(side(h, new BlockPos(2, 1, 1), net.minecraft.core.Direction.SOUTH) == NONE, "the energy cable doesn't join the pipe either");
+        h.assertTrue(a.network() == b.network() && a.network().size() == 2 && a.network().endpoints().size() == 1,
+                "one network of 2 pipes with the reservoir plugged in");
+        h.setBlock(new BlockPos(4, 1, 2), com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get());
+        h.assertTrue(side(h, new BlockPos(3, 1, 2), E) == MACHINE && a.network().endpoints().size() == 2, "plugs into a generator placed later");
+        h.succeed();
+    }
+
+    /** A reservoir on a pool fills two Mycelial Generators through a branching run of pipes, sharing the water. */
+    private static void pipeWatersGenerators(GameTestHelper h) {
+        reservoirOnPool(h);
+        var first = generator(h, new BlockPos(4, 2, 4), ItemStack.EMPTY, 0);
+        var second = generator(h, new BlockPos(2, 2, 5), ItemStack.EMPTY, 0);
+        for (BlockPos pos : List.of(new BlockPos(1, 2, 2), new BlockPos(1, 2, 3), new BlockPos(1, 2, 4), new BlockPos(2, 2, 4), new BlockPos(3, 2, 4))) {
+            pipe(h, pos);
+        }
+        h.succeedWhen(() -> {
+            h.assertTrue(first.getTank().getFluidAmount() >= 1_000 && second.getTank().getFluidAmount() >= 1_000,
+                    "both generators get water through the pipes: " + first.getTank().getFluidAmount() + " / " + second.getTank().getFluidAmount());
+        });
+    }
+
+    /** With transferRate = 100 a pipe network never moves more than 100 mB in a tick. */
+    private static void pipeRate(GameTestHelper h) {
+        var rateValue = com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.pipeTransferRate;
+        int old = rateValue.get();
+        rateValue.set(100);
+        var reservoir = reservoirOnPool(h);
+        reservoir.getTank().generate(8_000);
+        var target = generator(h, new BlockPos(1, 2, 4), ItemStack.EMPTY, 0);
+        pipe(h, new BlockPos(1, 2, 2));
+        pipe(h, new BlockPos(1, 2, 3));
+        int[] start = new int[1];
+        h.runAfterDelay(2, () -> start[0] = target.getTank().getFluidAmount());
+        h.runAfterDelay(12, () -> {
+            try {
+                int gained = target.getTank().getFluidAmount() - start[0];
+                h.assertTrue(gained > 0 && gained <= 10 * 100, "10 ticks at 100 mB/t, gained " + gained);
+            } finally {
+                rateValue.set(old);
+            }
+            h.succeed();
+        });
+    }
+
+    /** Breaking the middle pipe splits the network: the generator stops filling. */
+    private static void pipeBreakSplits(GameTestHelper h) {
+        reservoirOnPool(h);
+        var target = generator(h, new BlockPos(1, 2, 5), ItemStack.EMPTY, 0);
+        var near = pipe(h, new BlockPos(1, 2, 2));
+        pipe(h, new BlockPos(1, 2, 3));
+        var far = pipe(h, new BlockPos(1, 2, 4));
+        int[] stopped = new int[1];
+        h.runAfterDelay(30, () -> {
+            h.assertTrue(target.getTank().getFluidAmount() > 0, "filling before the break");
+            h.setBlock(new BlockPos(1, 2, 3), net.minecraft.world.level.block.Blocks.AIR);
+            h.assertTrue(near.network() != far.network() && near.network().size() == 1, "split into two networks of 1");
+            stopped[0] = target.getTank().getFluidAmount();
+        });
+        h.runAfterDelay(40, () -> {
+            h.assertTrue(target.getTank().getFluidAmount() == stopped[0], "no water crosses the gap");
+            h.succeed();
+        });
     }
 
     // ------------------------------------------------------------------ wireless power (Barely Functional Wrench)

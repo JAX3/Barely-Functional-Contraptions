@@ -1,0 +1,105 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/core"
+      }
+    },
+    {
+      "when": {
+        "north": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/arm_north"
+      }
+    },
+    {
+      "when": {
+        "north": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/plug_north"
+      }
+    },
+    {
+      "when": {
+        "south": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/arm_south"
+      }
+    },
+    {
+      "when": {
+        "south": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/plug_south"
+      }
+    },
+    {
+      "when": {
+        "west": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/arm_west"
+      }
+    },
+    {
+      "when": {
+        "west": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/plug_west"
+      }
+    },
+    {
+      "when": {
+        "east": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/arm_east"
+      }
+    },
+    {
+      "when": {
+        "east": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/plug_east"
+      }
+    },
+    {
+      "when": {
+        "down": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/arm_down"
+      }
+    },
+    {
+      "when": {
+        "down": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/plug_down"
+      }
+    },
+    {
+      "when": {
+        "up": "cable|machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/arm_up"
+      }
+    },
+    {
+      "when": {
+        "up": "machine"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/fluid_pipe/plug_up"
+      }
+    }
+  ]
+}

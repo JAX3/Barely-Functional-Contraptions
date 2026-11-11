@@ -528,5 +528,13 @@
   "jade.barelyfunctionalcontraptions.cable.network": "Network: %s cables, %s blocks plugged in",
   "jade.barelyfunctionalcontraptions.cable.rate": "Moving %s / %s FE/t",
   "advancements.barelyfunctionalcontraptions.energy_cable.title": "Plugged In",
-  "advancements.barelyfunctionalcontraptions.energy_cable.description": "Craft some Energy Cables"
+  "advancements.barelyfunctionalcontraptions.energy_cable.description": "Craft some Energy Cables",
+  "block.barelyfunctionalcontraptions.fluid_pipe": "Fluid Pipe",
+  "tooltip.barelyfunctionalcontraptions.fluid_pipe": "Carries water and other fluids from the Fluid Reservoir and other tanks to the blocks it is plugged into. Touching pipes form one network that moves up to %s mB/t.",
+  "barelyfunctionalcontraptions.configuration.fluid_pipe": "Fluid Pipe",
+  "config.jade.plugin_barelyfunctionalcontraptions.fluid_pipe": "Fluid Pipe",
+  "jade.barelyfunctionalcontraptions.pipe.network": "Network: %s pipes, %s blocks plugged in",
+  "jade.barelyfunctionalcontraptions.pipe.rate": "Moving %s / %s mB/t",
+  "advancements.barelyfunctionalcontraptions.fluid_pipe.title": "Pipe Dreams",
+  "advancements.barelyfunctionalcontraptions.fluid_pipe.description": "Craft some Fluid Pipes"
 }

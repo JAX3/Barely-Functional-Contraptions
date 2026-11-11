@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 87 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 58 Resourceful Sheep, 13 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 38 screenshots and 9 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 91 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 58 Resourceful Sheep, 17 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 40 screenshots and 10 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -88,7 +88,7 @@ In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `reci
 
 ### Advancements (`integration_advancements`)
 
-All 12 advancements in the *Barely Functional Contraptions* tab load, each shows in the tab, and each has the right parent (the root has none). The three special ones are earned through the real code paths, with a server player that never logs in (so it sends no network traffic):
+All 13 advancements in the *Barely Functional Contraptions* tab load, each shows in the tab, and each has the right parent (the root has none). The three special ones are earned through the real code paths, with a server player that never logs in (so it sends no network traffic):
 - **Fungal Network:** the player clicks two Mycelial Generators with a Barely Functional Wrench (`useOn`), which links them and grants it.
 - **Don't Cross the Streams:** a death by ordinary fire doesn't grant it; a death by the Zero Point beam's damage type does.
 - **Shear Genius:** powered Automatic Shears shear a sheep while the player stands next to them (the player is added to the level's player list just for that shearing run), which grants it. Another player 40 blocks away who watches a second sheep being sheared doesn't get it.
@@ -108,6 +108,17 @@ In the real client (`36_advancements.png`), after `/advancement grant … from �
 | `energy_cable_break_splits_network` | Breaking the middle of three cables splits the network into two, and the cube at the far end stops charging. |
 
 In the real client (`37_energy_cables.png`), a running Mycelial Generator feeds 8 cables: a straight run into a Hume Energy Cube, a branch turning off to a Mechanical Separator and a riser up into Automatic Shears. The arms join at each corner and T-junction, and a plug plate shows on every machine side. Jade on a cable (`38_energy_cable_jade.png`) reads *Network: 8 cables, 4 blocks plugged in* and *Moving 250 / 100,000 FE/t*: the generator's 250 FE/t passing through. `recipe_energy_cable.png` shows the recipe in a crafting table, making 8. The creative tab (`28_creative_tab_main.png`) lists the cable after the Zero Point Energy Module, and the advancement tab (`36_advancements.png`) shows *Plugged In*.
+
+### Fluid Pipes
+
+| Test | What it checks |
+|---|---|
+| `fluid_pipe_connects_to_pipes_and_tanks` | A pipe beside a Fluid Reservoir plugs into it and joins the next pipe. It ignores a Hume Energy Cube (no fluid connection) and doesn't join an Energy Cable beside it, and the cable doesn't join the pipe either. A Mycelial Generator placed later plugs in, and the network sees it. |
+| `fluid_pipe_reservoir_waters_two_generators` | A reservoir on a 2x2 pool fills two dry Mycelial Generators through a branching run of 5 pipes, at least 1,000 mB each. |
+| `fluid_pipe_respects_transfer_rate` | With `transferRate = 100`, at most 1,000 mB reaches the generator in 10 ticks. |
+| `fluid_pipe_break_splits_network` | Breaking the middle of three pipes splits the network, and the generator at the far end stops filling. |
+
+In the real client (`39_fluid_pipes.png`), a reservoir on a pool feeds 9 blue pipes: a straight run to one generator and a branch up a riser to a second one on a ledge. Jade on a pipe (`40_fluid_pipe_jade.png`) reads *Network: 9 pipes, 3 blocks plugged in* and *Moving 50 / 4,000 mB/t* (the reservoir's 1,000 mB a second). Jade shows no tank for the pipe, since it holds nothing. `recipe_fluid_pipe.png` shows the recipe making 8.
 
 ### Zero Point hum (real client, recorded)
 

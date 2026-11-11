@@ -33,5 +33,8 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCableBlockEntity>> ENERGY_CABLE = REGISTER.register("energy_cable",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCableBlockEntity::new, ModBlocks.ENERGY_CABLE.get()));
 
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidPipeBlockEntity>> FLUID_PIPE = REGISTER.register("fluid_pipe",
+            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidPipeBlockEntity::new, ModBlocks.FLUID_PIPE.get()));
+
     private ModBlockEntities() {}
 }

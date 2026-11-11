@@ -1,0 +1,36 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/fluid_pipe/pipe",
+    "cable": "barelyfunctionalcontraptions:block/fluid_pipe/pipe",
+    "plug": "barelyfunctionalcontraptions:block/fluid_pipe/pipe_plug"
+  },
+  "elements": [
+    {
+      "from": [
+        6,
+        6,
+        11
+      ],
+      "to": [
+        10,
+        10,
+        16
+      ],
+      "faces": {
+        "west": {
+          "texture": "#cable"
+        },
+        "east": {
+          "texture": "#cable"
+        },
+        "down": {
+          "texture": "#cable"
+        },
+        "up": {
+          "texture": "#cable"
+        }
+      }
+    }
+  ]
+}

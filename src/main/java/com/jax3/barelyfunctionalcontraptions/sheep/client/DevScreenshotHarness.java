@@ -344,6 +344,22 @@ public final class DevScreenshotHarness {
             case 1812 -> shot(mc, "recipe_energy_cable");
             case 1815 -> {
                 mc.player.closeContainer();
+                setHudHidden(mc, true);
+                server.execute(() -> pipeScene(server));
+            }
+            case 1860 -> shot(mc, "39_fluid_pipes");
+            case 1862 -> {
+                setHudHidden(mc, false);
+                command(server, "clear @a");
+                // In front of the pipe beside the reservoir, looking down at it, so Jade shows the network.
+                server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 29", pipeBase.getX() + 0.5, pipeBase.getY(), pipeBase.getZ() + 3.0)));
+            }
+            case 1885 -> shot(mc, "40_fluid_pipe_jade");
+            case 1887 -> server.execute(() -> showRecipe(server, "fluid_pipe"));
+            case 1907 -> shot(mc, "recipe_fluid_pipe");
+            case 1910 -> {
+                mc.player.closeContainer();
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
@@ -567,6 +583,37 @@ public final class DevScreenshotHarness {
         }
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 200 25", base.getX() + 0.5, base.getY() + 2, base.getZ() + 7.0));
+    }
+
+    private static BlockPos pipeBase;
+
+    /**
+     * A Fluid Reservoir on a 2x2 pool, piping water to two Mycelial Generators: one straight ahead and one up a riser
+     * on a stone ledge.
+     */
+    private static void pipeScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        BlockPos base = origin.offset(80, 30, -4);
+        pipeBase = base.south();
+        for (int x = -3; x <= 7; x++) for (int z = -3; z <= 5; z++) {
+            level.setBlock(base.offset(x, -2, z), Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+            level.setBlock(base.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+            for (int y = 0; y <= 4; y++) level.setBlock(base.offset(x, y, z), Blocks.AIR.defaultBlockState(), 3);
+        }
+        for (int x = -1; x <= 0; x++) for (int z = -1; z <= 0; z++) level.setBlock(base.offset(x, -1, z), Blocks.WATER.defaultBlockState(), 3);
+        level.setBlock(base, ModBlocks.FLUID_RESERVOIR.get().defaultBlockState(), 3);
+        var generator = com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.mycelial.block.MycelialGeneratorBlock.FACING, Direction.SOUTH);
+        level.setBlock(base.offset(5, 0, 1), generator, 3);
+        for (int y = 0; y <= 1; y++) level.setBlock(base.offset(3, y, -2), Blocks.STONE_BRICKS.defaultBlockState(), 3);
+        level.setBlock(base.offset(3, 2, -2), generator, 3);
+        var pipe = ModBlocks.FLUID_PIPE.get();
+        for (BlockPos pos : java.util.List.of(base.south(), base.offset(1, 0, 1), base.offset(2, 0, 1), base.offset(3, 0, 1), base.offset(4, 0, 1),
+                base.offset(3, 0, 0), base.offset(3, 0, -1), base.offset(3, 1, -1), base.offset(3, 2, -1))) {
+            level.setBlock(pos, pipe.withConnections(pipe.defaultBlockState(), level, pos), 3);
+        }
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 200 25", base.getX() + 0.5, base.getY() + 2, base.getZ() + 8.0));
     }
 
     /** Opens the floor module's GUI for the player. */

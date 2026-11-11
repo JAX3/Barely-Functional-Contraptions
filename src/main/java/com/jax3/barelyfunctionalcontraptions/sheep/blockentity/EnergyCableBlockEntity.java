@@ -17,7 +17,7 @@ import org.jspecify.annotations.Nullable;
  * {@link CableNetwork} to the blocks plugged into the network, and the network ticks once per game tick to pull from
  * sources that don't push.
  */
-public class EnergyCableBlockEntity extends BlockEntity {
+public class EnergyCableBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.Conduit {
     private @Nullable CableNetwork network;
     private final Map<Direction, EnergyHandler> handlers = new EnumMap<>(Direction.class);
     private final EnergyHandler unsided = new SideHandler(null);
@@ -42,6 +42,7 @@ public class EnergyCableBlockEntity extends BlockEntity {
     }
 
     /** Forgets the current network (every cable in it rebuilds next time it is used). */
+    @Override
     public void invalidateNetwork() {
         if (network != null) network.invalidate();
     }

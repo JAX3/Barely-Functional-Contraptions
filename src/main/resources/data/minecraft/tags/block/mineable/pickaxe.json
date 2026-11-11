@@ -7,6 +7,7 @@
     "barelyfunctionalcontraptions:hume_energy_cube",
     "barelyfunctionalcontraptions:functional_machine_block",
     "barelyfunctionalcontraptions:zero_point_energy_module",
-    "barelyfunctionalcontraptions:energy_cable"
+    "barelyfunctionalcontraptions:energy_cable",
+    "barelyfunctionalcontraptions:fluid_pipe"
   ]
 }

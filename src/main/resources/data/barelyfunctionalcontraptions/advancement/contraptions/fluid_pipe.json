@@ -1,0 +1,32 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:fluid_pipe"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.fluid_pipe.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.fluid_pipe.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "obtained": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:fluid_pipe"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtained"
+    ]
+  ]
+}

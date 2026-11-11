@@ -675,8 +675,7 @@ CABLE_PLUG_FACE = [
 ]
 
 
-def generate_energy_cable():
-    pal = CARTOON
+def generate_conduit(name, pal):
     img = Image.new("RGBA", (16, 16), CLEAR)
     across = "OHSO"
     collar = "OPpO"
@@ -686,7 +685,7 @@ def generate_energy_cable():
             img.putpixel((6 + k, i), pal[ch])   # vertical band
             img.putpixel((i, 6 + k), pal[ch])   # horizontal band
     grid(CABLE_CORE, pal, img, 5, 5)
-    img.save(out("block/energy_cable/cable.png"))
+    img.save(out(f"block/{name}/{name.split('_')[1]}.png"))
     plug = Image.new("RGBA", (16, 16), CLEAR)
     edge = "OMMMMMMO"
     for k, ch in enumerate(edge):
@@ -695,8 +694,18 @@ def generate_energy_cable():
             plug.putpixel((4 + k, d), c)  # top and bottom strips
             plug.putpixel((d, 4 + k), c)  # left and right strips
     grid(CABLE_PLUG_FACE, pal, plug, 4, 4)
-    plug.save(out("block/energy_cable/cable_plug.png"))
+    plug.save(out(f"block/{name}/{name.split('_')[1]}_plug.png"))
 
+
+
+# Fluid Pipe: the same tube in blue steel, with blue collars and a blue port ring with a white-blue glow instead of the
+# machines' purple and pink.
+PIPE_BLUE = {"P": hexc("#3fc8ff"), "p": hexc("#1b5fa8"), "G": hexc("#ffffff"), "g": hexc("#a8ecff")}
+
+
+def generate_energy_cable():
+    generate_conduit("energy_cable", CARTOON)
+    generate_conduit("fluid_pipe", dict(CARTOON, **PIPE_BLUE))
 
 def generate_creative_generator():
     """4-frame pulsing glow animation, same on every face."""

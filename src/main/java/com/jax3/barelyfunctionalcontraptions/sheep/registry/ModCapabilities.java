@@ -24,5 +24,7 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.ZERO_POINT_ENERGY_MODULE.get(), (be, side) -> be.getEnergyHandler());
         // Energy Cable: takes energy in on every face and passes it straight on through its network.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.ENERGY_CABLE.get(), (be, side) -> be.getEnergyHandler(side));
+        // Fluid Pipe: takes fluid in on every face and passes it straight on through its network.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.FLUID_PIPE.get(), (be, side) -> be.getFluidHandler(side));
     }
 }

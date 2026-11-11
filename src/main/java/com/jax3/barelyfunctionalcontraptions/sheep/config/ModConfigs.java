@@ -124,6 +124,8 @@ public final class ModConfigs {
         public final ModConfigSpec.BooleanValue zpeBeamPlayerKill;
         public final ModConfigSpec.IntValue cableTransferRate;
         public final ModConfigSpec.IntValue cableMaxNetworkSize;
+        public final ModConfigSpec.IntValue pipeTransferRate;
+        public final ModConfigSpec.IntValue pipeMaxNetworkSize;
 
         // ---------------------------------------------------------------- /barelyfunctionalcontraptions generate
         public final ModConfigSpec.ConfigValue<List<? extends String>> generatorAllowedTabs;
@@ -291,6 +293,14 @@ public final class ModConfigs {
                     .defineInRange("transferRate", 100_000, 1, Integer.MAX_VALUE);
             cableMaxNetworkSize = b.comment("Most cables in one network. Longer runs split into separate networks, which still pass",
                             "energy along only through the blocks plugged into both.")
+                    .defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
+            b.pop();
+
+            b.comment("Fluid Pipe (touching pipes form one network that carries fluids between tanks)").push("fluid_pipe");
+            pipeTransferRate = b.comment("Most mB per tick one pipe network carries in total, however many pipes and blocks are on it.")
+                    .defineInRange("transferRate", 4_000, 1, Integer.MAX_VALUE);
+            pipeMaxNetworkSize = b.comment("Most pipes in one network. Longer runs split into separate networks, which only pass",
+                            "fluid along through the blocks plugged into both.")
                     .defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
             b.pop();
 
