@@ -2,6 +2,7 @@ package com.jax3.barelyfunctionalcontraptions.registry;
 
 import com.jax3.barelyfunctionalcontraptions.BarelyFunctionalContraptions;
 import com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem;
+import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks;
 import com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResource;
 import com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry;
 import java.util.List;
@@ -24,7 +25,7 @@ public final class ContraptionsCreativeTab {
     public static final Supplier<CreativeModeTab> MAIN = REGISTER.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup." + BarelyFunctionalContraptions.MOD_ID))
             .withTabsBefore(CreativeModeTabs.SPAWN_EGGS)
-            .icon(() -> new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIAL_GENERATOR.get()))
+            .icon(() -> new ItemStack(ModBlocks.FUNCTIONAL_MACHINE_BLOCK.get()))
             .displayItems((params, output) -> {
                 // Crafting component
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FUNCTIONAL_MACHINE_BLOCK.get());
