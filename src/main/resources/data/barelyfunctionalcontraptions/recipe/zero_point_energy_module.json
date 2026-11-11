@@ -3,15 +3,16 @@
   "category": "redstone",
   "key": {
     "I": "minecraft:iron_ingot",
-    "E": "minecraft:ender_pearl",
+    "C": "minecraft:copper_ingot",
+    "S": "minecraft:nether_star",
     "A": "minecraft:amethyst_shard",
     "M": "barelyfunctionalcontraptions:functional_machine_block",
     "R": "minecraft:redstone_block"
   },
   "pattern": [
-    "IEI",
+    "ISI",
     "AMA",
-    "IRI"
+    "CRC"
   ],
   "result": {
     "id": "barelyfunctionalcontraptions:zero_point_energy_module",
