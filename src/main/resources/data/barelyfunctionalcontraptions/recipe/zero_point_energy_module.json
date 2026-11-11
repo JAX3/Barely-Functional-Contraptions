@@ -4,13 +4,13 @@
   "key": {
     "I": "minecraft:iron_ingot",
     "C": "minecraft:copper_ingot",
-    "S": "minecraft:nether_star",
+    "B": "minecraft:beacon",
     "A": "minecraft:amethyst_shard",
     "M": "barelyfunctionalcontraptions:functional_machine_block",
     "R": "minecraft:redstone_block"
   },
   "pattern": [
-    "ISI",
+    "IBI",
     "AMA",
     "CRC"
   ],
