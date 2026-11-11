@@ -9,7 +9,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
 | In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 95 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 62 Resourceful Sheep, 17 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 42 screenshots and 11 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 45 screenshots and 11 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -132,6 +132,15 @@ Fluid and Item Pipes share one network implementation (`PipeNetwork`), so the fl
 | `item_pipe_respects_transfer_rate` | With `transferRate = 1`, at most 10 wool leaves a stack of 64 in the shears in 10 ticks. |
 
 In the real client (`41_item_pipes.png`), yellow pipes run from Automatic Shears full of Iron Wool up into the side of a separator powered by a Creative Generator, and from its bottom along to a chest. Jade on a pipe (`42_item_pipe_jade.png`) reads *Network: 3 pipes, 2 blocks plugged in*. The shears' wool had already moved into the separator by then, so it reads *Moving 0 / 16 items/t*. `recipe_item_pipe.png` shows the recipe making 8.
+
+### Config screen labels
+
+A check run from the data script found every option and section in all four config files with a label in `en_us.json`. Options whose `.toml` name is used in more than one section get their own label key through `.translation()`: `enabled`, `autoOutput`, `energyCapacity`, `maxEnergyInput`, `transferRate` and `maxNetworkSize`. So the Mycelial Generator's network size reads *Max Generators per Network* rather than a cable label, and each pipe's rate shows its own unit. Labels are at most 27 characters. In the real client the harness opens the config screens the way *Mods → Config* does:
+- `43_config_sections.png`: the sheep/machines file with its named sections;
+- `44_config_zero_point.png`: the Zero Point section;
+- `45_config_mycelium.png`: the Mycelial Generator's *Mycelium Spreading* section.
+
+Every label is shown in full, with none cut off. The `.toml` keys are unchanged, so existing settings still load. All 95 GameTests still pass.
 
 ### Zero Point hum (real client, recorded)
 

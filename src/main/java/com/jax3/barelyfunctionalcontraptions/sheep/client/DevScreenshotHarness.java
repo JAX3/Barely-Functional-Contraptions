@@ -376,6 +376,17 @@ public final class DevScreenshotHarness {
             case 2002 -> shot(mc, "recipe_item_pipe");
             case 2005 -> {
                 mc.player.closeContainer();
+                openConfig(mc, "barelyfunctionalcontraptions-sheep-synced.toml");
+            }
+            case 2025 -> shot(mc, "43_config_sections");
+            case 2027 -> pressButton(mc, "Zero Point Energy Module");
+            case 2045 -> shot(mc, "44_config_zero_point");
+            case 2047 -> {
+                openConfig(mc, "barelyfunctionalcontraptions-mycelial-synced.toml");
+                pressButton(mc, "Mycelium Spreading");
+            }
+            case 2065 -> shot(mc, "45_config_mycelium");
+            case 2067 -> {
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
@@ -383,6 +394,45 @@ public final class DevScreenshotHarness {
             }
             default -> {}
         }
+    }
+
+    /** Opens the in-game config screen for one of the mod's config files, the way Mods > Config > (file) does. */
+    private static void openConfig(Minecraft mc, String fileName) {
+        var config = net.neoforged.fml.config.ModConfigs.getFileMap().get(fileName);
+        if (config == null) {
+            ResourcefulSheep.LOGGER.warn("Harness: no config file {}", fileName);
+            return;
+        }
+        var parent = new net.neoforged.neoforge.client.gui.ConfigurationScreen(
+                ModList.get().getModContainerById(ResourcefulSheep.MOD_ID).orElseThrow(), null);
+        mc.gui.setScreen(new net.neoforged.neoforge.client.gui.ConfigurationScreen.ConfigurationSectionScreen(parent, config.getType(), config,
+                net.minecraft.network.chat.Component.translatable("barelyfunctionalcontraptions.configuration.section." + fileName.replace("barelyfunctionalcontraptions-", "barelyfunctionalcontraptions.").replace("-", ".") + ".title")));
+    }
+
+    /** Presses the button labelled {@code label} on the open screen (searching nested lists), like a click. */
+    private static void pressButton(Minecraft mc, String label) {
+        if (mc.gui.screen() == null || !pressIn(mc.gui.screen().children(), label)) {
+            ResourcefulSheep.LOGGER.warn("Harness: no button '{}' on {}", label, mc.gui.screen());
+        }
+    }
+
+    private static boolean pressIn(java.util.List<? extends net.minecraft.client.gui.components.events.GuiEventListener> children, String label) {
+        // A config row is a container holding a label widget ("Zero Point Energy Module...") and its "Edit..." button.
+        boolean labelHere = children.stream().anyMatch(c -> c instanceof net.minecraft.client.gui.components.AbstractWidget w
+                && w.getMessage().getString().startsWith(label));
+        for (var child : children) {
+            if (child instanceof net.minecraft.client.gui.components.Button button
+                    && (labelHere || button.getMessage().getString().equals(label))) {
+                button.onPress(new net.minecraft.client.input.KeyEvent(257, 0, 0));
+                return true;
+            }
+        }
+        for (var child : children) {
+            if (child instanceof net.minecraft.client.gui.components.events.ContainerEventHandler container && pressIn(container.children(), label)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Opens the creative inventory on {@code tab} (set before opening, so the screen also turns to that tab's page). */

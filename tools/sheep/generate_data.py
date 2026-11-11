@@ -366,13 +366,6 @@ def lang():
         "gui.barelyfunctionalcontraptions.shears.status.invalid_input.desc": "",
         "gui.barelyfunctionalcontraptions.shears.status.redstone_disabled": "Disabled by Redstone",
         "gui.barelyfunctionalcontraptions.shears.status.redstone_disabled.desc": "Change the redstone signal or mode to run",
-        "barelyfunctionalcontraptions.configuration.energyPerShear": "Energy per shear",
-        "barelyfunctionalcontraptions.configuration.automatic_shears": "Automatic Shears",
-        "barelyfunctionalcontraptions.configuration.fluid_reservoir": "Fluid Reservoir",
-        "barelyfunctionalcontraptions.configuration.waterPerSecond": "Water per Second (mB)",
-        "barelyfunctionalcontraptions.configuration.capacity": "Tank Capacity (mB)",
-        "barelyfunctionalcontraptions.configuration.requireInfiniteSource": "Require Infinite Source",
-        "barelyfunctionalcontraptions.configuration.outputPerTick": "Push to Neighbours (mB/t)",
         "block.barelyfunctionalcontraptions.fluid_reservoir": "Fluid Reservoir",
         "block.barelyfunctionalcontraptions.hume_energy_cube": "Hume Energy Cube",
         "block.barelyfunctionalcontraptions.functional_machine_block": "Functional Machine Block",
@@ -380,18 +373,13 @@ def lang():
         "block.barelyfunctionalcontraptions.energy_cable": "Energy Cable",
         "block.barelyfunctionalcontraptions.fluid_pipe": "Fluid Pipe",
         "tooltip.barelyfunctionalcontraptions.fluid_pipe": "Carries water and other fluids from the Fluid Reservoir and other tanks to the blocks it is plugged into. Touching pipes form one network that moves up to %s mB/t.",
-        "barelyfunctionalcontraptions.configuration.fluid_pipe": "Fluid Pipe",
         "config.jade.plugin_barelyfunctionalcontraptions.pipes": "Fluid and Item Pipes",
         "block.barelyfunctionalcontraptions.item_pipe": "Item Pipe",
         "tooltip.barelyfunctionalcontraptions.item_pipe": "Carries items from the Automatic Shears, the Mechanical Separator, hoppers and other inventories to the blocks it is plugged into. Touching pipes form one network that moves up to %s items a tick.",
-        "barelyfunctionalcontraptions.configuration.item_pipe": "Item Pipe",
         "jade.barelyfunctionalcontraptions.item_pipe.rate": "Moving %s / %s items/t",
         "jade.barelyfunctionalcontraptions.pipe.network": "Network: %s pipes, %s blocks plugged in",
         "jade.barelyfunctionalcontraptions.pipe.rate": "Moving %s / %s mB/t",
         "tooltip.barelyfunctionalcontraptions.energy_cable": "Carries Forge Energy from generators and Hume Energy Cubes to the machines it is plugged into. Touching cables form one network that moves up to %s FE/t.",
-        "barelyfunctionalcontraptions.configuration.energy_cable": "Energy Cable",
-        "barelyfunctionalcontraptions.configuration.transferRate": "Transfer Rate per Network (FE/t)",
-        "barelyfunctionalcontraptions.configuration.maxNetworkSize": "Max Cables per Network",
         "config.jade.plugin_barelyfunctionalcontraptions.energy_cable": "Energy Cable",
         "jade.barelyfunctionalcontraptions.cable.network": "Network: %s cables, %s blocks plugged in",
         "jade.barelyfunctionalcontraptions.cable.rate": "Moving %s / %s FE/t",
@@ -430,7 +418,6 @@ def lang():
         "jade.barelyfunctionalcontraptions.zpe.linked_below": "Linked to the module below (%s block gap)",
         "jade.barelyfunctionalcontraptions.zpe.output": "+%s FE/t, from either module",
         "config.jade.plugin_barelyfunctionalcontraptions.zero_point_module": "Zero Point Energy Module",
-        "barelyfunctionalcontraptions.configuration.zero_point_energy_module": "Zero Point Energy Module",
         "tooltip.barelyfunctionalcontraptions.functional_machine_block": "The casing every machine is built around.",
         "tooltip.barelyfunctionalcontraptions.hume_energy_cube": "Stores Forge Energy, in and out on every side. Touching cubes join into one battery: every cube adds to the buffer and the transfer rate.",
         "tooltip.barelyfunctionalcontraptions.hume_energy_cube.stored": "Holds %s FE",
@@ -454,10 +441,6 @@ def lang():
         "gui.barelyfunctionalcontraptions.cube.status.empty.desc": "No energy stored",
         "gui.barelyfunctionalcontraptions.cube.status.idle": "Idle",
         "gui.barelyfunctionalcontraptions.cube.status.idle.desc": "No energy is moving in or out",
-        "barelyfunctionalcontraptions.configuration.energy_cube": "Hume Energy Cube",
-        "barelyfunctionalcontraptions.configuration.capacityPerCube": "Buffer per Cube (FE)",
-        "barelyfunctionalcontraptions.configuration.transferPerCube": "Transfer Rate per Cube (FE/t)",
-        "barelyfunctionalcontraptions.configuration.maxGroupSize": "Max Cubes per Group",
         "tooltip.barelyfunctionalcontraptions.fluid_reservoir": "Place it on top of an infinite water source to fill its water tank (10 buckets by default). Fills buckets and pushes water into tanks beside it.",
         "gui.barelyfunctionalcontraptions.reservoir.stored": "%s mB",
         "gui.barelyfunctionalcontraptions.reservoir.capacity": "of %s mB",
@@ -475,7 +458,6 @@ def lang():
         "gui.barelyfunctionalcontraptions.reservoir.status.no_source": "No Water Source",
         "gui.barelyfunctionalcontraptions.reservoir.status.no_source.desc": "Place it directly on top of a water source block",
         "jade.barelyfunctionalcontraptions.reservoir.water": "Water: %s / %s mB",
-        "barelyfunctionalcontraptions.configuration.shearInterval": "Shear interval",
         "tooltip.barelyfunctionalcontraptions.creative_generator": "Infinite Forge Energy for testing. Pushes FE into adjacent machines; cables can also pull from any side.",
         "jei.barelyfunctionalcontraptions.info.creative_generator": "Creative-only. Produces unlimited Forge Energy (FE): every tick it pushes power into all adjacent energy receivers (rate set by creativeGeneratorOutput in the server config), and cables or machines can pull unlimited FE from any side. Place it next to a Mechanical Separator to test without a power setup.",
         "item.barelyfunctionalcontraptions.resource_wool": "Resource Wool",
@@ -576,14 +558,6 @@ def lang():
         "config.jade.plugin_barelyfunctionalcontraptions.sheep_infusion": "Sheep infusion",
         "config.jade.plugin_barelyfunctionalcontraptions.separator_status": "Separator status",
         "config.jade.plugin_barelyfunctionalcontraptions.separator_progress": "Separator progress",
-        "barelyfunctionalcontraptions.configuration.title": "Barely Functional Contraptions Configuration",
-        "barelyfunctionalcontraptions.configuration.section.barelyfunctionalcontraptions.sheep.synced.toml": "Resourceful Sheep: gameplay (per world)",
-        "barelyfunctionalcontraptions.configuration.section.barelyfunctionalcontraptions.sheep.synced.toml.title": "Resourceful Sheep: gameplay (per world)",
-        "barelyfunctionalcontraptions.configuration.section.barelyfunctionalcontraptions.sheep.client.toml": "Resourceful Sheep: client",
-        "barelyfunctionalcontraptions.configuration.section.barelyfunctionalcontraptions.sheep.client.toml.title": "Resourceful Sheep: client",
-        "barelyfunctionalcontraptions.configuration.sheep": "Sheep",
-        "barelyfunctionalcontraptions.configuration.separator": "Mechanical Separator",
-        "barelyfunctionalcontraptions.configuration.creative_generator": "Creative Generator",
     }
     for name, r in RESOURCES.items():
         en[f"resource.{MOD}.{name}"] = r["display"]
@@ -912,6 +886,226 @@ def advancements():
     write(lang_path, merged)
 
 
+# Labels for every option in the in-game config screen (Mods > Barely Functional Contraptions > Config), both halves of
+# the mod. One style throughout: Title Case, units in brackets, at most 27 characters so the screen doesn't cut them
+# off (the full explanation is the option's tooltip, from its comment). The key is the option's name in the .toml file, or
+# "section.option" for options whose name is used in more than one section (those set .translation() in the Java
+# config). The .toml keys themselves are left alone so existing settings keep working.
+CONFIG_LABELS = {
+    # Screen and file titles
+    "title": "Barely Functional Contraptions Configuration",
+    "section.barelyfunctionalcontraptions.mycelial.synced.toml": "Mycelial Power: Gameplay (per world)",
+    "section.barelyfunctionalcontraptions.mycelial.synced.toml.title": "Mycelial Power: Gameplay (per world)",
+    "section.barelyfunctionalcontraptions.mycelial.client.toml": "Mycelial Power: Client",
+    "section.barelyfunctionalcontraptions.mycelial.client.toml.title": "Mycelial Power: Client",
+    "section.barelyfunctionalcontraptions.sheep.synced.toml": "Resourceful Sheep and Machines: Gameplay (per world)",
+    "section.barelyfunctionalcontraptions.sheep.synced.toml.title": "Resourceful Sheep and Machines: Gameplay (per world)",
+    "section.barelyfunctionalcontraptions.sheep.client.toml": "Resourceful Sheep: Client",
+    "section.barelyfunctionalcontraptions.sheep.client.toml.title": "Resourceful Sheep: Client",
+
+    # ---- Mycelial Generator (mycelial-synced.toml)
+    "general": "Mycelial Generator",
+    "requireWater": "Needs Water to Run",
+    "pauseWhenEnergyFull": "Pause When Energy Is Full",
+    "activeLightLevel": "Light Level While Running",
+    "allowBucketInteraction": "Fill Tank With Buckets",
+    "energy": "Generator Energy",
+    "baseGeneration": "Base Generation (FE/t)",
+    "maxEnergyStorage": "Energy Buffer (FE)",
+    "outputTransferRate": "Output Rate (FE/t)",
+    "energy.autoOutput": "Push Energy Into Neighbours",
+    "maxNetworkOutput": "Max Network Output (FE/t)",
+    "rounding": "Fractional FE Rounding",
+    "network": "Generator Networks",
+    "scalingEnabled": "Network Power Scaling",
+    "scalingMultiplier": "Scaling per Extra Generator",
+    "network.maxNetworkSize": "Max Generators per Network",
+    "countInactiveGenerators": "Idle Generators Count",
+    "mergeNetworks": "Merge Networks When Joined",
+    "shareResources": "Share Water in Networks",
+    "wrench": "Barely Functional Wrench",
+    "wrench.enabled": "Wrench Enabled",
+    "max_link_distance": "Max Link Distance (blocks)",
+    "max_manual_connections_per_generator": "Max Links per Generator",
+    "max_power_links_per_generator": "Max Machines per Generator",
+    "allow_cross_dimension_links": "Cross-Dimension Links",
+    "require_same_dimension": "Same Dimension Only",
+    "wrench_durability": "Wrench Durability (links)",
+    "allow_network_merging": "Links Can Merge Networks",
+    "show_link_particles": "Show Link Particles",
+    "fuel": "Fuel",
+    "fuels": "Mushroom Fuels",
+    "water": "Water Tank",
+    "tankCapacity": "Tank Capacity (mB)",
+    "consumptionAmount": "Water Used per Drink (mB)",
+    "consumptionInterval": "Ticks Between Drinks",
+    "scaleConsumptionWithNetwork": "Network Scales Water Use",
+    "acceptedFluids": "Accepted Fluids",
+    "allowFluidExtraction": "Allow Draining the Tank",
+    "mycelium": "Mycelium Spreading",
+    "mycelium.enabled": "Mycelium Spreading Enabled",
+    "initialChance": "Starting Chance",
+    "chanceIncrease": "Chance Gain per Failure",
+    "maxChance": "Max Chance",
+    "attemptInterval": "Ticks Between Tries",
+    "searchRadius": "Search Radius (blocks)",
+    "maxConversionsPerAttempt": "Blocks per Success",
+    "onlyDirt": "Only Convert Dirt",
+    "convertibleBlocks": "Convertible Blocks",
+    "resultBlock": "Block to Convert Into",
+    "requireAirAbove": "Needs Air Above",
+    "requireLight": "Needs Light",
+    "minimumLightLevel": "Minimum Light Level",
+    "resetChanceOnSuccess": "Reset Chance on Success",
+    "resetChanceOnStop": "Reset Chance on Stop",
+    "shareChanceAcrossNetwork": "Share Chance in Networks",
+    "networkIncreasesGrowthRate": "Network Speeds Up Chance",
+    "growthBonusPerGenerator": "Bonus per Extra Generator",
+    "networkExtraConversions": "Network Extra Blocks",
+    "generatorsPerExtraConversion": "Generators per Extra Block",
+    "maxExtraConversions": "Max Extra Blocks",
+    "trackConversions": "Count Converted Blocks",
+    "hugeMushroomEnabled": "Grow Huge Mushrooms",
+    "hugeMushroomChance": "Huge Mushroom Chance",
+    "hugeMushroomRedRatio": "Share of Red Huge Mushrooms",
+    "hugeMushroomMinDistance": "Huge Mushroom Min Distance",
+    "performance": "Performance",
+    "guiSyncInterval": "Ticks Between GUI Updates",
+    "containerProcessInterval": "Bucket Slot Delay (ticks)",
+    "energyOutputInterval": "Ticks Between Energy Pushes",
+    "compatibility": "Compatibility",
+    "firePlaceEvents": "Check Protection Mods",
+    "respectSpawnProtection": "Respect Spawn Protection",
+    "fakePlayerName": "Fake Player Name",
+    "jeiExampleNetworkSize": "Max Network Shown in JEI",
+
+    # ---- Mycelial Generator effects (mycelial-client.toml)
+    "effects": "Generator Effects",
+    "particles": "Spore Particles",
+    "particleDensity": "Spore Particle Amount (0-8)",
+    "sounds": "Running Sound",
+    "soundVolume": "Running Sound Volume",
+
+    # ---- Sheep infusion (sheep-synced.toml)
+    "sheep": "Sheep Infusion",
+    "feedingEnabled": "Infuse by Feeding",
+    "feedingAmountOverride": "Items per Feeding",
+    "allowBabies": "Allow Infusing Lambs",
+    "allowFeedingShearedSheep": "Allow Sheared Sheep",
+    "allowReplacingInfusion": "Allow Replacing an Infusion",
+    "sameResourceRefreshesUses": "Same Resource Refills",
+    "infusionConsumedByShearing": "Shearing Uses Infusion",
+    "infusionUsesOverride": "Shearings per Infusion",
+    "infusionUsesMultiplier": "Shearings Multiplier",
+    "woolDropCountOverride": "Wool per Shearing",
+    "shearingBonusChance": "Bonus Wool Chance (0-1)",
+    "shearingBonusAmount": "Bonus Wool Amount",
+    "killDropsEnabled": "Kills Drop Resource Wool",
+    "killWoolBonus": "Extra Wool When Killed",
+    "killDropsResource": "Kills Drop the Resource",
+    "preserveWoolColour": "Keep a Hint of Dye Colour",
+    "feedingParticles": "Infusion Effects",
+    "infusionCooldownTicks": "Re-Infuse Cooldown (ticks)",
+    "creativeConsumesItems": "Creative Uses Up Items",
+    "creativeIgnoresCooldown": "Creative Skips Cooldowns",
+    "sneakToInspect": "Sneak-Click to Inspect",
+
+    # ---- Mechanical Separator
+    "separator": "Mechanical Separator",
+    "separator.energyCapacity": "Energy Buffer (FE)",
+    "separator.maxEnergyInput": "Max Energy Input (FE/t)",
+    "defaultEnergyCost": "Default Energy (FE)",
+    "energyPerTickOverride": "Fixed Energy Use (FE/t)",
+    "defaultProcessingTicks": "Default Time (ticks)",
+    "defaultStringOutput": "Default String per Wool",
+    "primaryOutputMultiplier": "Resource Output Multiplier",
+    "bonusPrimaryChance": "Bonus Resource Chance (0-1)",
+    "energyCostMultiplier": "Energy Cost Multiplier",
+    "processingSpeedMultiplier": "Speed Multiplier",
+    "resetProgressWhenUnpowered": "Reset Progress Unpowered",
+    "energyInputSides": "Energy Input Sides",
+    "itemInputSides": "Wool Input Sides",
+    "itemOutputSides": "Output Sides",
+    "autoPushOutputs": "Push Out Outputs",
+    "autoPushInterval": "Ticks Between Output Pushes",
+    "redstoneControlEnabled": "Redstone Mode Button",
+    "defaultRedstoneMode": "Default Redstone Mode",
+
+    # ---- Creative Generator
+    "creative_generator": "Creative Generator",
+    "creativeGeneratorOutput": "Output to Each Side (FE/t)",
+
+    # ---- Automatic Shears
+    "automatic_shears": "Automatic Shears",
+    "shearInterval": "Sweep Interval (ticks)",
+    "energyPerShear": "Energy per Sheep (FE)",
+    "automatic_shears.energyCapacity": "Energy Buffer (FE)",
+    "automatic_shears.maxEnergyInput": "Max Energy Input (FE/t)",
+
+    # ---- Fluid Reservoir
+    "fluid_reservoir": "Fluid Reservoir",
+    "waterPerSecond": "Water Made per Second (mB)",
+    "capacity": "Tank Capacity (mB)",
+    "requireInfiniteSource": "Needs Infinite Water",
+    "outputPerTick": "Push Into Neighbours (mB/t)",
+
+    # ---- Hume Energy Cube
+    "energy_cube": "Hume Energy Cube",
+    "capacityPerCube": "Energy Buffer per Cube (FE)",
+    "transferPerCube": "Rate per Cube (FE/t)",
+    "maxGroupSize": "Max Cubes per Group",
+    "energy_cube.autoOutput": "Push Energy Into Neighbours",
+
+    # ---- Zero Point Energy Module
+    "zero_point_energy_module": "Zero Point Energy Module",
+    "energyPerBlock": "FE/t per Block of Gap",
+    "minGap": "Min Gap (blocks)",
+    "maxRange": "Max Distance Apart (blocks)",
+    "zero_point_energy_module.energyCapacity": "Buffer per Module (FE)",
+    "maxOutput": "Max Output (FE/t)",
+    "beamDamage": "Beam Damage (2 = One Heart)",
+    "beamBurnSeconds": "Beam Burn Time (seconds)",
+    "beamLooting": "Beam Looting Level",
+    "beamCountsAsPlayerKill": "Beam Kills Are Player Kills",
+
+    # ---- Energy Cable, Fluid Pipe, Item Pipe
+    "energy_cable": "Energy Cable",
+    "energy_cable.transferRate": "Network Rate (FE/t)",
+    "energy_cable.maxNetworkSize": "Max Cables per Network",
+    "fluid_pipe": "Fluid Pipe",
+    "fluid_pipe.transferRate": "Network Rate (mB/t)",
+    "fluid_pipe.maxNetworkSize": "Max Pipes per Network",
+    "item_pipe": "Item Pipe",
+    "item_pipe.transferRate": "Network Rate (items/t)",
+    "item_pipe.maxNetworkSize": "Max Pipes per Network",
+
+    # ---- /barelyfunctionalcontraptions generate
+    "generator": "Wool Type Generator Command",
+    "allowedCreativeTabs": "Allowed Creative Tabs",
+    "requireStackable": "Only Stackable Items",
+
+    # ---- Resourceful Sheep client (sheep-client.toml)
+    "ambientParticles": "Infused Sheep Particles",
+    "dyeTintStrength": "Dye Colour Strength (0-1)",
+    "showSheepSparkleOverlay": "Sparkle on Infused Wool",
+    "showResourceGrowths": "Resource Growths",
+    "detailedWoolTooltips": "Detailed Wool Tooltips",
+    "detailedMachineTooltips": "Detailed GUI Tooltips",
+}
+
+
+def config_labels():
+    """Writes CONFIG_LABELS into en_us.json, replacing every older config label."""
+    lang_path = os.path.join(ASSETS, "lang", "en_us.json")
+    with open(lang_path, encoding="utf-8") as f:
+        merged = json.load(f)
+    prefix = f"{MOD}.configuration."
+    merged = {k: v for k, v in merged.items() if not k.startswith(prefix)}
+    for key, label in CONFIG_LABELS.items():
+        merged[prefix + key] = label
+    write(lang_path, merged)
+
+
 if __name__ == "__main__":
     resource_definitions()
     item_models()
@@ -919,6 +1113,7 @@ if __name__ == "__main__":
     lang()
     recipes_loot_tags()
     advancements()
+    config_labels()
     print("Data written to", os.path.abspath(RES))
 
 

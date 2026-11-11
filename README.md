@@ -729,10 +729,14 @@ To give a data-pack resource its own icon, ship a resource pack that overrides `
 |---|---|
 | `config/barelyfunctionalcontraptions-mycelial-synced.toml` | Mycelial Generator, networks, wrench, water, fuels and mycelium spread. Synced to clients; a copy in `<world>/syncedconfig/` overrides it per world. |
 | `config/barelyfunctionalcontraptions-mycelial-client.toml` | Generator particles and sounds. |
-| `config/barelyfunctionalcontraptions-sheep-synced.toml` | Sheep infusion, the Mechanical Separator and the Creative Generator. Synced to clients; a copy in `<world>/syncedconfig/` overrides it per world. |
+| `config/barelyfunctionalcontraptions-sheep-synced.toml` | Sheep infusion, the Mechanical Separator, Automatic Shears, Fluid Reservoir, Hume Energy Cube, Zero Point Energy Module, Energy Cable, Fluid and Item Pipes, the Creative Generator and the `generate` command. Synced to clients; a copy in `<world>/syncedconfig/` overrides it per world. |
 | `config/barelyfunctionalcontraptions-sheep-client.toml` | Sheep particles, tinting, overlays and tooltips. |
 
-All four can be edited in-game from *Mods → Barely Functional Contraptions → Config*.
+All four can be edited in-game from *Mods → Barely Functional Contraptions → Config*. The screen gives every section and option a plain English name, with its unit in brackets (for example *FE/t per Block of Gap* or *Network Rate (mB/t)*). Hover over an option for the full explanation. The tables in this README use the names as they appear in the `.toml` files.
+
+| Sections | Options in a section |
+|---|---|
+| ![The config screen listing the sections: Sheep Infusion, Mechanical Separator, Creative Generator, Automatic Shears, Fluid Reservoir, Hume Energy Cube, Zero Point Energy Module](docs/screenshots/43_config_sections.png) | ![The Zero Point Energy Module config section: FE/t per Block of Gap, Min Gap (blocks), Max Distance Apart (blocks), Buffer per Module (FE), Max Output (FE/t), Beam Damage (2 = One Heart), Beam Burn Time (seconds)](docs/screenshots/44_config_zero_point.png) |
 
 ## Commands
 

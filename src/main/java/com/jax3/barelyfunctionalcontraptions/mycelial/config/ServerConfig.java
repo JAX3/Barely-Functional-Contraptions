@@ -127,7 +127,7 @@ public final class ServerConfig {
                 .defineInRange("outputTransferRate", 4_000, 0, Integer.MAX_VALUE);
         AUTO_OUTPUT = b.comment("If true, generators actively push energy into adjacent energy receivers (cables, machines).",
                         "If false, energy must be pulled out by the neighbouring block.")
-                .define("autoOutput", true);
+                .translation("barelyfunctionalcontraptions.configuration.energy.autoOutput").define("autoOutput", true);
         MAX_NETWORK_OUTPUT = b.comment("Optional maximum total FE/t of one generator network. 0 disables the cap.",
                         "When the formula exceeds the cap, every member's output is scaled down proportionally.")
                 .defineInRange("maxNetworkOutput", 0.0D, 0.0D, 1.0E12D);
@@ -145,7 +145,7 @@ public final class ServerConfig {
         SCALING_MULTIPLIER = b.comment("Exponential scaling multiplier applied per additional counted generator.")
                 .defineInRange("scalingMultiplier", 1.20D, 0.1D, 10.0D);
         MAX_NETWORK_SIZE = b.comment("Maximum number of generators in one network. Extra generators form separate networks.")
-                .defineInRange("maxNetworkSize", 64, 1, 1024);
+                .translation("barelyfunctionalcontraptions.configuration.network.maxNetworkSize").defineInRange("maxNetworkSize", 64, 1, 1024);
         COUNT_INACTIVE = b.comment("If true, idle generators (no fuel, no water or full) also count towards the exponent.",
                         "If false (default), only generators that are actively consuming mushrooms and water count.")
                 .define("countInactiveGenerators", false);
@@ -161,7 +161,7 @@ public final class ServerConfig {
                 "Each generator keeps its own fuel, water and energy unless shareResources = true.").push("wrench");
         WRENCH_ENABLED = b.comment("Enable the Barely Functional Wrench. When false, the wrench cannot create links and existing manual links",
                         "stop counting (they are kept and come back when re-enabled).")
-                .define("enabled", true);
+                .translation("barelyfunctionalcontraptions.configuration.wrench.enabled").define("enabled", true);
         MAX_LINK_DISTANCE = b.comment("Maximum straight-line distance in blocks between two linked generators.",
                         "Existing links longer than a lowered limit stop counting until the limit is raised again.")
                 .defineInRange("max_link_distance", 64, 1, 4096);
@@ -222,7 +222,7 @@ public final class ServerConfig {
         b.comment("Mycelium spreading. While running, a generator periodically tries to turn a nearby block into mycelium.",
                 "Each eligible attempt (one with at least one valid target) that fails raises the chance; at 100% the next attempt always succeeds.",
                 "All chances are fractions: 0.01 = 1%.").push("mycelium");
-        MYCELIUM_ENABLED = b.comment("Enable mycelium conversion.").define("enabled", true);
+        MYCELIUM_ENABLED = b.comment("Enable mycelium conversion.").translation("barelyfunctionalcontraptions.configuration.mycelium.enabled").define("enabled", true);
         INITIAL_CHANCE = b.comment("Chance of the first attempt, and the value the chance resets to.")
                 .defineInRange("initialChance", 0.01D, 0.0D, 1.0D);
         CHANCE_INCREASE = b.comment("Increase in chance after each unsuccessful eligible attempt (0.005 = +0.5 percentage points).")

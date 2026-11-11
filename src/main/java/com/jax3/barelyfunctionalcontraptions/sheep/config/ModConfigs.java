@@ -184,9 +184,9 @@ public final class ModConfigs {
 
             b.comment("Mechanical Separator machine").push("separator");
             energyCapacity = b.comment("Internal FE buffer size.")
-                    .defineInRange("energyCapacity", 100_000, 1, Integer.MAX_VALUE);
+                    .translation("barelyfunctionalcontraptions.configuration.separator.energyCapacity").defineInRange("energyCapacity", 100_000, 1, Integer.MAX_VALUE);
             maxEnergyInput = b.comment("Maximum FE accepted per tick (per insertion call).")
-                    .defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
+                    .translation("barelyfunctionalcontraptions.configuration.separator.maxEnergyInput").defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
             defaultEnergyCost = b.comment("Total FE to separate one wool when a resource/recipe does not specify 'energy_cost'.")
                     .defineInRange("defaultEnergyCost", 20_000, 0, Integer.MAX_VALUE);
             energyPerTickOverride = b.comment("If > 0, the machine always uses exactly this much FE per tick (total = this x processing ticks),",
@@ -234,9 +234,9 @@ public final class ModConfigs {
             automaticShearsEnergyPerShear = b.comment("FE used for each sheep sheared. 0 = runs without power.")
                     .defineInRange("energyPerShear", 2_000, 0, Integer.MAX_VALUE);
             automaticShearsEnergyCapacity = b.comment("FE buffer.")
-                    .defineInRange("energyCapacity", 50_000, 1, Integer.MAX_VALUE);
+                    .translation("barelyfunctionalcontraptions.configuration.automatic_shears.energyCapacity").defineInRange("energyCapacity", 50_000, 1, Integer.MAX_VALUE);
             automaticShearsMaxEnergyInput = b.comment("FE accepted per tick (every face except the front).")
-                    .defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
+                    .translation("barelyfunctionalcontraptions.configuration.automatic_shears.maxEnergyInput").defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
             b.pop();
 
             b.comment("Fluid Reservoir (makes water while placed directly on top of an infinite water source)").push("fluid_reservoir");
@@ -259,7 +259,7 @@ public final class ModConfigs {
             energyCubeMaxGroupSize = b.comment("Most cubes that join one group. Cubes beyond this form another group.")
                     .defineInRange("maxGroupSize", 64, 1, 4096);
             energyCubeAutoOutput = b.comment("Push energy into machines and cables touching the group every tick. false = they must pull it.")
-                    .define("autoOutput", true);
+                    .translation("barelyfunctionalcontraptions.configuration.energy_cube.autoOutput").define("autoOutput", true);
             b.pop();
 
             b.comment("Zero Point Energy Module (two modules in one column, facing each other, generate FE across the gap)").push("zero_point_energy_module");
@@ -272,7 +272,7 @@ public final class ModConfigs {
             zpeMaxRange = b.comment("Furthest apart (in blocks) two modules can be and still link.")
                     .defineInRange("maxRange", 64, 2, 384);
             zpeCapacity = b.comment("FE each module adds to the pair's shared buffer (a linked pair holds twice this).")
-                    .defineInRange("energyCapacity", 50_000, 1, Integer.MAX_VALUE);
+                    .translation("barelyfunctionalcontraptions.configuration.zero_point_energy_module.energyCapacity").defineInRange("energyCapacity", 50_000, 1, Integer.MAX_VALUE);
             zpeMaxOutput = b.comment("Most FE/t each module pushes into the machines and cables touching it (and that they can pull).",
                             "A linked module can always give out at least its pair's whole output, even when that is more than this,",
                             "so all of the pair's power can be taken from either module.")
@@ -292,26 +292,26 @@ public final class ModConfigs {
 
             b.comment("Energy Cable (touching cables form one network that carries FE between generators, cubes and machines)").push("energy_cable");
             cableTransferRate = b.comment("Most FE/t one cable network carries in total, however many cables and blocks are on it.")
-                    .defineInRange("transferRate", 100_000, 1, Integer.MAX_VALUE);
+                    .translation("barelyfunctionalcontraptions.configuration.energy_cable.transferRate").defineInRange("transferRate", 100_000, 1, Integer.MAX_VALUE);
             cableMaxNetworkSize = b.comment("Most cables in one network. Longer runs split into separate networks, which still pass",
                             "energy along only through the blocks plugged into both.")
-                    .defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
+                    .translation("barelyfunctionalcontraptions.configuration.energy_cable.maxNetworkSize").defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
             b.pop();
 
             b.comment("Fluid Pipe (touching pipes form one network that carries fluids between tanks)").push("fluid_pipe");
             pipeTransferRate = b.comment("Most mB per tick one pipe network carries in total, however many pipes and blocks are on it.")
-                    .defineInRange("transferRate", 4_000, 1, Integer.MAX_VALUE);
+                    .translation("barelyfunctionalcontraptions.configuration.fluid_pipe.transferRate").defineInRange("transferRate", 4_000, 1, Integer.MAX_VALUE);
             pipeMaxNetworkSize = b.comment("Most pipes in one network. Longer runs split into separate networks, which only pass",
                             "fluid along through the blocks plugged into both.")
-                    .defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
+                    .translation("barelyfunctionalcontraptions.configuration.fluid_pipe.maxNetworkSize").defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
             b.pop();
 
             b.comment("Item Pipe (touching pipes form one network that carries items between inventories)").push("item_pipe");
             itemPipeTransferRate = b.comment("Most items per tick one pipe network carries in total, however many pipes and blocks are on it.")
-                    .defineInRange("transferRate", 16, 1, Integer.MAX_VALUE);
+                    .translation("barelyfunctionalcontraptions.configuration.item_pipe.transferRate").defineInRange("transferRate", 16, 1, Integer.MAX_VALUE);
             itemPipeMaxNetworkSize = b.comment("Most pipes in one network. Longer runs split into separate networks, which only pass",
                             "items along through the blocks plugged into both.")
-                    .defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
+                    .translation("barelyfunctionalcontraptions.configuration.item_pipe.maxNetworkSize").defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
             b.pop();
 
             b.comment("Which items /barelyfunctionalcontraptions generate may turn into wool types (feeding items and separator outputs).",
