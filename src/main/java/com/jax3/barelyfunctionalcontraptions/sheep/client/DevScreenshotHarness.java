@@ -304,7 +304,17 @@ public final class DevScreenshotHarness {
                         "tp @a %.1f %d %.1f 180 -12", zeroPointBase.getX() + 0.5, zeroPointBase.getY() + 1, zeroPointBase.getZ() + 8.5));
             });
             case 1670 -> shot(mc, "34_zero_point_coloured_beam");
-            case 1675 -> {
+            case 1672 -> server.execute(() -> {
+                // A pig wanders into the beam: it is hurt and set on fire.
+                var pig = net.minecraft.world.entity.EntityTypes.PIG.create(server.overworld(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                if (pig != null) {
+                    pig.setNoAi(true);
+                    pig.snapTo(zeroPointBase.getX() + 0.5, zeroPointBase.getY() + 0.5, zeroPointBase.getZ() + 0.5, 90, 0);
+                    server.overworld().addFreshEntity(pig);
+                }
+            });
+            case 1679 -> shot(mc, "35_zero_point_beam_burns");
+            case 1685 -> {
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());

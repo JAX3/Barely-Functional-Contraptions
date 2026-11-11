@@ -34,6 +34,9 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  * beam, the beam is coloured by stained glass (blocks or panes) in its path: the first one sets its colour, and every
  * different one after that mixes with the colour so far. The floor module, which draws the beam, works out these
  * colour sections and syncs them too.</p>
+ *
+ * <p>The beam is dangerous: the floor module hurts every living thing touching it ({@code beamDamage}, with its own
+ * "vaporised by a Zero Point beam" death message) and sets it on fire for {@code beamBurnSeconds}.</p>
  */
 public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net.minecraft.world.MenuProvider {
     private static final int SCAN_INTERVAL = 5;
@@ -98,6 +101,7 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         }
         if (generating > 0) energy.generate(generating);
         pushEnergy(level, pos);
+        if (linkDistance > 0 && state.getValue(ZeroPointEnergyModuleBlock.FACING) == Direction.UP) burnEntitiesInBeam(level, pos);
         if (level.getGameTime() % 20 == 0) {
             outRate = outThisSecond / 20;
             outThisSecond = 0;
@@ -152,6 +156,38 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
             if (state.canOcclude()) return new ZeroPointLink.Scan(0, ZeroPointLink.BLOCKED, i);
         }
         return new ZeroPointLink.Scan(0, ZeroPointLink.NO_MODULE, maxRange);
+    }
+
+    /** The beam's damage type (data/barelyfunctionalcontraptions/damage_type/zero_point_beam.json). */
+    public static final net.minecraft.resources.ResourceKey<net.minecraft.world.damagesource.DamageType> BEAM_DAMAGE =
+            net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE,
+                    com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep.id("zero_point_beam"));
+    /** Half the width of the beam's damage area: a little wider than the drawn glow (0.16), so touching it counts. */
+    private static final double BEAM_HALF_WIDTH = 0.2;
+
+    /** The space the beam fills, from the floor emitter's tip to the ceiling emitter's, for a pair this far apart. */
+    public static net.minecraft.world.phys.AABB beamArea(BlockPos floorPos, int distance) {
+        double x = floorPos.getX() + 0.5, z = floorPos.getZ() + 0.5;
+        return new net.minecraft.world.phys.AABB(x - BEAM_HALF_WIDTH, floorPos.getY() + 0.5, z - BEAM_HALF_WIDTH,
+                x + BEAM_HALF_WIDTH, floorPos.getY() + distance + 0.5, z + BEAM_HALF_WIDTH);
+    }
+
+    /**
+     * Hurts and ignites every living thing in the beam (only the floor module does this, so each beam hits once).
+     * Living things are only hurt twice a second at most by the normal hurt cooldown; creative and spectator players,
+     * and anything invulnerable, are left alone by the usual damage rules.
+     */
+    private void burnEntitiesInBeam(ServerLevel level, BlockPos pos) {
+        float damage = (float) ModConfigs.getDouble(ModConfigs.SERVER.zpeBeamDamage);
+        if (damage <= 0) return;
+        int burnSeconds = ModConfigs.getInt(ModConfigs.SERVER.zpeBeamBurnSeconds);
+        var targets = level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, beamArea(pos, linkDistance),
+                e -> e.isAlive() && !e.isSpectator());
+        if (targets.isEmpty()) return;
+        var source = level.damageSources().source(BEAM_DAMAGE);
+        for (var target : targets) {
+            if (target.hurtServer(level, source, damage) && burnSeconds > 0) target.igniteForSeconds(burnSeconds);
+        }
     }
 
     /** The beam's default colour, used until it passes through stained glass. */

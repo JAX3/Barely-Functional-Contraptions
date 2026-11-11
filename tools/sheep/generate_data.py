@@ -360,6 +360,8 @@ def lang():
         "gui.barelyfunctionalcontraptions.zpe.desc.no_module.below": "No module within %s blocks below. Place one on the floor directly below, pointing up.",
         "gui.barelyfunctionalcontraptions.zpe.generation.tooltip": "Generation",
         "gui.barelyfunctionalcontraptions.zpe.generation.desc": "A linked pair makes more power the further apart the modules are. The two modules share one pool of energy, so all of it can be taken from either one. The gauge shows the whole pool. Out: energy leaving the pool through either module, averaged over a second.",
+        "death.attack.barelyfunctionalcontraptions.zero_point_beam": "%1$s was vaporised by a Zero Point beam",
+        "death.attack.barelyfunctionalcontraptions.zero_point_beam.player": "%1$s was vaporised by a Zero Point beam while fighting %2$s",
         "jade.barelyfunctionalcontraptions.zpe.unlinked": "No partner: needs a module facing it in the same column",
         "jade.barelyfunctionalcontraptions.zpe.linked_above": "Linked to the module above (%s block gap)",
         "jade.barelyfunctionalcontraptions.zpe.linked_below": "Linked to the module below (%s block gap)",
@@ -612,6 +614,14 @@ def recipes_loot_tags():
         "pattern": ["ISI", "AMA", "CRC"],
         "result": {"id": f"{MOD}:zero_point_energy_module", "count": 2},
     })
+    # The beam's damage: burning hurt sound, no knockback (it has no source to be pushed away from).
+    write(os.path.join(DATA, MOD, "damage_type", "zero_point_beam.json"), {
+        "effects": "burning",
+        "exhaustion": 0.1,
+        "message_id": f"{MOD}.zero_point_beam",
+        "scaling": "when_caused_by_living_non_player",
+    })
+    write(os.path.join(DATA, "minecraft", "tags", "damage_type", "no_knockback.json"), {"values": [f"{MOD}:zero_point_beam"]})
     write(os.path.join(DATA, MOD, "loot_table", "blocks", "zero_point_energy_module.json"), {
         "type": "minecraft:block",
         "pools": [{"rolls": 1, "condition": {"type": "minecraft:survives_explosion"},

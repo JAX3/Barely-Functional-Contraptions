@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 77 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 50 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 34 screenshots and 8 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 78 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 51 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 35 screenshots and 8 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -85,6 +85,10 @@ In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `reci
 - the recipe makes 2;
 - the GUI (`31_zero_point_gui.png`) shows the beam diagram with both modules lit and the beam between them, *of 100,000 FE*, *+5,000 FE/t*, *Shared pool*, *Out: 5,000 FE/t* (the full output, through the floor module alone) and a green *Linked: 5 block gap*;
 - after a stone block is put in the gap (`32_zero_point_gui_blocked.png`), the GUI shows the blocking block on a dotted line above the module, *+0 FE/t* and a red *Beam blocked 3 above*.
+
+### Zero Point beam damage (`zero_point_beam_burns_what_touches_it`)
+
+An iron golem with no AI stands on the floor module of a linked pair, inside the beam, and a pig stands two blocks away. The golem's health drops, its last damage is the beam's own `barelyfunctionalcontraptions:zero_point_beam` damage type, and it is set on fire. The pig keeps full health and isn't burning. In the real client (`35_zero_point_beam_burns.png`), a pig placed in the beam is on fire and flashing red a few ticks later.
 
 ### Block sounds (`all_blocks_use_iron_block_sounds`)
 

@@ -122,6 +122,7 @@ public final class ModGameTests {
         TESTS.put("machines_are_built_from_functional_machine_block", ModGameTests::machineBlockRecipes);
         TESTS.put("all_blocks_use_iron_block_sounds", ModGameTests::ironSounds);
         TESTS.put("zero_point_modules_generate_across_a_gap", ModGameTests::zeroPointModules);
+        TESTS.put("zero_point_beam_burns_what_touches_it", ModGameTests::zeroPointBeamBurns);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -978,6 +979,28 @@ public final class ModGameTests {
             try (Transaction tx = Transaction.openRoot()) {
                 h.assertTrue(handler.insert(1000, tx) == 0, "modules don't accept FE");
             }
+        });
+    }
+
+    /**
+     * The beam hurts and ignites living things in it, with its own damage type, and leaves things beside it alone.
+     * An iron golem (lots of health, no AI) stands on the floor module in the beam; a pig stands two blocks away.
+     */
+    private static void zeroPointBeamBurns(GameTestHelper h) {
+        BlockPos floor = new BlockPos(3, 1, 3), ceiling = new BlockPos(3, 4, 3);
+        h.setBlock(floor, zpe(Direction.UP));
+        h.setBlock(ceiling, zpe(Direction.DOWN));
+        zpeAt(h, floor);
+        zpeAt(h, ceiling);
+        var golem = h.spawnWithNoFreeWill(EntityTypes.IRON_GOLEM, new BlockPos(3, 2, 3));
+        var pig = h.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(5, 1, 3));
+        var beamKey = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_DAMAGE;
+        h.succeedWhen(() -> {
+            h.assertTrue(golem.getHealth() < golem.getMaxHealth(), "the golem in the beam is hurt, health " + golem.getHealth());
+            h.assertTrue(golem.getLastDamageSource() != null && golem.getLastDamageSource().is(beamKey),
+                    "hurt by the beam's own damage type, got " + golem.getLastDamageSource());
+            h.assertTrue(golem.getRemainingFireTicks() > 0, "the golem is set on fire");
+            h.assertTrue(pig.getHealth() == pig.getMaxHealth() && pig.getRemainingFireTicks() <= 0, "the pig beside the beam is untouched");
         });
     }
 

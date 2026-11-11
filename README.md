@@ -294,6 +294,9 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 - **Take it from either end:** the two modules share **one pool of energy**, so **the pair's full output can be taken from either module**. You only need to connect one of them: a machine on the floor module gets all 5,000 FE/t, not half. Each module adds a 50,000 FE buffer to the pool (100,000 FE for the pair).
 - **Output:** each module **pushes energy from the pool into every machine or cable touching it**, up to 100,000 FE/t (`maxOutput`), and **never less than the pair's whole output**: if the pair makes more than `maxOutput`, the limit rises to match, so one module can always give out everything the pair makes. Cables can also pull from it. If both ends have machines, they share what the pair makes. Modules don't accept energy and never push into each other.
 - **Looks:** while linked, the emitters glow bright blue, pulse and give off light, and blue sparks drift around them. Unlinked modules are dull grey-blue.
+- **The beam burns:** anything living that touches the beam (mobs, animals and players) takes **4 damage** (2 hearts, `beamDamage`) and is **set on fire for 5 seconds** (`beamBurnSeconds`). It keeps hurting them twice a second while they stay in it, and its death message is *"was vaporised by a Zero Point beam"*. Players in creative or spectator mode are safe, and fire-immune mobs like blazes take the damage but don't burn. Set `beamDamage` to 0 for a harmless beam. Dropped items are left alone.
+
+  ![A pig standing in a Zero Point beam, on fire and flashing red](docs/screenshots/35_zero_point_beam_burns.png)
 - **Coloured beams:** stained glass colours the beam just like a beacon beam. Put stained glass (blocks or panes) in the gap and the beam takes that colour from the glass upwards. Each further pane of a different colour mixes with the colour so far, so red then yellow gives orange. Glass of the same colour in a row changes nothing. The colour is only for looks: the power is the same.
 
   ![A Zero Point beam going blue, then red through red stained glass, then orange through yellow stained glass](docs/screenshots/34_zero_point_coloured_beam.png)
@@ -474,6 +477,8 @@ Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already 
 | `minGap` | 1 | Fewest blocks of open space needed between the modules before they link |
 | `maxRange` | 64 | Furthest apart (in blocks) two modules can be and still link |
 | `energyCapacity` | 50000 | FE each module adds to the pair's shared buffer (a linked pair holds twice this) |
+| `beamDamage` | 4.0 | Damage the beam does to anything living touching it (2 = one heart), at most twice a second. 0 = harmless, no fire |
+| `beamBurnSeconds` | 5 | Seconds the beam sets things on fire for. 0 = no fire |
 | `maxOutput` | 100000 | Most FE/t each module pushes into, or lets be pulled by, its neighbours. A linked module can always give out at least its pair's whole output, even when that is more than this |
 
 **`[generator]`** (limits for `/barelyfunctionalcontraptions generate`; see [What the generator may use](#what-the-generator-may-use))

@@ -118,6 +118,8 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue zpeMaxRange;
         public final ModConfigSpec.IntValue zpeCapacity;
         public final ModConfigSpec.IntValue zpeMaxOutput;
+        public final ModConfigSpec.DoubleValue zpeBeamDamage;
+        public final ModConfigSpec.IntValue zpeBeamBurnSeconds;
 
         // ---------------------------------------------------------------- /barelyfunctionalcontraptions generate
         public final ModConfigSpec.ConfigValue<List<? extends String>> generatorAllowedTabs;
@@ -267,6 +269,11 @@ public final class ModConfigs {
                             "A linked module can always give out at least its pair's whole output, even when that is more than this,",
                             "so all of the pair's power can be taken from either module.")
                     .defineInRange("maxOutput", 100_000, 1, Integer.MAX_VALUE);
+            zpeBeamDamage = b.comment("Damage the beam does to anything living that touches it (2 = one heart), at most twice a second",
+                            "while it stays in the beam (the usual hurt cooldown). 0 = the beam is harmless and doesn't burn.")
+                    .defineInRange("beamDamage", 4.0, 0.0, 1_000.0);
+            zpeBeamBurnSeconds = b.comment("Seconds the beam sets things on fire for. 0 = no fire, only the beam's own damage.")
+                    .defineInRange("beamBurnSeconds", 5, 0, 600);
             b.pop();
 
             b.comment("Which items /barelyfunctionalcontraptions generate may turn into wool types (feeding items and separator outputs).",
