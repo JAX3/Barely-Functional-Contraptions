@@ -1777,6 +1777,109 @@ def generate_cube_gui():
     img.save(out("gui/hume_energy_cube.png"))
 
 
+# ---------------------------------------------------------------------------
+# Zero Point Energy Module GUI: the Hume Energy Cube's layout with a blue energy gauge, a beam diagram between the
+# gauge and the info window, and no slots. Sprites (beside the 176x193 background):
+#   (176,0)  30x64 energy fill          (176,66) 4 frames of 30x2 surface shimmer
+#   (208,0)  16x8 module pointing up, off / (208,8) on      (208,16) pointing down, off / (208,24) on
+#   (208,32) 5x7 "this module" pointer  (208,40) 12x12 blocking block   (208,56) 16x8 missing module (dashed)
+#   (228,0)  4 frames of 6x64 beam      (186,194) status lamps shared with the other machines
+# ---------------------------------------------------------------------------
+ZPE_GUI_DEEP, ZPE_GUI_MID, ZPE_GUI_LIGHT = hexc("#1b5fa8"), hexc("#2f8fe0"), hexc("#3fc8ff")
+ZPE_GUI_SURFACE, ZPE_GUI_SPARK = hexc("#a8ecff"), hexc("#ffffff")
+ZPE_MODULE_UP = [
+    "....OOOOOOOO....",
+    "....OnQQQQnO....",
+    "....ONnnnnNO....",
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OBbMMMXXXXMMMBbO",
+    "OSSSSSSSSSSSSSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+ZPE_POINTER = ["W....", "WW...", "WWW..", "WWWW.", "WWW..", "WW...", "W...."]
+ZPE_BLOCKER = [
+    "OOOOOOOOOOOO",
+    "OHHHHHHHHHMO",
+    "OHRMMMMMMRSO",
+    "OHMRMMMMRMSO",
+    "OHMMRMMRMMSO",
+    "OHMMMRRMMMSO",
+    "OHMMMRRMMMSO",
+    "OHMMRMMRMMSO",
+    "OHMRMMMMRMSO",
+    "OHRMMMMMMRSO",
+    "OHSSSSSSSSSO",
+    "OOOOOOOOOOOO",
+]
+ZPE_MISSING = [
+    "O.O.O.O.O.O.O.O.",
+    "................",
+    "O......vv......O",
+    ".......v.v......",
+    "O........v.....O",
+    "........v.......",
+    "O...............",
+    ".O.O.O.Ov.O.O.O.",
+]
+
+
+def generate_zero_point_gui():
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # energy gauge, fill 11..40 x 19..82
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 46, 16, 76, 84, GUI["gauge"])          # beam diagram, 47..74 x 17..82
+    inset(img, 80, 16, 168, 78, GUI["panel"])         # info window
+    for x in range(84, 164):                          # divider between energy and generation
+        img.putpixel((x, 44), hexc("#2c2e36"))
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    rnd = random.Random(29)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice([ZPE_GUI_SURFACE, ZPE_GUI_LIGHT, ZPE_GUI_MID]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))
+    for y in range(64):                                         # energy fill
+        for x in range(30):
+            c = mix(ZPE_GUI_LIGHT, ZPE_GUI_DEEP, y / 63.0)
+            if (x + y) % 4 == 0:
+                c = mix(c, ZPE_GUI_SURFACE, 0.25)
+            img.putpixel((176 + x, y), c)
+    for k in range(1, 8):
+        ty = round(64 * k / 8)
+        for x in range(25, 30):
+            img.putpixel((176 + x, ty), mix(img.getpixel((176 + x, ty)), ZPE_GUI_SURFACE, 0.5))
+    for f in range(4):                                          # surface shimmer
+        for x in range(30):
+            img.putpixel((176 + x, 66 + f * 2), ZPE_GUI_SPARK if (x + f * 2) % 8 == 0 else ZPE_GUI_SURFACE)
+            img.putpixel((176 + x, 67 + f * 2), ZPE_GUI_LIGHT)
+    down = list(reversed(ZPE_MODULE_UP))
+    for i, (rows, extra) in enumerate(((ZPE_MODULE_UP, ZPE_OFF), (ZPE_MODULE_UP, ZPE_ON), (down, ZPE_OFF), (down, ZPE_ON))):
+        grid(rows, dict(CARTOON, **extra), img, 208, i * 8)
+    grid(ZPE_POINTER, {"W": hexc("#dfe4f5")}, img, 208, 32)
+    grid(ZPE_BLOCKER, dict(CARTOON, R=hexc("#ff4b4b")), img, 208, 40)
+    grid(ZPE_MISSING, {"O": hexc("#6a6f7c"), "v": hexc("#9aa0a6")}, img, 208, 56)
+    for f in range(4):                                          # beam: white core, blue glow, bright bands moving up
+        for y in range(64):
+            band = ((y + f * 4) % 16) < 3
+            row = [ZPE_GUI_DEEP, ZPE_GUI_LIGHT, ZPE_GUI_SPARK, ZPE_GUI_SPARK, ZPE_GUI_LIGHT, ZPE_GUI_DEEP]
+            if band:
+                row = [ZPE_GUI_MID, ZPE_GUI_SURFACE, ZPE_GUI_SPARK, ZPE_GUI_SPARK, ZPE_GUI_SURFACE, ZPE_GUI_MID]
+            for x, c in enumerate(row):
+                img.putpixel((228 + f * 6 + x, y), c)
+    img.save(out("gui/zero_point_energy_module.png"))
+
+
 CUBE_BOLT_ICON = [  # 9x9 GUI icon
     "....OOO..",
     "...OEEO..",
@@ -1804,6 +1907,7 @@ def main():
     generate_reservoir_gui()
     generate_energy_cube()
     generate_cube_gui()
+    generate_zero_point_gui()
     generate_jei()
     generate_logo()
     print("Textures written to", os.path.abspath(ROOT))

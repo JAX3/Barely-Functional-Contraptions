@@ -29,7 +29,8 @@ import org.jspecify.annotations.Nullable;
  * Zero Point Energy Module. Placed like an end rod: on a floor it points up, under a ceiling it points down. A module
  * pointing up links with the nearest module above it that points down, in the same column and with only see-through
  * blocks (air, glass...) between them. A linked pair draws a blue beam across the gap and generates FE: the bigger the
- * gap, the more power. Each module pushes its share into the machines and cables touching it.
+ * gap, the more power. Each module pushes its share into the machines and cables touching it. Right-click opens
+ * its GUI: stored energy, generation, the beam connection and why it isn't linked.
  */
 public class ZeroPointEnergyModuleBlock extends BaseEntityBlock {
     /** Which way the emitter points: UP (floor module) or DOWN (ceiling module). */
@@ -75,6 +76,15 @@ public class ZeroPointEnergyModuleBlock extends BaseEntityBlock {
         if (!(level instanceof ServerLevel serverLevel)) return null;
         return createTickerHelper(type, ModBlockEntities.ZERO_POINT_ENERGY_MODULE.get(),
                 (l, pos, s, be) -> be.serverTick(serverLevel, pos, s));
+    }
+
+    @Override
+    protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
+                                                                  net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof ZeroPointEnergyModuleBlockEntity be) {
+            player.openMenu(be, pos);
+        }
+        return net.minecraft.world.InteractionResult.SUCCESS;
     }
 
     @Override

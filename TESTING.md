@@ -9,7 +9,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
 | In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 77 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 50 Resourceful Sheep, 11 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 30 screenshots and 8 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 32 screenshots and 8 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -77,12 +77,14 @@ In the real client (`15_fluid_reservoir.png`, `16_fluid_reservoir_gui.png`): the
 
 ### Zero Point Energy Module (`zero_point_modules_generate_across_a_gap`)
 
-A module pointing up on the floor and one pointing down three blocks above it link at distance 3. Their output is 2 x `energyPerBlock` (a 2-block gap), and the two modules' shares add up to it. Both blockstates switch to `linked=true`. Glass in the gap keeps the link. Stone in the gap breaks it: both modules go back to `linked=false` and make nothing. Two modules both pointing up don't link, and nor do two touching modules (no gap). A Hume Energy Cube beside the floor module fills with the module's energy, the ceiling module charges its own buffer, and inserting FE into a module is refused.
+A module pointing up on the floor and one pointing down three blocks above it link at distance 3, and report `LINKED`. Their GUI menus receive the link, distance, facing, generation, pair output and buffer size. Their output is 2 x `energyPerBlock` (a 2-block gap), and the two modules' shares add up to it. Both blockstates switch to `linked=true`. Glass in the gap keeps the link. Stone in the gap breaks it: both modules go back to `linked=false` and make nothing, and the floor module reports `BLOCKED` 2 blocks up. Two modules both pointing up don't link (`WRONG_FACING`, and the top one reports `NO_MODULE`), and nor do two touching modules (`TOO_CLOSE`). A Hume Energy Cube beside the floor module fills with the module's energy, the ceiling module charges its own buffer, and inserting FE into a module is refused.
 
 In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `recipe_zero_point_energy_module.png`):
 - a floor module and a ceiling module under a stone overhang, 6 blocks apart, are joined by the blue beam, with both emitters lit;
 - Jade on the floor module reads *Linked to the module above (5 block gap)* and *+25 FE/t (pair: 50 FE/t)*, with an empty buffer because it is pushing everything into the Hume Energy Cube next to it;
-- the recipe makes 2.
+- the recipe makes 2;
+- the GUI (`31_zero_point_gui.png`) shows the beam diagram with both modules lit and the beam between them, *+25 FE/t*, *Pair: 50 FE/t*, *Out: 25 FE/t* and a green *Linked: 5 block gap*;
+- after a stone block is put in the gap (`32_zero_point_gui_blocked.png`), the GUI shows the blocking block on a dotted line above the module, *+0 FE/t* and a red *Beam blocked 3 above*.
 
 ### Block sounds (`all_blocks_use_iron_block_sounds`)
 

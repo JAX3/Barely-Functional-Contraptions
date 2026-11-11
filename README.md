@@ -293,6 +293,16 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 - **Power:** a linked pair makes **10 FE/t for every block of gap** (`energyPerBlock`), split between the two modules. A 5-block gap makes 50 FE/t (25 each), and a 63-block gap, the largest, makes 630 FE/t.
 - **Output:** each module has a 50,000 FE buffer and **pushes energy into every machine or cable touching it**, up to 10,000 FE/t (`maxOutput`). Cables can also pull from it. Modules don't accept energy and never push into each other. Use both ends: the floor module can power your machines while the ceiling module charges a Hume Energy Cube.
 - **Looks:** while linked, the emitters glow bright blue, pulse and give off light, and blue sparks drift around them. Unlinked modules are dull grey-blue.
+- **GUI:** right-click a module to open it. It's in the same slate style as the other machines:
+  - an energy gauge for the module's buffer;
+  - a **beam diagram**: the column with this module marked by a pointer, and at the far end what it found. When linked, both modules are lit with the animated beam between them. Otherwise it shows why: a blocking block (with a red cross) part of the way along, a partner that points the wrong way, a partner too close, or a dashed outline where a partner should go;
+  - the stored energy, this module's generation (*+25 FE/t*), the whole pair's (*Pair: 50 FE/t*) and the energy going out, averaged over the last second;
+  - a status lamp: *Linked: 5 block gap* (green), *Linked: buffer full* (orange, nothing is taking the energy), or in red *Beam blocked 3 above*, *Partner faces wrong way*, *Partner too close*, or grey *No module above*.
+  Hover over the diagram or the lamp for what to do about it.
+
+  | Linked | Beam blocked |
+  |---|---|
+  | ![Zero Point Energy Module GUI, linked: beam between two lit modules, +25 FE/t, pair 50 FE/t, out 25 FE/t](docs/screenshots/31_zero_point_gui.png) | ![Zero Point Energy Module GUI with the beam blocked 3 blocks above by a solid block](docs/screenshots/32_zero_point_gui_blocked.png) |
 - **Jade** shows whether a module is linked, the gap to its partner and how much it and the pair make. If it isn't linked, it tells you it needs a module facing it in the same column.
 - The recipe makes **two** modules, one pair. Mine them with a stone pickaxe or better.
 

@@ -275,7 +275,15 @@ public final class DevScreenshotHarness {
                         String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 27", zeroPointBase.getX() + 0.5, zeroPointBase.getY(), zeroPointBase.getZ() + 3.0)));
             }
             case 1555 -> shot(mc, "30_zero_point_jade");
-            case 1560 -> {
+            case 1558 -> server.execute(() -> openZeroPointGui(server));
+            case 1580 -> shot(mc, "31_zero_point_gui");
+            case 1582 -> {
+                mc.player.closeContainer();
+                server.execute(() -> server.overworld().setBlock(zeroPointBase.above(3), Blocks.STONE.defaultBlockState(), 3));
+            }
+            case 1595 -> server.execute(() -> openZeroPointGui(server));
+            case 1615 -> shot(mc, "32_zero_point_gui_blocked");
+            case 1620 -> {
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
@@ -463,6 +471,14 @@ public final class DevScreenshotHarness {
         placeCube(level, base.east(), 0);
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 -12", base.getX() + 0.5, base.getY() + 1, base.getZ() + 8.5));
+    }
+
+    /** Opens the floor module's GUI for the player. */
+    private static void openZeroPointGui(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        if (server.overworld().getBlockEntity(zeroPointBase) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity be) {
+            player.openMenu(be, zeroPointBase);
+        }
     }
 
     private static BlockPos wirelessBase;

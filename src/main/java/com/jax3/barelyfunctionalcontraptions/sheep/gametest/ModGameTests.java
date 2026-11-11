@@ -881,6 +881,16 @@ public final class ModGameTests {
         h.assertTrue(low.getLinkDistance() == 3 && high.getLinkDistance() == 3, "pair 3 apart links, got " + low.getLinkDistance() + "/" + high.getLinkDistance());
         h.assertTrue(low.getPairOutput() == 2 * perBlock, "2-block gap makes " + 2 * perBlock + " FE/t, got " + low.getPairOutput());
         h.assertTrue(low.getGenerating() + high.getGenerating() == low.getPairOutput(), "the two halves add up to the pair's output");
+        h.assertTrue(low.getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.LINKED, "linked reason");
+
+        // The GUI menu receives the module's numbers.
+        var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var menu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.ZeroPointModuleMenu) low.createMenu(0, player.getInventory(), player);
+        h.assertTrue(menu.getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.LINKED && menu.getLinkDistance() == 3 && menu.facesUp(), "menu shows the link");
+        h.assertTrue(menu.getGenerating() == low.getGenerating() && menu.getPairOutput() == low.getPairOutput(), "menu shows generation");
+        h.assertTrue(menu.getCapacity() == ModConfigs.getInt(ModConfigs.SERVER.zpeCapacity), "menu shows the buffer size");
+        var highMenu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.ZeroPointModuleMenu) high.createMenu(1, player.getInventory(), player);
+        h.assertFalse(highMenu.facesUp(), "ceiling module's menu knows it points down");
         h.assertBlockProperty(floor, linkedProp, true);
         h.assertBlockProperty(ceiling, linkedProp, true);
 
@@ -889,6 +899,9 @@ public final class ModGameTests {
         h.assertTrue(zpeAt(h, floor).getLinkDistance() == 3, "glass in the gap keeps the link");
         h.setBlock(floor.above(2), Blocks.STONE);
         h.assertTrue(zpeAt(h, floor).getLinkDistance() == 0 && zpeAt(h, ceiling).getLinkDistance() == 0, "stone in the gap breaks the link");
+        h.assertTrue(zpeAt(h, floor).getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.BLOCKED, "the floor module reports the beam is blocked");
+        var blocked = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.scan(h.getLevel(), h.absolutePos(floor), Direction.UP);
+        h.assertTrue(blocked.stoppedAt() == 2, "the block is 2 above, got " + blocked.stoppedAt());
         h.assertBlockProperty(floor, linkedProp, false);
         h.assertTrue(zpeAt(h, floor).getGenerating() == 0, "unlinked modules make nothing");
         h.setBlock(floor.above(2), Blocks.AIR);
@@ -898,11 +911,14 @@ public final class ModGameTests {
         h.setBlock(sameA, zpe(Direction.UP));
         h.setBlock(sameB, zpe(Direction.UP));
         h.assertTrue(zpeAt(h, sameA).getLinkDistance() == 0, "modules must face each other");
+        h.assertTrue(zpeAt(h, sameA).getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.WRONG_FACING, "reported as facing the wrong way");
+        h.assertTrue(zpeAt(h, sameB).getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.NO_MODULE, "nothing above the top one");
         // Touching (no gap): no link.
         BlockPos touchA = new BlockPos(5, 1, 5), touchB = new BlockPos(5, 2, 5);
         h.setBlock(touchA, zpe(Direction.UP));
         h.setBlock(touchB, zpe(Direction.DOWN));
         h.assertTrue(zpeAt(h, touchA).getLinkDistance() == 0, "modules need open space between them");
+        h.assertTrue(zpeAt(h, touchA).getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.TOO_CLOSE, "reported as too close");
 
         // A Hume Energy Cube touching the floor module fills up; the pair keeps making power over time.
         BlockPos cubePos = new BlockPos(1, 1, 2);
