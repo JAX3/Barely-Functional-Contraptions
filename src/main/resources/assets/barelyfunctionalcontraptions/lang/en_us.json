@@ -534,6 +534,8 @@
   "barelyfunctionalcontraptions.configuration.feedingEnabled": "Infuse by Feeding",
   "barelyfunctionalcontraptions.configuration.feedingAmountOverride": "Items per Feeding",
   "barelyfunctionalcontraptions.configuration.allowBabies": "Allow Infusing Lambs",
+  "barelyfunctionalcontraptions.configuration.breedingKeepsInfusion": "Lambs Inherit Infusion",
+  "barelyfunctionalcontraptions.configuration.breedingNeedsBothParents": "Needs Both Parents Infused",
   "barelyfunctionalcontraptions.configuration.allowFeedingShearedSheep": "Allow Sheared Sheep",
   "barelyfunctionalcontraptions.configuration.allowReplacingInfusion": "Allow Replacing an Infusion",
   "barelyfunctionalcontraptions.configuration.sameResourceRefreshesUses": "Same Resource Refills",

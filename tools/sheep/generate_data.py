@@ -1002,6 +1002,8 @@ CONFIG_LABELS = {
     "feedingEnabled": "Infuse by Feeding",
     "feedingAmountOverride": "Items per Feeding",
     "allowBabies": "Allow Infusing Lambs",
+    "breedingKeepsInfusion": "Lambs Inherit Infusion",
+    "breedingNeedsBothParents": "Needs Both Parents Infused",
     "allowFeedingShearedSheep": "Allow Sheared Sheep",
     "allowReplacingInfusion": "Allow Replacing an Infusion",
     "sameResourceRefreshesUses": "Same Resource Refills",
