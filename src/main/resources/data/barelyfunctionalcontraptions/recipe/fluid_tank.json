@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "G": "#c:glass_blocks",
+    "B": "minecraft:bucket",
+    "M": "barelyfunctionalcontraptions:functional_machine_block"
+  },
+  "pattern": [
+    "IGI",
+    "GMG",
+    "IBI"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:fluid_tank"
+  }
+}

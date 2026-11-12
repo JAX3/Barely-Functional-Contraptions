@@ -82,6 +82,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | ⭐ **Shear Genius** (goal) | Be within 16 blocks of Automatic Shears when they shear a sheep |
 | Bottomless Bucket | Craft a Fluid Reservoir |
 | Hume Sweet Hume | Craft a Hume Energy Cube |
+| Think Tank | Craft a Fluid Tank |
 | Something From Nothing | Craft a Zero Point Energy Module |
 | ⭐ **Don't Cross the Streams** (challenge, hidden) | Get vaporised by a Zero Point beam. It stays hidden until you earn it and gives 50 experience. |
 | Plugged In | Craft some Energy Cables |
@@ -307,6 +308,26 @@ Any shape works, not just full boxes. L-shapes, rings and walls with bends get p
 - Groups are limited to 64 cubes (`maxGroupSize`); extra cubes form another group. Mine it with a stone pickaxe or better.
 
 ![Hume Energy Cube recipe: iron ingots in the corners, amethyst shards on the top and sides, a block of redstone in the centre, a Functional Machine Block bottom middle](docs/screenshots/recipe_hume_energy_cube.png)
+
+### Fluid Tank
+The Hume Energy Cube's twin for fluids. It stores **one fluid** (water, lava or any modded fluid) behind **glass windows**, so you can see the level, and touching tanks join into **one big tank** with the same connected casing as the cube.
+
+| Water, lava and an L of tanks | Up close |
+|---|---|
+| ![Fluid Tanks on a stone pad: a 2x2x2 group of water, a 3-high tower of lava two thirds full, a single tank a quarter full and an L of three tanks half full](docs/screenshots/49_fluid_tanks.png) | ![Close up: the lava tower's level two thirds of the way up, a single tank with a quarter of water and the L half full](docs/screenshots/50_fluid_tanks_close.png) |
+
+- **One tank:** holds **16,000 mB** (16 buckets) and moves up to **1,000 mB/t** (a bucket a tick) in or out.
+- **Multiblock:** tanks touching on any face form **one tank**. Every tank adds 16,000 mB to the capacity and 1,000 mB/t to the transfer rate, up to 64 tanks. It fills **from the bottom up** like a real tank: the bottom layer fills first, the tanks of a layer share their fluid evenly, and the windows show **one level running across the whole group**. Tanks holding different fluids never join, even when they touch.
+- **Connected casing:** the frame drops where tanks touch, so a 2x2x2 looks like one big tank with one window on each side and one plain top plate. Inside corners turn properly, just like the Hume Energy Cube. A lone tank shows a blue valve on top.
+- **Filling and emptying:** right-click with a **bucket** (or any fluid container) to pour it in or take it out. Fluid goes in and out on **every side**, so Fluid Pipes, the Fluid Reservoir and other mods' pipes all work. The tank also **pushes its fluid into machines touching it** every tick, such as a Mycelial Generator's water tank (`autoOutput`), but never into another tank.
+- **With Fluid Pipes:** pipes give fluid to **machines first** and fill tanks with what's left. They never move fluid from one tank to another, so two tanks on one network don't pass it back and forth. The tank pushes into pipes itself.
+- **Breaking:** a broken tank keeps **its own share** of the fluid; the item's tooltip shows *Holds 7,000 mB of Lava*. Place it again and the fluid is back.
+- **GUI:** right-click with an empty hand. The gauge shows the fluid's own texture and colour, along with the fluid's name, *mB of capacity*, the group size and rate, and the flow in and out over the last second. The status lamp reads *Filling*, *Draining*, *Full*, *Empty* or *Idle*.
+
+  ![Fluid Tank GUI: the gauge half full of water, Water, 70,000 / 128,000 mB, x8 · 8,000 mB/t, In and Out](docs/screenshots/51_fluid_tank_gui.png)
+- A **comparator** reads how full the whole group is. Lava glows through the glass. Mine it with a stone pickaxe or better.
+
+![Fluid Tank recipe: iron ingots in the corners, glass on each side, a Functional Machine Block in the centre and a bucket bottom middle](docs/screenshots/recipe_fluid_tank.png)
 
 ### Zero Point Energy Module
 A generator that comes in pairs. Put one module on the floor and another on the ceiling **directly above it**, or one on each of **two walls facing each other**, with open space between them. The two link with a **blue beam** and make Forge Energy out of the gap: **the farther apart they are, the more power they make**.
@@ -551,6 +572,15 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `capacity` | 10000 | Tank size in mB (10 buckets) |
 | `requireInfiniteSource` | true | Only work over a self-refilling water source (false = any water source) |
 | `outputPerTick` | 1000 | mB pushed into neighbouring tanks (sides and top) per tick; 0 = no pushing |
+
+**`[fluid_tank]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `capacityPerTank` | 16000 | mB each tank adds to its group's capacity |
+| `transferPerTank` | 1000 | mB/t each tank adds to its group's transfer rate (in, out and pushing) |
+| `maxGroupSize` | 64 | Most tanks in one group; extra tanks form another group |
+| `autoOutput` | true | Push fluid into machines and pipes touching the group every tick (never into other tanks) |
 
 **`[energy_cube]`**
 

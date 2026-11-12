@@ -20,6 +20,8 @@ public final class ModCapabilities {
         // Hume Energy Cube: the whole connected group, in and out, on every face.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.HUME_ENERGY_CUBE.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.CREATIVE_GENERATOR.get(), (be, side) -> be.getEnergyHandler());
+        // Fluid Tank: the whole connected group, in and out, on every face.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.FLUID_TANK.get(), (be, side) -> be.getFluidHandler());
         // Zero Point Energy Module: output only, on every face.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.ZERO_POINT_ENERGY_MODULE.get(), (be, side) -> be.getEnergyHandler());
         // Energy Cable: takes energy in on every face and passes it straight on through its network.

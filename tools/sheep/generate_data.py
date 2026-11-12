@@ -241,6 +241,33 @@ def block_models():
         "textures": {"side": f"{MOD}:block/hume_energy_cube/side_0000_6", "top": f"{MOD}:block/hume_energy_cube/end_0000",
                      "bottom": f"{MOD}:block/hume_energy_cube/end_0000"},
     })
+    # Fluid Tank: the cube's casing models (same masks and inside corners), one glass side per mask, chosen in the world
+    # by the same connected model (type fluid_tank). Its fluid is drawn by FluidTankRenderer.
+    tank_dir = os.path.join(models_dir, "fluid_tank")
+    os.makedirs(tank_dir, exist_ok=True)
+    for name in os.listdir(tank_dir):
+        os.remove(os.path.join(tank_dir, name))
+    ft = f"{MOD}:block/fluid_tank/"
+    for face, sides in planes.items():
+        for m in range(16):
+            mask = "".join("1" if m & bit else "0" for bit in (8, 4, 2, 1))
+            if face in ("up", "down"):
+                write(os.path.join(tank_dir, f"{face}_{mask}.json"), face_model(face, ft + f"end_{mask}"))
+            else:
+                write(os.path.join(tank_dir, f"{face}_{mask}_0.json"), face_model(face, ft + f"side_{mask}"))
+        for corner in ("tl", "tr", "bl", "br"):
+            frm, to = offset[face]
+            write(os.path.join(tank_dir, f"inner_{face}_{corner}.json"), {
+                "parent": "minecraft:block/block",
+                "textures": {"particle": ft + f"inner_{corner}", "face": ft + f"inner_{corner}"},
+                "elements": [{"from": frm, "to": to, "faces": {face: {"texture": "#face", "cullface": face}}}],
+            })
+    write(os.path.join(ASSETS, "blockstates", "fluid_tank.json"), {"multipart": [{"apply": {"type": f"{MOD}:fluid_tank"}}]})
+    write(os.path.join(tank_dir, "item.json"), {
+        "parent": "minecraft:block/cube_bottom_top",
+        "textures": {"side": ft + "side_0000", "top": ft + "end_0000", "bottom": ft + "end_0000"},
+    })
+    write(os.path.join(ASSETS, "items", "fluid_tank.json"), {"model": {"type": "minecraft:model", "model": ft + "item"}})
     write(os.path.join(ASSETS, "blockstates", "fluid_reservoir.json"),
           {"variants": {f"fill={fill}": {"model": f"{MOD}:block/fluid_reservoir_{fill}"} for fill in range(5)}})
     write(os.path.join(ASSETS, "models", "block", "functional_machine_block.json"),
@@ -374,6 +401,28 @@ def lang():
         "block.barelyfunctionalcontraptions.functional_machine_block": "Functional Machine Block",
         "block.barelyfunctionalcontraptions.zero_point_energy_module": "Zero Point Energy Module",
         "block.barelyfunctionalcontraptions.energy_cable": "Energy Cable",
+        "block.barelyfunctionalcontraptions.fluid_tank": "Fluid Tank",
+        "tooltip.barelyfunctionalcontraptions.fluid_tank": "Stores one fluid, in and out on every side; right-click with a bucket to fill or empty it. Touching tanks join into one big tank: every tank adds to the capacity and the transfer rate.",
+        "tooltip.barelyfunctionalcontraptions.fluid_tank.stored": "Holds %s mB of %s",
+        "gui.barelyfunctionalcontraptions.tank.empty": "Empty",
+        "gui.barelyfunctionalcontraptions.tank.stored": "%s / %s mB",
+        "gui.barelyfunctionalcontraptions.tank.group": "x%s · %s mB/t",
+        "gui.barelyfunctionalcontraptions.tank.group.tooltip": "%s tanks in this group",
+        "gui.barelyfunctionalcontraptions.tank.group.desc": "Touching tanks holding the same fluid share one tank. Each one adds to the capacity and the transfer rate.",
+        "gui.barelyfunctionalcontraptions.tank.in": "In: %s mB/t",
+        "gui.barelyfunctionalcontraptions.tank.out": "Out: %s mB/t",
+        "gui.barelyfunctionalcontraptions.tank.flow.tooltip": "Fluid flowing in and out",
+        "gui.barelyfunctionalcontraptions.tank.flow.desc": "Averaged over the last second. Up to %s mB can go in or out per transfer.",
+        "gui.barelyfunctionalcontraptions.tank.status.charging": "Filling",
+        "gui.barelyfunctionalcontraptions.tank.status.charging.desc": "More fluid is coming in than going out",
+        "gui.barelyfunctionalcontraptions.tank.status.discharging": "Draining",
+        "gui.barelyfunctionalcontraptions.tank.status.discharging.desc": "More fluid is going out than coming in",
+        "gui.barelyfunctionalcontraptions.tank.status.full": "Full",
+        "gui.barelyfunctionalcontraptions.tank.status.full.desc": "The tank is full; add tanks to store more",
+        "gui.barelyfunctionalcontraptions.tank.status.empty": "Empty",
+        "gui.barelyfunctionalcontraptions.tank.status.empty.desc": "No fluid stored",
+        "gui.barelyfunctionalcontraptions.tank.status.idle": "Idle",
+        "gui.barelyfunctionalcontraptions.tank.status.idle.desc": "No fluid is moving in or out",
         "block.barelyfunctionalcontraptions.fluid_pipe": "Fluid Pipe",
         "tooltip.barelyfunctionalcontraptions.fluid_pipe": "Carries water and other fluids from the Fluid Reservoir and other tanks to the blocks it is plugged into. Touching pipes form one network that moves up to %s mB/t.",
         "config.jade.plugin_barelyfunctionalcontraptions.pipes": "Fluid and Item Pipes",
@@ -662,6 +711,27 @@ def recipes_loot_tags():
         "pattern": ["IBI", "AMA", "CRC"],
         "result": {"id": f"{MOD}:zero_point_energy_module", "count": 2},
     })
+    # Fluid Tank: glass around a bucket and a Functional Machine Block, iron corners.
+    write(os.path.join(DATA, MOD, "recipe", "fluid_tank.json"), {
+        "type": "minecraft:crafting_shaped",
+        "category": "redstone",
+        "key": {
+            "I": "minecraft:iron_ingot",
+            "G": "#c:glass_blocks",
+            "B": "minecraft:bucket",
+            "M": f"{MOD}:functional_machine_block",
+        },
+        "pattern": ["IGI", "GMG", "IBI"],
+        "result": {"id": f"{MOD}:fluid_tank"},
+    })
+    write(os.path.join(DATA, MOD, "loot_table", "blocks", "fluid_tank.json"), {
+        "type": "minecraft:block",
+        "pools": [{"rolls": 1, "condition": {"type": "minecraft:survives_explosion"},
+                   "entries": [{"type": "minecraft:item", "name": f"{MOD}:fluid_tank",
+                                "modifier": {"type": "minecraft:copy_components", "source": "block_entity",
+                                             "include": ["minecraft:custom_name", f"{MOD}:fluid_contents"]}}]}],
+        "random_sequence": f"{MOD}:blocks/fluid_tank",
+    })
     # Energy Cable: copper wire wrapped in wool, around redstone. Makes 8.
     write(os.path.join(DATA, MOD, "recipe", "energy_cable.json"), {
         "type": "minecraft:crafting_shaped",
@@ -818,8 +888,8 @@ def recipes_loot_tags():
     # Machines a Mycelial Generator can power wirelessly through a Barely Functional Wrench link.
     write(os.path.join(DATA, MOD, "tags", "block", "wireless_power_receivers.json"),
           {"values": [f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:hume_energy_cube"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block", f"{MOD}:zero_point_energy_module", f"{MOD}:energy_cable", f"{MOD}:fluid_pipe", f"{MOD}:item_pipe"]})
-    write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block", f"{MOD}:zero_point_energy_module"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "mineable", "pickaxe.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block", f"{MOD}:zero_point_energy_module", f"{MOD}:energy_cable", f"{MOD}:fluid_pipe", f"{MOD}:item_pipe", f"{MOD}:fluid_tank"]})
+    write(os.path.join(DATA, "minecraft", "tags", "block", "needs_stone_tool.json"), {"values": [f"{MOD}:mycelial_generator", f"{MOD}:mechanical_separator", f"{MOD}:automatic_shears", f"{MOD}:fluid_reservoir", f"{MOD}:hume_energy_cube", f"{MOD}:functional_machine_block", f"{MOD}:zero_point_energy_module", f"{MOD}:fluid_tank"]})
 
 
 # The mod's advancement tab: (path, parent, icon item, frame, criterion) where criterion is an item to obtain, or None
@@ -834,6 +904,7 @@ ADVANCEMENTS = [
     ("auto_shear", "automatic_shears", "automatic_shears", "goal", None),
     ("fluid_reservoir", "root", "fluid_reservoir", "task", "fluid_reservoir"),
     ("hume_energy_cube", "root", "hume_energy_cube", "task", "hume_energy_cube"),
+    ("fluid_tank", "root", "fluid_tank", "task", "fluid_tank"),
     ("zero_point_energy_module", "root", "zero_point_energy_module", "task", "zero_point_energy_module"),
     ("zero_point_death", "zero_point_energy_module", "zero_point_energy_module", "challenge", None),
     ("energy_cable", "root", "energy_cable", "task", "energy_cable"),
@@ -850,6 +921,7 @@ ADVANCEMENT_TEXT = {
     "auto_shear": ("Shear Genius", "Watch Automatic Shears shear a sheep for you"),
     "fluid_reservoir": ("Bottomless Bucket", "Craft a Fluid Reservoir"),
     "hume_energy_cube": ("Hume Sweet Hume", "Craft a Hume Energy Cube"),
+    "fluid_tank": ("Think Tank", "Craft a Fluid Tank"),
     "zero_point_energy_module": ("Something From Nothing", "Craft a Zero Point Energy Module"),
     "zero_point_death": ("Don't Cross the Streams", "Get vaporised by a Zero Point beam"),
     "energy_cable": ("Plugged In", "Craft some Energy Cables"),
@@ -1068,6 +1140,13 @@ CONFIG_LABELS = {
     "transferPerCube": "Rate per Cube (FE/t)",
     "maxGroupSize": "Max Cubes per Group",
     "energy_cube.autoOutput": "Push Energy Into Neighbours",
+
+    # ---- Fluid Tank
+    "fluid_tank": "Fluid Tank",
+    "fluid_tank.capacityPerTank": "Capacity per Tank (mB)",
+    "fluid_tank.transferPerTank": "Rate per Tank (mB/t)",
+    "fluid_tank.maxGroupSize": "Max Tanks per Group",
+    "fluid_tank.autoOutput": "Push Fluid Into Neighbours",
 
     # ---- Zero Point Energy Module
     "zero_point_energy_module": "Zero Point Energy Module",

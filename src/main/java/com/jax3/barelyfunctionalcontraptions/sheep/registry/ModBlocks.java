@@ -49,6 +49,15 @@ public final class ModBlocks {
                     .sound(SoundType.IRON)
                     .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyCubeBlock.CHARGE)));
 
+    /** Stores one fluid; touching tanks form one tank whose capacity and transfer rate grow with every tank. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.FluidTankBlock> FLUID_TANK = REGISTER.registerBlock("fluid_tank",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.FluidTankBlock::new,
+            p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.IRON)
+                    .noOcclusion());
+
     /** Crafting component for every machine: the blue-steel casing on its own. Stone pickaxe, like the machines. */
     public static final DeferredBlock<net.minecraft.world.level.block.Block> FUNCTIONAL_MACHINE_BLOCK = REGISTER.registerSimpleBlock("functional_machine_block",
             p -> p.mapColor(MapColor.METAL)

@@ -1,0 +1,27 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/fluid_tank/end_1010",
+    "face": "barelyfunctionalcontraptions:block/fluid_tank/end_1010"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#face",
+          "cullface": "up"
+        }
+      }
+    }
+  ]
+}

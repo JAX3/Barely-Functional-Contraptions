@@ -19,5 +19,10 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<MachineContents>> MACHINE_CONTENTS = REGISTER.registerComponentType(
             "machine_contents", b -> b.persistent(MachineContents.CODEC).networkSynchronized(MachineContents.STREAM_CODEC));
 
+    /** Fluid kept on a broken Fluid Tank item (that tank's own share of its group). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<net.neoforged.neoforge.fluids.SimpleFluidContent>> FLUID_CONTENTS = REGISTER.registerComponentType(
+            "fluid_contents", b -> b.persistent(net.neoforged.neoforge.fluids.SimpleFluidContent.CODEC)
+                    .networkSynchronized(net.neoforged.neoforge.fluids.SimpleFluidContent.STREAM_CODEC));
+
     private ModDataComponents() {}
 }

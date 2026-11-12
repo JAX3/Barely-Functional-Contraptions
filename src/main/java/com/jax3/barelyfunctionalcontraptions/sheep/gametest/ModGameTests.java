@@ -126,6 +126,11 @@ public final class ModGameTests {
         TESTS.put("zero_point_beam_kills_have_looting", ModGameTests::zeroPointBeamLooting);
         TESTS.put("zero_point_modules_link_sideways", ModGameTests::zeroPointSideways);
         TESTS.put("bred_lambs_keep_the_infusion", ModGameTests::breedingKeepsInfusion);
+        TESTS.put("fluid_tank_single", ModGameTests::tankSingle);
+        TESTS.put("fluid_tank_group_fills_bottom_up", ModGameTests::tankGroup);
+        TESTS.put("fluid_tank_different_fluids_stay_apart", ModGameTests::tankFluidsApart);
+        TESTS.put("fluid_tank_keeps_its_share_when_broken", ModGameTests::tankBreak);
+        TESTS.put("fluid_tank_buckets", ModGameTests::tankBuckets);
         TESTS.put("breeding_inheritance_rules", ModGameTests::breedingRules);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
@@ -455,6 +460,133 @@ public final class ModGameTests {
         h.succeed();
     }
 
+    // ------------------------------------------------------------------ fluid tanks
+
+    // Made when a test runs: fluid resources can't be created while the mod is still loading.
+    private static net.neoforged.neoforge.transfer.fluid.FluidResource water() {
+        return net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER);
+    }
+
+    private static net.neoforged.neoforge.transfer.fluid.FluidResource lava() {
+        return net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.LAVA);
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidTankBlockEntity tank(GameTestHelper h, BlockPos pos) {
+        h.setBlock(pos, ModBlocks.FLUID_TANK.get());
+        return h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidTankBlockEntity.class);
+    }
+
+    /** Pours {@code amount} mB in through the capability, in as many transfers as the rate needs. */
+    private static int pour(net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> handler,
+                            net.neoforged.neoforge.transfer.fluid.FluidResource fluid, int amount) {
+        int total = 0;
+        while (total < amount) {
+            try (Transaction tx = Transaction.openRoot()) {
+                int in = handler.insert(fluid, amount - total, tx);
+                tx.commit();
+                if (in <= 0) break;
+                total += in;
+            }
+        }
+        return total;
+    }
+
+    private static int drain(net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> handler,
+                             net.neoforged.neoforge.transfer.fluid.FluidResource fluid, int amount) {
+        try (Transaction tx = Transaction.openRoot()) {
+            int out = handler.extract(fluid, amount, tx);
+            tx.commit();
+            return out;
+        }
+    }
+
+    /** One tank: 16,000 mB of one fluid, 1,000 mB per transfer, in and out on any face; other fluids are refused. */
+    private static void tankSingle(GameTestHelper h) {
+        var t = tank(h, new BlockPos(2, 1, 2));
+        var face = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, h.absolutePos(new BlockPos(2, 1, 2)), Direction.NORTH);
+        h.assertTrue(face != null, "fluid capability on every face");
+        try (Transaction tx = Transaction.openRoot()) {
+            h.assertTrue(face.insert(water(), 5_000, tx) == 1_000, "one transfer moves at most 1,000 mB");
+        }
+        h.assertTrue(pour(face, water(), 20_000) == 16_000, "a tank holds 16,000 mB");
+        h.assertTrue(face.getAmountAsLong(0) == 16_000 && face.getResource(0).equals(water()), "full of water");
+        h.assertTrue(pour(face, lava(), 1_000) == 0, "lava is refused while it holds water");
+        h.assertTrue(drain(face, water(), 600) == 600 && t.getFluid().getAmount() == 15_400, "water comes back out");
+        h.assertTrue(drain(face, lava(), 600) == 0, "nothing comes out for the wrong fluid");
+        h.succeed();
+    }
+
+    /**
+     * Two tanks side by side with a third on top: one group of 3 (48,000 mB, 3,000 mB/t). 20,000 mB settles into the
+     * bottom layer, split evenly; 40,000 fills the bottom layer and puts the rest on top.
+     */
+    private static void tankGroup(GameTestHelper h) {
+        var a = tank(h, new BlockPos(1, 1, 2));
+        var b = tank(h, new BlockPos(2, 1, 2));
+        var top = tank(h, new BlockPos(2, 2, 2));
+        var group = top.group();
+        h.assertTrue(group == a.group() && group.size() == 3, "3 tanks form one group, got " + group.size());
+        h.assertTrue(group.capacity() == 48_000 && group.rate() == 3_000, "48,000 mB at 3,000 mB/t");
+        h.assertTrue(pour(top.getFluidHandler(), water(), 20_000) == 20_000, "poured in through the top tank");
+        h.runAfterDelay(2, () -> {
+            h.assertTrue(a.getFluid().getAmount() == 10_000 && b.getFluid().getAmount() == 10_000 && top.getFluid().isEmpty(),
+                    "settles into the bottom layer, evenly: " + a.getFluid().getAmount() + "/" + b.getFluid().getAmount() + "/" + top.getFluid().getAmount());
+            pour(a.getFluidHandler(), water(), 20_000);
+        });
+        h.runAfterDelay(4, () -> {
+            h.assertTrue(a.getFluid().getAmount() == 16_000 && b.getFluid().getAmount() == 16_000 && top.getFluid().getAmount() == 8_000,
+                    "bottom layer full, the rest on top: " + a.getFluid().getAmount() + "/" + b.getFluid().getAmount() + "/" + top.getFluid().getAmount());
+            h.assertTrue(group.amount() == 40_000, "nothing made or lost");
+            h.succeed();
+        });
+    }
+
+    /** Touching tanks of water and lava stay separate groups; an empty tank joins whichever it touches. */
+    private static void tankFluidsApart(GameTestHelper h) {
+        var water = tank(h, new BlockPos(1, 1, 2));
+        pour(water.getFluidHandler(), water(), 5_000);
+        var lava = tank(h, new BlockPos(3, 1, 2));
+        pour(lava.getFluidHandler(), lava(), 5_000);
+        var middle = tank(h, new BlockPos(2, 1, 2)); // touches both
+        for (var t : List.of(water, lava, middle)) t.invalidateGroup();
+        int together = (water.group() == middle.group() ? 1 : 0) + (lava.group() == middle.group() ? 1 : 0);
+        h.assertTrue(water.group() != lava.group(), "water and lava never share a group");
+        h.assertTrue(together == 1, "the empty tank joins exactly one of them");
+        h.succeed();
+    }
+
+    /** A broken tank drops itself with its own share of fluid, and placing it again puts the fluid back. */
+    private static void tankBreak(GameTestHelper h) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        var t = tank(h, pos);
+        pour(t.getFluidHandler(), lava(), 7_000);
+        h.getLevel().destroyBlock(h.absolutePos(pos), true);
+        var drops = h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                new net.minecraft.world.phys.AABB(h.absolutePos(pos)).inflate(2), e -> e.getItem().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_TANK.get()));
+        h.assertTrue(drops.size() == 1, "the tank drops itself");
+        ItemStack item = drops.getFirst().getItem();
+        var contents = item.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.FLUID_CONTENTS.get());
+        h.assertTrue(contents != null && contents.is(net.minecraft.world.level.material.Fluids.LAVA) && contents.copy().getAmount() == 7_000,
+                "the item keeps 7,000 mB of lava");
+        var placed = tank(h, pos);
+        placed.applyComponentsFromItemStack(item);
+        h.assertTrue(placed.getFluid().getAmount() == 7_000, "placed again, it holds the lava");
+        h.succeed();
+    }
+
+    /** Right-clicking with a water bucket pours it in; with an empty bucket, takes it back out. */
+    private static void tankBuckets(GameTestHelper h) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        var t = tank(h, pos);
+        Player player = playerHolding(h, new ItemStack(Items.WATER_BUCKET));
+        var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(pos)), Direction.UP, h.absolutePos(pos), false);
+        h.getLevel().getBlockState(h.absolutePos(pos)).useItemOn(player.getMainHandItem(), h.getLevel(), player, InteractionHand.MAIN_HAND, hit);
+        h.assertTrue(t.getFluid().getAmount() == 1_000 && player.getMainHandItem().is(Items.BUCKET), "the bucket emptied into the tank");
+        h.getLevel().getBlockState(h.absolutePos(pos)).useItemOn(player.getMainHandItem(), h.getLevel(), player, InteractionHand.MAIN_HAND, hit);
+        h.assertTrue(t.getFluid().isEmpty() && player.getMainHandItem().is(Items.WATER_BUCKET), "an empty bucket takes it back");
+        h.succeed();
+    }
+
     // ------------------------------------------------------------------ helpers
 
     private static final Identifier IRON = ResourcefulSheep.id("iron");
@@ -587,7 +719,7 @@ public final class ModGameTests {
                 "the Functional Machine Block has a shaped recipe");
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FUNCTIONAL_MACHINE_BLOCK.get().defaultBlockState()
                 .is(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE), "mined with a pickaxe");
-        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "zero_point_energy_module")) {
+        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "fluid_tank", "zero_point_energy_module")) {
             var holder = recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
                     ResourcefulSheep.id(machine))).orElse(null);
             h.assertTrue(holder != null && holder.value() instanceof net.minecraft.world.item.crafting.ShapedRecipe, "missing recipe " + machine);

@@ -1,0 +1,9 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "type": "barelyfunctionalcontraptions:fluid_tank"
+      }
+    }
+  ]
+}

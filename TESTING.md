@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 98 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 65 Resourceful Sheep, 17 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 48 screenshots and 11 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 105 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 70 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 51 screenshots and 12 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -88,7 +88,7 @@ In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `reci
 
 ### Advancements (`integration_advancements`)
 
-All 14 advancements in the *Barely Functional Contraptions* tab load, each shows in the tab, and each has the right parent (the root has none). The three special ones are earned through the real code paths, with a server player that never logs in (so it sends no network traffic):
+All 15 advancements in the *Barely Functional Contraptions* tab load, each shows in the tab, and each has the right parent (the root has none). The three special ones are earned through the real code paths, with a server player that never logs in (so it sends no network traffic):
 - **Fungal Network:** the player clicks two Mycelial Generators with a Barely Functional Wrench (`useOn`), which links them and grants it.
 - **Don't Cross the Streams:** a death by ordinary fire doesn't grant it; a death by the Zero Point beam's damage type does.
 - **Shear Genius:** powered Automatic Shears shear a sheep while the player stands next to them (the player is added to the level's player list just for that shearing run), which grants it. Another player 40 blocks away who watches a second sheep being sheared doesn't get it.
@@ -150,6 +150,24 @@ The screenshot run normally has no audio device. For this check, OpenAL Soft's *
 - An earlier recording, made with the first, higher version of the hum, also showed the beam-break behaviour: when stone broke the beam, the hum faded out while sliding down in pitch, and it came back when the beam relinked.
 
 The loop itself is checked for clicks: the jump from its last sample to its first (0.017) is no bigger than the largest step anywhere inside it (0.018).
+
+### Fluid Tank
+
+| Test | What it checks |
+|---|---|
+| `fluid_tank_single` | One tank has a fluid capability on every face. One transfer moves at most 1,000 mB, and the tank holds 16,000 mB. Lava is refused while it holds water. Water comes back out, but asking for lava gives nothing. |
+| `fluid_tank_group_fills_bottom_up` | Two tanks side by side with a third on top are one group of 3 (48,000 mB at 3,000 mB/t). 20,000 mB poured in through the top tank settles into the bottom layer, 10,000 mB each. Another 20,000 fills the bottom layer (16,000 each) and puts 8,000 on top. Nothing is made or lost. |
+| `fluid_tank_different_fluids_stay_apart` | A water tank and a lava tank with an empty one between them: water and lava never share a group, and the empty tank joins exactly one of them. |
+| `fluid_tank_keeps_its_share_when_broken` | A tank with 7,000 mB of lava is broken for real (`destroyBlock`). It drops itself with 7,000 mB of lava in the item, and placing that item again puts the lava back. |
+| `fluid_tank_buckets` | A mock player right-clicks with a water bucket (through the block's own `useItemOn`): 1,000 mB goes in and the player is left with an empty bucket. Clicking again with the empty bucket takes the water back out. |
+| `integration_fluid_tank_waters_generator` | A tank of water pushes at least 2,000 mB into a Mycelial Generator beside it. |
+| `integration_fluid_tank_with_pipes` | A reservoir pipes water to a generator and an empty tank on the same network: both fill. A full tank on that network keeps all 16,000 mB, because pipes never move fluid from one tank to another. |
+
+The machine recipe test now also checks that the Fluid Tank takes exactly one Functional Machine Block.
+
+In the real client (`49_fluid_tanks.png`, `50_fluid_tanks_close.png`), the scene has a 2x2x2 water group, a 3-high lava tower two thirds full, a single tank a quarter full and an L of three tanks half full. The casings join up like the cube's: one window per side of the 2x2x2, the L turning its inside corner, and one top plate. The lone tank has the blue valve. The fluid shows behind the glass at the right levels, the lava at two thirds of the tower. Water is see-through, and at first was hard to make out behind the glass, so the fluid's faces are now drawn from both sides: through the window you see the near and the far side of the water. The GUI (`51_fluid_tank_gui.png`) shows the gauge filled with water to 70,000 / 128,000 mB, *x8 · 8,000 mB/t*, and *Idle*. `recipe_fluid_tank.png` shows the recipe.
+
+The Hume Energy Cube now shares its connected-casing model with the tank. The cube's own tests still pass, and its screenshots look the same.
 
 ### Breeding keeps the infusion
 

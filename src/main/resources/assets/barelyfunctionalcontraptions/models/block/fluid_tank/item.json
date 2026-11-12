@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "barelyfunctionalcontraptions:block/fluid_tank/side_0000",
+    "top": "barelyfunctionalcontraptions:block/fluid_tank/end_0000",
+    "bottom": "barelyfunctionalcontraptions:block/fluid_tank/end_0000"
+  }
+}

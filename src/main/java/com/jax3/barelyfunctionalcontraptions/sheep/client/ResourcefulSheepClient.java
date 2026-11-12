@@ -37,13 +37,19 @@ public final class ResourcefulSheepClient {
     public static void init(IEventBus modBus, ModContainer container) {
 
         modBus.addListener(ResourcefulSheepClient::registerScreens);
-        modBus.addListener((net.neoforged.neoforge.client.event.RegisterBlockStateModels event) ->
-                event.registerModel(EnergyCubeModel.TYPE, EnergyCubeModel.Unbaked.MAP_CODEC));
+        modBus.addListener((net.neoforged.neoforge.client.event.RegisterBlockStateModels event) -> {
+            event.registerModel(EnergyCubeModel.CUBE.type(), EnergyCubeModel.Unbaked.MAP_CODEC);
+            event.registerModel(EnergyCubeModel.TANK.type(), EnergyCubeModel.Unbaked.TANK_CODEC);
+        });
         modBus.addListener(ResourcefulSheepClient::registerTintSources);
         modBus.addListener(ResourcefulSheepClient::registerRenderStateModifiers);
         modBus.addListener(ResourcefulSheepClient::addLayers);
-        modBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.ZERO_POINT_ENERGY_MODULE.get(), context -> new ZeroPointBeamRenderer()));
+        modBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> {
+            event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.ZERO_POINT_ENERGY_MODULE.get(), context -> new ZeroPointBeamRenderer());
+            event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.FLUID_TANK.get(), context -> new FluidTankRenderer());
+        });
 
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onRecipesReceived);
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onLoggingOut);
@@ -59,6 +65,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.AUTOMATIC_SHEARS.get(), AutomaticShearsScreen::new);
         event.register(ModMenus.FLUID_RESERVOIR.get(), FluidReservoirScreen::new);
         event.register(ModMenus.HUME_ENERGY_CUBE.get(), EnergyCubeScreen::new);
+        event.register(ModMenus.FLUID_TANK.get(), FluidTankScreen::new);
         event.register(ModMenus.ZERO_POINT_ENERGY_MODULE.get(), ZeroPointModuleScreen::new);
     }
 
@@ -114,6 +121,16 @@ public final class ResourcefulSheepClient {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.item_pipe",
                     String.format(java.util.Locale.ROOT, "%,d", com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeKind.ITEM.transferRate()))
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
+        }
+        if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_TANK.get())) {
+            event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.fluid_tank")
+                    .withStyle(net.minecraft.ChatFormatting.GRAY));
+            var fluid = event.getItemStack().get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.FLUID_CONTENTS.get());
+            if (fluid != null && !fluid.isEmpty()) {
+                var stack = fluid.copy();
+                event.getToolTip().add(2, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.fluid_tank.stored",
+                        String.format(java.util.Locale.ROOT, "%,d", stack.getAmount()), stack.getHoverName()).withStyle(net.minecraft.ChatFormatting.AQUA));
+            }
         }
         if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.hume_energy_cube")

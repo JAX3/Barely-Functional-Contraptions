@@ -60,6 +60,8 @@ public final class IntegrationGameTests {
         TESTS.put("fluid_pipe_reservoir_waters_two_generators", IntegrationGameTests::pipeWatersGenerators);
         TESTS.put("fluid_pipe_respects_transfer_rate", IntegrationGameTests::pipeRate);
         TESTS.put("fluid_pipe_break_splits_network", IntegrationGameTests::pipeBreakSplits);
+        TESTS.put("integration_fluid_tank_waters_generator", IntegrationGameTests::tankWatersGenerator);
+        TESTS.put("integration_fluid_tank_with_pipes", IntegrationGameTests::tankWithPipes);
         TESTS.put("integration_mycelial_generator_powers_separator_through_cables", IntegrationGameTests::generatorThroughCables);
         TESTS.put("integration_mushroom_infuses_sheep", IntegrationGameTests::mushroomInfusesSheep);
         TESTS.put("integration_mushroom_wool_fuels_generator", IntegrationGameTests::mushroomWoolFuelsGenerator);
@@ -214,7 +216,7 @@ public final class IntegrationGameTests {
                 {"root", null}, {"mycelial_generator", "root"}, {"mycelium_wrench", "mycelial_generator"},
                 {"link_generators", "mycelium_wrench"}, {"mechanical_separator", "root"}, {"automatic_shears", "root"},
                 {"auto_shear", "automatic_shears"}, {"fluid_reservoir", "root"}, {"hume_energy_cube", "root"},
-                {"zero_point_energy_module", "root"}, {"zero_point_death", "zero_point_energy_module"}, {"energy_cable", "root"}, {"fluid_pipe", "root"}, {"item_pipe", "root"}};
+                {"zero_point_energy_module", "root"}, {"zero_point_death", "zero_point_energy_module"}, {"energy_cable", "root"}, {"fluid_pipe", "root"}, {"item_pipe", "root"}, {"fluid_tank", "root"}};
         for (String[] entry : tree) {
             var advancement = server.getAdvancements().get(com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep.id("contraptions/" + entry[0]));
             h.assertTrue(advancement != null, "advancement " + entry[0] + " is loaded");
@@ -452,6 +454,40 @@ public final class IntegrationGameTests {
                 rateValue.set(old);
             }
             h.succeed();
+        });
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidTankBlockEntity tankAt(GameTestHelper h, BlockPos pos, int water) {
+        h.setBlock(pos, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FLUID_TANK.get());
+        var tank = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidTankBlockEntity.class);
+        if (water > 0) {
+            tank.storage().set(0, FluidResource.of(Fluids.WATER), water);
+        }
+        return tank;
+    }
+
+    /** A tank of water pushes into a Mycelial Generator beside it (autoOutput). */
+    private static void tankWatersGenerator(GameTestHelper h) {
+        tankAt(h, new BlockPos(2, 1, 2), 8_000);
+        var generator = generator(h, new BlockPos(3, 1, 2), ItemStack.EMPTY, 0);
+        h.succeedWhen(() -> h.assertTrue(generator.getTank().getFluidAmount() >= 2_000,
+                "the tank fills the generator, at " + generator.getTank().getFluidAmount()));
+    }
+
+    /**
+     * A reservoir pipes water into a tank and a generator on one network: the generator is served first. A second,
+     * full tank on the same network is never drained into the first: tanks don't feed tanks through pipes.
+     */
+    private static void tankWithPipes(GameTestHelper h) {
+        reservoirOnPool(h);
+        var empty = tankAt(h, new BlockPos(1, 2, 5), 0);
+        var full = tankAt(h, new BlockPos(3, 2, 4), 16_000);
+        var generator = generator(h, new BlockPos(0, 2, 4), ItemStack.EMPTY, 0);
+        for (BlockPos pos : List.of(new BlockPos(1, 2, 2), new BlockPos(1, 2, 3), new BlockPos(1, 2, 4), new BlockPos(2, 2, 4))) pipe(h, pos);
+        h.succeedWhen(() -> {
+            h.assertTrue(generator.getTank().getFluidAmount() >= 1_000, "the generator gets water, " + generator.getTank().getFluidAmount());
+            h.assertTrue(empty.getFluid().getAmount() >= 500, "the empty tank fills from the reservoir, " + empty.getFluid().getAmount());
+            h.assertTrue(full.getFluid().getAmount() == 16_000, "the full tank isn't drained by pipes, " + full.getFluid().getAmount());
         });
     }
 

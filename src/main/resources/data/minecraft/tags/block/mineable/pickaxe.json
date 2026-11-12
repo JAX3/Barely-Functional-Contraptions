@@ -9,6 +9,7 @@
     "barelyfunctionalcontraptions:zero_point_energy_module",
     "barelyfunctionalcontraptions:energy_cable",
     "barelyfunctionalcontraptions:fluid_pipe",
-    "barelyfunctionalcontraptions:item_pipe"
+    "barelyfunctionalcontraptions:item_pipe",
+    "barelyfunctionalcontraptions:fluid_tank"
   ]
 }

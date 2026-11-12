@@ -162,29 +162,46 @@ public final class PipeNetwork<T extends Resource> {
         delivering = true;
         int sent = 0;
         try {
-            List<ResourceHandler<T>> targets = new ArrayList<>();
+            // Machines first, then storage (Fluid Tanks). Storage never fills from other storage, so two tanks on one
+            // network don't pass the same fluid back and forth.
+            boolean fromStorage = from != null && kind.isStorage(level.getBlockEntity(from));
+            List<ResourceHandler<T>> machines = new ArrayList<>();
+            List<ResourceHandler<T>> storage = new ArrayList<>();
             int n = endpoints.size();
             for (int i = 0; i < n; i++) {
                 Endpoint end = endpoints.get((i + rotation) % n);
                 if (end.pos().equals(from)) continue;
                 ResourceHandler<T> handler = handler(level, end);
-                if (handler != null) targets.add(handler);
+                if (handler == null) continue;
+                if (kind.isStorage(level.getBlockEntity(end.pos()))) {
+                    if (!fromStorage) storage.add(handler);
+                } else {
+                    machines.add(handler);
+                }
             }
-            int left = targets.size();
-            for (ResourceHandler<T> target : targets) {
-                int share = (int) Math.ceil((allowed - sent) / (double) left--);
-                if (share > 0) sent += target.insert(resource, share, transaction);
-            }
-            for (ResourceHandler<T> target : targets) {
-                if (sent >= allowed) break;
-                sent += target.insert(resource, allowed - sent, transaction);
-            }
+            sent = share(machines, resource, allowed, transaction);
+            if (sent < allowed) sent += share(storage, resource, allowed - sent, transaction);
         } finally {
             delivering = false;
         }
         if (sent > 0) {
             moved.updateSnapshots(transaction);
             moved.amount += sent;
+        }
+        return sent;
+    }
+
+    /** Splits {@code amount} evenly between {@code targets}, then gives what some couldn't take to the others. */
+    private static <T extends Resource> int share(List<ResourceHandler<T>> targets, T resource, int amount, TransactionContext transaction) {
+        int sent = 0;
+        int left = targets.size();
+        for (ResourceHandler<T> target : targets) {
+            int portion = (int) Math.ceil((amount - sent) / (double) left--);
+            if (portion > 0) sent += target.insert(resource, portion, transaction);
+        }
+        for (ResourceHandler<T> target : targets) {
+            if (sent >= amount) break;
+            sent += target.insert(resource, amount - sent, transaction);
         }
         return sent;
     }

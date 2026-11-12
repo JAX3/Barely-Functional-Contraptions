@@ -41,6 +41,7 @@ public final class ContraptionsCreativeTab {
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.AUTOMATIC_SHEARS.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_RESERVOIR.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get());
+                output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_TANK.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CREATIVE_GENERATOR.get());
             })
             .build());

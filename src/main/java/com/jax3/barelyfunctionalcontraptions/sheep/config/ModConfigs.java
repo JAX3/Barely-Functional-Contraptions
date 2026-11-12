@@ -125,6 +125,10 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue zpeBeamLooting;
         public final ModConfigSpec.BooleanValue zpeBeamPlayerKill;
         public final ModConfigSpec.IntValue cableTransferRate;
+        public final ModConfigSpec.IntValue tankCapacityPerTank;
+        public final ModConfigSpec.IntValue tankTransferPerTank;
+        public final ModConfigSpec.IntValue tankMaxGroupSize;
+        public final ModConfigSpec.BooleanValue tankAutoOutput;
         public final ModConfigSpec.IntValue cableMaxNetworkSize;
         public final ModConfigSpec.IntValue pipeTransferRate;
         public final ModConfigSpec.IntValue pipeMaxNetworkSize;
@@ -267,6 +271,22 @@ public final class ModConfigs {
                     .defineInRange("maxGroupSize", 64, 1, 4096);
             energyCubeAutoOutput = b.comment("Push energy into machines and cables touching the group every tick. false = they must pull it.")
                     .translation("barelyfunctionalcontraptions.configuration.energy_cube.autoOutput").define("autoOutput", true);
+            b.pop();
+
+            b.comment("Fluid Tank (stores one fluid; touching tanks join into one tank)").push("fluid_tank");
+            tankCapacityPerTank = b.comment("mB each tank adds to its group's capacity (16000 = 16 buckets).")
+                    .translation("barelyfunctionalcontraptions.configuration.fluid_tank.capacityPerTank")
+                    .defineInRange("capacityPerTank", 16_000, 1_000, 100_000_000);
+            tankTransferPerTank = b.comment("mB/t each tank adds to its group's transfer rate (in, out and pushing). 1000 = a bucket a tick.")
+                    .translation("barelyfunctionalcontraptions.configuration.fluid_tank.transferPerTank")
+                    .defineInRange("transferPerTank", 1_000, 1, 1_000_000);
+            tankMaxGroupSize = b.comment("Most tanks that join one group. Tanks beyond this form another group.")
+                    .translation("barelyfunctionalcontraptions.configuration.fluid_tank.maxGroupSize")
+                    .defineInRange("maxGroupSize", 64, 1, 4096);
+            tankAutoOutput = b.comment("Push fluid into machines and pipes touching the group every tick (never into other tanks).",
+                            "false = they must pull it.")
+                    .translation("barelyfunctionalcontraptions.configuration.fluid_tank.autoOutput")
+                    .define("autoOutput", true);
             b.pop();
 
             b.comment("Zero Point Energy Module (two modules in one column, facing each other, generate FE across the gap)").push("zero_point_energy_module");

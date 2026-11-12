@@ -1687,8 +1687,9 @@ def _cube_mask_name(up, down, left, right):
     return "".join("1" if c else "0" for c in (up, down, left, right))
 
 
-def _cube_frame(img, up, down, left, right):
+def _cube_frame(img, up, down, left, right, pal=None):
     """Frame strips on the unconnected edges, and the bolted corners where two framed edges meet."""
+    CARTOON = pal or globals()["CARTOON"]
     src = CUBE_SIDE
     for i in range(16):
         if not up:
@@ -1751,12 +1752,13 @@ def cube_end(up=False, down=False, left=False, right=False):
     return img
 
 
-def cube_inner_corner(corner):
+def cube_inner_corner(corner, pal=None):
     """
     Transparent overlay with a 4x4 inside-corner frame piece, drawn where a face connects on two adjacent edges but
     the diagonal block between them is not a cube (the inside of an L). The two frame strips meeting there turn the
     corner as nested L-shaped bands: band k = min(depth into one strip, depth into the other).
     """
+    CARTOON = pal or globals()["CARTOON"]
     img = Image.new("RGBA", (16, 16), CLEAR)
     top = [CUBE_SIDE[y][6] for y in (3, 2, 1, 0)]          # top strip, inner to outer
     bottom = [CUBE_SIDE[y][6] for y in (12, 13, 14, 15)]   # bottom strip, inner to outer
@@ -1970,6 +1972,128 @@ def generate_advancement_background():
     grid(ADVANCEMENT_BACKGROUND, pal).save(out("gui/advancements/backgrounds/contraptions.png"))
 
 
+# ---------------------------------------------------------------------------
+# Fluid Tank: the Hume Energy Cube's casing in blue (blue rings instead of purple) with a glass window instead of
+# the energy window. The glass is mostly see-through, with faint diagonal streaks lined up across neighbouring tanks;
+# the fluid behind it is drawn by FluidTankRenderer. The same edge masks and inside corners as the cube.
+# A lone top shows a blue valve with a water drop.
+# ---------------------------------------------------------------------------
+TANK_PAL = dict(CARTOON, P=hexc("#3fc8ff"), p=hexc("#1b5fa8"))
+TANK_TOP = [
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMOOOOMMbSSO",
+    "OHMMMOPPPPOMMMSO",
+    "OHMMOPpKXKpPOMSO",
+    "OHMOPpKXQXKpPOSO",
+    "OHMOPKXQQQXKPOSO",
+    "OHMOPKXQWQXKPOSO",
+    "OHMOPKXXQXXKPOSO",
+    "OHMMOPKXXXKPOMSO",
+    "OHMMMOPPPPOMMMSO",
+    "OHMMMMOOOOMMMMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+TANK_TOP_PAL = dict(TANK_PAL, K=hexc("#0f2a4a"), X=hexc("#2f9fe0"), Q=hexc("#a8ecff"), W=hexc("#ffffff"))
+GLASS = (200, 232, 255, 38)
+GLASS_STREAK = (235, 248, 255, 120)
+GLASS_STREAK_SOFT = (225, 244, 255, 75)
+
+
+def tank_side(up=False, down=False, left=False, right=False):
+    img = Image.new("RGBA", (16, 16), GLASS)
+    for y in range(16):
+        for x in range(16):
+            d = (x + y) % 12
+            if d == 0:
+                img.putpixel((x, y), GLASS_STREAK)
+            elif d == 1:
+                img.putpixel((x, y), GLASS_STREAK_SOFT)
+    # A dark rim just inside the frame, so the window reads as recessed glass.
+    for i in range(16):
+        if not up:
+            img.putpixel((i, 4), (20, 28, 48, 150))
+        if not left:
+            img.putpixel((4, i), (20, 28, 48, 150))
+    _cube_frame(img, up, down, left, right, TANK_PAL)
+    return img
+
+
+def tank_end(up=False, down=False, left=False, right=False):
+    img = Image.new("RGBA", (16, 16), TANK_PAL["M"])
+    for y in range(3, 13) if not (up or down or left or right) else ():
+        for x in range(3, 13):
+            ch = TANK_TOP[y][x]
+            if ch not in "HMBbS":
+                img.putpixel((x, y), TANK_TOP_PAL[ch])
+    _cube_frame(img, up, down, left, right, TANK_PAL)
+    return img
+
+
+def generate_fluid_tank():
+    assert len(TANK_TOP) == 16 and all(len(r) == 16 for r in TANK_TOP)
+    folder = "block/fluid_tank"
+    os.makedirs(out(folder), exist_ok=True)
+    for name in os.listdir(out(folder)):
+        os.remove(out(folder + "/" + name))
+    for corner in ("tl", "tr", "bl", "br"):
+        cube_inner_corner(corner, TANK_PAL).save(out(f"{folder}/inner_{corner}.png"))
+    for m in range(16):
+        up, down, left, right = bool(m & 8), bool(m & 4), bool(m & 2), bool(m & 1)
+        mask = _cube_mask_name(up, down, left, right)
+        tank_end(up, down, left, right).save(out(f"{folder}/end_{mask}.png"))
+        tank_side(up, down, left, right).save(out(f"{folder}/side_{mask}.png"))
+
+
+TANK_DROP_ICON = [  # 9x9 GUI icon
+    "....O....",
+    "...OQO...",
+    "..OQXXO..",
+    ".OQXXXXO.",
+    "OQXXXXXXO",
+    "OQXXXXXXO",
+    "OXXXXXXKO",
+    ".OXXXXKO.",
+    "..OOOOO..",
+]
+
+
+def generate_tank_gui():
+    """Fluid Tank GUI: the Hume Energy Cube's layout; the gauge is filled with the fluid's own texture in game."""
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # fluid gauge (11..40 x 19..82, 30x64)
+    inset(img, 48, 16, 168, 78, GUI["panel"])        # info window
+    for x in range(52, 164):
+        img.putpixel((x, 54), hexc("#2c2e36"))
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    grid(TANK_DROP_ICON, TANK_TOP_PAL, img, 152, 4)
+    rnd = random.Random(17)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice([hexc("#3fc8ff"), hexc("#a8ecff"), hexc("#2f9fe0")]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))      # status lamps shared with the other machines
+    # Glass over the fluid (176,0) 30x64: a highlight down the left, and a mark for every eighth on the right.
+    for y in range(64):
+        img.putpixel((176 + 1, y), (255, 255, 255, 70))
+        img.putpixel((176 + 2, y), (255, 255, 255, 40))
+    for k in range(1, 8):
+        ty = round(64 * k / 8)
+        for x in range(25, 30):
+            img.putpixel((176 + x, ty), (230, 245, 255, 160))
+    img.save(out("gui/fluid_tank.png"))
+
+
 CUBE_BOLT_ICON = [  # 9x9 GUI icon
     "....OOO..",
     "...OEEO..",
@@ -1998,6 +2122,8 @@ def main():
     generate_reservoir_gui()
     generate_energy_cube()
     generate_cube_gui()
+    generate_fluid_tank()
+    generate_tank_gui()
     generate_zero_point_gui()
     generate_advancement_background()
     generate_jei()

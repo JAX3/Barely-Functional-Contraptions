@@ -24,6 +24,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> FLUID_RESERVOIR = REGISTER.registerSimpleBlockItem(ModBlocks.FLUID_RESERVOIR);
 
     public static final DeferredItem<BlockItem> HUME_ENERGY_CUBE = REGISTER.registerSimpleBlockItem(ModBlocks.HUME_ENERGY_CUBE);
+    public static final DeferredItem<BlockItem> FLUID_TANK = REGISTER.registerSimpleBlockItem(ModBlocks.FLUID_TANK);
     public static final DeferredItem<BlockItem> ZERO_POINT_ENERGY_MODULE = REGISTER.registerSimpleBlockItem(ModBlocks.ZERO_POINT_ENERGY_MODULE);
     public static final DeferredItem<BlockItem> ENERGY_CABLE = REGISTER.registerSimpleBlockItem(ModBlocks.ENERGY_CABLE);
     public static final DeferredItem<BlockItem> FLUID_PIPE = REGISTER.registerSimpleBlockItem(ModBlocks.FLUID_PIPE);

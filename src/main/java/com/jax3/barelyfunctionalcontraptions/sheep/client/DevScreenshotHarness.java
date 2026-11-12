@@ -412,7 +412,31 @@ public final class DevScreenshotHarness {
                 server.execute(() -> breedingScene(server));
             }
             case 2175 -> shot(mc, "48_bred_lambs");
-            case 2177 -> {
+            case 2177 -> server.execute(() -> tankScene(server));
+            case 2230 -> shot(mc, "49_fluid_tanks");
+            case 2232 -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                    String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 200 12", tankBase.getX() + 5.0, tankBase.getY(), tankBase.getZ() + 4.5));
+            case 2255 -> shot(mc, "50_fluid_tanks_close");
+            case 2257 -> {
+                setHudHidden(mc, false);
+                command(server, "clear @a");
+                server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 20", tankBase.getX() + 1.0, tankBase.getY(), tankBase.getZ() + 4.0)));
+            }
+            case 2262 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                if (server.overworld().getBlockEntity(tankBase) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidTankBlockEntity be) {
+                    player.openMenu(be, tankBase);
+                }
+            });
+            case 2280 -> shot(mc, "51_fluid_tank_gui");
+            case 2282 -> {
+                mc.player.closeContainer();
+                server.execute(() -> showRecipe(server, "fluid_tank"));
+            }
+            case 2302 -> shot(mc, "recipe_fluid_tank");
+            case 2305 -> {
+                mc.player.closeContainer();
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
@@ -811,6 +835,49 @@ public final class DevScreenshotHarness {
         }
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", base.getX() + 4.0, base.getY() + 3, base.getZ() + 6.0));
+    }
+
+    private static BlockPos tankBase;
+
+    /**
+     * Fluid Tanks: a 2x2x2 group a little over half full of water, a 3-high tower of lava two thirds full, a single
+     * tank a quarter full, and an L of three water tanks, on a stone pad.
+     */
+    private static void tankScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        BlockPos base = origin.offset(144, 30, -4);
+        tankBase = base;
+        for (int x = -3; x <= 10; x++) for (int z = -4; z <= 4; z++) {
+            level.setBlock(base.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+            for (int y = 0; y <= 5; y++) level.setBlock(base.offset(x, y, z), Blocks.AIR.defaultBlockState(), 3);
+        }
+        var tank = ModBlocks.FLUID_TANK.get().defaultBlockState();
+        var water = net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER);
+        var lava = net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.LAVA);
+        java.util.function.BiConsumer<BlockPos, Object[]> fill = (pos, f) -> {
+            if (level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidTankBlockEntity be) {
+                be.storage().set(0, (net.neoforged.neoforge.transfer.fluid.FluidResource) f[0], (Integer) f[1]);
+            }
+        };
+        // 2x2x2 of water: 70,000 of 128,000 mB (the group settles it: bottom full, top a little over a third).
+        for (int x = 0; x <= 1; x++) for (int y = 0; y <= 1; y++) for (int z = 0; z <= 1; z++) level.setBlock(base.offset(x, y, z), tank, 3);
+        for (int x = 0; x <= 1; x++) for (int z = 0; z <= 1; z++) fill.accept(base.offset(x, 0, z), new Object[]{water, 16_000});
+        fill.accept(base.offset(0, 1, 0), new Object[]{water, 6_000});
+        // A 3-high tower of lava, two thirds full.
+        for (int y = 0; y <= 2; y++) level.setBlock(base.offset(4, y, 0), tank, 3);
+        fill.accept(base.offset(4, 0, 0), new Object[]{lava, 16_000});
+        fill.accept(base.offset(4, 1, 0), new Object[]{lava, 16_000});
+        // A single tank, a quarter full of water.
+        level.setBlock(base.offset(6, 0, 1), tank, 3);
+        fill.accept(base.offset(6, 0, 1), new Object[]{water, 4_000});
+        // An L of three, half full.
+        level.setBlock(base.offset(8, 0, 0), tank, 3);
+        level.setBlock(base.offset(8, 0, 1), tank, 3);
+        level.setBlock(base.offset(9, 0, 1), tank, 3);
+        fill.accept(base.offset(8, 0, 0), new Object[]{water, 24_000 > 16_000 ? 16_000 : 0});
+        fill.accept(base.offset(8, 0, 1), new Object[]{water, 8_000});
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 28", base.getX() + 4.5, base.getY() + 4, base.getZ() + 8.5));
     }
 
     /** Opens the floor module's GUI for the player. */
