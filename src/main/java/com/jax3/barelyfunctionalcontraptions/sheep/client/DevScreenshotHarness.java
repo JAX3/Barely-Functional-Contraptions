@@ -408,6 +408,11 @@ public final class DevScreenshotHarness {
             case 2130 -> shot(mc, "47_zero_point_sideways_gui");
             case 2132 -> {
                 mc.player.closeContainer();
+                setHudHidden(mc, true);
+                server.execute(() -> breedingScene(server));
+            }
+            case 2175 -> shot(mc, "48_bred_lambs");
+            case 2177 -> {
                 mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
@@ -769,6 +774,43 @@ public final class DevScreenshotHarness {
         level.setBlock(base.offset(3, 3, 4), Blocks.STONE_BRICKS.defaultBlockState(), 3);
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 25", base.getX() + 3.5, base.getY() + 5, base.getZ() + 10.0));
+    }
+
+    /**
+     * Three pairs of sheep bred the vanilla way on a grass pad: Iron + Iron, Gold + plain white, Diamond + Emerald.
+     * Each lamb is born infused with one of its parents' resources.
+     */
+    private static void breedingScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        BlockPos base = origin.offset(128, 30, -4);
+        for (int x = -2; x <= 8; x++) for (int z = -3; z <= 3; z++) {
+            level.setBlock(base.offset(x, -1, z), Blocks.GRASS_BLOCK.defaultBlockState(), 3);
+            for (int y = 0; y <= 3; y++) level.setBlock(base.offset(x, y, z), Blocks.AIR.defaultBlockState(), 3);
+        }
+        String[][] pairs = {{"iron", "iron"}, {"gold", null}, {"diamond", "emerald"}};
+        for (int i = 0; i < pairs.length; i++) {
+            Sheep a = null, b = null;
+            for (int k = 0; k < 2; k++) {
+                Sheep sh = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                if (sh == null) return;
+                sh.setNoAi(true);
+                sh.snapTo(base.getX() + i * 3 + 0.5 + k * 1.2, base.getY(), base.getZ() - 0.5, 200, 0);
+                if (pairs[i][k] != null) {
+                    SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id(pairs[i][k])), 9, 0));
+                }
+                level.addFreshEntity(sh);
+                if (k == 0) a = sh; else b = sh;
+            }
+            var before = new java.util.HashSet<>(level.getEntitiesOfClass(Sheep.class, a.getBoundingBox().inflate(3), Sheep::isBaby));
+            a.spawnChildFromBreeding(level, b);
+            // Move the new lamb to the front so it isn't hidden behind its parents.
+            for (Sheep lamb : level.getEntitiesOfClass(Sheep.class, a.getBoundingBox().inflate(3), l -> l.isBaby() && !before.contains(l))) {
+                lamb.setNoAi(true);
+                lamb.snapTo(base.getX() + i * 3 + 1.1, base.getY(), base.getZ() + 1.3, 200, 0);
+            }
+        }
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", base.getX() + 4.0, base.getY() + 3, base.getZ() + 6.0));
     }
 
     /** Opens the floor module's GUI for the player. */

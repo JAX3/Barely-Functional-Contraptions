@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 96 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 63 Resourceful Sheep, 17 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 47 screenshots and 11 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 98 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 65 Resourceful Sheep, 17 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 48 screenshots and 11 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -150,6 +150,15 @@ The screenshot run normally has no audio device. For this check, OpenAL Soft's *
 - An earlier recording, made with the first, higher version of the hum, also showed the beam-break behaviour: when stone broke the beam, the hum faded out while sliding down in pitch, and it came back when the beam relinked.
 
 The loop itself is checked for clicks: the jump from its last sample to its first (0.017) is no bigger than the largest step anywhere inside it (0.018).
+
+### Breeding keeps the infusion
+
+| Test | What it checks |
+|---|---|
+| `bred_lambs_keep_the_infusion` | Real vanilla breeding (`spawnChildFromBreeding`). Two Iron sheep, each with one shearing used, have an Iron lamb with a full set of shearings. An Iron sheep and a plain one have an Iron lamb. Two plain sheep have a plain lamb. |
+| `breeding_inheritance_rules` | Iron and Gold parents pass on both resources over 40 lambs, at random. With `breedingNeedsBothParents`, Iron + plain passes nothing on but Iron + Gold still does. With `breedingKeepsInfusion` off, two Iron parents pass nothing on. |
+
+In the real client (`48_bred_lambs.png`), three pairs are bred the vanilla way: Iron + Iron, Gold + plain white, and Diamond + Emerald. Their lambs are grey (Iron), yellow (Gold) and cyan (Diamond). Lambs used to be skipped by the infused-wool layer, so an infused lamb looked white. Now its fleece uses vanilla's baby wool model and texture, tinted with the resource's colour. The sparkle and resource blocks appear once it grows up.
 
 ### Sideways Zero Point pairs (`zero_point_modules_link_sideways`)
 

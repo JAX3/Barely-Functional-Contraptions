@@ -42,11 +42,16 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
     private static final Identifier WOOL_TEXTURE = ResourcefulSheep.id("textures/entity/sheep/infused_wool.png");
     private static final Identifier ACCENT_TEXTURE = ResourcefulSheep.id("textures/entity/sheep/infused_wool_accent.png");
 
+    /** Lambs use vanilla's baby fleece (its own shape and texture), tinted with the resource's wool colour. */
+    private static final Identifier BABY_WOOL_TEXTURE = Identifier.withDefaultNamespace("textures/entity/sheep/sheep_wool_baby.png");
+
     private final EntityModel<SheepRenderState> model;
+    private final EntityModel<SheepRenderState> babyModel;
 
     public InfusedWoolLayer(RenderLayerParent<SheepRenderState, SheepModel> renderer, EntityModelSet models) {
         super(renderer);
         this.model = new SheepFurModel(models.bakeLayer(ModelLayers.SHEEP_WOOL));
+        this.babyModel = new SheepFurModel(models.bakeLayer(ModelLayers.SHEEP_BABY_WOOL));
     }
 
     /**
@@ -74,13 +79,20 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
     private static final float BLOCK_FLEECE_TOP = 4.25F + 0.3F;
 
     static void extract(Sheep sheep, SheepRenderState state) {
-        if (state.isSheared || state.isBaby) return;
+        if (state.isSheared) return;
         Optional<SheepResource> resource = SheepInfusionEvents.getInfusedResource(sheep);
         if (resource.isEmpty()) return;
         int wool = ARGB.opaque(resource.get().woolColor());
         if (ModConfigs.getBool(ModConfigs.SERVER.preserveWoolColour)) {
             float strength = (float) ModConfigs.getDouble(ModConfigs.CLIENT.dyeTintStrength);
             wool = ARGB.srgbLerp(strength, wool, ARGB.opaque(state.getWoolColor()));
+        }
+        if (state.isBaby) {
+            // A lamb born infused (see SheepInfusionEvents.onBabySpawn): its fleece takes the resource's colour; the
+            // sparkle and resource blocks only appear once it has grown up.
+            state.setRenderData(INFUSED_WOOL, new Colors(wool, 0, new ItemStackRenderState(), 0));
+            state.isSheared = true;
+            return;
         }
         int accent = ModConfigs.getBool(ModConfigs.CLIENT.showSheepSparkleOverlay) ? ARGB.opaque(resource.get().accentColor()) : 0;
 
@@ -105,6 +117,10 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
     public void submit(PoseStack poseStack, SubmitNodeCollector collector, int lightCoords, SheepRenderState state, float yRot, float xRot) {
         Colors colors = state.getRenderData(INFUSED_WOOL);
         if (colors == null) return;
+        if (state.isBaby) {
+            coloredCutoutModelCopyLayerRender(babyModel, BABY_WOOL_TEXTURE, poseStack, collector, lightCoords, state, colors.wool(), 1);
+            return;
+        }
         coloredCutoutModelCopyLayerRender(model, WOOL_TEXTURE, poseStack, collector, lightCoords, state, colors.wool(), 1);
         if (colors.accent() != 0) {
             coloredCutoutModelCopyLayerRender(model, ACCENT_TEXTURE, poseStack, collector, lightCoords, state, colors.accent(), 2);

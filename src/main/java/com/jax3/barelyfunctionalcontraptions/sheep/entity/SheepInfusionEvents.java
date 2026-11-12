@@ -84,6 +84,38 @@ public final class SheepInfusionEvents {
         }
     }
 
+    /**
+     * Breeding: a lamb takes after its parents. If they are infused it is born infused with one of their resources
+     * (either one at random when they differ), with that resource's full number of shearings. Its wool, like any
+     * lamb's, only drops once it has grown up. The parents keep their own infusions.
+     */
+    @SubscribeEvent
+    public static void onBabySpawn(net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent event) {
+        var child = event.getChild();
+        if (child == null || !(child.level() instanceof ServerLevel level) || !ModTags.isInfusable(child)) return;
+        Optional<SheepResource> inherited = inheritedResource(event.getParentA(), event.getParentB(), level.getRandom());
+        if (inherited.isEmpty()) return;
+        SheepResource resource = inherited.get();
+        setInfusion(child, SheepInfusion.NONE.withResource(resource.id(), resource.effectiveInfusionUses()));
+        if (ModConfigs.getBool(ModConfigs.SERVER.feedingParticles)) {
+            double x = child.getX(), y = child.getY() + 0.5, z = child.getZ();
+            level.sendParticles(new DustParticleOptions(resource.woolColor(), 1.0F), x, y, z, 14, 0.3, 0.25, 0.3, 0.02);
+        }
+    }
+
+    /**
+     * The resource a lamb of these two parents inherits, if any: following {@code breedingKeepsInfusion} and
+     * {@code breedingNeedsBothParents}, one of the parents' (loaded) infusions, picked at random when both have one.
+     */
+    public static Optional<SheepResource> inheritedResource(Entity parentA, Entity parentB, net.minecraft.util.RandomSource random) {
+        if (!ModConfigs.getBool(ModConfigs.SERVER.breedingKeepsInfusion)) return Optional.empty();
+        Optional<SheepResource> a = getInfusion(parentA).isInfused() ? getInfusedResource(parentA) : Optional.empty();
+        Optional<SheepResource> b = getInfusion(parentB).isInfused() ? getInfusedResource(parentB) : Optional.empty();
+        if (a.isPresent() && b.isPresent()) return random.nextBoolean() ? a : b;
+        if (ModConfigs.getBool(ModConfigs.SERVER.breedingNeedsBothParents)) return Optional.empty();
+        return a.isPresent() ? a : b;
+    }
+
     /** Returns {@code null} if the sheep may be infused, otherwise the reason it cannot. */
     static Component checkCanInfuse(Player player, LivingEntity sheep, SheepResource resource, ItemStack stack) {
         boolean creativeBypass = player.hasInfiniteMaterials() && ModConfigs.getBool(ModConfigs.SERVER.creativeIgnoresCooldown);

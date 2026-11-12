@@ -125,6 +125,8 @@ public final class ModGameTests {
         TESTS.put("zero_point_beam_burns_what_touches_it", ModGameTests::zeroPointBeamBurns);
         TESTS.put("zero_point_beam_kills_have_looting", ModGameTests::zeroPointBeamLooting);
         TESTS.put("zero_point_modules_link_sideways", ModGameTests::zeroPointSideways);
+        TESTS.put("bred_lambs_keep_the_infusion", ModGameTests::breedingKeepsInfusion);
+        TESTS.put("breeding_inheritance_rules", ModGameTests::breedingRules);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -386,6 +388,71 @@ public final class ModGameTests {
             }
             h.succeed();
         });
+    }
+
+    // ------------------------------------------------------------------ breeding
+
+    private static Sheep sheepAt(GameTestHelper h, BlockPos pos, @org.jspecify.annotations.Nullable Identifier infusion) {
+        Sheep sheep = h.spawn(EntityTypes.SHEEP, pos);
+        sheep.setNoAi(true);
+        if (infusion != null) {
+            int uses = SheepResourceRegistry.server().byId(infusion).orElseThrow().effectiveInfusionUses();
+            SheepInfusionEvents.setInfusion(sheep, SheepInfusion.NONE.withResource(infusion, uses).afterShearing(0, 0));
+        }
+        return sheep;
+    }
+
+    /** Breeds two sheep the vanilla way and returns the lamb. */
+    private static Sheep breed(GameTestHelper h, Sheep a, Sheep b) {
+        var before = new java.util.HashSet<>(h.getLevel().getEntitiesOfClass(Sheep.class, a.getBoundingBox().inflate(4), Sheep::isBaby));
+        a.spawnChildFromBreeding(h.getLevel(), b);
+        return h.getLevel().getEntitiesOfClass(Sheep.class, a.getBoundingBox().inflate(4), Sheep::isBaby).stream()
+                .filter(lamb -> !before.contains(lamb)).findFirst().orElseThrow(() -> new AssertionError("no lamb was born"));
+    }
+
+    /**
+     * Breeding two Iron sheep gives an Iron lamb with a full set of shearings (the parents had used one each), one
+     * Iron parent and a plain one also give an Iron lamb, and two plain sheep give a plain lamb.
+     */
+    private static void breedingKeepsInfusion(GameTestHelper h) {
+        int full = SheepResourceRegistry.server().byId(IRON).orElseThrow().effectiveInfusionUses();
+        Sheep lamb = breed(h, sheepAt(h, new BlockPos(1, 1, 1), IRON), sheepAt(h, new BlockPos(1, 1, 2), IRON));
+        SheepInfusion infusion = SheepInfusionEvents.getInfusion(lamb);
+        h.assertTrue(infusion.resource().map(IRON::equals).orElse(false), "two Iron parents make an Iron lamb, got " + infusion);
+        h.assertTrue(infusion.usesRemaining() == full, "the lamb gets a full " + full + " shearings, got " + infusion.usesRemaining());
+        Sheep one = breed(h, sheepAt(h, new BlockPos(4, 1, 1), IRON), sheepAt(h, new BlockPos(4, 1, 2), null));
+        h.assertTrue(SheepInfusionEvents.getInfusion(one).resource().map(IRON::equals).orElse(false), "one Iron parent is enough by default");
+        Sheep plain = breed(h, sheepAt(h, new BlockPos(1, 1, 4), null), sheepAt(h, new BlockPos(1, 1, 5), null));
+        h.assertFalse(SheepInfusionEvents.getInfusion(plain).isInfused(), "two plain sheep make a plain lamb");
+        h.succeed();
+    }
+
+    /**
+     * Iron and Gold parents pass on either one at random (both turn up over 40 lambs). With breedingNeedsBothParents
+     * one infused parent isn't enough; with breedingKeepsInfusion off nothing is passed on.
+     */
+    private static void breedingRules(GameTestHelper h) {
+        Identifier gold = ResourcefulSheep.id("gold");
+        Sheep iron = sheepAt(h, new BlockPos(1, 1, 1), IRON), golden = sheepAt(h, new BlockPos(1, 1, 2), gold), plain = sheepAt(h, new BlockPos(1, 1, 3), null);
+        var random = net.minecraft.util.RandomSource.create(42);
+        java.util.Set<Identifier> seen = new java.util.HashSet<>();
+        for (int i = 0; i < 40; i++) {
+            SheepInfusionEvents.inheritedResource(iron, golden, random).ifPresent(r -> seen.add(r.id()));
+        }
+        h.assertTrue(seen.equals(java.util.Set.of(IRON, gold)), "mixed parents pass on either resource, saw " + seen);
+        boolean oldBoth = ModConfigs.SERVER.breedingNeedsBothParents.get(), oldKeep = ModConfigs.SERVER.breedingKeepsInfusion.get();
+        try {
+            ModConfigs.SERVER.breedingNeedsBothParents.set(true);
+            h.assertTrue(SheepInfusionEvents.inheritedResource(iron, plain, random).isEmpty(), "needs both parents: one isn't enough");
+            h.assertTrue(SheepInfusionEvents.inheritedResource(iron, golden, random).isPresent(), "needs both parents: two are");
+            ModConfigs.SERVER.breedingNeedsBothParents.set(false);
+            ModConfigs.SERVER.breedingKeepsInfusion.set(false);
+            h.assertTrue(SheepInfusionEvents.inheritedResource(iron, iron, random).isEmpty(), "turned off, nothing is passed on");
+        } finally {
+            ModConfigs.SERVER.breedingNeedsBothParents.set(oldBoth);
+            ModConfigs.SERVER.breedingKeepsInfusion.set(oldKeep);
+        }
+        h.succeed();
     }
 
     // ------------------------------------------------------------------ helpers

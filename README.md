@@ -201,6 +201,12 @@ Right-click an **adult** sheep while holding a resource, for example an **Iron I
 - **Each infusion lasts 100 shearings by default**, whatever the resource (`infusionUsesOverride` in the config). Set that to `-1` to use each resource's own count instead: iron, gold, copper, redstone, lapis and coal last **9** shearings, and diamond, emerald, netherite scrap, cobblestone, oak log, quartz and the mushrooms last **1** or **3**.
 - Feeding an item that isn't a resource does nothing special, so wheat breeding, dyes and so on work as normal.
 - Sneak + right-click a sheep with an empty hand to see its infusion and how many shearings it has left.
+- **Breeding keeps the infusion.** Breed infused sheep with wheat as normal and the lamb is born infused with its parents' resource, with a **full set of shearings**. Its fleece shows the resource colour straight away, and the resource blocks grow in once it's an adult. Its wool, like any lamb's, can only be sheared once it has grown up.
+  - Two parents with **different** resources (Diamond + Emerald) pass on **one of the two at random**.
+  - **One** infused parent is enough by default, so an Iron sheep and a plain white one have an Iron lamb (set `breedingNeedsBothParents` to require both).
+  - The parents keep their own infusions, so a pair of infused sheep can breed a whole flock. Set `breedingKeepsInfusion` to false to turn this off.
+
+  ![Three pairs of sheep with their lambs: two Iron sheep and a grey Iron lamb, a Gold sheep and a plain white sheep with a yellow Gold lamb, a Diamond and an Emerald sheep with a cyan Diamond lamb](docs/screenshots/48_bred_lambs.png)
 
 ### 2. Shear it
 Shears and dispensers both work. An infused sheep drops **resource wool** (e.g. *Iron Wool*) **instead of** its normal wool. When the infusion runs out the sheep goes back to normal.
@@ -486,7 +492,9 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 |---|---|---|
 | `feedingEnabled` | true | Master switch for feeding |
 | `feedingAmountOverride` | -1 | Items consumed per feeding (-1 = use each definition's value) |
-| `allowBabies` | false | Allow lambs to be infused |
+| `allowBabies` | false | Allow lambs to be infused by feeding (bred lambs inherit their infusion either way) |
+| `breedingKeepsInfusion` | true | Lambs bred from infused sheep are born infused with a parent's resource and a full set of shearings; different parents pass on one at random |
+| `breedingNeedsBothParents` | false | Only pass the infusion on when both parents are infused |
 | `allowFeedingShearedSheep` | true | Infuse a sheep that has no wool yet |
 | `allowReplacingInfusion` | false | Feed a different resource to replace an infusion |
 | `sameResourceRefreshesUses` | true | Re-feeding the same resource tops the uses back up |

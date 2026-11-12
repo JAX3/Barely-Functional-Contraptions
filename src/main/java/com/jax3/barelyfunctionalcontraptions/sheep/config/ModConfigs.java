@@ -62,6 +62,8 @@ public final class ModConfigs {
         public final ModConfigSpec.BooleanValue feedingEnabled;
         public final ModConfigSpec.IntValue feedingAmountOverride;
         public final ModConfigSpec.BooleanValue allowBabies;
+        public final ModConfigSpec.BooleanValue breedingKeepsInfusion;
+        public final ModConfigSpec.BooleanValue breedingNeedsBothParents;
         public final ModConfigSpec.BooleanValue allowFeedingShearedSheep;
         public final ModConfigSpec.BooleanValue allowReplacingInfusion;
         public final ModConfigSpec.BooleanValue sameResourceRefreshesUses;
@@ -142,6 +144,11 @@ public final class ModConfigs {
                     .defineInRange("feedingAmountOverride", -1, -1, 64);
             allowBabies = b.comment("Allow lambs to be infused (their wool is only dropped once grown).")
                     .define("allowBabies", false);
+            breedingKeepsInfusion = b.comment("Lambs bred from infused sheep are born infused with a parent's resource, with a full set of",
+                            "shearings. Two parents with different resources pass on one of the two at random.")
+                    .define("breedingKeepsInfusion", true);
+            breedingNeedsBothParents = b.comment("Only pass the infusion on when both parents are infused (otherwise one infused parent is enough).")
+                    .define("breedingNeedsBothParents", false);
             allowFeedingShearedSheep = b.comment("Allow infusing a sheep that is currently sheared; its wool regrows infused.")
                     .define("allowFeedingShearedSheep", true);
             allowReplacingInfusion = b.comment("Allow feeding a different resource to an already-infused sheep, replacing the old infusion (the old one is lost).")
