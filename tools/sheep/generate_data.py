@@ -248,13 +248,26 @@ def block_models():
     for name in os.listdir(tank_dir):
         os.remove(os.path.join(tank_dir, name))
     ft = f"{MOD}:block/fluid_tank/"
+    # Each face is drawn from both sides: the outside as usual, plus a copy facing into the tank, so through the glass
+    # you see the inside of the far walls (the casing and its glass) instead of straight out the other side.
+    opposite = {"north": "south", "south": "north", "east": "west", "west": "east", "up": "down", "down": "up"}
+    planes_at = {"north": ([0, 0, 0], [16, 16, 0]), "south": ([0, 0, 16], [16, 16, 16]),
+                 "west": ([0, 0, 0], [0, 16, 16]), "east": ([16, 0, 0], [16, 16, 16]),
+                 "down": ([0, 0, 0], [16, 0, 16]), "up": ([0, 16, 0], [16, 16, 16])}
+
+    def tank_face_model(face, texture):
+        model = face_model(face, texture)
+        frm, to = planes_at[face]
+        model["elements"].append({"from": frm, "to": to, "faces": {opposite[face]: {"texture": "#face"}}})
+        return model
+
     for face, sides in planes.items():
         for m in range(16):
             mask = "".join("1" if m & bit else "0" for bit in (8, 4, 2, 1))
             if face in ("up", "down"):
-                write(os.path.join(tank_dir, f"{face}_{mask}.json"), face_model(face, ft + f"end_{mask}"))
+                write(os.path.join(tank_dir, f"{face}_{mask}.json"), tank_face_model(face, ft + f"end_{mask}"))
             else:
-                write(os.path.join(tank_dir, f"{face}_{mask}_0.json"), face_model(face, ft + f"side_{mask}"))
+                write(os.path.join(tank_dir, f"{face}_{mask}_0.json"), tank_face_model(face, ft + f"side_{mask}"))
         for corner in ("tl", "tr", "bl", "br"):
             frm, to = offset[face]
             write(os.path.join(tank_dir, f"inner_{face}_{corner}.json"), {
