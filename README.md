@@ -766,6 +766,12 @@ To give a data-pack resource its own icon, ship a resource pack that overrides `
 
 ---
 
+## Test world
+
+[`test-world/BFC-Test-World.zip`](test-world/BFC-Test-World.zip) is a creative world with every contraption set up
+and running: sheep and separators, generators, cubes, Zero Point pairs, cables, pipes and Fluid Tanks. Unzip it into
+your `saves` folder. [`test-world/README.md`](test-world/README.md) lists a teleport command for each scene.
+
 ## Configuration files
 
 | File | Contents |
