@@ -124,6 +124,7 @@ public final class ModGameTests {
         TESTS.put("zero_point_modules_generate_across_a_gap", ModGameTests::zeroPointModules);
         TESTS.put("zero_point_beam_burns_what_touches_it", ModGameTests::zeroPointBeamBurns);
         TESTS.put("zero_point_beam_kills_have_looting", ModGameTests::zeroPointBeamLooting);
+        TESTS.put("zero_point_modules_link_sideways", ModGameTests::zeroPointSideways);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -1136,11 +1137,11 @@ public final class ModGameTests {
         // The GUI menu receives the module's numbers.
         var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
         var menu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.ZeroPointModuleMenu) low.createMenu(0, player.getInventory(), player);
-        h.assertTrue(menu.getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.LINKED && menu.getLinkDistance() == 3 && menu.facesUp(), "menu shows the link");
+        h.assertTrue(menu.getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.LINKED && menu.getLinkDistance() == 3 && menu.facing() == Direction.UP, "menu shows the link");
         h.assertTrue(menu.getGenerating() == low.getGenerating() && menu.getPairOutput() == low.getPairOutput(), "menu shows generation");
         h.assertTrue(menu.getCapacity() == 2 * ModConfigs.getInt(ModConfigs.SERVER.zpeCapacity), "menu shows the pair's pooled buffer");
         var highMenu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.ZeroPointModuleMenu) high.createMenu(1, player.getInventory(), player);
-        h.assertFalse(highMenu.facesUp(), "ceiling module's menu knows it points down");
+        h.assertTrue(highMenu.facing() == Direction.DOWN && highMenu.towards().equals("below"), "ceiling module's menu knows it points down");
         h.assertBlockProperty(floor, linkedProp, true);
         h.assertBlockProperty(ceiling, linkedProp, true);
 
@@ -1231,6 +1232,57 @@ public final class ModGameTests {
      * The beam hurts and ignites living things in it, with its own damage type, and leaves things beside it alone.
      * An iron golem (lots of health, no AI) stands on the floor module in the beam; a pig stands two blocks away.
      */
+    /**
+     * Two modules on facing walls link across the room just like a floor and ceiling pair: the east-pointing one leads
+     * (keeps the odd FE and colours the beam), stained glass in the gap tints it, and the beam burns a pig standing in
+     * it. A module placed against any face points away from that face.
+     */
+    private static void zeroPointSideways(GameTestHelper h) {
+        int perBlock = ModConfigs.getInt(ModConfigs.SERVER.zpeEnergyPerBlock);
+        var block = ModBlocks.ZERO_POINT_ENERGY_MODULE.get();
+        var facingProp = com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.FACING;
+        // Placement: clicking each face of a block makes the module point out of that face.
+        var player = h.makeMockPlayer(GameType.SURVIVAL);
+        for (Direction face : Direction.values()) {
+            var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(new BlockPos(2, 5, 5))),
+                    face, h.absolutePos(new BlockPos(2, 5, 5)), false);
+            var context = new net.minecraft.world.item.context.BlockPlaceContext(h.getLevel(), player, InteractionHand.MAIN_HAND,
+                    new ItemStack(block), hit);
+            var placed = block.getStateForPlacement(context);
+            h.assertTrue(placed != null && placed.getValue(facingProp) == face, "placed against the " + face + " face it points " + face);
+        }
+
+        BlockPos west = new BlockPos(0, 2, 2), east = new BlockPos(5, 2, 2);
+        h.setBlock(west, zpe(Direction.EAST));
+        h.setBlock(east, zpe(Direction.WEST));
+        h.setBlock(new BlockPos(2, 2, 2), Blocks.STAINED_GLASS.red());
+        h.setBlock(new BlockPos(3, 1, 2), Blocks.STONE);
+        var lead = zpeAt(h, west);
+        var other = zpeAt(h, east);
+        h.assertTrue(lead.getLinkDistance() == 5 && other.getLinkDistance() == 5, "a sideways pair 5 apart links, got "
+                + lead.getLinkDistance() + "/" + other.getLinkDistance());
+        h.assertTrue(lead.getPairOutput() == 4 * perBlock && lead.getGenerating() + other.getGenerating() == lead.getPairOutput(),
+                "a 4-block gap makes " + 4 * perBlock + " FE/t, shared by the pair");
+        h.assertTrue(lead.getGenerating() >= other.getGenerating(), "the east-pointing module leads");
+        h.assertTrue(lead.getBeamColor() == net.minecraft.world.item.DyeColor.RED.getTextureDiffuseColor(), "red glass in the gap tints the beam");
+        var player2 = h.makeMockPlayer(GameType.SURVIVAL);
+        var menu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.ZeroPointModuleMenu) lead.createMenu(0, player2.getInventory(), player2);
+        h.assertTrue(menu.facing() == Direction.EAST && menu.towards().equals("ahead"), "the GUI says the partner is ahead");
+        // Facing the same way never links, sideways too.
+        h.setBlock(east, zpe(Direction.EAST));
+        h.assertTrue(zpeAt(h, west).getLink() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink.WRONG_FACING,
+                "a partner pointing the same way is reported");
+        h.setBlock(east, zpe(Direction.WEST));
+        zpeAt(h, west);
+        zpeAt(h, east);
+        var pig = h.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(3, 2, 2));
+        float health = pig.getHealth();
+        h.succeedWhen(() -> {
+            h.assertTrue(pig.getHealth() < health || !pig.isAlive(), "the sideways beam hurts the pig standing in it");
+            h.assertTrue(pig.isOnFire() || !pig.isAlive(), "and sets it on fire");
+        });
+    }
+
     private static void zeroPointBeamBurns(GameTestHelper h) {
         BlockPos floor = new BlockPos(3, 1, 3), ceiling = new BlockPos(3, 4, 3);
         h.setBlock(floor, zpe(Direction.UP));

@@ -8,8 +8,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 95 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 62 Resourceful Sheep, 17 integration, 1 NeoForge built-in |
-| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 45 screenshots and 11 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 96 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 63 Resourceful Sheep, 17 integration, 1 NeoForge built-in |
+| Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 47 screenshots and 11 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
@@ -150,6 +150,18 @@ The screenshot run normally has no audio device. For this check, OpenAL Soft's *
 - An earlier recording, made with the first, higher version of the hum, also showed the beam-break behaviour: when stone broke the beam, the hum faded out while sliding down in pitch, and it came back when the beam relinked.
 
 The loop itself is checked for clicks: the jump from its last sample to its first (0.017) is no bigger than the largest step anywhere inside it (0.018).
+
+### Sideways Zero Point pairs (`zero_point_modules_link_sideways`)
+
+- **Placement:** placing a module against each of the six faces of a block (through the block's own placement code) makes it point out of that face.
+- **Linking:** an east-pointing module and a west-pointing one 5 blocks apart link both ways, with 4 blocks of gap making 4 × `energyPerBlock` FE/t between them. The east-pointing one leads, the way the floor module does in a vertical pair: it keeps the odd FE, draws the beam and colours it.
+- **Glass and GUI:** red stained glass in the gap turns the beam red, and the GUI menu reports the module pointing east, with its partner *ahead*.
+- **Wrong way:** turning the far module to point east too gives *partner faces the wrong way*.
+- **Damage:** a pig standing in the sideways beam is hurt and set on fire.
+
+In the real client (`46_zero_point_sideways.png`), an east–west pair on two walls draws an orange beam (red glass, then a yellow pane) along the room, and a north–south pair on pillars draws a blue one above it. The rotated models sit flat against their walls. The east module's GUI (`47_zero_point_sideways_gui.png`) shows *+5,000 FE/t* for its 5-block gap and *Linked: buffer full*. The vertical tests are unchanged and still pass.
+
+The block state property changed from `vertical_direction` (up/down) to `facing` (all six directions). Modules placed in a world before this change come back pointing up, so ceiling modules need placing again.
 
 ### Zero Point beam damage (`zero_point_beam_burns_what_touches_it`)
 

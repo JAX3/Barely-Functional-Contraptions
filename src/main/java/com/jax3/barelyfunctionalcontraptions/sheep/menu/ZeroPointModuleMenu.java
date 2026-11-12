@@ -5,6 +5,7 @@ import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModMenus;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -67,7 +68,17 @@ public class ZeroPointModuleMenu extends AbstractContainerMenu {
     public int getLinkDistance() { return data.get(8); }
     public int getOutRate() { return int32(9); }
     /** True for a floor module (emitter up), false for a ceiling module. */
-    public boolean facesUp() { return data.get(11) == 1; }
+    /** Which way this module's emitter points. */
+    public Direction facing() { return Direction.from3DDataValue(data.get(11)); }
+
+    /** Lang suffix for where the partner should be: "above", "below" or (for a wall module) "ahead". */
+    public String towards() {
+        return switch (facing()) {
+            case UP -> "above";
+            case DOWN -> "below";
+            default -> "ahead";
+        };
+    }
     public ZeroPointLink getLink() { return ZeroPointLink.byId(data.get(12)); }
     /** How far along the column the last scan stopped. */
     public int getStoppedAt() { return data.get(13); }

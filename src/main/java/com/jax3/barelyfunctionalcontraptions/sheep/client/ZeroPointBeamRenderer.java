@@ -29,6 +29,8 @@ public class ZeroPointBeamRenderer implements BlockEntityRenderer<ZeroPointEnerg
         /** Beam pieces, bottom to top; empty when no beam is drawn. */
         final java.util.List<Piece> pieces = new java.util.ArrayList<>();
         float animationTime;
+        /** Which way the lead module points; the beam is drawn "up" and turned to point this way. */
+        Direction facing = Direction.UP;
     }
 
     /** One single-coloured stretch of beam, from {@code bottom} to {@code top} blocks above the floor module. */
@@ -46,10 +48,11 @@ public class ZeroPointBeamRenderer implements BlockEntityRenderer<ZeroPointEnerg
         BlockEntityRenderer.super.extractRenderState(be, state, partialTicks, cameraPosition, breakProgress);
         state.pieces.clear();
         state.animationTime = be.getLevel() != null ? Math.floorMod(be.getLevel().getGameTime(), 40) + partialTicks : 0;
-        boolean floorModule = be.getBlockState().hasProperty(ZeroPointEnergyModuleBlock.FACING)
-                && be.getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING) == Direction.UP;
+        if (!be.getBlockState().hasProperty(ZeroPointEnergyModuleBlock.FACING)) return;
+        Direction facing = be.getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING);
         int distance = be.getLinkDistance();
-        if (!floorModule || distance <= 0) return;
+        if (!ZeroPointEnergyModuleBlockEntity.isLead(facing) || distance <= 0) return;
+        state.facing = facing;
         // Both emitter tips are half a block into their blocks (the floor one at +0.5, the ceiling one at
         // distance + 0.5), so the beam is exactly as long as the distance between the two modules.
         float beamTop = distance + EMITTER_TIP;
@@ -59,6 +62,10 @@ public class ZeroPointBeamRenderer implements BlockEntityRenderer<ZeroPointEnerg
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        if (state.pieces.isEmpty()) return;
+        // Turn the block about its centre so "up" points along the emitter: the beacon helper always draws upwards.
+        poseStack.pushPose();
+        poseStack.rotateAround(state.facing.getRotation(), 0.5F, 0.5F, 0.5F);
         for (Piece piece : state.pieces) {
             float length = piece.top() - piece.bottom();
             poseStack.pushPose();
@@ -68,6 +75,7 @@ public class ZeroPointBeamRenderer implements BlockEntityRenderer<ZeroPointEnerg
                     0, 1, piece.color(), 0.1F, 0.16F);
             poseStack.popPose();
         }
+        poseStack.popPose();
     }
 
     @Override
@@ -83,6 +91,8 @@ public class ZeroPointBeamRenderer implements BlockEntityRenderer<ZeroPointEnerg
     @Override
     public AABB getRenderBoundingBox(ZeroPointEnergyModuleBlockEntity be) {
         BlockPos pos = be.getBlockPos();
-        return new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0, pos.getY() + Math.max(1, be.getLinkDistance()) + 1.0, pos.getZ() + 1.0);
+        Direction facing = be.getBlockState().hasProperty(ZeroPointEnergyModuleBlock.FACING)
+                ? be.getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING) : Direction.UP;
+        return new AABB(pos).minmax(new AABB(pos.relative(facing, Math.max(1, be.getLinkDistance()))));
     }
 }

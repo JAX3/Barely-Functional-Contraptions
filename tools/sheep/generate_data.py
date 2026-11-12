@@ -273,13 +273,16 @@ def block_models():
                 emitter,
             ],
         })
+    # Turned like an end rod: the model points up, and each facing rotates it (x first, then y).
     variants = {}
-    for facing, x in (("up", None), ("down", 180)):
+    for facing, x, y in (("up", 0, 0), ("down", 180, 0), ("north", 90, 0), ("east", 90, 90), ("south", 90, 180), ("west", 90, 270)):
         for linked in ("false", "true"):
             v = {"model": zpe + ("on" if linked == "true" else "off")}
             if x:
                 v["x"] = x
-            variants[f"linked={linked},vertical_direction={facing}"] = v
+            if y:
+                v["y"] = y
+            variants[f"facing={facing},linked={linked}"] = v
     write(os.path.join(ASSETS, "blockstates", "zero_point_energy_module.json"), {"variants": variants})
     write(os.path.join(ASSETS, "items", "zero_point_energy_module.json"),
           {"model": {"type": "minecraft:model", "model": zpe + "on"}})
@@ -383,7 +386,7 @@ def lang():
         "config.jade.plugin_barelyfunctionalcontraptions.energy_cable": "Energy Cable",
         "jade.barelyfunctionalcontraptions.cable.network": "Network: %s cables, %s blocks plugged in",
         "jade.barelyfunctionalcontraptions.cable.rate": "Moving %s / %s FE/t",
-        "tooltip.barelyfunctionalcontraptions.zero_point_energy_module": "Generates Forge Energy in pairs: place one on the floor and one on the ceiling directly above it, with open space between. The bigger the gap, the more power, and all of it can be taken from either module. Right-click to see the beam connection.",
+        "tooltip.barelyfunctionalcontraptions.zero_point_energy_module": "Generates Forge Energy in pairs: place two facing each other, one on the floor and one on the ceiling above it, or one on each of two facing walls, with open space between. The bigger the gap, the more power, and all of it can be taken from either module. Right-click to see the beam connection.",
         "gui.barelyfunctionalcontraptions.zpe.generating": "+%s FE/t",
         "gui.barelyfunctionalcontraptions.zpe.shared": "Shared pool",
         "gui.barelyfunctionalcontraptions.zpe.not_linked": "Not linked",
@@ -392,22 +395,29 @@ def lang():
         "gui.barelyfunctionalcontraptions.zpe.status.full.desc": "Nothing is taking the energy. Put a machine, cable or Hume Energy Cube against the module.",
         "gui.barelyfunctionalcontraptions.zpe.status.blocked.above": "Beam blocked %s above",
         "gui.barelyfunctionalcontraptions.zpe.status.blocked.below": "Beam blocked %s below",
+        "gui.barelyfunctionalcontraptions.zpe.status.blocked.ahead": "Beam blocked %s ahead",
         "gui.barelyfunctionalcontraptions.zpe.status.wrong_facing": "Partner faces wrong way",
         "gui.barelyfunctionalcontraptions.zpe.status.too_close": "Partner too close",
         "gui.barelyfunctionalcontraptions.zpe.status.no_module.above": "No module above",
         "gui.barelyfunctionalcontraptions.zpe.status.no_module.below": "No module below",
+        "gui.barelyfunctionalcontraptions.zpe.status.no_module.ahead": "No module ahead",
         "gui.barelyfunctionalcontraptions.zpe.beam.tooltip": "Beam connection",
         "gui.barelyfunctionalcontraptions.zpe.beam.this.up": "This module (marked) is on the floor, pointing up.",
         "gui.barelyfunctionalcontraptions.zpe.beam.this.down": "This module (marked) is on the ceiling, pointing down.",
+        "gui.barelyfunctionalcontraptions.zpe.beam.this.side": "This module (marked) is on a wall, pointing sideways. The diagram shows its beam standing up.",
         "gui.barelyfunctionalcontraptions.zpe.desc.linked.above": "Linked to the module %s blocks above (%s blocks of open space).",
         "gui.barelyfunctionalcontraptions.zpe.desc.linked.below": "Linked to the module %s blocks below (%s blocks of open space).",
+        "gui.barelyfunctionalcontraptions.zpe.desc.linked.ahead": "Linked to the module %s blocks ahead (%s blocks of open space).",
         "gui.barelyfunctionalcontraptions.zpe.desc.blocked.above": "A solid block %s blocks above stops the beam. Clear it, or swap it for glass.",
         "gui.barelyfunctionalcontraptions.zpe.desc.blocked.below": "A solid block %s blocks below stops the beam. Clear it, or swap it for glass.",
+        "gui.barelyfunctionalcontraptions.zpe.desc.blocked.ahead": "A solid block %s blocks ahead stops the beam. Clear it, or swap it for glass.",
         "gui.barelyfunctionalcontraptions.zpe.desc.wrong_facing.above": "The module %s blocks above points up too. Place it on the underside of a block so it points down.",
         "gui.barelyfunctionalcontraptions.zpe.desc.wrong_facing.below": "The module %s blocks below points down too. Place it on top of a block so it points up.",
+        "gui.barelyfunctionalcontraptions.zpe.desc.wrong_facing.ahead": "The module %s blocks ahead doesn't point back at this one. Place it on the wall facing this module.",
         "gui.barelyfunctionalcontraptions.zpe.desc.too_close": "The modules need more open space between them. Move one further away.",
         "gui.barelyfunctionalcontraptions.zpe.desc.no_module.above": "No module within %s blocks above. Place one on a ceiling directly above, pointing down.",
         "gui.barelyfunctionalcontraptions.zpe.desc.no_module.below": "No module within %s blocks below. Place one on the floor directly below, pointing up.",
+        "gui.barelyfunctionalcontraptions.zpe.desc.no_module.ahead": "No module within %s blocks ahead. Place one on the facing wall, straight in front of this one, pointing back at it.",
         "gui.barelyfunctionalcontraptions.zpe.generation.tooltip": "Generation",
         "gui.barelyfunctionalcontraptions.zpe.generation.desc": "A linked pair makes more power the further apart the modules are. The two modules share one pool of energy, so all of it can be taken from either one. The gauge shows the whole pool. Out: energy leaving the pool through either module, averaged over a second.",
         "subtitles.barelyfunctionalcontraptions.zero_point_hum": "Zero Point Energy Module hums",
@@ -416,6 +426,7 @@ def lang():
         "jade.barelyfunctionalcontraptions.zpe.unlinked": "No partner: needs a module facing it in the same column",
         "jade.barelyfunctionalcontraptions.zpe.linked_above": "Linked to the module above (%s block gap)",
         "jade.barelyfunctionalcontraptions.zpe.linked_below": "Linked to the module below (%s block gap)",
+        "jade.barelyfunctionalcontraptions.zpe.linked_ahead": "Linked to the module ahead (%s block gap)",
         "jade.barelyfunctionalcontraptions.zpe.output": "+%s FE/t, from either module",
         "config.jade.plugin_barelyfunctionalcontraptions.zero_point_module": "Zero Point Energy Module",
         "tooltip.barelyfunctionalcontraptions.functional_machine_block": "The casing every machine is built around.",

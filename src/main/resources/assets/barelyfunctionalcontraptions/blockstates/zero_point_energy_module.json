@@ -1,18 +1,56 @@
 {
   "variants": {
-    "linked=false,vertical_direction=up": {
+    "facing=up,linked=false": {
       "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/off"
     },
-    "linked=true,vertical_direction=up": {
+    "facing=up,linked=true": {
       "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on"
     },
-    "linked=false,vertical_direction=down": {
+    "facing=down,linked=false": {
       "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/off",
       "x": 180
     },
-    "linked=true,vertical_direction=down": {
+    "facing=down,linked=true": {
       "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on",
       "x": 180
+    },
+    "facing=north,linked=false": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/off",
+      "x": 90
+    },
+    "facing=north,linked=true": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on",
+      "x": 90
+    },
+    "facing=east,linked=false": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/off",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,linked=true": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on",
+      "x": 90,
+      "y": 90
+    },
+    "facing=south,linked=false": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/off",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,linked=true": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on",
+      "x": 90,
+      "y": 180
+    },
+    "facing=west,linked=false": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/off",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,linked=true": {
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on",
+      "x": 90,
+      "y": 270
     }
   }
 }

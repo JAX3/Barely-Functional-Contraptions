@@ -78,7 +78,7 @@ public class ZeroPointModuleScreen extends AbstractContainerScreen<ZeroPointModu
      * blocking block, a module facing the wrong way, a partner too close, or a dashed outline when nothing is there.
      */
     private void extractDiagram(GuiGraphicsExtractor graphics, int x, int y, long time) {
-        boolean up = menu.facesUp();
+        boolean up = menu.facing() != net.minecraft.core.Direction.DOWN; // wall modules are drawn like floor ones
         ZeroPointLink link = menu.getLink();
         boolean linked = link == ZeroPointLink.LINKED;
         int selfY = up ? BOTTOM_Y : TOP_Y;
@@ -140,7 +140,7 @@ public class ZeroPointModuleScreen extends AbstractContainerScreen<ZeroPointModu
     /** The status line beside the lamp. */
     private Component statusText() {
         ZeroPointLink link = menu.getLink();
-        String dir = menu.facesUp() ? "above" : "below";
+        String dir = menu.towards();
         return switch (link) {
             case LINKED -> menu.isBufferFull()
                     ? Component.translatable("gui.barelyfunctionalcontraptions.zpe.status.full")
@@ -174,14 +174,18 @@ public class ZeroPointModuleScreen extends AbstractContainerScreen<ZeroPointModu
         super.extractTooltip(graphics, mouseX, mouseY);
         if (!menu.getCarried().isEmpty() || hoveredSlot != null) return;
         List<Component> lines = new ArrayList<>();
-        String dir = menu.facesUp() ? "above" : "below";
+        String dir = menu.towards();
         if (isHovering(GAUGE_X - 2, GAUGE_Y - 2, GAUGE_W + 4, GAUGE_H + 4, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", fe(menu.getAmount()), fe(menu.getCapacity())));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.cube.percent",
                     String.format(Locale.ROOT, "%.1f", menu.getFillFraction() * 100)).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(DIAGRAM_X, DIAGRAM_Y, DIAGRAM_W, DIAGRAM_H, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.zpe.beam.tooltip"));
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.zpe.beam.this." + (menu.facesUp() ? "up" : "down"))
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.zpe.beam.this." + switch (menu.facing()) {
+                case UP -> "up";
+                case DOWN -> "down";
+                default -> "side";
+            })
                     .withStyle(ChatFormatting.GRAY));
             lines.add(linkDescription(dir).withStyle(menu.getLink() == ZeroPointLink.LINKED ? ChatFormatting.AQUA : ChatFormatting.RED));
         } else if (isHovering(80, 44, 88, 34, mouseX, mouseY)) {

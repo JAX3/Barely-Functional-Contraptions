@@ -74,7 +74,7 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
                 case 8 -> linkDistance;
                 case 9 -> getPairOutRate() & 0xFFFF;
                 case 10 -> getPairOutRate() >>> 16;
-                case 11 -> getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING) == Direction.UP ? 1 : 0;
+                case 11 -> getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING).get3DDataValue();
                 case 12 -> link.ordinal();
                 case 13 -> stoppedAt;
                 case 14 -> ModConfigs.getInt(ModConfigs.SERVER.zpeMaxRange);
@@ -103,7 +103,7 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         }
         if (generating > 0) energy.generate(generating);
         pushEnergy(level, pos);
-        if (linkDistance > 0 && state.getValue(ZeroPointEnergyModuleBlock.FACING) == Direction.UP) burnEntitiesInBeam(level, pos);
+        if (linkDistance > 0 && isLead(state.getValue(ZeroPointEnergyModuleBlock.FACING))) burnEntitiesInBeam(level, pos);
         if (level.getGameTime() % 20 == 0) {
             outRate = outThisSecond / 20;
             outThisSecond = 0;
@@ -129,9 +129,9 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         stoppedAt = scan.stoppedAt();
         int distance = scan.distance();
         int pairRate = pairOutput(distance);
-        // The floor module (facing up) keeps the odd FE so the pair adds up to exactly pairRate.
-        int share = facing == Direction.UP ? (pairRate + 1) / 2 : pairRate / 2;
-        int[] sections = facing == Direction.UP ? beamSections(level, pos, distance) : new int[0];
+        // The lead module keeps the odd FE so the pair adds up to exactly pairRate.
+        int share = isLead(facing) ? (pairRate + 1) / 2 : pairRate / 2;
+        int[] sections = isLead(facing) ? beamSections(level, pos, facing, distance) : new int[0];
         if (distance == linkDistance && share == generating && java.util.Arrays.equals(sections, beamSections)) return;
         linkDistance = distance;
         generating = share;
@@ -171,6 +171,14 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         return new ZeroPointLink.Scan(0, ZeroPointLink.NO_MODULE, maxRange);
     }
 
+    /**
+     * Which module of a pair leads: the one pointing up, south or east (the positive way along the beam's axis). The
+     * lead draws the beam, colours it, burns what touches it and keeps the odd FE, so each pair does those once.
+     */
+    public static boolean isLead(Direction facing) {
+        return facing.getAxisDirection() == Direction.AxisDirection.POSITIVE;
+    }
+
     /** The beam's damage type (data/barelyfunctionalcontraptions/damage_type/zero_point_beam.json). */
     public static final net.minecraft.resources.ResourceKey<net.minecraft.world.damagesource.DamageType> BEAM_DAMAGE =
             net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE,
@@ -178,15 +186,21 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
     /** Half the width of the beam's damage area: a little wider than the drawn glow (0.16), so touching it counts. */
     private static final double BEAM_HALF_WIDTH = 0.2;
 
-    /** The space the beam fills, from the floor emitter's tip to the ceiling emitter's, for a pair this far apart. */
-    public static net.minecraft.world.phys.AABB beamArea(BlockPos floorPos, int distance) {
-        double x = floorPos.getX() + 0.5, z = floorPos.getZ() + 0.5;
-        return new net.minecraft.world.phys.AABB(x - BEAM_HALF_WIDTH, floorPos.getY() + 0.5, z - BEAM_HALF_WIDTH,
-                x + BEAM_HALF_WIDTH, floorPos.getY() + distance + 0.5, z + BEAM_HALF_WIDTH);
+    /**
+     * The space the beam fills, from the lead emitter's tip (at {@code leadPos}, pointing {@code facing}) to its
+     * partner's, for a pair this far apart. Both tips are at the middle of their blocks.
+     */
+    public static net.minecraft.world.phys.AABB beamArea(BlockPos leadPos, Direction facing, int distance) {
+        net.minecraft.world.phys.Vec3 start = net.minecraft.world.phys.Vec3.atCenterOf(leadPos);
+        net.minecraft.world.phys.Vec3 end = net.minecraft.world.phys.Vec3.atCenterOf(leadPos.relative(facing, distance));
+        return new net.minecraft.world.phys.AABB(start, end).inflate(
+                facing.getAxis() == Direction.Axis.X ? 0 : BEAM_HALF_WIDTH,
+                facing.getAxis() == Direction.Axis.Y ? 0 : BEAM_HALF_WIDTH,
+                facing.getAxis() == Direction.Axis.Z ? 0 : BEAM_HALF_WIDTH);
     }
 
     /**
-     * Hurts and ignites every living thing in the beam (only the floor module does this, so each beam hits once).
+     * Hurts and ignites every living thing in the beam (only the lead module does this, so each beam hits once).
      * Living things are only hurt twice a second at most by the normal hurt cooldown; creative and spectator players,
      * and anything invulnerable, are left alone by the usual damage rules.
      */
@@ -194,7 +208,7 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         float damage = (float) ModConfigs.getDouble(ModConfigs.SERVER.zpeBeamDamage);
         if (damage <= 0) return;
         int burnSeconds = ModConfigs.getInt(ModConfigs.SERVER.zpeBeamBurnSeconds);
-        var targets = level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, beamArea(pos, linkDistance),
+        var targets = level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, beamArea(pos, getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING), linkDistance),
                 e -> e.isAlive() && !e.isSpectator());
         if (targets.isEmpty()) return;
         var source = level.damageSources().source(BEAM_DAMAGE);
@@ -222,12 +236,12 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
     public static final int BEAM_COLOR = 0xFF3FC8FF;
 
     /**
-     * Colour sections of a beam going {@code distance} blocks up from {@code pos}, with a beacon's rules: the beam
+     * Colour sections of a beam going {@code distance} blocks from {@code pos} towards {@code facing}, with a beacon's rules: the beam
      * starts {@link #BEAM_COLOR}; the first block with a beacon colour (stained glass or panes, or a modded block that
      * colours beacon beams) replaces it, and each later one with a different colour starts a section with the average
      * of the two. Returned as (start, colour) pairs; empty when not linked.
      */
-    public static int[] beamSections(Level level, BlockPos pos, int distance) {
+    public static int[] beamSections(Level level, BlockPos pos, Direction facing, int distance) {
         if (distance <= 0) return new int[0];
         it.unimi.dsi.fastutil.ints.IntArrayList out = new it.unimi.dsi.fastutil.ints.IntArrayList();
         out.add(0);
@@ -235,7 +249,7 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
         boolean tinted = false;
         int color = BEAM_COLOR;
         for (int i = 1; i < distance; i++) {
-            BlockPos at = pos.above(i);
+            BlockPos at = pos.relative(facing, i);
             Integer glass = level.getBlockState(at).getBeaconColorMultiplier(level, at, pos);
             if (glass == null || (tinted && glass == color)) continue;
             color = tinted ? net.minecraft.util.ARGB.average(color, glass) : glass;

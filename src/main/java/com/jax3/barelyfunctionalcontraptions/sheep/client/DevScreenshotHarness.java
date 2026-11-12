@@ -388,6 +388,27 @@ public final class DevScreenshotHarness {
             case 2065 -> shot(mc, "45_config_mycelium");
             case 2067 -> {
                 mc.gui.setScreen(null);
+                setHudHidden(mc, true);
+                server.execute(() -> sidewaysScene(server));
+            }
+            case 2110 -> shot(mc, "46_zero_point_sideways");
+            case 2111 -> {
+                setHudHidden(mc, false);
+                command(server, "clear @a");
+                // Close enough for the module's menu to stay open.
+                server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 10", sidewaysBase.getX() + 2.5, sidewaysBase.getY(), sidewaysBase.getZ() + 3.5)));
+            }
+            case 2112 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                if (server.overworld().getBlockEntity(sidewaysBase.above()) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity be) {
+                    player.openMenu(be, sidewaysBase.above());
+                }
+            });
+            case 2130 -> shot(mc, "47_zero_point_sideways_gui");
+            case 2132 -> {
+                mc.player.closeContainer();
+                mc.gui.setScreen(null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -712,6 +733,42 @@ public final class DevScreenshotHarness {
         }
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 200 25", base.getX() + 2.0, base.getY() + 2, base.getZ() + 7.5));
+    }
+
+    private static BlockPos sidewaysBase;
+
+    /**
+     * Zero Point modules on walls: an east-west pair across a 6-block room with red and yellow glass in the gap, and a
+     * north-south pair crossing above it, plus a floor-to-ceiling pair in the corner for comparison.
+     */
+    private static void sidewaysScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        BlockPos base = origin.offset(112, 30, -4);
+        sidewaysBase = base;
+        for (int x = -2; x <= 8; x++) for (int z = -4; z <= 4; z++) {
+            level.setBlock(base.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+            for (int y = 0; y <= 6; y++) level.setBlock(base.offset(x, y, z), Blocks.AIR.defaultBlockState(), 3);
+        }
+        // Two walls, 7 apart, east and west.
+        for (int y = 0; y <= 4; y++) for (int z = -3; z <= 3; z++) {
+            level.setBlock(base.offset(-1, y, z), Blocks.STONE_BRICKS.defaultBlockState(), 3);
+            level.setBlock(base.offset(7, y, z), Blocks.STONE_BRICKS.defaultBlockState(), 3);
+        }
+        var module = ModBlocks.ZERO_POINT_ENERGY_MODULE.get().defaultBlockState();
+        var facing = com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.FACING;
+        level.setBlock(base.above(), module.setValue(facing, Direction.EAST), 3);
+        level.setBlock(base.offset(6, 1, 0), module.setValue(facing, Direction.WEST), 3);
+        level.setBlock(base.offset(2, 1, 0), Blocks.STAINED_GLASS.red().defaultBlockState(), 3);
+        level.setBlock(base.offset(4, 1, 0), Blocks.STAINED_GLASS_PANE.yellow().defaultBlockState(), 3);
+        // A north-south pair higher up, hanging off two pillars.
+        for (int y = 0; y <= 4; y++) {
+            level.setBlock(base.offset(3, y, -4), Blocks.STONE_BRICKS.defaultBlockState(), 3);
+        }
+        level.setBlock(base.offset(3, 3, -3), module.setValue(facing, Direction.SOUTH), 3);
+        level.setBlock(base.offset(3, 3, 3), module.setValue(facing, Direction.NORTH), 3);
+        level.setBlock(base.offset(3, 3, 4), Blocks.STONE_BRICKS.defaultBlockState(), 3);
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 25", base.getX() + 3.5, base.getY() + 5, base.getZ() + 10.0));
     }
 
     /** Opens the floor module's GUI for the player. */

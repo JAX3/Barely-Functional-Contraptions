@@ -30,9 +30,12 @@ public enum ZeroPointModuleProvider implements IBlockComponentProvider {
             tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.zpe.unlinked").withStyle(ChatFormatting.RED));
             return;
         }
-        boolean up = accessor.getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING) == Direction.UP;
-        tooltip.add(Component.translatable(up ? "jade.barelyfunctionalcontraptions.zpe.linked_above" : "jade.barelyfunctionalcontraptions.zpe.linked_below",
-                distance - 1).withColor(0x3FC8FF));
+        String where = switch (accessor.getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING)) {
+            case UP -> "above";
+            case DOWN -> "below";
+            default -> "ahead";
+        };
+        tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.zpe.linked_" + where, distance - 1).withColor(0x3FC8FF));
         tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.zpe.output",
                 String.format(Locale.ROOT, "%,d", be.getPairOutput())).withStyle(ChatFormatting.GRAY));
     }

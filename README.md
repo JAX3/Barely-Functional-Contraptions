@@ -303,14 +303,19 @@ Any shape works, not just full boxes. L-shapes, rings and walls with bends get p
 ![Hume Energy Cube recipe: iron ingots in the corners, amethyst shards on the top and sides, a block of redstone in the centre, a Functional Machine Block bottom middle](docs/screenshots/recipe_hume_energy_cube.png)
 
 ### Zero Point Energy Module
-A generator that comes in pairs. Put one module on the floor and another on the ceiling **directly above it**, with open space between them. The two link with a **blue beam** and make Forge Energy out of the gap: **the farther apart they are, the more power they make**.
+A generator that comes in pairs. Put one module on the floor and another on the ceiling **directly above it**, or one on each of **two walls facing each other**, with open space between them. The two link with a **blue beam** and make Forge Energy out of the gap: **the farther apart they are, the more power they make**.
 
 | A linked pair, 5 blocks apart | Jade on the floor module |
 |---|---|
 | ![Two Zero Point Energy Modules, one on the floor and one under a stone overhang, joined by a blue beam, charging a Hume Energy Cube](docs/screenshots/29_zero_point_modules.png) | ![Jade: linked to the module above (5 block gap), +5,000 FE/t from either module, 2.5 kFE of 100 kFE](docs/screenshots/30_zero_point_jade.png) |
 
-- **Placing:** it goes on like an end rod. Placed on top of a block, the emitter points **up**; placed on the underside of a block (a ceiling), it points **down**. Placed against a wall, it points the opposite way to the way you're looking (look down to make it point up).
-- **Linking:** a module pointing up links with the **nearest module above it in the same column** that points down. The two must:
+- **Placing:** it goes on like an end rod, pointing **away from the block you place it against**. On top of a block the emitter points **up**, on the underside of a block (a ceiling) it points **down**, and on the side of a block (a wall) it points **straight out from the wall**.
+- **Sideways pairs:** two modules on facing walls work exactly like a floor and ceiling pair: same power per block of gap, same beam (stained glass colours it, and it burns anything that walks through it), same GUI. A beam running along the floor is a handy mob trap.
+
+  | Wall-to-wall pairs | The GUI of a wall module |
+  |---|---|
+  | ![An east-west pair of Zero Point modules on two stone-brick walls, joined by an orange beam through red glass and a yellow pane, with a blue north-south beam crossing above it between two pillars](docs/screenshots/46_zero_point_sideways.png) | ![Zero Point Energy Module GUI for a wall module: linked, +5,000 FE/t, shared pool](docs/screenshots/47_zero_point_sideways_gui.png) |
+- **Linking:** a module links with the **nearest module straight ahead of its emitter** (above it, below it, or across the room) that points back at it. The two must:
   - face each other (two modules pointing the same way never link);
   - have at least one block of open space between them (`minGap`), and be no more than 64 blocks apart (`maxRange`);
   - have nothing solid in the way. The beam passes through air, glass, panes, leaves and anything else see-through, so you can build a glass tube around it. Any solid block breaks the link.
