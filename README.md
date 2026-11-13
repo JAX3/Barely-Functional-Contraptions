@@ -393,6 +393,12 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 
 ![Zero Point Energy Module recipe: iron ingots top left and right, a beacon top middle, amethyst shards on the sides, a Functional Machine Block in the centre, copper ingots bottom left and right and a block of redstone bottom middle, making 2](docs/screenshots/recipe_zero_point_energy_module.png)
 
+### New blocks at a glance
+
+![Glow Panels (in the sun, under a Glow Lamp and shaded), the Contraptions Manual in a frame, an Energy Meter reading 60 FE/t, and Item and Fluid Pipes with orange Pull and green Push plugs](docs/screenshots/61_new_blocks.png)
+
+*From the left: a Glow Panel in the sun, a Glow Lamp on a panel, a shaded panel with the Contraptions Manual framed on it, an Energy Meter reading a panel's 60 FE/t, and Item and Fluid Pipes with Pull (orange) and Push (green) sides. Staged with `./gradlew runClient -PscreenshotHarness -PharnessScene=new_blocks`.*
+
 ### Glow Panel and Glow Lamp
 The **Glow Panel** is a thin, solar-style generator that makes Forge Energy from the **light falling on its top**. The **Glow Lamp** is a full-brightness lamp of glow ink that keeps the panels going at night and underground.
 

@@ -81,6 +81,10 @@ public final class DevScreenshotHarness {
         if (mc.player == null || server == null || mc.level == null) return;
         tick++;
         mc.gui.toastManager().clear();
+        if ("new_blocks".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            newBlocksTick(mc, server);
+            return;
+        }
         if ("power_blocks".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             powerBlocksTick(mc, server);
             return;
@@ -1115,6 +1119,78 @@ public final class DevScreenshotHarness {
         if (player.level().getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity be) {
             player.openMenu(be, pos); // the menu needs the position, exactly like a right-click on the block
         }
+    }
+
+    /** Every block added in the latest update, labelled: {@code -PharnessScene=new_blocks}. */
+    private static void newBlocksTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> newBlocksScene(server));
+            case 70 -> setHudHidden(mc, true);
+            case 160 -> shot(mc, "62_new_blocks");
+            case 162 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 22", origin.getX() - 4.0, origin.getY() + 2, origin.getZ() + 0.5));
+            case 200 -> shot(mc, "63_new_blocks_power");
+            case 202 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 22", origin.getX() + 6.0, origin.getY() + 2, origin.getZ() + 0.5));
+            case 240 -> shot(mc, "64_new_blocks_pipes");
+            case 250 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    private static void label(MinecraftServer server, BlockPos at, String text, String colour) {
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), String.format(java.util.Locale.ROOT,
+                "summon text_display %.2f %.2f %.2f {billboard:\"center\",text:{text:\"%s\",color:\"%s\"},background:1342177280,transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[1.3f,1.3f,1.3f]}}",
+                at.getX() + 0.5, at.getY() + 0.2, at.getZ() + 0.5, text, colour));
+    }
+
+    private static void newBlocksScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false", "gamerule advance_weather false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-12, 0, -10), o.offset(12, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-12, -1, -10), o.offset(12, -1, 6))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
+        int z = -4;
+        var panel = ModBlocks.GLOW_PANEL.get().defaultBlockState();
+        // Glow Panel in the sun; a Glow Lamp on a panel; a panel shaded by stone, with the Contraptions Manual framed on the stone.
+        level.setBlock(o.offset(-8, 0, z), panel, 3);
+        label(server, o.offset(-8, 1, z), "Glow Panel", "aqua");
+        level.setBlock(o.offset(-6, 0, z), panel, 3);
+        level.setBlock(o.offset(-6, 1, z), ModBlocks.GLOW_LAMP.get().defaultBlockState(), 3);
+        label(server, o.offset(-6, 2, z), "Glow Lamp", "aqua");
+        level.setBlock(o.offset(-4, 0, z), panel, 3);
+        level.setBlock(o.offset(-4, 1, z), Blocks.STONE_BRICKS.defaultBlockState(), 3);
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), String.format(java.util.Locale.ROOT,
+                "summon item_frame %d %d %d {Facing:3b,Fixed:1b,Item:{id:\"barelyfunctionalcontraptions:contraptions_manual\",count:1}}",
+                o.getX() - 4, o.getY() + 1, o.getZ() + z + 1));
+        label(server, o.offset(-4, 3, z), "Contraptions Manual", "yellow");
+        // Energy Meter: a Glow Panel in the sun -> meter -> Hume Energy Cube (a steady 60 FE/t).
+        level.setBlock(o.offset(-2, 0, z), panel, 3);
+        level.setBlock(o.offset(-1, 0, z), ModBlocks.ENERGY_METER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.EAST), 3);
+        level.setBlock(o.offset(0, 0, z), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        label(server, o.offset(-1, 1, z), "Energy Meter", "light_purple");
+        // Item Pipes: chest -> Pull (orange) ... Push (green) -> chest.
+        level.setBlock(o.offset(2, 0, z), Blocks.CHEST.defaultBlockState(), 3);
+        if (level.getBlockEntity(o.offset(2, 0, z)) instanceof net.minecraft.world.Container chest) chest.setItem(0, new ItemStack(Items.IRON_INGOT, 64));
+        level.setBlock(o.offset(5, 0, z), Blocks.CHEST.defaultBlockState(), 3);
+        var itemPipe = ModBlocks.ITEM_PIPE.get();
+        for (int x = 3; x <= 4; x++) level.setBlock(o.offset(x, 0, z), itemPipe.withConnections(itemPipe.defaultBlockState(), level, o.offset(x, 0, z)), 3);
+        setSide(level, o.offset(3, 0, z), Direction.WEST, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PULL);
+        setSide(level, o.offset(4, 0, z), Direction.EAST, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PUSH);
+        label(server, o.offset(3, 1, z), "Item Pipe: Pull / Push", "gold");
+        // Fluid Pipes: Fluid Tank -> Pull ... Push -> Fluid Tank.
+        level.setBlock(o.offset(7, 0, z), ModBlocks.FLUID_TANK.get().defaultBlockState(), 3);
+        level.setBlock(o.offset(10, 0, z), ModBlocks.FLUID_TANK.get().defaultBlockState(), 3);
+        var fluidPipe = ModBlocks.FLUID_PIPE.get();
+        for (int x = 8; x <= 9; x++) level.setBlock(o.offset(x, 0, z), fluidPipe.withConnections(fluidPipe.defaultBlockState(), level, o.offset(x, 0, z)), 3);
+        setSide(level, o.offset(8, 0, z), Direction.WEST, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PULL);
+        setSide(level, o.offset(9, 0, z), Direction.EAST, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PUSH);
+        label(server, o.offset(8, 2, z), "Fluid Pipe: Pull / Push", "aqua");
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 15", o.getX() + 1.0, o.getY() + 3, o.getZ() + 8.5));
     }
 
     /** Glow Panels, Glow Lamps and Energy Meters: {@code -PharnessScene=power_blocks}. */
