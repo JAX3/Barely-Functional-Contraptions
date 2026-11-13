@@ -38,7 +38,8 @@
         "- Right-click a generator, then another generator, to link them into one network (up to 64 blocks apart).",
         "- Right-click a generator, then a Mechanical Separator, Automatic Shears or Hume Energy Cube, to power it wirelessly.",
         "- Sneak and right-click a block to remove its links. Sneak and right-click the air to clear your selection.",
-        "The generator's screen shows how it is connected and which machines it is powering."
+        "The generator's screen shows how it is connected and which machines it is powering.",
+        "The wrench also sets each side of a Fluid or Item Pipe: see Pipe Sides."
       ]
     },
     {
@@ -135,15 +136,16 @@
       "title": "Pipe Sides",
       "icon": "barelyfunctionalcontraptions:item_pipe",
       "text": [
-        "Each side where a Fluid or Item Pipe meets a block can be set up on its own.",
+        "Each side where a Fluid or Item Pipe meets a block can be set up on its own with the Barely Functional Wrench.",
         "## Modes",
-        "Right-click the plug with an empty hand to cycle it:",
+        "Right-click the plug with the wrench to cycle it:",
         "- Normal: fills the block, and only takes from pure sources such as the Automatic Shears.",
         "- Pull (orange): empties the block, chests and tanks included.",
         "- Push (green): only fills the block, never takes from it.",
-        "- Off: no connection. Click the face of the pipe's core to turn it back on.",
+        "- Off: no connection. Wrench the face of the pipe's core to turn it back on.",
         "## Filters",
-        "Right-click a plug holding an item, or a bucket of a fluid, to add it to that side's filter, or remove it again. Only filtered things pass that side. Sneak and right-click with an empty hand to clear it."
+        "Hold the wrench in one hand and an item, or a bucket of a fluid, in the other, and right-click the plug to add it to that side's filter or remove it again. Only filtered things pass that side.",
+        "Sneak and right-click with the wrench to clear the filter."
       ]
     },
     {

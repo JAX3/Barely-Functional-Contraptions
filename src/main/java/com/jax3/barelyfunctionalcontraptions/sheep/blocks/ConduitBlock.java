@@ -139,50 +139,52 @@ public abstract class ConduitBlock extends BaseEntityBlock {
     }
 
     /**
-     * Right-click with an empty hand: cycles the mode of the clicked side (Normal, Pull, Push, Off). Sneak-right-click
-     * with an empty hand clears that side's filter.
+     * The Barely Functional Wrench on a pipe side (see {@code MyceliumWrenchItem}):
+     * <ul>
+     *     <li>right-click: cycles the clicked side's mode (Normal, Pull, Push, Off);</li>
+     *     <li>right-click with an item, or a filled bucket on a Fluid Pipe, in the other hand: adds it to that side's
+     *     filter, or removes it if it's already there;</li>
+     *     <li>sneak-right-click: clears that side's filter.</li>
+     * </ul>
+     * Returns {@link InteractionResult#PASS} if the block isn't a configurable conduit or the side has nothing to plug into.
      */
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!(level.getBlockEntity(pos) instanceof Configurable configurable)) return InteractionResult.PASS;
+    public static InteractionResult useWrench(Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof ConduitBlock conduit) || !(level.getBlockEntity(pos) instanceof Configurable configurable)) return InteractionResult.PASS;
         Direction side = clickedSide(pos, hit);
-        if (!canPlugIntoSide(level, pos, side)) return InteractionResult.PASS;
-        if (!level.isClientSide()) {
-            if (player.isSecondaryUseActive()) {
-                configurable.setSide(side, configurable.side(side).withoutFilter());
-                player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.filter_cleared", sideName(side)));
-            } else {
-                PipeSide updated = configurable.side(side).withMode(configurable.side(side).mode().next());
-                configurable.setSide(side, updated);
-                player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.mode", sideName(side), updated.mode().displayName()));
-            }
-            BlockState updatedState = withConnections(state, level, pos);
-            if (updatedState != state) level.setBlock(pos, updatedState, Block.UPDATE_ALL);
-            level.updateNeighborsAt(pos, this);
+        if (!conduit.canPlugIntoSide(level, pos, side)) {
+            if (!level.isClientSide()) player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.nothing_here", sideName(side)));
+            return InteractionResult.SUCCESS;
         }
-        return InteractionResult.SUCCESS;
-    }
-
-    /** Right-click a plug holding an item: adds it to (or removes it from) that side's filter. */
-    @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!(level.getBlockEntity(pos) instanceof Configurable configurable)) return InteractionResult.TRY_WITH_EMPTY_HAND;
-        Direction side = clickedSide(pos, hit);
-        if (!state.getValue(SIDES.get(side)).plugged()) return InteractionResult.TRY_WITH_EMPTY_HAND;
-        var entry = configurable.filterEntry(stack);
-        if (entry.isEmpty()) return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (!level.isClientSide()) {
-            PipeSide before = configurable.side(side);
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
+        ItemStack other = player.getItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
+        PipeSide before = configurable.side(side);
+        if (player.isSecondaryUseActive()) {
+            configurable.setSide(side, before.withoutFilter());
+            player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.filter_cleared", sideName(side)));
+        } else if (!other.isEmpty()) {
+            var entry = configurable.filterEntry(other);
+            if (entry.isEmpty()) {
+                player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.cant_filter", other.getHoverName()));
+                return InteractionResult.SUCCESS;
+            }
             PipeSide after = before.toggle(entry.get());
             if (after == before) {
                 player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.filter_full", PipeSide.MAX_FILTER));
-            } else {
-                configurable.setSide(side, after);
-                boolean added = after.filter().contains(entry.get());
-                player.sendOverlayMessage(Component.translatable(added ? "message.barelyfunctionalcontraptions.pipe.filter_added"
-                        : "message.barelyfunctionalcontraptions.pipe.filter_removed", configurable.filterName(entry.get()), sideName(side), after.filter().size()));
+                return InteractionResult.SUCCESS;
             }
+            configurable.setSide(side, after);
+            boolean added = after.filter().contains(entry.get());
+            player.sendOverlayMessage(Component.translatable(added ? "message.barelyfunctionalcontraptions.pipe.filter_added"
+                    : "message.barelyfunctionalcontraptions.pipe.filter_removed", configurable.filterName(entry.get()), sideName(side), after.filter().size()));
+        } else {
+            PipeSide updated = before.withMode(before.mode().next());
+            configurable.setSide(side, updated);
+            player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.mode", sideName(side), updated.mode().displayName()));
         }
+        BlockState updatedState = conduit.withConnections(state, level, pos);
+        if (updatedState != state) level.setBlock(pos, updatedState, Block.UPDATE_ALL);
+        level.updateNeighborsAt(pos, conduit);
         return InteractionResult.SUCCESS;
     }
 

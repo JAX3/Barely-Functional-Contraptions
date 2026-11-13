@@ -724,5 +724,7 @@
   "direction.barelyfunctionalcontraptions.down": "Bottom",
   "item.barelyfunctionalcontraptions.contraptions_manual": "Contraptions Manual",
   "tooltip.barelyfunctionalcontraptions.contraptions_manual": "Right-click to read about everything in the mod.",
-  "guide.barelyfunctionalcontraptions.missing": "The guide's text is missing (assets/barelyfunctionalcontraptions/guide/en_us.json)."
+  "guide.barelyfunctionalcontraptions.missing": "The guide's text is missing (assets/barelyfunctionalcontraptions/guide/en_us.json).",
+  "message.barelyfunctionalcontraptions.pipe.nothing_here": "Nothing for the %s side to connect to",
+  "message.barelyfunctionalcontraptions.pipe.cant_filter": "%s can't go in this pipe's filter"
 }
