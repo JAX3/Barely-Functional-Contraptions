@@ -16,11 +16,11 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|
 | GameTest `themed_sheep_have_their_features` | ✅ All ten themed resources load with their features; Hay uses the hay-bale fleece; a Nether Star makes a Wither sheep, whose wool separates into nether stars; the original 14 resources have no extra features |
 | GameTest `glowing_sheep_lights_the_block_it_stands_in` | ✅ A Glow Ink sheep puts a light-level-12 light where it stands; once it's sheared the light goes out on its next check |
-| GameTest `screaming_sheep_bleats_like_a_screaming_goat` | ✅ A Ghast sheep's bleat becomes a screaming goat's; a plain sheep still bleats |
+| GameTest `ghast_sheep_screams_like_a_ghast` | ✅ A Ghast sheep's bleat becomes the ghast's scream, and its hurt and death sounds the ghast's, even when sheared; a plain sheep still bleats; the `screaming` feature on its own gives the screaming goat's sounds |
 | GameTest `ghast_sheep_is_twice_the_size` | ✅ A Ghast sheep's `minecraft:scale` becomes 2 and its hitbox doubles; shearing doesn't change it, and once the infusion is gone it's back to 1 with the modifier removed |
 | Generator GameTests | ✅ Updated: Wheat and Bone Meal are no longer generated (the Hay and Skeleton sheep cover them), and a generated copy of either is flagged as a duplicate |
 | Real client (`-PharnessScene=themed_sheep`) | ✅ Each sheep photographed side-on (`52_themed_sheep.png`): Wither Skeleton Skulls either side of the Wither sheep's head, using the game's skull texture (front view `53_themed_wither_front.png`), Dragon wings, spider legs, ghast tentacles, skull faces and bony legs, sculk tendrils with glowing strands, on-fire flames, hay fleece. At night (`53_themed_sheep_night.png`) the Glow Ink sheep is fully bright and lights the grass, and glowing eyes and sculk strands stay lit. No errors from the mod in the log. |
-| Not yet checked in the client | The screaming sound is only covered by the GameTest, not listened to in game |
+| Not yet checked in the client | The replaced sounds are only covered by the GameTest, not listened to in game (the client loads the definitions with no errors) |
 
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 

@@ -485,7 +485,7 @@ Ten more built-in resources turn the sheep into a little version of the mob the 
 | Spider Eye | Spider | Four extra spider legs that move as it walks, and glowing red eyes | 2–4 Spider Eye + 4 String | 6,000 / 3 s |
 | Echo Shard | Sculk | Sculk tendrils on its head, sculk sensors on its back and fleece strands that glow | 2–4 Echo Shard + 2 Sculk | 80,000 / 10 s |
 | Blaze Rod | Blaze | Permanently on fire, without burning or taking damage | 2–4 Blaze Rod (+10% Glowstone Dust) | 20,000 / 5 s |
-| Ghast Tear | Ghast | **Twice the size**, ghast tentacles under its belly, and it **bleats like a screaming goat** | 2–4 Ghast Tear + 1 Gunpowder | 40,000 / 8 s |
+| Ghast Tear | Ghast | **Twice the size**, ghast tentacles under its belly, and it **screams like a ghast** (the ghast's scream instead of a bleat, and its hurt and death sounds) | 2–4 Ghast Tear + 1 Gunpowder | 40,000 / 8 s |
 
 ![The themed sheep at night](docs/screenshots/53_themed_sheep_night.png)
 
@@ -715,7 +715,8 @@ Definitions live in `data/<namespace>/barelyfunctionalcontraptions/sheep_resourc
     "features": ["wings", "glowing_eyes"],
     "feature_color": "#7A5C99",
     "wool_texture": "mypack:textures/entity/sheep/tin_wool.png",
-    "scale": 1.5
+    "scale": 1.5,
+    "sounds": { "ambient": "minecraft:entity.ghast.scream", "hurt": "minecraft:entity.ghast.hurt", "death": "minecraft:entity.ghast.death" }
   }
 }
 ```
@@ -733,10 +734,11 @@ Definitions live in `data/<namespace>/barelyfunctionalcontraptions/sheep_resourc
 | `glowing_eyes` | Eyes in the `accent_color` that glow in the dark |
 | `glowing` | The fleece glows, and the sheep lights the block it stands in (light level 12) |
 | `on_fire` | Shows the on-fire flames, without burning |
-| `screaming` | Bleats, hurts and dies with a screaming goat's sounds |
+| `screaming` | Bleats, hurts and dies with a screaming goat's sounds (unless `sounds` sets them) |
 
 - `feature_color` tints the wings, legs, tentacles and bones. The default is white, which shows them as drawn. Sculk tendrils have their own colours, so leave it white for them.
 - `scale` makes the sheep bigger or smaller while it's infused, from `0.25` to `4` times its normal size (default `1`). It goes through the vanilla `minecraft:scale` attribute as a modifier (`barelyfunctionalcontraptions:resource_scale`, multiplying the base value), so the hitbox, eye height and step height change with it, and it stacks with anything else that changes the scale, such as the `/attribute` command. Lambs stay in proportion. Shearing doesn't shrink the sheep; it goes back to normal once the infusion runs out.
+- `sounds` replaces the sheep's `ambient` (bleat), `hurt` and `death` sounds with any sound event id, vanilla or modded. Leave one out to keep the sheep's own. Like the size, the voice lasts as long as the infusion, even while the sheep is sheared.
 - `wool_texture` replaces the greyscale fleece. It uses the vanilla sheep wool layout (64x32) and is still tinted with `wool_color`, so set `wool_color` to `"#FFFFFF"` to show it as drawn. The texture must come from a resource pack.
 
 **Ores vs other materials.** For an ore, set `primary_output` to the raw material (as the built-ins do with Raw Iron). If you leave `primary_output` out, the separator gives back the fed item, which suits gems, logs and stone. A block input never implies 9 outputs automatically; you choose the numbers.

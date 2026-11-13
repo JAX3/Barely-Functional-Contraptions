@@ -24,7 +24,8 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 /**
  * What a resource's {@link SheepAppearance.Feature features} do in the world, beyond how the sheep is drawn:
- * glowing sheep light up the block they stand in, screaming sheep bleat like a screaming goat, and burning, glowing
+ * glowing sheep light up the block they stand in, sheep with their own {@code sounds} (or {@code screaming}) change
+ * their voice, and burning, glowing
  * and sculk sheep give off the matching particles.
  *
  * <p>Features only apply to grown sheep that still have their infused fleece, the same as how they're drawn.</p>
@@ -115,16 +116,39 @@ public final class SheepFeatureEvents {
         }
     }
 
-    /** Swaps a screaming sheep's bleats for a screaming goat's. Sheep sounds are played at the sheep's position. */
+    /**
+     * Swaps an infused sheep's bleat, hurt and death sounds for its resource's {@code sounds} (or a screaming goat's,
+     * with the {@code screaming} feature). Sheep sounds are played at the sheep's position, so the sheep is found there.
+     *
+     * <p>Unlike the looks, the voice depends only on the infusion: a sheared sheep or a lamb keeps it.</p>
+     */
     @SubscribeEvent
     public static void onSound(PlayLevelSoundEvent.AtPosition event) {
         Holder<SoundEvent> sound = event.getSound();
-        if (sound == null) return;
-        SoundEvent scream = SCREAMS.get(sound.value());
-        if (scream == null) return;
+        if (sound == null || !SCREAMS.containsKey(sound.value())) return;
         Vec3 at = event.getPosition();
-        boolean screaming = !event.getLevel().getEntitiesOfClass(Sheep.class, new AABB(at, at).inflate(0.01),
-                sheep -> sheep.position().distanceToSqr(at) < 1.0E-4 && has(sheep, Feature.SCREAMING)).isEmpty();
-        if (screaming) event.setSound(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(scream));
+        for (Sheep sheep : event.getLevel().getEntitiesOfClass(Sheep.class, new AABB(at, at).inflate(0.01),
+                sheep -> sheep.position().distanceToSqr(at) < 1.0E-4)) {
+            if (!sheep.hasData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_INFUSION)) continue;
+            Optional<Holder<SoundEvent>> replacement = SheepInfusionEvents.getInfusedResource(sheep)
+                    .flatMap(resource -> replacement(resource.appearance(), sound.value()));
+            if (replacement.isPresent()) {
+                event.setSound(replacement.get());
+                return;
+            }
+        }
+    }
+
+    /** What a sheep with this appearance plays instead of {@code original} (a sheep ambient, hurt or death sound). */
+    public static Optional<Holder<SoundEvent>> replacement(SheepAppearance appearance, SoundEvent original) {
+        SheepAppearance.Sounds sounds = appearance.sounds();
+        Optional<Holder<SoundEvent>> custom = original == SoundEvents.SHEEP_AMBIENT ? sounds.ambient()
+                : original == SoundEvents.SHEEP_HURT ? sounds.hurt()
+                : original == SoundEvents.SHEEP_DEATH ? sounds.death() : Optional.empty();
+        if (custom.isPresent()) return custom;
+        if (appearance.has(Feature.SCREAMING) && SCREAMS.containsKey(original)) {
+            return Optional.of(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SCREAMS.get(original)));
+        }
+        return Optional.empty();
     }
 }

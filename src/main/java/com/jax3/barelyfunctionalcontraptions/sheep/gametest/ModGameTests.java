@@ -145,7 +145,7 @@ public final class ModGameTests {
         TESTS.put("item_pipe_respects_transfer_rate", ModGameTests::itemPipeRate);
         TESTS.put("themed_sheep_have_their_features", ModGameTests::themedSheep);
         TESTS.put("glowing_sheep_lights_the_block_it_stands_in", ModGameTests::glowingSheepLight);
-        TESTS.put("screaming_sheep_bleats_like_a_screaming_goat", ModGameTests::screamingSheep);
+        TESTS.put("ghast_sheep_screams_like_a_ghast", ModGameTests::ghastSheepSounds);
         TESTS.put("ghast_sheep_is_twice_the_size", ModGameTests::ghastSheepScale);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -414,7 +414,7 @@ public final class ModGameTests {
         expected.put("spider", List.of(Feature.EXTRA_LEGS, Feature.GLOWING_EYES));
         expected.put("warden", List.of(Feature.SCULK));
         expected.put("blaze", List.of(Feature.ON_FIRE));
-        expected.put("ghast", List.of(Feature.TENTACLES, Feature.SCREAMING));
+        expected.put("ghast", List.of(Feature.TENTACLES));
         expected.forEach((name, features) -> {
             SheepResource resource = registry.byId(ResourcefulSheep.id(name)).orElseThrow(() -> new AssertionError("missing themed sheep " + name));
             for (var feature : features) {
@@ -466,18 +466,27 @@ public final class ModGameTests {
         });
     }
 
-    private static void screamingSheep(GameTestHelper h) {
+    private static void ghastSheepSounds(GameTestHelper h) {
         Sheep ghast = sheepAt(h, new BlockPos(1, 1, 1), ResourcefulSheep.id("ghast"));
         Sheep plain = sheepAt(h, new BlockPos(3, 1, 3), null);
-        java.util.function.Function<Sheep, net.minecraft.sounds.SoundEvent> bleat = sheep -> {
+        java.util.function.BiFunction<Sheep, net.minecraft.sounds.SoundEvent, Identifier> play = (sheep, sound) -> {
             var event = new net.neoforged.neoforge.event.PlayLevelSoundEvent.AtPosition(h.getLevel(), sheep.position(),
-                    net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(net.minecraft.sounds.SoundEvents.SHEEP_AMBIENT),
-                    net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
+                    net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
             com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.onSound(event);
-            return event.getSound().value();
+            return event.getSound().value().location();
         };
-        h.assertTrue(bleat.apply(ghast) == net.minecraft.sounds.SoundEvents.GOAT_SCREAMING_AMBIENT, "a Ghast sheep screams like a goat");
-        h.assertTrue(bleat.apply(plain) == net.minecraft.sounds.SoundEvents.SHEEP_AMBIENT, "a plain sheep still bleats");
+        h.assertTrue(play.apply(ghast, net.minecraft.sounds.SoundEvents.SHEEP_AMBIENT).equals(net.minecraft.sounds.SoundEvents.GHAST_SCREAM.location()), "a Ghast sheep's bleat is the ghast's scream");
+        h.assertTrue(play.apply(ghast, net.minecraft.sounds.SoundEvents.SHEEP_HURT).equals(net.minecraft.sounds.SoundEvents.GHAST_HURT.location()), "it hurts like a ghast");
+        h.assertTrue(play.apply(ghast, net.minecraft.sounds.SoundEvents.SHEEP_DEATH).equals(net.minecraft.sounds.SoundEvents.GHAST_DEATH.location()), "it dies like a ghast");
+        h.assertTrue(play.apply(plain, net.minecraft.sounds.SoundEvents.SHEEP_AMBIENT).equals(net.minecraft.sounds.SoundEvents.SHEEP_AMBIENT.location()), "a plain sheep still bleats");
+        // Sheared, it keeps its voice.
+        ghast.setSheared(true);
+        h.assertTrue(play.apply(ghast, net.minecraft.sounds.SoundEvents.SHEEP_AMBIENT).equals(net.minecraft.sounds.SoundEvents.GHAST_SCREAM.location()), "a sheared Ghast sheep still screams");
+        // The "screaming" feature on its own gives the screaming goat's sounds; listed sounds win over it.
+        var screaming = new com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance(Optional.empty(), List.of(Feature.SCREAMING), 0xFFFFFF, 1.0,
+                com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Sounds.NONE);
+        var replaced = com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.replacement(screaming, net.minecraft.sounds.SoundEvents.SHEEP_HURT);
+        h.assertTrue(replaced.isPresent() && replaced.get().value() == net.minecraft.sounds.SoundEvents.GOAT_SCREAMING_HURT, "screaming = screaming goat, got " + replaced);
         h.succeed();
     }
 

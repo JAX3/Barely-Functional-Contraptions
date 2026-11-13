@@ -20,10 +20,14 @@
   "growth_item": "minecraft:netherrack",
   "appearance": {
     "features": [
-      "tentacles",
-      "screaming"
+      "tentacles"
     ],
     "feature_color": "#F0F0F0",
-    "scale": 2.0
+    "scale": 2.0,
+    "sounds": {
+      "ambient": "minecraft:entity.ghast.scream",
+      "hurt": "minecraft:entity.ghast.hurt",
+      "death": "minecraft:entity.ghast.death"
+    }
   }
 }

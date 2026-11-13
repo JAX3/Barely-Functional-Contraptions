@@ -5,7 +5,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.StringRepresentable;
 
 /**
@@ -27,17 +29,20 @@ import net.minecraft.util.StringRepresentable;
  * @param scale        how big the sheep is while infused, as a multiple of its normal size (0.25 to 4; default 1).
  *                     Applied through the {@code minecraft:scale} attribute, so its hitbox, eye height and step
  *                     height grow with it.
+ * @param sounds       sounds played instead of the sheep's bleat, hurt and death sounds while it is infused (even when
+ *                     sheared)
  */
-public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> features, int featureColor, double scale) {
+public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> features, int featureColor, double scale, Sounds sounds) {
     public static final double MIN_SCALE = 0.25;
     public static final double MAX_SCALE = 4.0;
-    public static final SheepAppearance NONE = new SheepAppearance(Optional.empty(), List.of(), 0xFFFFFF, 1.0);
+    public static final SheepAppearance NONE = new SheepAppearance(Optional.empty(), List.of(), 0xFFFFFF, 1.0, Sounds.NONE);
 
     public static final Codec<SheepAppearance> CODEC = RecordCodecBuilder.create(i -> i.group(
             Identifier.CODEC.optionalFieldOf("wool_texture").forGetter(SheepAppearance::woolTexture),
             Feature.CODEC.listOf().optionalFieldOf("features", List.of()).forGetter(SheepAppearance::features),
             SheepResource.COLOR_CODEC.optionalFieldOf("feature_color", 0xFFFFFF).forGetter(SheepAppearance::featureColor),
-            Codec.doubleRange(MIN_SCALE, MAX_SCALE).optionalFieldOf("scale", 1.0).forGetter(SheepAppearance::scale)
+            Codec.doubleRange(MIN_SCALE, MAX_SCALE).optionalFieldOf("scale", 1.0).forGetter(SheepAppearance::scale),
+            Sounds.CODEC.optionalFieldOf("sounds", Sounds.NONE).forGetter(SheepAppearance::sounds)
     ).apply(i, SheepAppearance::new));
 
     public boolean has(Feature feature) {
@@ -45,7 +50,26 @@ public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> fe
     }
 
     public boolean isEmpty() {
-        return woolTexture.isEmpty() && features.isEmpty() && scale == 1.0;
+        return woolTexture.isEmpty() && features.isEmpty() && scale == 1.0 && sounds.isEmpty();
+    }
+
+    /**
+     * Sounds that replace the sheep's own: any sound event id, vanilla or modded, e.g.
+     * {@code "sounds": {"ambient": "minecraft:entity.ghast.scream"}}. Each one left out keeps the sheep's sound (or
+     * the screaming goat's, with the {@code screaming} feature).
+     */
+    public record Sounds(Optional<Holder<SoundEvent>> ambient, Optional<Holder<SoundEvent>> hurt, Optional<Holder<SoundEvent>> death) {
+        public static final Sounds NONE = new Sounds(Optional.empty(), Optional.empty(), Optional.empty());
+
+        public static final Codec<Sounds> CODEC = RecordCodecBuilder.create(i -> i.group(
+                SoundEvent.CODEC.optionalFieldOf("ambient").forGetter(Sounds::ambient),
+                SoundEvent.CODEC.optionalFieldOf("hurt").forGetter(Sounds::hurt),
+                SoundEvent.CODEC.optionalFieldOf("death").forGetter(Sounds::death)
+        ).apply(i, Sounds::new));
+
+        public boolean isEmpty() {
+            return ambient.isEmpty() && hurt.isEmpty() && death.isEmpty();
+        }
     }
 
     /**
@@ -71,7 +95,7 @@ public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> fe
         GLOWING,
         /** Looks like it is on fire, without burning or taking damage. */
         ON_FIRE,
-        /** Bleats with a screaming goat's voice. */
+        /** Bleats, hurts and dies with a screaming goat's sounds (while infused, even when sheared). */
         SCREAMING;
 
         public static final Codec<Feature> CODEC = StringRepresentable.fromEnum(Feature::values);
