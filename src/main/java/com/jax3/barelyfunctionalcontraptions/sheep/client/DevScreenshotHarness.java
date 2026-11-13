@@ -1126,12 +1126,14 @@ public final class DevScreenshotHarness {
             case 140 -> shot(mc, "56_glow_panels");
             case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 160 25", origin.getX() + 2.5, origin.getY() + 1, origin.getZ() - 0.5));
             case 170 -> shot(mc, "57_energy_meter");
-            case 172 -> {
+            case 171 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 90", origin.getX() - 2.5, origin.getY() + 3, origin.getZ() - 0.5));
+            case 200 -> shot(mc, "59_pipe_modes");
+            case 202 -> {
                 command(server, "time set midnight");
                 command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 35", origin.getX() + 0.5, origin.getY() + 2, origin.getZ() + 1.5));
             }
-            case 230 -> shot(mc, "58_glow_panels_night");
-            case 240 -> mc.stop();
+            case 260 -> shot(mc, "58_glow_panels_night");
+            case 270 -> mc.stop();
             default -> {}
         }
     }
@@ -1164,8 +1166,25 @@ public final class DevScreenshotHarness {
                 .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.EAST), 3);
         level.setBlock(o.offset(1, 0, -5), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
         level.setBlock(o.offset(2, 0, -5), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        // Front left: a chest -> Item Pipes -> a chest, the first side set to Pull (orange plug), the last to Push (green).
+        level.setBlock(o.offset(-5, 0, -1), Blocks.CHEST.defaultBlockState(), 3);
+        if (level.getBlockEntity(o.offset(-5, 0, -1)) instanceof net.minecraft.world.Container chest) chest.setItem(0, new ItemStack(Items.IRON_INGOT, 64));
+        level.setBlock(o.offset(-1, 0, -1), Blocks.CHEST.defaultBlockState(), 3);
+        var pipeBlock = ModBlocks.ITEM_PIPE.get();
+        for (int x = -4; x <= -2; x++) {
+            level.setBlock(o.offset(x, 0, -1), pipeBlock.withConnections(pipeBlock.defaultBlockState(), level, o.offset(x, 0, -1)), 3);
+        }
+        setSide(level, o.offset(-4, 0, -1), Direction.WEST, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PULL);
+        setSide(level, o.offset(-2, 0, -1), Direction.EAST, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PUSH);
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", o.getX() + 0.5, o.getY() + 2, o.getZ() + 3.5));
+    }
+
+    private static void setSide(ServerLevel level, BlockPos pos, Direction dir, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode mode) {
+        if (!(level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeBlockEntity<?> pipe)) return;
+        pipe.setSide(dir, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.DEFAULT.withMode(mode));
+        var block = (com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock) level.getBlockState(pos).getBlock();
+        level.setBlock(pos, block.withConnections(level.getBlockState(pos), level, pos), 3);
     }
 
     /** The themed sheep (wings, extra heads, legs...) only: {@code -PharnessScene=themed_sheep}. */

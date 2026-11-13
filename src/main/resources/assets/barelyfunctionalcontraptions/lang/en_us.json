@@ -704,5 +704,22 @@
   "advancements.barelyfunctionalcontraptions.glow_panel.description": "Craft a Glow Panel",
   "barelyfunctionalcontraptions.configuration.glow_panel": "Glow Panel",
   "barelyfunctionalcontraptions.configuration.sunRate": "Full Sunlight (FE/t)",
-  "barelyfunctionalcontraptions.configuration.lightRate": "Block Light 15 (FE/t)"
+  "barelyfunctionalcontraptions.configuration.lightRate": "Block Light 15 (FE/t)",
+  "pipe_mode.barelyfunctionalcontraptions.normal": "Normal",
+  "pipe_mode.barelyfunctionalcontraptions.pull": "Pull",
+  "pipe_mode.barelyfunctionalcontraptions.push": "Push",
+  "pipe_mode.barelyfunctionalcontraptions.disabled": "Off",
+  "message.barelyfunctionalcontraptions.pipe.mode": "%s side: %s",
+  "message.barelyfunctionalcontraptions.pipe.filter_added": "Added %s to the %s side's filter (%s)",
+  "message.barelyfunctionalcontraptions.pipe.filter_removed": "Removed %s from the %s side's filter (%s left)",
+  "message.barelyfunctionalcontraptions.pipe.filter_full": "That side's filter is full (%s entries)",
+  "message.barelyfunctionalcontraptions.pipe.filter_cleared": "Cleared the %s side's filter",
+  "jade.barelyfunctionalcontraptions.pipe.side": "%s: %s",
+  "jade.barelyfunctionalcontraptions.pipe.side_filter": "%s: %s, only %s",
+  "direction.barelyfunctionalcontraptions.north": "North",
+  "direction.barelyfunctionalcontraptions.south": "South",
+  "direction.barelyfunctionalcontraptions.east": "East",
+  "direction.barelyfunctionalcontraptions.west": "West",
+  "direction.barelyfunctionalcontraptions.up": "Top",
+  "direction.barelyfunctionalcontraptions.down": "Bottom"
 }

@@ -80,7 +80,7 @@ public final class CableNetwork {
                 BlockPos next = cable.getBlockPos().relative(dir);
                 CableConnection connection = state.hasProperty(EnergyCableBlock.SIDES.get(dir))
                         ? state.getValue(EnergyCableBlock.SIDES.get(dir)) : CableConnection.NONE;
-                if (connection == CableConnection.MACHINE) {
+                if (connection.plugged()) {
                     ends.add(new Endpoint(next, dir.getOpposite()));
                     continue;
                 }

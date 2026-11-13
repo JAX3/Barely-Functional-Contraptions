@@ -18,8 +18,10 @@ import org.jspecify.annotations.Nullable;
  * One pipe (Fluid Pipe or Item Pipe). Pipes hold nothing themselves: anything put into a pipe is passed straight on
  * through its {@link PipeNetwork} to the blocks plugged into the network.
  */
-public abstract class PipeBlockEntity<T extends Resource> extends BlockEntity implements ConduitBlock.Conduit {
+public abstract class PipeBlockEntity<T extends Resource> extends BlockEntity implements ConduitBlock.Conduit, ConduitBlock.Configurable {
     private @Nullable PipeNetwork<T> network;
+    /** Each side's mode and filter (only sides that differ from {@link PipeSide#DEFAULT} are stored). */
+    private final Map<Direction, PipeSide> sides = new EnumMap<>(Direction.class);
     private final Map<Direction, ResourceHandler<T>> handlers = new EnumMap<>(Direction.class);
     private final ResourceHandler<T> unsided = new SideHandler(null);
 
@@ -54,9 +56,56 @@ public abstract class PipeBlockEntity<T extends Resource> extends BlockEntity im
         network().tick(level);
     }
 
-    /** The capability on each face: accepts anything and passes it on through the network; never gives any out. */
-    public ResourceHandler<T> getHandler(@Nullable Direction side) {
-        return side == null ? unsided : handlers.get(side);
+    /** The capability on each face: accepts anything and passes it on through the network; never gives any out. None on a side that is off. */
+    public @Nullable ResourceHandler<T> getHandler(@Nullable Direction side) {
+        if (side == null) return unsided;
+        return side(side).mode() == PipeSide.Mode.DISABLED ? null : handlers.get(side);
+    }
+
+    @Override
+    public PipeSide side(Direction dir) {
+        return sides.getOrDefault(dir, PipeSide.DEFAULT);
+    }
+
+    @Override
+    public void setSide(Direction dir, PipeSide side) {
+        if (side.isDefault()) sides.remove(dir);
+        else sides.put(dir, side);
+        setChanged();
+        invalidateNetwork();
+        if (level != null) level.invalidateCapabilities(worldPosition);
+    }
+
+    @Override
+    public java.util.Optional<net.minecraft.resources.Identifier> filterEntry(net.minecraft.world.item.ItemStack stack) {
+        // Pipes and cables in hand are being placed against the pipe, not filtered.
+        if (stack.getItem() instanceof net.minecraft.world.item.BlockItem block && block.getBlock() instanceof ConduitBlock) return java.util.Optional.empty();
+        return kind().filterEntry().apply(stack);
+    }
+
+    @Override
+    public net.minecraft.network.chat.Component filterName(net.minecraft.resources.Identifier id) {
+        return kind().nameOf().apply(id);
+    }
+
+    /** Every side that isn't plain Normal with no filter. */
+    public Map<Direction, PipeSide> configuredSides() {
+        return java.util.Collections.unmodifiableMap(sides);
+    }
+
+    @Override
+    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+        super.loadAdditional(input);
+        sides.clear();
+        for (Direction dir : Direction.values()) {
+            input.read("side_" + dir.getSerializedName(), PipeSide.CODEC).filter(s -> !s.isDefault()).ifPresent(s -> sides.put(dir, s));
+        }
+    }
+
+    @Override
+    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+        super.saveAdditional(output);
+        sides.forEach((dir, side) -> output.store("side_" + dir.getSerializedName(), PipeSide.CODEC, side));
     }
 
     @Override

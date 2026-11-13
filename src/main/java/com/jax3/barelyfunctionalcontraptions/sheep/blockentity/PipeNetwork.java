@@ -33,12 +33,15 @@ import org.jspecify.annotations.Nullable;
  * thing in (chests, tanks, a generator's water tank, the separator's input slot) are never drained by the network, so
  * two of them on one network don't pass things back and forth.</p>
  *
+ * <p>Each pipe side can be set to pull (drain the block, chests and tanks included), push (only fill it) or off, and
+ * filtered to a list of items or fluids, which applies both ways; see {@link PipeSide}.</p>
+ *
  * <p>Networks are never saved: they are rebuilt from the world whenever a pipe is placed, broken, plugged in or
  * unplugged, or unloaded.</p>
  */
 public final class PipeNetwork<T extends Resource> {
-    /** A block plugged into the network: its position and the face of it that touches the pipe. */
-    public record Endpoint(BlockPos pos, Direction face) {}
+    /** A block plugged into the network: its position, the face of it that touches the pipe, and that pipe side's settings. */
+    public record Endpoint(BlockPos pos, Direction face, PipeSide side) {}
 
     private final List<PipeBlockEntity<T>> pipes;
     private final List<Endpoint> endpoints;
@@ -77,8 +80,8 @@ public final class PipeNetwork<T extends Resource> {
                 BlockPos next = pipe.getBlockPos().relative(dir);
                 CableConnection connection = state.hasProperty(ConduitBlock.SIDES.get(dir))
                         ? state.getValue(ConduitBlock.SIDES.get(dir)) : CableConnection.NONE;
-                if (connection == CableConnection.MACHINE) {
-                    ends.add(new Endpoint(next, dir.getOpposite()));
+                if (connection.plugged()) {
+                    ends.add(new Endpoint(next, dir.getOpposite(), pipe.side(dir)));
                     continue;
                 }
                 if (!seen.add(next) || !level.isLoaded(next)) continue;
@@ -170,7 +173,7 @@ public final class PipeNetwork<T extends Resource> {
             int n = endpoints.size();
             for (int i = 0; i < n; i++) {
                 Endpoint end = endpoints.get((i + rotation) % n);
-                if (end.pos().equals(from)) continue;
+                if (end.pos().equals(from) || !end.side().mode().takesIn() || !end.side().allows(kind.idOf().apply(resource))) continue;
                 ResourceHandler<T> handler = handler(level, end);
                 if (handler == null) continue;
                 if (kind.isStorage(level.getBlockEntity(end.pos()))) {
@@ -230,11 +233,15 @@ public final class PipeNetwork<T extends Resource> {
         rotation = (rotation + 1) % n;
         for (int i = 0; i < n && remaining() > 0; i++) {
             Endpoint source = endpoints.get((i + rotation) % n);
+            PipeSide.Mode mode = source.side().mode();
+            if (mode == PipeSide.Mode.PUSH || mode == PipeSide.Mode.DISABLED) continue;
             ResourceHandler<T> handler = handler(level, source);
             if (handler == null) continue;
             for (int slot = 0; slot < handler.size() && remaining() > 0; slot++) {
                 T resource = handler.getResource(slot);
-                if (resource.isEmpty() || handler.getAmountAsLong(slot) <= 0 || !onlyGivesOut(handler, slot, resource)) continue;
+                if (resource.isEmpty() || handler.getAmountAsLong(slot) <= 0 || !source.side().allows(kind.idOf().apply(resource))) continue;
+                // Pull sides empty anything; normal sides only give up what the block won't take back in.
+                if (mode != PipeSide.Mode.PULL && !onlyGivesOut(handler, slot, resource)) continue;
                 int available;
                 try (Transaction simulate = Transaction.openRoot()) {
                     available = handler.extract(resource, remaining(), simulate);

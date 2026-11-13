@@ -143,6 +143,8 @@ public final class ModGameTests {
         TESTS.put("item_pipe_shears_to_separator_to_chest", ModGameTests::itemPipeChain);
         TESTS.put("item_pipe_hopper_pushes_but_chests_are_not_drained", ModGameTests::itemPipePushAndChests);
         TESTS.put("item_pipe_respects_transfer_rate", ModGameTests::itemPipeRate);
+        TESTS.put("item_pipe_pull_side_drains_a_chest_through_a_filter", ModGameTests::itemPipePullFilter);
+        TESTS.put("item_pipe_side_modes_and_destination_filters", ModGameTests::itemPipeSideModes);
         TESTS.put("themed_sheep_have_their_features", ModGameTests::themedSheep);
         TESTS.put("glowing_sheep_lights_the_block_it_stands_in", ModGameTests::glowingSheepLight);
         TESTS.put("ghast_sheep_screams_like_a_ghast", ModGameTests::ghastSheepSounds);
@@ -380,6 +382,77 @@ public final class ModGameTests {
         h.succeedWhen(() -> {
             h.assertTrue(countIn(first, Items.COBBLESTONE) + countIn(second, Items.COBBLESTONE) == 5, "the hopper's 5 cobblestone reached the chests");
             h.assertTrue(countIn(first, Items.DIAMOND) == 10 && countIn(second, Items.DIAMOND) == 0, "the pipes don't move diamonds between chests");
+        });
+    }
+
+    /** Sets one side of a pipe and updates its block state, as a right-click on it would. */
+    private static void setPipeSide(GameTestHelper h, BlockPos pos, Direction dir, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide side) {
+        var pipe = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeBlockEntity.class);
+        pipe.setSide(dir, side);
+        var block = (com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock) h.getBlockState(pos).getBlock();
+        h.getLevel().setBlock(h.absolutePos(pos), block.withConnections(h.getBlockState(pos), h.getLevel(), h.absolutePos(pos)), 3);
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide side(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode mode, Identifier... filter) {
+        return new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide(mode, List.of(filter));
+    }
+
+    /** A Pull side empties a chest (which a normal side never does), and its filter lets only iron through. */
+    private static void itemPipePullFilter(GameTestHelper h) {
+        var source = chest(h, new BlockPos(1, 1, 2));
+        source.setItem(0, new ItemStack(Items.IRON_INGOT, 10));
+        source.setItem(1, new ItemStack(Items.GOLD_INGOT, 10));
+        itemPipe(h, new BlockPos(2, 1, 2));
+        itemPipe(h, new BlockPos(3, 1, 2));
+        var target = chest(h, new BlockPos(4, 1, 2));
+        setPipeSide(h, new BlockPos(2, 1, 2), Direction.WEST, side(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PULL, Identifier.withDefaultNamespace("iron_ingot")));
+        h.assertTrue(h.getBlockState(new BlockPos(2, 1, 2)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.SIDES.get(Direction.WEST))
+                == com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.PULL, "the pulling side shows a pull plug");
+        h.succeedWhen(() -> {
+            h.assertTrue(countIn(target, Items.IRON_INGOT) == 10, "all 10 iron pulled out of the chest, got " + countIn(target, Items.IRON_INGOT));
+            h.assertTrue(countIn(source, Items.GOLD_INGOT) == 10 && countIn(target, Items.GOLD_INGOT) == 0, "the gold stays: the filter only lets iron through");
+            // The setting is saved with the pipe.
+            var saved = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess());
+            h.getBlockEntity(new BlockPos(2, 1, 2), BlockEntity.class).saveWithoutMetadata(saved);
+            String tag = saved.buildResult().toString();
+            h.assertTrue(tag.contains("pull") && tag.contains("minecraft:iron_ingot"), "the side's mode and filter are saved: " + tag);
+        });
+    }
+
+    /**
+     * Wool from Automatic Shears skips a chest whose side only lets diamonds in, a Push side is never pulled from, and
+     * an Off side has no connection at all.
+     */
+    private static void itemPipeSideModes(GameTestHelper h) {
+        var shears = shearsAt(h, new BlockPos(1, 1, 2), Direction.WEST);
+        shears.setItem(0, new ItemStack(Items.WOOL.white(), 8));
+        itemPipe(h, new BlockPos(2, 1, 2));
+        itemPipe(h, new BlockPos(3, 1, 2));
+        var diamondsOnly = chest(h, new BlockPos(3, 1, 1));
+        var anything = chest(h, new BlockPos(4, 1, 2));
+        setPipeSide(h, new BlockPos(3, 1, 2), Direction.NORTH, side(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.NORMAL, Identifier.withDefaultNamespace("diamond")));
+        // Clicks map to sides: the end of an arm, or the face of the core.
+        BlockPos at = h.absolutePos(new BlockPos(2, 1, 2));
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.clickedSide(at,
+                new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at).add(-0.45, 0, 0), Direction.WEST, at, false)) == Direction.WEST, "a click on the west plug picks west");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.clickedSide(at,
+                new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at).add(0, 0.1875, 0), Direction.UP, at, false)) == Direction.UP, "a click on the top of the core picks up");
+        h.runAfterDelay(20, () -> {
+            h.assertTrue(countIn(anything, Items.WOOL.white()) == 8 && countIn(diamondsOnly, Items.WOOL.white()) == 0,
+                    "all the wool went to the unfiltered chest: " + countIn(anything, Items.WOOL.white()) + " / " + countIn(diamondsOnly, Items.WOOL.white()));
+            // Push: the pipe stops taking wool out of the shears.
+            setPipeSide(h, new BlockPos(2, 1, 2), Direction.WEST, side(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PUSH));
+            shears.setItem(0, new ItemStack(Items.WOOL.white(), 8));
+            h.runAfterDelay(20, () -> {
+                h.assertTrue(countIn(shears, Items.WOOL.white()) == 8, "a Push side is never pulled from");
+                // Off: no plug and no connection.
+                setPipeSide(h, new BlockPos(4, 1, 2).west(), Direction.EAST, side(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.DISABLED));
+                h.assertTrue(h.getBlockState(new BlockPos(3, 1, 2)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.SIDES.get(Direction.EAST))
+                        == com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.NONE, "an Off side has no plug");
+                h.assertTrue(h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK, h.absolutePos(new BlockPos(3, 1, 2)), Direction.EAST) == null,
+                        "and offers no connection to the chest");
+                h.succeed();
+            });
         });
     }
 

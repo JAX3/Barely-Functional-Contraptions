@@ -1,5 +1,14 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.blocks;
 
+import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -75,7 +84,7 @@ public abstract class ConduitBlock extends BaseEntityBlock {
         for (Direction dir : Direction.values()) {
             CableConnection connection = state.getValue(SIDES.get(dir));
             if (connection.connected()) shape = Shapes.or(shape, ARMS.get(dir));
-            if (connection == CableConnection.MACHINE) shape = Shapes.or(shape, PLUGS.get(dir));
+            if (connection.plugged()) shape = Shapes.or(shape, PLUGS.get(dir));
         }
         return shape;
     }
@@ -98,9 +107,87 @@ public abstract class ConduitBlock extends BaseEntityBlock {
         BlockPos other = pos.relative(dir);
         if (level.getBlockState(other).getBlock() == this) return CableConnection.CABLE;
         if (level instanceof Level real && real.isLoaded(other) && canPlugInto(real, other, dir.getOpposite())) {
-            return CableConnection.MACHINE;
+            PipeSide.Mode mode = level.getBlockEntity(pos) instanceof Configurable configurable ? configurable.side(dir).mode() : PipeSide.Mode.NORMAL;
+            return switch (mode) {
+                case NORMAL -> CableConnection.MACHINE;
+                case PULL -> CableConnection.PULL;
+                case PUSH -> CableConnection.PUSH;
+                case DISABLED -> CableConnection.NONE;
+            };
         }
         return CableConnection.NONE;
+    }
+
+    /** Whether there is a block this conduit could plug into on side {@code dir} (whatever that side's mode). */
+    public boolean canPlugIntoSide(Level level, BlockPos pos, Direction dir) {
+        BlockPos other = pos.relative(dir);
+        return level.getBlockState(other).getBlock() != this && level.isLoaded(other) && canPlugInto(level, other, dir.getOpposite());
+    }
+
+    /**
+     * The side of the conduit a click landed on: the arm or plug that was hit, or for a click on the core the face of
+     * the core that was hit (so a side whose connection was turned off can still be clicked).
+     */
+    public static Direction clickedSide(BlockPos pos, BlockHitResult hit) {
+        Vec3 local = hit.getLocation().subtract(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+        double ax = Math.abs(local.x), ay = Math.abs(local.y), az = Math.abs(local.z);
+        double max = Math.max(ax, Math.max(ay, az));
+        if (max <= 3.2 / 16.0) return hit.getDirection();
+        if (max == ax) return local.x > 0 ? Direction.EAST : Direction.WEST;
+        if (max == ay) return local.y > 0 ? Direction.UP : Direction.DOWN;
+        return local.z > 0 ? Direction.SOUTH : Direction.NORTH;
+    }
+
+    /**
+     * Right-click with an empty hand: cycles the mode of the clicked side (Normal, Pull, Push, Off). Sneak-right-click
+     * with an empty hand clears that side's filter.
+     */
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!(level.getBlockEntity(pos) instanceof Configurable configurable)) return InteractionResult.PASS;
+        Direction side = clickedSide(pos, hit);
+        if (!canPlugIntoSide(level, pos, side)) return InteractionResult.PASS;
+        if (!level.isClientSide()) {
+            if (player.isSecondaryUseActive()) {
+                configurable.setSide(side, configurable.side(side).withoutFilter());
+                player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.filter_cleared", sideName(side)));
+            } else {
+                PipeSide updated = configurable.side(side).withMode(configurable.side(side).mode().next());
+                configurable.setSide(side, updated);
+                player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.mode", sideName(side), updated.mode().displayName()));
+            }
+            BlockState updatedState = withConnections(state, level, pos);
+            if (updatedState != state) level.setBlock(pos, updatedState, Block.UPDATE_ALL);
+            level.updateNeighborsAt(pos, this);
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    /** Right-click a plug holding an item: adds it to (or removes it from) that side's filter. */
+    @Override
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!(level.getBlockEntity(pos) instanceof Configurable configurable)) return InteractionResult.TRY_WITH_EMPTY_HAND;
+        Direction side = clickedSide(pos, hit);
+        if (!state.getValue(SIDES.get(side)).plugged()) return InteractionResult.TRY_WITH_EMPTY_HAND;
+        var entry = configurable.filterEntry(stack);
+        if (entry.isEmpty()) return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (!level.isClientSide()) {
+            PipeSide before = configurable.side(side);
+            PipeSide after = before.toggle(entry.get());
+            if (after == before) {
+                player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.filter_full", PipeSide.MAX_FILTER));
+            } else {
+                configurable.setSide(side, after);
+                boolean added = after.filter().contains(entry.get());
+                player.sendOverlayMessage(Component.translatable(added ? "message.barelyfunctionalcontraptions.pipe.filter_added"
+                        : "message.barelyfunctionalcontraptions.pipe.filter_removed", configurable.filterName(entry.get()), sideName(side), after.filter().size()));
+            }
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    private static Component sideName(Direction side) {
+        return Component.translatable("direction.barelyfunctionalcontraptions." + side.getSerializedName());
     }
 
     /** The conduit's state with every side worked out from the blocks around it. */
@@ -151,5 +238,18 @@ public abstract class ConduitBlock extends BaseEntityBlock {
     /** A conduit's block entity: forgets its network when the conduits around it change. */
     public interface Conduit {
         void invalidateNetwork();
+    }
+
+    /** A conduit whose sides can be set to a {@link PipeSide.Mode} and filtered (Fluid and Item Pipes). */
+    public interface Configurable {
+        PipeSide side(Direction dir);
+
+        void setSide(Direction dir, PipeSide side);
+
+        /** The filter entry for what {@code stack} is or holds (the item, or a bucket's fluid), if it can be filtered. */
+        java.util.Optional<net.minecraft.resources.Identifier> filterEntry(ItemStack stack);
+
+        /** A display name for a filter entry. */
+        Component filterName(net.minecraft.resources.Identifier id);
     }
 }

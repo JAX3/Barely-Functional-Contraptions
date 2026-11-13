@@ -707,10 +707,32 @@ PIPE_BLUE = {"P": hexc("#3fc8ff"), "p": hexc("#1b5fa8"), "G": hexc("#ffffff"), "
 PIPE_YELLOW = {"P": hexc("#ffe14a"), "p": hexc("#c98a12"), "G": hexc("#ffffff"), "g": hexc("#ffe58a")}
 
 
+# Pipe sides set to Pull (orange ring) or Push (green ring): the same plug face in the mode's colour.
+PLUG_PULL = {"P": hexc("#ff8a2a"), "p": hexc("#b5501a"), "G": hexc("#fff1d6"), "g": hexc("#ffc27a")}
+PLUG_PUSH = {"P": hexc("#4be37a"), "p": hexc("#1f8a45"), "G": hexc("#f0fff4"), "g": hexc("#a8f5c2")}
+
+
+def generate_pipe_plug_modes(name, pal):
+    for mode, colours in (("pull", PLUG_PULL), ("push", PLUG_PUSH)):
+        mode_pal = dict(pal, **colours)
+        plug = Image.new("RGBA", (16, 16), CLEAR)
+        # The plate's thin edges (what you see from the side or above) are painted in the mode's colour too.
+        edge = "pPPPPPPp"
+        for k, ch in enumerate(edge):
+            for d in (0, 1, 14, 15):
+                c = mode_pal["O"] if d in (0, 15) else mode_pal[ch]
+                plug.putpixel((4 + k, d), c)
+                plug.putpixel((d, 4 + k), c)
+        grid(CABLE_PLUG_FACE, mode_pal, plug, 4, 4)
+        plug.save(out(f"block/{name}/{name.split('_')[1]}_plug_{mode}.png"))
+
+
 def generate_energy_cable():
     generate_conduit("energy_cable", CARTOON)
     generate_conduit("fluid_pipe", dict(CARTOON, **PIPE_BLUE))
     generate_conduit("item_pipe", dict(CARTOON, **PIPE_YELLOW))
+    generate_pipe_plug_modes("fluid_pipe", dict(CARTOON, **PIPE_BLUE))
+    generate_pipe_plug_modes("item_pipe", dict(CARTOON, **PIPE_YELLOW))
 
 def generate_creative_generator():
     """4-frame pulsing glow animation, same on every face."""

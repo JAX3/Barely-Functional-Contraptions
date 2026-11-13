@@ -14,20 +14,33 @@ import snownee.jade.api.StreamServerDataProvider;
 public enum PipeDataProvider implements StreamServerDataProvider<BlockAccessor, PipeDataProvider.Data> {
     INSTANCE;
 
-    public record Data(int cables, int endpoints, int rate, int maxRate) {
+    /**
+     * @param sides each side that isn't plain Normal: its direction, its mode and its filter
+     */
+    public record Data(int cables, int endpoints, int rate, int maxRate, java.util.List<Side> sides) {
         static final StreamCodec<RegistryFriendlyByteBuf, Data> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Data::cables,
                 ByteBufCodecs.VAR_INT, Data::endpoints,
                 ByteBufCodecs.VAR_INT, Data::rate,
                 ByteBufCodecs.VAR_INT, Data::maxRate,
+                Side.CODEC.apply(ByteBufCodecs.list()), Data::sides,
                 Data::new);
+    }
+
+    public record Side(net.minecraft.core.Direction dir, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide side) {
+        static final StreamCodec<RegistryFriendlyByteBuf, Side> CODEC = StreamCodec.composite(
+                net.minecraft.core.Direction.STREAM_CODEC, Side::dir,
+                ByteBufCodecs.fromCodec(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.CODEC), Side::side,
+                Side::new);
     }
 
     @Override
     public @Nullable Data streamData(BlockAccessor accessor) {
         if (!(accessor.getBlockEntity() instanceof PipeBlockEntity<?> be)) return null;
         PipeNetwork<?> network = be.network();
-        return new Data(network.size(), network.endpoints().size(), network.rate(), network.transferRate());
+        java.util.List<Side> sides = new java.util.ArrayList<>();
+        be.configuredSides().forEach((dir, side) -> sides.add(new Side(dir, side)));
+        return new Data(network.size(), network.endpoints().size(), network.rate(), network.transferRate(), sides);
     }
 
     @Override

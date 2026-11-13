@@ -7,7 +7,7 @@
     },
     {
       "when": {
-        "north": "cable|machine"
+        "north": "cable|machine|pull|push"
       },
       "apply": {
         "model": "barelyfunctionalcontraptions:block/item_pipe/arm_north"
@@ -23,7 +23,23 @@
     },
     {
       "when": {
-        "south": "cable|machine"
+        "north": "pull"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_pull_north"
+      }
+    },
+    {
+      "when": {
+        "north": "push"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_push_north"
+      }
+    },
+    {
+      "when": {
+        "south": "cable|machine|pull|push"
       },
       "apply": {
         "model": "barelyfunctionalcontraptions:block/item_pipe/arm_south"
@@ -39,7 +55,23 @@
     },
     {
       "when": {
-        "west": "cable|machine"
+        "south": "pull"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_pull_south"
+      }
+    },
+    {
+      "when": {
+        "south": "push"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_push_south"
+      }
+    },
+    {
+      "when": {
+        "west": "cable|machine|pull|push"
       },
       "apply": {
         "model": "barelyfunctionalcontraptions:block/item_pipe/arm_west"
@@ -55,7 +87,23 @@
     },
     {
       "when": {
-        "east": "cable|machine"
+        "west": "pull"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_pull_west"
+      }
+    },
+    {
+      "when": {
+        "west": "push"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_push_west"
+      }
+    },
+    {
+      "when": {
+        "east": "cable|machine|pull|push"
       },
       "apply": {
         "model": "barelyfunctionalcontraptions:block/item_pipe/arm_east"
@@ -71,7 +119,23 @@
     },
     {
       "when": {
-        "down": "cable|machine"
+        "east": "pull"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_pull_east"
+      }
+    },
+    {
+      "when": {
+        "east": "push"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_push_east"
+      }
+    },
+    {
+      "when": {
+        "down": "cable|machine|pull|push"
       },
       "apply": {
         "model": "barelyfunctionalcontraptions:block/item_pipe/arm_down"
@@ -87,7 +151,23 @@
     },
     {
       "when": {
-        "up": "cable|machine"
+        "down": "pull"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_pull_down"
+      }
+    },
+    {
+      "when": {
+        "down": "push"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_push_down"
+      }
+    },
+    {
+      "when": {
+        "up": "cable|machine|pull|push"
       },
       "apply": {
         "model": "barelyfunctionalcontraptions:block/item_pipe/arm_up"
@@ -99,6 +179,22 @@
       },
       "apply": {
         "model": "barelyfunctionalcontraptions:block/item_pipe/plug_up"
+      }
+    },
+    {
+      "when": {
+        "up": "pull"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_pull_up"
+      }
+    },
+    {
+      "when": {
+        "up": "push"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/item_pipe/plug_push_up"
       }
     }
   ]
