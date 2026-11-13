@@ -1118,11 +1118,11 @@ public final class DevScreenshotHarness {
 
     private static void themedSheepTick(Minecraft mc, MinecraftServer server) {
         // 60: stage; 120: overview; then one close-up per sheep every 25 ticks; then the overview again at night.
-        int closeStart = 130, perSheep = 25, night = closeStart + THEMED.length * perSheep;
+        int closeStart = 130, perSheep = 25, night = closeStart + THEMED.length * perSheep + 35;
         if (tick == 60) server.execute(() -> themedSheepScene(server));
         else if (tick == 70) setHudHidden(mc, true);
         else if (tick == 120) shot(mc, "52_themed_sheep");
-        else if (tick >= closeStart && tick < night) {
+        else if (tick >= closeStart && tick < closeStart + THEMED.length * perSheep) {
             int i = (tick - closeStart) / perSheep, step = (tick - closeStart) % perSheep;
             if (step == 0) {
                 // Slightly in front of the sheep's left side, looking back at it.
@@ -1130,6 +1130,11 @@ public final class DevScreenshotHarness {
             } else if (step == perSheep - 1) {
                 shot(mc, "53_themed_" + THEMED[i]);
             }
+        } else if (tick == night - 30) {
+            // The Wither sheep from the front, to show the three heads side by side.
+            command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 250 18", themedX(1) - 2.6, origin.getY(), origin.getZ() - 5 + 1.6));
+        } else if (tick == night - 2) {
+            shot(mc, "53_themed_wither_front");
         } else if (tick == night) {
             command(server, "time set midnight");
             command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 18", origin.getX() + 0.5, origin.getY() + 2, origin.getZ() + 5.5));

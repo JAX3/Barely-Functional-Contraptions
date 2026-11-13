@@ -47,7 +47,7 @@ public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> fe
      * none of them.
      */
     public enum Feature implements StringRepresentable {
-        /** Two smaller heads on the shoulders, like the Wither. */
+        /** Two smaller heads either side of its own head, like the Wither. */
         EXTRA_HEADS,
         /** A pair of flapping dragon wings on its back. */
         WINGS,

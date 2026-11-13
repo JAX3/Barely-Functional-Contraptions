@@ -477,7 +477,7 @@ Ten more built-in resources turn the sheep into a little version of the mob the 
 | Fed item | Sheep | What's different | Separator output (per wool) | FE / time |
 |---|---|---|---|---|
 | Hay Bale | Hay | A hay-bale fleece with binding bands | 2–4 Wheat | 4,000 / 2 s |
-| Nether Star | Wither | Two skull heads on its shoulders that look around on their own, and glowing eyes | 2–4 Nether Star + 1 Soul Sand | 400,000 / 20 s |
+| Nether Star | Wither | Two skull heads either side of its own head that look around on their own, and glowing eyes | 2–4 Nether Star + 1 Soul Sand | 400,000 / 20 s |
 | Dragon's Breath | Dragon | Flapping dragon wings, glowing purple eyes | 2–4 Dragon's Breath (+5% Ender Pearl) | 80,000 / 10 s |
 | Glow Ink Sac | Glow Ink | Its fleece glows in the dark and **lights up the block it stands in** (light level 12) | 2–4 Glow Ink Sac | 8,000 / 3 s |
 | Bone Block | Skeleton | A skull face and bony legs | 2–4 Bone (+10% Arrow) | 6,000 / 3 s |
@@ -723,7 +723,7 @@ Definitions live in `data/<namespace>/barelyfunctionalcontraptions/sheep_resourc
 
 | Feature | What it does |
 |---|---|
-| `extra_heads` | Two skull heads on the shoulders, like the Wither |
+| `extra_heads` | Two skull heads either side of the sheep's head, like the Wither |
 | `wings` | A pair of flapping dragon wings |
 | `extra_legs` | Four long spider legs along the sides |
 | `tentacles` | Ghast tentacles hanging under the belly |
