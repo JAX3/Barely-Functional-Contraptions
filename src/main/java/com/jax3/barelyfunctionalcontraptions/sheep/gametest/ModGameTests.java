@@ -145,6 +145,7 @@ public final class ModGameTests {
         TESTS.put("item_pipe_respects_transfer_rate", ModGameTests::itemPipeRate);
         TESTS.put("item_pipe_pull_side_drains_a_chest_through_a_filter", ModGameTests::itemPipePullFilter);
         TESTS.put("item_pipe_side_modes_and_destination_filters", ModGameTests::itemPipeSideModes);
+        TESTS.put("wrench_sets_pipe_modes_and_filters", ModGameTests::wrenchConfiguresPipes);
         TESTS.put("themed_sheep_have_their_features", ModGameTests::themedSheep);
         TESTS.put("glowing_sheep_lights_the_block_it_stands_in", ModGameTests::glowingSheepLight);
         TESTS.put("ghast_sheep_screams_like_a_ghast", ModGameTests::ghastSheepSounds);
@@ -455,6 +456,58 @@ public final class ModGameTests {
                 h.succeed();
             });
         });
+    }
+
+    /** The Barely Functional Wrench sets pipe sides; an empty hand or a held item no longer does. */
+    private static void wrenchConfiguresPipes(GameTestHelper h) {
+        chest(h, new BlockPos(1, 1, 2));
+        var pipe = itemPipe(h, new BlockPos(2, 1, 2));
+        BlockPos at = h.absolutePos(new BlockPos(2, 1, 2));
+        var westPlug = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at).add(-0.45, 0, 0), Direction.WEST, at, false);
+        Player player = h.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()));
+        java.util.function.Supplier<net.minecraft.world.InteractionResult> wrench = () -> com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.useWrench(
+                h.getLevel(), at, player, InteractionHand.MAIN_HAND, westPlug);
+        var PULL = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PULL;
+        var PUSH = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PUSH;
+        // Wrench: cycle the mode, and the plug follows.
+        h.assertTrue(wrench.get().consumesAction() && pipe.side(Direction.WEST).mode() == PULL, "one wrench click: Pull, got " + pipe.side(Direction.WEST).mode());
+        h.assertTrue(h.getBlockState(new BlockPos(2, 1, 2)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.SIDES.get(Direction.WEST))
+                == com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.PULL, "the plug turns orange");
+        wrench.get();
+        h.assertTrue(pipe.side(Direction.WEST).mode() == PUSH, "a second click: Push");
+        // Wrench with an item in the other hand: toggles it in the filter.
+        player.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.IRON_INGOT));
+        wrench.get();
+        h.assertTrue(pipe.side(Direction.WEST).filter().equals(List.of(Identifier.withDefaultNamespace("iron_ingot"))) && pipe.side(Direction.WEST).mode() == PUSH,
+                "the off-hand iron is added to the filter, mode kept: " + pipe.side(Direction.WEST));
+        player.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.GOLD_INGOT));
+        wrench.get();
+        h.assertTrue(pipe.side(Direction.WEST).filter().size() == 2, "gold added too");
+        wrench.get();
+        h.assertTrue(pipe.side(Direction.WEST).filter().size() == 1, "clicking with gold again removes it");
+        // Sneaking: clears the filter.
+        player.setShiftKeyDown(true);
+        wrench.get();
+        h.assertTrue(pipe.side(Direction.WEST).filter().isEmpty() && pipe.side(Direction.WEST).mode() == PUSH, "sneak-click clears the filter only");
+        player.setShiftKeyDown(false);
+        // Without the wrench nothing changes: an empty hand, or an item, on the plug.
+        Player bare = h.makeMockPlayer(GameType.SURVIVAL);
+        h.getBlockState(new BlockPos(2, 1, 2)).useWithoutItem(h.getLevel(), bare, westPlug);
+        bare.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND));
+        h.getBlockState(new BlockPos(2, 1, 2)).useItemOn(new ItemStack(Items.DIAMOND), h.getLevel(), bare, InteractionHand.MAIN_HAND, westPlug);
+        h.assertTrue(pipe.side(Direction.WEST).mode() == PUSH && pipe.side(Direction.WEST).filter().isEmpty(), "hands and items no longer configure pipes");
+        // Through the wrench item itself, as a real right-click does (it runs before the block is used).
+        player.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+        player.getMainHandItem().onItemUseFirst(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND, westPlug));
+        h.assertTrue(pipe.side(Direction.WEST).mode() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.DISABLED,
+                "right-clicking with the wrench item cycles Push to Off, got " + pipe.side(Direction.WEST).mode());
+        // A side with nothing to plug into isn't changed.
+        var eastSide = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at).add(0.19, 0, 0), Direction.EAST, at, false);
+        player.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+        com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.useWrench(h.getLevel(), at, player, InteractionHand.MAIN_HAND, eastSide);
+        h.assertTrue(pipe.side(Direction.EAST).isDefault(), "the empty east side stays as it is");
+        h.succeed();
     }
 
     /** With transferRate = 1 an item network never moves more than one item a tick. */

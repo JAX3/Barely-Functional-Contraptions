@@ -58,6 +58,14 @@ public class MyceliumWrenchItem extends Item {
      */
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        // Fluid and Item Pipes: the wrench sets each side's mode and filter.
+        if (context.getPlayer() != null && context.getLevel().getBlockState(context.getClickedPos()).getBlock()
+                instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock) {
+            var hit = new net.minecraft.world.phys.BlockHitResult(context.getClickLocation(), context.getClickedFace(), context.getClickedPos(), context.isInside());
+            InteractionResult result = com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.useWrench(
+                    context.getLevel(), context.getClickedPos(), context.getPlayer(), context.getHand(), hit);
+            if (result != InteractionResult.PASS) return result;
+        }
         if (!PowerLinking.isReceiver(context.getLevel(), context.getClickedPos())) {
             return InteractionResult.PASS;
         }

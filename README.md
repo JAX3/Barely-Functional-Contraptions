@@ -487,20 +487,20 @@ The third of the set: the same pipe for **items**, in **yellow**. It moves wool,
 ![Item Pipe recipe: copper ingots across the top and bottom rows, glass, a hopper and glass across the middle, making 8](docs/screenshots/recipe_item_pipe.png)
 
 ### Pipe sides: modes and filters
-Each side where a Fluid or Item Pipe meets a block can be set up on its own.
+Each side where a Fluid or Item Pipe meets a block can be set up on its own, with the **Barely Functional Wrench**.
 
 ![Two chests joined by Item Pipes: the left plug is orange (Pull), the right plug green (Push)](docs/screenshots/58_pipe_modes.png)
 
-- **Modes:** right-click the plug (or the face of the pipe's core towards the block) with an **empty hand** to cycle the side through four modes. The plug changes colour to match.
+- **Modes:** right-click the plug (or the face of the pipe's core towards the block) **with the wrench** to cycle the side through four modes. The plug changes colour to match.
 
   | Mode | Plug | What the pipe does with that block |
   |---|---|---|
   | **Normal** | Pipe colour | Puts things in. Takes things out only from pure sources (Automatic Shears, the separator's outputs, the Fluid Reservoir), so chests and tanks are never drained. This is how pipes always worked. |
   | **Pull** | Orange | Takes everything it can **out**, chests, barrels and tanks included, and never puts anything in. |
   | **Push** | Green | Only puts things **in**. It never takes anything out, even from a pure source. |
-  | **Off** | None | No connection on that side at all. Right-click the face of the core to turn it back on. |
-- **Filters:** right-click a plug **holding an item** to add that item to the side's filter, or to remove it if it's already there. A side holds up to 9 entries. On a Fluid Pipe, click with a **bucket of a fluid** (or any filled fluid container) to filter that fluid. With a filter, only those items or fluids pass that side, both in and out; an empty filter lets everything through. **Sneak + right-click** with an empty hand clears the side's filter.
-- Holding a pipe or cable while clicking still places it as normal.
+  | **Off** | None | No connection on that side at all. Wrench the face of the core to turn it back on. |
+- **Filters:** hold the wrench in one hand and **the item in the other**, and right-click the plug to add that item to the side's filter, or remove it if it's already there. A side holds up to 9 entries. On a Fluid Pipe, hold a **bucket of a fluid** (or any filled fluid container) in the other hand to filter that fluid. With a filter, only those items or fluids pass that side, both in and out; an empty filter lets everything through. **Sneak + right-click** with the wrench clears the side's filter (the mode stays).
+- Without the wrench, clicking a pipe does nothing special, so items and blocks in your hand are used or placed as normal.
 - **Jade** lists every side that isn't plain Normal, with its filter. The settings are saved with the pipe.
 - Energy Cables have no modes or filters.
 
