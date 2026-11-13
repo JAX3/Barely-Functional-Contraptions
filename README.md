@@ -493,20 +493,6 @@ Ten more built-in resources turn the sheep into a little version of the mob the 
 
 The glow is a real light. A Glow Ink sheep leaves an invisible light block where it stands, and the light goes out within half a second of the sheep moving away, being sheared or losing its infusion. The light block can't be seen or touched and never drops anything.
 
-### Melon sheep (player skin)
-
-Feed a sheep a **Melon Slice** and it takes on the skin and head of the player **GiantMelon** (UUID `62776558-b5f6-4b75-a2ef-009f8dc9fc52`):
-- their face goes on its head and their outfit on its body;
-- their trousers and shoes go on its back legs, and their sleeves on its front legs.
-
-The fleece still grows over the top, so the face and legs show best, and a sheared sheep shows the whole outfit.
-
-![Sheep wearing GiantMelon's skin](docs/screenshots/54_player_skin_sheep.png)
-
-- **Only a look:** it works on any sheep, infused or not, and doesn't change the sheep's resource, wool or drops. One slice is eaten (not in creative), and a sheep that already has the skin won't eat another. Lambs keep their normal look until they grow up.
-- **How the skin loads:** the sheep stores the UUID, and the game looks the skin up the same way a placed Player Head does. Until the skin has downloaded (or with no internet) it shows the default skin for that UUID.
-- **The player is set in code:** it is `SheepInfusionEvents.MELON_SKIN_PLAYER`.
-
 ### JEI: every wool type the separator handles
 With JEI installed, click the Mechanical Separator in JEI (or press **U** over it) to open **Mechanical Separation**. It lists **every wool type that's loaded**: built-in, mushroom, command-generated and data-pack ones, sorted by name. Plain wool → string and other explicit recipes come after them. Each wool type is one compact row: wool → resource (cycling through 2–4) + string + bonus chance, with energy and time. Like the Resource Infusion page and the Mycelial Generator's fuel page, it uses the same dark slate style as the machine screens: slate panels, recessed slots, and the separator's purple arrow filling over the real processing time. Hover over things for the details. JEI updates by itself after `/reload` or `/barelyfunctionalcontraptions generate`. Press **U** on any resource wool to jump to its row (**R** shows how to make it: the infusion page).
 

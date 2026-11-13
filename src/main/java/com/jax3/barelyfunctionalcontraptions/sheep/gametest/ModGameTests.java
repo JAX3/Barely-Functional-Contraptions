@@ -450,7 +450,7 @@ public final class ModGameTests {
 
     private static void melonSliceSkin(GameTestHelper h) {
         var skinAttachment = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_SKIN;
-        java.util.UUID id = java.util.UUID.fromString("62776558-b5f6-4b75-a2ef-009f8dc9fc52");
+        java.util.UUID id = SheepInfusionEvents.MELON_SKIN_PLAYER;
         // A Melon Slice gives the sheep that player's skin and head, and is eaten.
         Sheep sheep = sheep(h);
         Player player = playerHolding(h, new ItemStack(Items.MELON_SLICE, 3));
