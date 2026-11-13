@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "barelyfunctionalcontraptions:block/glow_panel"
+    },
+    "lit=true": {
+      "model": "barelyfunctionalcontraptions:block/glow_panel_lit"
+    }
+  }
+}

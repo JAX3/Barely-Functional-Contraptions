@@ -81,6 +81,10 @@ public final class DevScreenshotHarness {
         if (mc.player == null || server == null || mc.level == null) return;
         tick++;
         mc.gui.toastManager().clear();
+        if ("power_blocks".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            powerBlocksTick(mc, server);
+            return;
+        }
         if ("themed_sheep".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             themedSheepTick(mc, server);
             return;
@@ -1111,6 +1115,57 @@ public final class DevScreenshotHarness {
         if (player.level().getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity be) {
             player.openMenu(be, pos); // the menu needs the position, exactly like a right-click on the block
         }
+    }
+
+    /** Glow Panels, Glow Lamps and Energy Meters: {@code -PharnessScene=power_blocks}. */
+    private static void powerBlocksTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> powerBlocksScene(server));
+            case 70 -> setHudHidden(mc, true);
+            case 75 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 35", origin.getX() + 0.5, origin.getY() + 2, origin.getZ() + 1.5));
+            case 140 -> shot(mc, "56_glow_panels");
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 160 25", origin.getX() + 2.5, origin.getY() + 1, origin.getZ() - 0.5));
+            case 170 -> shot(mc, "57_energy_meter");
+            case 172 -> {
+                command(server, "time set midnight");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 35", origin.getX() + 0.5, origin.getY() + 2, origin.getZ() + 1.5));
+            }
+            case 230 -> shot(mc, "58_glow_panels_night");
+            case 240 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    private static void powerBlocksScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false", "gamerule advance_weather false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(8, 6, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(8, -1, 4))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        var panel = ModBlocks.GLOW_PANEL.get().defaultBlockState();
+        // Left: a 3x2 field of panels in the open. Right: three panels under Glow Lamps in a stone shelter.
+        for (int x = -6; x <= -4; x++) for (int z = -6; z <= -5; z++) level.setBlock(o.offset(x, 0, z), panel, 3);
+        for (int x = 3; x <= 5; x++) {
+            level.setBlock(o.offset(x, 0, -6), panel, 3);
+            level.setBlock(o.offset(x, 1, -6), ModBlocks.GLOW_LAMP.get().defaultBlockState(), 3);
+            level.setBlock(o.offset(x, 2, -6), Blocks.STONE_BRICK_SLAB.defaultBlockState(), 3);
+        }
+        // Middle: Glow Panel -> Energy Meter -> Hume Energy Cube, and a Creative Generator -> meter -> cube for a big number.
+        level.setBlock(o.offset(-1, 0, -3), panel, 3);
+        level.setBlock(o.offset(0, 0, -3), ModBlocks.ENERGY_METER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.EAST), 3);
+        level.setBlock(o.offset(1, 0, -3), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        level.setBlock(o.offset(-1, 0, -5), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+        level.setBlock(o.offset(0, 0, -5), ModBlocks.ENERGY_METER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.EAST), 3);
+        level.setBlock(o.offset(1, 0, -5), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        level.setBlock(o.offset(2, 0, -5), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", o.getX() + 0.5, o.getY() + 2, o.getZ() + 3.5));
     }
 
     /** The themed sheep (wings, extra heads, legs...) only: {@code -PharnessScene=themed_sheep}. */

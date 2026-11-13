@@ -35,5 +35,8 @@ public final class ModItems {
 
     public static final DeferredItem<BlockItem> ENERGY_METER = REGISTER.registerSimpleBlockItem(ModBlocks.ENERGY_METER);
 
+    public static final DeferredItem<BlockItem> GLOW_PANEL = REGISTER.registerSimpleBlockItem(ModBlocks.GLOW_PANEL);
+    public static final DeferredItem<BlockItem> GLOW_LAMP = REGISTER.registerSimpleBlockItem(ModBlocks.GLOW_LAMP);
+
     private ModItems() {}
 }

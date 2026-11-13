@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 112 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 77 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 113 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 78 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 51 screenshots and 12 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Themed sheep (the ideas in `Custom block.txt`)
@@ -18,6 +18,9 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | GameTest `glowing_sheep_lights_the_block_it_stands_in` | ✅ A Glow Ink sheep puts a light-level-12 light where it stands; once it's sheared the light goes out on its next check |
 | GameTest `ghast_sheep_screams_like_a_ghast` | ✅ A Ghast sheep's bleat becomes the ghast's scream, and its hurt and death sounds the ghast's, even when sheared; a plain sheep still bleats; the `screaming` feature on its own gives the screaming goat's sounds |
 | GameTest `ghast_sheep_is_twice_the_size` | ✅ A Ghast sheep's `minecraft:scale` becomes 2 and its hitbox doubles; shearing doesn't change it, and once the infusion is gone it's back to 1 with the modifier removed |
+| GameTest `energy_meter_measures_what_passes_through` | ✅ Pushes from the back reach the block in front, pulls from the front draw from behind, nothing goes backwards, only the back and front connect, rolled-back transfers aren't counted, the reading matches the 10,000 FE/t the cube takes, and the comparator gives 10 |
+| GameTest `glow_panel_runs_on_glow_lamps` | ✅ A panel under a Glow Lamp (with a roof, so no sun) makes the full 40 FE/t, lights up and charges the cube beside it; a panel covered by stone makes nothing; nothing can be pushed into a panel |
+| Real client, power blocks (`-PharnessScene=power_blocks`) | ✅ Panel cells light up, meter screens show 60 FE/t from a panel by day; at midnight sunlight gives 0 (checked in the log) while panels lit by Glow Lamps keep running |
 | Generator GameTests | ✅ Updated: Wheat and Bone Meal are no longer generated (the Hay and Skeleton sheep cover them), and a generated copy of either is flagged as a duplicate |
 | Real client (`-PharnessScene=themed_sheep`) | ✅ Each sheep photographed side-on (`52_themed_sheep.png`): Wither Skeleton Skulls either side of the Wither sheep's head, using the game's skull texture (front view `53_themed_wither_front.png`), Dragon wings, spider legs, ghast tentacles, Skeleton and Wither Skeleton Skull faces (front views `53_themed_skeleton_front.png`, `53_themed_wither_skeleton_front.png`) and bony legs, sculk tendrils with glowing strands, on-fire flames, hay fleece. At night (`53_themed_sheep_night.png`) the Glow Ink sheep is fully bright and lights the grass, and glowing eyes and sculk strands stay lit. No errors from the mod in the log. |
 | Not yet checked in the client | The replaced sounds are only covered by the GameTest, not listened to in game (the client loads the definitions with no errors) |

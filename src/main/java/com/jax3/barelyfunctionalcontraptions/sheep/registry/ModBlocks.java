@@ -118,6 +118,21 @@ public final class ModBlocks {
                     .strength(1.5F, 6.0F)
                     .sound(SoundType.IRON));
 
+    /** Makes FE from sunlight or block light falling on its top. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock> GLOW_PANEL = REGISTER.registerBlock("glow_panel",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock::new,
+            p -> p.mapColor(MapColor.COLOR_CYAN)
+                    .strength(1.5F, 6.0F)
+                    .sound(SoundType.IRON)
+                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock.LIT) ? 3 : 0));
+
+    /** A full-brightness lamp of glow ink: lights Glow Panels at night and underground. */
+    public static final DeferredBlock<net.minecraft.world.level.block.Block> GLOW_LAMP = REGISTER.registerSimpleBlock("glow_lamp",
+            p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE)
+                    .strength(0.3F)
+                    .sound(SoundType.IRON)
+                    .lightLevel(state -> 15));
+
     /** The invisible light a glowing sheep leaves where it stands; removes itself once the sheep has moved on. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock> SHEEP_GLOW = REGISTER.registerBlock("sheep_glow",
             com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock::new,

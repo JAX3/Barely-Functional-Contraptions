@@ -103,6 +103,10 @@ public final class ModConfigs {
         public final ModConfigSpec.BooleanValue redstoneControlEnabled;
         public final ModConfigSpec.EnumValue<RedstoneMode> defaultRedstoneMode;
         public final ModConfigSpec.IntValue creativeGeneratorOutput;
+        public final ModConfigSpec.IntValue glowPanelSunRate;
+        public final ModConfigSpec.IntValue glowPanelLightRate;
+        public final ModConfigSpec.IntValue glowPanelCapacity;
+        public final ModConfigSpec.IntValue glowPanelOutput;
         public final ModConfigSpec.IntValue automaticShearsInterval;
         public final ModConfigSpec.IntValue automaticShearsEnergyPerShear;
         public final ModConfigSpec.IntValue automaticShearsEnergyCapacity;
@@ -237,6 +241,17 @@ public final class ModConfigs {
             b.comment("Creative Generator (creative-only infinite FE source for testing)").push("creative_generator");
             creativeGeneratorOutput = b.comment("FE pushed into each adjacent energy receiver per tick (receivers still apply their own input limits). 0 disables pushing.")
                     .defineInRange("creativeGeneratorOutput", 1_000_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Glow Panel (makes FE from sunlight, or from block light such as a Glow Lamp, falling on its top)").push("glow_panel");
+            glowPanelSunRate = b.comment("FE/t in full sunlight. Scales down with the sky light (time of day, weather, shade).")
+                    .defineInRange("sunRate", 60, 0, 1_000_000);
+            glowPanelLightRate = b.comment("FE/t under block light 15 (a Glow Lamp, glowstone...). Scales with the light level; the panel uses whichever of sun or block light gives more.")
+                    .defineInRange("lightRate", 40, 0, 1_000_000);
+            glowPanelCapacity = b.comment("FE each panel stores.")
+                    .defineInRange("capacity", 10_000, 1, Integer.MAX_VALUE);
+            glowPanelOutput = b.comment("Most FE a panel pushes into the blocks beside and below it per tick, in total.")
+                    .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
             b.pop();
 
             b.comment("Automatic Shears (FE-powered; shears sheep in the 3x3 area in front of it into its inventory)").push("automatic_shears");

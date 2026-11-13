@@ -126,6 +126,12 @@ public final class ResourcefulSheepClient {
                     String.format(java.util.Locale.ROOT, "%,d", com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CableNetwork.transferRate()))
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
+        for (var item : java.util.List.of(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_LAMP)) {
+            if (event.getItemStack().is(item.get())) {
+                event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions." + item.getId().getPath())
+                        .withStyle(net.minecraft.ChatFormatting.GRAY));
+            }
+        }
         if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ENERGY_METER.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.energy_meter")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));

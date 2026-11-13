@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "G": "minecraft:glass",
+    "Q": "minecraft:quartz",
+    "D": "minecraft:daylight_detector",
+    "I": "minecraft:iron_ingot",
+    "R": "minecraft:redstone"
+  },
+  "pattern": [
+    "GGG",
+    "QDQ",
+    "IRI"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:glow_panel",
+    "count": 1
+  }
+}

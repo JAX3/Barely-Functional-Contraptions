@@ -11,6 +11,7 @@
     "barelyfunctionalcontraptions:fluid_pipe",
     "barelyfunctionalcontraptions:item_pipe",
     "barelyfunctionalcontraptions:fluid_tank",
-    "barelyfunctionalcontraptions:energy_meter"
+    "barelyfunctionalcontraptions:energy_meter",
+    "barelyfunctionalcontraptions:glow_panel"
   ]
 }

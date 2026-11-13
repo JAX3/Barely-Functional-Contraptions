@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "G": "minecraft:glass",
+    "I": "minecraft:glow_ink_sac",
+    "D": "minecraft:glowstone_dust"
+  },
+  "pattern": [
+    "GIG",
+    "IDI",
+    "GIG"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:glow_lamp",
+    "count": 2
+  }
+}

@@ -33,6 +33,8 @@ public final class ContraptionsCreativeTab {
                 output.accept(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIAL_GENERATOR.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ZERO_POINT_ENERGY_MODULE.get());
+                output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL.get());
+                output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_LAMP.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ENERGY_CABLE.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_PIPE.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ITEM_PIPE.get());

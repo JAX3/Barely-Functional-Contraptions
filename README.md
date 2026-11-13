@@ -89,6 +89,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Pipe Dreams | Craft some Fluid Pipes |
 | Special Delivery | Craft some Item Pipes |
 | Watt's Going On | Craft an Energy Meter |
+| Let There Be Glow | Craft a Glow Panel |
 | Wool You Look at That | Infuse a sheep with any resource |
 | Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
 | ⭐ **Three Heads Are Better Than One**, **Here Be Dragons**, **Shh... It's Sculking** (goals) | Infuse a sheep with a Nether Star, Dragon's Breath or Echo Shard |
@@ -382,6 +383,23 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 
 ![Zero Point Energy Module recipe: iron ingots top left and right, a beacon top middle, amethyst shards on the sides, a Functional Machine Block in the centre, copper ingots bottom left and right and a block of redstone bottom middle, making 2](docs/screenshots/recipe_zero_point_energy_module.png)
 
+### Glow Panel and Glow Lamp
+The **Glow Panel** is a thin, solar-style generator that makes Forge Energy from the **light falling on its top**. The **Glow Lamp** is a full-brightness lamp of glow ink that keeps the panels going at night and underground.
+
+| By day | At night |
+|---|---|
+| ![Glow Panels in the sun, panels under Glow Lamps, and an Energy Meter reading 60 FE/t from a panel](docs/screenshots/55_glow_panels.png) | ![The same scene at midnight: the panels under the lamps still run](docs/screenshots/57_glow_panels_night.png) |
+
+- **Sunlight:** with open sky above it, a panel makes up to **60 FE/t** (`sunRate`). It reads the sun the way a daylight detector does: less at dawn and dusk, in rain and in shade, and **nothing at night**.
+- **Glow light:** it also makes up to **40 FE/t** (`lightRate`) from **block light** on its top, scaled by the light level. A **Glow Lamp** sitting on it or above it gives the full 40 FE/t, and so does glowstone or any other light-15 block. A glowing **Glow Ink sheep** (light 12) standing on a panel gives 32 FE/t. The panel uses whichever of sun or glow gives more.
+- **Shade:** a solid block on top that doesn't glow (stone, a machine) shades it completely.
+- **Output:** it stores 10,000 FE and pushes up to 1,000 FE/t into blocks **beside and below** it (cables, machines, Hume Energy Cubes, other mods' FE blocks). Cables and machines can also pull from it. Panels don't charge each other, and nothing can be pushed into a panel.
+- Its cells light up while it is making power. **Right-click** or **Jade** shows how much it makes and from which light. Every number is in `[glow_panel]` in the synced config.
+- **Recipes:**
+  - Glow Panel: a row of glass, a daylight detector between two quartz, and iron ingots around redstone.
+  - 2 Glow Lamps: glass in the corners, Glow Ink Sacs on the sides and glowstone dust in the middle.
+- Mine the panel with a pickaxe. The lamp breaks by hand.
+
 ### Energy Cable
 Cables carry Forge Energy from the **power generators** (Mycelial Generator, Zero Point Energy Module, Creative Generator) and the **Hume Energy Cube** to the machines that use it, so a machine no longer has to touch its power source.
 
@@ -411,6 +429,7 @@ An inline meter for Forge Energy. Put it **between a generator (or cable) and wh
 - **Screens:** its side screens show the flow, shortened to 250, 12.5k or 1.2M, with *FE/t* under it. The number glows blue while energy is moving.
 - **Right-click** for the exact reading and the total that has passed since it was placed. **Jade** shows the same, plus the comparator signal.
 - **Comparator:** the signal rises with the flow on a log scale, so it's useful from a trickle to a Zero Point pair: 1 FE/t gives 1, 10 gives 3, 100 gives 5, 1,000 gives 8, 10,000 gives 10, 100,000 gives 13, and 1,000,000 or more gives 15. Only energy that actually moves counts.
+  ![An Energy Meter between a Glow Panel and a Hume Energy Cube, its screen reading 60 FE/t](docs/screenshots/56_energy_meter.png)
 - **Recipe:** iron ingots around a comparator, a glass pane on top and an Energy Cable on each side. Mine it with a pickaxe; it drops itself.
 
 ### Fluid Pipe

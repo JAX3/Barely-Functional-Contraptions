@@ -149,6 +149,7 @@ public final class ModGameTests {
         TESTS.put("ghast_sheep_is_twice_the_size", ModGameTests::ghastSheepScale);
         TESTS.put("themed_sheep_advancements", ModGameTests::themedAdvancements);
         TESTS.put("energy_meter_measures_what_passes_through", ModGameTests::energyMeter);
+        TESTS.put("glow_panel_runs_on_glow_lamps", ModGameTests::glowPanel);
         TESTS.put("melon_slice_gives_a_sheep_the_skin", ModGameTests::melonSliceSkin);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -2108,6 +2109,33 @@ public final class ModGameTests {
             }
         }
         h.succeed();
+    }
+
+    // ------------------------------------------------------------------ Glow Panel
+
+    private static void glowPanel(GameTestHelper h) {
+        // Under a Glow Lamp with a roof over it (no sky, so only the lamp counts): the full light rate.
+        BlockPos lit = new BlockPos(1, 1, 1);
+        h.setBlock(lit, ModBlocks.GLOW_PANEL.get());
+        h.setBlock(lit.above(), ModBlocks.GLOW_LAMP.get());
+        h.setBlock(lit.above(2), Blocks.STONE);
+        var cube = cube(h, lit.east());
+        // Covered by stone: no light at all.
+        BlockPos dark = new BlockPos(4, 1, 1);
+        h.setBlock(dark, ModBlocks.GLOW_PANEL.get());
+        h.setBlock(dark.above(), Blocks.STONE);
+        h.runAfterDelay(10, () -> {
+            var panel = h.getBlockEntity(lit, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity.class);
+            int rate = com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.glowPanelLightRate);
+            h.assertTrue(panel.generating() == rate, "a Glow Lamp gives the full " + rate + " FE/t, got " + panel.generating());
+            h.assertTrue(panel.source() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity.Source.GLOW, "from glow light, got " + panel.source());
+            h.assertTrue(h.getBlockState(lit).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock.LIT), "its cells light up");
+            h.assertTrue(cube.getEnergyHandler().getAmountAsLong() > 0, "it charges the cube beside it");
+            var covered = h.getBlockEntity(dark, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity.class);
+            h.assertTrue(covered.generating() == 0 && covered.getEnergyHandler().getAmountAsInt() == 0, "a covered panel makes nothing");
+            h.assertTrue(cubeInsert(cubeFace(h, dark, net.minecraft.core.Direction.UP), 100) == 0, "nothing can be put into a panel");
+            h.succeed();
+        });
     }
 
     // ------------------------------------------------------------------ Energy Meter
