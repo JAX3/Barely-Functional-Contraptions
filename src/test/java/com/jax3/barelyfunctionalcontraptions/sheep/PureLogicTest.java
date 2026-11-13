@@ -28,6 +28,45 @@ class PureLogicTest {
     }
 
     @Test
+    void guideContentIsWellFormed() throws Exception {
+        try (var in = getClass().getResourceAsStream("/assets/barelyfunctionalcontraptions/guide/en_us.json")) {
+            assertTrue(in != null, "the guide's en_us.json is in the jar");
+            var json = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+            var chapters = json.getAsJsonArray("chapters");
+            assertTrue(chapters.size() >= 10 && chapters.size() <= 12, "the chapter list fits the screen: " + chapters.size());
+            for (var element : chapters) {
+                var chapter = element.getAsJsonObject();
+                assertFalse(chapter.get("title").getAsString().isBlank());
+                assertTrue(Identifier.tryParse(chapter.get("icon").getAsString()) != null, "icon id " + chapter.get("icon"));
+                assertFalse(chapter.getAsJsonArray("text").isEmpty(), chapter.get("title") + " has text");
+            }
+        }
+    }
+
+    @Test
+    void pipeSideFilters() {
+        var iron = Identifier.withDefaultNamespace("iron_ingot");
+        var side = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.DEFAULT;
+        assertTrue(side.allows(iron) && side.isDefault(), "no filter lets everything through");
+        side = side.toggle(iron);
+        assertTrue(side.allows(iron) && !side.allows(Identifier.withDefaultNamespace("gold_ingot")), "a filter only lets its entries through");
+        assertTrue(side.toggle(iron).isDefault(), "toggling again removes the entry");
+        var full = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.DEFAULT;
+        for (int i = 0; i < com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.MAX_FILTER; i++) full = full.toggle(Identifier.withDefaultNamespace("item_" + i));
+        assertEquals(full, full.toggle(Identifier.withDefaultNamespace("one_more")), "a full filter takes no more");
+        assertEquals(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.NORMAL,
+                com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.DISABLED.next(), "the modes cycle round");
+    }
+
+    @Test
+    void energyMeterSignalScale() {
+        int[][] expected = {{0, 0}, {1, 1}, {10, 3}, {100, 5}, {1_000, 8}, {10_000, 10}, {100_000, 13}, {1_000_000, 15}, {Integer.MAX_VALUE, 15}};
+        for (int[] pair : expected) {
+            assertEquals(pair[1], com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity.signalFor(pair[0]), pair[0] + " FE/t");
+        }
+    }
+
+    @Test
     void parsesSideNamesLeniently() {
         assertEquals(RelativeSide.LEFT, RelativeSide.parse(" left "));
         assertNull(RelativeSide.parse("sideways"));

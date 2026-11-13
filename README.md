@@ -57,6 +57,16 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 |---|---|
 | ![Main creative tab](docs/screenshots/28_creative_tab_main.png) | ![Resource Wool creative tab](docs/screenshots/27_creative_tab_wool.png) |
 
+### Contraptions Manual (in-game guide)
+Craft a **Contraptions Manual** (a book and a redstone dust) and right-click it to read about everything in the mod in game: getting started, each generator and machine, the sheep, fluids, energy, Glow Panels, pipe modes and filters, and data packs.
+
+| Chapters | A chapter |
+|---|---|
+| ![The Contraptions Manual: twelve chapters with their icons, and Getting Started open](docs/screenshots/59_guide.png) | ![The Glow Panels chapter](docs/screenshots/60_guide_glow_panels.png) |
+
+- Pick a chapter on the left; long chapters turn over with the arrow buttons.
+- The text lives in `assets/barelyfunctionalcontraptions/guide/en_us.json`. A resource pack can replace it or add a translation (`guide/<language>.json`, e.g. `de_de.json`), which is used when the game is in that language. Each chapter has a `title`, an `icon` item and a list of `text` paragraphs; a paragraph starting with `## ` is a heading and one starting with `- ` is a list item.
+
 ### Functional Machine Block
 
 Every machine is built around a **Functional Machine Block**: the blue-steel casing of the machines on its own, with corner bolts and an empty, unlit port in the middle. Craft it from 4 iron ingots, 4 copper ingots and 1 redstone, then put one in the recipe of the Mycelial Generator, Mechanical Separator, Automatic Shears, Fluid Reservoir or Hume Energy Cube. It can also be placed as a decorative block (stone pickaxe, drops itself).
@@ -391,7 +401,7 @@ The **Glow Panel** is a thin, solar-style generator that makes Forge Energy from
 | ![Glow Panels in the sun, panels under Glow Lamps, and an Energy Meter reading 60 FE/t from a panel](docs/screenshots/55_glow_panels.png) | ![The same scene at midnight: the panels under the lamps still run](docs/screenshots/57_glow_panels_night.png) |
 
 - **Sunlight:** with open sky above it, a panel makes up to **60 FE/t** (`sunRate`). It reads the sun the way a daylight detector does: less at dawn and dusk, in rain and in shade, and **nothing at night**.
-- **Glow light:** it also makes up to **40 FE/t** (`lightRate`) from **block light** on its top, scaled by the light level. A **Glow Lamp** sitting on it or above it gives the full 40 FE/t, and so does glowstone or any other light-15 block. A glowing **Glow Ink sheep** (light 12) standing on a panel gives 32 FE/t. The panel uses whichever of sun or glow gives more.
+- **Glow light:** it also makes up to **40 FE/t** (`lightRate`) from **block light** on its top, scaled by the light level. A **Glow Lamp** sitting on it or above it gives the full 40 FE/t, and so does glowstone or any other light-15 block. A glowing **Glow Ink sheep** (light 12) standing right beside a panel lights it to about 29 FE/t. The panel uses whichever of sun or glow gives more.
 - **Shade:** a solid block on top that doesn't glow (stone, a machine) shades it completely.
 - **Output:** it stores 10,000 FE and pushes up to 1,000 FE/t into blocks **beside and below** it (cables, machines, Hume Energy Cubes, other mods' FE blocks). Cables and machines can also pull from it. Panels don't charge each other, and nothing can be pushed into a panel.
 - Its cells light up while it is making power. **Right-click** or **Jade** shows how much it makes and from which light. Every number is in `[glow_panel]` in the synced config.

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:book",
+    "minecraft:redstone"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:contraptions_manual",
+    "count": 1
+  }
+}

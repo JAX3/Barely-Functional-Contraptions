@@ -1,0 +1,163 @@
+{
+  "chapters": [
+    {
+      "title": "Getting Started",
+      "icon": "barelyfunctionalcontraptions:functional_machine_block",
+      "text": [
+        "Barely Functional Contraptions makes power from mushrooms, light and empty space, and grows resources on sheep.",
+        "## The machine casing",
+        "Every machine is built around a Functional Machine Block: craft it from iron ingots, copper ingots and redstone, and use it in the machine recipes.",
+        "## The loop",
+        "- Mycelial Generators burn mushrooms and water to make Forge Energy (FE).",
+        "- Feed sheep a resource (an iron ingot, a diamond...) to infuse their wool.",
+        "- Shear them for resource wool, and turn the wool back into resources in a Mechanical Separator powered by FE.",
+        "- Mushroom sheep give the generators their fuel, which closes the loop.",
+        "Sneak and right-click a sheep with an empty hand to see what it is infused with. JEI and Jade, if installed, show recipes and machine details."
+      ]
+    },
+    {
+      "title": "Mycelial Generator",
+      "icon": "barelyfunctionalcontraptions:mycelial_generator",
+      "text": [
+        "Burns red or brown mushrooms and water to make FE: 200 FE/t from brown mushrooms, 250 FE/t from red ones.",
+        "## Running it",
+        "- Give it water with a bucket, a bucket in its slot, a pipe, or a Fluid Reservoir placed next to it.",
+        "- Put mushrooms in the top slot. Hoppers and pipes can insert from any side.",
+        "- It pushes energy into cables and machines next to it.",
+        "## Networks",
+        "Generators that touch form a network, and every running member boosts the whole network's output exponentially.",
+        "## Mycelium",
+        "Running generators slowly turn nearby dirt into mycelium and sometimes sprout huge mushrooms, which gives you more fuel."
+      ]
+    },
+    {
+      "title": "Wrench and Links",
+      "icon": "barelyfunctionalcontraptions:mycelium_wrench",
+      "text": [
+        "The Barely Functional Wrench links blocks without touching.",
+        "- Right-click a generator, then another generator, to link them into one network (up to 64 blocks apart).",
+        "- Right-click a generator, then a Mechanical Separator, Automatic Shears or Hume Energy Cube, to power it wirelessly.",
+        "- Sneak and right-click a block to remove its links. Sneak and right-click the air to clear your selection.",
+        "The generator's screen shows how it is connected and which machines it is powering."
+      ]
+    },
+    {
+      "title": "Infusing Sheep",
+      "icon": "minecraft:iron_ingot",
+      "text": [
+        "Right-click a grown sheep holding a resource, such as an Iron Ingot, a Diamond or a Red Mushroom.",
+        "- Its fleece takes the resource's colour, and small blocks of the resource grow out of it.",
+        "- Each infusion lasts 100 shearings by default.",
+        "- Breed infused sheep with wheat and the lamb is born infused too.",
+        "- Kill an infused sheep with its wool for a little extra.",
+        "Anything that isn't a resource works as normal, so wheat, dyes and shears behave as usual.",
+        "## More resources",
+        "Data packs can add any resource, and operators can run /barelyfunctionalcontraptions generate to make one for every metal in the modpack."
+      ]
+    },
+    {
+      "title": "Wool and Machines",
+      "icon": "barelyfunctionalcontraptions:mechanical_separator",
+      "text": [
+        "## Mechanical Separator",
+        "Put resource wool in and supply FE. Each wool gives 2 to 4 of its resource, 2 string and sometimes a bonus. Iron wool takes 20,000 FE over 5 seconds.",
+        "Its redstone button sets whether redstone turns it on or off. Hoppers and pipes can feed it and empty it.",
+        "## Automatic Shears",
+        "Shears every sheep in the 3x3 area in front of its blades, using 2,000 FE per sheep, and keeps the wool in 9 slots. Put a hopper or pipe under it to collect the wool."
+      ]
+    },
+    {
+      "title": "Themed Sheep",
+      "icon": "minecraft:nether_star",
+      "text": [
+        "Ten resources turn sheep into little versions of the mob they come from:",
+        "- Hay Bale: a hay fleece (wheat).",
+        "- Nether Star: two Wither Skeleton Skulls beside its head (nether stars).",
+        "- Dragon's Breath: dragon wings (dragon's breath).",
+        "- Glow Ink Sac: a glowing fleece that lights up the ground (glow ink).",
+        "- Bone Block and Wither Rose: skull faces and bony legs (bones).",
+        "- Spider Eye: extra legs and red eyes (spider eyes).",
+        "- Echo Shard: sculk tendrils (echo shards).",
+        "- Blaze Rod: always on fire, but never hurt (blaze rods).",
+        "- Ghast Tear: twice the size, tentacles, and it screams like a ghast (ghast tears).",
+        "Each one has its own advancement, and collecting every wool is a challenge."
+      ]
+    },
+    {
+      "title": "Water and Fluids",
+      "icon": "barelyfunctionalcontraptions:fluid_tank",
+      "text": [
+        "## Fluid Reservoir",
+        "Place it on top of an infinite water source and it fills with a bucket of water a second, which it pushes into tanks and generators beside it.",
+        "## Fluid Tank",
+        "Holds 16 buckets of one fluid. Touching tanks join into one big tank that fills from the bottom up. Use buckets on it, or connect pipes on any side.",
+        "## Fluid Pipe",
+        "Carries fluid between anything that holds it, up to 4 buckets a tick. Machines are filled first, then tanks."
+      ]
+    },
+    {
+      "title": "Energy",
+      "icon": "barelyfunctionalcontraptions:hume_energy_cube",
+      "text": [
+        "## Hume Energy Cube",
+        "A battery: 1,000,000 FE and 10,000 FE/t per cube. Touching cubes join into one bigger battery that pushes into the machines and cables around it.",
+        "## Energy Cable",
+        "Joins generators, batteries and machines into one network moving up to 100,000 FE/t. Generators power machines first and charge cubes with the rest.",
+        "## Energy Meter",
+        "Place it looking the way the energy should flow: in at the back, out at the front. Its screens show the FE/t passing through. Right-click for the total, and read it with a comparator: the signal rises with the flow."
+      ]
+    },
+    {
+      "title": "Zero Point Module",
+      "icon": "barelyfunctionalcontraptions:zero_point_energy_module",
+      "text": [
+        "Place two modules facing each other, on a floor and ceiling or on two walls, with open space between them.",
+        "- They link with a beam and make 1,000 FE/t for every block of gap, up to 64 blocks.",
+        "- Take the energy from either end.",
+        "- Stained glass in the gap colours the beam.",
+        "- The beam burns anything that walks into it, and mobs it kills drop loot as if you had killed them."
+      ]
+    },
+    {
+      "title": "Glow Panels",
+      "icon": "barelyfunctionalcontraptions:glow_panel",
+      "text": [
+        "The Glow Panel makes power from the light falling on its top.",
+        "- In full sunlight it makes 60 FE/t, less at dawn, dusk and in rain, and nothing at night.",
+        "- Under block light it makes up to 40 FE/t. A Glow Lamp on it or above it gives the full amount, day or night, even underground.",
+        "- A glowing Glow Ink sheep standing next to it lights it up too.",
+        "It pushes its energy into blocks beside and below it.",
+        "## Glow Lamp",
+        "A full-brightness lamp made from glow ink sacs, glass and glowstone dust."
+      ]
+    },
+    {
+      "title": "Pipe Sides",
+      "icon": "barelyfunctionalcontraptions:item_pipe",
+      "text": [
+        "Each side where a Fluid or Item Pipe meets a block can be set up on its own.",
+        "## Modes",
+        "Right-click the plug with an empty hand to cycle it:",
+        "- Normal: fills the block, and only takes from pure sources such as the Automatic Shears.",
+        "- Pull (orange): empties the block, chests and tanks included.",
+        "- Push (green): only fills the block, never takes from it.",
+        "- Off: no connection. Click the face of the pipe's core to turn it back on.",
+        "## Filters",
+        "Right-click a plug holding an item, or a bucket of a fluid, to add it to that side's filter, or remove it again. Only filtered things pass that side. Sneak and right-click with an empty hand to clear it."
+      ]
+    },
+    {
+      "title": "Data Packs",
+      "icon": "minecraft:command_block",
+      "text": [
+        "Sheep resources are data: data/<namespace>/barelyfunctionalcontraptions/sheep_resources/<name>.json. They reload with /reload.",
+        "An appearance block gives any resource wings, extra heads, glowing, a bigger size, its own sounds and more.",
+        "## Commands",
+        "- /barelyfunctionalcontraptions list: every loaded resource.",
+        "- /barelyfunctionalcontraptions generate: a resource for every material in the modpack.",
+        "- /barelyfunctionalcontraptions generate item <item>: a resource fed with any item.",
+        "Every number in the mod can be changed in its config files, from the mod list's Config button."
+      ]
+    }
+  ]
+}

@@ -67,6 +67,7 @@ public final class ResourcefulSheepClient {
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onItemTooltip);
 
         com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.clientTickHandler = ZeroPointHumSound::tick;
+        com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem.openGuide = () -> net.minecraft.client.Minecraft.getInstance().gui.setScreen(new GuideScreen());
         DevScreenshotHarness.registerIfEnabled();
     }
 
@@ -131,6 +132,10 @@ public final class ResourcefulSheepClient {
                 event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions." + item.getId().getPath())
                         .withStyle(net.minecraft.ChatFormatting.GRAY));
             }
+        }
+        if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CONTRAPTIONS_MANUAL.get())) {
+            event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.contraptions_manual")
+                    .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
         if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ENERGY_METER.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.energy_meter")

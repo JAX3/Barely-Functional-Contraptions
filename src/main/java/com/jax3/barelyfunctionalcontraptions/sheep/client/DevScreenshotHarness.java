@@ -1133,7 +1133,11 @@ public final class DevScreenshotHarness {
                 command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 35", origin.getX() + 0.5, origin.getY() + 2, origin.getZ() + 1.5));
             }
             case 260 -> shot(mc, "58_glow_panels_night");
-            case 270 -> mc.stop();
+            case 262 -> mc.gui.setScreen(new GuideScreen());
+            case 275 -> shot(mc, "60_guide");
+            case 277 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter(9); }
+            case 290 -> shot(mc, "61_guide_glow_panels");
+            case 300 -> mc.stop();
             default -> {}
         }
     }

@@ -27,6 +27,7 @@ public final class ContraptionsCreativeTab {
             .withTabsBefore(CreativeModeTabs.SPAWN_EGGS)
             .icon(() -> new ItemStack(ModBlocks.FUNCTIONAL_MACHINE_BLOCK.get()))
             .displayItems((params, output) -> {
+                output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CONTRAPTIONS_MANUAL.get());
                 // Crafting component
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FUNCTIONAL_MACHINE_BLOCK.get());
                 // Power

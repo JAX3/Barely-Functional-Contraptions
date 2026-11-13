@@ -38,5 +38,9 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> GLOW_PANEL = REGISTER.registerSimpleBlockItem(ModBlocks.GLOW_PANEL);
     public static final DeferredItem<BlockItem> GLOW_LAMP = REGISTER.registerSimpleBlockItem(ModBlocks.GLOW_LAMP);
 
+    /** The in-game guide. */
+    public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem> CONTRAPTIONS_MANUAL = REGISTER.registerItem("contraptions_manual",
+            com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem::new, p -> p.stacksTo(1));
+
     private ModItems() {}
 }

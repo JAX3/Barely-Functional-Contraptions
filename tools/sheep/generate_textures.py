@@ -2436,6 +2436,30 @@ def generate_glow_panel():
     grid(GLOW_LAMP, lamp).save(out("block/glow_lamp.png"))
 
 
+MANUAL = [  # Contraptions Manual: a purple book with a brass gear on the cover
+    "................",
+    "..OOOOOOOOOOO...",
+    "..OPPPPPPPPPpO..",
+    "..OPPPPCCPPPpO..",
+    "..OPPPCYYCPPpO..",
+    "..OPPCYccYCPpO..",
+    "..OPPCcOOcCPpO..",
+    "..OPPCcOOcCPpO..",
+    "..OPPCYccYCPpO..",
+    "..OPPPCYYCPPpO..",
+    "..OPPPPCCPPPpO..",
+    "..OPPPPPPPPPpO..",
+    "..OwwwwwwwwwwO..",
+    "..OvvvvvvvvvvO..",
+    "...OOOOOOOOOO...",
+    "................",
+]
+
+
+def generate_manual():
+    grid(MANUAL, dict(CARTOON)).save(out("item/contraptions_manual.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -2454,6 +2478,7 @@ def main():
     generate_energy_cable()
     generate_energy_meter()
     generate_glow_panel()
+    generate_manual()
     generate_reservoir_gui()
     generate_energy_cube()
     generate_cube_gui()
