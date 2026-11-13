@@ -47,6 +47,8 @@ import net.minecraft.util.LightCoordsUtil;
 public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> {
     public static final ContextKey<Colors> INFUSED_WOOL = new ContextKey<>(ResourcefulSheep.id("infused_wool"));
     private static final Identifier WOOL_TEXTURE = ResourcefulSheep.id("textures/entity/sheep/infused_wool.png");
+    /** The melon sheep's fleece (see {@link SheepInfusionEvents#isMelonSheep}), drawn untinted. */
+    private static final Identifier MELON_WOOL_TEXTURE = ResourcefulSheep.id("textures/entity/sheep/melon_wool.png");
     private static final Identifier ACCENT_TEXTURE = ResourcefulSheep.id("textures/entity/sheep/infused_wool_accent.png");
 
     /** Lambs use vanilla's baby fleece (its own shape and texture), tinted with the resource's wool colour. */
@@ -113,8 +115,16 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
 
     static void extract(Sheep sheep, SheepRenderState state) {
         if (state.isSheared) return;
+        // The melon sheep: a grown sheep given the melon skin wears melon rind instead of wool, infused or not.
+        boolean melon = !state.isBaby && SheepInfusionEvents.isMelonSheep(sheep);
         Optional<SheepResource> resource = SheepInfusionEvents.getInfusedResource(sheep);
-        if (resource.isEmpty()) return;
+        if (resource.isEmpty()) {
+            if (melon) {
+                state.setRenderData(INFUSED_WOOL, new Colors(-1, 0, new ItemStackRenderState(), 0, SheepAppearance.NONE.withWoolTexture(MELON_WOOL_TEXTURE)));
+                state.isSheared = true;
+            }
+            return;
+        }
         int wool = ARGB.opaque(resource.get().woolColor());
         if (ModConfigs.getBool(ModConfigs.SERVER.preserveWoolColour)) {
             float strength = (float) ModConfigs.getDouble(ModConfigs.CLIENT.dyeTintStrength);
@@ -143,6 +153,12 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
             }
         }
         SheepAppearance appearance = resource.get().appearance();
+        if (melon) {
+            // Melon rind as drawn, without the resource's tint or sparkle; its features and growths still show.
+            appearance = appearance.withWoolTexture(MELON_WOOL_TEXTURE);
+            wool = -1;
+            accent = 0;
+        }
         // Burning sheep use the vanilla on-fire flames; they never actually burn.
         if (appearance.has(Feature.ON_FIRE)) state.displayFireAnimation = true;
         state.setRenderData(INFUSED_WOOL, new Colors(wool, accent, growth, count, appearance));

@@ -2149,6 +2149,43 @@ def generate_hay_wool():
     img.save(out("entity/sheep/hay_wool.png"))
 
 
+def generate_melon_wool():
+    """Melon-rind fleece in the vanilla sheep wool layout: green rind with dark stripes running along the body."""
+    rnd = random.Random(6262)
+    img = Image.new("RGBA", (64, 32), CLEAR)
+    light = [hexc("#8CC63F"), hexc("#7DB536"), hexc("#9AD14A")]
+    dark = [hexc("#3E6E1E"), hexc("#355F19")]
+    speck = hexc("#B9E06A")
+
+    def fill(rect, along_x, mask=None):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                if mask and not mask(x - x0, y - y0, x1 - x0, y1 - y0):
+                    continue
+                # Stripes run along the body: across x on the sides, across y on the top and bottom.
+                k = (y - y0) if along_x else (x - x0)
+                wobble = 1 if ((x + y) * 7 + rnd.randint(0, 3)) % 9 == 0 else 0
+                c = dark[(x + y) % 2] if (k + wobble) % 4 == 0 else rnd.choice(light)
+                if c in light and rnd.random() < 0.05:
+                    c = speck
+                img.putpixel((x, y), c)
+
+    head = box_faces(0, 0, 6, 6, 6)
+    for face in ("top", "east", "west", "south"):
+        fill(head[face], face != "top")
+    fill(head["north"], True, lambda x, y, w, h: y < 2 or (y < 3 and x in (0, w - 1)))
+    body = box_faces(28, 8, 8, 16, 6)
+    for face in ("east", "west", "north", "south"):
+        fill(body[face], False)
+    for face in ("top", "bottom"):
+        fill(body[face], True)
+    legs = box_faces(0, 16, 4, 6, 4)
+    fill(legs["top"], True)
+    for face in ("east", "north", "west", "south"):
+        fill(legs[face], False, lambda x, y, w, h: y < 4)
+    img.save(out("entity/sheep/melon_wool.png"))
+
 def generate_sheep_bones():
     """Skull face and bony legs in the vanilla sheep body layout (64x32); tinted by feature_color."""
     rnd = random.Random(777)
@@ -2257,6 +2294,7 @@ def main():
     generate_wool_items()
     generate_sheep_fur()
     generate_hay_wool()
+    generate_melon_wool()
     generate_sheep_bones()
     generate_sheep_extras()
     generate_block()

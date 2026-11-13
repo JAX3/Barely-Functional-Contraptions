@@ -456,6 +456,7 @@ public final class ModGameTests {
         Player stranger = playerHolding(h, new ItemStack(Items.MELON_SLICE, 3));
         feed(stranger, sheep);
         h.assertTrue(!sheep.hasData(skinAttachment) || sheep.getData(skinAttachment).profile().isEmpty(), "only that player can give the skin");
+        h.assertFalse(SheepInfusionEvents.isMelonSheep(sheep), "not a melon sheep yet");
         h.assertTrue(stranger.getMainHandItem().getCount() == 3, "another player's slice isn't eaten, left " + stranger.getMainHandItem().getCount());
         // That player's Melon Slice gives the sheep their skin and head, and is eaten.
         Player player = playerHolding(h, new ItemStack(Items.MELON_SLICE, 3));
@@ -464,6 +465,7 @@ public final class ModGameTests {
         var skin = sheep.getData(skinAttachment).profile();
         h.assertTrue(skin.isPresent() && skin.get().partialProfile().id().equals(id), "the sheep wears " + id + ", got " + skin);
         h.assertTrue(player.getMainHandItem().getCount() == 2, "one slice is eaten, left " + player.getMainHandItem().getCount());
+        h.assertTrue(SheepInfusionEvents.isMelonSheep(sheep), "it is now a melon sheep (melon fleece)");
         h.assertTrue(!SheepInfusionEvents.getInfusion(sheep).isInfused(), "a melon slice is only a look, not an infusion");
         // A sheep that already has the skin doesn't eat another.
         feed(player, sheep);

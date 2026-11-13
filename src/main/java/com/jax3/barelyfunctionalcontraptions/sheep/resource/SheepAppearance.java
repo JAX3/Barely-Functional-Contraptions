@@ -45,6 +45,11 @@ public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> fe
             Sounds.CODEC.optionalFieldOf("sounds", Sounds.NONE).forGetter(SheepAppearance::sounds)
     ).apply(i, SheepAppearance::new));
 
+    /** The same appearance with another fleece texture. */
+    public SheepAppearance withWoolTexture(Identifier texture) {
+        return new SheepAppearance(Optional.of(texture), features, featureColor, scale, sounds);
+    }
+
     public boolean has(Feature feature) {
         return features.contains(feature);
     }

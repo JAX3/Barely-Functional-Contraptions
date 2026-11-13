@@ -91,19 +91,24 @@ public final class SheepInfusionEvents {
     /** The player whose skin and head a sheep takes when fed a Melon Slice. */
     public static final java.util.UUID MELON_SKIN_PLAYER = java.util.UUID.fromString("62776558-b5f6-4b75-a2ef-009f8dc9fc52");
 
+    /** Whether this sheep was given the melon skin (by the {@link #MELON_SKIN_PLAYER} player feeding it a Melon Slice). */
+    public static boolean isMelonSheep(Entity entity) {
+        var attachment = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_SKIN;
+        return entity.hasData(attachment) && entity.getData(attachment).profile()
+                .map(p -> MELON_SKIN_PLAYER.equals(p.partialProfile().id())).orElse(false);
+    }
+
     /**
      * Feeding a sheep a Melon Slice gives it the skin and head of one particular player ({@link #MELON_SKIN_PLAYER}).
-     * Only that player can do it: for anyone else a Melon Slice does nothing and isn't used up.
+     * Only that player can do it: for anyone else a Melon Slice does nothing and isn't used up. Its fleece also turns
+     * into melon rind (drawn by the client).
      * The sheep stores that player's UUID and clients look the skin up the way a placed Player Head does. One slice is
      * used up (not in creative). This is only a look: it works on any sheep, infused or not, and doesn't change what
      * it drops. A sheep that already has the skin doesn't eat another slice.
      */
     private static void feedMelonSlice(PlayerInteractEvent.EntityInteract event, Player player, Sheep sheep, ItemStack stack) {
         var attachment = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_SKIN;
-        if (sheep.hasData(attachment) && sheep.getData(attachment).profile()
-                .map(p -> MELON_SKIN_PLAYER.equals(p.partialProfile().id())).orElse(false)) {
-            return; // already wearing it: leave the slice alone
-        }
+        if (isMelonSheep(sheep)) return; // already wearing it: leave the slice alone
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.SUCCESS);
         if (!(event.getLevel() instanceof ServerLevel level)) return;
