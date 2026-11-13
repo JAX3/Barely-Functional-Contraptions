@@ -735,5 +735,8 @@
   "gui.barelyfunctionalcontraptions.pipe_filter.mode.push": "Push: only fills the block, never takes from it",
   "gui.barelyfunctionalcontraptions.pipe_filter.mode.disabled": "Off: no connection on this side",
   "message.barelyfunctionalcontraptions.pipe.nothing_here_at_all": "This pipe isn't connected to any block yet",
-  "message.barelyfunctionalcontraptions.energy_meter.turned": "Energy Meter: in from the %s, out to the %s"
+  "message.barelyfunctionalcontraptions.energy_meter.turned": "Energy Meter: in from the %s, out to the %s",
+  "message.barelyfunctionalcontraptions.energy_meter.no_input": "Energy Meter: nothing to take energy from at the back (%s). Turn it with the wrench.",
+  "message.barelyfunctionalcontraptions.energy_meter.no_output": "Energy Meter: nothing to pass energy to at the front (%s). Turn it with the wrench.",
+  "message.barelyfunctionalcontraptions.energy_meter.no_both": "Energy Meter: nothing connected at the back (%s) or the front (%s). Put it between a power source and what it powers."
 }

@@ -81,6 +81,10 @@ public final class DevScreenshotHarness {
         if (mc.player == null || server == null || mc.level == null) return;
         tick++;
         mc.gui.toastManager().clear();
+        if ("meter_setups".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            meterSetupsTick(mc, server);
+            return;
+        }
         if ("interactions".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             interactionsTick(mc, server);
             return;
@@ -1123,6 +1127,135 @@ public final class DevScreenshotHarness {
         if (player.level().getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity be) {
             player.openMenu(be, pos); // the menu needs the position, exactly like a right-click on the block
         }
+    }
+
+    /** Rows of common Energy Meter set-ups, each meter placed by a real floor click ({@code -PharnessScene=meter_setups}). */
+    private static final String[] METER_ROWS = {"generator > meter > separator", "generator > cable > meter > cable > separator",
+            "cube > meter > separator", "glow panel > meter > cable > cube", "cable > meter > cable (creative generator > ... > cube)",
+            "generator > meter > (nothing)"};
+
+    private static void meterSetupsTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> meterSetupsScene(server));
+            case 76, 86, 96, 106, 116, 126 -> {
+                BlockPos spot = meterSpot((tick - 76) / 10);
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 60", spot.getX() + 0.5, spot.getY(), spot.getZ() + 1.8));
+            }
+            case 80, 90, 100, 110, 120, 130 -> {
+                int row = (tick - 80) / 10;
+                mc.player.getInventory().setSelectedSlot(0);
+                BlockPos floor = meterSpot(row).below();
+                var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floor).add(0, 0.5, 0), Direction.UP, floor, false);
+                mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+            }
+            case 135 -> setHudHidden(mc, true);
+            case 220 -> server.execute(() -> {
+                var level = server.overworld();
+                for (int row = 0; row < METER_ROWS.length; row++) {
+                    BlockPos meter = meterSpot(row);
+                    var state = level.getBlockState(meter);
+                    String reading = level.getBlockEntity(meter) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity be
+                            ? be.rate() + " FE/t, total " + be.total() : "no meter";
+                    BlockPos end = meterEnd(row);
+                    var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, end, null);
+                    ResourcefulSheep.LOGGER.warn("METER row {} ({}): {} {} -> end block {} holds {}", row, METER_ROWS[row],
+                            state.hasProperty(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING) ? state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING) : "-",
+                            reading, level.getBlockState(end).getBlock(), handler == null ? "?" : handler.getAmountAsLong());
+                }
+            });
+            case 225 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.8));
+            case 260 -> shot(mc, "67_meter_setups");
+            case 262 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 80", origin.getX() + 0.5, origin.getY() + 2, origin.getZ() - 1.0));
+            case 290 -> shot(mc, "68_meter_top");
+            case 292 -> {
+                BlockPos lone = meterSpot(5);
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", lone.getX() + 0.5, lone.getY(), lone.getZ() + 2.3));
+            }
+            case 320 -> shot(mc, "69_meter_no_output");
+            case 330 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    /** Where the meter of {@code row} goes (rows run west to east along z = -2 - 2*row). */
+    private static BlockPos meterSpot(int row) {
+        return origin.offset(0, 0, -2 - 2 * row);
+    }
+
+    private static BlockPos meterEnd(int row) {
+        return switch (row) {
+            case 1 -> meterSpot(row).east(2);
+            case 3 -> meterSpot(row).east(2);
+            case 4 -> meterSpot(row).east(3);
+            default -> meterSpot(row).east();
+        };
+    }
+
+    private static void meterSetupsScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-6, 0, -16), o.offset(6, 4, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-6, -1, -16), o.offset(6, -1, 4))) level.setBlock(p, Blocks.STONE.defaultBlockState(), 2);
+        var genState = com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.mycelial.block.MycelialGeneratorBlock.FACING, Direction.SOUTH);
+        // The separator faces south, so its west (left) side takes energy.
+        var sepState = ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState().setValue(MechanicalSeparatorBlock.FACING, Direction.SOUTH);
+        var cable = ModBlocks.ENERGY_CABLE.get();
+        java.util.function.Consumer<BlockPos> generator = pos -> {
+            level.setBlock(pos, genState, 3);
+            if (level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity g) {
+                g.getInventory().setStackInSlot(com.jax3.barelyfunctionalcontraptions.mycelial.capability.GeneratorItemHandler.FUEL_SLOT, new ItemStack(Items.RED_MUSHROOM, 32));
+                g.getTank().fillInternal(net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER), 8000);
+            }
+        };
+        java.util.function.Consumer<BlockPos> separator = pos -> {
+            level.setBlock(pos, sepState, 3);
+            if (level.getBlockEntity(pos) instanceof MechanicalSeparatorBlockEntity be) {
+                be.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 64));
+            }
+        };
+        java.util.function.Consumer<BlockPos> cableAt = pos -> level.setBlock(pos, cable.withConnections(cable.defaultBlockState(), level, pos), 3);
+        // Row 0: generator > meter > separator.
+        BlockPos m = meterSpot(0);
+        generator.accept(m.west());
+        separator.accept(m.east());
+        // Row 1: generator > cable > meter > cable > separator.
+        m = meterSpot(1);
+        generator.accept(m.west(2));
+        separator.accept(m.east(2));
+        cableAt.accept(m.west());
+        cableAt.accept(m.east());
+        // Row 2: charged cube > meter > separator.
+        m = meterSpot(2);
+        level.setBlock(m.west(), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        level.setBlock(m.west(2), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+        separator.accept(m.east());
+        // Row 3: glow panel > meter > cable > cube.
+        m = meterSpot(3);
+        level.setBlock(m.west(), ModBlocks.GLOW_PANEL.get().defaultBlockState(), 3);
+        cableAt.accept(m.east());
+        level.setBlock(m.east(2), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        // Row 4: creative generator > cable > meter > cable > cable > cube.
+        m = meterSpot(4);
+        level.setBlock(m.west(2), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+        cableAt.accept(m.west());
+        cableAt.accept(m.east());
+        cableAt.accept(m.east(2));
+        level.setBlock(m.east(3), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        // Row 5: a generator and nothing in front: the meter should say NO OUTPUT.
+        generator.accept(meterSpot(5).west());
+        for (BlockPos p : new BlockPos[]{meterSpot(1).west(), meterSpot(1).east(), meterSpot(3).east(), meterSpot(4).west(), meterSpot(4).east(), meterSpot(4).east(2)}) {
+            level.setBlock(p, cable.withConnections(level.getBlockState(p), level, p), 3);
+        }
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        player.getInventory().setItem(0, new ItemStack(ModItems.ENERGY_METER.get(), 16));
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 60", o.getX() + 0.5, o.getY() + 1, o.getZ() + 1.5));
     }
 
     /**

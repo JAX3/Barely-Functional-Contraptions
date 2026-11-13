@@ -446,7 +446,8 @@ An inline meter for Forge Energy. Put it **between a generator (or cable) and wh
   - with nothing around it, it points the way you look.
 - **The wrench** flips a meter end to end; sneak + wrench turns it to the next direction.
 - **Passes energy straight through:** it has no buffer. Whatever is pushed into the back goes on to the block in front, and whatever the block in front (or a cable network) pulls out comes from the block behind. Energy never goes backwards through it.
-- **Screens:** its side screens show the flow, shortened to 250, 12.5k or 1.2M, with *FE/t* under it. The number glows blue while energy is moving.
+- **Screens:** every face except the two ports shows the flow (top and bottom included), shortened to 250, 12.5k or 1.2M, with *FE/t* under it. The number glows blue while energy is moving.
+- **Not connected?** If there's nothing with an energy connection at its back or front, the screens say **NO INPUT**, **NO OUTPUT** or **NO IN/OUT** in red instead of 0, and right-clicking or Jade says which side to fix. A meter only measures energy that passes through it in a straight line, back to front. If a generator also touches the machine directly, or the meter sits round a corner, energy can go around it; turn it with the wrench, or move it so it's the only way through.
 - **Right-click** for the exact reading and the total that has passed since it was placed. **Jade** shows the same, plus the comparator signal.
 - **Comparator:** the signal rises with the flow on a log scale, so it's useful from a trickle to a Zero Point pair: 1 FE/t gives 1, 10 gives 3, 100 gives 5, 1,000 gives 8, 10,000 gives 10, 100,000 gives 13, and 1,000,000 or more gives 15. Only energy that actually moves counts.
   ![An Energy Meter between a Glow Panel and a Hume Energy Cube, its screen reading 60 FE/t](docs/screenshots/56_energy_meter.png)

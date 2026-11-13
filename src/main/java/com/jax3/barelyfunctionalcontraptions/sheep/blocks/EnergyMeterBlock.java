@@ -74,9 +74,20 @@ public class EnergyMeterBlock extends BaseEntityBlock {
             }
         }
         if (best != null) return defaultBlockState().setValue(FACING, best.getOpposite());
+        // No straight line: take energy from the neighbour that looks most like a source, so a receiver placed in
+        // front of it later connects.
+        Direction source = null;
+        int sourceBest = Integer.MIN_VALUE;
         for (Direction in : Direction.values()) {
-            if (energyAt(level, pos, in) != null) return defaultBlockState().setValue(FACING, in.getOpposite());
+            var handler = energyAt(level, pos, in);
+            if (handler == null) continue;
+            int score = sourceScore(handler);
+            if (source == null || score > sourceBest) {
+                source = in;
+                sourceBest = score;
+            }
         }
+        if (source != null) return defaultBlockState().setValue(FACING, source.getOpposite());
         return defaultBlockState().setValue(FACING, context.getNearestLookingDirection());
     }
 
@@ -94,6 +105,17 @@ public class EnergyMeterBlock extends BaseEntityBlock {
             int takes = handler.insert(Integer.MAX_VALUE / 4, simulate);
             return (gives > 0 ? 2 : 0) - (takes > 0 ? 1 : 0);
         }
+    }
+
+    /** "Nothing connected at the back (south)..." for a meter with an end that isn't connected. */
+    public static net.minecraft.network.chat.MutableComponent missingMessage(EnergyMeterBlockEntity be) {
+        Component in = Component.translatable("direction.barelyfunctionalcontraptions." + be.inputFace().getSerializedName());
+        Component out = Component.translatable("direction.barelyfunctionalcontraptions." + be.outputFace().getSerializedName());
+        return switch (be.missing()) {
+            case EnergyMeterBlockEntity.MISSING_INPUT -> Component.translatable("message.barelyfunctionalcontraptions.energy_meter.no_input", in);
+            case EnergyMeterBlockEntity.MISSING_OUTPUT -> Component.translatable("message.barelyfunctionalcontraptions.energy_meter.no_output", out);
+            default -> Component.translatable("message.barelyfunctionalcontraptions.energy_meter.no_both", in, out);
+        };
     }
 
     /** The wrench: flips the meter end to end, or with sneak turns it to the next direction. */
@@ -134,9 +156,13 @@ public class EnergyMeterBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof EnergyMeterBlockEntity be) {
-            player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.energy_meter.reading",
-                    String.format(Locale.ROOT, "%,d", be.rate()), String.format(Locale.ROOT, "%,d", be.total()))
-                    .withStyle(be.rate() > 0 ? ChatFormatting.AQUA : ChatFormatting.GRAY));
+            if (be.rate() == 0 && be.missing() != 0) {
+                player.sendOverlayMessage(missingMessage(be).withStyle(ChatFormatting.RED));
+            } else {
+                player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.energy_meter.reading",
+                        String.format(Locale.ROOT, "%,d", be.rate()), String.format(Locale.ROOT, "%,d", be.total()))
+                        .withStyle(be.rate() > 0 ? ChatFormatting.AQUA : ChatFormatting.GRAY));
+            }
         }
         return InteractionResult.SUCCESS;
     }

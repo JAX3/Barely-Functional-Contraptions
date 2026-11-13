@@ -19,8 +19,8 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Draws the Energy Meter's reading on its screens: the FE/t passing through, shortened (250, 12.5k, 1.2M), with
- * "FE/t" under it, glowing on every side face that has a screen (the faces that aren't the input or the output and
- * aren't the top or bottom).
+ * "FE/t" under it, glowing on every face that isn't the input or the output (top and bottom included). When an end
+ * has nothing to connect to, it shows NO INPUT, NO OUTPUT or NO IN/OUT in red instead.
  */
 public class EnergyMeterRenderer implements BlockEntityRenderer<EnergyMeterBlockEntity, EnergyMeterRenderer.State> {
     /** The screen is 8x6 pixels; the text is fitted inside it. */
@@ -28,9 +28,11 @@ public class EnergyMeterRenderer implements BlockEntityRenderer<EnergyMeterBlock
     private static final float SCREEN_CENTRE_Y = 7.5F / 16.0F;
     private static final int ON = 0xFF6FE3FF;
     private static final int OFF = 0xFF35506A;
+    private static final int WARN = 0xFFFF5A5A;
 
     public static final class State extends BlockEntityRenderState {
         int rate;
+        int missing;
         Direction in = Direction.DOWN;
         Direction out = Direction.UP;
     }
@@ -45,6 +47,7 @@ public class EnergyMeterRenderer implements BlockEntityRenderer<EnergyMeterBlock
                                    ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         BlockEntityRenderer.super.extractRenderState(be, state, partialTicks, cameraPosition, breakProgress);
         state.rate = be.rate();
+        state.missing = be.missing();
         state.in = be.inputFace();
         state.out = be.outputFace();
     }
@@ -59,17 +62,29 @@ public class EnergyMeterRenderer implements BlockEntityRenderer<EnergyMeterBlock
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         Font font = Minecraft.getInstance().font;
-        var number = Component.literal(shortRate(state.rate)).getVisualOrderText();
-        var unit = Component.literal("FE/t").getVisualOrderText();
-        int colour = state.rate > 0 ? ON : OFF;
+        boolean problem = state.rate == 0 && state.missing != 0;
+        var number = Component.literal(problem ? "NO" : shortRate(state.rate)).getVisualOrderText();
+        var unit = Component.literal(!problem ? "FE/t" : switch (state.missing) {
+            case EnergyMeterBlockEntity.MISSING_INPUT -> "INPUT";
+            case EnergyMeterBlockEntity.MISSING_OUTPUT -> "OUTPUT";
+            default -> "IN/OUT";
+        }).getVisualOrderText();
+        int colour = problem ? WARN : state.rate > 0 ? ON : OFF;
         float numberScale = Math.min(SCREEN_WIDTH / Math.max(1, font.width(number)), 0.32F / 16.0F);
-        float unitScale = 0.22F / 16.0F;
-        for (Direction face : Direction.Plane.HORIZONTAL) {
+        float unitScale = Math.min(SCREEN_WIDTH / Math.max(1, font.width(unit)), 0.22F / 16.0F);
+        for (Direction face : Direction.values()) {
             if (face == state.in || face == state.out) continue;
             poseStack.pushPose();
-            poseStack.translate(0.5F, 0.0F, 0.5F);
-            poseStack.rotateDegrees(Axis.YP, -face.toYRot());
-            poseStack.translate(0.0F, SCREEN_CENTRE_Y, 0.5F + 0.002F);
+            poseStack.translate(0.5F, 0.5F, 0.5F);
+            if (face.getAxis().isHorizontal()) {
+                poseStack.rotateDegrees(Axis.YP, -face.toYRot());
+            } else {
+                // Top and bottom: readable with the flow running left to right, or from the south if it runs up and down.
+                Direction across = state.out.getAxis().isHorizontal() ? state.out.getClockWise() : Direction.NORTH;
+                poseStack.rotateDegrees(Axis.YP, -(face == Direction.UP ? across : across.getOpposite()).toYRot());
+                poseStack.rotateDegrees(Axis.XP, face == Direction.UP ? -90 : 90);
+            }
+            poseStack.translate(0.0F, SCREEN_CENTRE_Y - 0.5F, 0.5F + 0.002F);
             poseStack.pushPose();
             poseStack.translate(0.0F, 0.06F, 0.0F);
             poseStack.scale(numberScale, -numberScale, numberScale);

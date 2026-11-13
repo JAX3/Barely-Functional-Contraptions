@@ -22,10 +22,11 @@ public final class EnergyMeterProvider {
 
     private EnergyMeterProvider() {}
 
-    public record Data(int rate, long total) {
+    public record Data(int rate, long total, Component problem) {
         static final StreamCodec<RegistryFriendlyByteBuf, Data> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Data::rate,
                 ByteBufCodecs.VAR_LONG, Data::total,
+                net.minecraft.network.chat.ComponentSerialization.STREAM_CODEC, Data::problem,
                 Data::new);
     }
 
@@ -34,7 +35,9 @@ public final class EnergyMeterProvider {
 
         @Override
         public @Nullable Data streamData(BlockAccessor accessor) {
-            return accessor.getBlockEntity() instanceof EnergyMeterBlockEntity be ? new Data(be.rate(), be.total()) : null;
+            if (!(accessor.getBlockEntity() instanceof EnergyMeterBlockEntity be)) return null;
+            Component problem = be.missing() == 0 ? Component.empty() : com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.missingMessage(be);
+            return new Data(be.rate(), be.total(), problem);
         }
 
         @Override
@@ -61,6 +64,7 @@ public final class EnergyMeterProvider {
                     .withStyle(ChatFormatting.GRAY));
             tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.energy_meter.signal", EnergyMeterBlockEntity.signalFor(data.rate()))
                     .withStyle(ChatFormatting.DARK_RED));
+            if (!data.problem().getString().isEmpty()) tooltip.add(data.problem().copy().withStyle(ChatFormatting.RED));
         }
 
         @Override

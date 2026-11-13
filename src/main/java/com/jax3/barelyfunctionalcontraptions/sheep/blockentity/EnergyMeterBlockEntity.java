@@ -36,6 +36,8 @@ public class EnergyMeterBlockEntity extends BlockEntity {
     private long window;
     private int rate;
     private long total;
+    /** Bit 1: nothing with an energy connection at the back; bit 2: nothing at the front. Checked once a second. */
+    private int missing;
     /** True while forwarding, so a loop back into this meter can't recurse. */
     private boolean passing;
     private final Counter counter = new Counter();
@@ -72,13 +74,23 @@ public class EnergyMeterBlockEntity extends BlockEntity {
         if (level.getGameTime() % 20 != 0) return;
         int newRate = (int) Math.min(Integer.MAX_VALUE, be.window / 20);
         be.window = 0;
-        if (newRate != be.rate) {
+        int newMissing = (be.neighbour(be.inputFace()) == null ? MISSING_INPUT : 0) | (be.neighbour(be.outputFace()) == null ? MISSING_OUTPUT : 0);
+        if (newRate != be.rate || newMissing != be.missing) {
             int oldSignal = signalFor(be.rate);
             be.rate = newRate;
+            be.missing = newMissing;
             be.setChanged();
             level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
             if (signalFor(newRate) != oldSignal) level.updateNeighbourForOutputSignal(pos, state.getBlock());
         }
+    }
+
+    public static final int MISSING_INPUT = 1;
+    public static final int MISSING_OUTPUT = 2;
+
+    /** Which ends have nothing with an energy connection: {@link #MISSING_INPUT}, {@link #MISSING_OUTPUT}, both or 0. */
+    public int missing() {
+        return missing;
     }
 
     /** Average FE/t that passed through over the last second. */
@@ -185,6 +197,7 @@ public class EnergyMeterBlockEntity extends BlockEntity {
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         rate = Math.max(0, input.getIntOr("Rate", 0));
+        missing = input.getIntOr("Missing", 0) & 3;
         total = Math.max(0L, input.getLongOr("Total", 0L));
     }
 
@@ -192,6 +205,7 @@ public class EnergyMeterBlockEntity extends BlockEntity {
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         output.putInt("Rate", rate);
+        output.putInt("Missing", missing);
         output.putLong("Total", total);
     }
 
