@@ -65,6 +65,10 @@ public final class SheepInfusionEvents {
             return;
         }
 
+        if (stack.is(net.minecraft.world.item.Items.PLAYER_HEAD) && target instanceof Sheep sheep) {
+            feedPlayerHead(event, player, sheep, stack);
+            return;
+        }
         if (!ModConfigs.getBool(ModConfigs.SERVER.feedingEnabled)) return;
         Optional<SheepResource> match = SheepResourceRegistry.get(level).byFeedingItem(stack);
         if (match.isEmpty()) return; // not a resource: let vanilla handle it
@@ -82,6 +86,27 @@ public final class SheepInfusionEvents {
         if (level instanceof ServerLevel serverLevel) {
             infuse(serverLevel, player, living, resource, stack);
         }
+    }
+
+    /**
+     * Feeding a sheep a Player Head gives it that player's skin: the head's own player (by UUID, as a placed head shows
+     * it), or the feeding player's for a blank head. One head is used up (not in creative). This is only a look: it
+     * works on any sheep, infused or not, and doesn't change what it drops.
+     */
+    private static void feedPlayerHead(PlayerInteractEvent.EntityInteract event, Player player, Sheep sheep, ItemStack stack) {
+        event.setCanceled(true);
+        event.setCancellationResult(InteractionResult.SUCCESS);
+        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        net.minecraft.world.item.component.ResolvableProfile profile = stack.get(net.minecraft.core.component.DataComponents.PROFILE);
+        if (profile == null) profile = net.minecraft.world.item.component.ResolvableProfile.createResolved(player.getGameProfile());
+        sheep.setData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_SKIN, SheepSkin.of(profile));
+        stack.consume(1, player);
+        level.playSound(null, sheep.getX(), sheep.getY(), sheep.getZ(), SoundEvents.ARMOR_EQUIP_LEATHER.value(), SoundSource.NEUTRAL, 1.0F, 1.0F);
+        level.sendParticles(ParticleTypes.HAPPY_VILLAGER, sheep.getX(), sheep.getY() + sheep.getBbHeight() * 0.7, sheep.getZ(), 8, 0.3, 0.3, 0.3, 0.02);
+        Component name = profile.name().<Component>map(Component::literal)
+                .orElseGet(() -> Component.translatable("message.barelyfunctionalcontraptions.skin.unknown_player"));
+        player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.skin.applied", name));
+        sheep.gameEvent(GameEvent.ENTITY_INTERACT, player);
     }
 
     /**

@@ -47,6 +47,8 @@ public final class ResourcefulSheepClient {
         modBus.addListener((EntityRenderersEvent.RegisterLayerDefinitions event) -> {
             event.registerLayerDefinition(SheepExtrasModel.LAYER, SheepExtrasModel::createLayer);
             event.registerLayerDefinition(SheepSkullsModel.LAYER, SheepSkullsModel::createLayer);
+            event.registerLayerDefinition(PlayerSkinSheepModel.WIDE, () -> PlayerSkinSheepModel.createLayer(false));
+            event.registerLayerDefinition(PlayerSkinSheepModel.SLIM, () -> PlayerSkinSheepModel.createLayer(true));
             event.registerLayerDefinition(InfusedWoolLayer.BONES_LAYER, InfusedWoolLayer::createBonesLayer);
         });
         modBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> {
@@ -79,7 +81,10 @@ public final class ResourcefulSheepClient {
     }
 
     private static void registerRenderStateModifiers(RegisterRenderStateModifiersEvent event) {
-        event.<Sheep, SheepRenderState>registerEntityModifier(SheepRenderer.class, (sheep, state) -> InfusedWoolLayer.extract(sheep, state));
+        event.<Sheep, SheepRenderState>registerEntityModifier(SheepRenderer.class, (sheep, state) -> {
+            PlayerSkinSheepLayer.extract(sheep, state);
+            InfusedWoolLayer.extract(sheep, state);
+        });
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -88,6 +93,7 @@ public final class ResourcefulSheepClient {
         for (EntityType<?> type : event.getEntityTypes()) {
             EntityRenderer<?, ?> renderer = event.getRenderer((EntityType) type);
             if (renderer instanceof SheepRenderer sheepRenderer) {
+                sheepRenderer.addLayer(new PlayerSkinSheepLayer(sheepRenderer, event.getEntityModels()));
                 sheepRenderer.addLayer(new InfusedWoolLayer(sheepRenderer, event.getEntityModels()));
             }
         }

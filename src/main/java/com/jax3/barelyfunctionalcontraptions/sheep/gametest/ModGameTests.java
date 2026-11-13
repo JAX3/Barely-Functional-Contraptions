@@ -147,6 +147,7 @@ public final class ModGameTests {
         TESTS.put("glowing_sheep_lights_the_block_it_stands_in", ModGameTests::glowingSheepLight);
         TESTS.put("ghast_sheep_screams_like_a_ghast", ModGameTests::ghastSheepSounds);
         TESTS.put("ghast_sheep_is_twice_the_size", ModGameTests::ghastSheepScale);
+        TESTS.put("player_head_gives_a_sheep_that_players_skin", ModGameTests::playerHeadSkin);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -445,6 +446,35 @@ public final class ModGameTests {
                 h.succeed();
             });
         });
+    }
+
+    private static void playerHeadSkin(GameTestHelper h) {
+        var skinAttachment = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_SKIN;
+        // A head with a player in it: the sheep takes that player's skin (by UUID), and the head is used up.
+        java.util.UUID id = java.util.UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5");
+        ItemStack named = new ItemStack(Items.PLAYER_HEAD, 2);
+        named.set(net.minecraft.core.component.DataComponents.PROFILE,
+                net.minecraft.world.item.component.ResolvableProfile.createResolved(new com.mojang.authlib.GameProfile(id, "Notch")));
+        Sheep sheep = sheep(h);
+        Player player = playerHolding(h, named);
+        feed(player, sheep);
+        var skin = sheep.getData(skinAttachment).profile();
+        h.assertTrue(skin.isPresent() && skin.get().partialProfile().id().equals(id), "the sheep wears the head's player, got " + skin);
+        h.assertTrue(player.getMainHandItem().getCount() == 1, "one head is used up, left " + player.getMainHandItem().getCount());
+        h.assertTrue(!SheepInfusionEvents.getInfusion(sheep).isInfused(), "a head is only a look, not an infusion");
+        // A blank head: the feeding player's own skin.
+        Sheep other = sheepAt(h, new BlockPos(1, 1, 1), null);
+        Player feeder = playerHolding(h, new ItemStack(Items.PLAYER_HEAD));
+        feed(feeder, other);
+        var own = other.getData(skinAttachment).profile();
+        h.assertTrue(own.isPresent() && own.get().partialProfile().id().equals(feeder.getUUID()), "a blank head gives the feeder's skin, got " + own);
+        // The skin is saved with the sheep.
+        var saved = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess());
+        sheep.saveWithoutId(saved);
+        Sheep copy = EntityTypes.SHEEP.create(h.getLevel(), net.minecraft.world.entity.EntitySpawnReason.LOAD);
+        copy.load(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess(), saved.buildResult()));
+        h.assertTrue(copy.getData(skinAttachment).profile().map(p -> p.partialProfile().id().equals(id)).orElse(false), "the skin survives saving and loading");
+        h.succeed();
     }
 
     private static void ghastSheepScale(GameTestHelper h) {

@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 109 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 74 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 110 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 75 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 51 screenshots and 12 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Themed sheep (the ideas in `Custom block.txt`)
@@ -18,6 +18,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | GameTest `glowing_sheep_lights_the_block_it_stands_in` | ✅ A Glow Ink sheep puts a light-level-12 light where it stands; once it's sheared the light goes out on its next check |
 | GameTest `ghast_sheep_screams_like_a_ghast` | ✅ A Ghast sheep's bleat becomes the ghast's scream, and its hurt and death sounds the ghast's, even when sheared; a plain sheep still bleats; the `screaming` feature on its own gives the screaming goat's sounds |
 | GameTest `ghast_sheep_is_twice_the_size` | ✅ A Ghast sheep's `minecraft:scale` becomes 2 and its hitbox doubles; shearing doesn't change it, and once the infusion is gone it's back to 1 with the modifier removed |
+| GameTest `player_head_gives_a_sheep_that_players_skin` | ✅ A head with a player gives the sheep that player's UUID and uses up one head; a blank head gives the feeder's own; it isn't an infusion; the skin survives saving and loading |
+| Real client, player-skin sheep (`54_player_skin_sheep.png`) | ✅ Face on the head, jacket on the body (sheared sheep), trousers and shoes on the back legs, sleeves on the front legs, and the fleece over the top on unsheared and infused sheep. Default skins only: the test machine can't download real skins |
 | Generator GameTests | ✅ Updated: Wheat and Bone Meal are no longer generated (the Hay and Skeleton sheep cover them), and a generated copy of either is flagged as a duplicate |
 | Real client (`-PharnessScene=themed_sheep`) | ✅ Each sheep photographed side-on (`52_themed_sheep.png`): Wither Skeleton Skulls either side of the Wither sheep's head, using the game's skull texture (front view `53_themed_wither_front.png`), Dragon wings, spider legs, ghast tentacles, skull faces and bony legs, sculk tendrils with glowing strands, on-fire flames, hay fleece. At night (`53_themed_sheep_night.png`) the Glow Ink sheep is fully bright and lights the grass, and glowing eyes and sculk strands stay lit. No errors from the mod in the log. |
 | Not yet checked in the client | The replaced sounds are only covered by the GameTest, not listened to in game (the client loads the definitions with no errors) |

@@ -493,6 +493,16 @@ Ten more built-in resources turn the sheep into a little version of the mob the 
 
 The glow is a real light. A Glow Ink sheep leaves an invisible light block where it stands, and the light goes out within half a second of the sheep moving away, being sheared or losing its infusion. The light block can't be seen or touched and never drops anything.
 
+### Player-skin sheep
+
+Feed a sheep a **Player Head** and it takes on that player's skin: their face on its head, their shirt or jacket on its body, their trousers and shoes on its back legs and their sleeves on its front legs. The fleece still grows over the top, so the face and legs show best, and a sheared sheep shows the whole outfit.
+
+![Sheep wearing player skins](docs/screenshots/54_player_skin_sheep.png)
+
+- **Whose skin:** a head that belongs to a player (from `/give @s player_head[profile=Notch]`, or a head a mod or data pack gives out) gives that player's skin. The sheep stores the head's player UUID and looks the skin up the same way a placed Player Head does. A **blank Player Head** gives the skin of **the player who feeds it**.
+- **Only a look:** it works on any sheep, infused or not, and doesn't change the sheep's resource, wool or drops. One head is used up (not in creative). Feeding another head changes the skin. Lambs keep their normal look until they grow up.
+- The skin is saved with the sheep and shown to every player. Until the real skin has downloaded (or with no internet), the sheep shows the default skin for that UUID, as Player Heads do.
+
 ### JEI: every wool type the separator handles
 With JEI installed, click the Mechanical Separator in JEI (or press **U** over it) to open **Mechanical Separation**. It lists **every wool type that's loaded**: built-in, mushroom, command-generated and data-pack ones, sorted by name. Plain wool → string and other explicit recipes come after them. Each wool type is one compact row: wool → resource (cycling through 2–4) + string + bonus chance, with energy and time. Like the Resource Infusion page and the Mycelial Generator's fuel page, it uses the same dark slate style as the machine screens: slate panels, recessed slots, and the separator's purple arrow filling over the real processing time. Hover over things for the details. JEI updates by itself after `/reload` or `/barelyfunctionalcontraptions generate`. Press **U** on any resource wool to jump to its row (**R** shows how to make it: the infusion page).
 

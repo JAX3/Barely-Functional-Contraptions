@@ -656,5 +656,7 @@
   "resource.barelyfunctionalcontraptions.warden": "Sculk",
   "resource.barelyfunctionalcontraptions.blaze": "Blaze",
   "resource.barelyfunctionalcontraptions.ghast": "Ghast",
-  "block.barelyfunctionalcontraptions.sheep_glow": "Sheep Glow"
+  "block.barelyfunctionalcontraptions.sheep_glow": "Sheep Glow",
+  "message.barelyfunctionalcontraptions.skin.applied": "This sheep now looks like %s",
+  "message.barelyfunctionalcontraptions.skin.unknown_player": "that player"
 }

@@ -1118,7 +1118,7 @@ public final class DevScreenshotHarness {
 
     private static void themedSheepTick(Minecraft mc, MinecraftServer server) {
         // 60: stage; 120: overview; then one close-up per sheep every 25 ticks; then the overview again at night.
-        int closeStart = 130, perSheep = 25, night = closeStart + THEMED.length * perSheep + 35;
+        int closeStart = 130, perSheep = 25, night = closeStart + THEMED.length * perSheep + 65;
         if (tick == 60) server.execute(() -> themedSheepScene(server));
         else if (tick == 70) setHudHidden(mc, true);
         else if (tick == 120) shot(mc, "52_themed_sheep");
@@ -1132,6 +1132,10 @@ public final class DevScreenshotHarness {
             } else if (step == perSheep - 1) {
                 shot(mc, "53_themed_" + THEMED[i]);
             }
+        } else if (tick == night - 60) {
+            command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 160 16", origin.getX() + 1.5, origin.getY(), origin.getZ() + 5.8));
+        } else if (tick == night - 32) {
+            shot(mc, "55_player_skin_sheep");
         } else if (tick == night - 30) {
             // The Wither sheep from the front, to show the three heads side by side.
             command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 250 18", themedX(1) - 2.6, origin.getY(), origin.getZ() - 5 + 1.6));
@@ -1168,6 +1172,27 @@ public final class DevScreenshotHarness {
             sh.yBodyRotO = 90;
             sh.setNoAi(true);
             SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id(THEMED[i])), 9, 0));
+            level.addFreshEntity(sh);
+        }
+        // Sheep fed Player Heads, facing the camera at an angle: the harness player's own skin (plain, sheared to
+        // show the body, and infused with iron) and another player's by UUID.
+        String[][] skinned = {{"self", "", "false"}, {"self", "", "true"}, {"self", "iron", "false"}, {"069a79f4-44e9-4726-a5be-fca90e38aaf5", "", "false"}};
+        for (int i = 0; i < skinned.length; i++) {
+            Sheep sh = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            sh.snapTo(o.getX() - 1.5 + i * 2.0, o.getY(), o.getZ() + 2.5, -20, 0);
+            sh.setYHeadRot(-20);
+            sh.yHeadRotO = -20;
+            sh.setYBodyRot(-20);
+            sh.yBodyRotO = -20;
+            sh.setNoAi(true);
+            sh.setSheared(Boolean.parseBoolean(skinned[i][2]));
+            var profile = skinned[i][0].equals("self")
+                    ? net.minecraft.world.item.component.ResolvableProfile.createResolved(player.getGameProfile())
+                    : net.minecraft.world.item.component.ResolvableProfile.createUnresolved(java.util.UUID.fromString(skinned[i][0]));
+            sh.setData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_SKIN, com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepSkin.of(profile));
+            if (!skinned[i][1].isEmpty()) {
+                SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id(skinned[i][1])), 9, 0));
+            }
             level.addFreshEntity(sh);
         }
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
