@@ -29,25 +29,29 @@ import net.minecraft.util.StringRepresentable;
  * @param scale        how big the sheep is while infused, as a multiple of its normal size (0.25 to 4; default 1).
  *                     Applied through the {@code minecraft:scale} attribute, so its hitbox, eye height and step
  *                     height grow with it.
+ * @param skullTexture a mob-head texture (the 64x32 layout skulls use, e.g. the skeleton's) drawn untinted over the
+ *                     sheep's head, so its face is that mob's skull
  * @param sounds       sounds played instead of the sheep's bleat, hurt and death sounds while it is infused (even when
  *                     sheared)
  */
-public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> features, int featureColor, double scale, Sounds sounds) {
+public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> features, int featureColor, double scale,
+                              Optional<Identifier> skullTexture, Sounds sounds) {
     public static final double MIN_SCALE = 0.25;
     public static final double MAX_SCALE = 4.0;
-    public static final SheepAppearance NONE = new SheepAppearance(Optional.empty(), List.of(), 0xFFFFFF, 1.0, Sounds.NONE);
+    public static final SheepAppearance NONE = new SheepAppearance(Optional.empty(), List.of(), 0xFFFFFF, 1.0, Optional.empty(), Sounds.NONE);
 
     public static final Codec<SheepAppearance> CODEC = RecordCodecBuilder.create(i -> i.group(
             Identifier.CODEC.optionalFieldOf("wool_texture").forGetter(SheepAppearance::woolTexture),
             Feature.CODEC.listOf().optionalFieldOf("features", List.of()).forGetter(SheepAppearance::features),
             SheepResource.COLOR_CODEC.optionalFieldOf("feature_color", 0xFFFFFF).forGetter(SheepAppearance::featureColor),
             Codec.doubleRange(MIN_SCALE, MAX_SCALE).optionalFieldOf("scale", 1.0).forGetter(SheepAppearance::scale),
+            Identifier.CODEC.optionalFieldOf("skull_texture").forGetter(SheepAppearance::skullTexture),
             Sounds.CODEC.optionalFieldOf("sounds", Sounds.NONE).forGetter(SheepAppearance::sounds)
     ).apply(i, SheepAppearance::new));
 
     /** The same appearance with another fleece texture. */
     public SheepAppearance withWoolTexture(Identifier texture) {
-        return new SheepAppearance(Optional.of(texture), features, featureColor, scale, sounds);
+        return new SheepAppearance(Optional.of(texture), features, featureColor, scale, skullTexture, sounds);
     }
 
     public boolean has(Feature feature) {
@@ -55,7 +59,7 @@ public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> fe
     }
 
     public boolean isEmpty() {
-        return woolTexture.isEmpty() && features.isEmpty() && scale == 1.0 && sounds.isEmpty();
+        return woolTexture.isEmpty() && features.isEmpty() && scale == 1.0 && skullTexture.isEmpty() && sounds.isEmpty();
     }
 
     /**

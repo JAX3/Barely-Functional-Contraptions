@@ -23,6 +23,7 @@
   "appearance": {
     "features": [
       "bones"
-    ]
+    ],
+    "skull_texture": "minecraft:textures/entity/skeleton/skeleton.png"
   }
 }

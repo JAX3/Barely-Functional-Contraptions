@@ -26,6 +26,7 @@
     "features": [
       "bones"
     ],
-    "feature_color": "#4A4A4A"
+    "feature_color": "#4A4A4A",
+    "skull_texture": "minecraft:textures/entity/skeleton/wither_skeleton.png"
   }
 }

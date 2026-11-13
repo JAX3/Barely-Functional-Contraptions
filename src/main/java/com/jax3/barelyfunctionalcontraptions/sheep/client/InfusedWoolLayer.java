@@ -66,6 +66,7 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
     private final SheepExtrasModel eyes;
     private final SheepModel bones;
     private final SheepSkullsModel skulls;
+    private final SheepSkullFaceModel skullFace;
 
     public InfusedWoolLayer(RenderLayerParent<SheepRenderState, SheepModel> renderer, EntityModelSet models) {
         super(renderer);
@@ -75,6 +76,7 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
         this.eyes = SheepExtrasModel.eyes(models.bakeLayer(SheepExtrasModel.LAYER));
         this.bones = new SheepModel(models.bakeLayer(BONES_LAYER));
         this.skulls = new SheepSkullsModel(models.bakeLayer(SheepSkullsModel.LAYER));
+        this.skullFace = new SheepSkullFaceModel(models.bakeLayer(SheepSkullFaceModel.LAYER));
     }
 
     /** The vanilla sheep body ({@code SheepModel.createBodyLayer}) inflated by a tiny amount. */
@@ -189,10 +191,14 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
     /** The extra body parts, bones and glowing eyes a resource's {@code appearance} asks for. */
     private void submitFeatures(PoseStack poseStack, SubmitNodeCollector collector, int lightCoords, SheepRenderState state, Colors colors) {
         SheepAppearance appearance = colors.appearance();
-        if (appearance.features().isEmpty() || state.isInvisible) return;
+        if ((appearance.features().isEmpty() && appearance.skullTexture().isEmpty()) || state.isInvisible) return;
         int tint = ARGB.opaque(appearance.featureColor());
         if (appearance.has(Feature.BONES)) {
             coloredCutoutModelCopyLayerRender(bones, BONES_TEXTURE, poseStack, collector, lightCoords, state, tint, 1);
+        }
+        if (appearance.skullTexture().isPresent()) {
+            // A mob's own skull texture over the head, untinted (the Skeleton sheep wears a Skeleton Skull).
+            coloredCutoutModelCopyLayerRender(skullFace, appearance.skullTexture().get(), poseStack, collector, lightCoords, state, -1, 1);
         }
         if (appearance.has(Feature.EXTRA_HEADS)) {
             // The game's own Wither Skeleton Skull texture, untinted.

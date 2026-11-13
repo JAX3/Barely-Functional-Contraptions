@@ -480,8 +480,8 @@ Ten more built-in resources turn the sheep into a little version of the mob the 
 | Nether Star | Wither | Two Wither Skeleton Skulls either side of its own head that look around on their own, and glowing eyes | 2–4 Nether Star + 1 Soul Sand | 400,000 / 20 s |
 | Dragon's Breath | Dragon | Flapping dragon wings, glowing purple eyes | 2–4 Dragon's Breath (+5% Ender Pearl) | 80,000 / 10 s |
 | Glow Ink Sac | Glow Ink | Its fleece glows in the dark and **lights up the block it stands in** (light level 12) | 2–4 Glow Ink Sac | 8,000 / 3 s |
-| Bone Block | Skeleton | A skull face and bony legs | 2–4 Bone (+10% Arrow) | 6,000 / 3 s |
-| Wither Rose | Wither Skeleton | A charred skull face and bony legs | 2–4 Bone + 2 Coal (+2.5% Wither Skeleton Skull) | 20,000 / 5 s |
+| Bone Block | Skeleton | A Skeleton Skull for a face (the game's own skull texture) and bony legs | 2–4 Bone (+10% Arrow) | 6,000 / 3 s |
+| Wither Rose | Wither Skeleton | A Wither Skeleton Skull for a face and charred, bony legs | 2–4 Bone + 2 Coal (+2.5% Wither Skeleton Skull) | 20,000 / 5 s |
 | Spider Eye | Spider | Four extra spider legs that move as it walks, and glowing red eyes | 2–4 Spider Eye + 4 String | 6,000 / 3 s |
 | Echo Shard | Sculk | Sculk tendrils on its head, sculk sensors on its back and fleece strands that glow | 2–4 Echo Shard + 2 Sculk | 80,000 / 10 s |
 | Blaze Rod | Blaze | Permanently on fire, without burning or taking damage | 2–4 Blaze Rod (+10% Glowstone Dust) | 20,000 / 5 s |
@@ -716,6 +716,7 @@ Definitions live in `data/<namespace>/barelyfunctionalcontraptions/sheep_resourc
     "feature_color": "#7A5C99",
     "wool_texture": "mypack:textures/entity/sheep/tin_wool.png",
     "scale": 1.5,
+    "skull_texture": "minecraft:textures/entity/skeleton/skeleton.png",
     "sounds": { "ambient": "minecraft:entity.ghast.scream", "hurt": "minecraft:entity.ghast.hurt", "death": "minecraft:entity.ghast.death" }
   }
 }
@@ -729,7 +730,7 @@ Definitions live in `data/<namespace>/barelyfunctionalcontraptions/sheep_resourc
 | `wings` | A pair of flapping dragon wings |
 | `extra_legs` | Four long spider legs along the sides |
 | `tentacles` | Ghast tentacles hanging under the belly |
-| `bones` | A skull face and bony legs |
+| `bones` | A drawn skull face and bony legs (a `skull_texture` covers the face) |
 | `sculk` | Sculk tendrils on the head, and accent strands that glow |
 | `glowing_eyes` | Eyes in the `accent_color` that glow in the dark |
 | `glowing` | The fleece glows, and the sheep lights the block it stands in (light level 12) |
@@ -739,6 +740,7 @@ Definitions live in `data/<namespace>/barelyfunctionalcontraptions/sheep_resourc
 - `feature_color` tints the wings, legs, tentacles and bones. The default is white, which shows them as drawn. Sculk tendrils have their own colours, so leave it white for them.
 - `scale` makes the sheep bigger or smaller while it's infused, from `0.25` to `4` times its normal size (default `1`). It goes through the vanilla `minecraft:scale` attribute as a modifier (`barelyfunctionalcontraptions:resource_scale`, multiplying the base value), so the hitbox, eye height and step height change with it, and it stacks with anything else that changes the scale, such as the `/attribute` command. Lambs stay in proportion. Shearing doesn't shrink the sheep; it goes back to normal once the infusion runs out.
 - `sounds` replaces the sheep's `ambient` (bleat), `hurt` and `death` sounds with any sound event id, vanilla or modded. Leave one out to keep the sheep's own. Like the size, the voice lasts as long as the infusion, even while the sheep is sheared.
+- `skull_texture` puts a mob's skull over the sheep's head, untinted. It takes any texture in the 64x32 mob-head layout the skull blocks use, such as `minecraft:textures/entity/skeleton/skeleton.png` or `.../wither_skeleton.png`.
 - `wool_texture` replaces the greyscale fleece. It uses the vanilla sheep wool layout (64x32) and is still tinted with `wool_color`, so set `wool_color` to `"#FFFFFF"` to show it as drawn. The texture must come from a resource pack.
 
 **Ores vs other materials.** For an ore, set `primary_output` to the raw material (as the built-ins do with Raw Iron). If you leave `primary_output` out, the separator gives back the fed item, which suits gems, logs and stone. A block input never implies 9 outputs automatically; you choose the numbers.

@@ -519,7 +519,7 @@ public final class ModGameTests {
         ghast.setSheared(true);
         h.assertTrue(play.apply(ghast, net.minecraft.sounds.SoundEvents.SHEEP_AMBIENT).equals(net.minecraft.sounds.SoundEvents.GHAST_SCREAM.location()), "a sheared Ghast sheep still screams");
         // The "screaming" feature on its own gives the screaming goat's sounds; listed sounds win over it.
-        var screaming = new com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance(Optional.empty(), List.of(Feature.SCREAMING), 0xFFFFFF, 1.0,
+        var screaming = new com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance(Optional.empty(), List.of(Feature.SCREAMING), 0xFFFFFF, 1.0, Optional.empty(),
                 com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Sounds.NONE);
         var replaced = com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.replacement(screaming, net.minecraft.sounds.SoundEvents.SHEEP_HURT);
         h.assertTrue(replaced.isPresent() && replaced.get().value() == net.minecraft.sounds.SoundEvents.GOAT_SCREAMING_HURT, "screaming = screaming goat, got " + replaced);

@@ -47,6 +47,7 @@ public final class ResourcefulSheepClient {
         modBus.addListener((EntityRenderersEvent.RegisterLayerDefinitions event) -> {
             event.registerLayerDefinition(SheepExtrasModel.LAYER, SheepExtrasModel::createLayer);
             event.registerLayerDefinition(SheepSkullsModel.LAYER, SheepSkullsModel::createLayer);
+            event.registerLayerDefinition(SheepSkullFaceModel.LAYER, SheepSkullFaceModel::createLayer);
             event.registerLayerDefinition(PlayerSkinSheepModel.WIDE, () -> PlayerSkinSheepModel.createLayer(false));
             event.registerLayerDefinition(PlayerSkinSheepModel.SLIM, () -> PlayerSkinSheepModel.createLayer(true));
             event.registerLayerDefinition(InfusedWoolLayer.BONES_LAYER, InfusedWoolLayer::createBonesLayer);
