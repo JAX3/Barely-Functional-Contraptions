@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/energy_meter_side",
+    "up": "barelyfunctionalcontraptions:block/energy_meter_out",
+    "down": "barelyfunctionalcontraptions:block/energy_meter_in",
+    "north": "barelyfunctionalcontraptions:block/energy_meter_side",
+    "south": "barelyfunctionalcontraptions:block/energy_meter_side",
+    "east": "barelyfunctionalcontraptions:block/energy_meter_side",
+    "west": "barelyfunctionalcontraptions:block/energy_meter_side"
+  }
+}

@@ -18,6 +18,9 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<AutomaticShearsBlockEntity>> AUTOMATIC_SHEARS = REGISTER.register("automatic_shears",
             () -> new BlockEntityType<>(AutomaticShearsBlockEntity::new, ModBlocks.AUTOMATIC_SHEARS.get()));
 
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity>> ENERGY_METER = REGISTER.register("energy_meter",
+            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity::new, ModBlocks.ENERGY_METER.get()));
+
     public static final Supplier<BlockEntityType<CreativeGeneratorBlockEntity>> CREATIVE_GENERATOR = REGISTER.register("creative_generator",
             () -> new BlockEntityType<>(CreativeGeneratorBlockEntity::new, ModBlocks.CREATIVE_GENERATOR.get()));
 

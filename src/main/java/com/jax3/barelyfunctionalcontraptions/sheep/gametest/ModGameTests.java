@@ -148,6 +148,7 @@ public final class ModGameTests {
         TESTS.put("ghast_sheep_screams_like_a_ghast", ModGameTests::ghastSheepSounds);
         TESTS.put("ghast_sheep_is_twice_the_size", ModGameTests::ghastSheepScale);
         TESTS.put("themed_sheep_advancements", ModGameTests::themedAdvancements);
+        TESTS.put("energy_meter_measures_what_passes_through", ModGameTests::energyMeter);
         TESTS.put("melon_slice_gives_a_sheep_the_skin", ModGameTests::melonSliceSkin);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -2107,6 +2108,55 @@ public final class ModGameTests {
             }
         }
         h.succeed();
+    }
+
+    // ------------------------------------------------------------------ Energy Meter
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity meter(GameTestHelper h, BlockPos pos, net.minecraft.core.Direction out) {
+        h.setBlock(pos, ModBlocks.ENERGY_METER.get().defaultBlockState().setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, out));
+        return h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity.class);
+    }
+
+    private static void energyMeter(GameTestHelper h) {
+        var east = net.minecraft.core.Direction.EAST;
+        var west = net.minecraft.core.Direction.WEST;
+        // Pushing: Creative Generator -> meter (in at the west, out at the east) -> Hume Energy Cube.
+        h.setBlock(new BlockPos(1, 1, 1), ModBlocks.CREATIVE_GENERATOR.get());
+        var pushed = meter(h, new BlockPos(2, 1, 1), east);
+        var cube = cube(h, new BlockPos(3, 1, 1));
+        // Pulling: a charged cube behind a meter, pulled from the meter's front.
+        cube(h, new BlockPos(1, 1, 4));
+        var pulled = meter(h, new BlockPos(2, 1, 4), east);
+        h.assertTrue(cubeInsert(cubeFace(h, new BlockPos(1, 1, 4), net.minecraft.core.Direction.UP), 10_000) == 10_000, "charge the source cube");
+        EnergyHandler front = cubeFace(h, new BlockPos(2, 1, 4), west.getOpposite());
+        EnergyHandler back = cubeFace(h, new BlockPos(2, 1, 4), west);
+        h.assertTrue(cubeFace(h, new BlockPos(2, 1, 4), net.minecraft.core.Direction.UP) == null, "the meter only connects at the back and the front");
+        int got;
+        try (Transaction tx = Transaction.openRoot()) {
+            got = front.extract(5_000, tx);
+            tx.commit();
+        }
+        h.assertTrue(got == 5_000, "pulling from the front draws from the block behind, got " + got);
+        h.assertTrue(cubeInsert(front, 1_000) == 0, "energy can't be pushed in at the front");
+        h.assertTrue(pulled.total() == 5_000, "the pulled energy is counted, total " + pulled.total());
+        // A rolled-back transfer isn't counted.
+        try (Transaction tx = Transaction.openRoot()) {
+            front.extract(3_000, tx);
+        }
+        h.assertTrue(pulled.total() == 5_000, "a cancelled transfer isn't counted, total " + pulled.total());
+        h.runAfterDelay(45, () -> {
+            int perTick = com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.energyCubeTransferPerCube);
+            h.assertTrue(cube.getEnergyHandler().getAmountAsLong() > 0, "the cube in front is charged through the meter");
+            h.assertTrue(pushed.rate() == perTick, "the meter reads the cube's " + perTick + " FE/t, got " + pushed.rate());
+            h.assertTrue(pushed.total() >= cube.getEnergyHandler().getAmountAsLong(), "the total covers what reached the cube: " + pushed.total() + " vs " + cube.getEnergyHandler().getAmountAsLong());
+            int signal = h.getBlockState(new BlockPos(2, 1, 1)).getAnalogOutputSignal(h.getLevel(), h.absolutePos(new BlockPos(2, 1, 1)), east);
+            h.assertTrue(signal == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity.signalFor(perTick) && signal == 10,
+                    "10,000 FE/t gives comparator signal 10, got " + signal);
+            h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity.signalFor(0) == 0
+                    && com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity.signalFor(1) == 1
+                    && com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity.signalFor(2_000_000) == 15, "signal scale");
+            h.succeed();
+        });
     }
 
     // ------------------------------------------------------------------ Hume Energy Cube

@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "barelyfunctionalcontraptions:block/energy_meter"
+    },
+    "facing=down": {
+      "model": "barelyfunctionalcontraptions:block/energy_meter",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "barelyfunctionalcontraptions:block/energy_meter",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "barelyfunctionalcontraptions:block/energy_meter",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "barelyfunctionalcontraptions:block/energy_meter",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west": {
+      "model": "barelyfunctionalcontraptions:block/energy_meter",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

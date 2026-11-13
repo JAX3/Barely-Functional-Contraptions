@@ -111,6 +111,13 @@ public final class ModBlocks {
                     .sound(SoundType.IRON)
                     .lightLevel(state -> 10));
 
+    /** Passes Forge Energy through, back to front, and measures it. Breaks fast like the cables. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock> ENERGY_METER = REGISTER.registerBlock("energy_meter",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(1.5F, 6.0F)
+                    .sound(SoundType.IRON));
+
     /** The invisible light a glowing sheep leaves where it stands; removes itself once the sheep has moved on. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock> SHEEP_GLOW = REGISTER.registerBlock("sheep_glow",
             com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock::new,

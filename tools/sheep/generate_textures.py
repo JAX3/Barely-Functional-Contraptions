@@ -2290,6 +2290,58 @@ def generate_sheep_extras():
     img.save(out("entity/sheep/sheep_extras.png"))
 
 
+METER_SIDE = [  # Energy Meter side: steel casing around a dark screen (the live FE/t is drawn on it in game)
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSOOOOOOOOMbSO",
+    "OMMOKKKKKKKKOMSO",
+    "OMMOKkkkkkkkOMSO",
+    "OMMOKkkkkkkkOMSO",
+    "OMMOKkkkkkkkOMSO",
+    "OMMOKkkkkkkkOMSO",
+    "OMMOKkkkkkkkOMSO",
+    "OMMOKKKKKKKKOMSO",
+    "OHMSOOOOOOOOSMSO",
+    "OHMPPPPPPPPPPMSO",
+    "OHBbSSSSSSSSBbSO",
+    "OHbSSSSSSSSSSbSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+METER_PORT = [  # Energy Meter in (dark core) and out (glowing core) faces
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMOOOOMMbSSO",
+    "OMMMMOPPPPOMMMSO",
+    "OMMMOPpccpPOMMSO",
+    "OMMOPpcCCcpPOMSO",
+    "OMMOPcCCCCcPOMSO",
+    "OMMOPcCCCCcPOMSO",
+    "OMMOPpcCCcpPOMSO",
+    "OMMMOPpccpPOMMSO",
+    "OMMMMOPPPPOMMMSO",
+    "OHbSMMOOOOMMbSSO",
+    "OHBbSSSSSSSSBbSO",
+    "OHbSSSSSSSSSSbSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+
+def generate_energy_meter():
+    """Energy Meter: screen sides, an unlit input port (back) and a glowing output port (front)."""
+    pal = dict(CARTOON)
+    pal["k"] = hexc("#10141c")
+    grid(METER_SIDE, pal).save(out("block/energy_meter_side.png"))
+    dark = dict(CARTOON)
+    dark["C"], dark["c"] = hexc("#141019"), hexc("#2a2238")
+    grid(METER_PORT, dark).save(out("block/energy_meter_in.png"))
+    lit = dict(CARTOON)
+    lit["C"], lit["c"] = hexc("#ffd2fb"), hexc("#ff6ae6")
+    grid(METER_PORT, lit).save(out("block/energy_meter_out.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -2306,6 +2358,7 @@ def main():
     generate_machine_block()
     generate_zero_point_module()
     generate_energy_cable()
+    generate_energy_meter()
     generate_reservoir_gui()
     generate_energy_cube()
     generate_cube_gui()

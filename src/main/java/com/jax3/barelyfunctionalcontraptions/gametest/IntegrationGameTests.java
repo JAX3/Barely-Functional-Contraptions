@@ -216,7 +216,7 @@ public final class IntegrationGameTests {
                 {"root", null}, {"mycelial_generator", "root"}, {"mycelium_wrench", "mycelial_generator"},
                 {"link_generators", "mycelium_wrench"}, {"mechanical_separator", "root"}, {"automatic_shears", "root"},
                 {"auto_shear", "automatic_shears"}, {"fluid_reservoir", "root"}, {"hume_energy_cube", "root"},
-                {"zero_point_energy_module", "root"}, {"zero_point_death", "zero_point_energy_module"}, {"energy_cable", "root"}, {"fluid_pipe", "root"}, {"item_pipe", "root"}, {"fluid_tank", "root"}};
+                {"zero_point_energy_module", "root"}, {"zero_point_death", "zero_point_energy_module"}, {"energy_cable", "root"}, {"fluid_pipe", "root"}, {"item_pipe", "root"}, {"fluid_tank", "root"}, {"energy_meter", "energy_cable"}};
         for (String[] entry : tree) {
             var advancement = server.getAdvancements().get(com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep.id("contraptions/" + entry[0]));
             h.assertTrue(advancement != null, "advancement " + entry[0] + " is loaded");

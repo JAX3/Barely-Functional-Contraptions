@@ -10,6 +10,7 @@
     "barelyfunctionalcontraptions:energy_cable",
     "barelyfunctionalcontraptions:fluid_pipe",
     "barelyfunctionalcontraptions:item_pipe",
-    "barelyfunctionalcontraptions:fluid_tank"
+    "barelyfunctionalcontraptions:fluid_tank",
+    "barelyfunctionalcontraptions:energy_meter"
   ]
 }

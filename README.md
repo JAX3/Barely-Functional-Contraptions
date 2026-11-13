@@ -88,6 +88,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Plugged In | Craft some Energy Cables |
 | Pipe Dreams | Craft some Fluid Pipes |
 | Special Delivery | Craft some Item Pipes |
+| Watt's Going On | Craft an Energy Meter |
 | Wool You Look at That | Infuse a sheep with any resource |
 | Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
 | ⭐ **Three Heads Are Better Than One**, **Here Be Dragons**, **Shh... It's Sculking** (goals) | Infuse a sheep with a Nether Star, Dragon's Breath or Echo Shard |
@@ -401,6 +402,16 @@ Cables carry Forge Energy from the **power generators** (Mycelial Generator, Zer
 - The recipe makes **8** cables: copper wire with redstone, wrapped in wool. Any colour of wool works. Cables break quickly with any tool (a pickaxe is fastest) and always drop themselves.
 
 ![Energy Cable recipe: wool across the top and bottom rows, a copper ingot, redstone and a copper ingot across the middle, making 8](docs/screenshots/recipe_energy_cable.png)
+
+### Energy Meter
+An inline meter for Forge Energy. Put it **between a generator (or cable) and what it powers**, and it shows how much energy goes through.
+
+- **Placing:** it points the way you look when you place it. Energy goes **in at the back** (dark port) and **out at the front** (glowing port). The other faces have no energy connection.
+- **Passes energy straight through:** it has no buffer. Whatever is pushed into the back goes on to the block in front, and whatever the block in front (or a cable network) pulls out comes from the block behind. Energy never goes backwards through it.
+- **Screens:** its side screens show the flow, shortened to 250, 12.5k or 1.2M, with *FE/t* under it. The number glows blue while energy is moving.
+- **Right-click** for the exact reading and the total that has passed since it was placed. **Jade** shows the same, plus the comparator signal.
+- **Comparator:** the signal rises with the flow on a log scale, so it's useful from a trickle to a Zero Point pair: 1 FE/t gives 1, 10 gives 3, 100 gives 5, 1,000 gives 8, 10,000 gives 10, 100,000 gives 13, and 1,000,000 or more gives 15. Only energy that actually moves counts.
+- **Recipe:** iron ingots around a comparator, a glass pane on top and an Energy Cable on each side. Mine it with a pickaxe; it drops itself.
 
 ### Fluid Pipe
 The Energy Cable's twin for fluids, in **blue** instead of purple. Pipes carry water (and any other fluid) from the **Fluid Reservoir** and other tanks to the blocks that need it, such as the Mycelial Generator's water tank.

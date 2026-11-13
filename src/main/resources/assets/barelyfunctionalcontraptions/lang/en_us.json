@@ -681,5 +681,13 @@
   "advancements.barelyfunctionalcontraptions.sheep.ghast.title": "Scream and Shout",
   "advancements.barelyfunctionalcontraptions.sheep.ghast.description": "Infuse a sheep with a Ghast Tear",
   "advancements.barelyfunctionalcontraptions.every_wool.title": "Fleece of Every Colour",
-  "advancements.barelyfunctionalcontraptions.every_wool.description": "Collect one of every built-in resource wool"
+  "advancements.barelyfunctionalcontraptions.every_wool.description": "Collect one of every built-in resource wool",
+  "block.barelyfunctionalcontraptions.energy_meter": "Energy Meter",
+  "message.barelyfunctionalcontraptions.energy_meter.reading": "Energy Meter: %s FE/t (%s FE in total)",
+  "tooltip.barelyfunctionalcontraptions.energy_meter": "Passes energy through, in at the back and out at the front, and measures it. Place it looking the way the energy should flow.",
+  "jade.barelyfunctionalcontraptions.energy_meter.rate": "Passing %s FE/t",
+  "jade.barelyfunctionalcontraptions.energy_meter.total": "%s FE in total",
+  "jade.barelyfunctionalcontraptions.energy_meter.signal": "Comparator signal %s",
+  "advancements.barelyfunctionalcontraptions.energy_meter.title": "Watt's Going On",
+  "advancements.barelyfunctionalcontraptions.energy_meter.description": "Craft an Energy Meter"
 }

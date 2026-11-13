@@ -36,6 +36,7 @@ public final class ContraptionsCreativeTab {
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ENERGY_CABLE.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_PIPE.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ITEM_PIPE.get());
+                output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ENERGY_METER.get());
                 // Processing
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.AUTOMATIC_SHEARS.get());

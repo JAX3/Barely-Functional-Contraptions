@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "C": "barelyfunctionalcontraptions:energy_cable",
+    "I": "minecraft:iron_ingot",
+    "Q": "minecraft:comparator",
+    "G": "minecraft:glass_pane"
+  },
+  "pattern": [
+    "IGI",
+    "CQC",
+    "III"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:energy_meter",
+    "count": 1
+  }
+}

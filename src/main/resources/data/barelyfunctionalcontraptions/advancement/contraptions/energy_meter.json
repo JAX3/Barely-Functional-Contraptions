@@ -1,0 +1,32 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/energy_cable",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:energy_meter"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.energy_meter.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.energy_meter.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "obtained": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:energy_meter"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtained"
+    ]
+  ]
+}
