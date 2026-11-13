@@ -466,7 +466,32 @@ An endless power source for creative mode, for testing builds without setting up
 | Red Mushroom | Red Mushroom Wool | 2–4 Red Mushroom (+5% Mycelium) | 3 | 8,000 / 4 s |
 | Brown Mushroom | Brown Mushroom Wool | 2–4 Brown Mushroom (+5% Mycelium) | 3 | 8,000 / 4 s |
 
-Every resource also gives 2 String. Plain wool (`#minecraft:wool`) can be separated into 3 string through the bundled `barelyfunctionalcontraptions:separating` recipe.
+Every resource also gives 2 String, unless its row says otherwise. Plain wool (`#minecraft:wool`) can be separated into 3 string through the bundled `barelyfunctionalcontraptions:separating` recipe.
+
+### Themed sheep
+
+Ten more built-in resources turn the sheep into a little version of the mob the resource comes from. Each one grows extra body parts or gets an extra behaviour while it has its infused fleece. Lambs and sheared sheep look normal.
+
+![The ten themed sheep](docs/screenshots/52_themed_sheep.png)
+
+| Fed item | Sheep | What's different | Separator output (per wool) | FE / time |
+|---|---|---|---|---|
+| Hay Bale | Hay | A hay-bale fleece with binding bands | 2–4 Wheat | 4,000 / 2 s |
+| Nether Star | Wither | Two skull heads on its shoulders that look around on their own, and glowing eyes | 2–4 Nether Star + 1 Soul Sand | 400,000 / 20 s |
+| Dragon's Breath | Dragon | Flapping dragon wings, glowing purple eyes | 2–4 Dragon's Breath (+5% Ender Pearl) | 80,000 / 10 s |
+| Glow Ink Sac | Glow Ink | Its fleece glows in the dark and **lights up the block it stands in** (light level 12) | 2–4 Glow Ink Sac | 8,000 / 3 s |
+| Bone Block | Skeleton | A skull face and bony legs | 2–4 Bone (+10% Arrow) | 6,000 / 3 s |
+| Wither Rose | Wither Skeleton | A charred skull face and bony legs | 2–4 Bone + 2 Coal (+2.5% Wither Skeleton Skull) | 20,000 / 5 s |
+| Spider Eye | Spider | Four extra spider legs that move as it walks, and glowing red eyes | 2–4 Spider Eye + 4 String | 6,000 / 3 s |
+| Echo Shard | Sculk | Sculk tendrils on its head, sculk sensors on its back and fleece strands that glow | 2–4 Echo Shard + 2 Sculk | 80,000 / 10 s |
+| Blaze Rod | Blaze | Permanently on fire, without burning or taking damage | 2–4 Blaze Rod (+10% Glowstone Dust) | 20,000 / 5 s |
+| Ghast Tear | Ghast | Ghast tentacles under its belly, and it **bleats like a screaming goat** | 2–4 Ghast Tear + 1 Gunpowder | 40,000 / 8 s |
+
+![The themed sheep at night](docs/screenshots/53_themed_sheep_night.png)
+
+*At night: the Glow Ink sheep lights up the grass around it, and the Sculk sheep's strands, the eyes and the fire still glow.*
+
+The glow is a real light. A Glow Ink sheep leaves an invisible light block where it stands, and the light goes out within half a second of the sheep moving away, being sheared or losing its infusion. The light block can't be seen or touched and never drops anything.
 
 ### JEI: every wool type the separator handles
 With JEI installed, click the Mechanical Separator in JEI (or press **U** over it) to open **Mechanical Separation**. It lists **every wool type that's loaded**: built-in, mushroom, command-generated and data-pack ones, sorted by name. Plain wool → string and other explicit recipes come after them. Each wool type is one compact row: wool → resource (cycling through 2–4) + string + bonus chance, with energy and time. Like the Resource Infusion page and the Mycelial Generator's fuel page, it uses the same dark slate style as the machine screens: slate panels, recessed slots, and the separator's purple arrow filling over the real processing time. Hover over things for the details. JEI updates by itself after `/reload` or `/barelyfunctionalcontraptions generate`. Press **U** on any resource wool to jump to its row (**R** shows how to make it: the infusion page).
@@ -685,9 +710,32 @@ Definitions live in `data/<namespace>/barelyfunctionalcontraptions/sheep_resourc
     "energy_cost": 20000,                    // total FE; default: config
     "processing_ticks": 100                  // default: config
   },
-  "growth_item": "mekanism:raw_tin"          // optional: block shown growing out of the fleece; default: the storage block of the fed item or output
+  "growth_item": "mekanism:raw_tin",         // optional: block shown growing out of the fleece; default: the storage block of the fed item or output
+  "appearance": {                            // optional: extra looks and behaviours (see below)
+    "features": ["wings", "glowing_eyes"],
+    "feature_color": "#7A5C99",
+    "wool_texture": "mypack:textures/entity/sheep/tin_wool.png"
+  }
 }
 ```
+
+**Appearance.** Any resource, including one from a data pack, can use the themed sheep's parts:
+
+| Feature | What it does |
+|---|---|
+| `extra_heads` | Two skull heads on the shoulders, like the Wither |
+| `wings` | A pair of flapping dragon wings |
+| `extra_legs` | Four long spider legs along the sides |
+| `tentacles` | Ghast tentacles hanging under the belly |
+| `bones` | A skull face and bony legs |
+| `sculk` | Sculk tendrils on the head, and accent strands that glow |
+| `glowing_eyes` | Eyes in the `accent_color` that glow in the dark |
+| `glowing` | The fleece glows, and the sheep lights the block it stands in (light level 12) |
+| `on_fire` | Shows the on-fire flames, without burning |
+| `screaming` | Bleats, hurts and dies with a screaming goat's sounds |
+
+- `feature_color` tints the heads, wings, legs, tentacles and bones. The default is white, which shows them as drawn. Sculk tendrils have their own colours, so leave it white for them.
+- `wool_texture` replaces the greyscale fleece. It uses the vanilla sheep wool layout (64x32) and is still tinted with `wool_color`, so set `wool_color` to `"#FFFFFF"` to show it as drawn. The texture must come from a resource pack.
 
 **Ores vs other materials.** For an ore, set `primary_output` to the raw material (as the built-ins do with Raw Iron). If you leave `primary_output` out, the separator gives back the fed item, which suits gems, logs and stone. A block input never implies 9 outputs automatically; you choose the numbers.
 
@@ -730,7 +778,7 @@ How the generator chooses each value:
 
 Picking single items or materials adds one file without touching the others. It refuses anything an existing built-in or hand-written resource already covers (same feeding item or same name), so you can't create duplicates this way. A wool type made from an arbitrary item (not a storage block) has `infusion_uses` 1, because the mod can't know how many units the item holds. That only matters with `infusionUsesOverride = -1`; by default every wool type lasts 100 shearings.
 
-Generated files are ordinary JSON in `<world>/datapacks/barelyfunctionalcontraptions_generated/`. You can edit them freely. Re-running `generate` (or `generate all`) rewrites only the wool types it generates itself; other generated ones, such as those added with `generate item`/`hand`/`material`, stay until you delete them with `generate remove` or `generate dedupe`. Sheep infused with them keep their infusion. In plain vanilla this adds Bone Meal, Dried Kelp, Slime and Wheat (Resin is skipped because the Resin Clump is not in an allowed creative tab).
+Generated files are ordinary JSON in `<world>/datapacks/barelyfunctionalcontraptions_generated/`. You can edit them freely. Re-running `generate` (or `generate all`) rewrites only the wool types it generates itself; other generated ones, such as those added with `generate item`/`hand`/`material`, stay until you delete them with `generate remove` or `generate dedupe`. Sheep infused with them keep their infusion. In plain vanilla this adds Dried Kelp and Slime; Hay Bales and Bone Blocks already belong to the Hay and Skeleton sheep (Resin is skipped because the Resin Clump is not in an allowed creative tab).
 
 #### Explicit separator recipes
 Use the recipe type `barelyfunctionalcontraptions:separating` to process any item, or to override how a particular wool is handled:
@@ -804,6 +852,7 @@ Requires **JDK 25**. Gradle 9 is downloaded by the wrapper.
 ./gradlew runGameTestServer              # runs every GameTest (both modules + integration) headlessly, then exits
 ./gradlew test                           # unit tests
 ./gradlew runClient -PscreenshotHarness  # stages a test world, saves screenshots to run/screenshots/ and quits
+./gradlew runClient -PscreenshotHarness -PharnessScene=themed_sheep  # only the themed sheep: close-ups and a night shot
 ```
 
 To launch the dev runs **without JEI**, pass `-Puse_jei_runtime=false`.

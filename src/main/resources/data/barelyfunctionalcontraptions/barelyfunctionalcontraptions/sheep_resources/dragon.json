@@ -1,0 +1,31 @@
+{
+  "feeding_item": "minecraft:dragon_breath",
+  "feeding_amount": 1,
+  "wool_color": "#2B2135",
+  "accent_color": "#D97BFF",
+  "category": "material",
+  "wool_drop_count": 1,
+  "infusion_uses": 1,
+  "separator": {
+    "primary_output": "minecraft:dragon_breath",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_count": 2,
+    "bonus_output": {
+      "item": "minecraft:ender_pearl",
+      "chance": 0.05
+    },
+    "energy_cost": 80000,
+    "processing_ticks": 200
+  },
+  "growth_item": "minecraft:purpur_block",
+  "appearance": {
+    "features": [
+      "wings",
+      "glowing_eyes"
+    ],
+    "feature_color": "#7A5C99"
+  }
+}

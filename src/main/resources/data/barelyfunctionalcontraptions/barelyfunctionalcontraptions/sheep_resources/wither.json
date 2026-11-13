@@ -1,0 +1,28 @@
+{
+  "feeding_item": "minecraft:nether_star",
+  "feeding_amount": 1,
+  "wool_color": "#3A3A3A",
+  "accent_color": "#D8D8FF",
+  "category": "material",
+  "wool_drop_count": 1,
+  "infusion_uses": 1,
+  "separator": {
+    "primary_output": "minecraft:nether_star",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_output": "minecraft:soul_sand",
+    "secondary_count": 1,
+    "energy_cost": 400000,
+    "processing_ticks": 400
+  },
+  "growth_item": "minecraft:soul_sand",
+  "appearance": {
+    "features": [
+      "extra_heads",
+      "glowing_eyes"
+    ],
+    "feature_color": "#707070"
+  }
+}

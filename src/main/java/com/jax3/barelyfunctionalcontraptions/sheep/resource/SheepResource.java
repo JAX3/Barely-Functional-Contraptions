@@ -41,6 +41,7 @@ import net.minecraft.world.item.crafting.Ingredient;
  * @param infusionUses  number of shearings one feeding lasts (before the global multiplier)
  * @param separator     how the Mechanical Separator processes this resource's wool
  * @param growthItem    optional item shown growing out of the fleece; defaults to the storage block of the feeding item or output
+ * @param appearance    optional extra looks and behaviours (wings, extra heads, glowing...), see {@link SheepAppearance}
  */
 public record SheepResource(
         Identifier id,
@@ -54,7 +55,8 @@ public record SheepResource(
         int woolDropCount,
         int infusionUses,
         Separator separator,
-        Optional<ItemStackTemplate> growthItem) {
+        Optional<ItemStackTemplate> growthItem,
+        SheepAppearance appearance) {
 
     /** Accepts {@code "#RRGGBB"}, {@code "RRGGBB"}, an integer, or an {@code [r, g, b]} array. */
     public static final Codec<Integer> COLOR_CODEC = Codec.withAlternative(
@@ -76,7 +78,8 @@ public record SheepResource(
             ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("wool_drop_count", 1).forGetter(Definition::woolDropCount),
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("infusion_uses", 1).forGetter(Definition::infusionUses),
             Separator.CODEC.optionalFieldOf("separator", Separator.DEFAULT).forGetter(Definition::separator),
-            ItemStackTemplate.CODEC.optionalFieldOf("growth_item").forGetter(Definition::growthItem)
+            ItemStackTemplate.CODEC.optionalFieldOf("growth_item").forGetter(Definition::growthItem),
+            SheepAppearance.CODEC.optionalFieldOf("appearance", SheepAppearance.NONE).forGetter(Definition::appearance)
     ).apply(i, Definition::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SheepResource> STREAM_CODEC = StreamCodec.composite(
@@ -86,12 +89,12 @@ public record SheepResource(
 
     public static SheepResource withId(Identifier id, Definition d) {
         return new SheepResource(id, d.feedingItem, d.feedingAmount, d.displayName, d.woolName, d.woolColor,
-                d.accentColor, d.category, d.woolDropCount, d.infusionUses, d.separator, d.growthItem);
+                d.accentColor, d.category, d.woolDropCount, d.infusionUses, d.separator, d.growthItem, d.appearance);
     }
 
     public Definition definition() {
         return new Definition(feedingItem, feedingAmount, displayName, woolName, woolColor, accentColor, category,
-                woolDropCount, infusionUses, separator, growthItem);
+                woolDropCount, infusionUses, separator, growthItem, appearance);
     }
 
     // ------------------------------------------------------------------ derived values (with config applied)
@@ -206,7 +209,7 @@ public record SheepResource(
     public record Definition(
             Ingredient feedingItem, int feedingAmount, Optional<Component> displayName, Optional<Component> woolName,
             int woolColor, int accentColor, Category category, int woolDropCount, int infusionUses, Separator separator,
-            Optional<ItemStackTemplate> growthItem) {}
+            Optional<ItemStackTemplate> growthItem, SheepAppearance appearance) {}
 
     /** What kind of material a resource is. Ores should normally separate into their raw material. */
     public enum Category implements StringRepresentable {

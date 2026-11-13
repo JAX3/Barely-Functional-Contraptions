@@ -48,6 +48,9 @@ neoForge {
             // ./gradlew runClient -PscreenshotHarness : stages a test world, captures screenshots, quits (see DevScreenshotHarness)
             if (project.hasProperty('screenshotHarness')) {
                 systemProperty 'barelyfunctionalcontraptions.screenshotHarness', 'true'
+                if (project.hasProperty('harnessScene')) {
+                    systemProperty 'barelyfunctionalcontraptions.screenshotHarness.scene', project.property('harnessScene')
+                }
                 programArguments.addAll '--width', '1280', '--height', '720'
             }
         }

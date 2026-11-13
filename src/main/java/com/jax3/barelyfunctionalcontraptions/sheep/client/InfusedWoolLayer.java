@@ -26,6 +26,13 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance;
+import com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Feature;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.util.LightCoordsUtil;
 
 /**
  * Renders resource-infused wool on sheep, with small blocks of the resource (Block of Iron, Block of Diamond...)
@@ -45,20 +52,44 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
     /** Lambs use vanilla's baby fleece (its own shape and texture), tinted with the resource's wool colour. */
     private static final Identifier BABY_WOOL_TEXTURE = Identifier.withDefaultNamespace("textures/entity/sheep/sheep_wool_baby.png");
 
+    /** Extra body parts ({@link SheepExtrasModel}) and the skull face and leg bones of {@link Feature#BONES}. */
+    private static final Identifier EXTRAS_TEXTURE = ResourcefulSheep.id("textures/entity/sheep/sheep_extras.png");
+    private static final Identifier BONES_TEXTURE = ResourcefulSheep.id("textures/entity/sheep/sheep_bones.png");
+    /** A copy of the vanilla sheep body, a hair larger so the bones texture sits just over the skin. */
+    public static final ModelLayerLocation BONES_LAYER = new ModelLayerLocation(ResourcefulSheep.id("sheep_bones"), "main");
+
     private final EntityModel<SheepRenderState> model;
     private final EntityModel<SheepRenderState> babyModel;
+    private final SheepExtrasModel extras;
+    private final SheepExtrasModel eyes;
+    private final SheepModel bones;
 
     public InfusedWoolLayer(RenderLayerParent<SheepRenderState, SheepModel> renderer, EntityModelSet models) {
         super(renderer);
         this.model = new SheepFurModel(models.bakeLayer(ModelLayers.SHEEP_WOOL));
         this.babyModel = new SheepFurModel(models.bakeLayer(ModelLayers.SHEEP_BABY_WOOL));
+        this.extras = SheepExtrasModel.parts(models.bakeLayer(SheepExtrasModel.LAYER));
+        this.eyes = SheepExtrasModel.eyes(models.bakeLayer(SheepExtrasModel.LAYER));
+        this.bones = new SheepModel(models.bakeLayer(BONES_LAYER));
+    }
+
+    /** The vanilla sheep body ({@code SheepModel.createBodyLayer}) inflated by a tiny amount. */
+    public static LayerDefinition createBonesLayer() {
+        CubeDeformation g = new CubeDeformation(0.04F);
+        var mesh = net.minecraft.client.model.QuadrupedModel.createBodyMesh(12, false, true, g);
+        var root = mesh.getRoot();
+        root.addOrReplaceChild("head", net.minecraft.client.model.geom.builders.CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -4.0F, -6.0F, 6.0F, 6.0F, 8.0F, g),
+                net.minecraft.client.model.geom.PartPose.offset(0.0F, 6.0F, -8.0F));
+        root.addOrReplaceChild("body", net.minecraft.client.model.geom.builders.CubeListBuilder.create().texOffs(28, 8).addBox(-4.0F, -10.0F, -7.0F, 8.0F, 16.0F, 6.0F, g),
+                net.minecraft.client.model.geom.PartPose.offsetAndRotation(0.0F, 5.0F, 2.0F, (float) (Math.PI / 2), 0.0F, 0.0F));
+        return LayerDefinition.create(mesh, 64, 32);
     }
 
     /**
      * What to draw: wool colours ({@code accent} is 0 when the sparkle overlay is disabled), the resource block that
      * sprouts from the fleece, and how many of them are showing.
      */
-    public record Colors(int wool, int accent, ItemStackRenderState growth, int growthCount) {}
+    public record Colors(int wool, int accent, ItemStackRenderState growth, int growthCount, SheepAppearance appearance) {}
 
     // ---------------------------------------------------------------- blocks: small blocks clustered in the fleece
 
@@ -90,7 +121,7 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
         if (state.isBaby) {
             // A lamb born infused (see SheepInfusionEvents.onBabySpawn): its fleece takes the resource's colour; the
             // sparkle and resource blocks only appear once it has grown up.
-            state.setRenderData(INFUSED_WOOL, new Colors(wool, 0, new ItemStackRenderState(), 0));
+            state.setRenderData(INFUSED_WOOL, new Colors(wool, 0, new ItemStackRenderState(), 0, SheepAppearance.NONE));
             state.isSheared = true;
             return;
         }
@@ -109,7 +140,10 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
                 count = uses < 0 || max <= 0 ? BLOCK_SPOTS.length : Mth.clamp(Mth.ceil(BLOCK_SPOTS.length * (float) uses / max), 2, BLOCK_SPOTS.length);
             }
         }
-        state.setRenderData(INFUSED_WOOL, new Colors(wool, accent, growth, count));
+        SheepAppearance appearance = resource.get().appearance();
+        // Burning sheep use the vanilla on-fire flames; they never actually burn.
+        if (appearance.has(Feature.ON_FIRE)) state.displayFireAnimation = true;
+        state.setRenderData(INFUSED_WOOL, new Colors(wool, accent, growth, count, appearance));
         state.isSheared = true; // hides the vanilla wool layer; the undercoat layer is unaffected
     }
 
@@ -121,12 +155,36 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
             coloredCutoutModelCopyLayerRender(babyModel, BABY_WOOL_TEXTURE, poseStack, collector, lightCoords, state, colors.wool(), 1);
             return;
         }
-        coloredCutoutModelCopyLayerRender(model, WOOL_TEXTURE, poseStack, collector, lightCoords, state, colors.wool(), 1);
+        SheepAppearance appearance = colors.appearance();
+        // Glowing fleece is drawn at full brightness; sculk only lights up its strands.
+        int woolLight = appearance.has(Feature.GLOWING) ? LightCoordsUtil.FULL_BRIGHT : lightCoords;
+        int accentLight = appearance.has(Feature.GLOWING) || appearance.has(Feature.SCULK) ? LightCoordsUtil.FULL_BRIGHT : lightCoords;
+        coloredCutoutModelCopyLayerRender(model, appearance.woolTexture().orElse(WOOL_TEXTURE), poseStack, collector, woolLight, state, colors.wool(), 1);
         if (colors.accent() != 0) {
-            coloredCutoutModelCopyLayerRender(model, ACCENT_TEXTURE, poseStack, collector, lightCoords, state, colors.accent(), 2);
+            coloredCutoutModelCopyLayerRender(model, ACCENT_TEXTURE, poseStack, collector, accentLight, state, colors.accent(), 2);
         }
+        submitFeatures(poseStack, collector, lightCoords, state, colors);
         if (state.isInvisible || colors.growthCount() <= 0 || colors.growth().isEmpty()) return;
-        submitBlocks(poseStack, collector, lightCoords, state, colors);
+        submitBlocks(poseStack, collector, woolLight, state, colors);
+    }
+
+    /** The extra body parts, bones and glowing eyes a resource's {@code appearance} asks for. */
+    private void submitFeatures(PoseStack poseStack, SubmitNodeCollector collector, int lightCoords, SheepRenderState state, Colors colors) {
+        SheepAppearance appearance = colors.appearance();
+        if (appearance.features().isEmpty() || state.isInvisible) return;
+        int tint = ARGB.opaque(appearance.featureColor());
+        if (appearance.has(Feature.BONES)) {
+            coloredCutoutModelCopyLayerRender(bones, BONES_TEXTURE, poseStack, collector, lightCoords, state, tint, 1);
+        }
+        if (appearance.has(Feature.EXTRA_HEADS) || appearance.has(Feature.WINGS) || appearance.has(Feature.EXTRA_LEGS)
+                || appearance.has(Feature.TENTACLES) || appearance.has(Feature.SCULK)) {
+            int light = appearance.has(Feature.GLOWING) ? LightCoordsUtil.FULL_BRIGHT : lightCoords;
+            coloredCutoutModelCopyLayerRender(extras, EXTRAS_TEXTURE, poseStack, collector, light, state, tint, 1);
+        }
+        if (appearance.has(Feature.GLOWING_EYES)) {
+            collector.order(3).submitModel(eyes, state, poseStack, RenderTypes.eyes(EXTRAS_TEXTURE), LightCoordsUtil.FULL_BRIGHT,
+                    OverlayTexture.NO_OVERLAY, ARGB.opaque(colors.accent() != 0 ? colors.accent() : 0xFF2020), null, state.outlineColor);
+        }
     }
 
     /** Blocks: little blocks of the resource sprouting from the fleece (the original look). */

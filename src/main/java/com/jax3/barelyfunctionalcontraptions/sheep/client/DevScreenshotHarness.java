@@ -81,6 +81,10 @@ public final class DevScreenshotHarness {
         if (mc.player == null || server == null || mc.level == null) return;
         tick++;
         mc.gui.toastManager().clear();
+        if ("themed_sheep".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            themedSheepTick(mc, server);
+            return;
+        }
         switch (tick) {
             case 60 -> server.execute(() -> setupScene(server));
             case 90 -> command(server, "barelyfunctionalcontraptions generate material slime");
@@ -1107,6 +1111,60 @@ public final class DevScreenshotHarness {
         if (player.level().getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity be) {
             player.openMenu(be, pos); // the menu needs the position, exactly like a right-click on the block
         }
+    }
+
+    /** The themed sheep (wings, extra heads, legs...) only: {@code -PharnessScene=themed_sheep}. */
+    private static final String[] THEMED = {"hay", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast"};
+
+    private static void themedSheepTick(Minecraft mc, MinecraftServer server) {
+        // 60: stage; 120: overview; then one close-up per sheep every 25 ticks; then the overview again at night.
+        int closeStart = 130, perSheep = 25, night = closeStart + THEMED.length * perSheep;
+        if (tick == 60) server.execute(() -> themedSheepScene(server));
+        else if (tick == 70) setHudHidden(mc, true);
+        else if (tick == 120) shot(mc, "52_themed_sheep");
+        else if (tick >= closeStart && tick < night) {
+            int i = (tick - closeStart) / perSheep, step = (tick - closeStart) % perSheep;
+            if (step == 0) {
+                // Slightly in front of the sheep's left side, looking back at it.
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 14", themedX(i), origin.getY(), origin.getZ() - 5 + 3.6));
+            } else if (step == perSheep - 1) {
+                shot(mc, "53_themed_" + THEMED[i]);
+            }
+        } else if (tick == night) {
+            command(server, "time set midnight");
+            command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 18", origin.getX() + 0.5, origin.getY() + 2, origin.getZ() + 5.5));
+        } else if (tick == night + 50) shot(mc, "54_themed_sheep_night");
+        else if (tick == night + 60) mc.stop();
+    }
+
+    private static double themedX(int i) {
+        return origin.getX() + (i - THEMED.length / 2) * 2.6 + 0.5;
+    }
+
+    /** The ten themed sheep in a row, all facing west so the camera (to the south) sees their left sides. */
+    private static void themedSheepScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false", "gamerule advance_weather false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-16, 0, -10), o.offset(16, 5, 7))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-16, -1, -10), o.offset(16, -1, 7))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        for (int i = 0; i < THEMED.length; i++) {
+            Sheep sh = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            sh.snapTo(themedX(i), o.getY(), o.getZ() - 5 + 0.5, 90, 0);
+            sh.setYHeadRot(90);
+            sh.yHeadRotO = 90;
+            sh.setYBodyRot(90);
+            sh.yBodyRotO = 90;
+            sh.setNoAi(true);
+            SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id(THEMED[i])), 9, 0));
+            level.addFreshEntity(sh);
+        }
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 18", o.getX() + 0.5, o.getY() + 2, o.getZ() + 9.5));
     }
 
     private static void shot(Minecraft mc, String name) {

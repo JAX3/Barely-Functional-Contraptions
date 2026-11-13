@@ -1,0 +1,31 @@
+{
+  "feeding_item": "minecraft:wither_rose",
+  "feeding_amount": 1,
+  "wool_color": "#2E2E2E",
+  "accent_color": "#7A7A7A",
+  "category": "organic",
+  "wool_drop_count": 1,
+  "infusion_uses": 1,
+  "separator": {
+    "primary_output": "minecraft:bone",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_output": "minecraft:coal",
+    "secondary_count": 2,
+    "bonus_output": {
+      "item": "minecraft:wither_skeleton_skull",
+      "chance": 0.025
+    },
+    "energy_cost": 20000,
+    "processing_ticks": 100
+  },
+  "growth_item": "minecraft:coal_block",
+  "appearance": {
+    "features": [
+      "bones"
+    ],
+    "feature_color": "#4A4A4A"
+  }
+}

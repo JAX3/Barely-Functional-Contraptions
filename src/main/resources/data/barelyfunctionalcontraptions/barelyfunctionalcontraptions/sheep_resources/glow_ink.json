@@ -1,0 +1,25 @@
+{
+  "feeding_item": "minecraft:glow_ink_sac",
+  "feeding_amount": 1,
+  "wool_color": "#3FB8AF",
+  "accent_color": "#B5FFE8",
+  "category": "organic",
+  "wool_drop_count": 1,
+  "infusion_uses": 1,
+  "separator": {
+    "primary_output": "minecraft:glow_ink_sac",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_count": 2,
+    "energy_cost": 8000,
+    "processing_ticks": 60
+  },
+  "growth_item": "minecraft:sea_lantern",
+  "appearance": {
+    "features": [
+      "glowing"
+    ]
+  }
+}

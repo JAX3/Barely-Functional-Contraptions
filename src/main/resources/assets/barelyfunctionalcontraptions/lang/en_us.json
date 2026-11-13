@@ -645,5 +645,16 @@
   "barelyfunctionalcontraptions.configuration.showSheepSparkleOverlay": "Sparkle on Infused Wool",
   "barelyfunctionalcontraptions.configuration.showResourceGrowths": "Resource Growths",
   "barelyfunctionalcontraptions.configuration.detailedWoolTooltips": "Detailed Wool Tooltips",
-  "barelyfunctionalcontraptions.configuration.detailedMachineTooltips": "Detailed GUI Tooltips"
+  "barelyfunctionalcontraptions.configuration.detailedMachineTooltips": "Detailed GUI Tooltips",
+  "resource.barelyfunctionalcontraptions.hay": "Hay",
+  "resource.barelyfunctionalcontraptions.wither": "Wither",
+  "resource.barelyfunctionalcontraptions.dragon": "Dragon",
+  "resource.barelyfunctionalcontraptions.glow_ink": "Glow Ink",
+  "resource.barelyfunctionalcontraptions.skeleton": "Skeleton",
+  "resource.barelyfunctionalcontraptions.wither_skeleton": "Wither Skeleton",
+  "resource.barelyfunctionalcontraptions.spider": "Spider",
+  "resource.barelyfunctionalcontraptions.warden": "Sculk",
+  "resource.barelyfunctionalcontraptions.blaze": "Blaze",
+  "resource.barelyfunctionalcontraptions.ghast": "Ghast",
+  "block.barelyfunctionalcontraptions.sheep_glow": "Sheep Glow"
 }

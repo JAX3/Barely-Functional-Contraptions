@@ -44,6 +44,10 @@ public final class ResourcefulSheepClient {
         modBus.addListener(ResourcefulSheepClient::registerTintSources);
         modBus.addListener(ResourcefulSheepClient::registerRenderStateModifiers);
         modBus.addListener(ResourcefulSheepClient::addLayers);
+        modBus.addListener((EntityRenderersEvent.RegisterLayerDefinitions event) -> {
+            event.registerLayerDefinition(SheepExtrasModel.LAYER, SheepExtrasModel::createLayer);
+            event.registerLayerDefinition(InfusedWoolLayer.BONES_LAYER, InfusedWoolLayer::createBonesLayer);
+        });
         modBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> {
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.ZERO_POINT_ENERGY_MODULE.get(), context -> new ZeroPointBeamRenderer());

@@ -111,5 +111,17 @@ public final class ModBlocks {
                     .sound(SoundType.IRON)
                     .lightLevel(state -> 10));
 
+    /** The invisible light a glowing sheep leaves where it stands; removes itself once the sheep has moved on. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock> SHEEP_GLOW = REGISTER.registerBlock("sheep_glow",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock::new,
+            p -> p.replaceable()
+                    .noCollision()
+                    .noOcclusion()
+                    .noLootTable()
+                    .instabreak()
+                    .pushReaction(PushReaction.POPPED)
+                    .mapColor(MapColor.NONE)
+                    .lightLevel(state -> com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.LIGHT_LEVEL));
+
     private ModBlocks() {}
 }

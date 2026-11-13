@@ -61,6 +61,7 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Feature;
 
 /**
  * In-world integration tests, run with {@code ./gradlew runGameTestServer} (a real dedicated-server environment,
@@ -142,6 +143,9 @@ public final class ModGameTests {
         TESTS.put("item_pipe_shears_to_separator_to_chest", ModGameTests::itemPipeChain);
         TESTS.put("item_pipe_hopper_pushes_but_chests_are_not_drained", ModGameTests::itemPipePushAndChests);
         TESTS.put("item_pipe_respects_transfer_rate", ModGameTests::itemPipeRate);
+        TESTS.put("themed_sheep_have_their_features", ModGameTests::themedSheep);
+        TESTS.put("glowing_sheep_lights_the_block_it_stands_in", ModGameTests::glowingSheepLight);
+        TESTS.put("screaming_sheep_bleats_like_a_screaming_goat", ModGameTests::screamingSheep);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -393,6 +397,68 @@ public final class ModGameTests {
             }
             h.succeed();
         });
+    }
+
+    // ------------------------------------------------------------------ themed sheep (appearance features)
+
+    private static void themedSheep(GameTestHelper h) {
+        var registry = SheepResourceRegistry.server();
+        java.util.Map<String, List<Feature>> expected = new java.util.LinkedHashMap<>();
+        expected.put("hay", List.of());
+        expected.put("wither", List.of(Feature.EXTRA_HEADS));
+        expected.put("dragon", List.of(Feature.WINGS));
+        expected.put("glow_ink", List.of(Feature.GLOWING));
+        expected.put("skeleton", List.of(Feature.BONES));
+        expected.put("wither_skeleton", List.of(Feature.BONES));
+        expected.put("spider", List.of(Feature.EXTRA_LEGS, Feature.GLOWING_EYES));
+        expected.put("warden", List.of(Feature.SCULK));
+        expected.put("blaze", List.of(Feature.ON_FIRE));
+        expected.put("ghast", List.of(Feature.TENTACLES, Feature.SCREAMING));
+        expected.forEach((name, features) -> {
+            SheepResource resource = registry.byId(ResourcefulSheep.id(name)).orElseThrow(() -> new AssertionError("missing themed sheep " + name));
+            for (var feature : features) {
+                h.assertTrue(resource.appearance().has(feature), name + " should have " + feature.getSerializedName() + ", has " + resource.appearance().features());
+            }
+        });
+        h.assertTrue(registry.byId(ResourcefulSheep.id("hay")).orElseThrow().appearance().woolTexture().isPresent(), "hay sheep use the hay-bale fleece");
+        h.assertTrue(registry.byFeedingItem(new ItemStack(Items.NETHER_STAR)).map(r -> r.id().getPath()).orElse("").equals("wither"), "nether stars make a Wither sheep");
+        h.assertTrue(registry.byId(ResourcefulSheep.id("wither")).orElseThrow().separation().primary().create().is(Items.NETHER_STAR), "Wither wool separates into nether stars");
+        // Resources without an appearance block (the original 14) are unchanged.
+        h.assertTrue(registry.byId(IRON).orElseThrow().appearance().isEmpty(), "iron has no extra features");
+        h.succeed();
+    }
+
+    private static void glowingSheepLight(GameTestHelper h) {
+        BlockPos rel = new BlockPos(2, 1, 2);
+        Sheep sheep = sheepAt(h, rel, ResourcefulSheep.id("glow_ink"));
+        BlockPos at = h.absolutePos(rel);
+        var glow = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.SHEEP_GLOW.get();
+        h.runAfterDelay(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.GLOW_PLACE_TICKS * 2, () -> {
+            h.assertTrue(h.getLevel().getBlockState(at).is(glow), "a glowing sheep lights the block it stands in, found " + h.getLevel().getBlockState(at));
+            h.assertTrue(h.getLevel().getBrightness(net.minecraft.world.level.LightLayer.BLOCK, at) == com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.LIGHT_LEVEL,
+                    "the light is level 12, got " + h.getLevel().getBrightness(net.minecraft.world.level.LightLayer.BLOCK, at));
+            // Sheared: no more glow, and the light goes out on its next check.
+            sheep.setSheared(true);
+            h.runAfterDelay(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.CHECK_TICKS + 2, () -> {
+                h.assertTrue(h.getLevel().getBlockState(at).isAir(), "the light goes out once the sheep is sheared, found " + h.getLevel().getBlockState(at));
+                h.succeed();
+            });
+        });
+    }
+
+    private static void screamingSheep(GameTestHelper h) {
+        Sheep ghast = sheepAt(h, new BlockPos(1, 1, 1), ResourcefulSheep.id("ghast"));
+        Sheep plain = sheepAt(h, new BlockPos(3, 1, 3), null);
+        java.util.function.Function<Sheep, net.minecraft.sounds.SoundEvent> bleat = sheep -> {
+            var event = new net.neoforged.neoforge.event.PlayLevelSoundEvent.AtPosition(h.getLevel(), sheep.position(),
+                    net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(net.minecraft.sounds.SoundEvents.SHEEP_AMBIENT),
+                    net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
+            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.onSound(event);
+            return event.getSound().value();
+        };
+        h.assertTrue(bleat.apply(ghast) == net.minecraft.sounds.SoundEvents.GOAT_SCREAMING_AMBIENT, "a Ghast sheep screams like a goat");
+        h.assertTrue(bleat.apply(plain) == net.minecraft.sounds.SoundEvents.SHEEP_AMBIENT, "a plain sheep still bleats");
+        h.succeed();
     }
 
     // ------------------------------------------------------------------ breeding
@@ -701,6 +767,7 @@ public final class ModGameTests {
         for (var block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
             var id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
             if (!id.getNamespace().equals(ResourcefulSheep.MOD_ID)) continue;
+            if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.SHEEP_GLOW.get()) continue; // invisible light, never placed by hand
             var sound = block.defaultBlockState().getSoundType();
             h.assertTrue(sound == net.minecraft.world.level.block.SoundType.IRON && sound.getPlaceSound() == ironPlace,
                     id + " should use the iron block sound type");
@@ -1644,7 +1711,9 @@ public final class ModGameTests {
         var plan = com.jax3.barelyfunctionalcontraptions.sheep.command.ResourceGenerator.plan(registries, SheepResourceRegistry.server(), false);
         java.util.Set<String> names = new java.util.HashSet<>();
         plan.forEach(g -> names.add(g.name()));
-        h.assertTrue(names.contains("slime") && names.contains("wheat") && names.contains("bone_meal"), "vanilla storage-block materials discovered: " + names);
+        h.assertTrue(names.contains("slime") && names.contains("dried_kelp"), "vanilla storage-block materials discovered: " + names);
+        // Hay Bales and Bone Blocks already feed the built-in Hay and Skeleton sheep.
+        h.assertFalse(names.contains("wheat") || names.contains("bone_meal"), "materials the themed sheep cover are skipped: " + names);
         h.assertFalse(names.contains("iron") || names.contains("diamond") || names.contains("netherite"), "already-defined materials skipped: " + names);
         h.assertFalse(names.stream().anyMatch(n -> n.startsWith("raw_")), "raw ore blocks skipped: " + names);
         var slime = plan.stream().filter(g -> g.name().equals("slime")).findFirst().orElseThrow();
@@ -1685,10 +1754,10 @@ public final class ModGameTests {
         var dups = com.jax3.barelyfunctionalcontraptions.sheep.command.ResourceGenerator.findDuplicates(new SheepResourceRegistry(combined));
         java.util.Set<String> dupNames = new java.util.HashSet<>();
         dups.forEach(d -> dupNames.add(d.resource().id().getPath()));
-        for (String n : List.of("iron", "gold", "copper", "redstone", "lapis", "coal", "diamond", "emerald", "netherite")) {
+        for (String n : List.of("iron", "gold", "copper", "redstone", "lapis", "coal", "diamond", "emerald", "netherite", "wheat", "bone_meal")) {
             h.assertTrue(dupNames.contains(n), "generated " + n + " should be flagged as a duplicate: " + dupNames);
         }
-        for (String n : List.of("slime", "wheat", "bone_meal")) {
+        for (String n : List.of("slime", "dried_kelp")) {
             h.assertFalse(dupNames.contains(n), n + " is unique and must be kept: " + dupNames);
         }
         h.assertTrue(dups.stream().noneMatch(d -> !com.jax3.barelyfunctionalcontraptions.sheep.command.ResourceGenerator.isGenerated(d.resource())),

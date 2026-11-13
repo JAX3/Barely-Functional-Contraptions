@@ -2107,9 +2107,163 @@ CUBE_BOLT_ICON = [  # 9x9 GUI icon
 ]
 
 
+# ---------------------------------------------------------------------------
+# Themed sheep (resource "appearance"): a hay-bale fleece, a skull-and-bones
+# overlay and the sheet of extra body parts (SheepExtrasModel, 64x64). Parts
+# that a resource tints with "feature_color" are drawn in light greys.
+# ---------------------------------------------------------------------------
+def generate_hay_wool():
+    """Hay-bale fleece in the vanilla sheep wool layout: golden straw with two binding bands round the body."""
+    rnd = random.Random(4242)
+    img = Image.new("RGBA", (64, 32), CLEAR)
+    straw = [hexc("#E3C252"), hexc("#D1AE3C"), hexc("#B8952C"), hexc("#F0D774")]
+    band = [hexc("#8C5A26"), hexc("#734820")]
+
+    def fill(rect, mask=None, banded=False):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                if mask and not mask(x - x0, y - y0, x1 - x0, y1 - y0):
+                    continue
+                # Straw runs in short streaks: the colour changes every few pixels along a row.
+                c = straw[(x // 3 + y * 7 + rnd.randint(0, 1)) % 4]
+                if (x * 5 + y * 3) % 9 == 0:
+                    c = shade(c, 0.82)
+                if banded and (y - y0) in (4, 5, 11, 12):
+                    c = band[(x + y) % 2]
+                img.putpixel((x, y), c)
+
+    head = box_faces(0, 0, 6, 6, 6)
+    for face in ("top", "east", "west", "south"):
+        fill(head[face])
+    fill(head["north"], lambda x, y, w, h: y < 2 or (y < 3 and x in (0, w - 1)))
+    body = box_faces(28, 8, 8, 16, 6)
+    for face in ("east", "west", "north", "south"):
+        fill(body[face], banded=True)
+    for face in ("top", "bottom"):
+        fill(body[face])
+    legs = box_faces(0, 16, 4, 6, 4)
+    fill(legs["top"])
+    for face in ("east", "north", "west", "south"):
+        fill(legs[face], lambda x, y, w, h: y < 4)
+    img.save(out("entity/sheep/hay_wool.png"))
+
+
+def generate_sheep_bones():
+    """Skull face and bony legs in the vanilla sheep body layout (64x32); tinted by feature_color."""
+    rnd = random.Random(777)
+    img = Image.new("RGBA", (64, 32), CLEAR)
+    bone = [(232, 230, 222, 255), (214, 211, 200, 255), (244, 243, 238, 255)]
+    dark = (30, 26, 24, 255)
+    crack = (168, 164, 152, 255)
+
+    def fill(rect, colour=None):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                img.putpixel((x, y), colour or rnd.choice(bone))
+
+    head = box_faces(0, 0, 6, 6, 8)
+    for face in head.values():
+        fill(face)
+    fx, fy = head["north"][0], head["north"][1]
+    for x, y in ((0, 2), (1, 2), (0, 3), (1, 3), (4, 2), (5, 2), (4, 3), (5, 3), (2, 4), (3, 4)):
+        img.putpixel((fx + x, fy + y), dark)
+    for x in range(6):
+        img.putpixel((fx + x, fy + 5), dark if x % 2 else crack)
+    # Legs: a thin bone down the middle of each side, with knuckles.
+    legs = box_faces(0, 16, 4, 12, 4)
+    for name, face in legs.items():
+        x0, y0, x1, y1 = face
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                edge = x in (x0, x1 - 1) and name not in ("top", "bottom")
+                c = rnd.choice(bone)
+                if edge:
+                    c = crack
+                if name not in ("top", "bottom") and (y - y0) in (5, 10):
+                    c = bone[2]
+                img.putpixel((x, y), c)
+    # Ribs on the body (only seen on a sheared sheep... which never shows features, but keeps the texture complete).
+    body = box_faces(28, 8, 8, 16, 6)
+    for name, face in body.items():
+        x0, y0, x1, y1 = face
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                img.putpixel((x, y), crack if (y - y0) % 3 == 2 else rnd.choice(bone))
+    img.save(out("entity/sheep/sheep_bones.png"))
+
+
+def generate_sheep_extras():
+    """The sheet of extra body parts for SheepExtrasModel (64x64)."""
+    rnd = random.Random(9001)
+    img = Image.new("RGBA", (64, 64), CLEAR)
+
+    def grey(v, a=255):
+        v = max(0, min(255, v))
+        return (v, v, v, a)
+
+    def fill(rect, fn):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                c = fn(x - x0, y - y0, x1 - x0, y1 - y0)
+                if c:
+                    img.putpixel((x, y), c)
+
+    # Side heads (texOffs 0,0; 5x5x6): a pale, cracked skull with dark eye sockets on the front.
+    for name, face in box_faces(0, 0, 5, 5, 6).items():
+        fill(face, lambda x, y, w, h: grey(196 + rnd.randint(-14, 14)) if (x + y * 3) % 7 else grey(160))
+    fx, fy = box_faces(0, 0, 5, 5, 6)["north"][:2]
+    for x, y in ((0, 1), (1, 1), (3, 1), (4, 1), (2, 2), (0, 3), (1, 4), (2, 3), (3, 4), (4, 3)):
+        img.putpixel((fx + x, fy + y), (24, 20, 20, 255))
+
+    # Wing bone (texOffs 0,12; 16x1x1).
+    fill((0, 12, 34, 14), lambda x, y, w, h: grey(214 if x % 4 else 170))
+    # Wing membrane (texOffs 0,14; 16x0x12): veins fanning back from the bone, a scalloped trailing edge.
+    def membrane(x, y, w, h):
+        scallop = (x % 4) in (0, 3)
+        if y == h - 1 and scallop:
+            return None
+        if y == h - 2 and x % 4 == 0:
+            return None
+        vein = x % 4 == 0
+        v = 128 if vein else 176 + rnd.randint(-10, 10) - y * 3
+        return grey(v)
+    fill((12, 14, 28, 26), membrane)
+    fill((28, 14, 44, 26), membrane)
+
+    # Spider legs (texOffs 0,26; 14x2x2): bristly, with darker joints.
+    fill((0, 26, 32, 30), lambda x, y, w, h: grey(110 if x % 7 in (0, 1) else 150 + rnd.randint(-18, 18)))
+
+    # Ghast tentacles (texOffs 0,30; up to 2x11x2): white, greying towards the tips.
+    fill((0, 30, 8, 43), lambda x, y, w, h: grey(246 - y * 4 + rnd.randint(-6, 6)))
+
+    # Sculk tendrils (texOffs 40,0; 6x7 planes): already coloured, deep teal with glowing cyan tips.
+    def tendril(x, y, w, h):
+        cx = abs(x - (w - 1) / 2.0)
+        if cx > 1.6 + y * 0.35:   # a frond, narrow at the top and widening down to the head
+            return None
+        if y <= 1 and cx < 1.5:
+            return hexc("#5FF5F5")
+        if cx < 0.6:
+            return hexc("#29DFEB")
+        return hexc("#0E5A63") if (x + y) % 3 else hexc("#0A3F47")
+    fill((40, 0, 46, 7), tendril)
+    fill((46, 0, 52, 7), tendril)
+
+    # Glowing eyes (texOffs 40,8; 6x6 plane on the face): the vanilla sheep's eye pixels, white so the accent tints them.
+    for x, y in ((0, 2), (1, 2), (4, 2), (5, 2)):
+        img.putpixel((40 + x, 8 + y), (255, 255, 255, 255))
+    img.save(out("entity/sheep/sheep_extras.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
+    generate_hay_wool()
+    generate_sheep_bones()
+    generate_sheep_extras()
     generate_block()
     generate_creative_generator()
     generate_automatic_shears()

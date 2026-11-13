@@ -63,6 +63,7 @@ public final class ResourcefulSheep {
 
         NeoForge.EVENT_BUS.register(SheepResourceManager.Events.class);
         NeoForge.EVENT_BUS.register(SheepInfusionEvents.class);
+        NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.command.ResourcefulSheepCommand.class);
     }
 

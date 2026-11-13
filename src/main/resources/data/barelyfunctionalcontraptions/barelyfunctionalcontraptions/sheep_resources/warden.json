@@ -1,0 +1,27 @@
+{
+  "feeding_item": "minecraft:echo_shard",
+  "feeding_amount": 1,
+  "wool_color": "#0D3B45",
+  "accent_color": "#29DFEB",
+  "category": "material",
+  "wool_drop_count": 1,
+  "infusion_uses": 1,
+  "separator": {
+    "primary_output": "minecraft:echo_shard",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_output": "minecraft:sculk",
+    "secondary_count": 2,
+    "energy_cost": 80000,
+    "processing_ticks": 200
+  },
+  "growth_item": "minecraft:sculk_sensor",
+  "appearance": {
+    "features": [
+      "sculk",
+      "glowing_eyes"
+    ]
+  }
+}

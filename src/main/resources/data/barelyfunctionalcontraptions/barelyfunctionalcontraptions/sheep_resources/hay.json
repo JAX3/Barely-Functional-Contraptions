@@ -1,0 +1,22 @@
+{
+  "feeding_item": "minecraft:hay_block",
+  "feeding_amount": 1,
+  "wool_color": "#FFFFFF",
+  "accent_color": "#FFF3B0",
+  "category": "organic",
+  "wool_drop_count": 1,
+  "infusion_uses": 9,
+  "separator": {
+    "primary_output": "minecraft:wheat",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_count": 2,
+    "energy_cost": 4000,
+    "processing_ticks": 40
+  },
+  "appearance": {
+    "wool_texture": "barelyfunctionalcontraptions:textures/entity/sheep/hay_wool.png"
+  }
+}

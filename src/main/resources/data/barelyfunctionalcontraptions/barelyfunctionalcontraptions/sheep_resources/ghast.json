@@ -1,0 +1,28 @@
+{
+  "feeding_item": "minecraft:ghast_tear",
+  "feeding_amount": 1,
+  "wool_color": "#F4F4F4",
+  "accent_color": "#C9E4F2",
+  "category": "material",
+  "wool_drop_count": 1,
+  "infusion_uses": 1,
+  "separator": {
+    "primary_output": "minecraft:ghast_tear",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_output": "minecraft:gunpowder",
+    "secondary_count": 1,
+    "energy_cost": 40000,
+    "processing_ticks": 160
+  },
+  "growth_item": "minecraft:netherrack",
+  "appearance": {
+    "features": [
+      "tentacles",
+      "screaming"
+    ],
+    "feature_color": "#F0F0F0"
+  }
+}

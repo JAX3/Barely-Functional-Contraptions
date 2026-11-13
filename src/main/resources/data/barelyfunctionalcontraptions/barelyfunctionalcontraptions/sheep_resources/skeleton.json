@@ -1,0 +1,28 @@
+{
+  "feeding_item": "minecraft:bone_block",
+  "feeding_amount": 1,
+  "wool_color": "#E8E4D4",
+  "accent_color": "#FFFFFF",
+  "category": "organic",
+  "wool_drop_count": 1,
+  "infusion_uses": 3,
+  "separator": {
+    "primary_output": "minecraft:bone",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_count": 2,
+    "bonus_output": {
+      "item": "minecraft:arrow",
+      "chance": 0.1
+    },
+    "energy_cost": 6000,
+    "processing_ticks": 60
+  },
+  "appearance": {
+    "features": [
+      "bones"
+    ]
+  }
+}

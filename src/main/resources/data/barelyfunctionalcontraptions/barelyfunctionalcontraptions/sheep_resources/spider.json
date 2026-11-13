@@ -1,0 +1,27 @@
+{
+  "feeding_item": "minecraft:spider_eye",
+  "feeding_amount": 1,
+  "wool_color": "#3D3330",
+  "accent_color": "#C8102E",
+  "category": "organic",
+  "wool_drop_count": 1,
+  "infusion_uses": 1,
+  "separator": {
+    "primary_output": "minecraft:spider_eye",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_count": 4,
+    "energy_cost": 6000,
+    "processing_ticks": 60
+  },
+  "growth_item": "minecraft:cobweb",
+  "appearance": {
+    "features": [
+      "extra_legs",
+      "glowing_eyes"
+    ],
+    "feature_color": "#4A3A34"
+  }
+}
