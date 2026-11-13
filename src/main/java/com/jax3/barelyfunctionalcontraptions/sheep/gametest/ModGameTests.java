@@ -451,9 +451,15 @@ public final class ModGameTests {
     private static void melonSliceSkin(GameTestHelper h) {
         var skinAttachment = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_SKIN;
         java.util.UUID id = SheepInfusionEvents.MELON_SKIN_PLAYER;
-        // A Melon Slice gives the sheep that player's skin and head, and is eaten.
+        // Anyone else's Melon Slice does nothing and isn't eaten.
         Sheep sheep = sheep(h);
+        Player stranger = playerHolding(h, new ItemStack(Items.MELON_SLICE, 3));
+        feed(stranger, sheep);
+        h.assertTrue(!sheep.hasData(skinAttachment) || sheep.getData(skinAttachment).profile().isEmpty(), "only that player can give the skin");
+        h.assertTrue(stranger.getMainHandItem().getCount() == 3, "another player's slice isn't eaten, left " + stranger.getMainHandItem().getCount());
+        // That player's Melon Slice gives the sheep their skin and head, and is eaten.
         Player player = playerHolding(h, new ItemStack(Items.MELON_SLICE, 3));
+        player.setUUID(id);
         feed(player, sheep);
         var skin = sheep.getData(skinAttachment).profile();
         h.assertTrue(skin.isPresent() && skin.get().partialProfile().id().equals(id), "the sheep wears " + id + ", got " + skin);

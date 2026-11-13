@@ -65,7 +65,7 @@ public final class SheepInfusionEvents {
             return;
         }
 
-        if (stack.is(net.minecraft.world.item.Items.MELON_SLICE) && target instanceof Sheep sheep) {
+        if (stack.is(net.minecraft.world.item.Items.MELON_SLICE) && target instanceof Sheep sheep && MELON_SKIN_PLAYER.equals(player.getUUID())) {
             feedMelonSlice(event, player, sheep, stack);
             return;
         }
@@ -93,6 +93,7 @@ public final class SheepInfusionEvents {
 
     /**
      * Feeding a sheep a Melon Slice gives it the skin and head of one particular player ({@link #MELON_SKIN_PLAYER}).
+     * Only that player can do it: for anyone else a Melon Slice does nothing and isn't used up.
      * The sheep stores that player's UUID and clients look the skin up the way a placed Player Head does. One slice is
      * used up (not in creative). This is only a look: it works on any sheep, infused or not, and doesn't change what
      * it drops. A sheep that already has the skin doesn't eat another slice.
