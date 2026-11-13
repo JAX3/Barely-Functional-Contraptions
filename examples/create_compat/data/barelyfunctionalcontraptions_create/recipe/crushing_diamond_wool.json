@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:crushing",
+  "ingredients": [
+    {
+      "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool",
+      "resource": "barelyfunctionalcontraptions:diamond"
+    }
+  ],
+  "processing_time": 250,
+  "results": [
+    {
+      "id": "minecraft:diamond",
+      "count": 2
+    },
+    {
+      "id": "minecraft:diamond",
+      "chance": 0.5
+    },
+    {
+      "id": "minecraft:string",
+      "count": 2
+    }
+  ]
+}

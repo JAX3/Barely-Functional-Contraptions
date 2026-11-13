@@ -152,6 +152,7 @@ public final class ModGameTests {
         TESTS.put("themed_sheep_advancements", ModGameTests::themedAdvancements);
         TESTS.put("energy_meter_measures_what_passes_through", ModGameTests::energyMeter);
         TESTS.put("glow_panel_runs_on_glow_lamps", ModGameTests::glowPanel);
+        TESTS.put("recipe_support_wool_ingredient_and_fuel_data_map", ModGameTests::recipeSupport);
         TESTS.put("melon_slice_gives_a_sheep_the_skin", ModGameTests::melonSliceSkin);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -2181,6 +2182,38 @@ public final class ModGameTests {
                 h.assertTrue(SheepResource.blockForm(growth.getItem()).isEmpty(), resource.id() + " grows a flat item " + growth);
             }
         }
+        h.succeed();
+    }
+
+    // ------------------------------------------------------------------ recipe support for other mods
+
+    private static void recipeSupport(GameTestHelper h) {
+        var ops = h.getLevel().registryAccess().createSerializationContext(JsonOps.INSTANCE);
+        java.util.function.Function<String, net.minecraft.world.item.crafting.Ingredient> parse = json ->
+                net.minecraft.world.item.crafting.Ingredient.CODEC.parse(ops, JsonParser.parseString(json)).getOrThrow();
+        var ironWool = com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(IRON, 1);
+        var diamondWool = com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("diamond"), 1);
+        var iron = parse.apply("{\"neoforge:ingredient_type\": \"barelyfunctionalcontraptions:resource_wool\", \"resource\": \"barelyfunctionalcontraptions:iron\"}");
+        h.assertTrue(iron.test(ironWool) && !iron.test(diamondWool) && !iron.test(new ItemStack(Items.IRON_INGOT)), "the resource wool ingredient matches only Iron Wool");
+        var gems = parse.apply("{\"neoforge:ingredient_type\": \"barelyfunctionalcontraptions:resource_wool\", \"category\": \"gem\"}");
+        h.assertTrue(gems.test(diamondWool) && !gems.test(ironWool), "a category matches the wool of every resource in it");
+        var any = parse.apply("{\"neoforge:ingredient_type\": \"barelyfunctionalcontraptions:resource_wool\"}");
+        h.assertTrue(any.test(ironWool) && any.test(diamondWool) && !any.test(new ItemStack(Items.WOOL.white())), "no filter matches any resource wool, not plain wool");
+        // It works inside the mod's own recipe type too.
+        var recipe = com.jax3.barelyfunctionalcontraptions.sheep.recipe.SeparatingRecipe.MAP_CODEC.codec().parse(ops, JsonParser.parseString(
+                "{\"ingredient\": {\"neoforge:ingredient_type\": \"barelyfunctionalcontraptions:resource_wool\", \"resource\": \"barelyfunctionalcontraptions:iron\"},"
+                        + " \"primary_output\": \"minecraft:iron_ingot\"}")).getOrThrow();
+        h.assertTrue(recipe.ingredient().test(ironWool), "a separating recipe can use it");
+        // Generator fuels from the barelyfunctionalcontraptions:mycelial_fuel data map, after the config's.
+        var crimson = com.jax3.barelyfunctionalcontraptions.mycelial.fuel.FuelRegistry.get(new ItemStack(Items.CRIMSON_FUNGUS));
+        h.assertTrue(crimson != null && crimson.burnTicks() == 300 && Math.abs(crimson.energyMultiplier() - 1.1) < 1e-9, "Crimson Fungus is a fuel from the data map: " + crimson);
+        var warped = com.jax3.barelyfunctionalcontraptions.mycelial.fuel.FuelRegistry.get(new ItemStack(Items.WARPED_FUNGUS));
+        h.assertTrue(warped != null && Math.abs(warped.waterMultiplier() - 0.8) < 1e-9, "Warped Fungus uses less water: " + warped);
+        var red = com.jax3.barelyfunctionalcontraptions.mycelial.fuel.FuelRegistry.get(new ItemStack(Items.RED_MUSHROOM));
+        h.assertTrue(red != null && red.burnTicks() == 600, "the config's Red Mushroom is unchanged: " + red);
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.mycelial.fuel.FuelRegistry.definitions().stream().anyMatch(d -> d.id().equals("minecraft:crimson_fungus")),
+                "data map fuels are listed (for JEI)");
+        h.assertFalse(com.jax3.barelyfunctionalcontraptions.mycelial.fuel.FuelRegistry.isFuel(new ItemStack(Items.DIRT)), "dirt still isn't fuel");
         h.succeed();
     }
 

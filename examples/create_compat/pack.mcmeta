@@ -1,0 +1,13 @@
+{
+  "pack": {
+    "description": "Barely Functional Contraptions: Create crushing for resource wool (example)",
+    "min_format": [
+      121,
+      0
+    ],
+    "max_format": [
+      121,
+      0
+    ]
+  }
+}

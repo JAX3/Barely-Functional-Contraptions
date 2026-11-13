@@ -47,6 +47,7 @@ public final class ResourcefulSheep {
         ModRecipes.TYPES.register(modBus);
         ModRecipes.SERIALIZERS.register(modBus);
         ModRecipes.BOOK_CATEGORIES.register(modBus);
+        ModRecipes.INGREDIENT_TYPES.register(modBus);
         ModLootModifiers.REGISTER.register(modBus);
         com.jax3.barelyfunctionalcontraptions.sheep.registry.ModSounds.REGISTER.register(modBus);
 

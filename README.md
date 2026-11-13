@@ -865,6 +865,25 @@ Use the recipe type `barelyfunctionalcontraptions:separating` to process any ite
 ```
 An explicit recipe always takes priority over a resource definition. JEI shows only the recipe that actually applies.
 
+#### Recipe support for other mods (KubeJS, Create, data packs)
+Two building blocks make the mod easy to drive from other mods' recipes and from KubeJS:
+
+- **`barelyfunctionalcontraptions:resource_wool` ingredient.** Asks for resource wool in any recipe (crafting, the separator, another mod's machine) without spelling out its data component:
+  ```jsonc
+  { "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool", "resource": "barelyfunctionalcontraptions:iron" } // Iron Wool
+  { "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool", "category": "gem" }  // any gem resource's wool
+  { "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool" }                     // any resource wool
+  ```
+- **`barelyfunctionalcontraptions:mycelial_fuel` data map.** Adds Mycelial Generator fuels from a data pack (`data/<namespace>/data_maps/item/mycelial_fuel.json`) instead of the config:
+  ```json
+  { "values": { "minecraft:crimson_fungus": { "burn_time": 300, "energy": 1.1, "water": 1.0, "mycelium": 1.0, "scaling": 0.0 } } }
+  ```
+  Only `burn_time` is required. The mod ships Crimson and Warped Fungus this way (300 ticks, x1.1 energy; Warped uses 20% less water). Fuels in the config's `fuels` list come first, so the config always wins for an item it lists. Data map fuels show on JEI's fuel page like the others. Keys may be `#tags`.
+
+Together with the `barelyfunctionalcontraptions:separating` recipe type above, that covers recipes, fuels and wool. Two ready-made examples are in `examples/`:
+- `examples/kubejs/server_scripts/barely_functional_contraptions.js`: a KubeJS script that adds separator recipes (one using the wool ingredient), a crafting recipe for any gem wool, and two fuels through the data map.
+- `examples/create_compat/`: a data pack with **Create crushing** recipes for the nine vanilla resource wools (2 + 50% resource, plus 2 string), loaded only when Create is installed. It uses the format of Create 6 and hasn't been tested with Create on 26.3, so it is shipped as an example rather than built in.
+
 #### Tags
 | Tag | Default contents | Purpose |
 |---|---|---|

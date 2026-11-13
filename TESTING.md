@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 36/36 passed (31 Mycelial Power + 5 Resourceful Sheep) |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 115 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 80 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 116 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 81 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 51 screenshots and 12 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Themed sheep (the ideas in `Custom block.txt`)
@@ -26,6 +26,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | Real client, pipe modes (`58_pipe_modes.png`) | ✅ Orange Pull and green Push plugs, visible from above as well as head-on |
 | Unit tests (`./gradlew test`) | ✅ The guide's `en_us.json` parses, has 10-12 chapters (what fits the screen) and every chapter has a title, an icon id and text; pipe filters toggle, fill up at 9 and the modes cycle; the Energy Meter's signal scale |
 | Real client, guide (`59_guide.png`, `60_guide_glow_panels.png`) | ✅ Opens from the harness, lists the 12 chapters with icons, wraps and pages the text, keeps headings with what follows |
+| GameTest `recipe_support_wool_ingredient_and_fuel_data_map` | ✅ The `resource_wool` ingredient matches only Iron Wool by resource, every gem wool by category, any resource wool (not plain wool) with no filter, and works inside a separating recipe; Crimson and Warped Fungus are fuels from the data map with its numbers, the config's Red Mushroom is unchanged and data map fuels are listed for JEI |
+| Not tested | The KubeJS script and the Create crushing example pack in `examples/` (neither mod was installed); they are examples, not loaded by default |
 | Generator GameTests | ✅ Updated: Wheat and Bone Meal are no longer generated (the Hay and Skeleton sheep cover them), and a generated copy of either is flagged as a duplicate |
 | Real client (`-PharnessScene=themed_sheep`) | ✅ Each sheep photographed side-on (`52_themed_sheep.png`): Wither Skeleton Skulls either side of the Wither sheep's head, using the game's skull texture (front view `53_themed_wither_front.png`), Dragon wings, spider legs, ghast tentacles, Skeleton and Wither Skeleton Skull faces (front views `53_themed_skeleton_front.png`, `53_themed_wither_skeleton_front.png`) and bony legs, sculk tendrils with glowing strands, on-fire flames, hay fleece. At night (`53_themed_sheep_night.png`) the Glow Ink sheep is fully bright and lights the grass, and glowing eyes and sculk strands stay lit. No errors from the mod in the log. |
 | Not yet checked in the client | The replaced sounds are only covered by the GameTest, not listened to in game (the client loads the definitions with no errors) |

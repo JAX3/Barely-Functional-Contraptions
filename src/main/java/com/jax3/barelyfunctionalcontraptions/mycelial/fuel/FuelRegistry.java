@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Resolves the configured fuel entries into item lookups. The single source of truth for both the
+ * Resolves the configured fuel entries, then the {@link MycelialFuelDataMap mycelial_fuel data map}, into item lookups. The single source of truth for both the
  * generator's gameplay logic and the JEI display. Rebuilt lazily whenever the config or tags change.
  */
 public final class FuelRegistry {
@@ -52,7 +52,8 @@ public final class FuelRegistry {
                 return entry.getValue();
             }
         }
-        return null;
+        // Not in the config: the barelyfunctionalcontraptions:mycelial_fuel data map (data packs, KubeJS...).
+        return s.dataMap.get(stack.getItem());
     }
 
     public static boolean isFuel(ItemStack stack) {
@@ -152,11 +153,25 @@ public final class FuelRegistry {
                 definitions.add(def);
             }
         }
-        return new Snapshot(exact, Collections.unmodifiableList(tags), Collections.unmodifiableList(definitions));
+        // Data map fuels, after the config's: one definition per item, skipped where the config already has the item.
+        Map<Item, FuelDefinition> dataMap = new IdentityHashMap<>();
+        BuiltInRegistries.ITEM.getDataMap(MycelialFuelDataMap.TYPE).forEach((key, fuel) -> {
+            Item item = BuiltInRegistries.ITEM.getValue(key);
+            if (item == Items.AIR || exact.containsKey(item)) return;
+            ItemStack stack = new ItemStack(item);
+            for (Map.Entry<TagKey<Item>, FuelDefinition> tag : tags) {
+                if (stack.is(tag.getKey())) return;
+            }
+            FuelDefinition def = fuel.toDefinition(key.identifier().toString());
+            dataMap.put(item, def);
+            definitions.add(def);
+        });
+        return new Snapshot(exact, Collections.unmodifiableList(tags), Collections.unmodifiableList(definitions), dataMap);
     }
 
     private record Snapshot(Map<Item, FuelDefinition> exact,
                             List<Map.Entry<TagKey<Item>, FuelDefinition>> tags,
-                            List<FuelDefinition> definitions) {
+                            List<FuelDefinition> definitions,
+                            Map<Item, FuelDefinition> dataMap) {
     }
 }
