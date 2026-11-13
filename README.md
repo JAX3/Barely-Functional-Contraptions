@@ -58,7 +58,7 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 | ![Main creative tab](docs/screenshots/28_creative_tab_main.png) | ![Resource Wool creative tab](docs/screenshots/27_creative_tab_wool.png) |
 
 ### Contraptions Manual (in-game guide)
-Craft a **Contraptions Manual** (a book and a redstone dust) and right-click it to read about everything in the mod in game: getting started, each generator and machine, the sheep, fluids, energy, Glow Panels, pipe modes and filters, and data packs.
+Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game: getting started, each generator and machine, the sheep, fluids, energy, Glow Panels, pipe modes and filters, and data packs.
 
 | Chapters | A chapter |
 |---|---|
