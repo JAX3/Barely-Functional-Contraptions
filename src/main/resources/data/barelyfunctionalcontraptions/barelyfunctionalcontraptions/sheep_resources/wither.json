@@ -22,7 +22,6 @@
     "features": [
       "extra_heads",
       "glowing_eyes"
-    ],
-    "feature_color": "#707070"
+    ]
   }
 }

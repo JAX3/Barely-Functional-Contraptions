@@ -2211,12 +2211,7 @@ def generate_sheep_extras():
                 if c:
                     img.putpixel((x, y), c)
 
-    # Side heads (texOffs 0,0; 5x5x6): a pale, cracked skull with dark eye sockets on the front.
-    for name, face in box_faces(0, 0, 5, 5, 6).items():
-        fill(face, lambda x, y, w, h: grey(196 + rnd.randint(-14, 14)) if (x + y * 3) % 7 else grey(160))
-    fx, fy = box_faces(0, 0, 5, 5, 6)["north"][:2]
-    for x, y in ((0, 1), (1, 1), (3, 1), (4, 1), (2, 2), (0, 3), (1, 4), (2, 3), (3, 4), (4, 3)):
-        img.putpixel((fx + x, fy + y), (24, 20, 20, 255))
+    # (0,0)-(22,11) is free: the Wither sheep's extra heads use the game's own Wither Skeleton Skull texture.
 
     # Wing bone (texOffs 0,12; 16x1x1).
     fill((0, 12, 34, 14), lambda x, y, w, h: grey(214 if x % 4 else 170))

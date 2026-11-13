@@ -23,7 +23,7 @@ import net.minecraft.util.StringRepresentable;
  * @param woolTexture  fleece texture used instead of the greyscale infused wool (still tinted with {@code wool_color};
  *                     use {@code "#FFFFFF"} to show it as drawn). It uses the vanilla sheep wool layout (64x32).
  * @param features     extra body parts and behaviours, see {@link Feature}
- * @param featureColor tint for the extra body parts (heads, wings, legs, tentacles, bones); white shows them as drawn
+ * @param featureColor tint for the extra body parts (wings, legs, tentacles, bones); white shows them as drawn
  */
 public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> features, int featureColor) {
     public static final SheepAppearance NONE = new SheepAppearance(Optional.empty(), List.of(), 0xFFFFFF);
@@ -47,7 +47,7 @@ public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> fe
      * none of them.
      */
     public enum Feature implements StringRepresentable {
-        /** Two smaller heads either side of its own head, like the Wither. */
+        /** Two Wither Skeleton Skulls (the game's own texture, untinted) either side of its own head, like the Wither. */
         EXTRA_HEADS,
         /** A pair of flapping dragon wings on its back. */
         WINGS,

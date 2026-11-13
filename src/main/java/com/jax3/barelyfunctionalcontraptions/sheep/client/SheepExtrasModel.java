@@ -18,8 +18,8 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.util.Mth;
 
 /**
- * The extra body parts an infused sheep can grow ({@link SheepAppearance.Feature}): Wither side heads, dragon wings,
- * spider legs, ghast tentacles, sculk tendrils and glowing eyes.
+ * The extra body parts an infused sheep can grow ({@link SheepAppearance.Feature}): dragon wings, spider legs, ghast
+ * tentacles, sculk tendrils and glowing eyes. The Wither's extra heads are {@link SheepSkullsModel}.
  *
  * <p>It uses the vanilla sheep model's coordinates, so the parts sit on the vanilla body: the body spans x -4..4,
  * y 6..12 (the fleece reaches up to about y 4.25) and z -8..8, the head pivots at (0, 6, -8) and faces -z, and the
@@ -45,8 +45,6 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
     private final ModelPart eyes;
     private final ModelPart leftTendril;
     private final ModelPart rightTendril;
-    private final ModelPart leftHead;
-    private final ModelPart rightHead;
     private final ModelPart leftWing;
     private final ModelPart rightWing;
     private final List<ModelPart> leftLegs = new ArrayList<>();
@@ -60,8 +58,6 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
         this.eyes = head.getChild("eyes");
         this.leftTendril = head.getChild("left_tendril");
         this.rightTendril = head.getChild("right_tendril");
-        this.leftHead = head.getChild("left_head");
-        this.rightHead = head.getChild("right_head");
         this.leftWing = root.getChild("left_wing");
         this.rightWing = root.getChild("right_wing");
         for (int i = 0; i < SPIDER_LEGS.length; i++) {
@@ -93,12 +89,6 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
                 PartPose.offsetAndRotation(2.0F, -4.0F, -3.0F, 0.0F, 0.0F, 0.35F));
         head.addOrReplaceChild("right_tendril", CubeListBuilder.create().texOffs(40, 0).mirror().addBox(-6.0F, -7.0F, 0.0F, 6.0F, 7.0F, 0.0F),
                 PartPose.offsetAndRotation(-2.0F, -4.0F, -3.0F, 0.0F, 0.0F, -0.35F));
-
-        // Wither side heads either side of the real head (a little smaller), attached to it so they graze with it.
-        // The real head spans x -3..3 (-3.6..3.6 with its fleece), y -4..2 and z -6..2 in head space.
-        CubeListBuilder sideHead = CubeListBuilder.create().texOffs(0, 0).addBox(-2.5F, -2.5F, -6.0F, 5.0F, 5.0F, 6.0F);
-        head.addOrReplaceChild("left_head", sideHead, PartPose.offset(6.2F, -0.5F, 0.5F));
-        head.addOrReplaceChild("right_head", sideHead, PartPose.offset(-6.2F, -0.5F, 0.5F));
 
         // Dragon wings: a bone along the leading edge with a membrane hanging behind it, hinged on the top of the back.
         PartDefinition leftWing = root.addOrReplaceChild("left_wing",
@@ -149,15 +139,6 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
         float tendrilSway = Mth.sin(t * 0.12F) * 0.12F;
         leftTendril.zRot += tendrilSway;
         rightTendril.zRot -= tendrilSway;
-
-        boolean heads = parts && appearance.has(Feature.EXTRA_HEADS);
-        leftHead.visible = heads;
-        rightHead.visible = heads;
-        // The side heads turn slightly outwards and look about a little on their own, like the Wither's.
-        leftHead.yRot = -0.25F + Mth.sin(t * 0.05F) * 0.2F;
-        leftHead.xRot = Mth.sin(t * 0.07F + 1.0F) * 0.12F;
-        rightHead.yRot = 0.25F + Mth.sin(t * 0.045F + 2.0F) * 0.2F;
-        rightHead.xRot = Mth.sin(t * 0.06F + 3.0F) * 0.12F;
 
         boolean wings = parts && appearance.has(Feature.WINGS);
         leftWing.visible = wings;

@@ -63,6 +63,7 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
     private final SheepExtrasModel extras;
     private final SheepExtrasModel eyes;
     private final SheepModel bones;
+    private final SheepSkullsModel skulls;
 
     public InfusedWoolLayer(RenderLayerParent<SheepRenderState, SheepModel> renderer, EntityModelSet models) {
         super(renderer);
@@ -71,6 +72,7 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
         this.extras = SheepExtrasModel.parts(models.bakeLayer(SheepExtrasModel.LAYER));
         this.eyes = SheepExtrasModel.eyes(models.bakeLayer(SheepExtrasModel.LAYER));
         this.bones = new SheepModel(models.bakeLayer(BONES_LAYER));
+        this.skulls = new SheepSkullsModel(models.bakeLayer(SheepSkullsModel.LAYER));
     }
 
     /** The vanilla sheep body ({@code SheepModel.createBodyLayer}) inflated by a tiny amount. */
@@ -176,7 +178,11 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
         if (appearance.has(Feature.BONES)) {
             coloredCutoutModelCopyLayerRender(bones, BONES_TEXTURE, poseStack, collector, lightCoords, state, tint, 1);
         }
-        if (appearance.has(Feature.EXTRA_HEADS) || appearance.has(Feature.WINGS) || appearance.has(Feature.EXTRA_LEGS)
+        if (appearance.has(Feature.EXTRA_HEADS)) {
+            // The game's own Wither Skeleton Skull texture, untinted.
+            coloredCutoutModelCopyLayerRender(skulls, SheepSkullsModel.TEXTURE, poseStack, collector, lightCoords, state, -1, 1);
+        }
+        if (appearance.has(Feature.WINGS) || appearance.has(Feature.EXTRA_LEGS)
                 || appearance.has(Feature.TENTACLES) || appearance.has(Feature.SCULK)) {
             int light = appearance.has(Feature.GLOWING) ? LightCoordsUtil.FULL_BRIGHT : lightCoords;
             coloredCutoutModelCopyLayerRender(extras, EXTRAS_TEXTURE, poseStack, collector, light, state, tint, 1);

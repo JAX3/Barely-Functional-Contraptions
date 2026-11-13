@@ -46,6 +46,7 @@ public final class ResourcefulSheepClient {
         modBus.addListener(ResourcefulSheepClient::addLayers);
         modBus.addListener((EntityRenderersEvent.RegisterLayerDefinitions event) -> {
             event.registerLayerDefinition(SheepExtrasModel.LAYER, SheepExtrasModel::createLayer);
+            event.registerLayerDefinition(SheepSkullsModel.LAYER, SheepSkullsModel::createLayer);
             event.registerLayerDefinition(InfusedWoolLayer.BONES_LAYER, InfusedWoolLayer::createBonesLayer);
         });
         modBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> {
