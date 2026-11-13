@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     "minecraft:book",
-    "minecraft:redstone"
+    "barelyfunctionalcontraptions:functional_machine_block"
   ],
   "result": {
     "id": "barelyfunctionalcontraptions:contraptions_manual",
