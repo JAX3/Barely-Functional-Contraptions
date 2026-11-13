@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:block/cube",
   "textures": {
-    "particle": "barelyfunctionalcontraptions:block/energy_meter_side",
-    "up": "barelyfunctionalcontraptions:block/energy_meter_out",
-    "down": "barelyfunctionalcontraptions:block/energy_meter_in",
+    "particle": "barelyfunctionalcontraptions:block/energy_meter_casing",
     "north": "barelyfunctionalcontraptions:block/energy_meter_side",
-    "south": "barelyfunctionalcontraptions:block/energy_meter_side",
-    "east": "barelyfunctionalcontraptions:block/energy_meter_side",
-    "west": "barelyfunctionalcontraptions:block/energy_meter_side"
+    "south": "barelyfunctionalcontraptions:block/energy_meter_casing",
+    "east": "barelyfunctionalcontraptions:block/energy_meter_out",
+    "west": "barelyfunctionalcontraptions:block/energy_meter_in",
+    "up": "barelyfunctionalcontraptions:block/energy_meter_casing",
+    "down": "barelyfunctionalcontraptions:block/energy_meter_casing"
   }
 }

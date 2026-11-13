@@ -1410,7 +1410,8 @@ public final class DevScreenshotHarness {
         // Energy Meter: a Glow Panel in the sun -> meter -> Hume Energy Cube (a steady 60 FE/t).
         level.setBlock(o.offset(-2, 0, z), panel, 3);
         level.setBlock(o.offset(-1, 0, z), ModBlocks.ENERGY_METER.get().defaultBlockState()
-                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.EAST), 3);
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.EAST)
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN, Direction.SOUTH), 3);
         level.setBlock(o.offset(0, 0, z), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
         label(server, o.offset(-1, 1, z), "Energy Meter", "light_purple");
         // Item Pipes: chest -> Pull (orange) ... Push (green) -> chest.
@@ -1480,11 +1481,13 @@ public final class DevScreenshotHarness {
         // Middle: Glow Panel -> Energy Meter -> Hume Energy Cube, and a Creative Generator -> meter -> cube for a big number.
         level.setBlock(o.offset(-1, 0, -3), panel, 3);
         level.setBlock(o.offset(0, 0, -3), ModBlocks.ENERGY_METER.get().defaultBlockState()
-                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.EAST), 3);
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.EAST)
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN, Direction.SOUTH), 3);
         level.setBlock(o.offset(1, 0, -3), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
         level.setBlock(o.offset(-1, 0, -5), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
         level.setBlock(o.offset(0, 0, -5), ModBlocks.ENERGY_METER.get().defaultBlockState()
-                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.EAST), 3);
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.EAST)
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN, Direction.SOUTH), 3);
         level.setBlock(o.offset(1, 0, -5), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
         level.setBlock(o.offset(2, 0, -5), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
         // Front left: a chest -> Item Pipes -> a chest, the first side set to Pull (orange plug), the last to Push (green).

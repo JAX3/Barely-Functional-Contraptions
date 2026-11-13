@@ -52,6 +52,11 @@ public class EnergyMeterBlockEntity extends BlockEntity {
         return getBlockState().getValue(EnergyMeterBlock.FACING);
     }
 
+    /** The side with the screen. */
+    public Direction screenFace() {
+        return getBlockState().getValue(EnergyMeterBlock.SCREEN);
+    }
+
     public Direction inputFace() {
         return outputFace().getOpposite();
     }

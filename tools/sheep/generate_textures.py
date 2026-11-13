@@ -2359,6 +2359,9 @@ def generate_energy_meter():
     dark = dict(CARTOON)
     dark["C"], dark["c"] = hexc("#141019"), hexc("#2a2238")
     grid(METER_PORT, dark).save(out("block/energy_meter_in.png"))
+    # Plain casing for the faces with neither a port nor the screen: the side panel with its screen window shut.
+    casing = [row.replace("K", "S").replace("k", "M") for row in METER_SIDE]
+    grid(casing, dict(CARTOON)).save(out("block/energy_meter_casing.png"))
     lit = dict(CARTOON)
     lit["C"], lit["c"] = hexc("#ffd2fb"), hexc("#ff6ae6")
     grid(METER_PORT, lit).save(out("block/energy_meter_out.png"))

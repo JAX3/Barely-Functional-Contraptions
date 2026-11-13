@@ -1,0 +1,33 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/energy_meter_casing",
+    "face": "barelyfunctionalcontraptions:block/energy_meter_casing"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#face",
+          "cullface": "east"
+        }
+      }
+    }
+  ]
+}

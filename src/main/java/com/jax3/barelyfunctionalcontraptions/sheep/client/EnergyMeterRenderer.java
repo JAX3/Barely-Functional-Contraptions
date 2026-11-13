@@ -19,8 +19,8 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Draws the Energy Meter's reading on its screens: the FE/t passing through, shortened (250, 12.5k, 1.2M), with
- * "FE/t" under it, glowing on every face that isn't the input or the output (top and bottom included). When an end
- * has nothing to connect to, it shows NO INPUT, NO OUTPUT or NO IN/OUT in red instead.
+ * "FE/t" under it, glowing on the meter's one screen (the side that faces whoever placed it). When an end has
+ * nothing to connect to, it shows NO INPUT, NO OUTPUT or NO IN/OUT in red instead.
  */
 public class EnergyMeterRenderer implements BlockEntityRenderer<EnergyMeterBlockEntity, EnergyMeterRenderer.State> {
     /** The screen is 8x6 pixels; the text is fitted inside it. */
@@ -35,6 +35,7 @@ public class EnergyMeterRenderer implements BlockEntityRenderer<EnergyMeterBlock
         int missing;
         Direction in = Direction.DOWN;
         Direction out = Direction.UP;
+        Direction screen = Direction.NORTH;
     }
 
     @Override
@@ -50,6 +51,7 @@ public class EnergyMeterRenderer implements BlockEntityRenderer<EnergyMeterBlock
         state.missing = be.missing();
         state.in = be.inputFace();
         state.out = be.outputFace();
+        state.screen = be.screenFace();
     }
 
     /** 250, 12.5k, 1.2M... */
@@ -72,20 +74,12 @@ public class EnergyMeterRenderer implements BlockEntityRenderer<EnergyMeterBlock
         int colour = problem ? WARN : state.rate > 0 ? ON : OFF;
         float numberScale = Math.min(SCREEN_WIDTH / Math.max(1, font.width(number)), 0.32F / 16.0F);
         float unitScale = Math.min(SCREEN_WIDTH / Math.max(1, font.width(unit)), 0.22F / 16.0F);
-        for (Direction face : Direction.values()) {
-            if (face == state.in || face == state.out) continue;
+        Direction face = state.screen;
+        if (face != state.in && face != state.out) {
             poseStack.pushPose();
             poseStack.translate(0.5F, 0.5F, 0.5F);
-            if (face.getAxis().isHorizontal()) {
-                poseStack.rotateDegrees(Axis.YP, -face.toYRot());
-            } else {
-                // Top and bottom: readable with the flow running left to right, or from the south if it runs up and down.
-                Direction across = state.out.getAxis().isHorizontal() ? state.out.getClockWise() : Direction.NORTH;
-                poseStack.rotateDegrees(Axis.YP, -(face == Direction.UP ? across : across.getOpposite()).toYRot());
-                poseStack.rotateDegrees(Axis.XP, face == Direction.UP ? -90 : 90);
-            }
-            // Side screens sit a little low on the face; the top and bottom ones are centred.
-            poseStack.translate(0.0F, face.getAxis().isHorizontal() ? SCREEN_CENTRE_Y - 0.5F : 0.0F, 0.5F + 0.002F);
+            poseStack.rotateDegrees(Axis.YP, -face.toYRot());
+            poseStack.translate(0.0F, SCREEN_CENTRE_Y - 0.5F, 0.5F + 0.002F);
             poseStack.pushPose();
             poseStack.translate(0.0F, 0.06F, 0.0F);
             poseStack.scale(numberScale, -numberScale, numberScale);

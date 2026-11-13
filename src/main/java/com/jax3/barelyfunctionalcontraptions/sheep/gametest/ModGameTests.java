@@ -2350,6 +2350,19 @@ public final class ModGameTests {
         h.setBlock(new BlockPos(2, 0, 5), Blocks.STONE);
         Direction floorFacing = place.apply(new BlockPos(2, 0, 2), Direction.UP);
         h.assertTrue(floorFacing == Direction.EAST, "between a generator and a cube it points at the cube, got " + floorFacing);
+        // The screen faces the player, on a side that isn't a port.
+        var screenProp = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN;
+        java.util.function.Function<net.minecraft.world.phys.Vec3, Direction> screenFor = at -> {
+            player.setPos(at);
+            BlockPos floor = h.absolutePos(new BlockPos(2, 0, 2));
+            var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floor).add(0, 0.5, 0), Direction.UP, floor, false);
+            return block.getStateForPlacement(new net.minecraft.world.item.context.BlockPlaceContext(h.getLevel(), player, InteractionHand.MAIN_HAND, meterItem, hit)).getValue(screenProp);
+        };
+        var centre = net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(new BlockPos(2, 1, 2)));
+        h.assertTrue(screenFor.apply(centre.add(0, 0, 3)) == Direction.SOUTH, "a player to the south sees the screen on the south side");
+        h.assertTrue(screenFor.apply(centre.add(0, 0, -3)) == Direction.NORTH, "a player to the north sees it on the north side");
+        Direction fromEnd = screenFor.apply(centre.add(-3, 0, 0.4));
+        h.assertTrue(fromEnd == Direction.SOUTH, "from the generator's end (west, slightly south) it goes on the nearer side, not on a port: " + fromEnd);
         // A charged cube to the east and an empty one to the west: in from the charged one.
         var charged = cube(h, new BlockPos(3, 1, 5));
         cube(h, new BlockPos(1, 1, 5));
@@ -2361,9 +2374,15 @@ public final class ModGameTests {
         h.setBlock(new BlockPos(5, 1, 2), block.defaultBlockState().setValue(facing, Direction.EAST));
         com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.turnWithWrench(h.getLevel(), h.absolutePos(new BlockPos(5, 1, 2)), player);
         h.assertTrue(h.getBlockState(new BlockPos(5, 1, 2)).getValue(facing) == Direction.WEST, "the wrench flips it end to end");
+        h.assertTrue(h.getBlockState(new BlockPos(5, 1, 2)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN) == Direction.NORTH,
+                "flipping keeps the screen where it was");
         player.setShiftKeyDown(true);
-        com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.turnWithWrench(h.getLevel(), h.absolutePos(new BlockPos(5, 1, 2)), player);
-        h.assertTrue(h.getBlockState(new BlockPos(5, 1, 2)).getValue(facing) != Direction.WEST, "sneak-wrench turns it");
+        for (int i = 0; i < 6; i++) {
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.turnWithWrench(h.getLevel(), h.absolutePos(new BlockPos(5, 1, 2)), player);
+            var turned = h.getBlockState(new BlockPos(5, 1, 2));
+            h.assertTrue(turned.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN).getAxis() != turned.getValue(facing).getAxis(),
+                    "turning never leaves the screen on a port: " + turned);
+        }
         h.succeed();
     }
 

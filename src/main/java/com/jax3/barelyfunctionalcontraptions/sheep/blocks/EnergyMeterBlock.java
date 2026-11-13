@@ -28,20 +28,23 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * The Energy Meter block. {@link #FACING} is where the energy comes out (the glowing port); it comes in at the back.
+ * {@link #SCREEN} is the one side with the reading on it, facing whoever placed it.
  * It faces itself when placed ({@link #getStateForPlacement}), and the wrench flips or turns it. Right-click shows the reading; a comparator reads
  * the flow ({@link EnergyMeterBlockEntity#signalFor}).
  */
 public class EnergyMeterBlock extends BaseEntityBlock {
     public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;
+    /** The face with the screen: always a side, facing the player who placed it, never one of the two ports. */
+    public static final EnumProperty<Direction> SCREEN = EnumProperty.create("screen", Direction.class, Direction.Plane.HORIZONTAL::test);
 
     public EnergyMeterBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.EAST).setValue(SCREEN, Direction.NORTH));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, SCREEN);
     }
 
     /**
@@ -57,6 +60,32 @@ public class EnergyMeterBlock extends BaseEntityBlock {
      */
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
+        BlockState state = portsFor(context);
+        net.minecraft.world.phys.Vec3 viewer = context.getPlayer() != null ? context.getPlayer().position()
+                : net.minecraft.world.phys.Vec3.atCenterOf(context.getClickedPos()).relative(context.getHorizontalDirection().getOpposite(), 2);
+        return state.setValue(SCREEN, screenFacing(context.getClickedPos(), state.getValue(FACING), viewer));
+    }
+
+    /**
+     * The side for the screen: the horizontal face that points most towards {@code viewer}, skipping the two ports.
+     */
+    public static Direction screenFacing(BlockPos pos, Direction output, net.minecraft.world.phys.Vec3 viewer) {
+        net.minecraft.world.phys.Vec3 toViewer = viewer.subtract(net.minecraft.world.phys.Vec3.atCenterOf(pos));
+        Direction best = null;
+        double bestDot = Double.NEGATIVE_INFINITY;
+        for (Direction dir : Direction.Plane.HORIZONTAL) {
+            if (dir.getAxis() == output.getAxis()) continue;
+            double dot = dir.getStepX() * toViewer.x + dir.getStepZ() * toViewer.z;
+            if (dot > bestDot) {
+                bestDot = dot;
+                best = dir;
+            }
+        }
+        return best;
+    }
+
+    /** The ports' direction, worked out from the neighbours (see {@link #getStateForPlacement}). */
+    private BlockState portsFor(BlockPlaceContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Direction against = context.getClickedFace().getOpposite();
@@ -124,7 +153,9 @@ public class EnergyMeterBlock extends BaseEntityBlock {
         if (!(state.getBlock() instanceof EnergyMeterBlock)) return;
         Direction facing = state.getValue(FACING);
         Direction next = player.isSecondaryUseActive() ? Direction.from3DDataValue((facing.get3DDataValue() + 1) % 6) : facing.getOpposite();
-        level.setBlock(pos, state.setValue(FACING, next), Block.UPDATE_ALL);
+        Direction screen = state.getValue(SCREEN);
+        if (screen.getAxis() == next.getAxis()) screen = screenFacing(pos, next, player.position());
+        level.setBlock(pos, state.setValue(FACING, next).setValue(SCREEN, screen), Block.UPDATE_ALL);
         level.invalidateCapabilities(pos);
         player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.energy_meter.turned",
                 Component.translatable("direction.barelyfunctionalcontraptions." + next.getOpposite().getSerializedName()),
@@ -133,12 +164,12 @@ public class EnergyMeterBlock extends BaseEntityBlock {
 
     @Override
     protected BlockState rotate(BlockState state, Rotation rotation) {
-        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING))).setValue(SCREEN, rotation.rotate(state.getValue(SCREEN)));
     }
 
     @Override
     protected BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
+        return state.setValue(FACING, mirror.mirror(state.getValue(FACING))).setValue(SCREEN, mirror.mirror(state.getValue(SCREEN)));
     }
 
     @Override

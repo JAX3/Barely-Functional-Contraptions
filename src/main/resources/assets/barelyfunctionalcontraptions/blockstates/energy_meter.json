@@ -1,30 +1,188 @@
 {
-  "variants": {
-    "facing=up": {
-      "model": "barelyfunctionalcontraptions:block/energy_meter"
+  "multipart": [
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/out_north"
+      }
     },
-    "facing=down": {
-      "model": "barelyfunctionalcontraptions:block/energy_meter",
-      "x": 180
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/in_north"
+      }
     },
-    "facing=north": {
-      "model": "barelyfunctionalcontraptions:block/energy_meter",
-      "x": 90
+    {
+      "when": {
+        "facing": "east|west|up|down",
+        "screen": "north"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/screen_north"
+      }
     },
-    "facing=south": {
-      "model": "barelyfunctionalcontraptions:block/energy_meter",
-      "x": 90,
-      "y": 180
+    {
+      "when": {
+        "facing": "east|west|up|down",
+        "screen": "south|east|west"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/casing_north"
+      }
     },
-    "facing=east": {
-      "model": "barelyfunctionalcontraptions:block/energy_meter",
-      "x": 90,
-      "y": 90
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/out_south"
+      }
     },
-    "facing=west": {
-      "model": "barelyfunctionalcontraptions:block/energy_meter",
-      "x": 90,
-      "y": 270
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/in_south"
+      }
+    },
+    {
+      "when": {
+        "facing": "east|west|up|down",
+        "screen": "south"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/screen_south"
+      }
+    },
+    {
+      "when": {
+        "facing": "east|west|up|down",
+        "screen": "north|east|west"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/casing_south"
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/out_east"
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/in_east"
+      }
+    },
+    {
+      "when": {
+        "facing": "north|south|up|down",
+        "screen": "east"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/screen_east"
+      }
+    },
+    {
+      "when": {
+        "facing": "north|south|up|down",
+        "screen": "north|south|west"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/casing_east"
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/out_west"
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/in_west"
+      }
+    },
+    {
+      "when": {
+        "facing": "north|south|up|down",
+        "screen": "west"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/screen_west"
+      }
+    },
+    {
+      "when": {
+        "facing": "north|south|up|down",
+        "screen": "north|south|east"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/casing_west"
+      }
+    },
+    {
+      "when": {
+        "facing": "up"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/out_up"
+      }
+    },
+    {
+      "when": {
+        "facing": "down"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/in_up"
+      }
+    },
+    {
+      "when": {
+        "facing": "north|south|east|west"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/casing_up"
+      }
+    },
+    {
+      "when": {
+        "facing": "down"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/out_down"
+      }
+    },
+    {
+      "when": {
+        "facing": "up"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/in_down"
+      }
+    },
+    {
+      "when": {
+        "facing": "north|south|east|west"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/energy_meter/casing_down"
+      }
     }
-  }
+  ]
 }
