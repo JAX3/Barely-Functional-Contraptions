@@ -84,7 +84,8 @@ public class EnergyMeterRenderer implements BlockEntityRenderer<EnergyMeterBlock
                 poseStack.rotateDegrees(Axis.YP, -(face == Direction.UP ? across : across.getOpposite()).toYRot());
                 poseStack.rotateDegrees(Axis.XP, face == Direction.UP ? -90 : 90);
             }
-            poseStack.translate(0.0F, SCREEN_CENTRE_Y - 0.5F, 0.5F + 0.002F);
+            // Side screens sit a little low on the face; the top and bottom ones are centred.
+            poseStack.translate(0.0F, face.getAxis().isHorizontal() ? SCREEN_CENTRE_Y - 0.5F : 0.0F, 0.5F + 0.002F);
             poseStack.pushPose();
             poseStack.translate(0.0F, 0.06F, 0.0F);
             poseStack.scale(numberScale, -numberScale, numberScale);
