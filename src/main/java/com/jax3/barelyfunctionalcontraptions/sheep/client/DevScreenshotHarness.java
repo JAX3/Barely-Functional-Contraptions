@@ -1174,9 +1174,9 @@ public final class DevScreenshotHarness {
             SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id(THEMED[i])), 9, 0));
             level.addFreshEntity(sh);
         }
-        // Sheep fed Player Heads, facing the camera at an angle: the harness player's own skin (plain, sheared to
-        // show the body, and infused with iron) and another player's by UUID.
-        String[][] skinned = {{"self", "", "false"}, {"self", "", "true"}, {"self", "iron", "false"}, {"069a79f4-44e9-4726-a5be-fca90e38aaf5", "", "false"}};
+        // Sheep fed Melon Slices, facing the camera at an angle: plain, sheared to show the body, and infused with iron.
+        String melon = SheepInfusionEvents.MELON_SKIN_PLAYER.toString();
+        String[][] skinned = {{melon, "", "false"}, {melon, "", "true"}, {melon, "iron", "false"}};
         for (int i = 0; i < skinned.length; i++) {
             Sheep sh = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
             sh.snapTo(o.getX() - 1.5 + i * 2.0, o.getY(), o.getZ() + 2.5, -20, 0);
@@ -1186,9 +1186,7 @@ public final class DevScreenshotHarness {
             sh.yBodyRotO = -20;
             sh.setNoAi(true);
             sh.setSheared(Boolean.parseBoolean(skinned[i][2]));
-            var profile = skinned[i][0].equals("self")
-                    ? net.minecraft.world.item.component.ResolvableProfile.createResolved(player.getGameProfile())
-                    : net.minecraft.world.item.component.ResolvableProfile.createUnresolved(java.util.UUID.fromString(skinned[i][0]));
+            var profile = net.minecraft.world.item.component.ResolvableProfile.createUnresolved(java.util.UUID.fromString(skinned[i][0]));
             sh.setData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_SKIN, com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepSkin.of(profile));
             if (!skinned[i][1].isEmpty()) {
                 SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id(skinned[i][1])), 9, 0));

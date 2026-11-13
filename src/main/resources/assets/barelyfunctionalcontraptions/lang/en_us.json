@@ -657,6 +657,5 @@
   "resource.barelyfunctionalcontraptions.blaze": "Blaze",
   "resource.barelyfunctionalcontraptions.ghast": "Ghast",
   "block.barelyfunctionalcontraptions.sheep_glow": "Sheep Glow",
-  "message.barelyfunctionalcontraptions.skin.applied": "This sheep now looks like %s",
-  "message.barelyfunctionalcontraptions.skin.unknown_player": "that player"
+  "message.barelyfunctionalcontraptions.skin.applied": "The sheep ate the melon and looks like someone else now"
 }

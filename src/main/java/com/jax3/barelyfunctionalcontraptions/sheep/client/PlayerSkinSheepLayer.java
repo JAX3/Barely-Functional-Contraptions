@@ -17,7 +17,7 @@ import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.player.PlayerModelType;
 
 /**
- * Draws a sheep that was fed a Player Head in that player's skin ({@link PlayerSkinSheepModel}), over the sheep's
+ * Draws a sheep that was fed a Melon Slice in the skin it was given ({@link PlayerSkinSheepModel}), over the sheep's
  * own body and under its fleece. The skin is looked up the way a placed Player Head looks its skin up: the default
  * skin for that UUID (Steve, Alex...) until the real one has downloaded. Lambs keep their own look.
  */

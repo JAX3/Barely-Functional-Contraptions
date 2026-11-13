@@ -11,8 +11,9 @@ import net.minecraft.world.item.component.ResolvableProfile;
 /**
  * The player whose skin a sheep wears, stored on the sheep as a data attachment (saved and synced to clients).
  *
- * <p>Set by feeding the sheep a Player Head: the head's player (its UUID, and name if it has one), or for a blank
- * head the player who fed it. Clients look the skin up by that profile, the same way a placed Player Head does.</p>
+ * <p>Set by feeding the sheep a Melon Slice, which gives it the skin and head of one particular player
+ * ({@link SheepInfusionEvents#MELON_SKIN_PLAYER}). Clients look the skin up by that profile, the same way a placed
+ * Player Head does.</p>
  *
  * @param profile the player, empty when the sheep wears no skin
  */

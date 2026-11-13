@@ -17,7 +17,7 @@ public final class ModAttachments {
                     .sync(SheepInfusion.STREAM_CODEC)
                     .build());
 
-    /** The player whose skin a sheep wears (fed a Player Head). Persisted only when set, and synced to tracking clients. */
+    /** The player whose skin a sheep wears (fed a Melon Slice). Persisted only when set, and synced to tracking clients. */
     public static final Supplier<AttachmentType<com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepSkin>> SHEEP_SKIN = REGISTER.register("sheep_skin",
             () -> AttachmentType.builder(() -> com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepSkin.NONE)
                     .serialize(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepSkin.CODEC, skin -> skin.profile().isPresent())

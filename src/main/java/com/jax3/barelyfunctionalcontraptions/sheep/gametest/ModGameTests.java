@@ -147,7 +147,7 @@ public final class ModGameTests {
         TESTS.put("glowing_sheep_lights_the_block_it_stands_in", ModGameTests::glowingSheepLight);
         TESTS.put("ghast_sheep_screams_like_a_ghast", ModGameTests::ghastSheepSounds);
         TESTS.put("ghast_sheep_is_twice_the_size", ModGameTests::ghastSheepScale);
-        TESTS.put("player_head_gives_a_sheep_that_players_skin", ModGameTests::playerHeadSkin);
+        TESTS.put("melon_slice_gives_a_sheep_the_skin", ModGameTests::melonSliceSkin);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -448,26 +448,24 @@ public final class ModGameTests {
         });
     }
 
-    private static void playerHeadSkin(GameTestHelper h) {
+    private static void melonSliceSkin(GameTestHelper h) {
         var skinAttachment = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_SKIN;
-        // A head with a player in it: the sheep takes that player's skin (by UUID), and the head is used up.
-        java.util.UUID id = java.util.UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5");
-        ItemStack named = new ItemStack(Items.PLAYER_HEAD, 2);
-        named.set(net.minecraft.core.component.DataComponents.PROFILE,
-                net.minecraft.world.item.component.ResolvableProfile.createResolved(new com.mojang.authlib.GameProfile(id, "Notch")));
+        java.util.UUID id = java.util.UUID.fromString("62776558-b5f6-4b75-a2ef-009f8dc9fc52");
+        // A Melon Slice gives the sheep that player's skin and head, and is eaten.
         Sheep sheep = sheep(h);
-        Player player = playerHolding(h, named);
+        Player player = playerHolding(h, new ItemStack(Items.MELON_SLICE, 3));
         feed(player, sheep);
         var skin = sheep.getData(skinAttachment).profile();
-        h.assertTrue(skin.isPresent() && skin.get().partialProfile().id().equals(id), "the sheep wears the head's player, got " + skin);
-        h.assertTrue(player.getMainHandItem().getCount() == 1, "one head is used up, left " + player.getMainHandItem().getCount());
-        h.assertTrue(!SheepInfusionEvents.getInfusion(sheep).isInfused(), "a head is only a look, not an infusion");
-        // A blank head: the feeding player's own skin.
+        h.assertTrue(skin.isPresent() && skin.get().partialProfile().id().equals(id), "the sheep wears " + id + ", got " + skin);
+        h.assertTrue(player.getMainHandItem().getCount() == 2, "one slice is eaten, left " + player.getMainHandItem().getCount());
+        h.assertTrue(!SheepInfusionEvents.getInfusion(sheep).isInfused(), "a melon slice is only a look, not an infusion");
+        // A sheep that already has the skin doesn't eat another.
+        feed(player, sheep);
+        h.assertTrue(player.getMainHandItem().getCount() == 2, "no second slice is eaten, left " + player.getMainHandItem().getCount());
+        // Player Heads don't change the skin any more.
         Sheep other = sheepAt(h, new BlockPos(1, 1, 1), null);
-        Player feeder = playerHolding(h, new ItemStack(Items.PLAYER_HEAD));
-        feed(feeder, other);
-        var own = other.getData(skinAttachment).profile();
-        h.assertTrue(own.isPresent() && own.get().partialProfile().id().equals(feeder.getUUID()), "a blank head gives the feeder's skin, got " + own);
+        feed(playerHolding(h, new ItemStack(Items.PLAYER_HEAD)), other);
+        h.assertTrue(!other.hasData(skinAttachment) || other.getData(skinAttachment).profile().isEmpty(), "a Player Head does nothing");
         // The skin is saved with the sheep.
         var saved = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess());
         sheep.saveWithoutId(saved);
