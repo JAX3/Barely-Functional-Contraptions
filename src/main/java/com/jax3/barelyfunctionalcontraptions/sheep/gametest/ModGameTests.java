@@ -147,6 +147,7 @@ public final class ModGameTests {
         TESTS.put("glowing_sheep_lights_the_block_it_stands_in", ModGameTests::glowingSheepLight);
         TESTS.put("ghast_sheep_screams_like_a_ghast", ModGameTests::ghastSheepSounds);
         TESTS.put("ghast_sheep_is_twice_the_size", ModGameTests::ghastSheepScale);
+        TESTS.put("themed_sheep_advancements", ModGameTests::themedAdvancements);
         TESTS.put("melon_slice_gives_a_sheep_the_skin", ModGameTests::melonSliceSkin);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -480,6 +481,43 @@ public final class ModGameTests {
         Sheep copy = EntityTypes.SHEEP.create(h.getLevel(), net.minecraft.world.entity.EntitySpawnReason.LOAD);
         copy.load(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess(), saved.buildResult()));
         h.assertTrue(copy.getData(skinAttachment).profile().map(p -> p.partialProfile().id().equals(id)).orElse(false), "the skin survives saving and loading");
+        h.succeed();
+    }
+
+    private static void themedAdvancements(GameTestHelper h) {
+        var server = h.getLevel().getServer();
+        for (String name : List.of("hay", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast")) {
+            var adv = server.getAdvancements().get(ResourcefulSheep.id("contraptions/sheep/" + name));
+            h.assertTrue(adv != null && adv.value().parent().map(ResourcefulSheep.id("contraptions/infuse_sheep")::equals).orElse(false),
+                    "themed advancement " + name + " is loaded under Infuse a Sheep");
+        }
+        var every = server.getAdvancements().get(ResourcefulSheep.id("contraptions/every_wool"));
+        h.assertTrue(every != null && every.value().criteria().size() == 24, "the every-wool challenge has one criterion per built-in wool");
+        h.assertTrue(every.value().criteria().keySet().containsAll(SheepResourceRegistry.server().all().stream()
+                .filter(r -> r.id().getNamespace().equals(ResourcefulSheep.MOD_ID)).map(r -> r.id().getPath()).toList()), "every built-in resource is in the challenge");
+
+        var player = new net.minecraft.server.level.ServerPlayer(server, h.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "adv-sheep-test"), net.minecraft.server.level.ClientInformation.createDefault()) {
+            @Override
+            public void sendSystemMessage(net.minecraft.network.chat.Component message, boolean overlay) {}
+        };
+        player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(new BlockPos(3, 1, 3))));
+        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.onInfused(player, SheepResourceRegistry.server().byId(ResourcefulSheep.id("wither")).orElseThrow());
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, "contraptions/infuse_sheep"), "infusing grants Wool You Look at That");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, "contraptions/sheep/wither"), "a Nether Star grants Three Heads Are Better Than One");
+        h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, "contraptions/sheep/dragon"), "but not the dragon one");
+        // Each criterion is met by picking up that resource's wool (the trigger checks the item that changed), and only that.
+        java.util.function.Function<String, ItemStack> wool = name -> {
+            ItemStack stack = new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.RESOURCE_WOOL.get());
+            stack.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.SHEEP_RESOURCE.get(), ResourcefulSheep.id(name));
+            return stack;
+        };
+        for (var entry : every.value().criteria().entrySet()) {
+            var instance = (net.minecraft.advancements.triggers.InventoryChangeTrigger.TriggerInstance) entry.getValue().triggerInstance();
+            h.assertTrue(instance.matches(player.getInventory(), wool.apply(entry.getKey()), 0, 0, 1), entry.getKey() + " wool is recognised");
+            String other = entry.getKey().equals("iron") ? "gold" : "iron";
+            h.assertFalse(instance.matches(player.getInventory(), wool.apply(other), 0, 0, 1), entry.getKey() + " isn't met by " + other + " wool");
+        }
         h.succeed();
     }
 

@@ -69,7 +69,7 @@ Every machine is built around a **Functional Machine Block**: the blue-steel cas
 
 ### Advancements
 
-The mod has its own advancement tab, **Barely Functional Contraptions**, with one advancement for making each machine and three special ones:
+The mod has its own advancement tab, **Barely Functional Contraptions**, with one advancement for making each machine, three special ones, one for each themed sheep and a wool-collecting challenge:
 
 | Advancement | How to get it |
 |---|---|
@@ -88,6 +88,12 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Plugged In | Craft some Energy Cables |
 | Pipe Dreams | Craft some Fluid Pipes |
 | Special Delivery | Craft some Item Pipes |
+| Wool You Look at That | Infuse a sheep with any resource |
+| Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
+| ⭐ **Three Heads Are Better Than One**, **Here Be Dragons**, **Shh... It's Sculking** (goals) | Infuse a sheep with a Nether Star, Dragon's Breath or Echo Shard |
+| ⭐ **Fleece of Every Colour** (challenge) | Collect one of each of the 24 built-in resource wools. Its progress shows which ones you still need, and it gives 100 experience. |
+
+A data pack's own resource can have an advancement too: put it at `data/barelyfunctionalcontraptions/advancement/contraptions/sheep/<name>.json` with a `minecraft:impossible` criterion named `done`, and infusing a sheep with `barelyfunctionalcontraptions:<name>` grants it.
 
 The crafting advancements are earned by getting the item into your inventory however you make it (crafting table, autocrafter or a friend handing it over).
 

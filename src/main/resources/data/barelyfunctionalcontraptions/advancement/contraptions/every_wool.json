@@ -1,0 +1,409 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/infuse_sheep",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:resource_wool",
+      "components": {
+        "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:diamond"
+      }
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.every_wool.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.every_wool.description"
+    },
+    "frame": "challenge"
+  },
+  "criteria": {
+    "iron": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:iron"
+            }
+          }
+        ]
+      }
+    },
+    "gold": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:gold"
+            }
+          }
+        ]
+      }
+    },
+    "copper": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:copper"
+            }
+          }
+        ]
+      }
+    },
+    "diamond": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:diamond"
+            }
+          }
+        ]
+      }
+    },
+    "emerald": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:emerald"
+            }
+          }
+        ]
+      }
+    },
+    "redstone": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:redstone"
+            }
+          }
+        ]
+      }
+    },
+    "lapis": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:lapis"
+            }
+          }
+        ]
+      }
+    },
+    "coal": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:coal"
+            }
+          }
+        ]
+      }
+    },
+    "netherite": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:netherite"
+            }
+          }
+        ]
+      }
+    },
+    "stone": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:stone"
+            }
+          }
+        ]
+      }
+    },
+    "wood": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:wood"
+            }
+          }
+        ]
+      }
+    },
+    "quartz": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:quartz"
+            }
+          }
+        ]
+      }
+    },
+    "red_mushroom": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:red_mushroom"
+            }
+          }
+        ]
+      }
+    },
+    "brown_mushroom": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:brown_mushroom"
+            }
+          }
+        ]
+      }
+    },
+    "hay": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:hay"
+            }
+          }
+        ]
+      }
+    },
+    "wither": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:wither"
+            }
+          }
+        ]
+      }
+    },
+    "dragon": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:dragon"
+            }
+          }
+        ]
+      }
+    },
+    "glow_ink": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:glow_ink"
+            }
+          }
+        ]
+      }
+    },
+    "skeleton": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:skeleton"
+            }
+          }
+        ]
+      }
+    },
+    "wither_skeleton": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:wither_skeleton"
+            }
+          }
+        ]
+      }
+    },
+    "spider": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:spider"
+            }
+          }
+        ]
+      }
+    },
+    "warden": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:warden"
+            }
+          }
+        ]
+      }
+    },
+    "blaze": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:blaze"
+            }
+          }
+        ]
+      }
+    },
+    "ghast": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:ghast"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "iron"
+    ],
+    [
+      "gold"
+    ],
+    [
+      "copper"
+    ],
+    [
+      "diamond"
+    ],
+    [
+      "emerald"
+    ],
+    [
+      "redstone"
+    ],
+    [
+      "lapis"
+    ],
+    [
+      "coal"
+    ],
+    [
+      "netherite"
+    ],
+    [
+      "stone"
+    ],
+    [
+      "wood"
+    ],
+    [
+      "quartz"
+    ],
+    [
+      "red_mushroom"
+    ],
+    [
+      "brown_mushroom"
+    ],
+    [
+      "hay"
+    ],
+    [
+      "wither"
+    ],
+    [
+      "dragon"
+    ],
+    [
+      "glow_ink"
+    ],
+    [
+      "skeleton"
+    ],
+    [
+      "wither_skeleton"
+    ],
+    [
+      "spider"
+    ],
+    [
+      "warden"
+    ],
+    [
+      "blaze"
+    ],
+    [
+      "ghast"
+    ]
+  ],
+  "rewards": {
+    "experience": 100
+  }
+}

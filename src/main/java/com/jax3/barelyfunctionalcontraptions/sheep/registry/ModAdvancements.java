@@ -18,13 +18,17 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
  * <ul>
  *     <li>{@link #LINK_GENERATORS}: linking two Mycelial Generators with the Barely Functional Wrench;</li>
  *     <li>{@link #AUTO_SHEAR}: Automatic Shears shearing a sheep within {@link #AUTO_SHEAR_RADIUS} blocks of you;</li>
- *     <li>{@link #ZERO_POINT_DEATH}: being killed by a Zero Point beam.</li>
+ *     <li>{@link #ZERO_POINT_DEATH}: being killed by a Zero Point beam;</li>
+ *     <li>{@link #INFUSE_SHEEP}: infusing any sheep, and {@code contraptions/sheep/<name>} for infusing one with the
+ *     mod's resource {@code <name>} (the themed sheep have one each; a data pack can add more the same way).</li>
  * </ul>
+ * The "every wool" challenge is plain data: an inventory_changed criterion for each built-in resource wool.
  */
 public final class ModAdvancements {
     public static final String LINK_GENERATORS = "contraptions/link_generators";
     public static final String AUTO_SHEAR = "contraptions/auto_shear";
     public static final String ZERO_POINT_DEATH = "contraptions/zero_point_death";
+    public static final String INFUSE_SHEEP = "contraptions/infuse_sheep";
     /** Players this close to Automatic Shears when they shear a sheep get {@link #AUTO_SHEAR}. */
     public static final double AUTO_SHEAR_RADIUS = 16;
 
@@ -58,6 +62,12 @@ public final class ModAdvancements {
         if (entity instanceof ServerPlayer player && source.is(ZeroPointEnergyModuleBlockEntity.BEAM_DAMAGE)) {
             award(player, ZERO_POINT_DEATH);
         }
+    }
+
+    /** Infusing a sheep: {@link #INFUSE_SHEEP}, plus the resource's own advancement if there is one. */
+    public static void onInfused(ServerPlayer player, com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResource resource) {
+        award(player, INFUSE_SHEEP);
+        if (resource.id().getNamespace().equals(ResourcefulSheep.MOD_ID)) award(player, "contraptions/sheep/" + resource.id().getPath());
     }
 
     public static void onLivingDeath(LivingDeathEvent event) {

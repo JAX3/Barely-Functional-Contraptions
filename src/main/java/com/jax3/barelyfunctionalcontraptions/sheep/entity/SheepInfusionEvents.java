@@ -202,6 +202,9 @@ public final class SheepInfusionEvents {
             level.sendParticles(ParticleTypes.HAPPY_VILLAGER, x, y, z, 6, 0.4, 0.3, 0.4, 0.0);
         }
         player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.infused", resource.name()).withStyle(ChatFormatting.GREEN));
+        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.onInfused(serverPlayer, resource);
+        }
     }
 
     /** Action-bar description used by sneak-inspection. */
