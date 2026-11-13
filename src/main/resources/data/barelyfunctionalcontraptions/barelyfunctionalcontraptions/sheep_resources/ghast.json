@@ -23,6 +23,7 @@
       "tentacles",
       "screaming"
     ],
-    "feature_color": "#F0F0F0"
+    "feature_color": "#F0F0F0",
+    "scale": 2.0
   }
 }

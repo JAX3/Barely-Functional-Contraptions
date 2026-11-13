@@ -51,10 +51,41 @@ public final class SheepFeatureEvents {
         return appearance(entity).map(a -> a.has(feature)).orElse(false);
     }
 
+    /** The {@code minecraft:scale} modifier an infused resource's {@code scale} adds. */
+    public static final net.minecraft.resources.Identifier SCALE_MODIFIER = com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep.id("resource_scale");
+
+    /**
+     * Sizes the sheep for its infusion: a resource's {@code scale} is added to the sheep's {@code minecraft:scale}
+     * attribute as a multiplier of its base value (so it stacks with anything else that changes the scale, and lambs
+     * stay in proportion). The modifier is saved with the sheep, so it doesn't shrink for a moment after loading, and
+     * it is removed as soon as the infusion ends or its resource is no longer loaded.
+     *
+     * <p>Unlike the looks, the size depends only on the infusion, not on the fleece: shearing doesn't shrink it.</p>
+     */
+    public static void updateScale(Sheep sheep) {
+        var attribute = sheep.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.SCALE);
+        if (attribute == null) return;
+        double scale = SheepInfusionEvents.getInfusedResource(sheep).map(r -> r.appearance().scale()).orElse(1.0);
+        var current = attribute.getModifier(SCALE_MODIFIER);
+        if (scale == 1.0) {
+            if (current != null) attribute.removeModifier(SCALE_MODIFIER);
+        } else if (current == null || current.amount() != scale - 1.0) {
+            attribute.addOrReplacePermanentModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(
+                    SCALE_MODIFIER, scale - 1.0, net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+        }
+    }
+
     @SubscribeEvent
     public static void onEntityTick(EntityTickEvent.Post event) {
         Entity entity = event.getEntity();
         if (!(entity instanceof Sheep sheep) || entity.tickCount % GLOW_PLACE_TICKS != 0) return;
+        if (!sheep.level().isClientSide() && sheep.hasData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_INFUSION)) {
+            updateScale(sheep);
+        } else if (!sheep.level().isClientSide()) {
+            // No infusion data at all (it's never been infused, or the data was removed): just clear any leftover size.
+            var attribute = sheep.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.SCALE);
+            if (attribute != null && attribute.getModifier(SCALE_MODIFIER) != null) attribute.removeModifier(SCALE_MODIFIER);
+        }
         Optional<SheepAppearance> appearance = appearance(sheep);
         if (appearance.isEmpty() || appearance.get().features().isEmpty()) return;
         Level level = sheep.level();

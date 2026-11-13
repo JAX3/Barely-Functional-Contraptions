@@ -1126,7 +1126,9 @@ public final class DevScreenshotHarness {
             int i = (tick - closeStart) / perSheep, step = (tick - closeStart) % perSheep;
             if (step == 0) {
                 // Slightly in front of the sheep's left side, looking back at it.
-                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 14", themedX(i), origin.getY(), origin.getZ() - 5 + 3.6));
+                // The Ghast sheep is twice the size, so the camera stands further back for it.
+                double back = THEMED[i].equals("ghast") ? 6.5 : 3.6;
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 14", themedX(i), origin.getY(), origin.getZ() - 5 + back));
             } else if (step == perSheep - 1) {
                 shot(mc, "53_themed_" + THEMED[i]);
             }

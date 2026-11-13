@@ -24,14 +24,20 @@ import net.minecraft.util.StringRepresentable;
  *                     use {@code "#FFFFFF"} to show it as drawn). It uses the vanilla sheep wool layout (64x32).
  * @param features     extra body parts and behaviours, see {@link Feature}
  * @param featureColor tint for the extra body parts (wings, legs, tentacles, bones); white shows them as drawn
+ * @param scale        how big the sheep is while infused, as a multiple of its normal size (0.25 to 4; default 1).
+ *                     Applied through the {@code minecraft:scale} attribute, so its hitbox, eye height and step
+ *                     height grow with it.
  */
-public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> features, int featureColor) {
-    public static final SheepAppearance NONE = new SheepAppearance(Optional.empty(), List.of(), 0xFFFFFF);
+public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> features, int featureColor, double scale) {
+    public static final double MIN_SCALE = 0.25;
+    public static final double MAX_SCALE = 4.0;
+    public static final SheepAppearance NONE = new SheepAppearance(Optional.empty(), List.of(), 0xFFFFFF, 1.0);
 
     public static final Codec<SheepAppearance> CODEC = RecordCodecBuilder.create(i -> i.group(
             Identifier.CODEC.optionalFieldOf("wool_texture").forGetter(SheepAppearance::woolTexture),
             Feature.CODEC.listOf().optionalFieldOf("features", List.of()).forGetter(SheepAppearance::features),
-            SheepResource.COLOR_CODEC.optionalFieldOf("feature_color", 0xFFFFFF).forGetter(SheepAppearance::featureColor)
+            SheepResource.COLOR_CODEC.optionalFieldOf("feature_color", 0xFFFFFF).forGetter(SheepAppearance::featureColor),
+            Codec.doubleRange(MIN_SCALE, MAX_SCALE).optionalFieldOf("scale", 1.0).forGetter(SheepAppearance::scale)
     ).apply(i, SheepAppearance::new));
 
     public boolean has(Feature feature) {
@@ -39,7 +45,7 @@ public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> fe
     }
 
     public boolean isEmpty() {
-        return woolTexture.isEmpty() && features.isEmpty();
+        return woolTexture.isEmpty() && features.isEmpty() && scale == 1.0;
     }
 
     /**

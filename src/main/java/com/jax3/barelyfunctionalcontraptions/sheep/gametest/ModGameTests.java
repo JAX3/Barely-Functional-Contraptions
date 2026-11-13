@@ -146,6 +146,7 @@ public final class ModGameTests {
         TESTS.put("themed_sheep_have_their_features", ModGameTests::themedSheep);
         TESTS.put("glowing_sheep_lights_the_block_it_stands_in", ModGameTests::glowingSheepLight);
         TESTS.put("screaming_sheep_bleats_like_a_screaming_goat", ModGameTests::screamingSheep);
+        TESTS.put("ghast_sheep_is_twice_the_size", ModGameTests::ghastSheepScale);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -441,6 +442,25 @@ public final class ModGameTests {
             sheep.setSheared(true);
             h.runAfterDelay(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.CHECK_TICKS + 2, () -> {
                 h.assertTrue(h.getLevel().getBlockState(at).isAir(), "the light goes out once the sheep is sheared, found " + h.getLevel().getBlockState(at));
+                h.succeed();
+            });
+        });
+    }
+
+    private static void ghastSheepScale(GameTestHelper h) {
+        Sheep ghast = sheepAt(h, new BlockPos(2, 1, 2), ResourcefulSheep.id("ghast"));
+        float plainWidth = EntityTypes.SHEEP.getWidth();
+        int wait = com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.GLOW_PLACE_TICKS * 2;
+        h.runAfterDelay(wait, () -> {
+            h.assertTrue(Math.abs(ghast.getScale() - 2.0F) < 1.0E-4, "a Ghast sheep is twice the size, scale " + ghast.getScale());
+            h.assertTrue(Math.abs(ghast.getBbWidth() - plainWidth * 2) < 1.0E-3, "its hitbox doubles too, width " + ghast.getBbWidth());
+            // Shearing doesn't shrink it; losing the infusion does.
+            ghast.setSheared(true);
+            SheepInfusionEvents.setInfusion(ghast, SheepInfusion.NONE);
+            h.runAfterDelay(wait, () -> {
+                h.assertTrue(Math.abs(ghast.getScale() - 1.0F) < 1.0E-4, "back to normal size once the infusion is gone, scale " + ghast.getScale());
+                h.assertTrue(ghast.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.SCALE)
+                        .getModifier(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.SCALE_MODIFIER) == null, "the modifier is removed");
                 h.succeed();
             });
         });
