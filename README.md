@@ -499,7 +499,16 @@ Each side where a Fluid or Item Pipe meets a block can be set up on its own, wit
   | **Pull** | Orange | Takes everything it can **out**, chests, barrels and tanks included, and never puts anything in. |
   | **Push** | Green | Only puts things **in**. It never takes anything out, even from a pure source. |
   | **Off** | None | No connection on that side at all. Wrench the face of the core to turn it back on. |
-- **Filters:** hold the wrench in one hand and **the item in the other**, and right-click the plug to add that item to the side's filter, or remove it if it's already there. A side holds up to 9 entries. On a Fluid Pipe, hold a **bucket of a fluid** (or any filled fluid container) in the other hand to filter that fluid. With a filter, only those items or fluids pass that side, both in and out; an empty filter lets everything through. **Sneak + right-click** with the wrench clears the side's filter (the mode stays).
+- **Filter grid:** **sneak + right-click** the plug with the wrench to open that side's filter: a **3x3 grid** of up to 9 items (or, on a Fluid Pipe, fluids, shown as their buckets).
+  - Click a grid slot while carrying an item to put it in that slot. On a Fluid Pipe, carry a bucket of the fluid (or any filled fluid container).
+  - Click a slot with nothing carried to take that entry out.
+  - Shift-click an item in your inventory to add it to the next free slot.
+  - Nothing is ever taken from you. The grid only remembers what to let through.
+  - The **mode button** on the left cycles Normal/Pull/Push/Off (hover over it for what the mode does), and **Clear** empties the filter.
+
+  ![The filter grid of an Item Pipe's west side: Pull mode, with iron, gold, copper, diamond and redstone in the 3x3 grid](docs/screenshots/62_pipe_filter.png)
+- **Quick filter:** with the wrench in one hand and an item (or a filled bucket) in the other, right-click the plug to add it to the filter, or remove it if it's already there.
+- With a filter, only those items or fluids pass that side, both in and out; an empty filter lets everything through.
 - Without the wrench, clicking a pipe does nothing special, so items and blocks in your hand are used or placed as normal.
 - **Jade** lists every side that isn't plain Normal, with its filter. The settings are saved with the pipe.
 - Energy Cables have no modes or filters.

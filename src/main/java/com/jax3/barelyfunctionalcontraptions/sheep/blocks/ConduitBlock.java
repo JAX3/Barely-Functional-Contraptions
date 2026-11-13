@@ -144,7 +144,8 @@ public abstract class ConduitBlock extends BaseEntityBlock {
      *     <li>right-click: cycles the clicked side's mode (Normal, Pull, Push, Off);</li>
      *     <li>right-click with an item, or a filled bucket on a Fluid Pipe, in the other hand: adds it to that side's
      *     filter, or removes it if it's already there;</li>
-     *     <li>sneak-right-click: clears that side's filter.</li>
+     *     <li>sneak-right-click: opens that side's filter grid ({@code PipeFilterMenu}), where the mode can be changed and
+ *     the filter cleared too.</li>
      * </ul>
      * Returns {@link InteractionResult#PASS} if the block isn't a configurable conduit or the side has nothing to plug into.
      */
@@ -160,8 +161,17 @@ public abstract class ConduitBlock extends BaseEntityBlock {
         ItemStack other = player.getItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
         PipeSide before = configurable.side(side);
         if (player.isSecondaryUseActive()) {
-            configurable.setSide(side, before.withoutFilter());
-            player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.filter_cleared", sideName(side)));
+            // Sneak: open this side's filter grid.
+            if (level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeBlockEntity<?> pipe) {
+                Component title = Component.translatable("gui.barelyfunctionalcontraptions.pipe_filter.title", state.getBlock().getName(), sideName(side));
+                player.openMenu(new net.minecraft.world.SimpleMenuProvider(
+                        (id, inventory, p) -> new com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu(id, inventory, pipe, side), title),
+                        buf -> {
+                            buf.writeBlockPos(pos);
+                            buf.writeEnum(side);
+                        });
+            }
+            return InteractionResult.SUCCESS;
         } else if (!other.isEmpty()) {
             var entry = configurable.filterEntry(other);
             if (entry.isEmpty()) {
@@ -182,10 +192,21 @@ public abstract class ConduitBlock extends BaseEntityBlock {
             configurable.setSide(side, updated);
             player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.mode", sideName(side), updated.mode().displayName()));
         }
+        refreshConnections(level, pos);
+        return InteractionResult.SUCCESS;
+    }
+
+    /** Re-works out a conduit's plugs after one of its sides changed mode, and tells its neighbours. */
+    public static void refreshConnections(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof ConduitBlock conduit)) return;
         BlockState updatedState = conduit.withConnections(state, level, pos);
         if (updatedState != state) level.setBlock(pos, updatedState, Block.UPDATE_ALL);
         level.updateNeighborsAt(pos, conduit);
-        return InteractionResult.SUCCESS;
+    }
+
+    public static Component sideNameOf(Direction side) {
+        return sideName(side);
     }
 
     private static Component sideName(Direction side) {

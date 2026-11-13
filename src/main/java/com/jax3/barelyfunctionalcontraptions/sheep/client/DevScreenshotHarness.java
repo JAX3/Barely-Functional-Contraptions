@@ -1131,7 +1131,30 @@ public final class DevScreenshotHarness {
             case 200 -> shot(mc, "63_new_blocks_power");
             case 202 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 22", origin.getX() + 6.0, origin.getY() + 2, origin.getZ() + 0.5));
             case 240 -> shot(mc, "64_new_blocks_pipes");
-            case 250 -> mc.stop();
+            case 242 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                BlockPos pipePos = origin.offset(3, 0, -4);
+                if (!(player.level().getBlockEntity(pipePos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeBlockEntity<?> pipe)) return;
+                var side = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.DEFAULT.withMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PULL);
+                for (String id : new String[]{"iron_ingot", "gold_ingot", "copper_ingot", "diamond", "redstone"}) side = side.toggle(net.minecraft.resources.Identifier.withDefaultNamespace(id));
+                pipe.setSide(Direction.WEST, side);
+                player.getInventory().setItem(0, new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()));
+                player.getInventory().setItem(1, new ItemStack(Items.EMERALD, 16));
+                player.getInventory().setItem(2, new ItemStack(Items.LAPIS_LAZULI, 32));
+                player.getInventory().setItem(3, new ItemStack(Items.COAL, 64));
+                net.minecraft.network.chat.Component title = net.minecraft.network.chat.Component.translatable("gui.barelyfunctionalcontraptions.pipe_filter.title", ModBlocks.ITEM_PIPE.get().getName(),
+                        com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.sideNameOf(Direction.WEST));
+                player.openMenu(new net.minecraft.world.SimpleMenuProvider(
+                        (id, inventory, p) -> new com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu(id, inventory, pipe, Direction.WEST), title),
+                        buf -> {
+                            buf.writeBlockPos(pipePos);
+                            buf.writeEnum(Direction.WEST);
+                        });
+            });
+            case 246 -> setHudHidden(mc, false);
+            case 248 -> mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+            case 265 -> shot(mc, "65_pipe_filter");
+            case 275 -> mc.stop();
             default -> {}
         }
     }

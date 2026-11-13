@@ -144,8 +144,8 @@
         "- Push (green): only fills the block, never takes from it.",
         "- Off: no connection. Wrench the face of the pipe's core to turn it back on.",
         "## Filters",
-        "Hold the wrench in one hand and an item, or a bucket of a fluid, in the other, and right-click the plug to add it to that side's filter or remove it again. Only filtered things pass that side.",
-        "Sneak and right-click with the wrench to clear the filter."
+        "Sneak and right-click the plug with the wrench to open its filter: a 3x3 grid. Click a slot holding an item, or a bucket of a fluid, to filter it there; click with nothing to remove it. Only filtered things pass that side. The grid also has a mode button and a Clear button.",
+        "Shortcut: hold an item in your other hand and right-click the plug with the wrench to add it to the filter, or remove it again."
       ]
     },
     {

@@ -48,6 +48,28 @@ public record PipeSide(Mode mode, List<Identifier> filter) {
         return new PipeSide(mode, List.copyOf(list));
     }
 
+    /**
+     * Puts {@code id} in filter position {@code index} (as in the 3x3 grid): replaces what's there, or adds it at the
+     * end if {@code index} is past the last entry. An entry already elsewhere in the filter moves here.
+     */
+    public PipeSide withEntry(int index, Identifier id) {
+        List<Identifier> list = new ArrayList<>(filter);
+        int existing = list.indexOf(id);
+        if (existing >= 0) list.remove(existing);
+        if (index < list.size()) list.set(index, id);
+        else if (list.size() < MAX_FILTER) list.add(id);
+        else return this;
+        return new PipeSide(mode, List.copyOf(list));
+    }
+
+    /** Removes filter position {@code index}, if there is one. */
+    public PipeSide withoutEntry(int index) {
+        if (index < 0 || index >= filter.size()) return this;
+        List<Identifier> list = new ArrayList<>(filter);
+        list.remove(index);
+        return new PipeSide(mode, List.copyOf(list));
+    }
+
     public PipeSide withoutFilter() {
         return new PipeSide(mode, List.of());
     }

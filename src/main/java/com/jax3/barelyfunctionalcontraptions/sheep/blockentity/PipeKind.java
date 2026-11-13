@@ -33,6 +33,17 @@ public record PipeKind<T extends Resource>(String name, T empty, long slotCapaci
             id -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getOptional(id)
                     .map(i -> new net.minecraft.world.item.ItemStack(i).getHoverName()).orElse(net.minecraft.network.chat.Component.literal(id.toString())));
 
+    /** The icon for a filter entry in the filter grid: the item itself, or for a fluid its bucket. */
+    public net.minecraft.world.item.ItemStack iconOf(net.minecraft.resources.Identifier id) {
+        if (this == ITEM) {
+            return net.minecraft.core.registries.BuiltInRegistries.ITEM.getOptional(id).map(net.minecraft.world.item.ItemStack::new)
+                    .orElse(net.minecraft.world.item.ItemStack.EMPTY);
+        }
+        return net.minecraft.core.registries.BuiltInRegistries.FLUID.getOptional(id)
+                .map(f -> f.getBucket() == net.minecraft.world.item.Items.AIR ? new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BUCKET) : new net.minecraft.world.item.ItemStack(f.getBucket()))
+                .orElse(net.minecraft.world.item.ItemStack.EMPTY);
+    }
+
     /** The fluid a bucket (or any fluid container) holds, as a filter entry. */
     private static java.util.Optional<net.minecraft.resources.Identifier> fluidIn(net.minecraft.world.item.ItemStack stack) {
         if (stack.isEmpty()) return java.util.Optional.empty();

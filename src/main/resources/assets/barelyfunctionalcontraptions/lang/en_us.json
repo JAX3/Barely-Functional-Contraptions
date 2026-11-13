@@ -726,5 +726,12 @@
   "tooltip.barelyfunctionalcontraptions.contraptions_manual": "Right-click to read about everything in the mod.",
   "guide.barelyfunctionalcontraptions.missing": "The guide's text is missing (assets/barelyfunctionalcontraptions/guide/en_us.json).",
   "message.barelyfunctionalcontraptions.pipe.nothing_here": "Nothing for the %s side to connect to",
-  "message.barelyfunctionalcontraptions.pipe.cant_filter": "%s can't go in this pipe's filter"
+  "message.barelyfunctionalcontraptions.pipe.cant_filter": "%s can't go in this pipe's filter",
+  "gui.barelyfunctionalcontraptions.pipe_filter.title": "%s: %s side",
+  "gui.barelyfunctionalcontraptions.pipe_filter.clear": "Clear",
+  "gui.barelyfunctionalcontraptions.pipe_filter.hint": "Click with an item to add it, or with nothing to remove it.",
+  "gui.barelyfunctionalcontraptions.pipe_filter.mode.normal": "Normal: fills the block, only takes from pure sources",
+  "gui.barelyfunctionalcontraptions.pipe_filter.mode.pull": "Pull: empties the block, never fills it",
+  "gui.barelyfunctionalcontraptions.pipe_filter.mode.push": "Push: only fills the block, never takes from it",
+  "gui.barelyfunctionalcontraptions.pipe_filter.mode.disabled": "Off: no connection on this side"
 }

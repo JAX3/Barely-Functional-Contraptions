@@ -486,11 +486,35 @@ public final class ModGameTests {
         h.assertTrue(pipe.side(Direction.WEST).filter().size() == 2, "gold added too");
         wrench.get();
         h.assertTrue(pipe.side(Direction.WEST).filter().size() == 1, "clicking with gold again removes it");
-        // Sneaking: clears the filter.
-        player.setShiftKeyDown(true);
-        wrench.get();
-        h.assertTrue(pipe.side(Direction.WEST).filter().isEmpty() && pipe.side(Direction.WEST).mode() == PUSH, "sneak-click clears the filter only");
-        player.setShiftKeyDown(false);
+        // The filter grid (sneak + wrench opens it): drive the menu as the screen would.
+        var menu = new com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu(1, player.getInventory(), pipe, Direction.WEST);
+        h.assertTrue(menu.getSlot(0).getItem().is(Items.IRON_INGOT) && menu.mode() == PUSH, "the grid shows the filter and the mode");
+        menu.setCarried(new ItemStack(Items.DIAMOND, 5));
+        menu.clicked(0, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player);
+        h.assertTrue(pipe.side(Direction.WEST).filter().equals(List.of(Identifier.withDefaultNamespace("diamond"))) && menu.getSlot(0).getItem().is(Items.DIAMOND),
+                "clicking a slot with diamonds puts diamond there: " + pipe.side(Direction.WEST));
+        h.assertTrue(menu.getCarried().getCount() == 5, "the carried diamonds aren't used up");
+        menu.clicked(4, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player);
+        h.assertTrue(pipe.side(Direction.WEST).filter().size() == 1, "the same item twice is only listed once");
+        menu.setCarried(ItemStack.EMPTY);
+        player.getInventory().setItem(9, new ItemStack(Items.EMERALD, 3));
+        int emeraldSlot = menu.slots.indexOf(menu.slots.stream().filter(sl -> sl.container == player.getInventory() && sl.getContainerSlot() == 9).findFirst().orElseThrow());
+        menu.quickMoveStack(player, emeraldSlot);
+        h.assertTrue(pipe.side(Direction.WEST).filter().size() == 2 && menu.getSlot(1).getItem().is(Items.EMERALD)
+                && player.getInventory().getItem(9).getCount() == 3, "shift-clicking emeralds adds them and keeps them in the inventory");
+        menu.clicked(0, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player);
+        h.assertTrue(pipe.side(Direction.WEST).filter().equals(List.of(Identifier.withDefaultNamespace("emerald"))), "clicking with nothing carried removes the entry");
+        menu.clickMenuButton(player, com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu.BUTTON_MODE);
+        h.assertTrue(pipe.side(Direction.WEST).mode() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.DISABLED && menu.mode() == pipe.side(Direction.WEST).mode(),
+                "the mode button cycles Push to Off");
+        h.assertTrue(h.getBlockState(new BlockPos(2, 1, 2)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.SIDES.get(Direction.WEST))
+                == com.jax3.barelyfunctionalcontraptions.sheep.blocks.CableConnection.NONE, "and the plug follows");
+        menu.clickMenuButton(player, com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu.BUTTON_CLEAR);
+        h.assertTrue(pipe.side(Direction.WEST).filter().isEmpty(), "Clear empties the filter");
+        menu.clickMenuButton(player, com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu.BUTTON_MODE);
+        menu.clickMenuButton(player, com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu.BUTTON_MODE);
+        menu.clickMenuButton(player, com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu.BUTTON_MODE);
+        h.assertTrue(pipe.side(Direction.WEST).mode() == PUSH, "round to Push again");
         // Without the wrench nothing changes: an empty hand, or an item, on the plug.
         Player bare = h.makeMockPlayer(GameType.SURVIVAL);
         h.getBlockState(new BlockPos(2, 1, 2)).useWithoutItem(h.getLevel(), bare, westPlug);
