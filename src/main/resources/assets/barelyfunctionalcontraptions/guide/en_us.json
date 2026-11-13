@@ -105,7 +105,7 @@
         "## Energy Cable",
         "Joins generators, batteries and machines into one network moving up to 100,000 FE/t. Generators power machines first and charge cubes with the rest.",
         "## Energy Meter",
-        "Place it looking the way the energy should flow: in at the back, out at the front. Its screens show the FE/t passing through. Right-click for the total, and read it with a comparator: the signal rises with the flow."
+        "Place it between a generator or battery and what it powers: it works out which way the energy flows by itself (in at the back, out at the front). The wrench flips it. Its screens show the FE/t passing through. Right-click for the total, and read it with a comparator: the signal rises with the flow."
       ]
     },
     {

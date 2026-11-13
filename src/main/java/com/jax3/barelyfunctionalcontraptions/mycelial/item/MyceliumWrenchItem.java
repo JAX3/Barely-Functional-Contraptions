@@ -58,6 +58,14 @@ public class MyceliumWrenchItem extends Item {
      */
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        // Energy Meter: the wrench flips it (sneak: turns it).
+        if (context.getPlayer() != null && context.getLevel().getBlockState(context.getClickedPos()).getBlock()
+                instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock) {
+            if (!context.getLevel().isClientSide()) {
+                com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.turnWithWrench(context.getLevel(), context.getClickedPos(), context.getPlayer());
+            }
+            return InteractionResult.SUCCESS;
+        }
         // Fluid and Item Pipes: the wrench sets each side's mode and filter.
         if (context.getPlayer() != null && context.getLevel().getBlockState(context.getClickedPos()).getBlock()
                 instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock) {

@@ -440,7 +440,11 @@ Cables carry Forge Energy from the **power generators** (Mycelial Generator, Zer
 ### Energy Meter
 An inline meter for Forge Energy. Put it **between a generator (or cable) and what it powers**, and it shows how much energy goes through.
 
-- **Placing:** it points the way you look when you place it. Energy goes **in at the back** (dark port) and **out at the front** (glowing port). The other faces have no energy connection.
+- **Placing:** energy goes **in at the back** (dark port) and **out at the front** (glowing port); the other faces have no energy connection. It faces the right way by itself:
+  - placed against a generator, battery or cable, energy comes in from that block;
+  - placed between two of them (say on the floor between a generator and a Hume Energy Cube), energy comes in from the one with energy to give and goes out to the other;
+  - with nothing around it, it points the way you look.
+- **The wrench** flips a meter end to end; sneak + wrench turns it to the next direction.
 - **Passes energy straight through:** it has no buffer. Whatever is pushed into the back goes on to the block in front, and whatever the block in front (or a cable network) pulls out comes from the block behind. Energy never goes backwards through it.
 - **Screens:** its side screens show the flow, shortened to 250, 12.5k or 1.2M, with *FE/t* under it. The number glows blue while energy is moving.
 - **Right-click** for the exact reading and the total that has passed since it was placed. **Jade** shows the same, plus the comparator signal.
@@ -504,6 +508,7 @@ Each side where a Fluid or Item Pipe meets a block can be set up on its own, wit
   - Click a slot with nothing carried to take that entry out.
   - Shift-click an item in your inventory to add it to the next free slot.
   - Nothing is ever taken from you. The grid only remembers what to let through.
+  - Clicking the middle of the pipe works too: the wrench picks the nearest side that is plugged into a block.
   - The **mode button** on the left cycles Normal/Pull/Push/Off (hover over it for what the mode does), and **Clear** empties the filter.
 
   ![The filter grid of an Item Pipe's west side: Pull mode, with iron, gold, copper, diamond and redstone in the 3x3 grid](docs/screenshots/62_pipe_filter.png)

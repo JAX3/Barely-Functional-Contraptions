@@ -81,6 +81,10 @@ public final class DevScreenshotHarness {
         if (mc.player == null || server == null || mc.level == null) return;
         tick++;
         mc.gui.toastManager().clear();
+        if ("interactions".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            interactionsTick(mc, server);
+            return;
+        }
         if ("new_blocks".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             newBlocksTick(mc, server);
             return;
@@ -1118,6 +1122,87 @@ public final class DevScreenshotHarness {
         BlockPos pos = origin.offset(6, 0, 0);
         if (player.level().getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity be) {
             player.openMenu(be, pos); // the menu needs the position, exactly like a right-click on the block
+        }
+    }
+
+    /**
+     * Checks real player interactions end to end ({@code -PharnessScene=interactions}): placing an Energy Meter
+     * against a running Mycelial Generator with a right-click, and sneak-right-clicking an Item Pipe's plug with the
+     * wrench. Results are written to the log as "INTERACTION ...".
+     */
+    private static void interactionsTick(Minecraft mc, MinecraftServer server) {
+        BlockPos o = origin;
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                BlockPos b = origin;
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                for (BlockPos p : BlockPos.betweenClosed(b.offset(-6, 0, -6), b.offset(6, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(b.offset(-6, -1, -6), b.offset(6, -1, 2))) level.setBlock(p, Blocks.STONE.defaultBlockState(), 2);
+                // A running generator at (-2, 0, -3), a Hume Energy Cube two blocks east of it; the meter goes in between.
+                BlockPos gen = b.offset(-2, 0, -3);
+                level.setBlock(gen, com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get().defaultBlockState()
+                        .setValue(com.jax3.barelyfunctionalcontraptions.mycelial.block.MycelialGeneratorBlock.FACING, Direction.SOUTH), 3);
+                if (level.getBlockEntity(gen) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity generator) {
+                    generator.getInventory().setStackInSlot(com.jax3.barelyfunctionalcontraptions.mycelial.capability.GeneratorItemHandler.FUEL_SLOT, new ItemStack(Items.RED_MUSHROOM, 32));
+                    generator.getTank().fillInternal(net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER), 8000);
+                }
+                level.setBlock(gen.east(2), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+                // A chest with an Item Pipe on its east side, at (2, 0, -3).
+                level.setBlock(b.offset(2, 0, -3), Blocks.CHEST.defaultBlockState(), 3);
+                var pipeBlock = ModBlocks.ITEM_PIPE.get();
+                level.setBlock(b.offset(3, 0, -3), pipeBlock.withConnections(pipeBlock.defaultBlockState(), level, b.offset(3, 0, -3)), 3);
+                player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+                player.getInventory().setItem(0, new ItemStack(ModItems.ENERGY_METER.get(), 4));
+                player.getInventory().setItem(1, new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()));
+                // Stand south of the gap, looking north at it: how a player would usually place the meter.
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", gen.getX() + 1.5, gen.getY(), gen.getZ() + 2.5));
+            });
+            case 80 -> {
+                // Right-click the floor in the gap between the generator and the cube, holding the meter.
+                mc.player.getInventory().setSelectedSlot(0);
+                BlockPos floor = origin.offset(-1, -1, -3);
+                var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floor).add(0, 0.5, 0), Direction.UP, floor, false);
+                var result = mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+                ResourcefulSheep.LOGGER.warn("INTERACTION meter place result {}", result);
+            }
+            case 90 -> server.execute(() -> {
+                BlockPos meter = origin.offset(-1, 0, -3);
+                var state = server.overworld().getBlockState(meter);
+                ResourcefulSheep.LOGGER.warn("INTERACTION meter state {}", state);
+            });
+            case 160 -> server.execute(() -> {
+                BlockPos meter = origin.offset(-1, 0, -3);
+                var level = server.overworld();
+                String rate = level.getBlockEntity(meter) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity be ? be.rate() + " FE/t, total " + be.total() : "no meter";
+                long cube = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, origin.offset(0, 0, -3), Direction.UP) instanceof net.neoforged.neoforge.transfer.energy.EnergyHandler h ? h.getAmountAsLong() : -1;
+                ResourcefulSheep.LOGGER.warn("INTERACTION meter reads {}; cube holds {}", rate, cube);
+            });
+            case 170 -> {
+                // Sneak + right-click the pipe's west plug with the wrench.
+                mc.gui.setScreen(null);
+                mc.player.getInventory().setSelectedSlot(1);
+                mc.options.keyShift.setDown(true);
+            }
+            case 175 -> {
+                BlockPos pipe = origin.offset(3, 0, -3);
+                // On the top of the pipe's middle, not on the plug: the easy click to make.
+                var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pipe).add(0, 0.19, 0), Direction.UP, pipe, false);
+                var result = mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+                ResourcefulSheep.LOGGER.warn("INTERACTION wrench sneak-click result {} (client sneaking {})", result, mc.player.isShiftKeyDown());
+            }
+            case 195 -> {
+                mc.options.keyShift.setDown(false);
+                ResourcefulSheep.LOGGER.warn("INTERACTION screen after sneak-click: {}", mc.gui.screen());
+                shot(mc, "66_interaction_filter");
+            }
+            case 200 -> mc.stop();
+            default -> {}
         }
     }
 

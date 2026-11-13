@@ -27,8 +27,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The Energy Meter block. {@link #FACING} is where the energy comes out: it is placed pointing the way you look, so
- * energy flows away from you, in at the back and out at the front. Right-click shows the reading; a comparator reads
+ * The Energy Meter block. {@link #FACING} is where the energy comes out (the glowing port); it comes in at the back.
+ * It faces itself when placed ({@link #getStateForPlacement}), and the wrench flips or turns it. Right-click shows the reading; a comparator reads
  * the flow ({@link EnergyMeterBlockEntity#signalFor}).
  */
 public class EnergyMeterBlock extends BaseEntityBlock {
@@ -44,9 +44,69 @@ public class EnergyMeterBlock extends BaseEntityBlock {
         builder.add(FACING);
     }
 
+    /**
+     * Works out which way the energy should go, so the meter connects however it was placed:
+     * <ol>
+     *     <li>placed against a block with an energy connection: energy comes in from that block;</li>
+     *     <li>otherwise, between two such blocks on opposite sides: energy comes in from the one with energy to give
+     *     (a running generator, a charged cube) and goes out to the one that takes it;</li>
+     *     <li>otherwise, next to just one: energy comes in from it;</li>
+     *     <li>otherwise it points the way you look.</li>
+     * </ol>
+     * The Barely Functional Wrench flips it afterwards (sneak with the wrench to turn it to the next direction).
+     */
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Direction against = context.getClickedFace().getOpposite();
+        if (energyAt(level, pos, against) != null) return defaultBlockState().setValue(FACING, against.getOpposite());
+        Direction best = null;
+        int bestScore = Integer.MIN_VALUE;
+        for (Direction in : Direction.values()) {
+            var source = energyAt(level, pos, in);
+            var target = energyAt(level, pos, in.getOpposite());
+            if (source == null || target == null) continue;
+            int score = sourceScore(source) - sourceScore(target);
+            if (best == null || score > bestScore) {
+                best = in;
+                bestScore = score;
+            }
+        }
+        if (best != null) return defaultBlockState().setValue(FACING, best.getOpposite());
+        for (Direction in : Direction.values()) {
+            if (energyAt(level, pos, in) != null) return defaultBlockState().setValue(FACING, in.getOpposite());
+        }
         return defaultBlockState().setValue(FACING, context.getNearestLookingDirection());
+    }
+
+    /** The energy connection of the block on side {@code dir} of {@code pos}, facing the meter. */
+    private static net.neoforged.neoforge.transfer.energy.@Nullable EnergyHandler energyAt(Level level, BlockPos pos, Direction dir) {
+        BlockPos other = pos.relative(dir);
+        if (!level.isLoaded(other) || level.getBlockEntity(other) instanceof EnergyMeterBlockEntity) return null;
+        return level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, other, dir.getOpposite());
+    }
+
+    /** How much a block looks like a source: energy it could give, minus what it would take. */
+    private static int sourceScore(net.neoforged.neoforge.transfer.energy.EnergyHandler handler) {
+        try (var simulate = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+            int gives = handler.extract(Integer.MAX_VALUE / 4, simulate);
+            int takes = handler.insert(Integer.MAX_VALUE / 4, simulate);
+            return (gives > 0 ? 2 : 0) - (takes > 0 ? 1 : 0);
+        }
+    }
+
+    /** The wrench: flips the meter end to end, or with sneak turns it to the next direction. */
+    public static void turnWithWrench(Level level, BlockPos pos, Player player) {
+        BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof EnergyMeterBlock)) return;
+        Direction facing = state.getValue(FACING);
+        Direction next = player.isSecondaryUseActive() ? Direction.from3DDataValue((facing.get3DDataValue() + 1) % 6) : facing.getOpposite();
+        level.setBlock(pos, state.setValue(FACING, next), Block.UPDATE_ALL);
+        level.invalidateCapabilities(pos);
+        player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.energy_meter.turned",
+                Component.translatable("direction.barelyfunctionalcontraptions." + next.getOpposite().getSerializedName()),
+                Component.translatable("direction.barelyfunctionalcontraptions." + next.getSerializedName())));
     }
 
     @Override

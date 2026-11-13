@@ -154,21 +154,36 @@ public abstract class ConduitBlock extends BaseEntityBlock {
         if (!(state.getBlock() instanceof ConduitBlock conduit) || !(level.getBlockEntity(pos) instanceof Configurable configurable)) return InteractionResult.PASS;
         Direction side = clickedSide(pos, hit);
         if (!conduit.canPlugIntoSide(level, pos, side)) {
-            if (!level.isClientSide()) player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.nothing_here", sideName(side)));
-            return InteractionResult.SUCCESS;
+            // A click on the pipe itself (its core or a pipe-to-pipe arm): use the nearest side that plugs into a block.
+            Direction nearest = null;
+            double best = Double.MAX_VALUE;
+            for (Direction dir : Direction.values()) {
+                if (!conduit.canPlugIntoSide(level, pos, dir)) continue;
+                double distance = hit.getLocation().distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(pos).relative(dir, 0.5));
+                if (distance < best) {
+                    best = distance;
+                    nearest = dir;
+                }
+            }
+            if (nearest == null) {
+                if (!level.isClientSide()) player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.pipe.nothing_here_at_all"));
+                return InteractionResult.SUCCESS;
+            }
+            side = nearest;
         }
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         ItemStack other = player.getItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
         PipeSide before = configurable.side(side);
         if (player.isSecondaryUseActive()) {
             // Sneak: open this side's filter grid.
+            Direction filterSide = side;
             if (level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeBlockEntity<?> pipe) {
-                Component title = Component.translatable("gui.barelyfunctionalcontraptions.pipe_filter.title", state.getBlock().getName(), sideName(side));
+                Component title = Component.translatable("gui.barelyfunctionalcontraptions.pipe_filter.title", state.getBlock().getName(), sideName(filterSide));
                 player.openMenu(new net.minecraft.world.SimpleMenuProvider(
-                        (id, inventory, p) -> new com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu(id, inventory, pipe, side), title),
+                        (id, inventory, p) -> new com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu(id, inventory, pipe, filterSide), title),
                         buf -> {
                             buf.writeBlockPos(pos);
-                            buf.writeEnum(side);
+                            buf.writeEnum(filterSide);
                         });
             }
             return InteractionResult.SUCCESS;

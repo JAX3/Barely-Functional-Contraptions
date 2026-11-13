@@ -152,6 +152,7 @@ public final class ModGameTests {
         TESTS.put("ghast_sheep_is_twice_the_size", ModGameTests::ghastSheepScale);
         TESTS.put("themed_sheep_advancements", ModGameTests::themedAdvancements);
         TESTS.put("energy_meter_measures_what_passes_through", ModGameTests::energyMeter);
+        TESTS.put("energy_meter_faces_the_right_way_when_placed", ModGameTests::energyMeterPlacement);
         TESTS.put("glow_panel_runs_on_glow_lamps", ModGameTests::glowPanel);
         TESTS.put("recipe_support_wool_ingredient_and_fuel_data_map", ModGameTests::recipeSupport);
         TESTS.put("melon_slice_gives_a_sheep_the_skin", ModGameTests::melonSliceSkin);
@@ -526,11 +527,12 @@ public final class ModGameTests {
         player.getMainHandItem().onItemUseFirst(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND, westPlug));
         h.assertTrue(pipe.side(Direction.WEST).mode() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.DISABLED,
                 "right-clicking with the wrench item cycles Push to Off, got " + pipe.side(Direction.WEST).mode());
-        // A side with nothing to plug into isn't changed.
-        var eastSide = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at).add(0.19, 0, 0), Direction.EAST, at, false);
+        // A click on a side with nothing to plug into (the top of the pipe's middle) uses the nearest plugged side.
+        var top = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at).add(0, 0.19, 0), Direction.UP, at, false);
         player.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
-        com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.useWrench(h.getLevel(), at, player, InteractionHand.MAIN_HAND, eastSide);
-        h.assertTrue(pipe.side(Direction.EAST).isDefault(), "the empty east side stays as it is");
+        var beforeTop = pipe.side(Direction.WEST).mode();
+        com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.useWrench(h.getLevel(), at, player, InteractionHand.MAIN_HAND, top);
+        h.assertTrue(pipe.side(Direction.UP).isDefault() && pipe.side(Direction.WEST).mode() == beforeTop.next(), "a click on the middle changes the plugged west side");
         h.succeed();
     }
 
@@ -2326,6 +2328,43 @@ public final class ModGameTests {
     private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity meter(GameTestHelper h, BlockPos pos, net.minecraft.core.Direction out) {
         h.setBlock(pos, ModBlocks.ENERGY_METER.get().defaultBlockState().setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, out));
         return h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity.class);
+    }
+
+    /** However the meter is placed, it faces from the source to the receiver; the wrench flips it. */
+    private static void energyMeterPlacement(GameTestHelper h) {
+        Player player = h.makeMockPlayer(GameType.SURVIVAL);
+        ItemStack meterItem = new ItemStack(ModItems.ENERGY_METER.get());
+        player.setItemInHand(InteractionHand.MAIN_HAND, meterItem);
+        var block = ModBlocks.ENERGY_METER.get();
+        var facing = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING;
+        java.util.function.BiFunction<BlockPos, Direction, Direction> place = (against, face) -> {
+            BlockPos abs = h.absolutePos(against);
+            var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(abs).relative(face, 0.5), face, abs, false);
+            var context = new net.minecraft.world.item.context.BlockPlaceContext(h.getLevel(), player, InteractionHand.MAIN_HAND, meterItem, hit);
+            return block.getStateForPlacement(context).getValue(facing);
+        };
+        // Clicking the floor between a Creative Generator (west) and a cube (east), looking any way: in from the generator.
+        h.setBlock(new BlockPos(1, 1, 2), ModBlocks.CREATIVE_GENERATOR.get());
+        cube(h, new BlockPos(3, 1, 2));
+        h.setBlock(new BlockPos(2, 0, 2), Blocks.STONE);
+        h.setBlock(new BlockPos(2, 0, 5), Blocks.STONE);
+        Direction floorFacing = place.apply(new BlockPos(2, 0, 2), Direction.UP);
+        h.assertTrue(floorFacing == Direction.EAST, "between a generator and a cube it points at the cube, got " + floorFacing);
+        // A charged cube to the east and an empty one to the west: in from the charged one.
+        var charged = cube(h, new BlockPos(3, 1, 5));
+        cube(h, new BlockPos(1, 1, 5));
+        cubeInsert(cubeFace(h, new BlockPos(3, 1, 5), Direction.UP), 5_000);
+        h.assertTrue(place.apply(new BlockPos(2, 0, 5), Direction.UP) == Direction.WEST, "between a charged and an empty cube it takes from the charged one");
+        // Placed against a cube's side: in from that cube.
+        h.assertTrue(place.apply(new BlockPos(3, 1, 2), Direction.SOUTH) == Direction.SOUTH, "placed against a cube, it takes from the cube");
+        // The wrench flips it; sneaking turns it to the next direction.
+        h.setBlock(new BlockPos(5, 1, 2), block.defaultBlockState().setValue(facing, Direction.EAST));
+        com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.turnWithWrench(h.getLevel(), h.absolutePos(new BlockPos(5, 1, 2)), player);
+        h.assertTrue(h.getBlockState(new BlockPos(5, 1, 2)).getValue(facing) == Direction.WEST, "the wrench flips it end to end");
+        player.setShiftKeyDown(true);
+        com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.turnWithWrench(h.getLevel(), h.absolutePos(new BlockPos(5, 1, 2)), player);
+        h.assertTrue(h.getBlockState(new BlockPos(5, 1, 2)).getValue(facing) != Direction.WEST, "sneak-wrench turns it");
+        h.succeed();
     }
 
     private static void energyMeter(GameTestHelper h) {

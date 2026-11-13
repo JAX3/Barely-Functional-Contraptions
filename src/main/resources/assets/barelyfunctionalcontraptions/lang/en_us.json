@@ -684,7 +684,7 @@
   "advancements.barelyfunctionalcontraptions.every_wool.description": "Collect one of every built-in resource wool",
   "block.barelyfunctionalcontraptions.energy_meter": "Energy Meter",
   "message.barelyfunctionalcontraptions.energy_meter.reading": "Energy Meter: %s FE/t (%s FE in total)",
-  "tooltip.barelyfunctionalcontraptions.energy_meter": "Passes energy through, in at the back and out at the front, and measures it. Place it looking the way the energy should flow.",
+  "tooltip.barelyfunctionalcontraptions.energy_meter": "Passes energy through and measures it. Place it next to a generator, battery or cable and it faces the right way by itself; the wrench flips it.",
   "jade.barelyfunctionalcontraptions.energy_meter.rate": "Passing %s FE/t",
   "jade.barelyfunctionalcontraptions.energy_meter.total": "%s FE in total",
   "jade.barelyfunctionalcontraptions.energy_meter.signal": "Comparator signal %s",
@@ -733,5 +733,7 @@
   "gui.barelyfunctionalcontraptions.pipe_filter.mode.normal": "Normal: fills the block, only takes from pure sources",
   "gui.barelyfunctionalcontraptions.pipe_filter.mode.pull": "Pull: empties the block, never fills it",
   "gui.barelyfunctionalcontraptions.pipe_filter.mode.push": "Push: only fills the block, never takes from it",
-  "gui.barelyfunctionalcontraptions.pipe_filter.mode.disabled": "Off: no connection on this side"
+  "gui.barelyfunctionalcontraptions.pipe_filter.mode.disabled": "Off: no connection on this side",
+  "message.barelyfunctionalcontraptions.pipe.nothing_here_at_all": "This pipe isn't connected to any block yet",
+  "message.barelyfunctionalcontraptions.energy_meter.turned": "Energy Meter: in from the %s, out to the %s"
 }
