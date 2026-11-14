@@ -112,6 +112,10 @@ public final class DevScreenshotHarness {
             newBlocksTick(mc, server);
             return;
         }
+        if ("showcase".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            showcaseTick(mc, server);
+            return;
+        }
         if ("altar".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             altarTick(mc, server);
             return;
@@ -646,7 +650,7 @@ public final class DevScreenshotHarness {
         }
     }
 
-    /** The crafted contraptions, in the order the README shows them. */
+    /** The crafted contraptions, in the order docs/REFERENCE.md shows them. */
     private static final String[] RECIPES = {"functional_machine_block", "mycelial_generator", "mycelium_wrench", "mechanical_separator",
             "automatic_shears", "fluid_reservoir", "hume_energy_cube", "zero_point_energy_module"};
 
@@ -1593,6 +1597,108 @@ public final class DevScreenshotHarness {
             });
         }
         if (tick == end + 60) mc.stop();
+    }
+
+    /** For the README: every block on stepped rows, the creative tabs, and every built-in sheep: {@code -PharnessScene=showcase}. */
+    private static void showcaseTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> showcaseScene(server));
+            case 70 -> {
+                setHudHidden(mc, true);
+                command(server, "gamemode spectator @a"); // floats where it is put, so the camera can sit up high
+            }
+            case 75 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 28", origin.getX() + 0.5, origin.getY() + 5, origin.getZ() + 2.5));
+            case 158, 228 -> {
+                if (mc.player != null) ResourcefulSheep.LOGGER.info("CAMERA at {} yaw={} pitch={} origin={}", mc.player.position(), mc.player.getYRot(), mc.player.getXRot(), origin);
+            }
+            case 160 -> shot(mc, "showcase_blocks");
+            case 162 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 0 33", origin.getX() + 0.5, origin.getY() + 7, origin.getZ() + 11.0));
+            case 230 -> shot(mc, "showcase_sheep");
+            case 232 -> {
+                command(server, "gamemode creative @a");
+                openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.MAIN.get());
+            }
+            case 250 -> shot(mc, "showcase_tab_main");
+            case 252 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get());
+            case 256, 236 -> mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // no tooltip in the shot
+            case 270 -> shot(mc, "showcase_tab_wool");
+            case 280 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    private static final String[][] SHOWCASE_ROWS = {
+            {"mechanical_separator", "automatic_shears", "wool_packer", "infusion_altar", "wool_bale"},
+            {"mycelial_generator", "zero_point_energy_module", "glow_panel", "glow_lamp", "blaze_furnace"},
+            {"wool_burner", "hume_energy_cube", "fluid_tank", "fluid_reservoir", "creative_generator"},
+            {"energy_cable", "fluid_pipe", "item_pipe", "energy_meter", "functional_machine_block"},
+    };
+
+    private static void showcaseScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false",
+                "gamerule advance_weather false", "gamerule spawn_mobs false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-14, 0, -14), o.offset(14, 10, 40))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-14, -1, -14), o.offset(14, -1, 40))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
+        // Stepped rows: the front row on the floor, each further row a block higher, so every label shows.
+        for (int row = 0; row < SHOWCASE_ROWS.length; row++) {
+            int z = -3 - row * 3, y = row;
+            if (y > 0) {
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-9, 0, z - 1), o.offset(9, y - 1, z + 1))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+            }
+            String[] names = SHOWCASE_ROWS[row];
+            for (int i = 0; i < names.length; i++) {
+                BlockPos at = o.offset((int) Math.round((i - (names.length - 1) / 2.0) * 4), y, z);
+                var block = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(ResourcefulSheep.id(names[i]));
+                net.minecraft.world.level.block.state.BlockState state = block.defaultBlockState();
+                for (var prop : state.getProperties()) {
+                    if (prop.getName().equals("facing") && prop.getPossibleValues().contains(Direction.SOUTH)) {
+                        state = setUnchecked(state, prop, Direction.SOUTH);
+                    }
+                }
+                level.setBlock(at, state, 3);
+                if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBaleBlockEntity bale) {
+                    bale.setResource(ResourcefulSheep.id("gold"));
+                    level.sendBlockUpdated(at, bale.getBlockState(), bale.getBlockState(), 3);
+                }
+                net.minecraft.network.chat.Component name = new ItemStack(block).getHoverName();
+                if (names[i].equals("wool_bale")) name = net.minecraft.network.chat.Component.literal("Wool Bale");
+                String[] colours = {"light_purple", "gold", "yellow", "aqua"};
+                label(server, at.above(), name.getString(), colours[row]);
+            }
+        }
+        // Every built-in sheep in a pen further back, each with its name.
+        var resources = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().all().stream()
+                .filter(r -> r.id().getNamespace().equals(ResourcefulSheep.MOD_ID)).toList();
+        int perRow = 6;
+        for (int i = 0; i < resources.size(); i++) {
+            var r = resources.get(i);
+            int col = i % perRow, row = i / perRow;
+            double x = o.getX() + 0.5 + (col - (perRow - 1) / 2.0) * 3.4;
+            double z = o.getZ() + 16.5 + row * 4.0;
+            Sheep sh = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            sh.snapTo(x, o.getY(), z, 160, 0); // facing the camera, which looks south from in front of the pen
+            sh.setYHeadRot(160);
+            sh.setYBodyRot(160);
+            sh.yBodyRotO = 160;
+            sh.setNoAi(true);
+            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sh,
+                    new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion(java.util.Optional.of(r.id()), 9, 0));
+            level.addFreshEntity(sh);
+            double scale = r.appearance().scale();
+            label(server, BlockPos.containing(x, o.getY() + 1.1 + (scale > 1 ? 1.1 : 0), z), r.name().getString(), "white");
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static net.minecraft.world.level.block.state.BlockState setUnchecked(net.minecraft.world.level.block.state.BlockState state,
+                                                                                net.minecraft.world.level.block.state.properties.Property prop, Comparable value) {
+        return state.setValue(prop, value);
     }
 
     /** The Infusion Altar making a Wither sheep, and a bred sheep's stats: {@code -PharnessScene=altar}. */

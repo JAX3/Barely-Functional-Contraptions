@@ -1,6 +1,6 @@
 # Barely Functional Contraptions: Mycelial Power configuration reference
 
-The Mycelial Power module uses two NeoForge TOML files. (The Resourceful Sheep module has its own two files, described in the [README](../README.md#resourceful-sheep-config).)
+The Mycelial Power module uses two NeoForge TOML files. (The Resourceful Sheep module has its own two files, described in the [full reference](REFERENCE.md#configuration).)
 
 | File | Type | Location | Contents |
 |---|---|---|---|

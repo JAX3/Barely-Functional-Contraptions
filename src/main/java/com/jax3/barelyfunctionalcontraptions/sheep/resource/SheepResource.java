@@ -27,7 +27,7 @@ import net.minecraft.world.item.crafting.Ingredient;
  *
  * <p>Loaded from {@code data/<namespace>/barelyfunctionalcontraptions/sheep_resources/<path>.json}; the resource id is
  * {@code <namespace>:<path>}. The same object drives sheep feeding, shearing drops, the Mechanical Separator and
- * JEI, so all of those always agree. See {@code README.md} for the full JSON reference.</p>
+ * JEI, so all of those always agree. See {@code docs/REFERENCE.md} for the full JSON reference.</p>
  *
  * @param id            resource id (from the file location, not part of the JSON)
  * @param feedingItem   what must be fed to the sheep; an item, a tag ({@code "#c:storage_blocks/tin"}) or a list
@@ -36,7 +36,7 @@ import net.minecraft.world.item.crafting.Ingredient;
  * @param woolName      optional full wool name ("Iron Wool"); defaults to "{displayName} Wool"
  * @param woolColor     main RGB colour of the wool (sheep and item tint)
  * @param accentColor   RGB colour of the glinting strands/flecks
- * @param category      what kind of material this is; purely informational except for defaults documented in README
+ * @param category      what kind of material this is; purely informational except for defaults documented in docs/REFERENCE.md
  * @param woolDropCount infused wool dropped per shearing
  * @param infusionUses  number of shearings one feeding lasts (before the global multiplier)
  * @param separator     how the Mechanical Separator processes this resource's wool
