@@ -112,6 +112,10 @@ public final class DevScreenshotHarness {
             newBlocksTick(mc, server);
             return;
         }
+        if ("world_tour".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            worldTourTick(mc, server);
+            return;
+        }
         if ("extend_world".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             extendWorldTick(mc, server);
             return;
@@ -1497,6 +1501,17 @@ public final class DevScreenshotHarness {
             {"themed sheep", 202},
             {"blaze furnace", 234},
     };
+    /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
+    private static void worldTourTick(Minecraft mc, MinecraftServer server) {
+        String[] tps = {"tp @a 167.0 38 -0.5 180 15", "tp @a 202.5 37 0.5 180 18", "tp @a 237.5 40 -3.5 170 30"};
+        if (tick == 30) setHudHidden(mc, true);
+        for (int i = 0; i < tps.length; i++) {
+            if (tick == 40 + i * 60) command(server, tps[i]);
+            if (tick == 90 + i * 60) shot(mc, "tour_" + i);
+        }
+        if (tick == 40 + tps.length * 60 + 20) mc.stop();
+    }
+
     private static net.minecraft.world.phys.Vec3 extendReturn = net.minecraft.world.phys.Vec3.ZERO;
     private static float extendYaw, extendPitch;
 
@@ -1528,7 +1543,13 @@ public final class DevScreenshotHarness {
                     player.teleportTo(x + 0.5, 35, -8.5); // exactly on the spot, in case it drifted
                     switch (i) {
                         case 0 -> newBlocksScene(server);
-                        case 1 -> themedSheepScene(server);
+                        case 1 -> {
+                            themedSheepScene(server);
+                            // The skinned (Melon Slice) sheep are a private easter egg: keep them out of the shared world.
+                            var level = player.level();
+                            level.getEntitiesOfClass(Sheep.class, new net.minecraft.world.phys.AABB(origin).inflate(20),
+                                    sh -> sh.hasData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_SKIN)).forEach(Sheep::discard);
+                        }
                         default -> blazeFurnaceScene(server);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);

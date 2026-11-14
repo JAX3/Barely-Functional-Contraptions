@@ -31,5 +31,13 @@ z = -9.
 | Zero Point modules on walls (sideways beams) | `/tp @s 106 39 1` |
 | Bred lambs that kept their parents' infusion | `/tp @s 122 37 -3` |
 | Fluid Tanks: water, lava, a single tank and an L | `/tp @s 139 38 0` |
+| New blocks: Glow Panels and a Glow Lamp, an Energy Meter, Item and Fluid Pipes with Pull and Push sides | `/tp @s 167 38 -0.5` |
+| Themed sheep: hay, wither, dragon, glow ink, skeleton, wither skeleton, spider, sculk, blaze, ghast | `/tp @s 202.5 37 0.5` |
+| Blaze Sheep Furnace with four Blaze sheep, and Automatic Shears, both with their working area shown | `/tp @s 237.5 40 -3.5` |
 
-The world is rebuilt each time the harness runs, so this file is updated whenever a new contraption is added.
+The last three scenes were added to the existing world with
+`./gradlew runClient -PscreenshotHarness -PharnessScene=extend_world "-PharnessWorld=BFC Test World"` (unzip this
+world into `run/saves` first). This file is updated whenever a new contraption is added.
+
+When you first open the world, Minecraft warns that it uses experimental settings, because it's a superflat test world.
+Choose **I Know What I'm Doing!**. The warning won't show again for this world.
