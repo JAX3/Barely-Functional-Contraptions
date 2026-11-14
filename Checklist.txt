@@ -1,4 +1,3 @@
-These are the ideas from the earlier roadmap that haven’t been built yet. Steps 1, 7, 15, 16 and 17 are done, and part of step 5 (the Glow Panel and Glow Lamp).
 
 Logistics
 2. Pipe tiers: copper, then iron, then netherite pipes that move more per tick, made with upgrade items or by crafting.
@@ -7,7 +6,7 @@ Logistics
 Power
 5. The rest of the themed generators:
 Wool Burner: burns plain or spare wool for power.
-Blaze Sheep Furnace: makes power from the Blaze sheep’s flames.
+
 6. Energy tiers or a capacitor item that charges tools, plus a wireless charger.
 Resource generation
 8. Sheep stats from breeding: yield, growth speed and how long an infusion lasts go up as you breed good sheep together, like the Chickens mod.
