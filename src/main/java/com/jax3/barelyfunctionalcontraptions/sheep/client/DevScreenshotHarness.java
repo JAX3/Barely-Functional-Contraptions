@@ -48,6 +48,7 @@ public final class DevScreenshotHarness {
     private static int tick = -1;
     private static boolean worldRequested;
     private static BlockPos origin = BlockPos.ZERO;
+    private static boolean confirmedExperimental;
 
     private DevScreenshotHarness() {}
 
@@ -63,6 +64,12 @@ public final class DevScreenshotHarness {
                 || event.getNewScreen() instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen)) return;
         worldRequested = true;
         Minecraft mc = Minecraft.getInstance();
+        String existing = System.getProperty("barelyfunctionalcontraptions.screenshotHarness.world");
+        if (existing != null && !existing.isBlank()) {
+            // Add to a world that's already there (the test world) instead of starting a fresh one.
+            mc.execute(() -> mc.createWorldOpenFlows().openWorld(existing, () -> ResourcefulSheep.LOGGER.error("Harness could not open world {}", existing)));
+            return;
+        }
         mc.execute(() -> {
             try {
                 LevelSettings settings = new LevelSettings("FR Harness", GameType.CREATIVE, LevelSettings.DifficultySettings.DEFAULT, true, WorldDataConfiguration.DEFAULT);
@@ -78,6 +85,18 @@ public final class DevScreenshotHarness {
     private static void onTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         MinecraftServer server = mc.getSingleplayerServer();
+        // Opening an existing test world (superflat test dimensions) first asks to confirm its experimental settings.
+        if (mc.player == null && mc.gui.screen() != null && System.getProperty("barelyfunctionalcontraptions.screenshotHarness.world") != null
+                && !confirmedExperimental) {
+            for (var child : mc.gui.screen().children()) {
+                if (child instanceof net.minecraft.client.gui.components.Button button && button.getMessage().getString().equals("I Know What I'm Doing!")) {
+                    confirmedExperimental = true;
+                    button.onPress(new net.minecraft.client.input.KeyEvent(257, 0, 0));
+                    ResourcefulSheep.LOGGER.info("Harness: confirmed the world's experimental settings");
+                    break;
+                }
+            }
+        }
         if (mc.player == null || server == null || mc.level == null) return;
         tick++;
         mc.gui.toastManager().clear();
@@ -91,6 +110,10 @@ public final class DevScreenshotHarness {
         }
         if ("new_blocks".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             newBlocksTick(mc, server);
+            return;
+        }
+        if ("extend_world".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            extendWorldTick(mc, server);
             return;
         }
         if ("blaze_furnace".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
@@ -1462,6 +1485,64 @@ public final class DevScreenshotHarness {
             case 300 -> mc.stop();
             default -> {}
         }
+    }
+
+    /**
+     * Adds the newer scenes to the test world, each on its own platform at y = 34 further east along the row of
+     * scenes, then puts the player back where they were and saves: {@code -PharnessScene=extend_world
+     * -PharnessWorld="BFC Test World"}.
+     */
+    private static final Object[][] EXTRA_SCENES = {
+            {"new blocks", 166},
+            {"themed sheep", 202},
+            {"blaze furnace", 234},
+    };
+    private static net.minecraft.world.phys.Vec3 extendReturn = net.minecraft.world.phys.Vec3.ZERO;
+    private static float extendYaw, extendPitch;
+
+    private static void extendWorldTick(Minecraft mc, MinecraftServer server) {
+        int start = 60, per = 80;
+        int end = start + EXTRA_SCENES.length * per;
+        if (tick == start) {
+            server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                extendReturn = player.position();
+                extendYaw = player.getYRot();
+                extendPitch = player.getXRot();
+                ResourcefulSheep.LOGGER.info("EXTEND player starts at {}", extendReturn);
+            });
+        }
+        if (tick >= start && tick < end) {
+            int i = (tick - start) / per, step = (tick - start) % per;
+            int x = (Integer) EXTRA_SCENES[i][1];
+            if (step == 0) {
+                server.execute(() -> {
+                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                    player.getAbilities().flying = true;
+                    player.onUpdateAbilities();
+                    player.teleportTo(x + 0.5, 35, -8.5);
+                });
+            } else if (step == 40) {
+                server.execute(() -> {
+                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                    player.teleportTo(x + 0.5, 35, -8.5); // exactly on the spot, in case it drifted
+                    switch (i) {
+                        case 0 -> newBlocksScene(server);
+                        case 1 -> themedSheepScene(server);
+                        default -> blazeFurnaceScene(server);
+                    }
+                    ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
+                });
+            }
+        }
+        if (tick == end + 20) {
+            server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                player.teleportTo(player.level(), extendReturn.x, extendReturn.y, extendReturn.z, java.util.Set.of(), extendYaw, extendPitch, true);
+                ResourcefulSheep.LOGGER.info("EXTEND player back at {}", player.position());
+            });
+        }
+        if (tick == end + 60) mc.stop();
     }
 
     /** The Blaze Sheep Furnace with four Blaze sheep, and both machines' working areas shown: {@code -PharnessScene=blaze_furnace}. */

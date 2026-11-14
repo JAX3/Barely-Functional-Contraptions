@@ -51,6 +51,10 @@ neoForge {
                 if (project.hasProperty('harnessScene')) {
                     systemProperty 'barelyfunctionalcontraptions.screenshotHarness.scene', project.property('harnessScene')
                 }
+                // -PharnessWorld=<folder in run/saves>: open that world instead of making a fresh one (scene extend_world)
+                if (project.hasProperty('harnessWorld')) {
+                    systemProperty 'barelyfunctionalcontraptions.screenshotHarness.world', project.property('harnessWorld')
+                }
                 programArguments.addAll '--width', '1280', '--height', '720'
             }
         }
