@@ -23,4 +23,12 @@ public interface AreaDisplay {
         setShowsArea(!showsArea());
         return showsArea();
     }
+
+    /** Toggles the area and tells {@code player} which way it went ("Showing / Hiding the working area"). */
+    default boolean toggleArea(net.minecraft.world.entity.player.Player player) {
+        boolean shown = toggleArea();
+        player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("message.barelyfunctionalcontraptions.area." + (shown ? "shown" : "hidden"))
+                .withColor(areaColor() & 0xFFFFFF));
+        return shown;
+    }
 }

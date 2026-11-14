@@ -155,7 +155,8 @@ public class MechanicalSeparatorScreen extends AbstractContainerScreen<Mechanica
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0 && isHovering(BUTTON_X, BUTTON_Y, BUTTON_SIZE, BUTTON_SIZE, event.x(), event.y())
+        // Left button: 1 in this version's numbering (MOUSE_BUTTON_LEFT), not GLFW's 0.
+        if (event.button() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT && isHovering(BUTTON_X, BUTTON_Y, BUTTON_SIZE, BUTTON_SIZE, event.x(), event.y())
                 && minecraft != null && minecraft.gameMode != null) {
             minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MechanicalSeparatorMenu.BUTTON_REDSTONE);

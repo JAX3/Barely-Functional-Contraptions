@@ -12,16 +12,11 @@ import java.util.Locale;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 /**
  * Window of the Blaze Sheep Furnace, laid out like the Zero Point Energy Module's. Left: the FE buffer. Middle: the
@@ -44,7 +39,6 @@ public class BlazeFurnaceScreen extends AbstractContainerScreen<BlazeFurnaceMenu
     private static final int LAMP_X = 9, LAMP_Y = 87, LAMP_U = 186, LAMP_V = 194;
     private static final int AREA_X = 154, AREA_Y = 4, BUTTON_SIZE = 16, BUTTON_U = 176, BUTTON_V = 146;
     private static final int AREA_ON = 0xFFFF8A1F;
-    private static final ItemStack AREA_ICON = new ItemStack(Items.SPYGLASS);
 
     public BlazeFurnaceScreen(BlazeFurnaceMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, 193);
@@ -55,6 +49,8 @@ public class BlazeFurnaceScreen extends AbstractContainerScreen<BlazeFurnaceMenu
     protected void init() {
         super.init();
         this.titleLabelX = (imageWidth - font.width(title)) / 2;
+        addRenderableWidget(new AreaToggleButton(leftPos + AREA_X, topPos + AREA_Y, TEXTURE, BUTTON_U, BUTTON_V,
+                menu::isShowingArea, AREA_ON, menu.containerId, BlazeFurnaceMenu.BUTTON_AREA));
     }
 
     @Override
@@ -79,12 +75,6 @@ public class BlazeFurnaceScreen extends AbstractContainerScreen<BlazeFurnaceMenu
 
         MachineStatus lamp = status();
         graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + LAMP_X, y + LAMP_Y, LAMP_U + lamp.ordinal() * 8 % 64, LAMP_V + lamp.ordinal() / 8 * 8, 8, 8, TEX, TEX);
-
-        // Show-area button.
-        boolean hovered = isHovering(AREA_X, AREA_Y, BUTTON_SIZE, BUTTON_SIZE, mouseX, mouseY);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + AREA_X, y + AREA_Y, BUTTON_U + (hovered ? 16 : 0), BUTTON_V, BUTTON_SIZE, BUTTON_SIZE, TEX, TEX);
-        graphics.fakeItem(AREA_ICON, x + AREA_X, y + AREA_Y);
-        if (menu.isShowingArea()) graphics.outline(x + AREA_X - 1, y + AREA_Y - 1, BUTTON_SIZE + 2, BUTTON_SIZE + 2, AREA_ON);
     }
 
     /**
@@ -203,17 +193,6 @@ public class BlazeFurnaceScreen extends AbstractContainerScreen<BlazeFurnaceMenu
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.area.click").withStyle(ChatFormatting.DARK_GRAY));
         }
         if (!lines.isEmpty()) graphics.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
-    }
-
-    @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0 && isHovering(AREA_X, AREA_Y, BUTTON_SIZE, BUTTON_SIZE, event.x(), event.y())
-                && minecraft != null && minecraft.gameMode != null) {
-            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, BlazeFurnaceMenu.BUTTON_AREA);
-            return true;
-        }
-        return super.mouseClicked(event, doubleClick);
     }
 
     private static String seconds(int ticks) {

@@ -46,9 +46,8 @@ public class AutomaticShearsScreen extends AbstractContainerScreen<AutomaticShea
     private static final int LAMP_U = 186, LAMP_V = 194;
     private static final int BUTTON_X = 154, BUTTON_Y = 4, BUTTON_SIZE = 16;
     private static final int BUTTON_U = 176, BUTTON_V = 0;
-    /** Show-area button, left of the redstone button: a spyglass, framed in light blue while the outline is shown. */
+    /** Show-area button ({@link AreaToggleButton}), left of the redstone button, framed in light blue while the outline is shown. */
     private static final int AREA_X = 136;
-    private static final net.minecraft.world.item.ItemStack AREA_ICON = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SPYGLASS);
 
     public AutomaticShearsScreen(AutomaticShearsMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, 193);
@@ -59,6 +58,8 @@ public class AutomaticShearsScreen extends AbstractContainerScreen<AutomaticShea
     protected void init() {
         super.init();
         this.titleLabelX = (imageWidth - font.width(title)) / 2;
+        addRenderableWidget(new AreaToggleButton(leftPos + AREA_X, topPos + BUTTON_Y, TEXTURE, BUTTON_U, BUTTON_V + 64,
+                menu::isShowingArea, 0xFF7FD3FF, menu.containerId, AutomaticShearsMenu.BUTTON_AREA));
     }
 
     @Override
@@ -92,11 +93,6 @@ public class AutomaticShearsScreen extends AbstractContainerScreen<AutomaticShea
         // Redstone mode button (normal / hovered background + mode icon).
         boolean hovered = isHovering(BUTTON_X, BUTTON_Y, BUTTON_SIZE, BUTTON_SIZE, mouseX, mouseY);
         graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + BUTTON_X, y + BUTTON_Y, BUTTON_U + (hovered ? 16 : 0), BUTTON_V + 64, BUTTON_SIZE, BUTTON_SIZE, TEX, TEX);
-        // Show-area button.
-        boolean areaHovered = isHovering(AREA_X, BUTTON_Y, BUTTON_SIZE, BUTTON_SIZE, mouseX, mouseY);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + AREA_X, y + BUTTON_Y, BUTTON_U + (areaHovered ? 16 : 0), BUTTON_V + 64, BUTTON_SIZE, BUTTON_SIZE, TEX, TEX);
-        graphics.fakeItem(AREA_ICON, x + AREA_X, y + BUTTON_Y);
-        if (menu.isShowingArea()) graphics.outline(x + AREA_X - 1, y + BUTTON_Y - 1, BUTTON_SIZE + 2, BUTTON_SIZE + 2, 0xFF7FD3FF);
         int mode = menu.getRedstoneMode().ordinal();
         graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + BUTTON_X, y + BUTTON_Y, BUTTON_U + (mode % 4) * 16 % 64, BUTTON_V + (mode / 4) * 16, BUTTON_SIZE, BUTTON_SIZE, TEX, TEX);
     }
@@ -175,16 +171,11 @@ public class AutomaticShearsScreen extends AbstractContainerScreen<AutomaticShea
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0 && isHovering(BUTTON_X, BUTTON_Y, BUTTON_SIZE, BUTTON_SIZE, event.x(), event.y())
+        // Left button: 1 in this version's numbering (MOUSE_BUTTON_LEFT), not GLFW's 0.
+        if (event.button() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT && isHovering(BUTTON_X, BUTTON_Y, BUTTON_SIZE, BUTTON_SIZE, event.x(), event.y())
                 && minecraft != null && minecraft.gameMode != null) {
             minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AutomaticShearsMenu.BUTTON_REDSTONE);
-            return true;
-        }
-        if (event.button() == 0 && isHovering(AREA_X, BUTTON_Y, BUTTON_SIZE, BUTTON_SIZE, event.x(), event.y())
-                && minecraft != null && minecraft.gameMode != null) {
-            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AutomaticShearsMenu.BUTTON_AREA);
             return true;
         }
         return super.mouseClicked(event, doubleClick);

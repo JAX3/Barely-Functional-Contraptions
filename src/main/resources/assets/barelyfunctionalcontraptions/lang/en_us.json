@@ -781,5 +781,6 @@
   "gui.barelyfunctionalcontraptions.blaze_furnace.heat.boosted": "Boosted x%s: making %s FE/t",
   "gui.barelyfunctionalcontraptions.blaze_furnace.boost.tooltip": "Power and boost",
   "gui.barelyfunctionalcontraptions.blaze_furnace.boost.desc": "Heat from the sheep, multiplied while a boost item burns.",
-  "gui.barelyfunctionalcontraptions.blaze_furnace.boost.left": "%ss of %ss left"
+  "gui.barelyfunctionalcontraptions.blaze_furnace.boost.left": "%ss of %ss left",
+  "gui.barelyfunctionalcontraptions.area.button": "Show or hide the working area"
 }

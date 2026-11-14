@@ -204,8 +204,8 @@ public final class DevScreenshotHarness {
                 var handle = mc.getWindow().handle();
                 double scale = mc.getWindow().getGuiScale();
                 mc.mouseHandler.onMove(handle, 70 * scale, 45 * scale, 0, 0);
-                mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(0, 0), 1);
-                mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(0, 0), 0);
+                mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
+                mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
                 mc.mouseHandler.onMove(handle, 2, 2, 0, 0);
             }
             case 560 -> shot(mc, "08_mod_list");
@@ -1612,13 +1612,34 @@ public final class DevScreenshotHarness {
             // And on the shears' window button.
             case 322, 334 -> clickGui(mc, 136 + 8, 4 + 8);
             case 332, 344 -> logArea(server, origin.offset(5, 0, -4), "shears window button");
+            // The redstone button beside it, with a real left click too.
+            case 336 -> clickGui(mc, 154 + 8, 4 + 8);
+            case 340 -> server.execute(() -> {
+                if (server.overworld().getBlockEntity(origin.offset(5, 0, -4)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity be) {
+                    ResourcefulSheep.LOGGER.info("REDSTONE after a click on the shears' redstone button: {}", be.getRedstoneMode());
+                }
+            });
+            // Hide the furnace's area with its window button, close the window and look: only the shears' box is left.
             case 346 -> {
                 if (mc.player != null) mc.player.closeContainer();
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 0.5, origin.getY(), origin.getZ() - 1.5));
+            }
+            case 350 -> openAt(server, origin.offset(0, 0, -4));
+            case 362 -> clickGui(mc, 154 + 8, 4 + 8);
+            case 368 -> {
+                logArea(server, origin.offset(0, 0, -4), "furnace window button (then closed)");
+                if (mc.player != null) mc.player.closeContainer();
+                setHudHidden(mc, true);
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 170 30", origin.getX() + 3.5, origin.getY() + 5, origin.getZ() + 5.5));
+            }
+            case 400 -> shot(mc, "69_furnace_area_hidden_by_button");
+            case 402 -> {
+                setHudHidden(mc, false);
                 mc.gui.setScreen(new GuideScreen());
             }
-            case 356 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter(10); }
-            case 370 -> shot(mc, "66_guide_blaze_furnace");
-            case 380 -> mc.stop();
+            case 412 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter(10); }
+            case 426 -> shot(mc, "66_guide_blaze_furnace");
+            case 436 -> mc.stop();
             default -> {}
         }
     }
@@ -1638,12 +1659,16 @@ public final class DevScreenshotHarness {
         int left = (window.getGuiScaledWidth() - 176) / 2, top = (window.getGuiScaledHeight() - 193) / 2;
         long handle = window.handle();
         mc.mouseHandler.onMove(handle, (left + gx) * scale, (top + gy) * scale, 0, 0);
-        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(0, 0), 1);
-        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(0, 0), 0);
+        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
+        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
         mc.mouseHandler.onMove(handle, 4, 4, 0, 0);
     }
 
     private static void logArea(MinecraftServer server, BlockPos pos, String what) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level != null && mc.level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AreaDisplay client) {
+            ResourcefulSheep.LOGGER.info("AREA (client) after a click on the {}: shown={}", what, client.showsArea());
+        }
         server.execute(() -> {
             if (server.overworld().getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AreaDisplay area) {
                 ResourcefulSheep.LOGGER.info("AREA after a click on the {}: shown={}", what, area.showsArea());

@@ -108,9 +108,7 @@ public class BlazeFurnaceBlock extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof BlazeFurnaceBlockEntity be)) return InteractionResult.SUCCESS;
         if (player.isSecondaryUseActive()) {
-            boolean shown = be.toggleArea();
-            player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.area." + (shown ? "shown" : "hidden"))
-                    .withStyle(ChatFormatting.GOLD));
+            be.toggleArea(player);
             return InteractionResult.SUCCESS;
         }
         player.openMenu(be, pos);

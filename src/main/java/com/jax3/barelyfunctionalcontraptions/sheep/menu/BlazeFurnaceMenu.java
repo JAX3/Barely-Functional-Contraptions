@@ -94,7 +94,7 @@ public class BlazeFurnaceMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (id == BUTTON_AREA && blockEntity != null) {
-            blockEntity.toggleArea();
+            blockEntity.toggleArea(player);
             return true;
         }
         return false;
