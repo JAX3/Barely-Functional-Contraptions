@@ -4,8 +4,8 @@ Logistics
 3. Wool Barrel or drawer: a block that stores large amounts of one item, for resource wool, which builds up fast.
 4. Sheep transport: a Sheep Crate or catching net that picks up an infused sheep and keeps its infusion, skin and stats until you place it again.
 Power
-5. The rest of the themed generators:
-Wool Burner: burns plain or spare wool for power.
+5. [DONE] The rest of the themed generators:
+Wool Burner: burns plain or spare wool for power. (Done, along with the Blaze Sheep Furnace.)
 
 6. Energy tiers or a capacitor item that charges tools, plus a wireless charger.
 Resource generation
