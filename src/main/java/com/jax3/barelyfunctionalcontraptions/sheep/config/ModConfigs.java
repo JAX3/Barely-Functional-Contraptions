@@ -107,6 +107,7 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue glowPanelLightRate;
         public final ModConfigSpec.IntValue glowPanelCapacity;
         public final ModConfigSpec.IntValue glowPanelOutput;
+        public final ModConfigSpec.IntValue blazeFurnaceRadius;
         public final ModConfigSpec.IntValue blazeFurnaceMaxHeaters;
         public final ModConfigSpec.DoubleValue blazeFurnaceFalloff;
         public final ModConfigSpec.IntValue blazeFurnaceCapacity;
@@ -258,7 +259,9 @@ public final class ModConfigs {
                     .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
             b.pop();
 
-            b.comment("Blaze Sheep Furnace (makes FE from the heat of Blaze sheep in the 3x3 area around and above it; heat sources are data-driven, see furnace_heat)").push("blaze_furnace");
+            b.comment("Blaze Sheep Furnace (makes FE from the heat of Blaze sheep in the area around and above it; heat sources are data-driven, see furnace_heat)").push("blaze_furnace");
+            blazeFurnaceRadius = b.comment("How far out the heating area reaches from the furnace, in blocks: 1 = the 3x3 columns around it (default), 2 = 5x5, and so on. It always covers the furnace's own level and the block above. The area outline follows it.")
+                    .defineInRange("radius", 1, 0, 8);
             blazeFurnaceMaxHeaters = b.comment("Most heat sources (sheep) one furnace counts; the hottest are used.")
                     .defineInRange("maxHeatSources", 4, 1, 64);
             blazeFurnaceFalloff = b.comment("How much less each extra heat source adds: the 2nd gives (1 - falloff) of its power, the 3rd (1 - 2 x falloff) and so on. 0 = no falloff.")

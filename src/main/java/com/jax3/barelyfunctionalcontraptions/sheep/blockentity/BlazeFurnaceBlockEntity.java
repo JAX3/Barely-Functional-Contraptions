@@ -135,9 +135,19 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
         super(ModBlockEntities.BLAZE_FURNACE.get(), pos, state);
     }
 
-    /** The 3x3 columns centred on the furnace, at its height and the block above. A mob counts when its feet are inside. */
+    /**
+     * The heating area: the columns within {@code [blaze_furnace] radius} blocks of the furnace (3x3 at the default
+     * radius 1), at its height and the block above. A mob counts when its feet are inside. The area outline shows the
+     * same box. The config is synced, so clients draw the outline at the server's radius.
+     */
     public static AABB heatingArea(BlockPos pos) {
-        return new AABB(pos.getX() - 1, pos.getY(), pos.getZ() - 1, pos.getX() + 2, pos.getY() + 2, pos.getZ() + 2);
+        return heatingArea(pos, ModConfigs.getInt(ModConfigs.SERVER.blazeFurnaceRadius));
+    }
+
+    /** The heating area at {@code radius}: (2 radius + 1) x (2 radius + 1) columns, two blocks tall. */
+    public static AABB heatingArea(BlockPos pos, int radius) {
+        int r = Math.max(0, radius);
+        return new AABB(pos.getX() - r, pos.getY(), pos.getZ() - r, pos.getX() + r + 1, pos.getY() + 2, pos.getZ() + r + 1);
     }
 
     /**

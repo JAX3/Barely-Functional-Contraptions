@@ -2569,6 +2569,16 @@ public final class ModGameTests {
         h.assertTrue(furnace.showsArea() && shears.showsArea(), "sneak-clicking shows the areas");
         h.assertTrue(furnace.displayedArea().equals(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.heatingArea(h.absolutePos(FURNACE_POS))),
                 "the furnace shows its heating area");
+        // The area follows [blaze_furnace] radius: 1 (the default) is 3x3, 2 is 5x5, always two blocks tall.
+        BlockPos abs = h.absolutePos(FURNACE_POS);
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.blazeFurnaceRadius.getDefault() == 1, "the radius defaults to 1");
+        var r1 = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.heatingArea(abs, 1);
+        var r2 = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.heatingArea(abs, 2);
+        var r0 = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.heatingArea(abs, 0);
+        h.assertTrue(r1.getXsize() == 3 && r1.getZsize() == 3 && r1.getYsize() == 2 && r1.minY == abs.getY(), "radius 1 is 3x3, two tall: " + r1);
+        h.assertTrue(r2.getXsize() == 5 && r2.getZsize() == 5 && r2.getYsize() == 2 && r2.contains(net.minecraft.world.phys.Vec3.atBottomCenterOf(abs.offset(2, 0, -2))),
+                "radius 2 is 5x5 and reaches two blocks out: " + r2);
+        h.assertTrue(r0.getXsize() == 1 && r0.contains(net.minecraft.world.phys.Vec3.atBottomCenterOf(abs.above())), "radius 0 is only the furnace's column: " + r0);
         h.assertTrue(shears.displayedArea().equals(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.shearingArea(h.absolutePos(SHEARS_POS), Direction.SOUTH)),
                 "the shears show their shearing area");
         h.assertTrue(furnace.getUpdateTag(h.getLevel().registryAccess()).getBooleanOr("show_area", false)

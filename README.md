@@ -425,7 +425,7 @@ A generator that makes Forge Energy from the **heat of Blaze sheep** standing ar
 |---|---|
 | ![A Blaze Sheep Furnace with four burning Blaze sheep around and on top of it inside an orange outline, and Automatic Shears with a blue 3x3 outline](docs/screenshots/70_blaze_furnace.png) | ![Close-up of the furnace's lit front with Blaze sheep beside and on top of it](docs/screenshots/71_blaze_furnace_close.png) |
 
-- **Where the sheep go:** the **3×3 columns centred on the furnace**, at its own level and the block above. Sheep standing right next to it, at its corners, or on top of it all count. A sheep counts when its feet are in that area.
+- **Where the sheep go:** the **3×3 columns centred on the furnace**, at its own level and the block above. Sheep standing right next to it, at its corners, or on top of it all count. A sheep counts when its feet are in that area. To make the area bigger or smaller, change `radius` in `[blaze_furnace]` in the synced config: `1` is 3×3 (the default), `2` is 5×5, up to `8`. The area outline always matches it.
 - **How much power:** one Blaze sheep gives **80 FE/t**. Each extra one adds a little less (the `falloff`, 12.5%), and the hottest four count (`maxHeatSources`):
 
   | Blaze sheep | Power |
