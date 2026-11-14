@@ -179,6 +179,7 @@
         "Put a whole bale in the Mechanical Separator. It takes 15 times the power of one wool, more than its 9 wool would, and as long as those 9 one at a time. In return it gives 12 wool's worth of everything: a third more resources.",
         "An Iron Wool Bale, for example, gives 24-48 raw iron and 24 string for about 300,000 FE, where its 9 wool would give 18-36 raw iron.",
         "Bales stack to 64, so they also carry nine times as much wool in a chest or pipe.",
+        "To get the wool back, put a bale on its own in any crafting grid: it gives its 9 wool.",
         "## As a block",
         "A bale can be placed like a hay bale, in the colour of its wool, and softens falls the same way. Breaking it gives the bale back.",
         "## Config",

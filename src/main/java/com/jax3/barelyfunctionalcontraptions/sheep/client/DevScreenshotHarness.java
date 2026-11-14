@@ -1627,7 +1627,24 @@ public final class DevScreenshotHarness {
             }
             case 268 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Packer"); }
             case 280 -> shot(mc, "89_guide_wool_packer");
-            case 290 -> mc.stop();
+            // Unpacking: a Diamond Wool Bale in the inventory's 2x2 crafting grid.
+            case 282 -> {
+                mc.gui.setScreen(null);
+                command(server, "gamemode survival @a"); // the survival inventory, with its crafting grid
+                server.execute(() -> {
+                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                    player.inventoryMenu.getSlot(1).set(com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("diamond"), 3));
+                    player.inventoryMenu.slotsChanged(player.inventoryMenu.getCraftSlots());
+                    player.inventoryMenu.broadcastChanges();
+                });
+            }
+            case 288 -> { if (mc.player != null) mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)); }
+            case 296 -> {
+                if (mc.player != null) ResourcefulSheep.LOGGER.info("UNPACK result={}", mc.player.inventoryMenu.getSlot(0).getItem());
+                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // no tooltip over the grid
+            }
+            case 310 -> shot(mc, "90_unpack_wool_bale");
+            case 316 -> mc.stop();
             default -> {}
         }
     }

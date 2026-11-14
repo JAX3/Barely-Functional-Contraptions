@@ -169,6 +169,7 @@ public final class ModGameTests {
         TESTS.put("wool_packer_pauses_and_works_with_hoppers", ModGameTests::woolPackerPausesAndHoppers);
         TESTS.put("wool_bale_separates_for_more", ModGameTests::woolBaleSeparationNumbers);
         TESTS.put("wool_bale_block_keeps_its_wool", ModGameTests::woolBaleBlock);
+        TESTS.put("wool_bale_unpacks_into_nine_wool", ModGameTests::woolBaleUnpacks);
         TESTS.put(LONG_BALE_TEST, ModGameTests::separatorSeparatesBale);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -2805,6 +2806,37 @@ public final class ModGameTests {
         ItemStack picked = h.getBlockState(pos).getCloneItemStack(h.getLevel(), h.absolutePos(pos), false);
         h.assertTrue(isBaleOf(picked, IRON, 1), "pick-block gives the same bale, got " + picked);
         h.assertTrue(h.getBlockState(pos).is(net.minecraft.tags.BlockTags.MINEABLE_WITH_HOE), "a hoe breaks it fastest");
+        h.succeed();
+    }
+
+    /** A Wool Bale alone in a crafting grid gives back its 9 wool, of the same resource; anything else doesn't match. */
+    private static void woolBaleUnpacks(GameTestHelper h) {
+        var level = h.getLevel();
+        java.util.function.Function<List<ItemStack>, ItemStack> craft = items -> {
+            var input = net.minecraft.world.item.crafting.CraftingInput.of(3, 3, items);
+            return level.recipeAccess().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, level)
+                    .map(holder -> holder.value().assemble(input)).orElse(ItemStack.EMPTY);
+        };
+        java.util.function.Function<ItemStack, List<ItemStack>> grid = stack -> {
+            List<ItemStack> items = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+            items.set(4, stack);
+            return items;
+        };
+        var bale = com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(IRON, 1);
+        ItemStack out = craft.apply(grid.apply(bale));
+        h.assertTrue(out.getCount() == 9 && out.getItem() instanceof ResourceWoolItem && IRON.equals(ResourceWoolItem.getResourceId(out)),
+                "an Iron Wool Bale unpacks into 9 Iron Wool, got " + out);
+        var gold = com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("gold"), 1);
+        List<ItemStack> corner = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        corner.set(0, gold);
+        ItemStack goldOut = craft.apply(corner);
+        h.assertTrue(goldOut.getCount() == 9 && ResourcefulSheep.id("gold").equals(ResourceWoolItem.getResourceId(goldOut)),
+                "anywhere in the grid, and it keeps the wool: " + goldOut);
+        List<ItemStack> two = grid.apply(bale);
+        two.set(0, bale.copy());
+        h.assertTrue(craft.apply(two).isEmpty() || !(craft.apply(two).getItem() instanceof ResourceWoolItem), "two bales at once don't unpack");
+        h.assertTrue(!(craft.apply(grid.apply(new ItemStack(ModItems.WOOL_BALE.get()))).getItem() instanceof ResourceWoolItem),
+                "a bale with no wool gives nothing");
         h.succeed();
     }
 

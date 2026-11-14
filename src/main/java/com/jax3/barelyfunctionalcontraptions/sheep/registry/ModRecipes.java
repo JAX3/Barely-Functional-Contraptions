@@ -27,5 +27,9 @@ public final class ModRecipes {
             () -> SeparatingRecipe.SERIALIZER);
     public static final Supplier<RecipeBookCategory> SEPARATING_CATEGORY = BOOK_CATEGORIES.register("separating", RecipeBookCategory::new);
 
+    /** Shapeless crafting of a Wool Bale back into its 9 wool ({@code "type": "barelyfunctionalcontraptions:unpack_wool_bale"}). */
+    public static final Supplier<RecipeSerializer<com.jax3.barelyfunctionalcontraptions.sheep.recipe.UnpackWoolBaleRecipe>> UNPACK_WOOL_BALE_SERIALIZER =
+            SERIALIZERS.register("unpack_wool_bale", () -> com.jax3.barelyfunctionalcontraptions.sheep.recipe.UnpackWoolBaleRecipe.SERIALIZER);
+
     private ModRecipes() {}
 }

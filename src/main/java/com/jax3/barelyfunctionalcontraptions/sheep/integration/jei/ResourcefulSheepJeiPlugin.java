@@ -65,6 +65,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         if (!bales.isEmpty()) {
             registration.addItemStackInfo(bales, Component.translatable("jei.barelyfunctionalcontraptions.info.wool_bale"));
         }
+        registration.addRecipes(mezz.jei.api.constants.RecipeTypes.CRAFTING, unpackingRecipes(resources));
         registration.addItemStackInfo(new ItemStack(ModItems.WOOL_PACKER.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.wool_packer"));
         registration.addItemStackInfo(new ItemStack(ModItems.MECHANICAL_SEPARATOR.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.separator"));
         registration.addItemStackInfo(new ItemStack(ModItems.CREATIVE_GENERATOR.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.creative_generator"));
@@ -98,6 +99,26 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
             displays.add(new SeparationDisplay(holder.id().identifier(), inputs, holder.value().toSeparation()));
         }
         return displays;
+    }
+
+    /**
+     * The special bale-unpacking recipe can't list its inputs, so JEI gets one ordinary shapeless recipe per wool:
+     * that wool's bale gives 9 of it.
+     */
+    static List<RecipeHolder<net.minecraft.world.item.crafting.CraftingRecipe>> unpackingRecipes(SheepResourceRegistry resources) {
+        List<RecipeHolder<net.minecraft.world.item.crafting.CraftingRecipe>> recipes = new ArrayList<>();
+        for (SheepResource resource : resources.all()) {
+            var bale = net.neoforged.neoforge.common.crafting.DataComponentIngredient.of(true, ModDataComponents.SHEEP_RESOURCE.get(), resource.id(), ModItems.WOOL_BALE.get());
+            var wool = new net.minecraft.world.item.ItemStackTemplate(ModItems.RESOURCE_WOOL.get(),
+                    com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.WOOL_PER_BALE,
+                    net.minecraft.core.component.DataComponentPatch.builder().set(ModDataComponents.SHEEP_RESOURCE.get(), resource.id()).build());
+            var recipe = new net.minecraft.world.item.crafting.ShapelessRecipe(new net.minecraft.world.item.crafting.Recipe.CommonInfo(false),
+                    new net.minecraft.world.item.crafting.CraftingRecipe.CraftingBookInfo(net.minecraft.world.item.crafting.CraftingBookCategory.MISC, ""),
+                    wool, List.of(bale));
+            Identifier id = ResourcefulSheep.id("unpack_wool_bale/" + resource.id().getNamespace() + "/" + resource.id().getPath());
+            recipes.add(new RecipeHolder<>(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id), recipe));
+        }
+        return recipes;
     }
 
     @Override

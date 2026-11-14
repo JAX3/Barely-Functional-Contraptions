@@ -839,7 +839,7 @@
   "gui.barelyfunctionalcontraptions.wool_packer.progress.desc": "%s FE a bale.",
   "jade.barelyfunctionalcontraptions.wool_packer.pressing": "Pressing a bale: %s%%",
   "config.jade.plugin_barelyfunctionalcontraptions.wool_packer": "Wool Packer",
-  "jei.barelyfunctionalcontraptions.info.wool_bale": "9 of one resource wool, pressed together in a Wool Packer. Separate the whole bale in a Mechanical Separator: it takes more power than its 9 wool, but gives a third more of everything (by default). It can also be placed as a block.",
+  "jei.barelyfunctionalcontraptions.info.wool_bale": "9 of one resource wool, pressed together in a Wool Packer. Separate the whole bale in a Mechanical Separator: it takes more power than its 9 wool, but gives a third more of everything (by default). It can also be placed as a block, or crafted on its own back into its 9 wool.",
   "jei.barelyfunctionalcontraptions.info.wool_packer": "Presses 9 of the same resource wool into a Wool Bale, using a little power. Hoppers and pipes can feed it wool and take the bales out.",
   "advancements.barelyfunctionalcontraptions.wool_packer.title": "Bale Out",
   "advancements.barelyfunctionalcontraptions.wool_packer.description": "Press a Wool Bale in a Wool Packer",

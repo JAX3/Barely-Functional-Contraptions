@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 39/39 passed |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 129 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 94 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 130 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 95 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 51 screenshots and 12 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Themed sheep (the ideas in `Custom block.txt`)
@@ -39,6 +39,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | GameTest `wool_bale_separates_for_more` | ✅ An Iron Wool Bale separates into 24-48 raw iron, 24 string and a 10% chance of 36 nuggets, for 300,600 FE (334 FE/t, rounded up) over 900 ticks; a bale with no wool doesn't separate; a bale of a wool whose outputs stack to 16 gives at most 16 |
 | GameTest `separator_separates_a_whole_bale` | ✅ A real Mechanical Separator turns one Iron Wool Bale into 24-48 raw iron and 24 string and uses it up (this test gets 1,200 ticks; a bale takes 900) |
 | GameTest `wool_bale_block_keeps_its_wool` | ✅ A placed bale stores its wool from the item, drops the same Iron Wool Bale when broken, gives it on pick-block, and is mined fastest with a hoe |
+| GameTest `wool_bale_unpacks_into_nine_wool` | ✅ An Iron Wool Bale alone in a 3x3 grid crafts into 9 Iron Wool, and a Gold Wool Bale in a corner into 9 Gold Wool; two bales at once, or a bale with no wool, don't match |
+| Real client, unpacking (`90_unpack_wool_bale.png`) | ✅ 3 Diamond Wool Bales in the survival inventory's 2x2 grid show 9 Diamond Wool in the result slot (the log reads `UNPACK result=9 barelyfunctionalcontraptions:resource_wool`) |
 | Real client, Wool Packer (`-PharnessScene=wool_packer`) | ✅ Two packers fed by hoppers from chests: the log reads `status=PROCESSING progress=7/40`, and the separator beside them works an Iron Wool Bale at `334` FE/t over `900` ticks. 14 placed bales of the built-in wools each show their own wool colour; the log shows the client knew each bale's wool. The window shows nine lit pips, the arrow filling and *Pressing a bale*; hovering the pips shows *Wool: 8 of 9*. The bale's tooltip shows in the separator, and the manual's new Wool Packer chapter is on the Logistics tab. The creative test checks the Resource Wool tab has a bale of every wool |
 | Real client, meter set-ups (`-PharnessScene=meter_setups`) | ✅ Meters placed by real floor clicks in six set-ups read: generator→meter→separator 250 FE/t; generator→cable→meter→cable→separator 250 FE/t; cube→meter→separator 1,000 FE/t; Glow Panel→meter→cable→cube 60 FE/t; creative generator→cables→meter→cables→cube 1,000,000 FE moved then 0 once the cube was full; a lone meter beside a generator shows NO OUTPUT in red. The number is readable on the top face from the front |
 | Generator GameTests | ✅ Updated: Wheat and Bone Meal are no longer generated (the Hay and Skeleton sheep cover them), and a generated copy of either is flagged as a duplicate |

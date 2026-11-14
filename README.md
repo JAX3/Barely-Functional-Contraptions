@@ -562,6 +562,11 @@ So a bale gives a third more of everything for two-thirds more power. Every coun
 
 All of this is in `[wool_packer]` in the synced config: `baleYield` (12 = 12 wool's worth of outputs), `baleEnergy` (15 = 15 wool's energy) and `baleTime` (9 = 9 wool's time). A separating recipe whose ingredient matches a Wool Bale with its `sheep_resource` component gives that bale its own outputs instead.
 
+#### Unpacking bales
+Put a bale on its own anywhere in a crafting grid (the inventory's 2x2 grid works) to get its **9 wool** back, of the same resource. JEI lists this for every wool type. The recipe is `data/barelyfunctionalcontraptions/recipe/unpack_wool_bale.json`; a data pack can remove it by overriding that file.
+
+![A Diamond Wool Bale in the inventory's crafting grid, with 9 Diamond Wool in the result slot](docs/screenshots/90_unpack_wool_bale.png)
+
 #### Placing bales
 A bale can be placed like a hay bale, standing up or lying down, in the colour of its wool with two steel straps round it. It softens falls the same way, breaks fastest with a hoe, and drops the same bale back. Pick-block gives the bale too. The creative Resource Wool tab has a bale of every wool after the wools.
 
