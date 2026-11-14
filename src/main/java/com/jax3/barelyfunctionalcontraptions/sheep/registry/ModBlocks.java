@@ -133,6 +133,15 @@ public final class ModBlocks {
                     .sound(SoundType.IRON)
                     .lightLevel(state -> 15));
 
+    /** Makes FE from the heat of Blaze sheep around it. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock> BLAZE_FURNACE = REGISTER.registerBlock("blaze_furnace",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock::new,
+            p -> p.mapColor(MapColor.NETHER)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.IRON)
+                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.LIT) ? 13 : 0));
+
     /** The invisible light a glowing sheep leaves where it stands; removes itself once the sheep has moved on. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock> SHEEP_GLOW = REGISTER.registerBlock("sheep_glow",
             com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock::new,

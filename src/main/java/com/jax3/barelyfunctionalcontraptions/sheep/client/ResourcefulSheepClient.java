@@ -59,6 +59,10 @@ public final class ResourcefulSheepClient {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.FLUID_TANK.get(), context -> new FluidTankRenderer());
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.ENERGY_METER.get(), context -> new EnergyMeterRenderer());
+            event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.AUTOMATIC_SHEARS.get(), context -> new AreaOutlineRenderer<>());
+            event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.BLAZE_FURNACE.get(), context -> new AreaOutlineRenderer<>());
         });
 
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onRecipesReceived);
@@ -128,7 +132,8 @@ public final class ResourcefulSheepClient {
                     String.format(java.util.Locale.ROOT, "%,d", com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CableNetwork.transferRate()))
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
-        for (var item : java.util.List.of(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_LAMP)) {
+        for (var item : java.util.List.of(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_LAMP,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLAZE_FURNACE)) {
             if (event.getItemStack().is(item.get())) {
                 event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions." + item.getId().getPath())
                         .withStyle(net.minecraft.ChatFormatting.GRAY));

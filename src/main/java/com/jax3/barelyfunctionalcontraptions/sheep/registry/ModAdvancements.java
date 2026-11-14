@@ -27,6 +27,8 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 public final class ModAdvancements {
     public static final String LINK_GENERATORS = "contraptions/link_generators";
     public static final String AUTO_SHEAR = "contraptions/auto_shear";
+    /** A Blaze Sheep Furnace starting to make power from heat within {@link #AUTO_SHEAR_RADIUS} blocks of you. */
+    public static final String BLAZE_FURNACE = "contraptions/blaze_furnace";
     public static final String ZERO_POINT_DEATH = "contraptions/zero_point_death";
     public static final String INFUSE_SHEEP = "contraptions/infuse_sheep";
     /** Players this close to Automatic Shears when they shear a sheep get {@link #AUTO_SHEAR}. */

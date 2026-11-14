@@ -22,6 +22,10 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.CREATIVE_GENERATOR.get(), (be, side) -> be.getEnergyHandler());
         // Glow Panel: its buffer, on every face (it only pushes sideways and down itself).
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.GLOW_PANEL.get(), (be, side) -> be.getEnergyHandler());
+        // Blaze Sheep Furnace: its buffer on every face, and its boost slot (in only) for hoppers and pipes.
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.BLAZE_FURNACE.get(), (be, side) -> be.getEnergyHandler());
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.BLAZE_FURNACE.get(),
+                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Energy Meter: in at the back, out at the front, nothing on the other faces.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.ENERGY_METER.get(), (be, side) -> be.getEnergyHandler(side));
         // Fluid Tank: the whole connected group, in and out, on every face.

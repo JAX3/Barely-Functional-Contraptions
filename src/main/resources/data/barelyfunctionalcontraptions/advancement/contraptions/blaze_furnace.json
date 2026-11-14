@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/sheep/blaze",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:blaze_furnace"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.blaze_furnace.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.blaze_furnace.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

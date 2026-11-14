@@ -1,0 +1,8 @@
+{
+  "values": {
+    "minecraft:blaze_rod": {
+      "multiplier": 2.0,
+      "duration": 600
+    }
+  }
+}

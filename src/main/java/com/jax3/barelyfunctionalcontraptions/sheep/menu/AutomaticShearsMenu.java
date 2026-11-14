@@ -25,6 +25,7 @@ public class AutomaticShearsMenu extends AbstractContainerMenu {
     public static final int GRID_X = 96, GRID_Y = 20;
     public static final int INVENTORY_Y = 111;
     public static final int BUTTON_REDSTONE = 0;
+    public static final int BUTTON_AREA = 1;
 
     private static final int MACHINE_SLOTS = AutomaticShearsBlockEntity.SIZE;
     private static final int PLAYER_START = MACHINE_SLOTS;
@@ -103,6 +104,10 @@ public class AutomaticShearsMenu extends AbstractContainerMenu {
             blockEntity.cycleRedstoneMode();
             return true;
         }
+        if (id == BUTTON_AREA && blockEntity != null) {
+            blockEntity.toggleArea();
+            return true;
+        }
         return false;
     }
 
@@ -125,6 +130,7 @@ public class AutomaticShearsMenu extends AbstractContainerMenu {
     public RedstoneMode getRedstoneMode() { return RedstoneMode.byId(data.get(7)); }
     public boolean isPowered() { return data.get(8) != 0; }
     public int getEnergyPerShear() { return combine(9, 10); }
+    public boolean isShowingArea() { return data.get(11) != 0; }
 
     public float getEnergyFraction() {
         int cap = getCapacity();

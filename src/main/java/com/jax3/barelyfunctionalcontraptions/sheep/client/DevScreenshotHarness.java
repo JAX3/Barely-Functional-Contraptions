@@ -93,6 +93,10 @@ public final class DevScreenshotHarness {
             newBlocksTick(mc, server);
             return;
         }
+        if ("blaze_furnace".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            blazeFurnaceTick(mc, server);
+            return;
+        }
         if ("power_blocks".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             powerBlocksTick(mc, server);
             return;
@@ -1458,6 +1462,91 @@ public final class DevScreenshotHarness {
             case 300 -> mc.stop();
             default -> {}
         }
+    }
+
+    /** The Blaze Sheep Furnace with four Blaze sheep, and both machines' working areas shown: {@code -PharnessScene=blaze_furnace}. */
+    private static void blazeFurnaceTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> blazeFurnaceScene(server));
+            case 70 -> setHudHidden(mc, true);
+            case 75 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 165 32", origin.getX() + 1.5, origin.getY() + 3, origin.getZ() + 2.5));
+            case 130 -> server.execute(() -> {
+                ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                if (level.getBlockEntity(origin.offset(0, 0, -4)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity be) {
+                    ResourcefulSheep.LOGGER.info("FURNACE generating={} heat={} heaters={} boost={}t x{} waiting={} lit={} message='{}'", be.generating(), be.heat(),
+                            be.heaterCount(), be.boostTicks(), be.boostMultiplier(), be.boostItems(), be.getBlockState().getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.LIT),
+                            com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.statusMessage(be).getString());
+                }
+            });
+            case 140 -> shot(mc, "62_blaze_furnace");
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 0.5, origin.getY() + 2, origin.getZ() - 1.2));
+            case 170 -> shot(mc, "63_blaze_furnace_close");
+            case 172 -> {
+                command(server, "time set midnight");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 165 32", origin.getX() + 1.5, origin.getY() + 3, origin.getZ() + 2.5));
+            }
+            case 230 -> shot(mc, "64_blaze_furnace_night");
+            case 232 -> {
+                setHudHidden(mc, false);
+                server.execute(() -> {
+                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                    BlockPos pos = origin.offset(5, 0, -4);
+                    if (player.level().getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity be) player.openMenu(be, pos);
+                });
+            }
+            case 250 -> shot(mc, "65_shears_area_button");
+            case 252 -> {
+                if (mc.player != null) mc.player.closeContainer();
+                mc.gui.setScreen(new GuideScreen());
+            }
+            case 262 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter(10); }
+            case 275 -> shot(mc, "66_guide_blaze_furnace");
+            case 285 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    private static void blazeFurnaceScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false", "gamerule advance_weather false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(10, 6, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(10, -1, 4))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        // The furnace, front to the camera, with a Hume Energy Cube under it and Blaze Rods loaded.
+        BlockPos furnacePos = o.offset(0, 0, -4);
+        level.setBlock(furnacePos, ModBlocks.BLAZE_FURNACE.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.FACING, Direction.SOUTH), 3);
+        level.setBlock(furnacePos.below(), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        if (level.getBlockEntity(furnacePos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity be) {
+            be.insertBoost(new ItemStack(Items.BLAZE_ROD, 5), null);
+            be.setShowsArea(true);
+        }
+        // Four Blaze sheep: one on top, one either side and one behind. A plain sheep in front doesn't count.
+        double[][] spots = {{0.5, 1, -3.5, 160}, {-0.5, 0, -3.5, 120}, {1.5, 0, -3.5, -120}, {0.5, 0, -4.5, 0}, {-0.5, 0, -2.5, 200}};
+        for (int i = 0; i < spots.length; i++) {
+            double[] at = spots[i];
+            Sheep sh = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            float yaw = (float) at[3];
+            sh.snapTo(o.getX() + at[0], o.getY() + at[1], o.getZ() + at[2], yaw, 0);
+            sh.setYHeadRot(yaw);
+            sh.yHeadRotO = yaw;
+            sh.setYBodyRot(yaw);
+            sh.yBodyRotO = yaw;
+            sh.setNoAi(true);
+            if (i < 4) SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id("blaze")), 9, 0));
+            level.addFreshEntity(sh);
+        }
+        // Automatic Shears to the right, facing the camera, with their shearing area shown.
+        BlockPos shearsPos = o.offset(5, 0, -4);
+        level.setBlock(shearsPos, ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.SOUTH), 3);
+        if (level.getBlockEntity(shearsPos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity be) be.setShowsArea(true);
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 165 32", o.getX() + 1.5, o.getY() + 3, o.getZ() + 2.5));
     }
 
     private static void powerBlocksScene(MinecraftServer server) {

@@ -24,6 +24,9 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity>> GLOW_PANEL = REGISTER.register("glow_panel",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity::new, ModBlocks.GLOW_PANEL.get()));
 
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity>> BLAZE_FURNACE = REGISTER.register("blaze_furnace",
+            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity::new, ModBlocks.BLAZE_FURNACE.get()));
+
     public static final Supplier<BlockEntityType<CreativeGeneratorBlockEntity>> CREATIVE_GENERATOR = REGISTER.register("creative_generator",
             () -> new BlockEntityType<>(CreativeGeneratorBlockEntity::new, ModBlocks.CREATIVE_GENERATOR.get()));
 

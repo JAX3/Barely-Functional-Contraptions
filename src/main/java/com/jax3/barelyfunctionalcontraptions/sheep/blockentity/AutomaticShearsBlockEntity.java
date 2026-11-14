@@ -50,10 +50,11 @@ import org.jspecify.annotations.Nullable;
  *     Energy and the redstone mode are kept when the block is broken.</li>
  * </ul>
  */
-public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity {
+public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity implements AreaDisplay {
+    public static final int AREA_COLOR = 0xFF7FD3FF;
     public static final int SIZE = 9;
     /** Number of int fields synced to the menu (split into 16-bit halves where needed). */
-    public static final int DATA_COUNT = 11;
+    public static final int DATA_COUNT = 12;
     /** Ticks the status stays on "Shearing" after a sweep that sheared something. */
     private static final int SHEARING_DISPLAY_TICKS = 12;
 
@@ -65,6 +66,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity {
     private MachineStatus status = MachineStatus.IDLE;
     private RedstoneMode redstoneMode = ModConfigs.get(ModConfigs.SERVER.defaultRedstoneMode);
     private boolean powered;
+    private boolean showArea;
 
     private final ContainerData data = new ContainerData() {
         @Override
@@ -82,6 +84,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity {
                 case 8 -> powered ? 1 : 0;
                 case 9 -> cost & 0xFFFF;
                 case 10 -> cost >>> 16;
+                case 11 -> showArea ? 1 : 0;
                 default -> 0;
             };
         }
@@ -242,6 +245,43 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity {
         setRedstoneMode(redstoneMode.next());
     }
 
+    // ------------------------------------------------------------------ area outline
+
+    @Override
+    public boolean showsArea() {
+        return showArea;
+    }
+
+    @Override
+    public void setShowsArea(boolean show) {
+        showArea = show;
+        setChanged();
+        if (level != null) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+    }
+
+    @Override
+    public AABB displayedArea() {
+        return shearingArea(worldPosition, getBlockState().getValue(AutomaticShearsBlock.FACING));
+    }
+
+    @Override
+    public int areaColor() {
+        return AREA_COLOR;
+    }
+
+    @Override
+    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    /** Clients only need the area setting. */
+    @Override
+    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+        tag.putBoolean("show_area", showArea);
+        return tag;
+    }
+
     // ------------------------------------------------------------------ container
 
     @Override
@@ -285,6 +325,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity {
         input.child("energy").ifPresent(energy::deserialize);
         cooldown = input.getIntOr("cooldown", 0);
         redstoneMode = RedstoneMode.byId(input.getIntOr("redstone_mode", redstoneMode.ordinal()));
+        showArea = input.getBooleanOr("show_area", false);
     }
 
     @Override
@@ -294,6 +335,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity {
         energy.serialize(output.child("energy"));
         output.putInt("cooldown", cooldown);
         output.putInt("redstone_mode", redstoneMode.ordinal());
+        output.putBoolean("show_area", showArea);
     }
 
     /** Broken blocks keep their stored energy and redstone mode (same component as the separator). */

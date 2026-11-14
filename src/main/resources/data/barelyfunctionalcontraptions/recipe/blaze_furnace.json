@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "N": "minecraft:nether_bricks",
+    "B": "minecraft:blaze_rod",
+    "F": "minecraft:blast_furnace",
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
+    "I": "minecraft:iron_bars",
+    "R": "minecraft:redstone"
+  },
+  "pattern": [
+    "NIN",
+    "BMB",
+    "RFR"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:blaze_furnace"
+  }
+}

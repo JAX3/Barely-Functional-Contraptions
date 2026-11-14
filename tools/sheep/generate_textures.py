@@ -9,6 +9,7 @@ All art is procedurally drawn here (no vanilla textures are read or copied); onl
 the UV *layout* of the sheep fur model (64x32) is matched so the overlay wraps
 the vanilla model correctly.
 """
+import math
 import os
 import random
 from PIL import Image
@@ -2439,6 +2440,114 @@ def generate_glow_panel():
     grid(GLOW_LAMP, lamp).save(out("block/glow_lamp.png"))
 
 
+BLAZE_FURNACE_FRONT = [  # Blaze Sheep Furnace front: steel casing, brass-rimmed fire mouth (filled in per state)
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMMMMMMMbSSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHMOCCCCCCCCOMSO",
+    "OHMO........OMSO",
+    "OHMO........OMSO",
+    "OHMO........OMSO",
+    "OHMO........OMSO",
+    "OHMO........OMSO",
+    "OHMOCCCCCCCCOMSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+BLAZE_FURNACE_SIDE = [  # side: steel casing with three heat vents
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMMMMMMMbSSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHMOVVVVVVVVOMSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHMOVVVVVVVVOMSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHMOVVVVVVVVOMSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+BLAZE_FURNACE_TOP = [  # top: an iron grate over the embers, where the sheep stand
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHOOOOOOOOOOOOSO",
+    "OHOHVHVHVHVHVOSO",
+    "OHOHVHVHVHVHVOSO",
+    "OHOMVMVMVMVMVOSO",
+    "OHOHVHVHVHVHVOSO",
+    "OHOHVHVHVHVHVOSO",
+    "OHOMVMVMVMVMVOSO",
+    "OHOHVHVHVHVHVOSO",
+    "OHOHVHVHVHVHVOSO",
+    "OHOMVMVMVMVMVOSO",
+    "OHOSVSVSVSVSVOSO",
+    "OHOOOOOOOOOOOOSO",
+    "OMSSSSSSSSSSSSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+FIRE = [hexc("#5a1408"), hexc("#a3260c"), hexc("#e8561a"), hexc("#ff9a2e"), hexc("#ffd25a"), hexc("#fff4c2")]
+
+
+def _fire_mouth(img, oy, t, lit):
+    """The 8x5 fire mouth at (4, 6): dull embers when cold, flickering flames (frame t of 8) when lit."""
+    for x in range(8):
+        for y in range(5):
+            px, py = 4 + x, oy + 6 + y
+            depth = 4 - y  # 0 at the bottom row
+            if not lit:
+                c = hexc("#141019") if depth > 0 else (hexc("#4a1a12") if x % 3 == 1 else hexc("#2a2238"))
+            else:
+                # Flame height per column, wavering over the 8 frames.
+                h = 2.6 + 1.6 * math.sin(t * math.pi / 4 + x * 1.9) + 0.8 * math.sin(t * math.pi / 2 + x * 0.7)
+                heat = h - depth  # >0 inside the flame, bigger is hotter
+                if heat <= -0.5:
+                    c = hexc("#2b0a06")
+                else:
+                    c = FIRE[max(0, min(len(FIRE) - 1, int(heat + 1.5)))]
+            img.putpixel((px, py), c)
+
+
+def generate_blaze_furnace():
+    """Blaze Sheep Furnace: front (cold, and an 8-frame animated fire), sides and top grate (cold and lit)."""
+    pal = dict(CARTOON)
+    front = grid(BLAZE_FURNACE_FRONT, pal)
+    _fire_mouth(front, 0, 0, False)
+    front.save(out("block/blaze_furnace_front.png"))
+    frames = 8
+    anim = Image.new("RGBA", (16, 16 * frames), CLEAR)
+    for t in range(frames):
+        grid(BLAZE_FURNACE_FRONT, pal, anim, 0, 16 * t)
+        _fire_mouth(anim, 16 * t, t, True)
+    anim.save(out("block/blaze_furnace_front_on.png"))
+    with open(out("block/blaze_furnace_front_on.png") + ".mcmeta", "w") as f:
+        f.write('{\n  "animation": {\n    "frametime": 3\n  }\n}\n')
+    cold = dict(CARTOON)
+    cold["V"] = hexc("#2a2238")
+    lit = dict(CARTOON)
+    lit["V"] = hexc("#ff8a2a")
+    grid(BLAZE_FURNACE_SIDE, cold).save(out("block/blaze_furnace_side.png"))
+    grid(BLAZE_FURNACE_SIDE, lit).save(out("block/blaze_furnace_side_lit.png"))
+    grid(BLAZE_FURNACE_TOP, cold).save(out("block/blaze_furnace_top.png"))
+    top = grid(BLAZE_FURNACE_TOP, lit)
+    for y in range(3, 13):  # embers glow unevenly between the bars
+        for x in range(4, 13, 2):
+            k = (x * 7 + y * 3) % 6
+            top.putpixel((x, y), FIRE[4] if k == 0 else FIRE[3] if k < 3 else FIRE[2])
+    top.save(out("block/blaze_furnace_top_lit.png"))
+
+
 MANUAL = [  # Contraptions Manual: a purple book with a brass gear on the cover
     "................",
     "..OOOOOOOOOOO...",
@@ -2481,6 +2590,7 @@ def main():
     generate_energy_cable()
     generate_energy_meter()
     generate_glow_panel()
+    generate_blaze_furnace()
     generate_manual()
     generate_reservoir_gui()
     generate_energy_cube()

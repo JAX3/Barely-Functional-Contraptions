@@ -107,6 +107,10 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue glowPanelLightRate;
         public final ModConfigSpec.IntValue glowPanelCapacity;
         public final ModConfigSpec.IntValue glowPanelOutput;
+        public final ModConfigSpec.IntValue blazeFurnaceMaxHeaters;
+        public final ModConfigSpec.DoubleValue blazeFurnaceFalloff;
+        public final ModConfigSpec.IntValue blazeFurnaceCapacity;
+        public final ModConfigSpec.IntValue blazeFurnaceOutput;
         public final ModConfigSpec.IntValue automaticShearsInterval;
         public final ModConfigSpec.IntValue automaticShearsEnergyPerShear;
         public final ModConfigSpec.IntValue automaticShearsEnergyCapacity;
@@ -251,6 +255,17 @@ public final class ModConfigs {
             glowPanelCapacity = b.comment("FE each panel stores.")
                     .defineInRange("capacity", 10_000, 1, Integer.MAX_VALUE);
             glowPanelOutput = b.comment("Most FE a panel pushes into the blocks beside and below it per tick, in total.")
+                    .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Blaze Sheep Furnace (makes FE from the heat of Blaze sheep in the 3x3 area around and above it; heat sources are data-driven, see furnace_heat)").push("blaze_furnace");
+            blazeFurnaceMaxHeaters = b.comment("Most heat sources (sheep) one furnace counts; the hottest are used.")
+                    .defineInRange("maxHeatSources", 4, 1, 64);
+            blazeFurnaceFalloff = b.comment("How much less each extra heat source adds: the 2nd gives (1 - falloff) of its power, the 3rd (1 - 2 x falloff) and so on. 0 = no falloff.")
+                    .defineInRange("falloff", 0.125, 0.0, 1.0);
+            blazeFurnaceCapacity = b.comment("FE each furnace stores.")
+                    .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
+            blazeFurnaceOutput = b.comment("Most FE a furnace pushes into the blocks around it per tick, in total.")
                     .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
             b.pop();
 

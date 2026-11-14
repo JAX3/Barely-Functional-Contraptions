@@ -63,6 +63,9 @@ public final class ResourcefulSheep {
         container.registerConfig(ModConfig.Type.CLIENT, ModConfigs.CLIENT_SPEC, BarelyFunctionalContraptions.MOD_ID + "-sheep-client.toml");
 
         NeoForge.EVENT_BUS.register(SheepResourceManager.Events.class);
+        NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceHeatManager.Events.class);
+        modBus.addListener((net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent event) ->
+                event.register(com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceBoostDataMap.TYPE));
         NeoForge.EVENT_BUS.register(SheepInfusionEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.command.ResourcefulSheepCommand.class);

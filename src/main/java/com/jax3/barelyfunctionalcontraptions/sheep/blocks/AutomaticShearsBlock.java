@@ -71,7 +71,14 @@ public class AutomaticShearsBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof AutomaticShearsBlockEntity be) {
-            player.openMenu(be, pos);
+            if (player.isSecondaryUseActive()) {
+                // Sneak-click with an empty hand: show or hide the shearing area.
+                boolean shown = be.toggleArea();
+                player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("message.barelyfunctionalcontraptions.area." + (shown ? "shown" : "hidden"))
+                        .withStyle(net.minecraft.ChatFormatting.AQUA));
+            } else {
+                player.openMenu(be, pos);
+            }
         }
         return InteractionResult.SUCCESS;
     }

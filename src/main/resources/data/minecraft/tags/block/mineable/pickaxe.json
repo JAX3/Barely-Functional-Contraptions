@@ -12,6 +12,7 @@
     "barelyfunctionalcontraptions:item_pipe",
     "barelyfunctionalcontraptions:fluid_tank",
     "barelyfunctionalcontraptions:energy_meter",
-    "barelyfunctionalcontraptions:glow_panel"
+    "barelyfunctionalcontraptions:glow_panel",
+    "barelyfunctionalcontraptions:blaze_furnace"
   ]
 }

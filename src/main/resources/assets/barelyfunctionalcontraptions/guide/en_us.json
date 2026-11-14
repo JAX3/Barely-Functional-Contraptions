@@ -133,6 +133,21 @@
       ]
     },
     {
+      "title": "Blaze Sheep Furnace",
+      "icon": "barelyfunctionalcontraptions:blaze_furnace",
+      "text": [
+        "The Blaze Sheep Furnace makes power from the heat of Blaze sheep standing in the 3x3 area around it, on its own level or on top of it.",
+        "- One Blaze sheep gives 80 FE/t. Each extra one adds a little less: 150, 210 and 260 FE/t for two, three and four. It counts up to four.",
+        "- Only a sheep showing its blazing fleece counts. A sheared sheep or a lamb gives nothing until its wool grows back.",
+        "- In rain or water a sheep gives half.",
+        "- Right-click with a Blaze Rod to load it: each rod doubles the output for 30 seconds. Hoppers and pipes can fill it too.",
+        "Shear the sheep for Blaze Rods, or leave the fleece on for power: that's the trade-off.",
+        "It pushes its energy into every block around it, and a comparator reads one level per 20 FE/t.",
+        "## Showing the area",
+        "Sneak-right-click the furnace or the Automatic Shears with an empty hand to show or hide its working area. The shears also have a button for it in their window."
+      ]
+    },
+    {
       "title": "Pipe Sides",
       "icon": "barelyfunctionalcontraptions:item_pipe",
       "text": [
@@ -154,6 +169,7 @@
       "text": [
         "Sheep resources are data: data/<namespace>/barelyfunctionalcontraptions/sheep_resources/<name>.json. They reload with /reload.",
         "An appearance block gives any resource wings, extra heads, glowing, a bigger size, its own sounds and more.",
+        "Furnace heat sources are data too: data/<namespace>/barelyfunctionalcontraptions/furnace_heat/<name>.json names a sheep, an entity or a look such as on_fire, and its power. Boost items are the blaze_furnace_boost data map.",
         "## Commands",
         "- /barelyfunctionalcontraptions list: every loaded resource.",
         "- /barelyfunctionalcontraptions generate: a resource for every material in the modpack.",

@@ -156,6 +156,10 @@ public final class ModGameTests {
         TESTS.put("glow_panel_runs_on_glow_lamps", ModGameTests::glowPanel);
         TESTS.put("recipe_support_wool_ingredient_and_fuel_data_map", ModGameTests::recipeSupport);
         TESTS.put("melon_slice_gives_a_sheep_the_skin", ModGameTests::melonSliceSkin);
+        TESTS.put("blaze_furnace_heats_from_blaze_sheep", ModGameTests::blazeFurnaceHeat);
+        TESTS.put("blaze_furnace_blaze_rod_boost", ModGameTests::blazeFurnaceBoost);
+        TESTS.put("blaze_furnace_heat_sources_are_data", ModGameTests::blazeFurnaceData);
+        TESTS.put("machines_show_their_working_area", ModGameTests::machineAreaToggle);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -1044,7 +1048,7 @@ public final class ModGameTests {
                 "the Functional Machine Block has a shaped recipe");
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FUNCTIONAL_MACHINE_BLOCK.get().defaultBlockState()
                 .is(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE), "mined with a pickaxe");
-        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "fluid_tank", "zero_point_energy_module")) {
+        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "fluid_tank", "zero_point_energy_module", "blaze_furnace")) {
             var holder = recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
                     ResourcefulSheep.id(machine))).orElse(null);
             h.assertTrue(holder != null && holder.value() instanceof net.minecraft.world.item.crafting.ShapedRecipe, "missing recipe " + machine);
@@ -2429,6 +2433,162 @@ public final class ModGameTests {
     }
 
     // ------------------------------------------------------------------ Hume Energy Cube
+
+    // ------------------------------------------------------------------ Blaze Sheep Furnace
+
+    private static final BlockPos FURNACE_POS = new BlockPos(3, 1, 3);
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity furnace(GameTestHelper h) {
+        h.getLevel().resetWeatherCycle(); // rain halves a sheep's heat
+        h.setBlock(FURNACE_POS, ModBlocks.BLAZE_FURNACE.get());
+        return h.getBlockEntity(FURNACE_POS, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.class);
+    }
+
+    private static net.minecraft.world.phys.BlockHitResult hitTop(GameTestHelper h, BlockPos rel) {
+        BlockPos abs = h.absolutePos(rel);
+        return new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(abs).add(0, 0.5, 0), Direction.UP, abs, false);
+    }
+
+    private static void blazeFurnaceHeat(GameTestHelper h) {
+        var furnace = furnace(h);
+        var cube = cube(h, FURNACE_POS.below());
+        Identifier blaze = ResourcefulSheep.id("blaze");
+        sheepAt(h, new BlockPos(2, 1, 3), blaze);
+        Sheep plain = sheepAt(h, new BlockPos(4, 1, 3), null);
+        h.runAfterDelay(25, () -> {
+            h.assertTrue(furnace.generating() == 80, "one Blaze sheep beside it gives 80 FE/t, got " + furnace.generating());
+            h.assertTrue(furnace.heaterCount() == 1, "the plain sheep beside it doesn't count, counted " + furnace.heaterCount());
+            h.assertTrue(h.getBlockState(FURNACE_POS).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.LIT), "it lights up");
+            h.assertTrue(furnace.comparatorSignal() == 4, "a comparator reads one level per 20 FE/t, got " + furnace.comparatorSignal());
+            h.assertTrue(cube.getEnergyHandler().getAmountAsLong() > 0, "it charges the cube under it");
+            // Three more around it and one standing on top: only the hottest four count, each adding less.
+            Sheep onTop = sheepAt(h, FURNACE_POS.above(), blaze);
+            Sheep east = sheepAt(h, new BlockPos(4, 1, 2), blaze);
+            sheepAt(h, new BlockPos(2, 1, 4), blaze);
+            sheepAt(h, new BlockPos(4, 1, 4), blaze);
+            sheepAt(h, new BlockPos(3, 1, 6), blaze); // two blocks past the 3x3: out of range
+            Sheep lamb = sheepAt(h, new BlockPos(2, 1, 2), blaze);
+            lamb.setBaby(true);
+            h.runAfterDelay(25, () -> {
+                h.assertTrue(furnace.heaterCount() == 4, "it counts four of the five in range, counted " + furnace.heaterCount());
+                h.assertTrue(furnace.generating() == 260, "four Blaze sheep give 80 + 70 + 60 + 50 = 260 FE/t, got " + furnace.generating());
+                // Sheared sheep have no flames: down to three.
+                onTop.setSheared(true);
+                east.setSheared(true);
+                plain.discard();
+                h.runAfterDelay(25, () -> {
+                    h.assertTrue(furnace.generating() == 210, "three Blaze sheep give 210 FE/t, got " + furnace.generating());
+                    h.succeed();
+                });
+            });
+        });
+    }
+
+    private static void blazeFurnaceBoost(GameTestHelper h) {
+        var furnace = furnace(h);
+        var state = h.getBlockState(FURNACE_POS);
+        // Right-click with Blaze Rods loads them; anything else doesn't go in.
+        Player player = playerHolding(h, new ItemStack(Items.BLAZE_ROD, 3));
+        state.useItemOn(player.getMainHandItem(), h.getLevel(), player, InteractionHand.MAIN_HAND, hitTop(h, FURNACE_POS));
+        h.assertTrue(furnace.boostItems().is(Items.BLAZE_ROD) && furnace.boostItems().getCount() == 3, "three Blaze Rods go in, got " + furnace.boostItems());
+        h.assertTrue(player.getMainHandItem().isEmpty(), "and leave the player's hand");
+        Player cobble = playerHolding(h, new ItemStack(Items.COBBLESTONE, 5));
+        var result = state.useItemOn(cobble.getMainHandItem(), h.getLevel(), cobble, InteractionHand.MAIN_HAND, hitTop(h, FURNACE_POS));
+        h.assertTrue(result instanceof net.minecraft.world.InteractionResult.TryEmptyHandInteraction && cobble.getMainHandItem().getCount() == 5,
+                "cobblestone isn't a boost item");
+        // A hopper pointing into it adds rods and keeps everything else; a hopper below can't take them out.
+        h.setBlock(new BlockPos(3, 1, 2), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.SOUTH));
+        var feeder = h.getBlockEntity(new BlockPos(3, 1, 2), net.minecraft.world.level.block.entity.HopperBlockEntity.class);
+        feeder.setItem(0, new ItemStack(Items.BLAZE_ROD, 2));
+        feeder.setItem(1, new ItemStack(Items.DIRT, 1));
+        h.setBlock(FURNACE_POS.below(), Blocks.HOPPER);
+        h.runAfterDelay(30, () -> {
+            h.assertTrue(furnace.boostItems().getCount() == 5, "the hopper adds its two rods and none are burnt without heat, got " + furnace.boostItems());
+            h.assertTrue(furnace.boostTicks() == 0, "nothing burns while there's no heat to boost");
+            h.assertTrue(feeder.getItem(1).is(Items.DIRT), "dirt stays in the hopper");
+            sheepAt(h, new BlockPos(2, 1, 3), ResourcefulSheep.id("blaze"));
+            h.runAfterDelay(25, () -> {
+                h.assertTrue(furnace.boostTicks() > 0 && furnace.boostItems().getCount() == 4, "a sheep's heat burns one rod, left " + furnace.boostItems());
+                h.assertTrue(furnace.generating() == 160, "a Blaze Rod doubles 80 FE/t to 160, got " + furnace.generating());
+                h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.statusMessage(furnace).getString().contains("x2"),
+                        "right-click says it's boosted: " + com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.statusMessage(furnace).getString());
+                h.assertTrue(h.getBlockEntity(FURNACE_POS.below(), net.minecraft.world.level.block.entity.HopperBlockEntity.class).isEmpty(),
+                        "the hopper under it can't pull rods out");
+                h.succeed();
+            });
+        });
+    }
+
+    private static void blazeFurnaceData(GameTestHelper h) {
+        h.getLevel().resetWeatherCycle();
+        var sources = com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceHeatManager.sources();
+        h.assertTrue(sources.stream().anyMatch(e -> e.getKey().equals(ResourcefulSheep.id("blaze_sheep")))
+                && sources.stream().anyMatch(e -> e.getKey().equals(ResourcefulSheep.id("fiery_sheep"))), "the built-in heat sources load: " + sources);
+        var ops = net.minecraft.resources.RegistryOps.create(com.mojang.serialization.JsonOps.INSTANCE, h.getLevel().registryAccess());
+        var codec = com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceHeat.CODEC;
+        java.util.function.Function<String, com.mojang.serialization.DataResult<com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceHeat>> parse =
+                json -> codec.parse(ops, com.google.gson.JsonParser.parseString(json));
+        var cowHeat = parse.apply("{\"entity\": \"minecraft:cow\", \"power\": 30}").getOrThrow();
+        h.assertTrue(parse.apply("{\"entity\": \"#minecraft:skeletons\", \"power\": 5}").isSuccess(), "an entity tag parses");
+        h.assertTrue(parse.apply("{\"sheep\": \"a:b\", \"feature\": \"on_fire\", \"power\": 5}").isError(), "two kinds at once is an error");
+        h.assertTrue(parse.apply("{\"power\": 5}").isError(), "no kind is an error");
+        var glowing = parse.apply("{\"feature\": \"glowing\", \"power\": 10}").getOrThrow();
+        var cow = h.spawn(EntityTypes.COW, new BlockPos(1, 1, 1));
+        cow.setNoAi(true);
+        Sheep blaze = sheepAt(h, new BlockPos(3, 1, 3), ResourcefulSheep.id("blaze"));
+        Sheep glowInk = sheepAt(h, new BlockPos(5, 1, 1), ResourcefulSheep.id("glow_ink"));
+        h.assertTrue(cowHeat.matches(cow) && !cowHeat.matches(blaze), "an entity source matches that entity only");
+        h.assertTrue(glowing.matches(glowInk) && !glowing.matches(blaze), "a feature source matches sheep showing that look");
+        var heat = com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceHeatManager.heatOf(blaze).orElseThrow();
+        h.assertTrue(heat.power() == 80 && heat.sheep().isPresent(), "the Blaze sheep's own source (80) wins over the on_fire one (60), got " + heat);
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceHeatManager.heatOf(cow).isEmpty(), "a cow isn't a heat source by default");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.combine(List.of(80.0, 80.0, 80.0, 80.0, 80.0), 4, 0.125) == 260,
+                "four of five count, with falloff");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.combine(List.of(10.0, 30.0), 4, 0.0) == 40, "no falloff just adds");
+        // Standing in water: half its heat.
+        Sheep wet = sheepAt(h, new BlockPos(5, 1, 5), ResourcefulSheep.id("blaze"));
+        h.setBlock(new BlockPos(5, 1, 5), Blocks.WATER);
+        h.runAfterDelay(3, () -> {
+            h.assertTrue(heat.powerFor(wet) == 40 && heat.powerFor(blaze) == 80, "in water it gives half: " + heat.powerFor(wet));
+            h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceBoostDataMap.of(new ItemStack(Items.BLAZE_ROD)) != null
+                    && com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceBoostDataMap.of(new ItemStack(Items.BLAZE_ROD)).duration() == 600,
+                    "the Blaze Rod boost comes from the data map");
+            h.succeed();
+        });
+    }
+
+    private static void machineAreaToggle(GameTestHelper h) {
+        var shears = autoShears(h);
+        var furnace = furnace(h);
+        Player player = h.makeMockPlayer(GameType.SURVIVAL);
+        h.assertFalse(shears.showsArea() || furnace.showsArea(), "areas start hidden");
+        // Sneak-right-click with an empty hand toggles it.
+        player.setShiftKeyDown(true);
+        h.getBlockState(FURNACE_POS).useWithoutItem(h.getLevel(), player, hitTop(h, FURNACE_POS));
+        h.getBlockState(SHEARS_POS).useWithoutItem(h.getLevel(), player, hitTop(h, SHEARS_POS));
+        h.assertTrue(furnace.showsArea() && shears.showsArea(), "sneak-clicking shows the areas");
+        h.assertTrue(furnace.displayedArea().equals(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.heatingArea(h.absolutePos(FURNACE_POS))),
+                "the furnace shows its heating area");
+        h.assertTrue(shears.displayedArea().equals(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.shearingArea(h.absolutePos(SHEARS_POS), Direction.SOUTH)),
+                "the shears show their shearing area");
+        h.assertTrue(furnace.getUpdateTag(h.getLevel().registryAccess()).getBooleanOr("show_area", false)
+                && shears.getUpdateTag(h.getLevel().registryAccess()).getBooleanOr("show_area", false), "and tell clients");
+        // The shears' window button toggles it too, and shows it in the menu.
+        var menu = new com.jax3.barelyfunctionalcontraptions.sheep.menu.AutomaticShearsMenu(0, player.getInventory(), shears,
+                new net.minecraft.world.inventory.SimpleContainerData(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.DATA_COUNT) {
+                    @Override
+                    public int get(int index) {
+                        return index == 11 ? (shears.showsArea() ? 1 : 0) : 0;
+                    }
+                });
+        menu.clickMenuButton(player, com.jax3.barelyfunctionalcontraptions.sheep.menu.AutomaticShearsMenu.BUTTON_AREA);
+        h.assertFalse(shears.showsArea() || menu.isShowingArea(), "the window button hides it");
+        // Without sneaking, the furnace just reports and the setting stays.
+        player.setShiftKeyDown(false);
+        h.getBlockState(FURNACE_POS).useWithoutItem(h.getLevel(), player, hitTop(h, FURNACE_POS));
+        h.assertTrue(furnace.showsArea(), "a plain click doesn't change it");
+        h.succeed();
+    }
 
     private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity cube(GameTestHelper h, BlockPos pos) {
         h.setBlock(pos, ModBlocks.HUME_ENERGY_CUBE.get());
