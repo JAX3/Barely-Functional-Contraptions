@@ -2331,7 +2331,13 @@ public final class ModGameTests {
             int rate = com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.glowPanelLightRate);
             h.assertTrue(panel.generating() == rate, "a Glow Lamp gives the full " + rate + " FE/t, got " + panel.generating());
             h.assertTrue(panel.source() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity.Source.GLOW, "from glow light, got " + panel.source());
-            h.assertTrue(h.getBlockState(lit).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock.LIT), "its cells light up");
+            var GLOW = com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock.GLOW;
+            h.assertTrue(h.getBlockState(lit).getValue(GLOW) == 2, "a lamp's 40 of the best 60 FE/t lights the cells half way, got " + h.getBlockState(lit).getValue(GLOW));
+            h.assertTrue(h.getBlockState(dark).getValue(GLOW) == 0, "a covered panel stays dark");
+            java.util.function.IntUnaryOperator glowFor = com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock::glowFor;
+            h.assertTrue(glowFor.applyAsInt(60) == 3 && glowFor.applyAsInt(40) == 2 && glowFor.applyAsInt(20) == 1
+                    && glowFor.applyAsInt(1) == 1 && glowFor.applyAsInt(0) == 0, "full sun is brightest, dusk dim, nothing dark");
+            h.assertTrue(h.getBlockState(lit).getLightEmission() == 2, "and it gives off light to match");
             h.assertTrue(cube.getEnergyHandler().getAmountAsLong() > 0, "it charges the cube beside it");
             var covered = h.getBlockEntity(dark, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity.class);
             h.assertTrue(covered.generating() == 0 && covered.getEnergyHandler().getAmountAsInt() == 0, "a covered panel makes nothing");

@@ -99,8 +99,8 @@ public class GlowPanelBlockEntity extends BlockEntity {
         be.source = be.generating <= 0 ? Source.NONE : sun >= glow ? Source.SUN : Source.GLOW;
         be.energy.generate(be.generating);
         be.push(level, pos);
-        boolean lit = be.generating > 0;
-        if (state.getValue(GlowPanelBlock.LIT) != lit) level.setBlock(pos, state.setValue(GlowPanelBlock.LIT, lit), Block.UPDATE_CLIENTS);
+        int brightness = GlowPanelBlock.glowFor(be.generating);
+        if (state.getValue(GlowPanelBlock.GLOW) != brightness) level.setBlock(pos, state.setValue(GlowPanelBlock.GLOW, brightness), Block.UPDATE_CLIENTS);
     }
 
     private void push(ServerLevel level, BlockPos pos) {

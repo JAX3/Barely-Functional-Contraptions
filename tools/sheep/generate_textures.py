@@ -2626,6 +2626,11 @@ def generate_glow_panel():
     lit = dict(CARTOON)
     lit["C"], lit["c"] = hexc("#9ffbe8"), hexc("#3fcfc0")
     grid(GLOW_PANEL_TOP, lit).save(out("block/glow_panel_top_lit.png"))
+    # In between, for when it makes less than its best (dusk, rain, a Glow Lamp at night): the cells part lit.
+    for name, t in (("dim", 0.35), ("half", 0.68)):
+        part = dict(CARTOON)
+        part["C"], part["c"] = mix(idle["C"], lit["C"], t), mix(idle["c"], lit["c"], t)
+        grid(GLOW_PANEL_TOP, part).save(out(f"block/glow_panel_top_{name}.png"))
     grid(GLOW_PANEL_SIDE, dict(CARTOON)).save(out("block/glow_panel_side.png"))
     lamp = dict(CARTOON)
     lamp["C"], lamp["c"], lamp["Y"], lamp["G"] = hexc("#5ee8d6"), hexc("#2fb7b0"), hexc("#b8fff2"), hexc("#ffffff")

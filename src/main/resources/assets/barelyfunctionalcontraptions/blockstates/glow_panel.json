@@ -1,9 +1,15 @@
 {
   "variants": {
-    "lit=false": {
+    "glow=0": {
       "model": "barelyfunctionalcontraptions:block/glow_panel"
     },
-    "lit=true": {
+    "glow=1": {
+      "model": "barelyfunctionalcontraptions:block/glow_panel_dim"
+    },
+    "glow=2": {
+      "model": "barelyfunctionalcontraptions:block/glow_panel_half"
+    },
+    "glow=3": {
       "model": "barelyfunctionalcontraptions:block/glow_panel_lit"
     }
   }

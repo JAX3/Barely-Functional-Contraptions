@@ -413,15 +413,19 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 ### Glow Panel and Glow Lamp
 The **Glow Panel** is a thin, solar-style generator that makes Forge Energy from the **light falling on its top**. The **Glow Lamp** is a full-brightness lamp of glow ink that keeps the panels going at night and underground.
 
-| By day | At night |
+| By day | At sunset |
 |---|---|
-| ![Glow Panels in the sun, panels under Glow Lamps, and an Energy Meter reading 60 FE/t from a panel](docs/screenshots/55_glow_panels.png) | ![The same scene at midnight: the panels under the lamps still run](docs/screenshots/57_glow_panels_night.png) |
+| ![Glow Panels in the sun, panels under Glow Lamps, and an Energy Meter reading 60 FE/t from a panel](docs/screenshots/55_glow_panels.png) | ![The same scene at sunset: the panels in the open glow a dimmer teal and the meter reads 21 FE/t](docs/screenshots/91_glow_panels_dusk.png) |
+
+At midnight the panels under the lamps still run:
+
+![The same scene at midnight: the panels under the lamps still run](docs/screenshots/57_glow_panels_night.png)
 
 - **Sunlight:** with open sky above it, a panel makes up to **60 FE/t** (`sunRate`). It reads the sun the way a daylight detector does: less at dawn and dusk, in rain and in shade, and **nothing at night**.
 - **Glow light:** it also makes up to **40 FE/t** (`lightRate`) from **block light** on its top, scaled by the light level. A **Glow Lamp** sitting on it or above it gives the full 40 FE/t, and so does glowstone or any other light-15 block. A glowing **Glow Ink sheep** (light 12) standing right beside a panel lights it to about 29 FE/t. The panel uses whichever of sun or glow gives more.
 - **Shade:** a solid block on top that doesn't glow (stone, a machine) shades it completely.
 - **Output:** it stores 10,000 FE and pushes up to 1,000 FE/t into blocks **beside and below** it (cables, machines, Hume Energy Cubes, other mods' FE blocks). Cables and machines can also pull from it. Panels don't charge each other, and nothing can be pushed into a panel.
-- Its cells light up while it is making power. **Right-click** or **Jade** shows how much it makes and from which light. Every number is in `[glow_panel]` in the synced config.
+- **Its cells show how much it is making.** They are dark when it makes nothing, dim when it makes up to a third of its best (60 FE/t by default): at dawn, dusk, in rain or in a lamp's spill light. They are half lit up to two-thirds (a Glow Lamp's 40 FE/t, so at night under a lamp) and fully lit above that (the midday sun). The panel gives off a little light to match (0 to 3). **Right-click** or **Jade** shows how much it makes and from which light. Every number is in `[glow_panel]` in the synced config.
 - **Recipes:**
   - Glow Panel: a row of glass, a daylight detector between two quartz, and iron ingots around redstone.
   - 2 Glow Lamps: glass in the corners, Glow Ink Sacs on the sides and glowstone dust in the middle.

@@ -124,7 +124,7 @@ public final class ModBlocks {
             p -> p.mapColor(MapColor.COLOR_CYAN)
                     .strength(1.5F, 6.0F)
                     .sound(SoundType.IRON)
-                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock.LIT) ? 3 : 0));
+                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock.GLOW)));
 
     /** A full-brightness lamp of glow ink: lights Glow Panels at night and underground. */
     public static final DeferredBlock<net.minecraft.world.level.block.Block> GLOW_LAMP = REGISTER.registerSimpleBlock("glow_lamp",

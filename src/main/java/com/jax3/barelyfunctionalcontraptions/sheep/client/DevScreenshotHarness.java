@@ -1489,14 +1489,31 @@ public final class DevScreenshotHarness {
                 command(server, "time set midnight");
                 command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 35", origin.getX() + 0.5, origin.getY() + 2, origin.getZ() + 1.5));
             }
+            case 138, 258, 318 -> logPanels(server);
             case 260 -> shot(mc, "58_glow_panels_night");
-            case 262 -> mc.gui.setScreen(new GuideScreen());
-            case 275 -> shot(mc, "60_guide");
-            case 277 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Glow Panels"); }
-            case 290 -> shot(mc, "61_guide_glow_panels");
-            case 300 -> mc.stop();
+            // Sunset: the open-sky panels make less, so their cells glow dimmer.
+            case 262 -> command(server, "time set 12300");
+            case 320 -> shot(mc, "58_glow_panels_dusk");
+            case 322 -> mc.gui.setScreen(new GuideScreen());
+            case 335 -> shot(mc, "60_guide");
+            case 337 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Glow Panels"); }
+            case 350 -> shot(mc, "61_guide_glow_panels");
+            case 360 -> mc.stop();
             default -> {}
         }
+    }
+
+    /** Logs every Glow Panel near the scene: what it makes and how brightly its cells glow. */
+    private static void logPanels(MinecraftServer server) {
+        server.execute(() -> {
+            ServerLevel level = server.overworld();
+            for (BlockPos p : BlockPos.betweenClosed(origin.offset(-10, -2, -10), origin.offset(10, 4, 10))) {
+                if (level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity panel) {
+                    ResourcefulSheep.LOGGER.info("PANEL at {} generating={} source={} glow={}", p.immutable(),
+                            panel.generating(), panel.source(), panel.getBlockState().getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock.GLOW));
+                }
+            }
+        });
     }
 
     /**
