@@ -109,6 +109,13 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue glowPanelOutput;
         public final ModConfigSpec.IntValue woolBurnerCapacity;
         public final ModConfigSpec.IntValue woolBurnerOutput;
+        public final ModConfigSpec.BooleanValue statsEnabled;
+        public final ModConfigSpec.IntValue statsMax;
+        public final ModConfigSpec.DoubleValue statsIncreaseChance;
+        public final ModConfigSpec.DoubleValue statsDecreaseChance;
+        public final ModConfigSpec.DoubleValue statsYieldPerPoint;
+        public final ModConfigSpec.DoubleValue statsGrowthPerPoint;
+        public final ModConfigSpec.DoubleValue statsEndurancePerPoint;
         public final ModConfigSpec.IntValue woolPackerCapacity;
         public final ModConfigSpec.IntValue woolPackerMaxInput;
         public final ModConfigSpec.IntValue woolPackerEnergyPerBale;
@@ -273,6 +280,23 @@ public final class ModConfigs {
                     .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
             woolBurnerOutput = b.comment("Most FE a Wool Burner pushes into the blocks around it per tick, in total.")
                     .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Sheep stats from breeding: Yield, Growth and Endurance, each 1 (wild) to maxStat. A lamb gets its parents' average, with a chance of one more.").push("sheep_stats");
+            statsEnabled = b.comment("Whether bred stats are passed on and have any effect. Off: every sheep acts like a wild one (stats already bred are kept).")
+                    .define("enabled", true);
+            statsMax = b.comment("Highest a stat can reach.")
+                    .defineInRange("maxStat", 10, 1, 100);
+            statsIncreaseChance = b.comment("Chance (0-1) that each of a lamb's stats comes out one higher than its parents' average.")
+                    .defineInRange("increaseChance", 0.25, 0.0, 1.0);
+            statsDecreaseChance = b.comment("Chance (0-1) that each of a lamb's stats comes out one lower than its parents' average.")
+                    .defineInRange("decreaseChance", 0.05, 0.0, 1.0);
+            statsYieldPerPoint = b.comment("Yield: extra wool per shearing for each point above 1, as a share of the normal amount. 0.15 = Yield 10 shears 2.35 times as much (fractions are a chance of one more).")
+                    .defineInRange("yieldPerPoint", 0.15, 0.0, 10.0);
+            statsGrowthPerPoint = b.comment("Growth: chance per second, for each point above 1, that a sheared sheep regrows its wool on its own without eating grass. 0.01 = Growth 10 regrows in about 11 seconds on average.")
+                    .defineInRange("growthPerPoint", 0.01, 0.0, 1.0);
+            statsEndurancePerPoint = b.comment("Endurance: extra shearings an infusion lasts for each point above 1, as a share of its normal uses. 0.1 = Endurance 10 lasts 1.9 times as long.")
+                    .defineInRange("endurancePerPoint", 0.1, 0.0, 10.0);
             b.pop();
 
             b.comment("Wool Packer (FE-powered; presses 9 of the same resource wool into a Wool Bale) and Wool Bales in the Mechanical Separator").push("wool_packer");

@@ -850,5 +850,14 @@
   "barelyfunctionalcontraptions.configuration.baleEnergy": "Bale energy (wool's worth)",
   "barelyfunctionalcontraptions.configuration.baleTime": "Bale time (wool's worth)",
   "barelyfunctionalcontraptions.configuration.energyCapacity": "Buffer (FE)",
-  "barelyfunctionalcontraptions.configuration.maxEnergyInput": "Max input (FE/t)"
+  "barelyfunctionalcontraptions.configuration.maxEnergyInput": "Max input (FE/t)",
+  "message.barelyfunctionalcontraptions.stats": "Yield %s · Growth %s · Endurance %s",
+  "barelyfunctionalcontraptions.configuration.sheep_stats": "Sheep Stats",
+  "barelyfunctionalcontraptions.configuration.maxStat": "Highest stat",
+  "barelyfunctionalcontraptions.configuration.increaseChance": "Chance a lamb's stat goes up",
+  "barelyfunctionalcontraptions.configuration.decreaseChance": "Chance a lamb's stat goes down",
+  "barelyfunctionalcontraptions.configuration.yieldPerPoint": "Yield: extra wool per point",
+  "barelyfunctionalcontraptions.configuration.growthPerPoint": "Growth: regrow chance per point",
+  "barelyfunctionalcontraptions.configuration.endurancePerPoint": "Endurance: extra uses per point",
+  "barelyfunctionalcontraptions.configuration.enabled": "Enabled"
 }

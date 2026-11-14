@@ -28,6 +28,8 @@ public enum SheepInfusionProvider implements IEntityComponentProvider {
     public void appendTooltip(ITooltip tooltip, EntityAccessor accessor, IPluginConfig config) {
         Entity entity = accessor.getEntity();
         if (!ModTags.isInfusable(entity)) return;
+        var stats = SheepInfusionEvents.getStats(entity);
+        if (!stats.isWild()) tooltip.add(SheepInfusionEvents.statsLine(stats));
         SheepInfusion infusion = SheepInfusionEvents.getInfusion(entity);
         long now = accessor.getLevel().getGameTime();
         if (!infusion.isInfused()) {

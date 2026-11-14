@@ -43,6 +43,21 @@ public final class SheepInfusionEvents {
         entity.setData(ModAttachments.SHEEP_INFUSION, infusion);
     }
 
+    /** The sheep's bred stats as they act now: a wild sheep's when {@code [sheep_stats] enabled} is off. */
+    public static SheepStats getStats(Entity entity) {
+        if (!ModConfigs.getBool(ModConfigs.SERVER.statsEnabled)) return SheepStats.WILD;
+        return entity.getData(ModAttachments.SHEEP_STATS).clamped();
+    }
+
+    public static void setStats(Entity entity, SheepStats stats) {
+        entity.setData(ModAttachments.SHEEP_STATS, stats.clamped());
+    }
+
+    /** Shearings an infusion of {@code resource} lasts on this sheep: the resource's uses, raised by its Endurance. */
+    public static int infusionUses(Entity entity, SheepResource resource) {
+        return getStats(entity).infusionUses(resource.effectiveInfusionUses());
+    }
+
     public static Optional<SheepResource> getInfusedResource(Entity entity) {
         return getInfusion(entity).resource().flatMap(id -> SheepResourceRegistry.get(entity.level()).byId(id));
     }
@@ -121,18 +136,26 @@ public final class SheepInfusionEvents {
     }
 
     /**
-     * Breeding: a lamb takes after its parents. If they are infused it is born infused with one of their resources
-     * (either one at random when they differ), with that resource's full number of shearings. Its wool, like any
-     * lamb's, only drops once it has grown up. The parents keep their own infusions.
+     * Breeding: a lamb takes after its parents. Its bred stats are their average, with a chance of one more
+     * ({@link SheepStats#bred}). If they are infused it is born infused with one of their resources (either one at
+     * random when they differ), with that resource's full number of shearings, raised by its own Endurance. Its wool,
+     * like any lamb's, only drops once it has grown up. The parents keep their own infusions.
      */
     @SubscribeEvent
     public static void onBabySpawn(net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent event) {
         var child = event.getChild();
         if (child == null || !(child.level() instanceof ServerLevel level) || !ModTags.isInfusable(child)) return;
+        if (ModConfigs.getBool(ModConfigs.SERVER.statsEnabled)) {
+            SheepStats stats = SheepStats.bred(getStats(event.getParentA()), getStats(event.getParentB()), level.getRandom());
+            setStats(child, stats);
+            if (stats.total() > Math.max(getStats(event.getParentA()).total(), getStats(event.getParentB()).total())) {
+                level.sendParticles(ParticleTypes.HAPPY_VILLAGER, child.getX(), child.getY() + 0.6, child.getZ(), 8, 0.3, 0.3, 0.3, 0.0);
+            }
+        }
         Optional<SheepResource> inherited = inheritedResource(event.getParentA(), event.getParentB(), level.getRandom());
         if (inherited.isEmpty()) return;
         SheepResource resource = inherited.get();
-        setInfusion(child, SheepInfusion.NONE.withResource(resource.id(), resource.effectiveInfusionUses()));
+        setInfusion(child, SheepInfusion.NONE.withResource(resource.id(), infusionUses(child, resource)));
         if (ModConfigs.getBool(ModConfigs.SERVER.feedingParticles)) {
             double x = child.getX(), y = child.getY() + 0.5, z = child.getZ();
             level.sendParticles(new DustParticleOptions(resource.woolColor(), 1.0F), x, y, z, 14, 0.3, 0.25, 0.3, 0.02);
@@ -170,7 +193,7 @@ public final class SheepInfusionEvents {
         if (current.isInfused() && getInfusedResource(sheep).isPresent()) {
             boolean same = current.resource().get().equals(resource.id());
             if (same) {
-                int max = resource.effectiveInfusionUses();
+                int max = infusionUses(sheep, resource);
                 boolean canRefresh = ModConfigs.getBool(ModConfigs.SERVER.sameResourceRefreshesUses) && max > 0 && current.usesRemaining() < max;
                 if (!canRefresh) return Component.translatable("message.barelyfunctionalcontraptions.already_infused", resource.name());
             } else if (!creativeBypass && !ModConfigs.getBool(ModConfigs.SERVER.allowReplacingInfusion)) {
@@ -187,7 +210,7 @@ public final class SheepInfusionEvents {
 
     static void infuse(ServerLevel level, Player player, LivingEntity sheep, SheepResource resource, ItemStack stack) {
         SheepInfusion current = getInfusion(sheep);
-        setInfusion(sheep, current.withResource(resource.id(), resource.effectiveInfusionUses()));
+        setInfusion(sheep, current.withResource(resource.id(), infusionUses(sheep, resource)));
 
         boolean consume = !player.hasInfiniteMaterials() || ModConfigs.getBool(ModConfigs.SERVER.creativeConsumesItems);
         if (consume) stack.shrink(resource.effectiveFeedingAmount());
@@ -207,8 +230,21 @@ public final class SheepInfusionEvents {
         }
     }
 
-    /** Action-bar description used by sneak-inspection. */
+    /** Action-bar description used by sneak-inspection: the infusion, then the bred stats once they aren't wild. */
     public static Component describe(LivingEntity sheep) {
+        Component infusion = describeInfusion(sheep);
+        SheepStats stats = getStats(sheep);
+        if (stats.isWild()) return infusion;
+        return infusion.copy().append(Component.literal("  ")).append(statsLine(stats));
+    }
+
+    /** "Yield 3 · Growth 2 · Endurance 4", for inspection and Jade. */
+    public static Component statsLine(SheepStats stats) {
+        return Component.translatable("message.barelyfunctionalcontraptions.stats", stats.yield(), stats.growth(), stats.endurance())
+                .withStyle(ChatFormatting.GOLD);
+    }
+
+    private static Component describeInfusion(LivingEntity sheep) {
         SheepInfusion infusion = getInfusion(sheep);
         if (!infusion.isInfused()) {
             if (infusion.onCooldown(sheep.level().getGameTime())) {

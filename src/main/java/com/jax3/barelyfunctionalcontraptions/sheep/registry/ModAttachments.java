@@ -17,6 +17,13 @@ public final class ModAttachments {
                     .sync(SheepInfusion.STREAM_CODEC)
                     .build());
 
+    /** Bred stats of a sheep (yield, growth, endurance). Persisted once they differ from a wild sheep's, and synced. */
+    public static final Supplier<AttachmentType<com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats>> SHEEP_STATS = REGISTER.register("sheep_stats",
+            () -> AttachmentType.builder(() -> com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats.WILD)
+                    .serialize(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats.CODEC, stats -> !stats.isWild())
+                    .sync(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats.STREAM_CODEC)
+                    .build());
+
     /** The player whose skin a sheep wears (fed a Melon Slice). Persisted only when set, and synced to tracking clients. */
     public static final Supplier<AttachmentType<com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepSkin>> SHEEP_SKIN = REGISTER.register("sheep_skin",
             () -> AttachmentType.builder(() -> com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepSkin.NONE)

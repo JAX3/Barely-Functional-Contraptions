@@ -50,18 +50,19 @@ public final class InfusedWoolLootModifier extends LootModifier {
         if (entity == null || !ModTags.isInfusable(entity)) return loot;
 
         SheepInfusion infusion = SheepInfusionEvents.getInfusion(entity);
-        if (!infusion.isInfused()) return loot;
+        SheepStats stats = SheepInfusionEvents.getStats(entity);
+        if (!infusion.isInfused()) return withYield(loot, stats, context);
         Optional<SheepResource> resource = SheepResourceRegistry.server().byId(infusion.resource().get());
         if (resource.isEmpty()) {
             // The wool type isn't loaded right now (its data pack was removed or disabled, or its mod is missing).
             // Keep the infusion untouched so the sheep is infused again as soon as the definition comes back;
             // until then it shears like a normal sheep. Feeding it a resource replaces the stale infusion.
             ResourcefulSheep.LOGGER.debug("Infusion {} on {} is not loaded; shearing normally and keeping it", infusion.resource().get(), entity);
-            return loot;
+            return withYield(loot, stats, context);
         }
 
         loot.removeIf(stack -> stack.is(ModTags.REPLACEABLE_WOOL));
-        int count = resource.get().effectiveWoolDropCount();
+        int count = stats.woolCount(resource.get().effectiveWoolDropCount(), context.getRandom());
         if (context.getRandom().nextDouble() < ModConfigs.getDouble(ModConfigs.SERVER.shearingBonusChance)) {
             count += ModConfigs.getInt(ModConfigs.SERVER.shearingBonusAmount);
         }
@@ -74,6 +75,25 @@ public final class InfusedWoolLootModifier extends LootModifier {
         SheepInfusionEvents.setInfusion(entity, infusion.afterShearing(context.getLevel().getGameTime(),
                 ModConfigs.getInt(ModConfigs.SERVER.infusionCooldownTicks)));
         return loot;
+    }
+
+    /** A sheep that isn't infused still gets its Yield: more of its plain wool. */
+    private static ObjectArrayList<ItemStack> withYield(ObjectArrayList<ItemStack> loot, SheepStats stats, LootContext context) {
+        if (stats.yield() <= 1) return loot;
+        ObjectArrayList<ItemStack> out = new ObjectArrayList<>();
+        for (ItemStack stack : loot) {
+            if (!stack.is(ModTags.REPLACEABLE_WOOL)) {
+                out.add(stack);
+                continue;
+            }
+            int count = stats.woolCount(stack.getCount(), context.getRandom());
+            while (count > 0) {
+                int n = Math.min(count, stack.getMaxStackSize());
+                out.add(stack.copyWithCount(n));
+                count -= n;
+            }
+        }
+        return out;
     }
 
     @Override

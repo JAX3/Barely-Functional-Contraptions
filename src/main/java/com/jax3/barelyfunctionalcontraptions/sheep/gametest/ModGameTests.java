@@ -136,6 +136,8 @@ public final class ModGameTests {
         TESTS.put("fluid_tank_keeps_its_share_when_broken", ModGameTests::tankBreak);
         TESTS.put("fluid_tank_buckets", ModGameTests::tankBuckets);
         TESTS.put("breeding_inheritance_rules", ModGameTests::breedingRules);
+        TESTS.put("sheep_stats_are_bred", ModGameTests::sheepStatsBred);
+        TESTS.put("sheep_stats_yield_endurance_growth", ModGameTests::sheepStatsEffects);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -760,8 +762,9 @@ public final class ModGameTests {
      * Iron parent and a plain one also give an Iron lamb, and two plain sheep give a plain lamb.
      */
     private static void breedingKeepsInfusion(GameTestHelper h) {
-        int full = SheepResourceRegistry.server().byId(IRON).orElseThrow().effectiveInfusionUses();
         Sheep lamb = breed(h, sheepAt(h, new BlockPos(1, 1, 1), IRON), sheepAt(h, new BlockPos(1, 1, 2), IRON));
+        // A full set for this lamb: the resource's uses, raised by the Endurance it was born with.
+        int full = SheepInfusionEvents.infusionUses(lamb, SheepResourceRegistry.server().byId(IRON).orElseThrow());
         SheepInfusion infusion = SheepInfusionEvents.getInfusion(lamb);
         h.assertTrue(infusion.resource().map(IRON::equals).orElse(false), "two Iron parents make an Iron lamb, got " + infusion);
         h.assertTrue(infusion.usesRemaining() == full, "the lamb gets a full " + full + " shearings, got " + infusion.usesRemaining());
@@ -798,6 +801,98 @@ public final class ModGameTests {
             ModConfigs.SERVER.breedingKeepsInfusion.set(oldKeep);
         }
         h.succeed();
+    }
+
+    // ------------------------------------------------------------------ sheep stats
+
+    /** Runs {@code body} with the stat chances set, putting them back after. */
+    private static void withStatChances(double up, double down, Runnable body) {
+        double oldUp = ModConfigs.SERVER.statsIncreaseChance.get(), oldDown = ModConfigs.SERVER.statsDecreaseChance.get();
+        try {
+            ModConfigs.SERVER.statsIncreaseChance.set(up);
+            ModConfigs.SERVER.statsDecreaseChance.set(down);
+            body.run();
+        } finally {
+            ModConfigs.SERVER.statsIncreaseChance.set(oldUp);
+            ModConfigs.SERVER.statsDecreaseChance.set(oldDown);
+        }
+    }
+
+    /**
+     * Lambs average their parents' stats with a chance of one more: wild sheep give 1s, or 2s when the chance comes
+     * up; 4 and 7 average to 5 or 6; nothing passes the cap; the stats are saved on the lamb from real breeding.
+     */
+    private static void sheepStatsBred(GameTestHelper h) {
+        var random = net.minecraft.util.RandomSource.create(7);
+        com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats wild = com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats.WILD;
+        var mid = new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats(4, 4, 4);
+        var high = new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats(7, 7, 7);
+        var top = new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats(10, 10, 10);
+        withStatChances(0, 0, () -> {
+            var child = com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats.bred(wild, wild, random);
+            h.assertTrue(child.equals(wild), "two wild sheep with no luck make a wild lamb, got " + child);
+            for (int i = 0; i < 20; i++) {
+                var c = com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats.bred(mid, high, random);
+                h.assertTrue(c.yield() >= 5 && c.yield() <= 6, "4 and 7 average to 5 or 6, got " + c);
+            }
+        });
+        withStatChances(1, 0, () -> {
+            h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats.bred(wild, wild, random).equals(new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats(2, 2, 2)),
+                    "with the chance always coming up, wild parents give 2s");
+            h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats.bred(top, top, random).equals(top), "never past the cap of 10");
+            // Real breeding: two 7s make 8s, saved on the lamb.
+            Sheep a = sheepAt(h, new BlockPos(1, 1, 1), null), b = sheepAt(h, new BlockPos(1, 1, 2), null);
+            SheepInfusionEvents.setStats(a, high);
+            SheepInfusionEvents.setStats(b, high);
+            Sheep lamb = breed(h, a, b);
+            var stats = SheepInfusionEvents.getStats(lamb);
+            h.assertTrue(stats.equals(new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats(8, 8, 8)), "two 7s bred make an 8 lamb, got " + stats);
+            h.assertTrue(SheepInfusionEvents.describe(lamb).getString().contains("Yield 8"), "inspecting it shows its stats: " + SheepInfusionEvents.describe(lamb).getString());
+        });
+        withStatChances(0, 1, () -> h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats.bred(wild, wild, random).equals(wild), "never below 1"));
+        h.succeed();
+    }
+
+    /**
+     * Yield 10 shears 2.35 times the wool (infused and plain); Endurance 10 makes an infusion last 1.9 times as long;
+     * Growth 10 regrows wool 9% of seconds and Growth 1 never on its own.
+     */
+    private static void sheepStatsEffects(GameTestHelper h) {
+        var best = new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats(10, 10, 10);
+        // Yield on Iron Wool (1 a shearing): 2.35, so 2 or 3.
+        Sheep iron = sheepAt(h, new BlockPos(1, 1, 1), IRON);
+        SheepInfusionEvents.setStats(iron, best);
+        int ironWool = count(shear(h, iron), st -> IRON.equals(ResourceWoolItem.getResourceId(st)));
+        h.assertTrue(ironWool == 2 || ironWool == 3, "Yield 10 shears 2-3 Iron Wool, got " + ironWool);
+        // Yield on plain wool: vanilla's 1-3 becomes at least 2.
+        Sheep plain = sheepAt(h, new BlockPos(3, 1, 1), null);
+        SheepInfusionEvents.setStats(plain, best);
+        int white = count(shear(h, plain), st -> st.is(Items.WOOL.white()));
+        h.assertTrue(white >= 2 && white <= 8, "Yield 10 shears more plain wool, got " + white);
+        // Endurance: feeding Iron to an Endurance-10 sheep.
+        Sheep tough = sheepAt(h, new BlockPos(5, 1, 1), null);
+        SheepInfusionEvents.setStats(tough, best);
+        feed(playerHolding(h, new ItemStack(Items.IRON_INGOT)), tough);
+        int base = SheepResourceRegistry.server().byId(IRON).orElseThrow().effectiveInfusionUses();
+        int uses = SheepInfusionEvents.getInfusion(tough).usesRemaining();
+        h.assertTrue(uses == Math.round(base * 1.9), "Endurance 10 makes " + base + " shearings last " + Math.round(base * 1.9) + ", got " + uses);
+        // Growth.
+        h.assertTrue(Math.abs(best.regrowChancePerSecond() - 0.09) < 1e-9, "Growth 10: 9% a second, got " + best.regrowChancePerSecond());
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats.WILD.regrowChancePerSecond() == 0, "Growth 1 never regrows on its own");
+        Sheep shorn = sheepAt(h, new BlockPos(1, 1, 4), null);
+        shorn.setSheared(true);
+        h.runAfterDelay(100, () -> {
+            h.assertTrue(shorn.isSheared(), "a wild sheep with no grass stays sheared");
+            // With the chance at 100%, a Growth-2 sheep regrows within a second.
+            double old = ModConfigs.SERVER.statsGrowthPerPoint.get();
+            ModConfigs.SERVER.statsGrowthPerPoint.set(1.0);
+            SheepInfusionEvents.setStats(shorn, new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats(1, 2, 1));
+            h.runAfterDelay(25, () -> {
+                ModConfigs.SERVER.statsGrowthPerPoint.set(old);
+                h.assertFalse(shorn.isSheared(), "Growth regrows the wool without grass");
+                h.succeed();
+            });
+        });
     }
 
     // ------------------------------------------------------------------ fluid tanks
