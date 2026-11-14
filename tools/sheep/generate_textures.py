@@ -1060,6 +1060,7 @@ def jei_slate_sprites(img):
       (176,0)  18x18 slot frame        (196,0) 26x26 big (output) slot frame
       (176,32) 24x16 arrow, empty      (176,48) 24x16 arrow, filled (purple, animated in JEI)
       (204,32) 13x13 plus sign
+      (0,150)  150x86 Infusion Altar panel: a rune ring behind a cross of five slots, a text strip at the bottom
     """
     panel(img, 0, 64, 200, 84)
     panel(img, 0, 88, 150, 146)
@@ -1069,6 +1070,21 @@ def jei_slate_sprites(img):
     for x in range(3, 147):
         if rnd.random() < 0.18:
             img.putpixel((x, 145), rnd.choice([hexc("#e3e1ea"), hexc("#b7b3c6"), hexc("#86c25a")]))
+    panel(img, 0, 150, 150, 236)
+    for a in range(0, 360, 4):                          # rune ring behind the cross (centre slot at 30,28)
+        x = round(38 + 27 * math.cos(math.radians(a)))
+        y = round(150 + 36 + 27 * math.sin(math.radians(a)))
+        img.putpixel((x, y), hexc("#3b2a5c"))
+    for (ix, iy) in [(30, 6), (8, 28), (30, 28), (52, 28), (30, 50)]:
+        slot(img, ix, 150 + iy)
+    for i in range(-2, 20):                             # amethyst rim on the centre slot
+        for (px, py) in [(30 + i, 176), (30 + i, 197), (28, 178 + i - 2), (49, 178 + i - 2)]:
+            img.putpixel((px, py), hexc("#7b44c9"))
+    inset(img, 4, 220, 146, 234, GUI["panel"])
+    rnd2 = random.Random(23)
+    for x in range(3, 147):
+        if rnd2.random() < 0.18:
+            img.putpixel((x, 235), rnd2.choice([hexc("#e3e1ea"), hexc("#b7b3c6"), hexc("#c27cff")]))
     slot(img, 177, 1)                                   # 18x18 frame at (176,0)
     inset(img, 196, 0, 222, 26, GUI["panel"])            # 26x26 big frame at (196,0)
     inset(img, 200, 4, 218, 22, GUI["slot"])

@@ -48,13 +48,16 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         var gui = registration.getJeiHelpers().getGuiHelper();
-        registration.addRecipeCategories(new InfusionCategory(gui), new SeparationCategory(gui));
+        registration.addRecipeCategories(new InfusionCategory(gui), new AltarCategory(gui), new SeparationCategory(gui));
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         SheepResourceRegistry resources = SheepResourceRegistry.client();
-        registration.addRecipes(InfusionCategory.TYPE, resources.all().stream().map(InfusionDisplay::new).toList());
+        // By hand: every resource that can be fed by hand. At the altar: those that must be, or that take catalysts.
+        registration.addRecipes(InfusionCategory.TYPE, resources.all().stream().filter(r -> !r.altar().altarOnly()).map(InfusionDisplay::new).toList());
+        registration.addRecipes(AltarCategory.TYPE, resources.all().stream()
+                .filter(r -> r.altar().altarOnly() || !r.altar().catalysts().isEmpty()).map(AltarDisplay::new).toList());
         registration.addRecipes(SeparationCategory.TYPE, buildSeparations(resources));
 
         List<ItemStack> wool = resources.all().stream().map(r -> ResourceWoolItem.create(r.id(), 1)).toList();
@@ -158,6 +161,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registration.addCraftingStation(SeparationCategory.TYPE, ModItems.MECHANICAL_SEPARATOR.get());
         registration.addCraftingStation(InfusionCategory.TYPE, Items.SHEARS);
-        registration.addCraftingStation(InfusionCategory.TYPE, ModItems.INFUSION_ALTAR.get());
+        registration.addCraftingStation(InfusionCategory.TYPE, ModItems.INFUSION_ALTAR.get()); // tier 1 works there too
+        registration.addCraftingStation(AltarCategory.TYPE, ModItems.INFUSION_ALTAR.get());
     }
 }

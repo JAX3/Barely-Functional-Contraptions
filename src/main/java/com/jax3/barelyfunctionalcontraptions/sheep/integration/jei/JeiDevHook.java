@@ -69,6 +69,16 @@ public final class JeiDevHook {
                 .forEach(r -> forSeparator.add(String.valueOf(category.getIdentifier(r))));
     }
 
+    /** Opens the Infusion Altar category, and reports how many recipes it and Resource Infusion have. */
+    public static @Nullable String showAltar() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return null;
+        rt.getRecipesGui().showTypes(java.util.List.of(AltarCategory.TYPE));
+        var altar = rt.getRecipeManager().createRecipeLookup(AltarCategory.TYPE).get().map(d -> d.resource().id().getPath()).toList();
+        var byHand = rt.getRecipeManager().createRecipeLookup(InfusionCategory.TYPE).get().map(d -> d.resource().id().getPath()).toList();
+        return "altar recipes=" + altar + ", by hand=" + byHand.size() + " (wither by hand: " + byHand.contains("wither") + ")";
+    }
+
     /** Opens the Resource Infusion ({@code infusion = true}) or Mechanical Separation category. */
     public static boolean showCategory(boolean infusion) {
         IJeiRuntime rt = runtime;

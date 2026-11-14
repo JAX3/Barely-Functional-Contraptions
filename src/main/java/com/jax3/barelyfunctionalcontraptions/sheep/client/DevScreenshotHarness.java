@@ -1813,7 +1813,21 @@ public final class DevScreenshotHarness {
             case 310 -> shot(mc, "96_guide_altar");
             case 312 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Breeding Sheep"); }
             case 325 -> shot(mc, "96_guide_breeding");
-            case 335 -> mc.stop();
+            // JEI: the Infusion Altar page, and what Soul Sand is used for.
+            case 327 -> {
+                mc.gui.setScreen(null);
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
+                    ResourcefulSheep.LOGGER.info("JEI {}", com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showAltar());
+                }
+            }
+            case 345 -> shot(mc, "98_jei_altar");
+            case 347 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
+                    com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.show(new ItemStack(Items.SOUL_SAND), false);
+                }
+            }
+            case 365 -> shot(mc, "98_jei_soul_sand_uses");
+            case 375 -> mc.stop();
             default -> {}
         }
     }

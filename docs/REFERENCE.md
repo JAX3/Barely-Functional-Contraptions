@@ -271,6 +271,9 @@ The **Infusion Altar** is a powered pedestal. Put the feeding item in its **cent
 - **Which sheep:** the nearest grown sheep in reach that can take the resource, just as when fed by hand: not already infused with something else, not a lamb (unless `allowBabies` is on). Its Endurance counts.
 - **Automation:** tier 1 resources work too, with no catalysts, so an altar with a hopper of iron ingots keeps a pen infused without you. Hoppers and pipes put feeding items and catalysts in from any side and can't take them out. A comparator reads its progress. Jade shows its status.
 - **Advancements:** the nearest player within 16 blocks gets the infusion advancements, as if they had fed the sheep.
+- **JEI:** an *Infusion Altar* page shows each altar infusion laid out like the altar's window: the feeding item in the centre, the catalysts round it, the wool it gives, and the tier and power. Looking up the uses of a catalyst (Soul Sand, Sculk...) or of the feeding item finds it. Tier 2 sheep are no longer on the *Resource Infusion* (by hand) page.
+
+  ![JEI's Infusion Altar page for the Dragon sheep: Dragon's Breath in the centre with End Stone, Popped Chorus Fruit and Eyes of Ender round it, an arrow to Dragon Wool, and Tier 2 · 200,000 FE](screenshots/98_jei_altar.png)
 - **Recipe:** amethyst blocks either side of an enchanting table, gold ingots either side of a Functional Machine Block, and diamonds and a gold ingot along the bottom. Mine it with a pickaxe.
 - **Config:** `[infusion_altar]` sets the power, time, buffer and from which tier the altar is required (`altarOnlyFromTier`; 4 lets every resource be fed by hand again).
 

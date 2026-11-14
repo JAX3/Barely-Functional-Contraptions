@@ -58,26 +58,7 @@ public class InfusionCategory extends AbstractRecipeCategory<InfusionDisplay> {
         builder.addSlot(RecipeIngredientRole.INPUT, 6, 8)
                 .setBackground(slot, -1, -1)
                 .addItemStacks(feeding)
-                .addRichTooltipCallback((view, tooltip) -> {
-                    tooltip.add(Component.translatable("jei.barelyfunctionalcontraptions.consumed", amount).withStyle(ChatFormatting.GRAY));
-                    var ritual = r.altar();
-                    if (ritual.altarOnly() || !ritual.catalysts().isEmpty()) {
-                        tooltip.add(Component.translatable("jei.barelyfunctionalcontraptions.altar_catalysts").withStyle(ChatFormatting.DARK_PURPLE));
-                        for (var c : ritual.catalysts()) {
-                            @SuppressWarnings("deprecation")
-                            Component name = c.ingredient().items().findFirst().map(h -> new ItemStack(h).getHoverName()).orElse(Component.literal("?"));
-                            tooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.infusion_altar.catalyst_line", c.count(), name).withStyle(ChatFormatting.GRAY));
-                        }
-                        tooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.infusion_altar.energy_line",
-                                String.format(java.util.Locale.ROOT, "%,d", ritual.effectiveEnergy())).withStyle(ChatFormatting.GRAY));
-                    }
-                });
-        // The catalysts, so looking up their uses finds this infusion.
-        for (var c : r.altar().catalysts()) {
-            @SuppressWarnings("deprecation")
-            List<ItemStack> stacks = c.ingredient().items().map(h -> new ItemStack(h, c.count())).toList();
-            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStacks(stacks);
-        }
+                .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.barelyfunctionalcontraptions.consumed", amount).withStyle(ChatFormatting.GRAY)));
         int drop = Math.max(1, r.effectiveWoolDropCount());
         builder.addSlot(RecipeIngredientRole.OUTPUT, 124, 8)
                 .setBackground(bigSlot, -5, -5)
@@ -96,9 +77,7 @@ public class InfusionCategory extends AbstractRecipeCategory<InfusionDisplay> {
         Component usesLine = uses < 0
                 ? Component.translatable("jei.barelyfunctionalcontraptions.uses_permanent")
                 : Component.translatable("jei.barelyfunctionalcontraptions.uses", uses);
-        Component second = r.altar().altarOnly()
-                ? Component.translatable("jei.barelyfunctionalcontraptions.altar_only", r.altar().tier())
-                : Component.translatable("jei.barelyfunctionalcontraptions.category", r.category().displayName());
+        Component second = Component.translatable("jei.barelyfunctionalcontraptions.category", r.category().displayName());
         builder.addText(List.<FormattedText>of(usesLine, second), WIDTH, 22)
                 .setPosition(0, 33)
                 .setColor(JeiTextures.TEXT)
