@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 39/39 passed |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 134 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 99 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 135 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 100 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 51 screenshots and 12 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Themed sheep (the ideas in `Custom block.txt`)
@@ -42,6 +42,8 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | GameTest `wool_bale_block_keeps_its_wool` | ✅ A placed bale stores its wool from the item, drops the same Iron Wool Bale when broken, gives it on pick-block, and is mined fastest with a hoe |
 | GameTest `wool_bale_unpacks_into_nine_wool` | ✅ An Iron Wool Bale alone in a 3x3 grid crafts into 9 Iron Wool, and a Gold Wool Bale in a corner into 9 Gold Wool; two bales at once, or a bale with no wool, don't match |
 | Real client, unpacking (`90_unpack_wool_bale.png`) | ✅ 3 Diamond Wool Bales in the survival inventory's 2x2 grid show 9 Diamond Wool in the result slot (the log reads `UNPACK result=9 barelyfunctionalcontraptions:resource_wool`) |
+| GameTest `cube_and_tank_keep_contents_through_a_player` | ✅ Broken the way a player's game mode does it, with an iron pickaxe: a cube with 300,000 FE and a tank with 5,000 mB of lava drop items that keep them; placed back by a player's click beside an empty cube and tank, the groups hold 300,000 FE and 5,000 mB. Broken by a creative player: a cube with 50,000 FE and a tank with 2,000 mB drop themselves with them, and an empty cube drops nothing (before the fix the creative ones were lost) |
+| Real client, creative breaking (`-PharnessScene=keep_contents`) | ✅ Real creative left clicks on a charged cube and a lava tank: the log reads `hume_energy_cube energy=750000` and `fluid_tank fluid=1000 Lava`, and the items' tooltips read *Holds 750,000 FE* and *Holds 1,000 mB of Lava* (`97_*.png`) |
 | GameTest `sheep_stats_are_bred` | ✅ With no luck, two wild sheep make a wild lamb and parents of 4 and 7 make 5s or 6s; with the chance always coming up, wild parents make 2s and two 10s stay 10; with it always going down, nothing drops below 1. Real breeding of two 7s makes an 8 lamb, saved on it, and inspecting it shows *Yield 8* |
 | GameTest `sheep_stats_yield_endurance_growth` | ✅ Yield 10 shears 2-3 Iron Wool (1 normally) and more plain wool; Endurance 10 makes a 100-shearing infusion last 190; Growth 10 is a 9% chance a second, Growth 1 none; a wild sheared sheep with no grass stays sheared, and a Growth 2 sheep regrows on its own once the chance is 100% |
 | GameTest `bred_lambs_keep_the_infusion` (updated) | ✅ The lamb's full set of shearings now includes its own Endurance |

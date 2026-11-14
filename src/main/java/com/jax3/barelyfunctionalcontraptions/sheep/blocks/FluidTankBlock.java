@@ -101,4 +101,12 @@ public class FluidTankBlock extends BaseEntityBlock {
     protected boolean propagatesSkylightDown(BlockState state) {
         return true;
     }
+
+    /** In creative, a tank that still holds fluid drops itself with it, like a shulker box. */
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        KeepsContents.dropInCreative(level, pos, state, player,
+                level.getBlockEntity(pos) instanceof FluidTankBlockEntity be && !be.getFluid().isEmpty());
+        return super.playerWillDestroy(level, pos, state, player);
+    }
 }

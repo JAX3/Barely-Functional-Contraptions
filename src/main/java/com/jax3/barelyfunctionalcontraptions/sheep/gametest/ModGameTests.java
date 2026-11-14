@@ -134,6 +134,7 @@ public final class ModGameTests {
         TESTS.put("fluid_tank_group_fills_bottom_up", ModGameTests::tankGroup);
         TESTS.put("fluid_tank_different_fluids_stay_apart", ModGameTests::tankFluidsApart);
         TESTS.put("fluid_tank_keeps_its_share_when_broken", ModGameTests::tankBreak);
+        TESTS.put("cube_and_tank_keep_contents_through_a_player", ModGameTests::keepContentsThroughPlayer);
         TESTS.put("fluid_tank_buckets", ModGameTests::tankBuckets);
         TESTS.put("breeding_inheritance_rules", ModGameTests::breedingRules);
         TESTS.put("sheep_stats_are_bred", ModGameTests::sheepStatsBred);
@@ -1077,6 +1078,90 @@ public final class ModGameTests {
         var placed = tank(h, pos);
         placed.applyComponentsFromItemStack(item);
         h.assertTrue(placed.getFluid().getAmount() == 7_000, "placed again, it holds the lava");
+        h.succeed();
+    }
+
+    /** The dropped item of {@code item} lying around {@code pos}, or empty. */
+    private static ItemStack droppedNear(GameTestHelper h, BlockPos pos, net.minecraft.world.item.Item item) {
+        return h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                new net.minecraft.world.phys.AABB(h.absolutePos(pos)).inflate(2), e -> e.getItem().is(item))
+                .stream().findFirst().map(e -> e.getItem().copy()).orElse(ItemStack.EMPTY);
+    }
+
+    /**
+     * Breaks the block at {@code pos} the way a player's game mode does: the block's own playerWillDestroy, then, unless
+     * the player is in creative, drops if the held tool can harvest it.
+     */
+    private static void breakLikeAPlayer(GameTestHelper h, Player player, BlockPos pos) {
+        var level = h.getLevel();
+        BlockPos abs = h.absolutePos(pos);
+        var state = level.getBlockState(abs);
+        var be = level.getBlockEntity(abs);
+        var adjusted = state.getBlock().playerWillDestroy(level, abs, state, player);
+        boolean drops = !player.preventsBlockDrops() && adjusted.canHarvestBlock(level, abs, player);
+        level.removeBlock(abs, false);
+        if (drops) net.minecraft.world.level.block.Block.dropResources(adjusted, level, abs, be, player, player.getMainHandItem().copy()); // what playerDestroy does
+    }
+
+    /** Places {@code stack} the way a player does, by clicking the east face of the block west of {@code pos}. */
+    private static void placeLikeAPlayer(GameTestHelper h, Player player, BlockPos pos, ItemStack stack) {
+        player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+        BlockPos west = h.absolutePos(pos.west());
+        var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(west).add(0.5, 0, 0), Direction.EAST, west, false);
+        stack.useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND, hit));
+    }
+
+    /**
+     * Broken by a player (survival or creative), a charged cube and a filled tank drop themselves with what they held;
+     * placed back by a player next to another one, they hold it again and the group adds it up.
+     */
+    private static void keepContentsThroughPlayer(GameTestHelper h) {
+        Player survival = playerHolding(h, new ItemStack(Items.IRON_PICKAXE));
+        // Survival: a lone cube with 300,000 FE and a lone tank with 5,000 mB of lava.
+        BlockPos cubePos = new BlockPos(1, 1, 1), tankPos = new BlockPos(1, 1, 4);
+        cube(h, cubePos).storage().set(300_000);
+        pour(tank(h, tankPos).getFluidHandler(), lava(), 5_000);
+        breakLikeAPlayer(h, survival, cubePos);
+        breakLikeAPlayer(h, survival, tankPos);
+        ItemStack cubeItem = droppedNear(h, cubePos, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get());
+        ItemStack tankItem = droppedNear(h, tankPos, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_TANK.get());
+        var energy = cubeItem.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_CONTENTS.get());
+        var fluid = tankItem.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.FLUID_CONTENTS.get());
+        h.assertTrue(energy != null && energy.energy() == 300_000, "a survival-broken cube's item keeps 300,000 FE, got " + energy);
+        h.assertTrue(fluid != null && fluid.copy().getAmount() == 5_000, "a survival-broken tank's item keeps 5,000 mB, got " + fluid);
+        // Placed back by the player beside an empty cube / tank: the group holds it all.
+        BlockPos cube2 = new BlockPos(4, 1, 1), tank2 = new BlockPos(4, 1, 4);
+        var emptyCube = cube(h, cube2);
+        var emptyTank = tank(h, tank2);
+        placeLikeAPlayer(h, survival, cube2.east(), cubeItem);
+        placeLikeAPlayer(h, survival, tank2.east(), tankItem);
+        h.assertTrue(h.getBlockState(cube2.east()).is(ModBlocks.HUME_ENERGY_CUBE.get()), "the player placed the cube, found " + h.getBlockState(cube2.east())
+                + " below " + h.getBlockState(cube2.east().below()));
+        var placedCube = h.getBlockEntity(cube2.east(), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
+        h.assertTrue(placedCube.storage().getAmountAsInt() == 300_000, "the placed cube holds its 300,000 FE itself, has " + placedCube.storage().getAmountAsInt()
+                + ", group " + placedCube.group().amount() + " of " + placedCube.group().size());
+        h.assertTrue(emptyCube.group().amount() == 300_000 && emptyCube.group().size() == 2,
+                "placed next to an empty cube, the group has 300,000 FE, got " + emptyCube.group().amount() + " in " + emptyCube.group().size());
+        h.assertTrue(emptyTank.getFluidHandler().getAmountAsInt(0) == 5_000,
+                "placed next to an empty tank, the group has 5,000 mB, got " + emptyTank.getFluidHandler().getAmountAsInt(0));
+        // Creative: breaking a charged cube or a filled tank still drops it with its contents (an empty one doesn't drop).
+        Player creative = h.makeMockPlayer(GameType.CREATIVE);
+        GameType.CREATIVE.updatePlayerAbilities(creative.getAbilities()); // what the game does for a real creative player
+        BlockPos cCube = new BlockPos(1, 1, 7), cTank = new BlockPos(4, 1, 7), cEmpty = new BlockPos(7, 1, 7);
+        cube(h, cCube).storage().set(50_000);
+        pour(tank(h, cTank).getFluidHandler(), lava(), 2_000);
+        cube(h, cEmpty);
+        breakLikeAPlayer(h, creative, cCube);
+        breakLikeAPlayer(h, creative, cTank);
+        breakLikeAPlayer(h, creative, cEmpty);
+        var cEnergy = droppedNear(h, cCube, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get())
+                .get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_CONTENTS.get());
+        var cFluid = droppedNear(h, cTank, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_TANK.get())
+                .get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.FLUID_CONTENTS.get());
+        h.assertTrue(cEnergy != null && cEnergy.energy() == 50_000, "a creative-broken charged cube drops with its 50,000 FE, got " + cEnergy);
+        h.assertTrue(cFluid != null && cFluid.copy().getAmount() == 2_000, "a creative-broken tank drops with its 2,000 mB, got " + cFluid);
+        h.assertTrue(droppedNear(h, cEmpty, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get()).isEmpty(),
+                "an empty cube broken in creative drops nothing");
         h.succeed();
     }
 

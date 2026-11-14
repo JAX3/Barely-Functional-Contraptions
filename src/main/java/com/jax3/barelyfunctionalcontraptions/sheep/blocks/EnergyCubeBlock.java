@@ -116,4 +116,12 @@ public class EnergyCubeBlock extends BaseEntityBlock {
     private static String fe(long value) {
         return String.format(Locale.ROOT, "%,d", value);
     }
+
+    /** In creative, a cube that still holds energy drops itself with it, like a shulker box. */
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        KeepsContents.dropInCreative(level, pos, state, player,
+                level.getBlockEntity(pos) instanceof EnergyCubeBlockEntity be && be.storage().getAmountAsInt() > 0);
+        return super.playerWillDestroy(level, pos, state, player);
+    }
 }

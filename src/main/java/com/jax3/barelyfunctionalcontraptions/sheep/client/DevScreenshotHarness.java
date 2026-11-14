@@ -112,6 +112,10 @@ public final class DevScreenshotHarness {
             newBlocksTick(mc, server);
             return;
         }
+        if ("keep_contents".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            keepContentsTick(mc, server);
+            return;
+        }
         if ("showcase".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             showcaseTick(mc, server);
             return;
@@ -1597,6 +1601,58 @@ public final class DevScreenshotHarness {
             });
         }
         if (tick == end + 60) mc.stop();
+    }
+
+    /**
+     * A charged Hume Energy Cube and a filled Fluid Tank broken with real creative clicks drop themselves with what they
+     * held; the items' tooltips show it: {@code -PharnessScene=keep_contents}.
+     */
+    private static void keepContentsTick(Minecraft mc, MinecraftServer server) {
+        BlockPos cubePos = origin == null ? null : origin.offset(0, 0, -2);
+        BlockPos tankPos = origin == null ? null : origin.offset(1, 0, -2);
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                command(server, "gamemode creative @a");
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-3, 0, -5), origin.offset(3, 3, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                BlockPos c = origin.offset(0, 0, -2), t = origin.offset(1, 0, -2);
+                level.setBlock(c, ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+                level.setBlock(t, ModBlocks.FLUID_TANK.get().defaultBlockState(), 3);
+                if (level.getBlockEntity(c) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity cube) cube.storage().set(750_000);
+                if (level.getBlockEntity(t) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidTankBlockEntity tank) {
+                    try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                        tank.getFluidHandler().insert(net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.LAVA), 12_000, tx);
+                        tx.commit();
+                    }
+                }
+                player.getInventory().clearContent();
+            });
+            // Real creative left clicks on each block.
+            case 80 -> { if (mc.gameMode != null) mc.gameMode.startDestroyBlock(cubePos, Direction.UP); }
+            case 90 -> { if (mc.gameMode != null) mc.gameMode.startDestroyBlock(tankPos, Direction.UP); }
+            case 110 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                for (var e : player.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(origin).inflate(6))) {
+                    ItemStack item = e.getItem();
+                    ResourcefulSheep.LOGGER.info("DROPPED {} energy={} fluid={}", item,
+                            item.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_CONTENTS.get()),
+                            java.util.Optional.ofNullable(item.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.FLUID_CONTENTS.get())).map(f -> f.copy().getAmount() + " " + f.copy().getHoverName().getString()).orElse("none"));
+                    player.getInventory().add(item.copy());
+                    e.discard();
+                }
+                ResourcefulSheep.LOGGER.info("BLOCKS cube={} tank={}", player.level().getBlockState(origin.offset(0, 0, -2)), player.level().getBlockState(origin.offset(1, 0, -2)));
+            });
+            case 115 -> command(server, "gamemode survival @a");
+            case 125 -> { if (mc.player != null) mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)); }
+            case 135 -> hover(mc, 176, 166, 16, 150); // hotbar slot 1: the cube
+            case 150 -> shot(mc, "97_cube_keeps_energy");
+            case 152 -> hover(mc, 176, 166, 34, 150); // hotbar slot 2: the tank
+            case 167 -> shot(mc, "97_tank_keeps_fluid");
+            case 175 -> mc.stop();
+            default -> {}
+        }
     }
 
     /** For the README: every block on stepped rows, the creative tabs, and every built-in sheep: {@code -PharnessScene=showcase}. */
