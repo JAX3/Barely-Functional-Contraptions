@@ -109,6 +109,13 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue glowPanelOutput;
         public final ModConfigSpec.IntValue woolBurnerCapacity;
         public final ModConfigSpec.IntValue woolBurnerOutput;
+        public final ModConfigSpec.IntValue woolPackerCapacity;
+        public final ModConfigSpec.IntValue woolPackerMaxInput;
+        public final ModConfigSpec.IntValue woolPackerEnergyPerBale;
+        public final ModConfigSpec.IntValue woolPackerTicksPerBale;
+        public final ModConfigSpec.DoubleValue baleYield;
+        public final ModConfigSpec.DoubleValue baleEnergy;
+        public final ModConfigSpec.DoubleValue baleTime;
         public final ModConfigSpec.IntValue blazeFurnaceRadius;
         public final ModConfigSpec.IntValue blazeFurnaceMaxHeaters;
         public final ModConfigSpec.DoubleValue blazeFurnaceFalloff;
@@ -266,6 +273,23 @@ public final class ModConfigs {
                     .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
             woolBurnerOutput = b.comment("Most FE a Wool Burner pushes into the blocks around it per tick, in total.")
                     .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Wool Packer (FE-powered; presses 9 of the same resource wool into a Wool Bale) and Wool Bales in the Mechanical Separator").push("wool_packer");
+            woolPackerCapacity = b.comment("FE each Wool Packer stores.")
+                    .defineInRange("energyCapacity", 20_000, 1, Integer.MAX_VALUE);
+            woolPackerMaxInput = b.comment("Most FE a Wool Packer accepts per tick.")
+                    .defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
+            woolPackerEnergyPerBale = b.comment("FE to press one bale. 0 = the packer needs no power.")
+                    .defineInRange("energyPerBale", 1_000, 0, Integer.MAX_VALUE);
+            woolPackerTicksPerBale = b.comment("Ticks to press one bale (20 = one second).")
+                    .defineInRange("ticksPerBale", 40, 1, 72_000);
+            baleYield = b.comment("What separating one bale gives, in pieces of wool's worth of outputs. One bale holds 9 wool, so above 9 is the reward for baling: 12 = a third more of every output. Counts are capped at a stack so a bale never jams the separator.")
+                    .defineInRange("baleYield", 12.0, 1.0, 64.0);
+            baleEnergy = b.comment("FE to separate one bale, in pieces of wool's worth: 15 = 15 times the wool's energy cost, more than its 9 wool would take.")
+                    .defineInRange("baleEnergy", 15.0, 0.0, 1_000.0);
+            baleTime = b.comment("Time to separate one bale, in pieces of wool's worth: 9 = as long as its 9 wool one at a time.")
+                    .defineInRange("baleTime", 9.0, 0.05, 1_000.0);
             b.pop();
 
             b.comment("Blaze Sheep Furnace (makes FE from the heat of Blaze sheep in the area around and above it; heat sources are data-driven, see furnace_heat)").push("blaze_furnace");

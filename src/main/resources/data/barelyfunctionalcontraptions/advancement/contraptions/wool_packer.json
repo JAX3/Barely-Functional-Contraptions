@@ -1,0 +1,32 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:wool_packer"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.wool_packer.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.wool_packer.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "bale": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:wool_bale"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "bale"
+    ]
+  ]
+}

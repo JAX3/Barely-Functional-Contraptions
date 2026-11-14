@@ -1,0 +1,85 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/wool_bale_side",
+    "side": "barelyfunctionalcontraptions:block/wool_bale_side",
+    "end": "barelyfunctionalcontraptions:block/wool_bale_end",
+    "side_straps": "barelyfunctionalcontraptions:block/wool_bale_side_straps"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side",
+          "tintindex": 0,
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#side",
+          "tintindex": 0,
+          "cullface": "south"
+        },
+        "east": {
+          "texture": "#side",
+          "tintindex": 0,
+          "cullface": "east"
+        },
+        "west": {
+          "texture": "#side",
+          "tintindex": 0,
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#end",
+          "tintindex": 0,
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#end",
+          "tintindex": 0,
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side_straps",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#side_straps",
+          "cullface": "south"
+        },
+        "east": {
+          "texture": "#side_straps",
+          "cullface": "east"
+        },
+        "west": {
+          "texture": "#side_straps",
+          "cullface": "west"
+        }
+      }
+    }
+  ]
+}

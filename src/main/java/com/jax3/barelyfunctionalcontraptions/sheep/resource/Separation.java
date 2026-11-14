@@ -83,4 +83,33 @@ public record Separation(
         int lo = Mth.floor(r.min() * mult), hi = Mth.ceil(r.max() * mult);
         return lo == hi ? Integer.toString(lo) : lo + "-" + hi;
     }
+    /**
+     * The same operation for a Wool Bale of this wool: every output times {@code [wool_packer] baleYield}, and the
+     * energy and time times {@code baleEnergy} and {@code baleTime} (all in pieces of wool's worth; a bale holds 9).
+     * Each count is capped at one stack so a bale always fits the separator's output slots.
+     */
+    public Separation baled() {
+        double yield = ModConfigs.getDouble(ModConfigs.SERVER.baleYield);
+        double mult = ModConfigs.getDouble(ModConfigs.SERVER.primaryOutputMultiplier);
+        int extra = ModConfigs.getDouble(ModConfigs.SERVER.bonusPrimaryChance) > 0 ? 1 : 0;
+        int stack = primary.create().getMaxStackSize();
+        // maxPrimaryCount() = ceil(max x mult) + extra must stay within a stack.
+        int primaryCap = Math.max(1, (int) Math.floor((stack - extra) / Math.max(mult, 1e-9)));
+        int min = Math.min(primaryCap, Math.max(1, (int) Math.round(primaryMin() * yield)));
+        int max = Math.min(primaryCap, Math.max(min, (int) Math.round(Math.max(primaryMin(), primaryMax) * yield)));
+        int energy = (int) Math.min(Integer.MAX_VALUE, Math.round(
+                energyCost.orElseGet(() -> ModConfigs.getInt(ModConfigs.SERVER.defaultEnergyCost)) * ModConfigs.getDouble(ModConfigs.SERVER.baleEnergy)));
+        int ticks = (int) Math.max(1, Math.min(Integer.MAX_VALUE, Math.round(
+                processingTicks.orElseGet(() -> ModConfigs.getInt(ModConfigs.SERVER.defaultProcessingTicks)) * ModConfigs.getDouble(ModConfigs.SERVER.baleTime))));
+        return new Separation(withCount(primary, min), max,
+                secondary.map(s -> withCount(s, (int) Math.round(s.count() * yield))),
+                bonus.map(b -> new ChanceOutput(withCount(b.item(), (int) Math.round(b.item().count() * yield)), b.chance())),
+                Optional.of(energy), Optional.of(ticks));
+    }
+
+    /** {@code template} with {@code count} items, kept within 1 and a stack. */
+    private static ItemStackTemplate withCount(ItemStackTemplate template, int count) {
+        int stack = template.create().getMaxStackSize();
+        return new ItemStackTemplate(template.item(), Math.max(1, Math.min(stack, count)), template.components());
+    }
 }

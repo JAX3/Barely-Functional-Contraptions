@@ -25,7 +25,9 @@ public record ResourceWoolTintSource(Channel channel) implements ItemTintSource 
 
     @Override
     public int calculate(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity owner) {
-        return ResourceWoolItem.getResource(stack, true)
+        // Resource wool and Wool Bales both carry the resource component.
+        return com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.client()
+                .byId(stack.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.SHEEP_RESOURCE.get()))
                 .map(r -> ARGB.opaque(channel == Channel.WOOL ? r.woolColor() : r.accentColor()))
                 .orElse(channel == Channel.WOOL ? 0xFFE6E6E6 : 0xFFFFFFFF);
     }

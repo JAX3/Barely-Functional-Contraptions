@@ -151,6 +151,22 @@ public final class ModBlocks {
                     .sound(SoundType.IRON)
                     .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.LIT) ? 13 : 0));
 
+    /** Presses 9 of one resource wool into a Wool Bale. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock> WOOL_PACKER = REGISTER.registerBlock("wool_packer",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.IRON));
+
+    /** 9 resource wool pressed into one block. Soft like a hay bale; quickest with a hoe. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBaleBlock> WOOL_BALE = REGISTER.registerBlock("wool_bale",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBaleBlock::new,
+            p -> p.mapColor(MapColor.WOOL)
+                    .strength(0.8F)
+                    .sound(SoundType.WOOL)
+                    .ignitedByLava());
+
     /** The invisible light a glowing sheep leaves where it stands; removes itself once the sheep has moved on. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock> SHEEP_GLOW = REGISTER.registerBlock("sheep_glow",
             com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock::new,

@@ -26,6 +26,10 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.WOOL_BURNER.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.WOOL_BURNER.get(),
                 (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
+        // Wool Packer: its buffer (in only) on every face; wool in and bales out for hoppers and pipes.
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.WOOL_PACKER.get(), (be, side) -> be.getEnergyHandler());
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.WOOL_PACKER.get(),
+                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Blaze Sheep Furnace: its buffer on every face, and its boost slot (in only) for hoppers and pipes.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.BLAZE_FURNACE.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.BLAZE_FURNACE.get(),

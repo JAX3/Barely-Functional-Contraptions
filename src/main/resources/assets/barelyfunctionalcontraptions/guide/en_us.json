@@ -38,6 +38,7 @@
         "An appearance block gives any resource wings, extra heads, glowing, a bigger size, its own sounds and more.",
         "Furnace heat sources are data too: data/<namespace>/barelyfunctionalcontraptions/furnace_heat/<name>.json names a sheep, an entity or a look such as on_fire, and its power. Boost items are the blaze_furnace_boost data map.",
         "Wool Burner fuels are data too: data/<namespace>/barelyfunctionalcontraptions/wool_burner_fuel/<name>.json, each with an ingredient, a burn_time and a power.",
+        "A separating recipe whose ingredient matches a Wool Bale (barelyfunctionalcontraptions:wool_bale with its sheep_resource component) gives that bale its own outputs instead of the scaled-up wool ones.",
         "## Commands",
         "- /barelyfunctionalcontraptions list: every loaded resource.",
         "- /barelyfunctionalcontraptions generate: a resource for every material in the modpack.",
@@ -169,6 +170,23 @@
       "tab": "logistics"
     },
     {
+      "title": "Wool Packer",
+      "icon": "barelyfunctionalcontraptions:wool_packer",
+      "text": [
+        "The Wool Packer presses 9 of the same resource wool into one Wool Bale. Each bale takes 1,000 FE over 2 seconds.",
+        "Right-click it with resource wool, put wool in the left slot of its window, or feed it with a hopper or pipe. The nine pips light up as the wool for the next bale comes in. Hoppers and pipes take the bales out of any side, but never the wool.",
+        "## Separating bales",
+        "Put a whole bale in the Mechanical Separator. It takes 15 times the power of one wool, more than its 9 wool would, and as long as those 9 one at a time. In return it gives 12 wool's worth of everything: a third more resources.",
+        "An Iron Wool Bale, for example, gives 24-48 raw iron and 24 string for about 300,000 FE, where its 9 wool would give 18-36 raw iron.",
+        "Bales stack to 64, so they also carry nine times as much wool in a chest or pipe.",
+        "## As a block",
+        "A bale can be placed like a hay bale, in the colour of its wool, and softens falls the same way. Breaking it gives the bale back.",
+        "## Config",
+        "The packer's power and speed, and what bales cost and give in the separator, are in the [wool_packer] section of the server config."
+      ],
+      "tab": "logistics"
+    },
+    {
       "title": "Infusing Sheep",
       "icon": "minecraft:iron_ingot",
       "text": [
@@ -209,6 +227,7 @@
         "## Mechanical Separator",
         "Put resource wool in and supply FE. Each wool gives 2 to 4 of its resource, 2 string and sometimes a bonus. Iron wool takes 20,000 FE over 5 seconds.",
         "Its redstone button sets whether redstone turns it on or off. Hoppers and pipes can feed it and empty it.",
+        "It also separates Wool Bales from the Wool Packer, for more resources (see Wool Packer under Logistics).",
         "## Automatic Shears",
         "Shears every sheep in the 3x3 area in front of its blades, using 2,000 FE per sheep, and keeps the wool in 9 slots. Put a hopper or pipe under it to collect the wool."
       ]

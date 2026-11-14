@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "barelyfunctionalcontraptions:block/wool_bale",
+    "tints": [
+      {
+        "type": "barelyfunctionalcontraptions:resource_wool",
+        "channel": "wool"
+      }
+    ]
+  }
+}

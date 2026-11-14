@@ -42,6 +42,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
     public void registerItemSubtypes(ISubtypeRegistration registration) {
         // Each resource wool variant is a distinct JEI ingredient.
         registration.registerFromDataComponentTypes(ModItems.RESOURCE_WOOL.get(), ModDataComponents.SHEEP_RESOURCE.get());
+        registration.registerFromDataComponentTypes(ModItems.WOOL_BALE.get(), ModDataComponents.SHEEP_RESOURCE.get());
     }
 
     @Override
@@ -60,6 +61,11 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         if (!wool.isEmpty()) {
             registration.addItemStackInfo(wool, Component.translatable("jei.barelyfunctionalcontraptions.info.resource_wool"));
         }
+        List<ItemStack> bales = resources.all().stream().map(r -> com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(r.id(), 1)).toList();
+        if (!bales.isEmpty()) {
+            registration.addItemStackInfo(bales, Component.translatable("jei.barelyfunctionalcontraptions.info.wool_bale"));
+        }
+        registration.addItemStackInfo(new ItemStack(ModItems.WOOL_PACKER.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.wool_packer"));
         registration.addItemStackInfo(new ItemStack(ModItems.MECHANICAL_SEPARATOR.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.separator"));
         registration.addItemStackInfo(new ItemStack(ModItems.CREATIVE_GENERATOR.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.creative_generator"));
     }
@@ -80,6 +86,11 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
             boolean overridden = recipes.stream().anyMatch(h -> h.value().ingredient().test(wool));
             if (!overridden) {
                 displays.add(new SeparationDisplay(resource.id(), List.of(wool), resource.separation()));
+            }
+            // And its bale, right after it.
+            ItemStack bale = com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(resource.id(), 1);
+            if (recipes.stream().noneMatch(h -> h.value().ingredient().test(bale))) {
+                displays.add(new SeparationDisplay(resource.id().withSuffix("_bale"), List.of(bale), resource.separation().baled()));
             }
         }
         for (RecipeHolder<SeparatingRecipe> holder : recipes) {

@@ -42,6 +42,8 @@ public final class ResourcefulSheepClient {
             event.registerModel(EnergyCubeModel.TANK.type(), EnergyCubeModel.Unbaked.TANK_CODEC);
         });
         modBus.addListener(ResourcefulSheepClient::registerTintSources);
+        modBus.addListener((RegisterColorHandlersEvent.BlockTintSources event) -> event.register(
+                java.util.List.of(WoolBaleTint.INSTANCE), com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.WOOL_BALE.get()));
         modBus.addListener(ResourcefulSheepClient::registerRenderStateModifiers);
         modBus.addListener(ResourcefulSheepClient::addLayers);
         modBus.addListener((EntityRenderersEvent.RegisterLayerDefinitions event) -> {
@@ -85,6 +87,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.PIPE_FILTER.get(), PipeFilterScreen::new);
         event.register(ModMenus.BLAZE_FURNACE.get(), BlazeFurnaceScreen::new);
         event.register(ModMenus.WOOL_BURNER.get(), WoolBurnerScreen::new);
+        event.register(ModMenus.WOOL_PACKER.get(), WoolPackerScreen::new);
     }
 
     private static void registerTintSources(RegisterColorHandlersEvent.ItemTintSources event) {

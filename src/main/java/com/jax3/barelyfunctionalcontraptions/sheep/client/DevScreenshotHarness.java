@@ -112,6 +112,10 @@ public final class DevScreenshotHarness {
             newBlocksTick(mc, server);
             return;
         }
+        if ("wool_packer".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            woolPackerTick(mc, server);
+            return;
+        }
         if ("wool_burner".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             woolBurnerTick(mc, server);
             return;
@@ -1568,6 +1572,136 @@ public final class DevScreenshotHarness {
             });
         }
         if (tick == end + 60) mc.stop();
+    }
+
+    /** Wool Packers fed by hoppers, a separator working a bale, and placed bales of every colour: {@code -PharnessScene=wool_packer}. */
+    private static void woolPackerTick(Minecraft mc, MinecraftServer server) {
+        BlockPos packer = origin == null ? null : origin.offset(-3, 0, -4);
+        switch (tick) {
+            case 60 -> server.execute(() -> woolPackerScene(server));
+            case 70 -> setHudHidden(mc, true);
+            case 150 -> server.execute(() -> {
+                ServerLevel level = server.overworld();
+                if (level.getBlockEntity(packer) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity be) {
+                    ResourcefulSheep.LOGGER.info("PACKER status={} progress={}/{} input={} output={} energy={} active={}", be.status(), be.progress(), be.maxProgress(),
+                            be.input(), be.output(), be.getEnergyHandler().getAmountAsInt(),
+                            be.getBlockState().getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.ACTIVE));
+                }
+                if (level.getBlockEntity(origin.offset(3, 0, -4)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MechanicalSeparatorBlockEntity sep) {
+                    ResourcefulSheep.LOGGER.info("SEPARATOR status={} progress={}/{} energyPerTick={} input={}", sep.getStatus(), sep.getProgress(), sep.getMaxProgress(),
+                            sep.getEnergyPerTick(), sep.getInventory().getStack(0));
+                }
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, 0, 1), origin.offset(8, 0, 3))) {
+                    if (level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBaleBlockEntity bale) {
+                        ResourcefulSheep.LOGGER.info("BALE at {} resource={}", p.immutable(), bale.resource());
+                    }
+                }
+            });
+            case 160 -> shot(mc, "85_wool_packers");
+            case 162 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 200 30", origin.getX() - 2.5, origin.getY() + 2, origin.getZ() + 6.5));
+            case 190 -> {
+                ClientLevelLog.bales(mc, origin);
+                shot(mc, "86_wool_bales");
+            }
+            case 192 -> {
+                setHudHidden(mc, false);
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() - 2.5, origin.getY(), origin.getZ() - 1.5));
+            }
+            case 196 -> openAt(server, packer);
+            case 206 -> shot(mc, "87_wool_packer_gui");
+            // Hover over the pips.
+            case 208 -> hover(mc, 176, 193, 68, 60);
+            case 222 -> shot(mc, "87_wool_packer_gui_pips");
+            case 224 -> {
+                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+                if (mc.player != null) mc.player.closeContainer();
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 3.5, origin.getY(), origin.getZ() - 1.5));
+            }
+            case 230 -> openAt(server, origin.offset(3, 0, -4));
+            case 240 -> hover(mc, 176, 193, 52, 64); // the bale in the separator's input slot
+            case 256 -> shot(mc, "88_separator_bale_gui");
+            case 258 -> {
+                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+                if (mc.player != null) mc.player.closeContainer();
+                mc.gui.setScreen(new GuideScreen());
+            }
+            case 268 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Packer"); }
+            case 280 -> shot(mc, "89_guide_wool_packer");
+            case 290 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    /** Moves the mouse to ({@code x}, {@code y}) inside a centred window of the given size. */
+    private static void hover(Minecraft mc, int width, int height, int x, int y) {
+        var window = mc.getWindow();
+        double scale = window.getGuiScale();
+        int left = (window.getGuiScaledWidth() - width) / 2, top = (window.getGuiScaledHeight() - height) / 2;
+        mc.mouseHandler.onMove(window.handle(), (left + x) * scale, (top + y) * scale, 0, 0);
+    }
+
+    /** Client-side check that placed bales got their wool (and so their colour). */
+    private static final class ClientLevelLog {
+        static void bales(Minecraft mc, BlockPos origin) {
+            if (mc.level == null) return;
+            for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, 0, 1), origin.offset(8, 0, 3))) {
+                if (mc.level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBaleBlockEntity bale) {
+                    ResourcefulSheep.LOGGER.info("CLIENT BALE at {} resource={}", p.immutable(), bale.resource());
+                }
+            }
+        }
+    }
+
+    private static void woolPackerScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false", "gamerule advance_weather false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(8, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(8, -1, 6))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
+        var south = Direction.SOUTH;
+        // Two packers fed from chests through hoppers, powered by a creative generator behind each.
+        net.minecraft.resources.Identifier[] wools = {ResourcefulSheep.id("iron"), ResourcefulSheep.id("gold")};
+        for (int i = 0; i < 2; i++) {
+            BlockPos at = o.offset(-3 - i * 3, 0, -4);
+            level.setBlock(at, ModBlocks.WOOL_PACKER.get().defaultBlockState().setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.FACING, south), 3);
+            level.setBlock(at.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+            level.setBlock(at.above(), Blocks.HOPPER.defaultBlockState(), 3);
+            level.setBlock(at.above(2), Blocks.CHEST.defaultBlockState(), 3);
+            if (level.getBlockEntity(at.above(2)) instanceof net.minecraft.world.Container chest) {
+                for (int k = 0; k < 4; k++) chest.setItem(k, com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(wools[i], 64));
+            }
+            if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity be) {
+                be.setItem(0, com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(wools[i], 64));
+                be.setItem(1, com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(wools[i], 5));
+            }
+        }
+        label(server, o.offset(-3, 3, -4), "Wool Packer", "white");
+        // A separator working an Iron Wool Bale.
+        BlockPos sep = o.offset(3, 0, -4);
+        level.setBlock(sep, ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.MechanicalSeparatorBlock.FACING, south), 3);
+        level.setBlock(sep.east(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+        if (level.getBlockEntity(sep) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MechanicalSeparatorBlockEntity be) {
+            be.getInventory().setStack(0, com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("iron"), 3));
+        }
+        label(server, sep.above(), "Separating a bale", "gold");
+        // A row of placed bales, every built-in wool, some lying down.
+        var ids = com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.BUILT_IN_WOOL;
+        for (int i = 0; i < ids.size(); i++) {
+            BlockPos at = o.offset(-7 + i % 7 * 2 + i / 7, 0, 1 + i / 7 * 2);
+            Direction.Axis axis = i % 3 == 1 ? Direction.Axis.X : i % 3 == 2 ? Direction.Axis.Z : Direction.Axis.Y;
+            level.setBlock(at, ModBlocks.WOOL_BALE.get().defaultBlockState().setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBaleBlock.AXIS, axis), 3);
+            if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBaleBlockEntity bale) {
+                bale.setResource(ResourcefulSheep.id(ids.get(i)));
+                level.sendBlockUpdated(at, bale.getBlockState(), bale.getBlockState(), 3);
+            }
+        }
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 24", o.getX() + 0.0, o.getY() + 4, o.getZ() + 6.5));
     }
 
     /** Three Wool Burners (wool, string, Coal Wool) charging cubes, and one fed by a hopper: {@code -PharnessScene=wool_burner}. */

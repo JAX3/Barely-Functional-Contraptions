@@ -73,6 +73,9 @@ public final class ModGameTests {
     private static final Map<String, Consumer<GameTestHelper>> TESTS = new java.util.LinkedHashMap<>();
     private static final java.util.Map<String, Consumer<GameTestHelper>> RELOAD_TESTS = new java.util.LinkedHashMap<>();
 
+    /** The one test that needs more than 400 ticks: a whole bale takes 45 seconds. */
+    private static final String LONG_BALE_TEST = "separator_separates_a_whole_bale";
+
     static {
         TESTS.put("definitions_loaded", ModGameTests::definitionsLoaded);
         TESTS.put("feed_iron_block_infuses_sheep", ModGameTests::feedIronBlock);
@@ -162,6 +165,11 @@ public final class ModGameTests {
         TESTS.put("machines_show_their_working_area", ModGameTests::machineAreaToggle);
         TESTS.put("wool_burner_burns_wool_string_and_coal_wool", ModGameTests::woolBurnerFuels);
         TESTS.put("wool_burner_waits_while_full_and_takes_only_fuel", ModGameTests::woolBurnerFullAndHoppers);
+        TESTS.put("wool_packer_presses_nine_wool_into_a_bale", ModGameTests::woolPackerPresses);
+        TESTS.put("wool_packer_pauses_and_works_with_hoppers", ModGameTests::woolPackerPausesAndHoppers);
+        TESTS.put("wool_bale_separates_for_more", ModGameTests::woolBaleSeparationNumbers);
+        TESTS.put("wool_bale_block_keeps_its_wool", ModGameTests::woolBaleBlock);
+        TESTS.put(LONG_BALE_TEST, ModGameTests::separatorSeparatesBale);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -173,7 +181,8 @@ public final class ModGameTests {
         Holder<TestEnvironmentDefinition<?>> env = event.registerEnvironment(ResourcefulSheep.id("sheep_default"), new TestEnvironmentDefinition.AllOf());
         for (String name : TESTS.keySet()) {
             ResourceKey<Consumer<GameTestHelper>> fn = ResourceKey.create(Registries.TEST_FUNCTION, ResourcefulSheep.id(name));
-            event.registerTest(ResourcefulSheep.id(name), new FunctionGameTestInstance(fn, new TestData<>(env, STRUCTURE, 400, 0, true)));
+            int maxTicks = name.equals(LONG_BALE_TEST) ? 1200 : 400; // a whole bale takes 45 seconds
+            event.registerTest(ResourcefulSheep.id(name), new FunctionGameTestInstance(fn, new TestData<>(env, STRUCTURE, maxTicks, 0, true)));
         }
         // Tests that run /barelyfunctionalcontraptions generate (which reloads data packs) get their own batch, so the reload
         // never happens in the middle of the other tests.
@@ -1032,6 +1041,7 @@ public final class ModGameTests {
             var id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
             if (!id.getNamespace().equals(ResourcefulSheep.MOD_ID)) continue;
             if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.SHEEP_GLOW.get()) continue; // invisible light, never placed by hand
+            if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.WOOL_BALE.get()) continue; // wool, so it sounds like wool
             var sound = block.defaultBlockState().getSoundType();
             h.assertTrue(sound == net.minecraft.world.level.block.SoundType.IRON && sound.getPlaceSound() == ironPlace,
                     id + " should use the iron block sound type");
@@ -1050,7 +1060,7 @@ public final class ModGameTests {
                 "the Functional Machine Block has a shaped recipe");
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FUNCTIONAL_MACHINE_BLOCK.get().defaultBlockState()
                 .is(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE), "mined with a pickaxe");
-        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "fluid_tank", "zero_point_energy_module", "blaze_furnace", "wool_burner")) {
+        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "fluid_tank", "zero_point_energy_module", "blaze_furnace", "wool_burner", "wool_packer")) {
             var holder = recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
                     ResourcefulSheep.id(machine))).orElse(null);
             h.assertTrue(holder != null && holder.value() instanceof net.minecraft.world.item.crafting.ShapedRecipe, "missing recipe " + machine);
@@ -2685,6 +2695,132 @@ public final class ModGameTests {
         });
     }
 
+    // ------------------------------------------------------------------ Wool Packer and Wool Bales
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity packer(GameTestHelper h, BlockPos pos, ItemStack wool, boolean powered) {
+        h.setBlock(pos, ModBlocks.WOOL_PACKER.get());
+        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.class);
+        be.setItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.INPUT, wool);
+        if (powered) {
+            var energy = (net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler) be.getEnergyHandler();
+            energy.set(energy.getCapacityAsInt());
+        }
+        return be;
+    }
+
+    private static boolean isBaleOf(ItemStack stack, Identifier resource, int count) {
+        return stack.is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BALE.get()) && stack.getCount() == count
+                && resource.equals(stack.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.SHEEP_RESOURCE.get()));
+    }
+
+    /** 20 Iron Wool: two bales, 1,000 FE each over 40 ticks, and 2 wool left waiting. */
+    private static void woolPackerPresses(GameTestHelper h) {
+        var be = packer(h, new BlockPos(1, 1, 1), ResourceWoolItem.create(IRON, 20), true);
+        var gold = packer(h, new BlockPos(4, 1, 1), ResourceWoolItem.create(ResourcefulSheep.id("gold"), 8), true);
+        h.assertFalse(be.canPlaceItem(0, new ItemStack(Items.WOOL.white())), "plain wool can't be baled");
+        h.assertTrue(be.canPlaceItem(0, ResourceWoolItem.create(IRON, 1)), "resource wool can");
+        h.assertFalse(be.canPlaceItem(1, com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(IRON, 1)), "nothing goes into the bale slot");
+        h.runAfterDelay(5, () -> h.assertTrue(h.getBlockState(new BlockPos(1, 1, 1)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.ACTIVE),
+                "the press runs"));
+        h.runAfterDelay(41, () -> {
+            h.assertTrue(isBaleOf(be.output(), IRON, 1) && be.input().getCount() == 11, "one bale after 40 ticks, got " + be.output() + " / " + be.input());
+        });
+        h.runAfterDelay(100, () -> {
+            h.assertTrue(isBaleOf(be.output(), IRON, 2) && be.input().getCount() == 2, "two bales, 2 wool left, got " + be.output() + " / " + be.input());
+            h.assertTrue(be.status() == MachineStatus.IDLE, "waits for more wool, was " + be.status());
+            h.assertTrue(be.getEnergyHandler().getAmountAsInt() == 18_000, "1,000 FE a bale, have " + be.getEnergyHandler().getAmountAsInt());
+            h.assertTrue(gold.output().isEmpty() && gold.input().getCount() == 8, "8 wool isn't a bale");
+            h.assertFalse(h.getBlockState(new BlockPos(1, 1, 1)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.ACTIVE), "the press stops");
+            h.succeed();
+        });
+    }
+
+    /** No power pauses it, a full bale slot stops it, hoppers feed wool in and take only bales out. */
+    private static void woolPackerPausesAndHoppers(GameTestHelper h) {
+        var unpowered = packer(h, new BlockPos(1, 1, 1), ResourceWoolItem.create(IRON, 9), false);
+        var full = packer(h, new BlockPos(3, 1, 1), ResourceWoolItem.create(IRON, 9), true);
+        full.setItem(1, com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(IRON, 64));
+        var mixed = packer(h, new BlockPos(5, 1, 1), ResourceWoolItem.create(IRON, 9), true);
+        mixed.setItem(1, com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("gold"), 1));
+        // Hopper above with 12 Iron Wool and a dirt; hopper below pulls.
+        BlockPos fedPos = new BlockPos(3, 2, 4);
+        var fed = packer(h, fedPos, ItemStack.EMPTY, true);
+        h.setBlock(fedPos.above(), Blocks.HOPPER);
+        var top = h.getBlockEntity(fedPos.above(), net.minecraft.world.level.block.entity.HopperBlockEntity.class);
+        top.setItem(0, ResourceWoolItem.create(IRON, 12));
+        top.setItem(1, new ItemStack(Items.DIRT));
+        h.setBlock(fedPos.below(), Blocks.HOPPER);
+        var bottom = h.getBlockEntity(fedPos.below(), net.minecraft.world.level.block.entity.HopperBlockEntity.class);
+        h.runAfterDelay(60, () -> {
+            h.assertTrue(unpowered.status() == MachineStatus.NO_ENERGY && unpowered.output().isEmpty(), "no power, no bale: " + unpowered.status());
+            h.assertTrue(full.status() == MachineStatus.OUTPUT_FULL && full.input().getCount() == 9, "a full bale slot stops it: " + full.status());
+            h.assertTrue(mixed.status() == MachineStatus.OUTPUT_FULL && mixed.input().getCount() == 9, "a different bale in the slot stops it");
+        });
+        h.succeedWhen(() -> {
+            h.assertTrue(top.getItem(1).is(Items.DIRT), "the hopper keeps the dirt");
+            int bales = 0, wool = 0;
+            for (int i = 0; i < bottom.getContainerSize(); i++) {
+                ItemStack st = bottom.getItem(i);
+                if (st.is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BALE.get())) bales += st.getCount();
+                if (st.getItem() instanceof ResourceWoolItem) wool += st.getCount();
+            }
+            h.assertTrue(wool == 0, "the hopper below never takes the wool");
+            h.assertTrue(bales == 1, "the hopper below takes the bale, has " + bales);
+            h.assertTrue(fed.input().getCount() == 3 && top.getItem(0).isEmpty(), "the 3 left over wait in the packer, has " + fed.input());
+        });
+    }
+
+    /** A bale gives 12 wool's worth for 15 wool's energy over 9 wool's time; counts never pass a stack. */
+    private static void woolBaleSeparationNumbers(GameTestHelper h) {
+        var iron = com.jax3.barelyfunctionalcontraptions.sheep.recipe.SeparationLookup.find(h.getLevel(),
+                com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(IRON, 1)).orElseThrow();
+        h.assertTrue(iron.primary().item().value() == Items.RAW_IRON && iron.primaryRange().min() == 24 && iron.primaryRange().max() == 48,
+                "an Iron Wool Bale gives 24-48 raw iron, got " + iron.primaryRange());
+        h.assertTrue(iron.secondary().orElseThrow().count() == 24, "and 24 string, got " + iron.secondary());
+        h.assertTrue(iron.bonus().orElseThrow().item().count() == 36 && Math.abs(iron.bonus().get().chance() - 0.1F) < 1e-6,
+                "and a 10% chance of 36 iron nuggets, got " + iron.bonus());
+        // 300,000 FE spread over 900 ticks is 334 FE/t once rounded up, so 300,600 in all.
+        h.assertTrue(iron.effectiveEnergy() >= 300_000 && iron.effectiveEnergy() < 300_900 && iron.effectiveTicks() == 900,
+                "for about 300,000 FE over 900 ticks, got " + iron.effectiveEnergy() + " / " + iron.effectiveTicks());
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.recipe.SeparationLookup.find(h.getLevel(),
+                new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BALE.get())).isEmpty(), "a blank bale doesn't separate");
+        // Ender pearls stack to 16: a bale of pearl wool gives at most a stack.
+        var pearls = new com.jax3.barelyfunctionalcontraptions.sheep.resource.Separation(new net.minecraft.world.item.ItemStackTemplate(Items.ENDER_PEARL, 2), 4,
+                java.util.Optional.empty(), java.util.Optional.of(new com.jax3.barelyfunctionalcontraptions.sheep.resource.ChanceOutput(
+                        new net.minecraft.world.item.ItemStackTemplate(Items.ENDER_PEARL, 3), 0.5F)), java.util.Optional.empty(), java.util.Optional.empty()).baled();
+        h.assertTrue(pearls.maxPrimaryCount() <= 16 && pearls.bonus().orElseThrow().item().count() <= 16,
+                "bale outputs fit in a stack, got " + pearls.maxPrimaryCount() + " / " + pearls.bonus());
+        h.succeed();
+    }
+
+    /** A placed bale keeps its wool: it drops the same bale, and pick-block gives it too. */
+    private static void woolBaleBlock(GameTestHelper h) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        h.setBlock(pos, ModBlocks.WOOL_BALE.get());
+        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBaleBlockEntity.class);
+        be.applyComponentsFromItemStack(com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(IRON, 1));
+        h.assertTrue(IRON.equals(be.resource()), "placing a bale stores its wool, got " + be.resource());
+        var drops = net.minecraft.world.level.block.Block.getDrops(h.getBlockState(pos), h.getLevel(), h.absolutePos(pos), be);
+        h.assertTrue(drops.size() == 1 && isBaleOf(drops.getFirst(), IRON, 1), "breaking it gives the Iron Wool Bale back, got " + drops);
+        ItemStack picked = h.getBlockState(pos).getCloneItemStack(h.getLevel(), h.absolutePos(pos), false);
+        h.assertTrue(isBaleOf(picked, IRON, 1), "pick-block gives the same bale, got " + picked);
+        h.assertTrue(h.getBlockState(pos).is(net.minecraft.tags.BlockTags.MINEABLE_WITH_HOE), "a hoe breaks it fastest");
+        h.succeed();
+    }
+
+    /** A whole Iron Wool Bale through the separator: 24-48 raw iron and 24 string, the bale used up. */
+    private static void separatorSeparatesBale(GameTestHelper h) {
+        MechanicalSeparatorBlockEntity be = separator(h, new BlockPos(3, 1, 3));
+        be.getInventory().setStack(SeparatorInventory.INPUT, com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(IRON, 1));
+        h.onEachTick(() -> be.getEnergy().set(be.getEnergy().getCapacityAsInt()));
+        h.succeedWhen(() -> {
+            ItemStack raw = be.getInventory().getStack(SeparatorInventory.PRIMARY);
+            h.assertTrue(raw.is(Items.RAW_IRON) && raw.getCount() >= 24 && raw.getCount() <= 48, "24-48 raw iron expected, got " + raw);
+            h.assertTrue(be.getInventory().getStack(SeparatorInventory.SECONDARY).getCount() == 24, "24 string expected");
+            h.assertTrue(be.getInventory().getStack(SeparatorInventory.INPUT).isEmpty(), "bale used up");
+        });
+    }
+
     private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity cube(GameTestHelper h, BlockPos pos) {
         h.setBlock(pos, ModBlocks.HUME_ENERGY_CUBE.get());
         return h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
@@ -2881,7 +3017,7 @@ public final class ModGameTests {
                 .thenSucceed();
     }
 
-    /** The main tab holds the machines and tools only; every resource wool is in the Resource Wool tab. */
+    /** The main tab holds the machines and tools only; every resource wool, and a bale of each, is in the Resource Wool tab. */
     private static void creativeTabs(GameTestHelper h) {
         var level = h.getLevel();
         net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(level.enabledFeatures(), true, level.registryAccess());
@@ -2890,9 +3026,14 @@ public final class ModGameTests {
         h.assertTrue(main.stream().noneMatch(s -> s.is(ModItems.RESOURCE_WOOL.get())), "no resource wool in the main tab");
         h.assertTrue(main.stream().anyMatch(s -> s.is(ModItems.MECHANICAL_SEPARATOR.get()))
                 && main.stream().anyMatch(s -> s.is(ModItems.HUME_ENERGY_CUBE.get())), "machines stay in the main tab");
-        h.assertTrue(!wool.isEmpty() && wool.stream().allMatch(s -> s.is(ModItems.RESOURCE_WOOL.get())), "the wool tab holds only resource wool");
-        h.assertTrue(wool.size() >= com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.BUILT_IN_WOOL.size(),
-                "every built-in wool type, got " + wool.size());
+        h.assertTrue(main.stream().noneMatch(s -> s.is(ModItems.WOOL_BALE.get())), "no bales in the main tab");
+        h.assertTrue(!wool.isEmpty() && wool.stream().allMatch(s -> s.is(ModItems.RESOURCE_WOOL.get()) || s.is(ModItems.WOOL_BALE.get())),
+                "the wool tab holds only resource wool and bales");
+        long pieces = wool.stream().filter(s -> s.is(ModItems.RESOURCE_WOOL.get())).count();
+        long bales = wool.stream().filter(s -> s.is(ModItems.WOOL_BALE.get())).count();
+        h.assertTrue(pieces >= com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.BUILT_IN_WOOL.size(),
+                "every built-in wool type, got " + pieces);
+        h.assertTrue(bales == pieces, "a bale of every wool, got " + bales + " for " + pieces);
         h.succeed();
     }
 }

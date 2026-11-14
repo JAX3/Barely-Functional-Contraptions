@@ -19,7 +19,8 @@ import net.minecraft.world.level.Level;
  *
  * <ol>
  *     <li>An explicit {@code barelyfunctionalcontraptions:separating} recipe matching the item wins (lets packs override).</li>
- *     <li>Otherwise, resource wool uses its sheep resource definition's {@code separator} block.</li>
+ *     <li>Otherwise, resource wool uses its sheep resource definition's {@code separator} block, and a Wool Bale the
+ *     same scaled up for a bale ({@link Separation#baled()}).</li>
  * </ol>
  * Works on both logical sides: the client uses recipes received through NeoForge's recipe sync, so slot validation
  * in the GUI matches the server.
@@ -37,6 +38,10 @@ public final class SeparationLookup {
         if (stack.isEmpty()) return Optional.empty();
         Optional<SeparatingRecipe> recipe = findRecipe(level, stack);
         if (recipe.isPresent()) return recipe.map(SeparatingRecipe::toSeparation);
+        if (stack.getItem() instanceof com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem) {
+            return com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.getResource(stack, level.isClientSide())
+                    .map(r -> r.separation().baled());
+        }
         return ResourceWoolItem.getResource(stack, level.isClientSide()).map(SheepResource::separation);
     }
 

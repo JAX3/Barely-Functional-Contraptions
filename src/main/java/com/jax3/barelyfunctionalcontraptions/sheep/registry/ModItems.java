@@ -40,6 +40,12 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> BLAZE_FURNACE = REGISTER.registerSimpleBlockItem(ModBlocks.BLAZE_FURNACE);
     public static final DeferredItem<BlockItem> WOOL_BURNER = REGISTER.registerSimpleBlockItem(ModBlocks.WOOL_BURNER);
 
+    public static final DeferredItem<BlockItem> WOOL_PACKER = REGISTER.registerSimpleBlockItem(ModBlocks.WOOL_PACKER);
+
+    /** 9 resource wool in one; like resource wool, the {@link ModDataComponents#SHEEP_RESOURCE} component says which. */
+    public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem> WOOL_BALE = REGISTER.registerItem("wool_bale",
+            p -> new com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem(ModBlocks.WOOL_BALE.get(), p.useBlockDescriptionPrefix()));
+
     /** The in-game guide. */
     public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem> CONTRAPTIONS_MANUAL = REGISTER.registerItem("contraptions_manual",
             com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem::new, p -> p.stacksTo(1));

@@ -2764,6 +2764,184 @@ def generate_manual():
     grid(MANUAL, dict(CARTOON)).save(out("item/contraptions_manual.png"))
 
 
+# ---------------------------------------------------------------------------
+# Wool Bale: a greyscale wool block (tinted with the resource's wool colour in game) under untinted steel straps,
+# laid like a hay bale. Wool Packer: the machine casing with a press in its front and nine tufts on its sides.
+# ---------------------------------------------------------------------------
+def _grey(v, a=255):
+    v = max(0, min(255, int(v)))
+    return (v, v, v, a)
+
+
+def generate_wool_bale():
+    rnd = random.Random(91)
+    # Side: pressed fleece in puffy rows, each lock lit on top and shaded underneath.
+    side = Image.new("RGBA", (16, 16), CLEAR)
+    for y in range(16):
+        for x in range(16):
+            row = y // 4
+            lx = (x + (2 if row % 2 else 0)) % 4      # locks staggered like brickwork
+            ly = y % 4
+            v = 240 - ly * 14 - (8 if lx == 3 else 0) + rnd.randint(-5, 5)
+            if ly == 3 and lx in (0, 3):
+                v -= 18
+            side.putpixel((x, y), _grey(v))
+    side.save(out("block/wool_bale_side.png"))
+
+    # Ends: the cut face of the bale, a swirl of compressed fleece inside a darker rim.
+    end = Image.new("RGBA", (16, 16), CLEAR)
+    for y in range(16):
+        for x in range(16):
+            d = math.hypot(x - 7.5, y - 7.5)
+            ring = int(d * 1.15 + math.atan2(y - 7.5, x - 7.5) * 0.6) % 3
+            v = 240 - ring * 14 + rnd.randint(-4, 4)
+            if x in (0, 15) or y in (0, 15):
+                v = 172 + rnd.randint(-6, 6)
+            end.putpixel((x, y), _grey(v))
+    end.save(out("block/wool_bale_end.png"))
+
+    # Two thin steel straps round the sides, each with a small brass buckle.
+    straps = Image.new("RGBA", (16, 16), CLEAR)
+    for band in (3, 12):
+        for x in range(16):
+            straps.putpixel((x, band), CARTOON["H"])
+            straps.putpixel((x, band + 1), CARTOON["S"])
+        for (x, y) in [(7, 0), (8, 0), (7, 1), (8, 1)]:
+            straps.putpixel((x, band + y), CARTOON["C"] if y == 0 else CARTOON["c"])
+    straps.save(out("block/wool_bale_side_straps.png"))
+
+
+WOOL_PACKER_SIDE = [  # side: casing with nine tufts, three by three
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMMMMMMMbSSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHMOWwOWwOWwOMSO",
+    "OHMOwvOwvOwvOMSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHMOWwOWwOWwOMSO",
+    "OHMOwvOwvOwvOMSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHMOWwOWwOWwOMSO",
+    "OHMOwvOwvOwvOMSO",
+    "OHBOOOOOOOOOOBSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+WOOL_PACKER_TOP = [  # top: the press's ram housing, bolted down
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMMMMMMMbSSO",
+    "OHMMOOOOOOOOMMSO",
+    "OHMMOCCCCCCOMMSO",
+    "OHMMOCYYYYcOMMSO",
+    "OHMMOCYKKccOMMSO",
+    "OHMMOCYKKccOMMSO",
+    "OHMMOCcccccOMMSO",
+    "OHMMOCCCCCCOMMSO",
+    "OHMMOOOOOOOOMMSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+
+def _press_mouth(img, oy, drop, glow):
+    """The 8x5 press mouth at (4, 6): a brass ram {drop} pixels down onto a tuft of wool."""
+    for x in range(8):
+        for y in range(5):
+            img.putpixel((4 + x, oy + 6 + y), hexc("#141019"))
+    for x in range(8):                                    # the ram
+        for y in range(drop + 1):
+            c = CARTOON["c"] if y < drop else CARTOON["C"]
+            img.putpixel((4 + x, oy + 6 + y), c)
+        img.putpixel((4 + x, oy + 6 + drop), CARTOON["Y"] if x in (2, 3) else CARTOON["C"])
+    wool_top = 6 + drop + 1
+    for y in range(max(wool_top, 8), 11):                 # the wool, squashed flatter as the ram comes down
+        for x in range(1, 7):
+            c = CARTOON["w"] if (x + y) % 3 else CARTOON["v"]
+            if glow and y == 10:
+                c = CARTOON["W"]
+            img.putpixel((4 + x, oy + y), c)
+
+
+def generate_wool_packer():
+    pal = dict(CARTOON)
+    front = grid(BLAZE_FURNACE_FRONT, pal)
+    _press_mouth(front, 0, 0, False)
+    front.save(out("block/wool_packer_front.png"))
+    drops = [0, 1, 2, 2, 1, 0, 0, 0]
+    anim = Image.new("RGBA", (16, 16 * len(drops)), CLEAR)
+    for t, drop in enumerate(drops):
+        grid(BLAZE_FURNACE_FRONT, pal, anim, 0, 16 * t)
+        _press_mouth(anim, 16 * t, drop, drop == 2)
+    anim.save(out("block/wool_packer_front_on.png"))
+    with open(out("block/wool_packer_front_on.png") + ".mcmeta", "w") as f:
+        f.write('{\n  "animation": {\n    "frametime": 3\n  }\n}\n')
+    grid(WOOL_PACKER_SIDE, pal).save(out("block/wool_packer_side.png"))
+    grid(WOOL_PACKER_TOP, pal).save(out("block/wool_packer_top.png"))
+
+
+def generate_wool_packer_gui():
+    """Wool Packer window: energy gauge, wool slot with 3x3 pips, press arrow, bale slot, info lines."""
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # energy gauge, fill 11..40 x 19..82
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 46, 16, 168, 84, GUI["panel"])         # work window
+    slot(img, 62, 31)                                 # wool
+    big_slot(img, 126, 31)                            # bale
+    img.alpha_composite(arrow_shape(hexc("#2c2e36"), hexc("#17181c")), (86, 31))
+    for i in range(9):                                # 3x3 pips at (61, 53), 5x5 on a 7 grid
+        px, py = 61 + i % 3 * 7, 53 + i // 3 * 7
+        inset(img, px, py, px + 5, py + 5, hexc("#3a3c46"))
+    for x in range(88, 164):
+        if x % 2 == 0:
+            img.putpixel((x, 51), hexc("#22232a"))
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    sheep_icon(img, 146, 5, hexc("#f2f2f2"))
+    rnd = random.Random(53)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice([hexc("#e3e1ea"), hexc("#b7b3c6"), CARTOON["C"]]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    for y in range(64):                                             # energy fill, the separator's purple
+        t = y / 63.0
+        c = mix(hexc("#ff6ae6"), hexc("#5c2aa6"), t)
+        for x in range(30):
+            cc = mix(c, hexc("#ffd2fb"), 0.35) if x in (3, 4, 5) else (shade(c, 0.75) if x >= 26 else c)
+            img.putpixel((176 + x, y), cc)
+    for k in range(1, 8):
+        ty = round(64 * k / 8)
+        for x in range(25, 30):
+            img.putpixel((176 + x, ty), mix(img.getpixel((176 + x, ty)), hexc("#ffd2fb"), 0.5))
+    for f in range(4):                                              # energy surface shimmer
+        for x in range(30):
+            img.putpixel((176 + x, 66 + f * 2), hexc("#ffffff") if (x + f * 2) % 8 == 0 else hexc("#ffd2fb"))
+            img.putpixel((176 + x, 67 + f * 2), hexc("#ff6ae6"))
+    img.alpha_composite(arrow_shape(CARTOON["C"], hexc("#5a3510")), (176, 80))   # press arrow fill, brass
+    for x in range(178, 197):
+        if img.getpixel((x, 86))[3]:
+            img.putpixel((x, 86), CARTOON["Y"])
+    pip = ["WWWwv", "WWwwv", "Wwwwv", "wwwvv", "vvvvv"]                         # lit pip: a little wool tuft
+    grid(pip, {"W": hexc("#ffffff"), "w": hexc("#e3e1ea"), "v": hexc("#b7b3c6")}, img, 176, 100)
+    img.save(out("gui/wool_packer.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -2793,6 +2971,9 @@ def main():
     generate_zero_point_gui()
     generate_blaze_furnace_gui()
     generate_wool_burner_gui()
+    generate_wool_bale()
+    generate_wool_packer()
+    generate_wool_packer_gui()
     generate_advancement_background()
     generate_jei()
     generate_logo()

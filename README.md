@@ -61,7 +61,7 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game. Its chapters are sorted into four tabs along the top of the left panel:
 
 - **Power:** the generators (Mycelial Generator, Zero Point Module, Glow Panels, Blaze Sheep Furnace, Wool Burner) and energy storage.
-- **Logistics:** cables and the Energy Meter, tanks and pipes, and pipe modes and filters.
+- **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
 - **Productive:** infusing sheep, the themed sheep, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, and data packs and commands.
 
@@ -108,6 +108,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Watt's Going On | Craft an Energy Meter |
 | Let There Be Glow | Craft a Glow Panel |
 | Fleece Navidad | Craft a Wool Burner |
+| Bale Out | Press a Wool Bale in a Wool Packer |
 | ⭐ **Sheepish Combustion** (goal) | Be within 16 blocks of a Blaze Sheep Furnace when it starts making power from a Blaze sheep |
 | Wool You Look at That | Infuse a sheep with any resource |
 | Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
@@ -530,6 +531,48 @@ Each file in `data/<namespace>/barelyfunctionalcontraptions/wool_burner_fuel/<na
 
 When several fuels match an item, the one that gives the most energy in all is used. To change a built-in fuel, use the same file path in your own data pack. Files may use NeoForge load conditions, and they reload with `/reload`.
 
+### Wool Packer and Wool Bales
+The **Wool Packer** presses 9 of the same resource wool into one **Wool Bale**. A whole bale goes through the Mechanical Separator in one go: it costs **more power** than its 9 wool, but gives **more resources**.
+
+![Two Wool Packers fed Iron and Gold Wool by hoppers from chests, a Mechanical Separator working an Iron Wool Bale, and placed bales of every built-in wool in front, some standing and some lying down](docs/screenshots/85_wool_packers.png)
+
+- **Pressing:** each bale takes 1,000 FE over 2 seconds (25 FE/t). The packer only starts once 9 wool are in and the bale will fit, and the press pauses without power.
+- **Loading it:**
+  - right-click it with resource wool;
+  - put wool in the left slot of its window (shift-click works);
+  - feed it with a hopper or pipe from any side.
+
+  The wool slot takes resource wool only. Hoppers and pipes can take bales out of any side, but never the wool.
+- **Window:** right-click with an empty hand. It shows the energy buffer, the wool slot with **nine pips** that light up as the wool for the next bale comes in, a brass arrow that fills while it presses, the bale slot, the FE/t and the time per bale. A status lamp shows *Pressing a bale*, *Waiting for wool*, *No energy*, *Output full* or *Unknown wool*. Jade shows the same, and a comparator reads how full the wool slot is.
+- **Looks:** the brass ram in its front thumps down while it presses, puffing out bits of wool.
+- **Recipe:** iron ingots in the corners, a piston on top, wool either side of a Functional Machine Block, and redstone at the bottom. Mine it with a pickaxe; its contents drop.
+
+#### Separating a bale
+Put a bale in the Mechanical Separator like any wool. With the default config, compared with the bale's 9 wool separated one at a time:
+
+| | 9 Iron Wool | 1 Iron Wool Bale |
+|---|---|---|
+| Raw iron | 18-36 | **24-48** |
+| String | 18 | **24** |
+| Iron nuggets | 3 each, 10% chance per wool | 36, 10% chance |
+| Energy | 180,000 FE | **about 300,000 FE** |
+| Time | 45 s | 45 s |
+
+So a bale gives a third more of everything for two-thirds more power. Every count is capped at one stack, so a bale never jams the separator (ender pearls, for example, stop at 16). Bales stack to 64, so they also carry nine times as much wool in a chest or pipe.
+
+All of this is in `[wool_packer]` in the synced config: `baleYield` (12 = 12 wool's worth of outputs), `baleEnergy` (15 = 15 wool's energy) and `baleTime` (9 = 9 wool's time). A separating recipe whose ingredient matches a Wool Bale with its `sheep_resource` component gives that bale its own outputs instead.
+
+#### Placing bales
+A bale can be placed like a hay bale, standing up or lying down, in the colour of its wool with two steel straps round it. It softens falls the same way, breaks fastest with a hoe, and drops the same bale back. Pick-block gives the bale too. The creative Resource Wool tab has a bale of every wool after the wools.
+
+| Placed bales | The packer's window, pressing |
+|---|---|
+| ![Placed Wool Bales of the built-in wools, each in its wool's colour with steel straps and brass buckles, some standing and some lying down](docs/screenshots/86_wool_bales.png) | ![The Wool Packer window: a full energy gauge, 50 Iron Wool in the wool slot with all nine pips lit, the brass arrow half full, 8 Iron Wool Bales in the bale slot, 25 FE/t and 2s a bale, status Pressing a bale](docs/screenshots/87_wool_packer_gui.png) |
+
+| A bale in the separator | Its manual chapter |
+|---|---|
+| ![The Mechanical Separator window with 3 Iron Wool Bales in its input slot and the tooltip: Iron Wool Bale, 9 x Iron Wool, pressed together](docs/screenshots/88_separator_bale_gui.png) | ![The Contraptions Manual's Logistics tab with the new Wool Packer chapter open](docs/screenshots/89_guide_wool_packer.png) |
+
 ### Energy Cable
 Cables carry Forge Energy from the **power generators** (Mycelial Generator, Zero Point Energy Module, Creative Generator) and the **Hume Energy Cube** to the machines that use it, so a machine no longer has to touch its power source.
 
@@ -787,6 +830,18 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `energyPerShear` | 2000 | FE used per sheep sheared (0 = runs without power) |
 | `energyCapacity` | 50000 | FE buffer |
 | `maxEnergyInput` | 1000 | FE accepted per tick (every face except the front) |
+
+**`[wool_packer]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `energyCapacity` | 20000 | FE each Wool Packer stores |
+| `maxEnergyInput` | 1000 | FE it accepts per tick |
+| `energyPerBale` | 1000 | FE to press one bale (0 = needs no power) |
+| `ticksPerBale` | 40 | Ticks to press one bale |
+| `baleYield` | 12.0 | What separating a bale gives, in wool's worth of outputs (a bale holds 9) |
+| `baleEnergy` | 15.0 | FE to separate a bale, in wool's worth |
+| `baleTime` | 9.0 | Time to separate a bale, in wool's worth |
 
 **`[fluid_reservoir]`**
 

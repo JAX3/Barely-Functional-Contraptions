@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "barelyfunctionalcontraptions:block/wool_bale"
+    },
+    "axis=z": {
+      "model": "barelyfunctionalcontraptions:block/wool_bale",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "barelyfunctionalcontraptions:block/wool_bale",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

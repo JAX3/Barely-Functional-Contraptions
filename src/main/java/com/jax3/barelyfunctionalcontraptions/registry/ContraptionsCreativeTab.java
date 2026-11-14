@@ -44,6 +44,7 @@ public final class ContraptionsCreativeTab {
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ENERGY_METER.get());
                 // Processing
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get());
+                output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_PACKER.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.AUTOMATIC_SHEARS.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_RESERVOIR.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get());
@@ -62,13 +63,12 @@ public final class ContraptionsCreativeTab {
             .icon(() -> ResourceWoolItem.create(BarelyFunctionalContraptions.id("gold"), 1))
             .displayItems((params, output) -> {
                 SheepResourceRegistry loaded = SheepResourceRegistry.client();
-                if (loaded.isEmpty()) {
-                    BUILT_IN_WOOL.forEach(name -> output.accept(ResourceWoolItem.create(BarelyFunctionalContraptions.id(name), 1)));
-                } else {
-                    for (SheepResource resource : loaded.all()) {
-                        output.accept(ResourceWoolItem.create(resource.id(), 1));
-                    }
-                }
+                List<net.minecraft.resources.Identifier> ids = loaded.isEmpty()
+                        ? BUILT_IN_WOOL.stream().map(BarelyFunctionalContraptions::id).toList()
+                        : loaded.all().stream().map(SheepResource::id).toList();
+                ids.forEach(id -> output.accept(ResourceWoolItem.create(id, 1)));
+                // Then a bale of each.
+                ids.forEach(id -> output.accept(com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(id, 1)));
             })
             .build());
 

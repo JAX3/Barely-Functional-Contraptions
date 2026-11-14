@@ -1,0 +1,10 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "front": "barelyfunctionalcontraptions:block/wool_packer_front",
+    "side": "barelyfunctionalcontraptions:block/wool_packer_side",
+    "top": "barelyfunctionalcontraptions:block/wool_packer_top",
+    "bottom": "barelyfunctionalcontraptions:block/mechanical_separator_bottom",
+    "particle": "barelyfunctionalcontraptions:block/wool_packer_side"
+  }
+}

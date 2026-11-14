@@ -29,6 +29,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(GlowPanelProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity.class);
         registration.registerBlockDataProvider(BlazeFurnaceProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.class);
         registration.registerBlockDataProvider(WoolBurnerProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity.class);
+        registration.registerBlockDataProvider(WoolPackerProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.class);
         registration.registerBlockDataProvider(EnergyMeterProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity.class);
     }
 
@@ -44,6 +45,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(GlowPanelProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock.class);
         registration.registerBlockComponent(BlazeFurnaceProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.class);
         registration.registerBlockComponent(WoolBurnerProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.class);
+        registration.registerBlockComponent(WoolPackerProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.class);
         registration.registerBlockComponent(EnergyMeterProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.class);
     }
 }
