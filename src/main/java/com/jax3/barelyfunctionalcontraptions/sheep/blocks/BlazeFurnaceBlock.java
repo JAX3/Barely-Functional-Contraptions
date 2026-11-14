@@ -44,7 +44,7 @@ import org.jspecify.annotations.Nullable;
  * <ul>
  *     <li>right-click with a boost item (a Blaze Rod) to load it;</li>
  *     <li>sneak-right-click with an empty hand to show or hide the heating area;</li>
- *     <li>right-click with an empty hand to see what it is making.</li>
+ *     <li>right-click with an empty hand to open its window (the heat column, energy, boost slot and area button).</li>
  * </ul>
  */
 public class BlazeFurnaceBlock extends BaseEntityBlock {
@@ -113,7 +113,7 @@ public class BlazeFurnaceBlock extends BaseEntityBlock {
                     .withStyle(ChatFormatting.GOLD));
             return InteractionResult.SUCCESS;
         }
-        player.sendOverlayMessage(statusMessage(be));
+        player.openMenu(be, pos);
         return InteractionResult.SUCCESS;
     }
 

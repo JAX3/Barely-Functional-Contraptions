@@ -1970,6 +1970,67 @@ def generate_zero_point_gui():
     img.save(out("gui/zero_point_energy_module.png"))
 
 
+def generate_blaze_furnace_gui():
+    """Blaze Sheep Furnace window: energy gauge, heat column (fire rising with the heat), info window, boost slot."""
+    shears = Image.open(out("gui/automatic_shears.png")).convert("RGBA")
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # energy gauge, fill 11..40 x 19..82
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 46, 16, 76, 84, GUI["gauge"])          # heat column, 47..74 x 17..82
+    inset(img, 80, 16, 168, 78, GUI["panel"])         # info window
+    for x in range(84, 164):                          # divider between energy and heat
+        img.putpixel((x, 44), hexc("#2c2e36"))
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    slot(img, 152, 87)                                # boost slot
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    rnd = random.Random(31)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice(FIRE[2:5]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    img.paste(shears.crop((176, 64, 208, 80)), (176, 146))          # button background, normal and hovered
+    for y in range(64):                                             # energy fill: amber, light at the top
+        for x in range(30):
+            c = mix(FIRE[4], FIRE[1], y / 63.0)
+            if (x + y) % 4 == 0:
+                c = mix(c, FIRE[5], 0.2)
+            img.putpixel((176 + x, y), c)
+    for k in range(1, 8):
+        ty = round(64 * k / 8)
+        for x in range(25, 30):
+            img.putpixel((176 + x, ty), mix(img.getpixel((176 + x, ty)), FIRE[5], 0.5))
+    for f in range(4):                                              # energy surface shimmer
+        for x in range(30):
+            img.putpixel((176 + x, 66 + f * 2), FIRE[5] if (x + f * 2) % 8 == 0 else FIRE[4])
+            img.putpixel((176 + x, 67 + f * 2), FIRE[3])
+    # Heat column: 3 frames of 26x64 at (176 + 26f, 80). Flame tongues along the top, a hot core below.
+    for f in range(3):
+        ox = 176 + f * 26
+        for x in range(26):
+            tip = 5 + 3.5 * math.sin(f * 2.1 + x * 0.9) + 1.5 * math.sin(f * 1.3 + x * 2.3)
+            for y in range(64):
+                d = y - (9 - tip)  # depth below the flame's edge
+                if d < 0:
+                    continue
+                centre = 1 - abs(x - 12.5) / 13.0
+                heat = min(1.0, d / 40.0) * 0.55 + centre * 0.4 + 0.05 * math.sin(y * 0.7 + f * 2 + x)
+                c = FIRE[1 + max(0, min(3, int(heat * 4.2)))] if d > 2 else FIRE[3]
+                if d > 6 and (x * 7 + y * 3 + f * 5) % 23 == 0:
+                    c = FIRE[5]
+                img.putpixel((ox + x, 80 + y), c)
+    img.save(out("gui/blaze_furnace.png"))
+
+
 ADVANCEMENT_BACKGROUND = [  # dim blue-steel floor plate, tiled behind the advancement tab
     "SMMMMMMMMMMMMMMS",
     "MbMMMMMMMMMMMMbM",
@@ -2598,6 +2659,7 @@ def main():
     generate_fluid_tank()
     generate_tank_gui()
     generate_zero_point_gui()
+    generate_blaze_furnace_gui()
     generate_advancement_background()
     generate_jei()
     generate_logo()

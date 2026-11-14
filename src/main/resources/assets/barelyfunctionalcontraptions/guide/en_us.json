@@ -140,11 +140,12 @@
         "- One Blaze sheep gives 80 FE/t. Each extra one adds a little less: 150, 210 and 260 FE/t for two, three and four. It counts up to four.",
         "- Only a sheep showing its blazing fleece counts. A sheared sheep or a lamb gives nothing until its wool grows back.",
         "- In rain or water a sheep gives half.",
-        "- Right-click with a Blaze Rod to load it: each rod doubles the output for 30 seconds. Hoppers and pipes can fill it too.",
+        "- Right-click with a Blaze Rod to load it, or put rods in the boost slot in its window: each rod doubles the output for 30 seconds. Hoppers and pipes can fill it too.",
         "Shear the sheep for Blaze Rods, or leave the fleece on for power: that's the trade-off.",
         "It pushes its energy into every block around it, and a comparator reads one level per 20 FE/t.",
+        "Right-click it with an empty hand to open its window. The fire in the middle column rises with the heat; each line is one more heat source, and its pip lights while that source is in use.",
         "## Showing the area",
-        "Sneak-right-click the furnace or the Automatic Shears with an empty hand to show or hide its working area. The shears also have a button for it in their window."
+        "Click the spyglass button in the furnace's or the Automatic Shears' window, or sneak-right-click either block with an empty hand, to show or hide its working area."
       ]
     },
     {

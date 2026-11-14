@@ -1590,22 +1590,65 @@ public final class DevScreenshotHarness {
             case 230 -> shot(mc, "64_blaze_furnace_night");
             case 232 -> {
                 setHudHidden(mc, false);
-                server.execute(() -> {
-                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
-                    BlockPos pos = origin.offset(5, 0, -4);
-                    if (player.level().getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity be) player.openMenu(be, pos);
-                });
+                command(server, "time set noon");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 0.5, origin.getY(), origin.getZ() - 1.5));
             }
-            case 250 -> shot(mc, "65_shears_area_button");
-            case 252 -> {
+            case 236 -> openAt(server, origin.offset(0, 0, -4));
+            case 250 -> shot(mc, "67_blaze_furnace_gui");
+            // Real clicks on the furnace window's area button: off, then on again.
+            case 252, 264 -> clickGui(mc, 154 + 8, 4 + 8);
+            case 262, 274 -> logArea(server, origin.offset(0, 0, -4), "furnace window button");
+            // Shear two of the sheep: the heat column drops to two marks.
+            case 276 -> server.execute(() -> server.overworld().getEntitiesOfClass(Sheep.class,
+                    com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.heatingArea(origin.offset(0, 0, -4)),
+                    sh -> !sh.isSheared() && sh.getX() > origin.getX() + 0.6).forEach(sh -> sh.setSheared(true)));
+            case 300 -> shot(mc, "68_blaze_furnace_gui_two_sheep");
+            case 302 -> {
+                if (mc.player != null) mc.player.closeContainer();
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 5.5, origin.getY(), origin.getZ() - 0.5));
+            }
+            case 306 -> openAt(server, origin.offset(5, 0, -4));
+            case 320 -> shot(mc, "65_shears_area_button");
+            // And on the shears' window button.
+            case 322, 334 -> clickGui(mc, 136 + 8, 4 + 8);
+            case 332, 344 -> logArea(server, origin.offset(5, 0, -4), "shears window button");
+            case 346 -> {
                 if (mc.player != null) mc.player.closeContainer();
                 mc.gui.setScreen(new GuideScreen());
             }
-            case 262 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter(10); }
-            case 275 -> shot(mc, "66_guide_blaze_furnace");
-            case 285 -> mc.stop();
+            case 356 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter(10); }
+            case 370 -> shot(mc, "66_guide_blaze_furnace");
+            case 380 -> mc.stop();
             default -> {}
         }
+    }
+
+    /** Opens the window of the block at {@code pos}, as a right-click does. */
+    private static void openAt(MinecraftServer server, BlockPos pos) {
+        server.execute(() -> {
+            ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+            if (player.level().getBlockEntity(pos) instanceof net.minecraft.world.MenuProvider provider) player.openMenu(provider, pos);
+        });
+    }
+
+    /** A real left click at ({@code gx}, {@code gy}) inside a centred 176x193 container window, then the cursor parked. */
+    private static void clickGui(Minecraft mc, int gx, int gy) {
+        var window = mc.getWindow();
+        double scale = window.getGuiScale();
+        int left = (window.getGuiScaledWidth() - 176) / 2, top = (window.getGuiScaledHeight() - 193) / 2;
+        long handle = window.handle();
+        mc.mouseHandler.onMove(handle, (left + gx) * scale, (top + gy) * scale, 0, 0);
+        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(0, 0), 1);
+        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(0, 0), 0);
+        mc.mouseHandler.onMove(handle, 4, 4, 0, 0);
+    }
+
+    private static void logArea(MinecraftServer server, BlockPos pos, String what) {
+        server.execute(() -> {
+            if (server.overworld().getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AreaDisplay area) {
+                ResourcefulSheep.LOGGER.info("AREA after a click on the {}: shown={}", what, area.showsArea());
+            }
+        });
     }
 
     private static void blazeFurnaceScene(MinecraftServer server) {

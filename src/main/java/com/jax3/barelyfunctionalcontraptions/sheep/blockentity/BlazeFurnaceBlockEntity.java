@@ -52,17 +52,21 @@ import org.jspecify.annotations.Nullable;
  * It stores {@code capacity} FE and pushes it into every block around it; cables and machines can also pull from it.
  * Its comparator signal is one level per 20 FE/t it is making.
  */
-public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyContainer, AreaDisplay {
+public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
     /** Ticks between looks for heat sources. */
     public static final int SCAN_INTERVAL = 10;
     /** FE/t per comparator level. */
     public static final int FE_PER_SIGNAL = 20;
     public static final int AREA_COLOR = 0xFFFF8A1F;
     private static final int[] SLOTS = {0};
+    /** Number of values synced to the window ({@link com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu}). */
+    public static final int DATA_COUNT = 18;
 
     private final FurnaceEnergy energy = new FurnaceEnergy();
     private ItemStack boostItems = ItemStack.EMPTY;
     private int boostTicks;
+    /** How long the boost burning now lasts in all, for the window's countdown. */
+    private int boostDuration;
     private double boostMultiplier = 1.0;
     private boolean showArea;
 
@@ -74,6 +78,58 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
     private int[] heaters = new int[0];
     private int scanCooldown;
     private int lastSignal;
+
+    private final net.minecraft.world.inventory.ContainerData data = new net.minecraft.world.inventory.ContainerData() {
+        @Override
+        public int get(int index) {
+            int maxHeat = maxHeat();
+            int best = bestPower();
+            return switch (index) {
+                case 0 -> energy.getAmountAsInt() & 0xFFFF;
+                case 1 -> energy.getAmountAsInt() >>> 16;
+                case 2 -> energy.getCapacityAsInt() & 0xFFFF;
+                case 3 -> energy.getCapacityAsInt() >>> 16;
+                case 4 -> generating & 0xFFFF;
+                case 5 -> generating >>> 16;
+                case 6 -> heat & 0xFFFF;
+                case 7 -> heat >>> 16;
+                case 8 -> maxHeat & 0xFFFF;
+                case 9 -> maxHeat >>> 16;
+                case 10 -> heaters.length;
+                case 11 -> ModConfigs.getInt(ModConfigs.SERVER.blazeFurnaceMaxHeaters);
+                case 12 -> Math.min(0xFFFF, boostTicks);
+                case 13 -> Math.min(0xFFFF, boostDuration);
+                case 14 -> (int) Math.round(boostMultiplier() * 100);
+                case 15 -> showArea ? 1 : 0;
+                case 16 -> best & 0xFFFF;
+                case 17 -> best >>> 16;
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int index, int value) {
+            // Server-authoritative; the client-side menu keeps its own SimpleContainerData copy.
+        }
+
+        @Override
+        public int getCount() {
+            return DATA_COUNT;
+        }
+    };
+
+    /** The hottest loaded heat source's power: what one of the best heat sources gives. */
+    public static int bestPower() {
+        int best = 0;
+        for (var entry : FurnaceHeatManager.sources()) best = Math.max(best, entry.getValue().power());
+        return best;
+    }
+
+    /** Most heat a furnace can get from the hottest heat sources (before a boost): the top of the window's column. */
+    public static int maxHeat() {
+        int max = ModConfigs.getInt(ModConfigs.SERVER.blazeFurnaceMaxHeaters);
+        return combine(java.util.Collections.nCopies(max, (double) bestPower()), max, ModConfigs.getDouble(ModConfigs.SERVER.blazeFurnaceFalloff));
+    }
 
     public BlazeFurnaceBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.BLAZE_FURNACE.get(), pos, state);
@@ -165,6 +221,7 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
         if (boost == null) return;
         boostItems.shrink(1);
         boostTicks = boost.duration();
+        boostDuration = boost.duration();
         boostMultiplier = boost.multiplier();
         setChanged();
     }
@@ -265,6 +322,16 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
     @Override
     public int areaColor() {
         return AREA_COLOR;
+    }
+
+    @Override
+    public net.minecraft.network.chat.Component getDisplayName() {
+        return net.minecraft.network.chat.Component.translatable("block.barelyfunctionalcontraptions.blaze_furnace");
+    }
+
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int containerId, net.minecraft.world.entity.player.Inventory inventory, Player player) {
+        return new com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu(containerId, inventory, this, data);
     }
 
     // ------------------------------------------------------------------ container (the boost slot)
@@ -382,6 +449,7 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
         input.child("energy").ifPresent(energy::deserialize);
         boostItems = input.read("boost_items", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         boostTicks = input.getIntOr("boost_ticks", 0);
+        boostDuration = input.getIntOr("boost_duration", boostTicks);
         boostMultiplier = input.getDoubleOr("boost_multiplier", 1.0);
         showArea = input.getBooleanOr("show_area", false);
         heaters = input.getIntArray("heaters").orElse(new int[0]);
@@ -393,6 +461,7 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
         energy.serialize(output.child("energy"));
         if (!boostItems.isEmpty()) output.store("boost_items", ItemStack.OPTIONAL_CODEC, boostItems);
         output.putInt("boost_ticks", boostTicks);
+        output.putInt("boost_duration", boostDuration);
         output.putDouble("boost_multiplier", boostMultiplier);
         output.putBoolean("show_area", showArea);
     }

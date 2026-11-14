@@ -2583,10 +2583,23 @@ public final class ModGameTests {
                 });
         menu.clickMenuButton(player, com.jax3.barelyfunctionalcontraptions.sheep.menu.AutomaticShearsMenu.BUTTON_AREA);
         h.assertFalse(shears.showsArea() || menu.isShowingArea(), "the window button hides it");
-        // Without sneaking, the furnace just reports and the setting stays.
+        // Without sneaking, a click opens the furnace's window and the setting stays.
         player.setShiftKeyDown(false);
         h.getBlockState(FURNACE_POS).useWithoutItem(h.getLevel(), player, hitTop(h, FURNACE_POS));
         h.assertTrue(furnace.showsArea(), "a plain click doesn't change it");
+        // The furnace's window: its area button toggles it, and its slot only takes boost items.
+        var furnaceMenu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu) furnace.createMenu(1, player.getInventory(), player);
+        furnaceMenu.clickMenuButton(player, com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu.BUTTON_AREA);
+        h.assertFalse(furnace.showsArea() || furnaceMenu.isShowingArea(), "the furnace window's button hides it");
+        furnaceMenu.clickMenuButton(player, com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu.BUTTON_AREA);
+        h.assertTrue(furnace.showsArea() && furnaceMenu.isShowingArea(), "and shows it again");
+        h.assertTrue(furnaceMenu.getSlot(0).mayPlace(new ItemStack(Items.BLAZE_ROD)) && !furnaceMenu.getSlot(0).mayPlace(new ItemStack(Items.COBBLESTONE)),
+                "the boost slot takes Blaze Rods only");
+        h.assertTrue(furnaceMenu.getMaxHeat() == 260 && furnaceMenu.getBestPower() == 80 && furnaceMenu.getMaxHeaters() == 4,
+                "the heat column tops out at four Blaze sheep: " + furnaceMenu.getMaxHeat());
+        player.getInventory().setItem(0, new ItemStack(Items.BLAZE_ROD, 3));
+        furnaceMenu.quickMoveStack(player, 1 + 27); // hotbar slot 0
+        h.assertTrue(furnace.boostItems().getCount() == 3, "shift-clicking Blaze Rods puts them in the furnace, got " + furnace.boostItems());
         h.succeed();
     }
 

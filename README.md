@@ -437,10 +437,22 @@ A generator that makes Forge Energy from the **heat of Blaze sheep** standing ar
 
 - **Only blazing sheep:** a sheep counts only while it shows its blazing fleece. A **sheared** sheep or a **lamb** gives nothing until its wool grows back. So you choose between **shearing for Blaze Rods** and **leaving the fleece on for power**. Automatic Shears on a redstone timer let you have some of both.
 - **Rain and water:** a sheep in rain or water gives **half**.
-- **Blaze Rod boost:** right-click the furnace with Blaze Rods to load them, or feed them in with a hopper or pipe (it holds one stack and only takes boost items; hoppers and pipes can't take them back out). Each rod **doubles the output for 30 seconds**. Rods only burn while there is heat to boost, so a cold furnace keeps them.
+- **Blaze Rod boost:** right-click the furnace with Blaze Rods to load them, put them in the boost slot in its window, or feed them in with a hopper or pipe (it holds one stack and only takes boost items; hoppers and pipes can't take them back out). Each rod **doubles the output for 30 seconds**. Rods only burn while there is heat to boost, so a cold furnace keeps them.
 - **Output:** it stores 20,000 FE and pushes up to 1,000 FE/t into **every block around it** (cables, machines, Hume Energy Cubes, other mods' FE blocks). Cables and machines can also pull from it. It doesn't join a wrench-linked generator network, which only the Mycelial Generator can lead.
-- **Info:** its front glows, flickers and crackles while it runs, and small flames drift from each sheep heating it into it. **Right-click** with an empty hand shows what it makes (for example *520 FE/t from 4 heat sources, boosted x2 for 27s, 4 x Blaze Rod waiting*), and Jade shows the same. A **comparator** reads one level per 20 FE/t.
-- **Show the area:** **sneak-right-click** with an empty hand to draw its area as an orange box, and again to hide it.
+- **Window:** **right-click** with an empty hand to open it. It's laid out like the Zero Point Energy Module's:
+  - **Left:** the energy buffer.
+  - **Middle:** the **heat column**. Fire rises with the heat from the sheep, out of the most four Blaze sheep can give. There's a line for each extra heat source, with a pip that lights for each one in use, and the fire pulses brighter while a boost burns.
+  - **Right:** stored energy, FE/t made, heat sources in use (*Sources: 3/4*) and the boost's time left.
+  - **Bottom:** a status lamp (*Burning*, *Burning, boosted*, *Cold*, *Buffer full*) and the **boost slot** for Blaze Rods. Shift-click rods into it, or take them back out.
+  - **Top right:** the **show-area button**.
+
+  Hover over any part for details.
+
+  | Four Blaze sheep, boosted | One sheared: three sources, 420 FE/t |
+  |---|---|
+  | ![The Blaze Sheep Furnace window: an empty energy gauge, a full heat column with four lit pips, +520 FE/t, Sources: 4/4, Boost x2: 21s, Burning, boosted, and 4 Blaze Rods in the boost slot](docs/screenshots/74_blaze_furnace_gui.png) | ![The same window with one sheep sheared: the heat column three-quarters full with three pips lit, +420 FE/t, Sources: 3/4](docs/screenshots/75_blaze_furnace_gui_three_sheep.png) |
+- **Info:** its front glows, flickers and crackles while it runs, and small flames drift from each sheep heating it into it. Jade shows what it makes (for example *520 FE/t from 4 heat sources, boosted x2 for 27s, 4 x Blaze Rod waiting*). A **comparator** reads one level per 20 FE/t.
+- **Show the area:** click the spyglass button in its window, or **sneak-right-click** it with an empty hand, to draw its area as an orange box. Do it again to hide it.
 - **Recipe:** nether bricks and iron bars across the top, Blaze Rods either side of a Functional Machine Block, and redstone either side of a Blast Furnace. Mine it with a pickaxe; any loaded Blaze Rods drop.
 - Every number is in `[blaze_furnace]` in the synced config.
 

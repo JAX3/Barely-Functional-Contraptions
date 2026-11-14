@@ -83,6 +83,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.FLUID_TANK.get(), FluidTankScreen::new);
         event.register(ModMenus.ZERO_POINT_ENERGY_MODULE.get(), ZeroPointModuleScreen::new);
         event.register(ModMenus.PIPE_FILTER.get(), PipeFilterScreen::new);
+        event.register(ModMenus.BLAZE_FURNACE.get(), BlazeFurnaceScreen::new);
     }
 
     private static void registerTintSources(RegisterColorHandlersEvent.ItemTintSources event) {

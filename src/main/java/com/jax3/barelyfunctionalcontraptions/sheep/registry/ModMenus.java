@@ -33,5 +33,8 @@ public final class ModMenus {
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu>> PIPE_FILTER = REGISTER.register("pipe_filter",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.PipeFilterMenu::new));
 
+    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu>> BLAZE_FURNACE = REGISTER.register("blaze_furnace",
+            () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu::new));
+
     private ModMenus() {}
 }
