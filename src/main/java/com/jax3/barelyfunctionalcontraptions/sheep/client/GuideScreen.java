@@ -18,6 +18,8 @@ public class GuideScreen extends Screen {
     private static final int HEIGHT = 214;
     private static final int LIST_WIDTH = 118;
     private static final int ROW = 15;
+    /** Space for the chapter list, below the title. */
+    private static final int LIST_HEIGHT = HEIGHT - 26;
     private static final int TEXT_WIDTH = WIDTH - LIST_WIDTH - 24;
     private static final int LINES = 17;
 
@@ -31,6 +33,11 @@ public class GuideScreen extends Screen {
     public GuideScreen() {
         super(Component.translatable("item.barelyfunctionalcontraptions.contraptions_manual"));
         this.chapters = GuideBook.load();
+    }
+
+    /** Height of one chapter button: 15, or less so that a longer list still fits in the window. */
+    private int row() {
+        return Math.min(ROW, LIST_HEIGHT / Math.max(1, chapters.size()));
     }
 
     private int left() {
@@ -48,7 +55,7 @@ public class GuideScreen extends Screen {
         for (int i = 0; i < chapters.size(); i++) {
             int index = i;
             addRenderableWidget(Button.builder(Component.literal(chapters.get(i).title()), b -> openChapter(index))
-                    .bounds(x + 18, y + i * ROW, LIST_WIDTH - 20, ROW - 1).build());
+                    .bounds(x + 18, y + i * row(), LIST_WIDTH - 20, row() - 1).build());
         }
         int textLeft = left() + LIST_WIDTH + 12;
         back = addRenderableWidget(Button.builder(Component.literal("<"), b -> turn(-1)).bounds(textLeft, top() + HEIGHT - 22, 20, 16).build());
@@ -128,7 +135,7 @@ public class GuideScreen extends Screen {
         int x = left(), y = top();
         g.text(font, title, x + 8, y + 6, 0xFFE8D8FF, false);
         for (int i = 0; i < chapters.size(); i++) {
-            g.item(chapters.get(i).icon(), x + 6, y + 22 + i * ROW - 1);
+            g.item(chapters.get(i).icon(), x + 6, y + 22 + i * row() - 1);
         }
         if (chapters.isEmpty()) {
             g.text(font, Component.translatable("guide.barelyfunctionalcontraptions.missing"), x + LIST_WIDTH + 12, y + 24, 0xFFFF8080, false);

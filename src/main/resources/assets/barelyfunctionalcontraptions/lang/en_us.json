@@ -744,7 +744,7 @@
   "message.barelyfunctionalcontraptions.blaze_furnace.running": "Blaze Sheep Furnace: %s FE/t from %s heat sources",
   "message.barelyfunctionalcontraptions.blaze_furnace.cold": "Blaze Sheep Furnace: cold, no Blaze sheep in range (%s FE/t)",
   "message.barelyfunctionalcontraptions.blaze_furnace.boosted": ", boosted x%s for %ss",
-  "message.barelyfunctionalcontraptions.blaze_furnace.waiting": ", %s %s waiting",
+  "message.barelyfunctionalcontraptions.blaze_furnace.waiting": ", %s x %s waiting",
   "message.barelyfunctionalcontraptions.blaze_furnace.boost_full": "The furnace can't take any more of that",
   "message.barelyfunctionalcontraptions.area.shown": "Showing the working area",
   "message.barelyfunctionalcontraptions.area.hidden": "Hiding the working area",

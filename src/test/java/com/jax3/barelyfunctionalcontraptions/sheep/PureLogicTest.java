@@ -33,7 +33,7 @@ class PureLogicTest {
             assertTrue(in != null, "the guide's en_us.json is in the jar");
             var json = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
             var chapters = json.getAsJsonArray("chapters");
-            assertTrue(chapters.size() >= 10 && chapters.size() <= 12, "the chapter list fits the screen: " + chapters.size());
+            assertTrue(chapters.size() >= 10 && chapters.size() <= 14, "the chapter list fits the screen: " + chapters.size());
             for (var element : chapters) {
                 var chapter = element.getAsJsonObject();
                 assertFalse(chapter.get("title").getAsString().isBlank());

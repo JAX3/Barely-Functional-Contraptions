@@ -58,7 +58,7 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 | ![Main creative tab](docs/screenshots/28_creative_tab_main.png) | ![Resource Wool creative tab](docs/screenshots/27_creative_tab_wool.png) |
 
 ### Contraptions Manual (in-game guide)
-Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game: getting started, each generator and machine, the sheep, fluids, energy, Glow Panels, pipe modes and filters, and data packs.
+Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game: getting started, each generator and machine, the sheep, fluids, energy, Glow Panels, the Blaze Sheep Furnace, pipe modes and filters, and data packs.
 
 | Chapters | A chapter |
 |---|---|
@@ -100,6 +100,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Special Delivery | Craft some Item Pipes |
 | Watt's Going On | Craft an Energy Meter |
 | Let There Be Glow | Craft a Glow Panel |
+| ⭐ **Sheepish Combustion** (goal) | Be within 16 blocks of a Blaze Sheep Furnace when it starts making power from a Blaze sheep |
 | Wool You Look at That | Infuse a sheep with any resource |
 | Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
 | ⭐ **Three Heads Are Better Than One**, **Here Be Dragons**, **Shh... It's Sculking** (goals) | Infuse a sheep with a Nether Star, Dragon's Breath or Echo Shard |
@@ -263,14 +264,15 @@ An FE-powered machine that shears sheep for you and keeps the wool.
 - **Inventory:** 9 slots. Take the wool out by hand (shift-click works), or put a **hopper underneath** (or any pipe) to pull it out automatically. Nothing can be put *into* it. A comparator reads how full it is.
 - **When it's full:** it stops shearing until there is room again, so wool is never thrown away. If one sheep's drops only partly fit, the rest drop on the ground at the sheep.
 - **Redstone:** the same four modes as the separator, cycled with the button in the top-right corner: *Ignored* (default), *Active with Signal*, *Active without Signal*, *Disabled*.
+- **Show the area:** **sneak-right-click** it with an empty hand, or click the spyglass button next to the redstone button in its window, to draw the 3×3 area as a light-blue box with a grid on the ground. Do it again to hide it. The setting is saved with the block.
 - **Which mobs:** only those in the entity tag `#barelyfunctionalcontraptions:auto_shearable`, which is sheep by default. It never turns a mooshroom into a cow or takes a snow golem's pumpkin.
 - Its shears never wear out. Mine it with a stone pickaxe or better. When broken it keeps its stored energy and redstone mode, like the separator, and its wool drops on the ground.
 
 ![Automatic Shears recipe: copper ingots top left and right, redstone top middle, shears left and right, a Functional Machine Block in the centre, iron ingots bottom left and right, a chest bottom middle](docs/screenshots/recipe_automatic_shears.png)
 
-| GUI |
-|---|
-| ![Automatic Shears GUI](docs/screenshots/12_automatic_shears_gui.png) |
+| GUI | Area shown (spyglass button framed in blue) |
+|---|---|
+| ![Automatic Shears GUI](docs/screenshots/12_automatic_shears_gui.png) | ![The Automatic Shears window with the show-area button switched on, next to the redstone button](docs/screenshots/73_shears_area_button.png) |
 
 ### Fluid Reservoir
 A water source for your machines. Put it **directly on top of an infinite water source** and it fills its **10-bucket tank** with water.
@@ -415,6 +417,58 @@ The **Glow Panel** is a thin, solar-style generator that makes Forge Energy from
   - Glow Panel: a row of glass, a daylight detector between two quartz, and iron ingots around redstone.
   - 2 Glow Lamps: glass in the corners, Glow Ink Sacs on the sides and glowstone dust in the middle.
 - Mine the panel with a pickaxe. The lamp breaks by hand.
+
+### Blaze Sheep Furnace
+A generator that makes Forge Energy from the **heat of Blaze sheep** standing around it. Their fleece is always on fire, so the sheep themselves are the fuel.
+
+| The furnace (orange box) and the Automatic Shears (blue box) with their areas shown | Up close: flames drift from the sheep into the furnace |
+|---|---|
+| ![A Blaze Sheep Furnace with four burning Blaze sheep around and on top of it inside an orange outline, and Automatic Shears with a blue 3x3 outline](docs/screenshots/70_blaze_furnace.png) | ![Close-up of the furnace's lit front with Blaze sheep beside and on top of it](docs/screenshots/71_blaze_furnace_close.png) |
+
+- **Where the sheep go:** the **3×3 columns centred on the furnace**, at its own level and the block above. Sheep standing right next to it, at its corners, or on top of it all count. A sheep counts when its feet are in that area.
+- **How much power:** one Blaze sheep gives **80 FE/t**. Each extra one adds a little less (the `falloff`, 12.5%), and the hottest four count (`maxHeatSources`):
+
+  | Blaze sheep | Power |
+  |---|---|
+  | 1 | 80 FE/t |
+  | 2 | 150 FE/t |
+  | 3 | 210 FE/t |
+  | 4 or more | 260 FE/t |
+
+- **Only blazing sheep:** a sheep counts only while it shows its blazing fleece. A **sheared** sheep or a **lamb** gives nothing until its wool grows back. So you choose between **shearing for Blaze Rods** and **leaving the fleece on for power**. Automatic Shears on a redstone timer let you have some of both.
+- **Rain and water:** a sheep in rain or water gives **half**.
+- **Blaze Rod boost:** right-click the furnace with Blaze Rods to load them, or feed them in with a hopper or pipe (it holds one stack and only takes boost items; hoppers and pipes can't take them back out). Each rod **doubles the output for 30 seconds**. Rods only burn while there is heat to boost, so a cold furnace keeps them.
+- **Output:** it stores 20,000 FE and pushes up to 1,000 FE/t into **every block around it** (cables, machines, Hume Energy Cubes, other mods' FE blocks). Cables and machines can also pull from it. It doesn't join a wrench-linked generator network, which only the Mycelial Generator can lead.
+- **Info:** its front glows, flickers and crackles while it runs, and small flames drift from each sheep heating it into it. **Right-click** with an empty hand shows what it makes (for example *520 FE/t from 4 heat sources, boosted x2 for 27s, 4 x Blaze Rod waiting*), and Jade shows the same. A **comparator** reads one level per 20 FE/t.
+- **Show the area:** **sneak-right-click** with an empty hand to draw its area as an orange box, and again to hide it.
+- **Recipe:** nether bricks and iron bars across the top, Blaze Rods either side of a Functional Machine Block, and redstone either side of a Blast Furnace. Mine it with a pickaxe; any loaded Blaze Rods drop.
+- Every number is in `[blaze_furnace]` in the synced config.
+
+![The same scene at midnight: the furnace and the burning sheep light up the dark](docs/screenshots/72_blaze_furnace_night.png)
+
+#### Heat sources and boosts in data packs
+**What heats the furnace** is data. Each file in `data/<namespace>/barelyfunctionalcontraptions/furnace_heat/<name>.json` is one heat source and names **exactly one** of:
+
+- `"sheep"`: a sheep resource id. The built-in `blaze_sheep.json` is `{"sheep": "barelyfunctionalcontraptions:blaze", "power": 80}`.
+- `"feature"`: an `appearance` feature, so **any** infused sheep that shows it counts. The built-in `fiery_sheep.json` is `{"feature": "on_fire", "power": 60}`, so a data pack's own fiery sheep work straight away.
+- `"entity"`: an entity type, a list of them or a tag, e.g. `{"entity": "minecraft:blaze", "power": 40}` to let caged blazes heat it.
+
+Each file also has:
+
+- `"power"`: FE/t, before the falloff. Use `0` to switch a source off.
+- `"wet_multiplier"`: what the source gives in rain or water. It's optional and defaults to `0.5`.
+
+When several files match, the most specific one wins: `sheep`, then `entity`, then `feature`. To change a built-in source, use the same file path in your own data pack. Files may use NeoForge load conditions, and they reload with `/reload`.
+
+**Boost items** are the data map `barelyfunctionalcontraptions:blaze_furnace_boost`:
+
+```json
+// data/<namespace>/data_maps/item/blaze_furnace_boost.json
+{ "values": { "minecraft:blaze_rod": { "multiplier": 2.0, "duration": 600 },
+              "minecraft:blaze_powder": { "multiplier": 1.5, "duration": 200 } } }
+```
+
+`duration` is in ticks. Only the Blaze Rod is a boost item by default.
 
 ### Energy Cable
 Cables carry Forge Energy from the **power generators** (Mycelial Generator, Zero Point Energy Module, Creative Generator) and the **Hume Energy Cube** to the machines that use it, so a machine no longer has to touch its power source.

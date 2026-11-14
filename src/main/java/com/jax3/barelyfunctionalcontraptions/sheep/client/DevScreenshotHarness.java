@@ -1469,7 +1469,7 @@ public final class DevScreenshotHarness {
         switch (tick) {
             case 60 -> server.execute(() -> blazeFurnaceScene(server));
             case 70 -> setHudHidden(mc, true);
-            case 75 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 165 32", origin.getX() + 1.5, origin.getY() + 3, origin.getZ() + 2.5));
+            case 75 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 170 30", origin.getX() + 3.5, origin.getY() + 5, origin.getZ() + 5.5));
             case 130 -> server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
                 if (level.getBlockEntity(origin.offset(0, 0, -4)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity be) {
@@ -1483,7 +1483,7 @@ public final class DevScreenshotHarness {
             case 170 -> shot(mc, "63_blaze_furnace_close");
             case 172 -> {
                 command(server, "time set midnight");
-                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 165 32", origin.getX() + 1.5, origin.getY() + 3, origin.getZ() + 2.5));
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 170 30", origin.getX() + 3.5, origin.getY() + 5, origin.getZ() + 5.5));
             }
             case 230 -> shot(mc, "64_blaze_furnace_night");
             case 232 -> {
@@ -1515,7 +1515,7 @@ public final class DevScreenshotHarness {
         }
         BlockPos o = origin;
         for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(10, 6, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
-        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(10, -1, 4))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(10, -1, 8))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
         // The furnace, front to the camera, with a Hume Energy Cube under it and Blaze Rods loaded.
         BlockPos furnacePos = o.offset(0, 0, -4);
         level.setBlock(furnacePos, ModBlocks.BLAZE_FURNACE.get().defaultBlockState()

@@ -17,7 +17,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Draws the working area of a machine ({@link AreaDisplay}: the Automatic Shears, the Blaze Sheep Furnace) as a
- * coloured box outline while it is switched on, with a faint inner grid line on each block boundary along the floor.
+ * coloured box outline while it is switched on, with a faint grid line on each block boundary along the floor.
  */
 public class AreaOutlineRenderer<T extends BlockEntity & AreaDisplay> implements BlockEntityRenderer<T, AreaOutlineRenderer.State> {
     /** Pulled in a hair so the lines don't hide inside the faces of blocks along the edge. */
@@ -68,12 +68,20 @@ public class AreaOutlineRenderer<T extends BlockEntity & AreaDisplay> implements
             line(buffer, pose, x1, y0, z0, x1, y0, z1, color);
             line(buffer, pose, x0, y1, z0, x0, y1, z1, color);
             line(buffer, pose, x1, y1, z0, x1, y1, z1, color);
-            // Block lines across the floor, so the 3x3 reads at a glance.
+            // Block lines across the floor, so the 3x3 reads at a glance. Where the area reaches below the machine
+            // (the shears also shear a block down), the grid is drawn at the machine's own level, on the ground.
+            float gy = Math.max(y0, (float) INSET);
+            if (gy > y0) {
+                line(buffer, pose, x0, gy, z0, x1, gy, z0, color);
+                line(buffer, pose, x0, gy, z1, x1, gy, z1, color);
+                line(buffer, pose, x0, gy, z0, x0, gy, z1, color);
+                line(buffer, pose, x1, gy, z0, x1, gy, z1, color);
+            }
             for (double x = Math.ceil(b.minX); x < b.maxX; x++) {
-                line(buffer, pose, (float) x, y0, z0, (float) x, y0, z1, faint);
+                line(buffer, pose, (float) x, gy, z0, (float) x, gy, z1, faint);
             }
             for (double z = Math.ceil(b.minZ); z < b.maxZ; z++) {
-                line(buffer, pose, x0, y0, (float) z, x1, y0, (float) z, faint);
+                line(buffer, pose, x0, gy, (float) z, x1, gy, (float) z, faint);
             }
         });
     }
