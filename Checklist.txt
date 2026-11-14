@@ -1,0 +1,19 @@
+These are the ideas from the earlier roadmap that haven’t been built yet. Steps 1, 7, 15, 16 and 17 are done, and part of step 5 (the Glow Panel and Glow Lamp).
+
+Logistics
+2. Pipe tiers: copper, then iron, then netherite pipes that move more per tick, made with upgrade items or by crafting.
+3. Wool Barrel or drawer: a block that stores large amounts of one item, for resource wool, which builds up fast.
+4. Sheep transport: a Sheep Crate or catching net that picks up an infused sheep and keeps its infusion, skin and stats until you place it again.
+Power
+5. The rest of the themed generators:
+Wool Burner: burns plain or spare wool for power.
+Blaze Sheep Furnace: makes power from the Blaze sheep’s flames.
+6. Energy tiers or a capacitor item that charges tools, plus a wireless charger.
+Resource generation
+8. Sheep stats from breeding: yield, growth speed and how long an infusion lasts go up as you breed good sheep together, like the Chickens mod.
+9. Resource mutations: breeding two resources makes a new one (for example Iron + Gold gives Copper), so rare resources become things to work towards.
+10. Tiers of infusion: the Wither, Dragon and Sculk sheep need a better feeding station or a ritual, not just one item.
+11. Sheep Feeder block: infuses and re-feeds sheep in range on its own, so a pen runs without you.
+12. Auto-breeder and lamb sorter: like Industrial Foregoing’s rancher and baby separator.
+13. Separator upgrades: speed, energy use and a chance of extra output, plus a better processing step (for example wool into fibre, giving 4–6 resource instead of 2–4).
+14. Fluid sheep: themed sheep that give buckets of lava, water or honey, which can go into the Fluid Tank.
