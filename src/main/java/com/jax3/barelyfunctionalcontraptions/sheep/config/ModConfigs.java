@@ -116,6 +116,12 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue statsYieldPerPoint;
         public final ModConfigSpec.DoubleValue statsGrowthPerPoint;
         public final ModConfigSpec.DoubleValue statsEndurancePerPoint;
+        public final ModConfigSpec.IntValue altarOnlyFromTier;
+        public final ModConfigSpec.IntValue altarBaseEnergy;
+        public final ModConfigSpec.IntValue altarHighTierEnergy;
+        public final ModConfigSpec.IntValue altarTicks;
+        public final ModConfigSpec.IntValue altarCapacity;
+        public final ModConfigSpec.IntValue altarMaxInput;
         public final ModConfigSpec.IntValue woolPackerCapacity;
         public final ModConfigSpec.IntValue woolPackerMaxInput;
         public final ModConfigSpec.IntValue woolPackerEnergyPerBale;
@@ -297,6 +303,21 @@ public final class ModConfigs {
                     .defineInRange("growthPerPoint", 0.01, 0.0, 1.0);
             statsEndurancePerPoint = b.comment("Endurance: extra shearings an infusion lasts for each point above 1, as a share of its normal uses. 0.1 = Endurance 10 lasts 1.9 times as long.")
                     .defineInRange("endurancePerPoint", 0.1, 0.0, 10.0);
+            b.pop();
+
+            b.comment("Infusion Altar (FE-powered; infuses the sheep beside it, with catalysts for the higher tiers; each resource's tier and catalysts are in its definition's 'altar' block)").push("infusion_altar");
+            altarOnlyFromTier = b.comment("Resources of this tier and up can only be infused at an altar, not fed by hand. The Wither, Dragon and Warden sheep are tier 2. 4 = every resource can be fed by hand.")
+                    .defineInRange("altarOnlyFromTier", 2, 1, 4);
+            altarBaseEnergy = b.comment("FE a tier 1 infusion takes at the altar, when its definition doesn't say.")
+                    .defineInRange("baseEnergy", 20_000, 0, Integer.MAX_VALUE);
+            altarHighTierEnergy = b.comment("FE a tier 2 or 3 infusion takes, when its definition doesn't say.")
+                    .defineInRange("highTierEnergy", 200_000, 0, Integer.MAX_VALUE);
+            altarTicks = b.comment("Ticks one infusion takes at the altar (the energy is spread over them).")
+                    .defineInRange("ticks", 100, 1, 72_000);
+            altarCapacity = b.comment("FE the altar stores.")
+                    .defineInRange("energyCapacity", 250_000, 1, Integer.MAX_VALUE);
+            altarMaxInput = b.comment("Most FE the altar accepts per tick.")
+                    .defineInRange("maxEnergyInput", 5_000, 1, Integer.MAX_VALUE);
             b.pop();
 
             b.comment("Wool Packer (FE-powered; presses 9 of the same resource wool into a Wool Bale) and Wool Bales in the Mechanical Separator").push("wool_packer");

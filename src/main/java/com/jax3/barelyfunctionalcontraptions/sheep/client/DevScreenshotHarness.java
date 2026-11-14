@@ -112,6 +112,10 @@ public final class DevScreenshotHarness {
             newBlocksTick(mc, server);
             return;
         }
+        if ("altar".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            altarTick(mc, server);
+            return;
+        }
         if ("wool_packer".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             woolPackerTick(mc, server);
             return;
@@ -1589,6 +1593,101 @@ public final class DevScreenshotHarness {
             });
         }
         if (tick == end + 60) mc.stop();
+    }
+
+    /** The Infusion Altar making a Wither sheep, and a bred sheep's stats: {@code -PharnessScene=altar}. */
+    private static void altarTick(Minecraft mc, MinecraftServer server) {
+        BlockPos altar = origin == null ? null : origin.offset(0, 0, -3);
+        switch (tick) {
+            case 60 -> server.execute(() -> altarScene(server));
+            case 70 -> setHudHidden(mc, true);
+            // First only the star and the soul sand: the window shows the missing catalysts faded.
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 0.5, origin.getY(), origin.getZ() - 0.5));
+            case 86 -> openAt(server, altar);
+            case 100 -> shot(mc, "92_altar_missing_catalysts");
+            case 102 -> hover(mc, 176, 193, 100, 47); // an empty side slot: the full list, missing ones in red
+            case 118 -> shot(mc, "92_altar_catalyst_tooltip");
+            case 120 -> {
+                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+                server.execute(() -> {
+                    if (server.overworld().getBlockEntity(altar) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity be) {
+                        be.setItem(2, new ItemStack(Items.BONE_BLOCK, 2));
+                        be.setItem(3, new ItemStack(Items.WITHER_ROSE, 1));
+                    }
+                });
+            }
+            case 150 -> shot(mc, "93_altar_infusing_gui");
+            case 152 -> {
+                if (mc.player != null) mc.player.closeContainer();
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 204 30", origin.getX() - 0.5, origin.getY() + 1, origin.getZ() + 1.5));
+            }
+            case 175 -> shot(mc, "94_altar_infusing");
+            case 176, 260 -> server.execute(() -> {
+                if (server.overworld().getBlockEntity(altar) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity be) {
+                    ResourcefulSheep.LOGGER.info("ALTAR status={} progress={}/{} energy={}", be.status(), be.progress(), be.maxProgress(), be.getEnergyHandler().getAmountAsInt());
+                }
+                for (var sheep : server.overworld().getEntitiesOfClass(net.minecraft.world.entity.animal.sheep.Sheep.class, new net.minecraft.world.phys.AABB(origin).inflate(12))) {
+                    ResourcefulSheep.LOGGER.info("SHEEP {} infusion={} stats={}", sheep.getId(),
+                            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.getInfusion(sheep),
+                            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.getStats(sheep));
+                }
+            });
+            // The bred sheep: look at it with the HUD on (Jade), and show the sneak-inspect line.
+            case 262 -> {
+                setHudHidden(mc, false);
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f -90 20", origin.getX() + 7.0, origin.getY(), origin.getZ() - 2.5));
+            }
+            case 272 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                for (var sheep : server.overworld().getEntitiesOfClass(net.minecraft.world.entity.animal.sheep.Sheep.class, new net.minecraft.world.phys.AABB(origin).inflate(12))) {
+                    if (!com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.getStats(sheep).isWild()) {
+                        player.sendOverlayMessage(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.describe(sheep));
+                    }
+                }
+            });
+            case 285 -> shot(mc, "95_sheep_stats");
+            case 287 -> mc.gui.setScreen(new GuideScreen());
+            case 297 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Infusion Altar"); }
+            case 310 -> shot(mc, "96_guide_altar");
+            case 312 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Breeding Sheep"); }
+            case 325 -> shot(mc, "96_guide_breeding");
+            case 335 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    private static void altarScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false", "gamerule advance_weather false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(10, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(10, -1, 6))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        BlockPos altar = o.offset(0, 0, -3);
+        level.setBlock(altar, ModBlocks.INFUSION_ALTAR.get().defaultBlockState(), 3);
+        level.setBlock(altar.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+        if (level.getBlockEntity(altar) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity be) {
+            be.setItem(0, new ItemStack(Items.NETHER_STAR, 1));
+            be.setItem(1, new ItemStack(Items.SOUL_SAND, 4));
+        }
+        var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        sheep.snapTo(altar.getX() + 1.5, altar.getY(), altar.getZ() + 0.5, 90, 0);
+        sheep.setNoAi(true);
+        level.addFreshEntity(sheep);
+        // A well-bred sheep further along.
+        var bred = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        bred.snapTo(o.getX() + 9.5, o.getY(), o.getZ() - 2.5, 90, 0);
+        bred.setNoAi(true);
+        level.addFreshEntity(bred);
+        com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setStats(bred, new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats(7, 4, 9));
+        int uses = com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.infusionUses(bred,
+                com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(ResourcefulSheep.id("gold")).orElseThrow());
+        com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(bred,
+                com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(ResourcefulSheep.id("gold"), uses));
+        label(server, altar.above(), "Infusion Altar", "light_purple");
     }
 
     /** Wool Packers fed by hoppers, a separator working a bale, and placed bales of every colour: {@code -PharnessScene=wool_packer}. */

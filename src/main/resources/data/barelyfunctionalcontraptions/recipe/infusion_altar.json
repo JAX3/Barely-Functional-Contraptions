@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "A": "minecraft:amethyst_block",
+    "E": "minecraft:enchanting_table",
+    "G": "minecraft:gold_ingot",
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
+    "D": "minecraft:diamond"
+  },
+  "pattern": [
+    "AEA",
+    "GMG",
+    "DGD"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:infusion_altar"
+  }
+}

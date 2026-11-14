@@ -42,5 +42,8 @@ public final class ModMenus {
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolPackerMenu>> WOOL_PACKER = REGISTER.register("wool_packer",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolPackerMenu::new));
 
+    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.InfusionAltarMenu>> INFUSION_ALTAR = REGISTER.register("infusion_altar",
+            () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.InfusionAltarMenu::new));
+
     private ModMenus() {}
 }

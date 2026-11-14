@@ -175,9 +175,27 @@ public final class SheepInfusionEvents {
         return a.isPresent() ? a : b;
     }
 
-    /** Returns {@code null} if the sheep may be infused, otherwise the reason it cannot. */
+    /** Returns {@code null} if the sheep may be infused by hand, otherwise the reason it cannot. */
     static Component checkCanInfuse(Player player, LivingEntity sheep, SheepResource resource, ItemStack stack) {
+        if (resource.altar().altarOnly()) {
+            return Component.translatable("message.barelyfunctionalcontraptions.needs_altar", resource.name(), resource.altar().tier());
+        }
         boolean creativeBypass = player.hasInfiniteMaterials() && ModConfigs.getBool(ModConfigs.SERVER.creativeIgnoresCooldown);
+        Component refusal = checkSheep(sheep, resource, creativeBypass);
+        if (refusal != null) return refusal;
+        int needed = resource.effectiveFeedingAmount();
+        if (stack.getCount() < needed && !(player.hasInfiniteMaterials() && !ModConfigs.getBool(ModConfigs.SERVER.creativeConsumesItems))) {
+            return Component.translatable("message.barelyfunctionalcontraptions.needs_more", needed, stack.getHoverName());
+        }
+        return null;
+    }
+
+    /**
+     * Whether this sheep can take {@code resource} now, whoever is infusing it (a player or an Infusion Altar):
+     * {@code null} if so, otherwise the reason. {@code bypass} skips the cooldown and the no-replacing rule.
+     */
+    public static Component checkSheep(LivingEntity sheep, SheepResource resource, boolean bypass) {
+        boolean creativeBypass = bypass;
         if (sheep.isBaby() && !ModConfigs.getBool(ModConfigs.SERVER.allowBabies)) {
             return Component.translatable("message.barelyfunctionalcontraptions.too_young");
         }
@@ -201,11 +219,19 @@ public final class SheepInfusionEvents {
                         getInfusedResource(sheep).map(SheepResource::name).orElse(Component.literal(current.resource().get().toString())));
             }
         }
-        int needed = resource.effectiveFeedingAmount();
-        if (stack.getCount() < needed && !(player.hasInfiniteMaterials() && !ModConfigs.getBool(ModConfigs.SERVER.creativeConsumesItems))) {
-            return Component.translatable("message.barelyfunctionalcontraptions.needs_more", needed, stack.getHoverName());
-        }
         return null;
+    }
+
+    /** Infuses {@code sheep} with {@code resource} without a player (the Infusion Altar), with the usual effects. */
+    public static void infuseFromAltar(ServerLevel level, LivingEntity sheep, SheepResource resource) {
+        setInfusion(sheep, getInfusion(sheep).withResource(resource.id(), infusionUses(sheep, resource)));
+        sheep.gameEvent(GameEvent.EAT);
+        level.playSound(null, sheep, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.NEUTRAL, 1.0F, 0.8F);
+        level.playSound(null, sheep, SoundEvents.SHEEP_AMBIENT, SoundSource.NEUTRAL, 1.0F, 1.3F);
+        double x = sheep.getX(), y = sheep.getY() + sheep.getBbHeight() * 0.7, z = sheep.getZ();
+        level.sendParticles(new DustParticleOptions(resource.woolColor(), 1.6F), x, y, z, 40, 0.5, 0.4, 0.5, 0.02);
+        level.sendParticles(new DustParticleOptions(resource.accentColor(), 1.0F), x, y, z, 20, 0.45, 0.35, 0.45, 0.02);
+        level.sendParticles(ParticleTypes.END_ROD, x, y, z, 16, 0.4, 0.4, 0.4, 0.05);
     }
 
     static void infuse(ServerLevel level, Player player, LivingEntity sheep, SheepResource resource, ItemStack stack) {

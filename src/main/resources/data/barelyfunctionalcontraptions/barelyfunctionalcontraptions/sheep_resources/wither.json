@@ -23,5 +23,22 @@
       "extra_heads",
       "glowing_eyes"
     ]
+  },
+  "altar": {
+    "tier": 2,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:soul_sand",
+        "count": 4
+      },
+      {
+        "ingredient": "minecraft:bone_block",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:wither_rose",
+        "count": 1
+      }
+    ]
   }
 }

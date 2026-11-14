@@ -9,9 +9,9 @@ Wool Burner: burns plain or spare wool for power. (Done, along with the Blaze Sh
 
 6. Energy tiers or a capacitor item that charges tools, plus a wireless charger.
 Resource generation
-8. Sheep stats from breeding: yield, growth speed and how long an infusion lasts go up as you breed good sheep together, like the Chickens mod.
+8. [DONE] Sheep stats from breeding: yield, growth speed and how long an infusion lasts go up as you breed good sheep together, like the Chickens mod.
 9. Resource mutations: breeding two resources makes a new one (for example Iron + Gold gives Copper), so rare resources become things to work towards.
-10. Tiers of infusion: the Wither, Dragon and Sculk sheep need a better feeding station or a ritual, not just one item.
+10. [DONE] Tiers of infusion: the Wither, Dragon and Sculk sheep need a better feeding station or a ritual, not just one item.
 11. Sheep Feeder block: infuses and re-feeds sheep in range on its own, so a pen runs without you.
 12. Auto-breeder and lamb sorter: like Industrial Foregoing’s rancher and baby separator.
 13. Separator upgrades: speed, energy use and a chance of extra output, plus a better processing step (for example wool into fibre, giving 4–6 resource instead of 2–4).

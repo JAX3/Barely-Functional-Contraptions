@@ -62,7 +62,7 @@ Craft a **Contraptions Manual** (a book and a Functional Machine Block) and righ
 
 - **Power:** the generators (Mycelial Generator, Zero Point Module, Glow Panels, Blaze Sheep Furnace, Wool Burner) and energy storage.
 - **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
-- **Productive:** infusing sheep, the themed sheep, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
+- **Productive:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, and data packs and commands.
 
 Hover over a tab to see its name.
@@ -109,6 +109,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Let There Be Glow | Craft a Glow Panel |
 | Fleece Navidad | Craft a Wool Burner |
 | Bale Out | Press a Wool Bale in a Wool Packer |
+| Altar-ed States | Craft an Infusion Altar |
 | ⭐ **Sheepish Combustion** (goal) | Be within 16 blocks of a Blaze Sheep Furnace when it starts making power from a Blaze sheep |
 | Wool You Look at That | Infuse a sheep with any resource |
 | Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
@@ -236,6 +237,46 @@ Right-click an **adult** sheep while holding a resource, for example an **Iron I
   - The parents keep their own infusions, so a pair of infused sheep can breed a whole flock. Set `breedingKeepsInfusion` to false to turn this off.
 
   ![Three pairs of sheep with their lambs: two Iron sheep and a grey Iron lamb, a Gold sheep and a plain white sheep with a yellow Gold lamb, a Diamond and an Emerald sheep with a cyan Diamond lamb](docs/screenshots/48_bred_lambs.png)
+
+### Bred stats: Yield, Growth and Endurance
+Every sheep has three stats from **1 to 10**. Wild sheep are all 1s, and you raise them by breeding.
+
+| Stat | What it does (defaults) |
+|---|---|
+| **Yield** | More wool per shearing, infused or plain: +15% of the normal amount per point, so Yield 10 shears about 2.35 times as much. A fraction is a chance of one more. |
+| **Growth** | A sheared sheep grows its wool back **on its own**, without grass: a 1% chance a second per point above 1, so about 11 seconds at Growth 10. Growth 1 still needs grass, as in vanilla. |
+| **Endurance** | An infusion lasts more shearings: +10% per point, so Endurance 10 makes 100 shearings last 190. It counts when the sheep is fed, infused at an altar or born infused. |
+
+- **Breeding:** a lamb gets the **average** of its parents' stats (a half rounds either way at random). Each stat then has a **25% chance of going up one** and a 5% chance of going down one, never past 1 or 10. So two wild sheep make 1s or 2s, and breeding your best sheep together keeps pushing the line up. A lamb that comes out better than both parents gives off happy-villager sparkles.
+- **Seeing them:** sneak + right-click a sheep with an empty hand, or look at it with **Jade**. Wild sheep don't show a line.
+- Stats stay through shearing, infusing, dyeing and saving. All the numbers, and a switch to turn stats off, are in `[sheep_stats]` in the synced config.
+
+![Jade on a bred Gold sheep: Yield 7, Growth 4, Endurance 9, Infused Gold, 180 shearings left (100 raised by Endurance 9), with the same line from sneak-inspecting in the action bar](docs/screenshots/95_sheep_stats.png)
+
+### Infusion tiers and the Infusion Altar
+Most resources are **tier 1** and are fed by hand. The **Wither, Dragon and Warden sheep are tier 2**: right-clicking a sheep with a Nether Star, Dragon's Breath or Echo Shard now only tells you it needs an altar, and the item isn't used.
+
+The **Infusion Altar** is a powered pedestal. Put the feeding item in its **centre slot** and the **catalysts** in the four slots around it, give it power, and stand a grown sheep **within 2 blocks** of it. A stream of the resource's colour runs from the altar to the sheep, and when the bar fills the sheep is infused. The items and power are only used when it finishes.
+
+| Sheep | Feeding item | Catalysts | Power |
+|---|---|---|---|
+| Wither | Nether Star | 4 Soul Sand, 2 Bone Blocks, 1 Wither Rose | 200,000 FE |
+| Dragon | Dragon's Breath | 4 End Stone, 4 Popped Chorus Fruit, 2 Eyes of Ender | 200,000 FE |
+| Warden | Echo Shard | 4 Sculk, 4 Amethyst Shards, 1 Sculk Catalyst | 200,000 FE |
+| Any tier 1 | as by hand | none | 20,000 FE |
+
+- **Window:** the energy buffer, the cross of slots, a progress bar, the tier and FE/t (2,000 FE/t for tier 2 over 5 seconds). The catalysts still needed show **faded in the empty side slots**, and hovering a side slot lists them, with the missing ones in red. A status lamp shows *Waiting*, *Infusing*, *No energy*, *Missing catalysts*, *No sheep* or *Not enough items*.
+- **Which sheep:** the nearest grown sheep in reach that can take the resource, just as when fed by hand: not already infused with something else, not a lamb (unless `allowBabies` is on). Its Endurance counts.
+- **Automation:** tier 1 resources work too, with no catalysts, so an altar with a hopper of iron ingots keeps a pen infused without you. Hoppers and pipes put feeding items and catalysts in from any side and can't take them out. A comparator reads its progress. Jade shows its status.
+- **Advancements:** the nearest player within 16 blocks gets the infusion advancements, as if they had fed the sheep.
+- **Recipe:** amethyst blocks either side of an enchanting table, gold ingots either side of a Functional Machine Block, and diamonds and a gold ingot along the bottom. Mine it with a pickaxe.
+- **Config:** `[infusion_altar]` sets the power, time, buffer and from which tier the altar is required (`altarOnlyFromTier`; 4 lets every resource be fed by hand again).
+
+| The window: catalysts still needed | Infusing |
+|---|---|
+| ![The Infusion Altar window with a Nether Star in the centre and Soul Sand above; the tooltip lists Needs 1 x Nether Star, 4 x Soul Sand, then 2 x Bone Block and 1 x Wither Rose in red, and 200,000 FE](docs/screenshots/92_altar_catalyst_tooltip.png) | ![The window with all four catalysts in, Tier 2, 2,000 FE/t, the progress bar filling and status Infusing](docs/screenshots/93_altar_infusing_gui.png) |
+
+![The Infusion Altar, a steel and amethyst pedestal, with a sheep beside it being infused](docs/screenshots/94_altar_infusing.png)
 
 ### 2. Shear it
 Shears and dispensers both work. An infused sheep drops **resource wool** (e.g. *Iron Wool*) **instead of** its normal wool. When the infusion runs out the sheep goes back to normal.
@@ -840,6 +881,26 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `energyCapacity` | 50000 | FE buffer |
 | `maxEnergyInput` | 1000 | FE accepted per tick (every face except the front) |
 
+**`[sheep_stats]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `enabled` | true | Whether stats are bred and have any effect |
+| `maxStat` | 10 | Highest a stat can reach |
+| `increaseChance` / `decreaseChance` | 0.25 / 0.05 | Chance each of a lamb's stats comes out one higher / lower than its parents' average |
+| `yieldPerPoint` | 0.15 | Extra wool per shearing per Yield point above 1, as a share of the normal amount |
+| `growthPerPoint` | 0.01 | Chance a second, per Growth point above 1, that a sheared sheep regrows its wool |
+| `endurancePerPoint` | 0.1 | Extra shearings per Endurance point above 1, as a share of the infusion's uses |
+
+**`[infusion_altar]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `altarOnlyFromTier` | 2 | Resources of this tier and up can only be infused at an altar (4 = none) |
+| `baseEnergy` / `highTierEnergy` | 20000 / 200000 | FE for a tier 1 / tier 2+ infusion when the definition doesn't say |
+| `ticks` | 100 | Ticks one infusion takes |
+| `energyCapacity` / `maxEnergyInput` | 250000 / 5000 | The altar's buffer and input rate |
+
 **`[wool_packer]`**
 
 | Key | Default | Meaning |
@@ -974,6 +1035,11 @@ Definitions live in `data/<namespace>/barelyfunctionalcontraptions/sheep_resourc
     "processing_ticks": 100                  // default: config
   },
   "growth_item": "mekanism:raw_tin",         // optional: block shown growing out of the fleece; default: the storage block of the fed item or output
+  "altar": {                                 // optional: its tier and what it takes at an Infusion Altar
+    "tier": 2,                               // 1-3; from [infusion_altar] altarOnlyFromTier (2) it can't be fed by hand
+    "catalysts": [ { "ingredient": "minecraft:soul_sand", "count": 4 } ],  // up to 4, used up
+    "energy": 200000                         // FE; default: the config's for its tier
+  },
   "appearance": {                            // optional: extra looks and behaviours (see below)
     "features": ["wings", "glowing_eyes"],
     "feature_color": "#7A5C99",

@@ -2947,6 +2947,145 @@ def generate_wool_packer_gui():
     img.save(out("gui/wool_packer.png"))
 
 
+# ---------------------------------------------------------------------------
+# Infusion Altar: a pedestal (wide base, column, wide top) of blue steel with an amethyst rune ring on top that glows
+# while it infuses, and its window: energy gauge, a cross of five slots, progress bar and tier readout.
+# ---------------------------------------------------------------------------
+ALTAR_TOP = [
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMOOOOOOMbSSO",
+    "OHMMOPpPPpPOMMSO",
+    "OHMOPpggggpPOMSO",
+    "OHMOPgGGGGgPOMSO",
+    "OHMOPgGWWGgPOMSO",
+    "OHMOPgGWWGgPOMSO",
+    "OHMOPgGGGGgPOMSO",
+    "OHMOPpggggpPOMSO",
+    "OHMMOPpPPpPOMMSO",
+    "OHbSMOOOOOOMbSSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSSSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+ALTAR_SIDE = [  # used for the base and the top slab edges
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OMBbMMPPPPMMBbSO",
+    "OSSSSSSSSSSSSSSO",
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHMMMMMMMMMMMMSO",
+    "OHMMPpMMMMPpMMSO",
+    "OHMMpPMMMMpPMMSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHMMMMMMMMMMMMSO",
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+ALTAR_COLUMN = [
+    "OOOOOOOOOOOOOOOO",
+    "OSMMMHHHHHHMMMSO",
+    "OSMMHPPPPPPHMMSO",
+    "OSMMHPggggPHMMSO",
+    "OSMMHPgGGgPHMMSO",
+    "OSMMHPgGGgPHMMSO",
+    "OSMMHPggggPHMMSO",
+    "OSMMHPPPPPPHMMSO",
+    "OSMMMHHHHHHMMMSO",
+    "OSMMMMMMMMMMMMSO",
+    "OSMMMMbMMbMMMMSO",
+    "OSMMMMMMMMMMMMSO",
+    "OSMMMMMMMMMMMMSO",
+    "OSMMMMbMMbMMMMSO",
+    "OSSSSSSSSSSSSSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+
+def generate_infusion_altar():
+    dull = dict(CARTOON)
+    dull["g"], dull["G"], dull["W"] = hexc("#5c2aa6"), hexc("#7b44c9"), hexc("#a77ce6")
+    grid(ALTAR_TOP, dull).save(out("block/infusion_altar_top.png"))
+    frames = 8
+    anim = Image.new("RGBA", (16, 16 * frames), CLEAR)
+    for t in range(frames):
+        pulse = 0.5 + 0.5 * math.sin(t * math.pi / 4)
+        lit = dict(CARTOON)
+        lit["g"] = mix(hexc("#ff6ae6"), hexc("#c27cff"), pulse)
+        lit["G"] = mix(hexc("#ffd2fb"), hexc("#ff9af0"), pulse)
+        lit["W"] = WHITE
+        grid(ALTAR_TOP, lit, anim, 0, 16 * t)
+    anim.save(out("block/infusion_altar_top_active.png"))
+    with open(out("block/infusion_altar_top_active.png") + ".mcmeta", "w") as f:
+        f.write('{\n  "animation": {\n    "frametime": 3\n  }\n}\n')
+    grid(ALTAR_SIDE, dict(CARTOON)).save(out("block/infusion_altar_side.png"))
+    grid(ALTAR_COLUMN, dull).save(out("block/infusion_altar_column.png"))
+    lit = dict(CARTOON)
+    lit["g"], lit["G"] = hexc("#ff6ae6"), hexc("#ffd2fb")
+    grid(ALTAR_COLUMN, lit).save(out("block/infusion_altar_column_active.png"))
+
+
+def generate_infusion_altar_gui():
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # energy gauge, fill 11..40 x 19..82
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 46, 16, 168, 86, GUI["panel"])          # work window
+    # A faint rune ring behind the cross of slots.
+    for a in range(0, 360, 4):
+        r = 27
+        x = round(82 + r * math.cos(math.radians(a)))
+        y = round(47 + r * math.sin(math.radians(a)))
+        img.putpixel((x, y), hexc("#3b2a5c"))
+    for (ix, iy) in [(74, 39), (74, 18), (95, 39), (74, 60), (53, 39)]:
+        slot(img, ix, iy)
+    for (ix, iy) in [(74, 39)]:                         # the centre slot gets an amethyst rim
+        for i in range(-2, 20):
+            for (px, py) in [(ix + i, iy - 2), (ix + i, iy + 19), (ix - 2, iy + i), (ix + 19, iy + i)]:
+                img.putpixel((px, py), hexc("#7b44c9"))
+    inset(img, 49, 79, 117, 84, GUI["gauge"])          # progress bar, fill 50..115 x 80..82
+    for x in range(120, 165):
+        if x % 2 == 0:
+            img.putpixel((x, 33), hexc("#22232a"))
+    inset(img, 8, 86, 18, 96, GUI["gauge"])            # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    sheep_icon(img, 146, 5, hexc("#f2f2f2"))
+    rnd = random.Random(61)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice([hexc("#e3e1ea"), hexc("#b7b3c6"), hexc("#c27cff")]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    for y in range(64):
+        t = y / 63.0
+        c = mix(hexc("#ff6ae6"), hexc("#5c2aa6"), t)
+        for x in range(30):
+            img.putpixel((176 + x, y), mix(c, hexc("#ffd2fb"), 0.35) if x in (3, 4, 5) else (shade(c, 0.75) if x >= 26 else c))
+    for f in range(4):
+        for x in range(30):
+            img.putpixel((176 + x, 66 + f * 2), hexc("#ffffff") if (x + f * 2) % 8 == 0 else hexc("#ffd2fb"))
+            img.putpixel((176 + x, 67 + f * 2), hexc("#ff6ae6"))
+    for x in range(66):                                             # progress fill (176,80) 66x3
+        c = mix(hexc("#7b44c9"), hexc("#ff9af0"), x / 65.0)
+        img.putpixel((176 + x, 80), mix(c, WHITE, 0.4))
+        img.putpixel((176 + x, 81), c)
+        img.putpixel((176 + x, 82), shade(c, 0.7))
+    img.save(out("gui/infusion_altar.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -2979,6 +3118,8 @@ def main():
     generate_wool_bale()
     generate_wool_packer()
     generate_wool_packer_gui()
+    generate_infusion_altar()
+    generate_infusion_altar_gui()
     generate_advancement_background()
     generate_jei()
     generate_logo()

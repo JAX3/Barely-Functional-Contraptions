@@ -27,5 +27,22 @@
       "glowing_eyes"
     ],
     "feature_color": "#7A5C99"
+  },
+  "altar": {
+    "tier": 2,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:end_stone",
+        "count": 4
+      },
+      {
+        "ingredient": "minecraft:popped_chorus_fruit",
+        "count": 4
+      },
+      {
+        "ingredient": "minecraft:ender_eye",
+        "count": 2
+      }
+    ]
   }
 }

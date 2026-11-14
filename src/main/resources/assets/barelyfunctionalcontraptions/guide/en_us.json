@@ -199,7 +199,8 @@
         "- Kill an infused sheep with its wool for a little extra.",
         "Anything that isn't a resource works as normal, so wheat, dyes and shears behave as usual.",
         "## More resources",
-        "Data packs can add any resource, and operators can run /barelyfunctionalcontraptions generate to make one for every metal in the modpack."
+        "Data packs can add any resource, and operators can run /barelyfunctionalcontraptions generate to make one for every metal in the modpack.",
+        "The Wither, Dragon and Warden sheep are tier 2 and need an Infusion Altar instead."
       ],
       "tab": "productive"
     },
@@ -220,6 +221,36 @@
         "Each one has its own advancement, and collecting every wool is a challenge."
       ],
       "tab": "productive"
+    },
+    {
+      "title": "Infusion Altar",
+      "icon": "barelyfunctionalcontraptions:infusion_altar",
+      "tab": "productive",
+      "text": [
+        "Most resources are tier 1 and can be fed to a sheep by hand. The Wither, Dragon and Warden sheep are tier 2: their Nether Star, Dragon's Breath or Echo Shard only works at an Infusion Altar.",
+        "Put the feeding item in the centre slot and the catalysts in the four slots round it, power the altar, and stand a grown sheep within 2 blocks of it. The sheep takes the resource when the bar fills, and the items are used up then.",
+        "## Tier 2 catalysts",
+        "- Wither: 4 Soul Sand, 2 Bone Blocks, 1 Wither Rose.",
+        "- Dragon: 4 End Stone, 4 Popped Chorus Fruit, 2 Eyes of Ender.",
+        "- Warden: 4 Sculk, 4 Amethyst Shards, 1 Sculk Catalyst.",
+        "Tier 2 takes 200,000 FE over 5 seconds. Tier 1 resources work at the altar too, with no catalysts and 20,000 FE, so it can infuse a pen without you.",
+        "The catalysts still needed show faded in the empty slots. Hoppers and pipes can feed it from any side.",
+        "Data packs set a resource's tier, catalysts and power in its \"altar\" block."
+      ]
+    },
+    {
+      "title": "Breeding Sheep",
+      "icon": "minecraft:wheat",
+      "tab": "productive",
+      "text": [
+        "Every sheep has three stats from 1 to 10. Wild sheep are all 1s.",
+        "- Yield: more wool per shearing. Yield 10 gives about 2.35 times as much.",
+        "- Growth: sheared wool grows back on its own, without grass. At Growth 10 it takes about 11 seconds.",
+        "- Endurance: an infusion lasts more shearings. Endurance 10 makes it last 1.9 times as long.",
+        "A lamb gets the average of its parents' stats, with a 1 in 4 chance of each going up one (and a small chance of one down). Keep breeding your best sheep together to push a line up.",
+        "Sneak and right-click a sheep with an empty hand to see its stats, or look at it with Jade.",
+        "Lambs of infused sheep are born infused too, and their own Endurance counts."
+      ]
     },
     {
       "title": "Wool Machines",

@@ -158,5 +158,6 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registration.addCraftingStation(SeparationCategory.TYPE, ModItems.MECHANICAL_SEPARATOR.get());
         registration.addCraftingStation(InfusionCategory.TYPE, Items.SHEARS);
+        registration.addCraftingStation(InfusionCategory.TYPE, ModItems.INFUSION_ALTAR.get());
     }
 }

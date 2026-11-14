@@ -36,6 +36,9 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBaleBlockEntity>> WOOL_BALE = REGISTER.register("wool_bale",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBaleBlockEntity::new, ModBlocks.WOOL_BALE.get()));
 
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity>> INFUSION_ALTAR = REGISTER.register("infusion_altar",
+            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity::new, ModBlocks.INFUSION_ALTAR.get()));
+
     public static final Supplier<BlockEntityType<CreativeGeneratorBlockEntity>> CREATIVE_GENERATOR = REGISTER.register("creative_generator",
             () -> new BlockEntityType<>(CreativeGeneratorBlockEntity::new, ModBlocks.CREATIVE_GENERATOR.get()));
 

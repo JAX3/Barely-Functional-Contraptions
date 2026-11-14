@@ -23,5 +23,22 @@
       "sculk",
       "glowing_eyes"
     ]
+  },
+  "altar": {
+    "tier": 2,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:sculk",
+        "count": 4
+      },
+      {
+        "ingredient": "minecraft:amethyst_shard",
+        "count": 4
+      },
+      {
+        "ingredient": "minecraft:sculk_catalyst",
+        "count": 1
+      }
+    ]
   }
 }

@@ -138,6 +138,8 @@ public final class ModGameTests {
         TESTS.put("breeding_inheritance_rules", ModGameTests::breedingRules);
         TESTS.put("sheep_stats_are_bred", ModGameTests::sheepStatsBred);
         TESTS.put("sheep_stats_yield_endurance_growth", ModGameTests::sheepStatsEffects);
+        TESTS.put("infusion_altar_infuses_a_wither_sheep", ModGameTests::altarWither);
+        TESTS.put("infusion_altar_waits_for_what_it_needs", ModGameTests::altarWaits);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -895,6 +897,75 @@ public final class ModGameTests {
         });
     }
 
+    // ------------------------------------------------------------------ Infusion Altar
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity altar(GameTestHelper h, BlockPos pos, boolean powered, ItemStack... items) {
+        h.setBlock(pos, ModBlocks.INFUSION_ALTAR.get());
+        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity.class);
+        for (int i = 0; i < items.length; i++) be.setItem(i, items[i]);
+        if (powered) {
+            var energy = (net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler) be.getEnergyHandler();
+            energy.set(energy.getCapacityAsInt());
+        }
+        return be;
+    }
+
+    /**
+     * A Nether Star can't be fed by hand any more (tier 2); at a powered altar with its catalysts the sheep beside it
+     * becomes a Wither sheep, and the star, the catalysts and exactly 200,000 FE are used.
+     */
+    private static void altarWither(GameTestHelper h) {
+        Identifier wither = ResourcefulSheep.id("wither");
+        Sheep byHand = sheepAt(h, new BlockPos(6, 1, 6), null);
+        Player player = playerHolding(h, new ItemStack(Items.NETHER_STAR));
+        feed(player, byHand);
+        h.assertFalse(SheepInfusionEvents.getInfusion(byHand).isInfused(), "a Nether Star can't be fed by hand");
+        h.assertTrue(player.getMainHandItem().is(Items.NETHER_STAR), "and the star isn't used");
+
+        BlockPos pos = new BlockPos(2, 1, 2);
+        var be = altar(h, pos, true, new ItemStack(Items.NETHER_STAR, 2), new ItemStack(Items.SOUL_SAND, 5),
+                new ItemStack(Items.BONE_BLOCK, 2), new ItemStack(Items.WITHER_ROSE, 1));
+        Sheep sheep = sheepAt(h, new BlockPos(3, 1, 2), null);
+        int start = be.getEnergyHandler().getAmountAsInt();
+        h.runAfterDelay(20, () -> h.assertTrue(be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AltarStatus.INFUSING, "it infuses, was " + be.status()));
+        h.succeedWhen(() -> {
+            h.assertTrue(SheepInfusionEvents.getInfusion(sheep).resource().map(wither::equals).orElse(false), "the sheep beside it becomes a Wither sheep");
+            h.assertTrue(be.getItem(0).getCount() == 1, "one Nether Star used, left " + be.getItem(0));
+            h.assertTrue(be.getItem(1).getCount() == 1 && be.getItem(2).isEmpty() && be.getItem(3).isEmpty(), "4 soul sand, 2 bone blocks and the rose used");
+            h.assertTrue(start - be.getEnergyHandler().getAmountAsInt() == 200_000, "200,000 FE used, used " + (start - be.getEnergyHandler().getAmountAsInt()));
+        });
+    }
+
+    /** It waits for catalysts, a sheep, power and enough items; tier 1 needs no catalysts; Endurance still counts. */
+    private static void altarWaits(GameTestHelper h) {
+        // Missing a catalyst.
+        var noRose = altar(h, new BlockPos(1, 1, 1), true, new ItemStack(Items.NETHER_STAR), new ItemStack(Items.SOUL_SAND, 4), new ItemStack(Items.BONE_BLOCK, 2));
+        sheepAt(h, new BlockPos(1, 1, 2), null);
+        // No sheep.
+        var alone = altar(h, new BlockPos(5, 1, 1), true, new ItemStack(Items.IRON_INGOT));
+        // No power.
+        var unpowered = altar(h, new BlockPos(1, 1, 5), false, new ItemStack(Items.IRON_INGOT));
+        sheepAt(h, new BlockPos(1, 1, 6), null);
+        // Tier 1 Iron at a powered altar, an already-Gold sheep next to it is skipped for a plain Endurance-10 one.
+        var iron = altar(h, new BlockPos(5, 1, 5), true, new ItemStack(Items.IRON_INGOT, 3));
+        sheepAt(h, new BlockPos(5, 1, 6), ResourcefulSheep.id("gold"));
+        Sheep tough = sheepAt(h, new BlockPos(6, 1, 5), null);
+        SheepInfusionEvents.setStats(tough, new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats(1, 1, 10));
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity.isCatalyst(h.getLevel(), new ItemStack(Items.SOUL_SAND)), "soul sand is a catalyst");
+        h.assertFalse(iron.canPlaceItem(0, new ItemStack(Items.DIRT)), "dirt isn't a feeding item");
+        h.runAfterDelay(130, () -> {
+            h.assertTrue(noRose.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AltarStatus.MISSING_CATALYSTS, "waits for the Wither Rose, was " + noRose.status());
+            h.assertTrue(alone.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AltarStatus.NO_SHEEP, "waits for a sheep, was " + alone.status());
+            h.assertTrue(unpowered.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AltarStatus.NO_ENERGY, "waits for power, was " + unpowered.status());
+            h.assertTrue(noRose.getItem(0).getCount() == 1 && noRose.getItem(1).getCount() == 4, "nothing is used while it waits");
+            h.assertTrue(SheepInfusionEvents.getInfusion(tough).resource().map(IRON::equals).orElse(false), "tier 1 Iron needs no catalysts");
+            int base = SheepResourceRegistry.server().byId(IRON).orElseThrow().effectiveInfusionUses();
+            h.assertTrue(SheepInfusionEvents.getInfusion(tough).usesRemaining() == Math.round(base * 1.9), "its Endurance still counts");
+            h.assertTrue(iron.getItem(0).getCount() == 2, "one ingot used, then it waits: no other sheep can take Iron");
+            h.succeed();
+        });
+    }
+
     // ------------------------------------------------------------------ fluid tanks
 
     // Made when a test runs: fluid resources can't be created while the mod is still loading.
@@ -1156,7 +1227,7 @@ public final class ModGameTests {
                 "the Functional Machine Block has a shaped recipe");
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FUNCTIONAL_MACHINE_BLOCK.get().defaultBlockState()
                 .is(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE), "mined with a pickaxe");
-        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "fluid_tank", "zero_point_energy_module", "blaze_furnace", "wool_burner", "wool_packer")) {
+        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "fluid_tank", "zero_point_energy_module", "blaze_furnace", "wool_burner", "wool_packer", "infusion_altar")) {
             var holder = recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
                     ResourcefulSheep.id(machine))).orElse(null);
             h.assertTrue(holder != null && holder.value() instanceof net.minecraft.world.item.crafting.ShapedRecipe, "missing recipe " + machine);

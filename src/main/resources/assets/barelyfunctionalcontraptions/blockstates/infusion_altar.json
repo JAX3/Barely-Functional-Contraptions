@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "barelyfunctionalcontraptions:block/infusion_altar"
+    },
+    "active=true": {
+      "model": "barelyfunctionalcontraptions:block/infusion_altar_active"
+    }
+  }
+}

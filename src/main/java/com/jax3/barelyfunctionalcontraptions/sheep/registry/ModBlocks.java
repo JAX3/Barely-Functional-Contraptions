@@ -151,6 +151,16 @@ public final class ModBlocks {
                     .sound(SoundType.IRON)
                     .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.LIT) ? 13 : 0));
 
+    /** Infuses the sheep beside it, with catalysts and power: the only way to infuse tier 2 resources. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock> INFUSION_ALTAR = REGISTER.registerBlock("infusion_altar",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock::new,
+            p -> p.mapColor(MapColor.COLOR_PURPLE)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.IRON)
+                    .noOcclusion()
+                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock.ACTIVE) ? 10 : 4));
+
     /** Presses 9 of one resource wool into a Wool Bale. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock> WOOL_PACKER = REGISTER.registerBlock("wool_packer",
             com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock::new,

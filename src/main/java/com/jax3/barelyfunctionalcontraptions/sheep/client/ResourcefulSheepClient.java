@@ -88,6 +88,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.BLAZE_FURNACE.get(), BlazeFurnaceScreen::new);
         event.register(ModMenus.WOOL_BURNER.get(), WoolBurnerScreen::new);
         event.register(ModMenus.WOOL_PACKER.get(), WoolPackerScreen::new);
+        event.register(ModMenus.INFUSION_ALTAR.get(), InfusionAltarScreen::new);
     }
 
     private static void registerTintSources(RegisterColorHandlersEvent.ItemTintSources event) {
