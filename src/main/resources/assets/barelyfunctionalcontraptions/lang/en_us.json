@@ -809,7 +809,7 @@
   "barelyfunctionalcontraptions.configuration.wool_burner": "Wool Burner",
   "guide.barelyfunctionalcontraptions.tab.power": "Power",
   "guide.barelyfunctionalcontraptions.tab.logistics": "Logistics",
-  "guide.barelyfunctionalcontraptions.tab.productive": "Productive",
+  "guide.barelyfunctionalcontraptions.tab.production": "Production",
   "guide.barelyfunctionalcontraptions.tab.utility": "Utility",
   "block.barelyfunctionalcontraptions.wool_packer": "Wool Packer",
   "tooltip.barelyfunctionalcontraptions.wool_packer": "Presses 9 of the same resource wool into a Wool Bale. Needs power.",

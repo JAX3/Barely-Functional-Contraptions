@@ -1877,7 +1877,7 @@ public final class DevScreenshotHarness {
             case 250 -> shot(mc, "79_guide_wool_burner");
             // The other tabs, opened with real clicks on their buttons.
             case 252, 266, 280 -> {
-                int tabIndex = (tick - 252) / 14 + 1; // Logistics, Productive, Utility
+                int tabIndex = (tick - 252) / 14 + 1; // Logistics, Production, Utility
                 var window = mc.getWindow();
                 double scale = window.getGuiScale();
                 int left = (window.getGuiScaledWidth() - 330) / 2, top = (window.getGuiScaledHeight() - 214) / 2;
@@ -1887,7 +1887,7 @@ public final class DevScreenshotHarness {
             }
             case 258, 272, 286 -> mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // no tooltip in the shot
             case 262 -> shot(mc, "79_guide_tab_logistics");
-            case 276 -> shot(mc, "79_guide_tab_productive");
+            case 276 -> shot(mc, "79_guide_tab_production");
             case 290 -> shot(mc, "79_guide_tab_utility");
             case 300 -> mc.stop();
             default -> {}

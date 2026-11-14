@@ -38,7 +38,7 @@ class PureLogicTest {
             for (var element : chapters) {
                 var chapter = element.getAsJsonObject();
                 String tab = chapter.get("tab").getAsString();
-                assertTrue(java.util.List.of("power", "logistics", "productive", "utility").contains(tab), chapter.get("title") + " has a known tab: " + tab);
+                assertTrue(java.util.List.of("power", "logistics", "production", "utility").contains(tab), chapter.get("title") + " has a known tab: " + tab);
                 perTab.merge(tab, 1, Integer::sum);
                 assertFalse(chapter.get("title").getAsString().isBlank());
                 assertTrue(Identifier.tryParse(chapter.get("icon").getAsString()) != null, "icon id " + chapter.get("icon"));

@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
 /**
- * The in-game guide (the Contraptions Manual). Four tabs along the top of the left panel (Power, Logistics, Productive,
+ * The in-game guide (the Contraptions Manual). Four tabs along the top of the left panel (Power, Logistics, Production,
  * Utility), the open tab's chapters below them with their icons, and the chapter's text on the right, wrapped and split
  * into pages, with page buttons below. Drawn in the mod's dark slate style.
  */

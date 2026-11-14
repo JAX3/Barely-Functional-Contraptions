@@ -62,17 +62,17 @@ Craft a **Contraptions Manual** (a book and a Functional Machine Block) and righ
 
 - **Power:** the generators (Mycelial Generator, Zero Point Module, Glow Panels, Blaze Sheep Furnace, Wool Burner) and energy storage.
 - **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
-- **Productive:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
+- **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, and data packs and commands.
 
-Hover over a tab to see its name.
+Hover over a tab to see its name. A resource pack's guide file can still use the tab's old name, `"productive"`; it now means Production.
 
-| Power tab | Productive tab |
+| Power tab | Production tab |
 |---|---|
-| ![The Contraptions Manual on its Power tab: four tab icons along the top with Power framed, its six chapters below, and the Wool Burner chapter open](docs/screenshots/83_guide_power_tab.png) | ![The Productive tab: Infusing Sheep, Themed Sheep, Wool Machines and Fluid Reservoir, with Infusing Sheep open](docs/screenshots/84_guide_productive_tab.png) |
+| ![The Contraptions Manual on its Power tab: four tab icons along the top with Power framed, its six chapters below, and the Wool Burner chapter open](docs/screenshots/83_guide_power_tab.png) | ![The Production tab: Infusing Sheep, Themed Sheep, Infusion Altar, Breeding Sheep, Wool Machines and Fluid Reservoir, with Infusing Sheep open](docs/screenshots/84_guide_production_tab.png) |
 
 - Pick a tab, then a chapter on the left; long chapters turn over with the arrow buttons.
-- The text lives in `assets/barelyfunctionalcontraptions/guide/en_us.json`. A resource pack can replace it or add a translation (`guide/<language>.json`, e.g. `de_de.json`), which is used when the game is in that language. Each chapter has a `title`, an `icon` item, a `tab` (`power`, `logistics`, `productive` or `utility`) and a list of `text` paragraphs; a paragraph starting with `## ` is a heading and one starting with `- ` is a list item.
+- The text lives in `assets/barelyfunctionalcontraptions/guide/en_us.json`. A resource pack can replace it or add a translation (`guide/<language>.json`, e.g. `de_de.json`), which is used when the game is in that language. Each chapter has a `title`, an `icon` item, a `tab` (`power`, `logistics`, `production` or `utility`) and a list of `text` paragraphs; a paragraph starting with `## ` is a heading and one starting with `- ` is a list item.
 
 ### Functional Machine Block
 

@@ -202,7 +202,7 @@
         "Data packs can add any resource, and operators can run /barelyfunctionalcontraptions generate to make one for every metal in the modpack.",
         "The Wither, Dragon and Warden sheep are tier 2 and need an Infusion Altar instead."
       ],
-      "tab": "productive"
+      "tab": "production"
     },
     {
       "title": "Themed Sheep",
@@ -220,12 +220,12 @@
         "- Ghast Tear: twice the size, tentacles, and it screams like a ghast (ghast tears).",
         "Each one has its own advancement, and collecting every wool is a challenge."
       ],
-      "tab": "productive"
+      "tab": "production"
     },
     {
       "title": "Infusion Altar",
       "icon": "barelyfunctionalcontraptions:infusion_altar",
-      "tab": "productive",
+      "tab": "production",
       "text": [
         "Most resources are tier 1 and can be fed to a sheep by hand. The Wither, Dragon and Warden sheep are tier 2: their Nether Star, Dragon's Breath or Echo Shard only works at an Infusion Altar.",
         "Put the feeding item in the centre slot and the catalysts in the four slots round it, power the altar, and stand a grown sheep within 2 blocks of it. The sheep takes the resource when the bar fills, and the items are used up then.",
@@ -241,7 +241,7 @@
     {
       "title": "Breeding Sheep",
       "icon": "minecraft:wheat",
-      "tab": "productive",
+      "tab": "production",
       "text": [
         "Every sheep has three stats from 1 to 10. Wild sheep are all 1s.",
         "- Yield: more wool per shearing. Yield 10 gives about 2.35 times as much.",
@@ -255,7 +255,7 @@
     {
       "title": "Wool Machines",
       "icon": "barelyfunctionalcontraptions:mechanical_separator",
-      "tab": "productive",
+      "tab": "production",
       "text": [
         "## Mechanical Separator",
         "Put resource wool in and supply FE. Each wool gives 2 to 4 of its resource, 2 string and sometimes a bonus. Iron wool takes 20,000 FE over 5 seconds.",
@@ -268,7 +268,7 @@
     {
       "title": "Fluid Reservoir",
       "icon": "barelyfunctionalcontraptions:fluid_reservoir",
-      "tab": "productive",
+      "tab": "production",
       "text": [
         "Place it on top of an infinite water source and it fills with a bucket of water a second, which it pushes into tanks and generators beside it."
       ]

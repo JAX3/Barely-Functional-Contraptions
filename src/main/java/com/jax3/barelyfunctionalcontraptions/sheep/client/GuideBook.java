@@ -24,14 +24,14 @@ import net.minecraft.world.item.Items;
  *       "text": ["A paragraph.", "## A heading", "- A list item"] } ] }
  * }</pre>
  * Paragraphs are wrapped and split into pages by the screen. A paragraph starting with {@code ## } is a heading.
- * {@code tab} is one of {@code power}, {@code logistics}, {@code productive} or {@code utility} (the default).
+ * {@code tab} is one of {@code power}, {@code logistics}, {@code production} or {@code utility} (the default).
  */
 public final class GuideBook {
     public record Chapter(String title, ItemStack icon, Tab tab, List<String> text) {}
 
     /** The guide's tabs, in the order they're shown. */
     public enum Tab {
-        POWER, LOGISTICS, PRODUCTIVE, UTILITY;
+        POWER, LOGISTICS, PRODUCTION, UTILITY;
 
         public String key() {
             return name().toLowerCase(java.util.Locale.ROOT);
@@ -46,13 +46,14 @@ public final class GuideBook {
             return new ItemStack(switch (this) {
                 case POWER -> com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get();
                 case LOGISTICS -> com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ITEM_PIPE.get();
-                case PRODUCTIVE -> com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get();
+                case PRODUCTION -> com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get();
                 case UTILITY -> com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get();
             });
         }
 
         /** The tab named {@code key} ("power"...), or Utility for anything else. */
         public static Tab byKey(String key) {
+            if (key.equals("productive")) return PRODUCTION; // its old name, for older resource packs
             for (Tab tab : values()) if (tab.key().equals(key)) return tab;
             return UTILITY;
         }
