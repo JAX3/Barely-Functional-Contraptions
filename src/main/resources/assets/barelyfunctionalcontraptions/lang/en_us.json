@@ -806,5 +806,9 @@
   "config.jade.plugin_barelyfunctionalcontraptions.wool_burner": "Wool Burner",
   "advancements.barelyfunctionalcontraptions.wool_burner.title": "Fleece Navidad",
   "advancements.barelyfunctionalcontraptions.wool_burner.description": "Craft a Wool Burner",
-  "barelyfunctionalcontraptions.configuration.wool_burner": "Wool Burner"
+  "barelyfunctionalcontraptions.configuration.wool_burner": "Wool Burner",
+  "guide.barelyfunctionalcontraptions.tab.power": "Power",
+  "guide.barelyfunctionalcontraptions.tab.logistics": "Logistics",
+  "guide.barelyfunctionalcontraptions.tab.productive": "Productive",
+  "guide.barelyfunctionalcontraptions.tab.utility": "Utility"
 }

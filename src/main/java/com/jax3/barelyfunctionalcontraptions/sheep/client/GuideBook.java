@@ -20,13 +20,43 @@ import net.minecraft.world.item.Items;
  *
  * <pre>{@code
  * { "chapters": [
- *     { "title": "Mycelial Generator", "icon": "barelyfunctionalcontraptions:mycelial_generator",
+ *     { "title": "Mycelial Generator", "icon": "barelyfunctionalcontraptions:mycelial_generator", "tab": "power",
  *       "text": ["A paragraph.", "## A heading", "- A list item"] } ] }
  * }</pre>
  * Paragraphs are wrapped and split into pages by the screen. A paragraph starting with {@code ## } is a heading.
+ * {@code tab} is one of {@code power}, {@code logistics}, {@code productive} or {@code utility} (the default).
  */
 public final class GuideBook {
-    public record Chapter(String title, ItemStack icon, List<String> text) {}
+    public record Chapter(String title, ItemStack icon, Tab tab, List<String> text) {}
+
+    /** The guide's tabs, in the order they're shown. */
+    public enum Tab {
+        POWER, LOGISTICS, PRODUCTIVE, UTILITY;
+
+        public String key() {
+            return name().toLowerCase(java.util.Locale.ROOT);
+        }
+
+        public net.minecraft.network.chat.Component title() {
+            return net.minecraft.network.chat.Component.translatable("guide.barelyfunctionalcontraptions.tab." + key());
+        }
+
+        /** The tab's icon. */
+        public ItemStack icon() {
+            return new ItemStack(switch (this) {
+                case POWER -> com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get();
+                case LOGISTICS -> com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ITEM_PIPE.get();
+                case PRODUCTIVE -> com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get();
+                case UTILITY -> com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get();
+            });
+        }
+
+        /** The tab named {@code key} ("power"...), or Utility for anything else. */
+        public static Tab byKey(String key) {
+            for (Tab tab : values()) if (tab.key().equals(key)) return tab;
+            return UTILITY;
+        }
+    }
 
     private GuideBook() {}
 
@@ -59,7 +89,8 @@ public final class GuideBook {
                     : new ItemStack(Items.BOOK);
             List<String> text = new ArrayList<>();
             for (JsonElement line : chapter.getAsJsonArray("text")) text.add(line.getAsString());
-            chapters.add(new Chapter(title, icon, List.copyOf(text)));
+            Tab tab = Tab.byKey(chapter.has("tab") ? chapter.get("tab").getAsString() : "");
+            chapters.add(new Chapter(title, icon, tab, List.copyOf(text)));
         }
         return chapters;
     }

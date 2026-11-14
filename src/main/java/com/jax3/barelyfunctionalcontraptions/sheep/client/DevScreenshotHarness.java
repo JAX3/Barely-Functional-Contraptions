@@ -1488,7 +1488,7 @@ public final class DevScreenshotHarness {
             case 260 -> shot(mc, "58_glow_panels_night");
             case 262 -> mc.gui.setScreen(new GuideScreen());
             case 275 -> shot(mc, "60_guide");
-            case 277 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter(9); }
+            case 277 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Glow Panels"); }
             case 290 -> shot(mc, "61_guide_glow_panels");
             case 300 -> mc.stop();
             default -> {}
@@ -1606,9 +1606,23 @@ public final class DevScreenshotHarness {
                 if (mc.player != null) mc.player.closeContainer();
                 mc.gui.setScreen(new GuideScreen());
             }
-            case 237 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter(11); }
+            case 237 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Burner"); }
             case 250 -> shot(mc, "79_guide_wool_burner");
-            case 260 -> mc.stop();
+            // The other tabs, opened with real clicks on their buttons.
+            case 252, 266, 280 -> {
+                int tabIndex = (tick - 252) / 14 + 1; // Logistics, Productive, Utility
+                var window = mc.getWindow();
+                double scale = window.getGuiScale();
+                int left = (window.getGuiScaledWidth() - 330) / 2, top = (window.getGuiScaledHeight() - 214) / 2;
+                mc.mouseHandler.onMove(window.handle(), (left + 6 + tabIndex * 28 + 13) * scale, (top + 21 + 10) * scale, 0, 0);
+                mc.mouseHandler.onButton(window.handle(), new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
+                mc.mouseHandler.onButton(window.handle(), new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
+            }
+            case 258, 272, 286 -> mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // no tooltip in the shot
+            case 262 -> shot(mc, "79_guide_tab_logistics");
+            case 276 -> shot(mc, "79_guide_tab_productive");
+            case 290 -> shot(mc, "79_guide_tab_utility");
+            case 300 -> mc.stop();
             default -> {}
         }
     }
@@ -1718,7 +1732,7 @@ public final class DevScreenshotHarness {
                 setHudHidden(mc, false);
                 mc.gui.setScreen(new GuideScreen());
             }
-            case 412 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter(10); }
+            case 412 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Blaze Furnace"); }
             case 426 -> shot(mc, "66_guide_blaze_furnace");
             case 436 -> mc.stop();
             default -> {}

@@ -13,6 +13,36 @@
         "- Shear them for resource wool, and turn the wool back into resources in a Mechanical Separator powered by FE.",
         "- Mushroom sheep give the generators their fuel, which closes the loop.",
         "Sneak and right-click a sheep with an empty hand to see what it is infused with. JEI and Jade, if installed, show recipes and machine details."
+      ],
+      "tab": "utility"
+    },
+    {
+      "title": "Wrench and Links",
+      "icon": "barelyfunctionalcontraptions:mycelium_wrench",
+      "text": [
+        "The Barely Functional Wrench links blocks without touching.",
+        "- Right-click a generator, then another generator, to link them into one network (up to 64 blocks apart).",
+        "- Right-click a generator, then a Mechanical Separator, Automatic Shears or Hume Energy Cube, to power it wirelessly.",
+        "- Sneak and right-click a block to remove its links. Sneak and right-click the air to clear your selection.",
+        "The generator's screen shows how it is connected and which machines it is powering.",
+        "The wrench also sets each side of a Fluid or Item Pipe: see Pipe Sides."
+      ],
+      "tab": "utility"
+    },
+    {
+      "title": "Data Packs",
+      "icon": "minecraft:command_block",
+      "tab": "utility",
+      "text": [
+        "Sheep resources are data: data/<namespace>/barelyfunctionalcontraptions/sheep_resources/<name>.json. They reload with /reload.",
+        "An appearance block gives any resource wings, extra heads, glowing, a bigger size, its own sounds and more.",
+        "Furnace heat sources are data too: data/<namespace>/barelyfunctionalcontraptions/furnace_heat/<name>.json names a sheep, an entity or a look such as on_fire, and its power. Boost items are the blaze_furnace_boost data map.",
+        "Wool Burner fuels are data too: data/<namespace>/barelyfunctionalcontraptions/wool_burner_fuel/<name>.json, each with an ingredient, a burn_time and a power.",
+        "## Commands",
+        "- /barelyfunctionalcontraptions list: every loaded resource.",
+        "- /barelyfunctionalcontraptions generate: a resource for every material in the modpack.",
+        "- /barelyfunctionalcontraptions generate item <item>: a resource fed with any item.",
+        "Every number in the mod can be changed in its config files, from the mod list's Config button."
       ]
     },
     {
@@ -28,85 +58,8 @@
         "Generators that touch form a network, and every running member boosts the whole network's output exponentially.",
         "## Mycelium",
         "Running generators slowly turn nearby dirt into mycelium and sometimes sprout huge mushrooms, which gives you more fuel."
-      ]
-    },
-    {
-      "title": "Wrench and Links",
-      "icon": "barelyfunctionalcontraptions:mycelium_wrench",
-      "text": [
-        "The Barely Functional Wrench links blocks without touching.",
-        "- Right-click a generator, then another generator, to link them into one network (up to 64 blocks apart).",
-        "- Right-click a generator, then a Mechanical Separator, Automatic Shears or Hume Energy Cube, to power it wirelessly.",
-        "- Sneak and right-click a block to remove its links. Sneak and right-click the air to clear your selection.",
-        "The generator's screen shows how it is connected and which machines it is powering.",
-        "The wrench also sets each side of a Fluid or Item Pipe: see Pipe Sides."
-      ]
-    },
-    {
-      "title": "Infusing Sheep",
-      "icon": "minecraft:iron_ingot",
-      "text": [
-        "Right-click a grown sheep holding a resource, such as an Iron Ingot, a Diamond or a Red Mushroom.",
-        "- Its fleece takes the resource's colour, and small blocks of the resource grow out of it.",
-        "- Each infusion lasts 100 shearings by default.",
-        "- Breed infused sheep with wheat and the lamb is born infused too.",
-        "- Kill an infused sheep with its wool for a little extra.",
-        "Anything that isn't a resource works as normal, so wheat, dyes and shears behave as usual.",
-        "## More resources",
-        "Data packs can add any resource, and operators can run /barelyfunctionalcontraptions generate to make one for every metal in the modpack."
-      ]
-    },
-    {
-      "title": "Wool and Machines",
-      "icon": "barelyfunctionalcontraptions:mechanical_separator",
-      "text": [
-        "## Mechanical Separator",
-        "Put resource wool in and supply FE. Each wool gives 2 to 4 of its resource, 2 string and sometimes a bonus. Iron wool takes 20,000 FE over 5 seconds.",
-        "Its redstone button sets whether redstone turns it on or off. Hoppers and pipes can feed it and empty it.",
-        "## Automatic Shears",
-        "Shears every sheep in the 3x3 area in front of its blades, using 2,000 FE per sheep, and keeps the wool in 9 slots. Put a hopper or pipe under it to collect the wool."
-      ]
-    },
-    {
-      "title": "Themed Sheep",
-      "icon": "minecraft:nether_star",
-      "text": [
-        "Ten resources turn sheep into little versions of the mob they come from:",
-        "- Hay Bale: a hay fleece (wheat).",
-        "- Nether Star: two Wither Skeleton Skulls beside its head (nether stars).",
-        "- Dragon's Breath: dragon wings (dragon's breath).",
-        "- Glow Ink Sac: a glowing fleece that lights up the ground (glow ink).",
-        "- Bone Block and Wither Rose: skull faces and bony legs (bones).",
-        "- Spider Eye: extra legs and red eyes (spider eyes).",
-        "- Echo Shard: sculk tendrils (echo shards).",
-        "- Blaze Rod: always on fire, but never hurt (blaze rods).",
-        "- Ghast Tear: twice the size, tentacles, and it screams like a ghast (ghast tears).",
-        "Each one has its own advancement, and collecting every wool is a challenge."
-      ]
-    },
-    {
-      "title": "Water and Fluids",
-      "icon": "barelyfunctionalcontraptions:fluid_tank",
-      "text": [
-        "## Fluid Reservoir",
-        "Place it on top of an infinite water source and it fills with a bucket of water a second, which it pushes into tanks and generators beside it.",
-        "## Fluid Tank",
-        "Holds 16 buckets of one fluid. Touching tanks join into one big tank that fills from the bottom up. Use buckets on it, or connect pipes on any side.",
-        "## Fluid Pipe",
-        "Carries fluid between anything that holds it, up to 4 buckets a tick. Machines are filled first, then tanks."
-      ]
-    },
-    {
-      "title": "Energy",
-      "icon": "barelyfunctionalcontraptions:hume_energy_cube",
-      "text": [
-        "## Hume Energy Cube",
-        "A battery: 1,000,000 FE and 10,000 FE/t per cube. Touching cubes join into one bigger battery that pushes into the machines and cables around it.",
-        "## Energy Cable",
-        "Joins generators, batteries and machines into one network moving up to 100,000 FE/t. Generators power machines first and charge cubes with the rest.",
-        "## Energy Meter",
-        "Place it between a generator or battery and what it powers: it works out which way the energy flows by itself (in at the back, out at the front). The wrench flips it. Its screens show the FE/t passing through. Right-click for the total, and read it with a comparator: the signal rises with the flow."
-      ]
+      ],
+      "tab": "power"
     },
     {
       "title": "Zero Point Module",
@@ -117,7 +70,8 @@
         "- Take the energy from either end.",
         "- Stained glass in the gap colours the beam.",
         "- The beam burns anything that walks into it, and mobs it kills drop loot as if you had killed them."
-      ]
+      ],
+      "tab": "power"
     },
     {
       "title": "Glow Panels",
@@ -130,7 +84,8 @@
         "It pushes its energy into blocks beside and below it.",
         "## Glow Lamp",
         "A full-brightness lamp made from glow ink sacs, glass and glowstone dust."
-      ]
+      ],
+      "tab": "power"
     },
     {
       "title": "Blaze Furnace",
@@ -146,7 +101,8 @@
         "Right-click it with an empty hand to open its window. The fire in the middle column rises with the heat; each line is one more heat source, and its pip lights while that source is in use.",
         "## Showing the area",
         "Click the spyglass button in the furnace's or the Automatic Shears' window, or sneak-right-click either block with an empty hand, to show or hide its working area."
-      ]
+      ],
+      "tab": "power"
     },
     {
       "title": "Wool Burner",
@@ -161,6 +117,38 @@
         "A comparator reads how full its fuel slot is.",
         "## Data packs",
         "Fuels are data: data/<namespace>/barelyfunctionalcontraptions/wool_burner_fuel/<name>.json, each with an ingredient, a burn_time in ticks and a power in FE/t."
+      ],
+      "tab": "power"
+    },
+    {
+      "title": "Energy Storage",
+      "icon": "barelyfunctionalcontraptions:hume_energy_cube",
+      "tab": "power",
+      "text": [
+        "A battery: 1,000,000 FE and 10,000 FE/t per cube. Touching cubes join into one bigger battery that pushes into the machines and cables around it."
+      ]
+    },
+    {
+      "title": "Cables and Meter",
+      "icon": "barelyfunctionalcontraptions:energy_cable",
+      "tab": "logistics",
+      "text": [
+        "## Energy Cable",
+        "Joins generators, batteries and machines into one network moving up to 100,000 FE/t. Generators power machines first and charge cubes with the rest.",
+        "## Energy Meter",
+        "Place it between a generator or battery and what it powers: it works out which way the energy flows by itself (in at the back, out at the front). The wrench flips it. Its screens show the FE/t passing through. Right-click for the total, and read it with a comparator: the signal rises with the flow."
+      ]
+    },
+    {
+      "title": "Tanks and Pipes",
+      "icon": "barelyfunctionalcontraptions:fluid_tank",
+      "tab": "logistics",
+      "text": [
+        "## Fluid Tank",
+        "Holds 16 buckets of one fluid. Touching tanks join into one big tank that fills from the bottom up. Use buckets on it, or connect pipes on any side.",
+        "## Fluid Pipe",
+        "Carries fluid between anything that holds it, up to 4 buckets a tick. Machines are filled first, then tanks.",
+        "Item Pipes carry items the same way, up to 16 a tick, taking only from output slots so chests and machine inputs are never drained."
       ]
     },
     {
@@ -177,20 +165,60 @@
         "## Filters",
         "Sneak and right-click the plug with the wrench to open its filter: a 3x3 grid. Click a slot holding an item, or a bucket of a fluid, to filter it there; click with nothing to remove it. Only filtered things pass that side. The grid also has a mode button and a Clear button.",
         "Shortcut: hold an item in your other hand and right-click the plug with the wrench to add it to the filter, or remove it again."
+      ],
+      "tab": "logistics"
+    },
+    {
+      "title": "Infusing Sheep",
+      "icon": "minecraft:iron_ingot",
+      "text": [
+        "Right-click a grown sheep holding a resource, such as an Iron Ingot, a Diamond or a Red Mushroom.",
+        "- Its fleece takes the resource's colour, and small blocks of the resource grow out of it.",
+        "- Each infusion lasts 100 shearings by default.",
+        "- Breed infused sheep with wheat and the lamb is born infused too.",
+        "- Kill an infused sheep with its wool for a little extra.",
+        "Anything that isn't a resource works as normal, so wheat, dyes and shears behave as usual.",
+        "## More resources",
+        "Data packs can add any resource, and operators can run /barelyfunctionalcontraptions generate to make one for every metal in the modpack."
+      ],
+      "tab": "productive"
+    },
+    {
+      "title": "Themed Sheep",
+      "icon": "minecraft:nether_star",
+      "text": [
+        "Ten resources turn sheep into little versions of the mob they come from:",
+        "- Hay Bale: a hay fleece (wheat).",
+        "- Nether Star: two Wither Skeleton Skulls beside its head (nether stars).",
+        "- Dragon's Breath: dragon wings (dragon's breath).",
+        "- Glow Ink Sac: a glowing fleece that lights up the ground (glow ink).",
+        "- Bone Block and Wither Rose: skull faces and bony legs (bones).",
+        "- Spider Eye: extra legs and red eyes (spider eyes).",
+        "- Echo Shard: sculk tendrils (echo shards).",
+        "- Blaze Rod: always on fire, but never hurt (blaze rods).",
+        "- Ghast Tear: twice the size, tentacles, and it screams like a ghast (ghast tears).",
+        "Each one has its own advancement, and collecting every wool is a challenge."
+      ],
+      "tab": "productive"
+    },
+    {
+      "title": "Wool Machines",
+      "icon": "barelyfunctionalcontraptions:mechanical_separator",
+      "tab": "productive",
+      "text": [
+        "## Mechanical Separator",
+        "Put resource wool in and supply FE. Each wool gives 2 to 4 of its resource, 2 string and sometimes a bonus. Iron wool takes 20,000 FE over 5 seconds.",
+        "Its redstone button sets whether redstone turns it on or off. Hoppers and pipes can feed it and empty it.",
+        "## Automatic Shears",
+        "Shears every sheep in the 3x3 area in front of its blades, using 2,000 FE per sheep, and keeps the wool in 9 slots. Put a hopper or pipe under it to collect the wool."
       ]
     },
     {
-      "title": "Data Packs",
-      "icon": "minecraft:command_block",
+      "title": "Fluid Reservoir",
+      "icon": "barelyfunctionalcontraptions:fluid_reservoir",
+      "tab": "productive",
       "text": [
-        "Sheep resources are data: data/<namespace>/barelyfunctionalcontraptions/sheep_resources/<name>.json. They reload with /reload.",
-        "An appearance block gives any resource wings, extra heads, glowing, a bigger size, its own sounds and more.",
-        "Furnace heat sources are data too: data/<namespace>/barelyfunctionalcontraptions/furnace_heat/<name>.json names a sheep, an entity or a look such as on_fire, and its power. Boost items are the blaze_furnace_boost data map.",
-        "## Commands",
-        "- /barelyfunctionalcontraptions list: every loaded resource.",
-        "- /barelyfunctionalcontraptions generate: a resource for every material in the modpack.",
-        "- /barelyfunctionalcontraptions generate item <item>: a resource fed with any item.",
-        "Every number in the mod can be changed in its config files, from the mod list's Config button."
+        "Place it on top of an infinite water source and it fills with a bucket of water a second, which it pushes into tanks and generators beside it."
       ]
     }
   ]

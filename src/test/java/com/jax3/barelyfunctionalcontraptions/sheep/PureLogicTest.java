@@ -33,13 +33,19 @@ class PureLogicTest {
             assertTrue(in != null, "the guide's en_us.json is in the jar");
             var json = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
             var chapters = json.getAsJsonArray("chapters");
-            assertTrue(chapters.size() >= 10 && chapters.size() <= 14, "the chapter list fits the screen: " + chapters.size());
+            assertTrue(chapters.size() >= 10, "the guide has its chapters: " + chapters.size());
+            var perTab = new java.util.HashMap<String, Integer>();
             for (var element : chapters) {
                 var chapter = element.getAsJsonObject();
+                String tab = chapter.get("tab").getAsString();
+                assertTrue(java.util.List.of("power", "logistics", "productive", "utility").contains(tab), chapter.get("title") + " has a known tab: " + tab);
+                perTab.merge(tab, 1, Integer::sum);
                 assertFalse(chapter.get("title").getAsString().isBlank());
                 assertTrue(Identifier.tryParse(chapter.get("icon").getAsString()) != null, "icon id " + chapter.get("icon"));
                 assertFalse(chapter.getAsJsonArray("text").isEmpty(), chapter.get("title") + " has text");
             }
+            assertEquals(4, perTab.size(), "every tab has chapters: " + perTab);
+            perTab.forEach((tab, count) -> assertTrue(count <= 9, "the " + tab + " tab's list fits under the tabs: " + count));
         }
     }
 
