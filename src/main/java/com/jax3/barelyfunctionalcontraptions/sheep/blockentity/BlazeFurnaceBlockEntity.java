@@ -136,8 +136,8 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
     }
 
     /**
-     * The heating area: the columns within {@code [blaze_furnace] radius} blocks of the furnace (3x3 at the default
-     * radius 1), at its height and the block above. A mob counts when its feet are inside. The area outline shows the
+     * The heating area: the columns within {@code [blaze_furnace] radius} blocks of the furnace (5x5 at the default
+     * radius 2), at its height and the block above. A mob counts when its feet are inside. The area outline shows the
      * same box. The config is synced, so clients draw the outline at the server's radius.
      */
     public static AABB heatingArea(BlockPos pos) {

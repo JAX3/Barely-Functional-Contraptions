@@ -1,0 +1,5 @@
+{
+  "ingredient": "minecraft:string",
+  "burn_time": 50,
+  "power": 30
+}

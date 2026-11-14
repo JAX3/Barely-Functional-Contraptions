@@ -112,6 +112,10 @@ public final class DevScreenshotHarness {
             newBlocksTick(mc, server);
             return;
         }
+        if ("wool_burner".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            woolBurnerTick(mc, server);
+            return;
+        }
         if ("world_tour".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             worldTourTick(mc, server);
             return;
@@ -1564,6 +1568,83 @@ public final class DevScreenshotHarness {
             });
         }
         if (tick == end + 60) mc.stop();
+    }
+
+    /** Three Wool Burners (wool, string, Coal Wool) charging cubes, and one fed by a hopper: {@code -PharnessScene=wool_burner}. */
+    private static void woolBurnerTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> woolBurnerScene(server));
+            case 70 -> setHudHidden(mc, true);
+            case 120 -> server.execute(() -> {
+                for (int i = 0; i < 4; i++) {
+                    if (server.overworld().getBlockEntity(origin.offset(-5 + i * 3, 0, -4)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity be) {
+                        ResourcefulSheep.LOGGER.info("BURNER {} generating={} burn={}/{} fuel={} lit={}", i, be.generating(), be.burnTime(), be.burnTotal(), be.fuel(),
+                                be.getBlockState().getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.LIT));
+                    }
+                }
+            });
+            case 140 -> shot(mc, "76_wool_burners");
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "time set midnight"));
+            case 190 -> shot(mc, "77_wool_burners_night");
+            case 192 -> {
+                setHudHidden(mc, false);
+                command(server, "time set noon");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 1.5, origin.getY(), origin.getZ() - 1.5));
+            }
+            case 196 -> openAt(server, origin.offset(1, 0, -4)); // the Coal Wool burner
+            case 206 -> shot(mc, "78_wool_burner_gui");
+            // Hover over the fuel box for its list of fuels.
+            case 208 -> {
+                var window = mc.getWindow();
+                double scale = window.getGuiScale();
+                int left = (window.getGuiScaledWidth() - 176) / 2, top = (window.getGuiScaledHeight() - 193) / 2;
+                mc.mouseHandler.onMove(window.handle(), (left + 67) * scale, (top + 30) * scale, 0, 0);
+            }
+            case 225 -> shot(mc, "78_wool_burner_gui_fuels");
+            case 227 -> {
+                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+                if (mc.player != null) mc.player.closeContainer();
+                mc.gui.setScreen(new GuideScreen());
+            }
+            case 237 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter(11); }
+            case 250 -> shot(mc, "79_guide_wool_burner");
+            case 260 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    private static void woolBurnerScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false", "gamerule advance_weather false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(8, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(8, -1, 6))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
+        // Plain wool, string, Coal Wool, and one fed by a hopper from a chest of mixed wool. Each charges a cube behind it.
+        ItemStack[] fuels = {new ItemStack(Items.WOOL.white(), 32), new ItemStack(Items.STRING, 64),
+                com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("coal"), 16), ItemStack.EMPTY};
+        String[] names = {"Wool: 30 FE/t", "String: 30 FE/t", "Coal Wool: 120 FE/t", "Fed by a hopper"};
+        for (int i = 0; i < 4; i++) {
+            BlockPos at = o.offset(-5 + i * 3, 0, -4);
+            level.setBlock(at, ModBlocks.WOOL_BURNER.get().defaultBlockState()
+                    .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.FACING, Direction.SOUTH), 3);
+            if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity be) be.setItem(0, fuels[i]);
+            level.setBlock(at.north(), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+            label(server, at.above(i == 3 ? 3 : 1), names[i], i == 2 ? "gold" : "white");
+        }
+        BlockPos fed = o.offset(4, 0, -4);
+        level.setBlock(fed.above(), Blocks.HOPPER.defaultBlockState(), 3);
+        level.setBlock(fed.above(2), Blocks.CHEST.defaultBlockState(), 3);
+        if (level.getBlockEntity(fed.above(2)) instanceof net.minecraft.world.Container chest) {
+            chest.setItem(0, new ItemStack(Items.WOOL.red(), 64));
+            chest.setItem(1, new ItemStack(Items.WOOL.blue(), 64));
+            chest.setItem(2, new ItemStack(Items.STRING, 64));
+        }
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 20", o.getX() + 0.0, o.getY() + 2, o.getZ() + 4.5));
     }
 
     /** The Blaze Sheep Furnace with four Blaze sheep, and both machines' working areas shown: {@code -PharnessScene=blaze_furnace}. */

@@ -58,7 +58,7 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](s
 | ![Main creative tab](docs/screenshots/28_creative_tab_main.png) | ![Resource Wool creative tab](docs/screenshots/27_creative_tab_wool.png) |
 
 ### Contraptions Manual (in-game guide)
-Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game: getting started, each generator and machine, the sheep, fluids, energy, Glow Panels, the Blaze Sheep Furnace, pipe modes and filters, and data packs.
+Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game: getting started, each generator and machine, the sheep, fluids, energy, Glow Panels, the Blaze Sheep Furnace, the Wool Burner, pipe modes and filters, and data packs.
 
 | Chapters | A chapter |
 |---|---|
@@ -100,6 +100,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Special Delivery | Craft some Item Pipes |
 | Watt's Going On | Craft an Energy Meter |
 | Let There Be Glow | Craft a Glow Panel |
+| Fleece Navidad | Craft a Wool Burner |
 | ⭐ **Sheepish Combustion** (goal) | Be within 16 blocks of a Blaze Sheep Furnace when it starts making power from a Blaze sheep |
 | Wool You Look at That | Infuse a sheep with any resource |
 | Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
@@ -425,7 +426,7 @@ A generator that makes Forge Energy from the **heat of Blaze sheep** standing ar
 |---|---|
 | ![A Blaze Sheep Furnace with four burning Blaze sheep around and on top of it inside an orange outline, and Automatic Shears with a blue 3x3 outline](docs/screenshots/70_blaze_furnace.png) | ![Close-up of the furnace's lit front with Blaze sheep beside and on top of it](docs/screenshots/71_blaze_furnace_close.png) |
 
-- **Where the sheep go:** the **3×3 columns centred on the furnace**, at its own level and the block above. Sheep standing right next to it, at its corners, or on top of it all count. A sheep counts when its feet are in that area. To make the area bigger or smaller, change `radius` in `[blaze_furnace]` in the synced config: `1` is 3×3 (the default), `2` is 5×5, up to `8`. The area outline always matches it.
+- **Where the sheep go:** the **5×5 columns centred on the furnace** (two blocks out each way), at its own level and the block above. Sheep standing next to it, a block further out, or on top of it all count. A sheep counts when its feet are in that area. To make the area bigger or smaller, change `radius` in `[blaze_furnace]` in the synced config: `1` is 3×3, `2` is 5×5 (the default), up to `8`. The area outline always matches it.
 - **How much power:** one Blaze sheep gives **80 FE/t**. Each extra one adds a little less (the `falloff`, 12.5%), and the hottest four count (`maxHeatSources`):
 
   | Blaze sheep | Power |
@@ -481,6 +482,46 @@ When several files match, the most specific one wins: `sheep`, then `entity`, th
 ```
 
 `duration` is in ticks. Only the Blaze Rod is a boost item by default.
+
+### Wool Burner
+A simple generator that **burns spare wool** for Forge Energy: plain wool, string, and Coal Wool from coal-infused sheep.
+
+![Four Wool Burners: one burning white wool, one string, one Coal Wool, and one fed red and blue wool and string by a hopper from a chest above it](docs/screenshots/80_wool_burners.png)
+
+| Fuel | Power | Burns for | Energy per item |
+|---|---|---|---|
+| Plain wool (any colour) | 30 FE/t | 10 s | 6,000 FE |
+| String | 30 FE/t | 2.5 s | 1,500 FE |
+| Coal Wool | 120 FE/t | 20 s | 48,000 FE |
+
+- **Loading it:**
+  - right-click it with fuel;
+  - put fuel in the slot in its window (shift-click works);
+  - feed it with a hopper or pipe from any side.
+
+  The slot takes fuel only, and hoppers and pipes can't take it back out.
+- **Burning:** one item burns at a time, and the next is lit as soon as the last burns out. While its buffer is full it **waits** before lighting the next item, so no fuel is wasted.
+- **Output:** it stores 20,000 FE and pushes up to 1,000 FE/t into **every block around it** (`[wool_burner]` in the synced config). Cables and machines can also pull from it.
+- **Window:** right-click with an empty hand. It shows the energy buffer, a flame that burns down as the item burns, the FE/t and the time left, with a status lamp (*Burning*, *Out of fuel*, *Paused: buffer full*). Hover over the flame for the list of fuels. Jade shows the same, and a comparator reads how full the fuel slot is.
+- **Looks:** its front glows and crackles while it burns, and smoke rises from the chimney on top.
+- **Recipe:** iron ingots either side of a wool block, furnaces either side of a Functional Machine Block, and copper ingots either side of redstone. Mine it with a pickaxe; its fuel drops.
+
+| Window | Hover over the flame: the fuels |
+|---|---|
+| ![The Wool Burner window burning Coal Wool: +120 FE/t, 14s left, 15 Coal Wool in the slot](docs/screenshots/81_wool_burner_gui.png) | ![The same window with the fuel tooltip: Coal Wool 120 FE/t for 20s, String 30 FE/t for 2.5s, White Wool and 15 more 30 FE/t for 10s](docs/screenshots/82_wool_burner_gui_fuels.png) |
+
+#### Fuels in data packs
+Each file in `data/<namespace>/barelyfunctionalcontraptions/wool_burner_fuel/<name>.json` is one fuel:
+
+```json
+{ "ingredient": "#minecraft:wool", "burn_time": 200, "power": 30 }
+```
+
+- `ingredient`: any recipe ingredient. It can be an item, a tag, or the mod's `resource_wool` ingredient for one kind of resource wool. The built-in `coal_wool.json` uses `{"neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool", "resource": "barelyfunctionalcontraptions:coal"}`.
+- `burn_time`: ticks one item burns for.
+- `power`: FE/t while it burns.
+
+When several fuels match an item, the one that gives the most energy in all is used. To change a built-in fuel, use the same file path in your own data pack. Files may use NeoForge load conditions, and they reload with `/reload`.
 
 ### Energy Cable
 Cables carry Forge Energy from the **power generators** (Mycelial Generator, Zero Point Energy Module, Creative Generator) and the **Hume Energy Cube** to the machines that use it, so a machine no longer has to touch its power source.

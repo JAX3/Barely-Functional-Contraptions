@@ -2031,6 +2031,137 @@ def generate_blaze_furnace_gui():
     img.save(out("gui/blaze_furnace.png"))
 
 
+BURNER_FLAME = [  # 14x14 flame for the Wool Burner window: lit sprite, and a dim outline in the background
+    "......F.......",
+    ".....FF.......",
+    ".....FFF......",
+    "....FFFF..F...",
+    "...FFFYFF.FF..",
+    "...FFYYFFFFF..",
+    "..FFYYYYFFFF..",
+    "..FFYYWYYFFF..",
+    ".FFYYWWWYYFFF.",
+    ".FFYWWWWWYYFF.",
+    ".FFYWWWWWWYFF.",
+    ".FFYYWWWWYYFF.",
+    "..FFYYYYYYFF..",
+    "...FFFFFFFF...",
+]
+
+
+def generate_wool_burner_gui():
+    """Wool Burner window: energy gauge, fuel box (flame over the fuel slot), info window."""
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # energy gauge, fill 11..40 x 19..82
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 46, 16, 88, 84, GUI["gauge"])          # fuel box
+    grid(BURNER_FLAME, {"F": GUI["tick"], "Y": GUI["tick"], "W": GUI["tick"]}, img, 60, 24)
+    slot(img, 59, 56)                                 # fuel slot
+    inset(img, 92, 16, 168, 78, GUI["panel"])         # info window
+    for x in range(96, 164):
+        img.putpixel((x, 44), hexc("#2c2e36"))
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    rnd = random.Random(37)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice([hexc("#e3e1ea"), hexc("#b7b3c6"), FIRE[3]]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    for y in range(64):                                             # energy fill
+        for x in range(30):
+            c = mix(FIRE[4], FIRE[1], y / 63.0)
+            if (x + y) % 4 == 0:
+                c = mix(c, FIRE[5], 0.2)
+            img.putpixel((176 + x, y), c)
+    for k in range(1, 8):
+        ty = round(64 * k / 8)
+        for x in range(25, 30):
+            img.putpixel((176 + x, ty), mix(img.getpixel((176 + x, ty)), FIRE[5], 0.5))
+    for f in range(4):                                              # energy surface shimmer
+        for x in range(30):
+            img.putpixel((176 + x, 66 + f * 2), FIRE[5] if (x + f * 2) % 8 == 0 else FIRE[4])
+            img.putpixel((176 + x, 67 + f * 2), FIRE[3])
+    grid(BURNER_FLAME, {"F": FIRE[2], "Y": FIRE[4], "W": FIRE[5]}, img, 176, 80)   # lit flame
+    img.save(out("gui/wool_burner.png"))
+
+
+WOOL_BURNER_TOP = [  # top: casing around a round chimney
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMMMMMMMbSSO",
+    "OHMMMMOOOOMMMMSO",
+    "OHMMMOkkkkOMMMSO",
+    "OHMMOkKKKKkOMMSO",
+    "OHMMOkKVVKkOMMSO",
+    "OHMMOkKVVKkOMMSO",
+    "OHMMOkKKKKkOMMSO",
+    "OHMMMOkkkkOMMMSO",
+    "OHMMMMOOOOMMMMSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+WOOL_BURNER_SIDE = [  # side: casing with a wool bale emblem
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMMMMMMMbSSO",
+    "OHMMMOOOOOOMMMSO",
+    "OHMMOWWwWWwOMMSO",
+    "OHMMOwWWwWWOMMSO",
+    "OHMMOWwWWwWOMMSO",
+    "OHMMOvwvvwvOMMSO",
+    "OHMMMOOOOOOMMMSO",
+    "OHMOVVVVVVVVOMSO",
+    "OHMOOOOOOOOOOMSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+
+def generate_wool_burner():
+    """Wool Burner: front (cold, and animated fire with a tuft of wool in it), sides and chimney top (cold and lit)."""
+    pal = dict(CARTOON)
+    front = grid(BLAZE_FURNACE_FRONT, pal)
+    _fire_mouth(front, 0, 0, False)
+    for (x, y) in [(6, 9), (7, 9), (8, 9), (7, 8), (9, 10), (6, 10)]:   # a tuft of wool on the grate
+        front.putpixel((x, y), hexc("#b7b3c6"))
+    front.save(out("block/wool_burner_front.png"))
+    frames = 8
+    anim = Image.new("RGBA", (16, 16 * frames), CLEAR)
+    for t in range(frames):
+        grid(BLAZE_FURNACE_FRONT, pal, anim, 0, 16 * t)
+        _fire_mouth(anim, 16 * t, t, True)
+        for (x, y) in [(6, 10), (7, 10), (8, 10), (7, 9)]:                 # the wool glowing as it burns
+            anim.putpixel((x, 16 * t + y), FIRE[4] if (t + x) % 3 else FIRE[5])
+    anim.save(out("block/wool_burner_front_on.png"))
+    with open(out("block/wool_burner_front_on.png") + ".mcmeta", "w") as f:
+        f.write('{\n  "animation": {\n    "frametime": 3\n  }\n}\n')
+    cold = dict(CARTOON)
+    cold["V"] = hexc("#2a2238")
+    lit = dict(CARTOON)
+    lit["V"] = hexc("#ff8a2a")
+    grid(WOOL_BURNER_SIDE, cold).save(out("block/wool_burner_side.png"))
+    grid(WOOL_BURNER_SIDE, lit).save(out("block/wool_burner_side_lit.png"))
+    grid(WOOL_BURNER_TOP, cold).save(out("block/wool_burner_top.png"))
+    grid(WOOL_BURNER_TOP, lit).save(out("block/wool_burner_top_lit.png"))
+
+
 ADVANCEMENT_BACKGROUND = [  # dim blue-steel floor plate, tiled behind the advancement tab
     "SMMMMMMMMMMMMMMS",
     "MbMMMMMMMMMMMMbM",
@@ -2652,6 +2783,7 @@ def main():
     generate_energy_meter()
     generate_glow_panel()
     generate_blaze_furnace()
+    generate_wool_burner()
     generate_manual()
     generate_reservoir_gui()
     generate_energy_cube()
@@ -2660,6 +2792,7 @@ def main():
     generate_tank_gui()
     generate_zero_point_gui()
     generate_blaze_furnace_gui()
+    generate_wool_burner_gui()
     generate_advancement_background()
     generate_jei()
     generate_logo()

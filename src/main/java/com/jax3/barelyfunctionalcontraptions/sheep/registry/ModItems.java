@@ -38,6 +38,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> GLOW_PANEL = REGISTER.registerSimpleBlockItem(ModBlocks.GLOW_PANEL);
     public static final DeferredItem<BlockItem> GLOW_LAMP = REGISTER.registerSimpleBlockItem(ModBlocks.GLOW_LAMP);
     public static final DeferredItem<BlockItem> BLAZE_FURNACE = REGISTER.registerSimpleBlockItem(ModBlocks.BLAZE_FURNACE);
+    public static final DeferredItem<BlockItem> WOOL_BURNER = REGISTER.registerSimpleBlockItem(ModBlocks.WOOL_BURNER);
 
     /** The in-game guide. */
     public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem> CONTRAPTIONS_MANUAL = REGISTER.registerItem("contraptions_manual",

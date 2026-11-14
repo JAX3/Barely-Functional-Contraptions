@@ -1,0 +1,10 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "front": "barelyfunctionalcontraptions:block/wool_burner_front",
+    "side": "barelyfunctionalcontraptions:block/wool_burner_side",
+    "top": "barelyfunctionalcontraptions:block/wool_burner_top",
+    "bottom": "barelyfunctionalcontraptions:block/blaze_furnace_side",
+    "particle": "barelyfunctionalcontraptions:block/wool_burner_side"
+  }
+}

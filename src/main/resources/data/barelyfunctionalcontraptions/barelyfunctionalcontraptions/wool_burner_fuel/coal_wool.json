@@ -1,0 +1,8 @@
+{
+  "ingredient": {
+    "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool",
+    "resource": "barelyfunctionalcontraptions:coal"
+  },
+  "burn_time": 400,
+  "power": 120
+}

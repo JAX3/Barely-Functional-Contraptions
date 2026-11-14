@@ -160,6 +160,8 @@ public final class ModGameTests {
         TESTS.put("blaze_furnace_blaze_rod_boost", ModGameTests::blazeFurnaceBoost);
         TESTS.put("blaze_furnace_heat_sources_are_data", ModGameTests::blazeFurnaceData);
         TESTS.put("machines_show_their_working_area", ModGameTests::machineAreaToggle);
+        TESTS.put("wool_burner_burns_wool_string_and_coal_wool", ModGameTests::woolBurnerFuels);
+        TESTS.put("wool_burner_waits_while_full_and_takes_only_fuel", ModGameTests::woolBurnerFullAndHoppers);
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
@@ -1048,7 +1050,7 @@ public final class ModGameTests {
                 "the Functional Machine Block has a shaped recipe");
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FUNCTIONAL_MACHINE_BLOCK.get().defaultBlockState()
                 .is(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE), "mined with a pickaxe");
-        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "fluid_tank", "zero_point_energy_module", "blaze_furnace")) {
+        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "fluid_tank", "zero_point_energy_module", "blaze_furnace", "wool_burner")) {
             var holder = recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
                     ResourcefulSheep.id(machine))).orElse(null);
             h.assertTrue(holder != null && holder.value() instanceof net.minecraft.world.item.crafting.ShapedRecipe, "missing recipe " + machine);
@@ -2569,9 +2571,11 @@ public final class ModGameTests {
         h.assertTrue(furnace.showsArea() && shears.showsArea(), "sneak-clicking shows the areas");
         h.assertTrue(furnace.displayedArea().equals(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.heatingArea(h.absolutePos(FURNACE_POS))),
                 "the furnace shows its heating area");
-        // The area follows [blaze_furnace] radius: 1 (the default) is 3x3, 2 is 5x5, always two blocks tall.
+        // The area follows [blaze_furnace] radius: 1 is 3x3, 2 (the default) is 5x5, always two blocks tall.
         BlockPos abs = h.absolutePos(FURNACE_POS);
-        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.blazeFurnaceRadius.getDefault() == 1, "the radius defaults to 1");
+        h.assertTrue(furnace.displayedArea().equals(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.heatingArea(abs,
+                com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.blazeFurnaceRadius))),
+                "the area uses the configured radius");
         var r1 = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.heatingArea(abs, 1);
         var r2 = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.heatingArea(abs, 2);
         var r0 = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.heatingArea(abs, 0);
@@ -2611,6 +2615,74 @@ public final class ModGameTests {
         furnaceMenu.quickMoveStack(player, 1 + 27); // hotbar slot 0
         h.assertTrue(furnace.boostItems().getCount() == 3, "shift-clicking Blaze Rods puts them in the furnace, got " + furnace.boostItems());
         h.succeed();
+    }
+
+    // ------------------------------------------------------------------ Wool Burner
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity burner(GameTestHelper h, BlockPos pos, ItemStack fuel) {
+        h.setBlock(pos, ModBlocks.WOOL_BURNER.get());
+        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity.class);
+        be.setItem(0, fuel);
+        return be;
+    }
+
+    private static void woolBurnerFuels(GameTestHelper h) {
+        var wool = burner(h, new BlockPos(1, 1, 1), new ItemStack(Items.WOOL.red(), 2));
+        var string = burner(h, new BlockPos(3, 1, 1), new ItemStack(Items.STRING, 4));
+        var coal = burner(h, new BlockPos(5, 1, 1), com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("coal"), 1));
+        var iron = burner(h, new BlockPos(1, 1, 4), com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(IRON, 1));
+        var cube = cube(h, new BlockPos(1, 1, 2));
+        h.runAfterDelay(5, () -> {
+            h.assertTrue(wool.generating() == 30 && wool.burnTotal() == 200 && wool.fuel().getCount() == 1,
+                    "plain wool: 30 FE/t for 200 ticks, one used, got " + wool.generating() + " / " + wool.burnTotal() + " / " + wool.fuel());
+            h.assertTrue(string.generating() == 30 && string.burnTotal() == 50 && string.fuel().getCount() == 3,
+                    "string: 30 FE/t for 50 ticks, got " + string.generating() + " / " + string.burnTotal());
+            h.assertTrue(coal.generating() == 120 && coal.burnTotal() == 400 && coal.fuel().isEmpty(),
+                    "Coal Wool: 120 FE/t for 400 ticks, got " + coal.generating() + " / " + coal.burnTotal());
+            h.assertTrue(iron.generating() == 0 && iron.fuel().getCount() == 1, "Iron Wool isn't a fuel");
+            h.assertTrue(h.getBlockState(new BlockPos(1, 1, 1)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.LIT), "it lights up");
+            h.assertTrue(cube.getEnergyHandler().getAmountAsLong() > 0, "it charges the cube beside it");
+            // String burns out after 50 ticks and the next one is lit straight away.
+            h.runAfterDelay(50, () -> {
+                h.assertTrue(string.fuel().getCount() == 2 && string.generating() == 30, "the next string is lit, left " + string.fuel());
+                h.succeed();
+            });
+        });
+    }
+
+    private static void woolBurnerFullAndHoppers(GameTestHelper h) {
+        // Full buffer, nothing taking power: the wool waits.
+        var full = burner(h, new BlockPos(1, 1, 1), new ItemStack(Items.WOOL.white(), 3));
+        var buffer = (net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler) full.getEnergyHandler();
+        buffer.set(buffer.getCapacityAsInt());
+        // Right-click with wool loads it; cobblestone doesn't go in.
+        BlockPos pos = new BlockPos(4, 1, 4);
+        var burner = burner(h, pos, ItemStack.EMPTY);
+        Player player = playerHolding(h, new ItemStack(Items.WOOL.blue(), 5));
+        h.getBlockState(pos).useItemOn(player.getMainHandItem(), h.getLevel(), player, InteractionHand.MAIN_HAND, hitTop(h, pos));
+        h.assertTrue(burner.fuel().is(Items.WOOL.blue()) && burner.fuel().getCount() == 5 && player.getMainHandItem().isEmpty(), "right-clicking with wool loads it");
+        h.assertFalse(burner.canPlaceItem(0, new ItemStack(Items.COBBLESTONE)), "cobblestone isn't fuel");
+        // A hopper pointing in adds string and keeps dirt; a hopper under it can't pull fuel out.
+        BlockPos fedPos = new BlockPos(1, 1, 4);
+        var fed = burner(h, fedPos, ItemStack.EMPTY);
+        h.setBlock(fedPos.north(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.SOUTH));
+        var hopper = h.getBlockEntity(fedPos.north(), net.minecraft.world.level.block.entity.HopperBlockEntity.class);
+        hopper.setItem(0, new ItemStack(Items.STRING, 2));
+        hopper.setItem(1, new ItemStack(Items.DIRT, 1));
+        h.setBlock(new BlockPos(4, 0, 4), Blocks.HOPPER);
+        h.runAfterDelay(30, () -> {
+            h.assertTrue(full.burnTime() == 0 && full.fuel().getCount() == 3, "with a full buffer it doesn't light more wool, left " + full.fuel());
+            h.assertTrue(hopper.getItem(1).is(Items.DIRT) && hopper.getItem(0).isEmpty(), "the hopper puts string in and keeps the dirt");
+            h.assertTrue(fed.burnTime() > 0 || fed.generating() > 0 || fed.fuel().getCount() < 2, "the string burns");
+            h.assertTrue(h.getBlockEntity(new BlockPos(4, 0, 4), net.minecraft.world.level.block.entity.HopperBlockEntity.class).isEmpty(),
+                    "the hopper under it can't pull wool out");
+            // Emptying the buffer lets it light again.
+            buffer.set(0);
+            h.runAfterDelay(3, () -> {
+                h.assertTrue(full.burnTime() > 0 && full.fuel().getCount() == 2, "once there's room it lights the next wool");
+                h.succeed();
+            });
+        });
     }
 
     private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity cube(GameTestHelper h, BlockPos pos) {

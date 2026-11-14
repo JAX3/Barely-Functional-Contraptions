@@ -133,6 +133,15 @@ public final class ModBlocks {
                     .sound(SoundType.IRON)
                     .lightLevel(state -> 15));
 
+    /** Burns wool, string and Coal Wool for FE. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock> WOOL_BURNER = REGISTER.registerBlock("wool_burner",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.IRON)
+                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.LIT) ? 13 : 0));
+
     /** Makes FE from the heat of Blaze sheep around it. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock> BLAZE_FURNACE = REGISTER.registerBlock("blaze_furnace",
             com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock::new,

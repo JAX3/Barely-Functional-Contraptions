@@ -107,6 +107,8 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue glowPanelLightRate;
         public final ModConfigSpec.IntValue glowPanelCapacity;
         public final ModConfigSpec.IntValue glowPanelOutput;
+        public final ModConfigSpec.IntValue woolBurnerCapacity;
+        public final ModConfigSpec.IntValue woolBurnerOutput;
         public final ModConfigSpec.IntValue blazeFurnaceRadius;
         public final ModConfigSpec.IntValue blazeFurnaceMaxHeaters;
         public final ModConfigSpec.DoubleValue blazeFurnaceFalloff;
@@ -259,8 +261,15 @@ public final class ModConfigs {
                     .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
             b.pop();
 
+            b.comment("Wool Burner (burns wool, string and Coal Wool for FE; fuels are data-driven, see wool_burner_fuel)").push("wool_burner");
+            woolBurnerCapacity = b.comment("FE each Wool Burner stores. It stops burning while this is full, so no fuel is wasted.")
+                    .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
+            woolBurnerOutput = b.comment("Most FE a Wool Burner pushes into the blocks around it per tick, in total.")
+                    .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
             b.comment("Blaze Sheep Furnace (makes FE from the heat of Blaze sheep in the area around and above it; heat sources are data-driven, see furnace_heat)").push("blaze_furnace");
-            blazeFurnaceRadius = b.comment("How far out the heating area reaches from the furnace, in blocks: 1 = the 3x3 columns around it (default), 2 = 5x5, and so on. It always covers the furnace's own level and the block above. The area outline follows it.")
+            blazeFurnaceRadius = b.comment("How far out the heating area reaches from the furnace, in blocks: 1 = the 3x3 columns around it, 2 = 5x5 (default), and so on. It always covers the furnace's own level and the block above. The area outline follows it.")
                     .defineInRange("radius", 2, 0, 8);
             blazeFurnaceMaxHeaters = b.comment("Most heat sources (sheep) one furnace counts; the hottest are used.")
                     .defineInRange("maxHeatSources", 4, 1, 64);

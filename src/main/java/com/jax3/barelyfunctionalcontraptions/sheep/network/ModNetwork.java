@@ -12,5 +12,8 @@ public final class ModNetwork {
         PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
         // Handled on the main thread (default), since it replaces state read by rendering and JEI.
         registrar.playToClient(SyncSheepResourcesPayload.TYPE, SyncSheepResourcesPayload.STREAM_CODEC, SyncSheepResourcesPayload::handle);
+        registrar.playToClient(com.jax3.barelyfunctionalcontraptions.sheep.burner.WoolBurnerFuels.SyncPayload.TYPE,
+                com.jax3.barelyfunctionalcontraptions.sheep.burner.WoolBurnerFuels.SyncPayload.STREAM_CODEC,
+                com.jax3.barelyfunctionalcontraptions.sheep.burner.WoolBurnerFuels.SyncPayload::handle);
     }
 }
