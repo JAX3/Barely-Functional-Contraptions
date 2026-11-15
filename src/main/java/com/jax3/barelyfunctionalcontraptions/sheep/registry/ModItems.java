@@ -47,6 +47,10 @@ public final class ModItems {
     public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem> WOOL_BALE = REGISTER.registerItem("wool_bale",
             p -> new com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem(ModBlocks.WOOL_BALE.get(), p.useBlockDescriptionPrefix()));
 
+    /** A sheep spawn egg per resource; the {@link ModDataComponents#SHEEP_RESOURCE} component says which, and the sheep comes infused. */
+    public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceSheepSpawnEggItem> RESOURCE_SHEEP_SPAWN_EGG = REGISTER.registerItem("resource_sheep_spawn_egg",
+            com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceSheepSpawnEggItem::new);
+
     /** The in-game guide. */
     public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem> CONTRAPTIONS_MANUAL = REGISTER.registerItem("contraptions_manual",
             com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem::new, p -> p.stacksTo(1));

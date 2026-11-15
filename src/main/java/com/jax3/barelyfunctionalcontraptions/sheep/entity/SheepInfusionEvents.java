@@ -80,6 +80,13 @@ public final class SheepInfusionEvents {
             return;
         }
 
+        if (stack.getItem() instanceof com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceSheepSpawnEggItem && target instanceof Sheep parent) {
+            // An infused lamb, as a vanilla egg would give a plain one.
+            event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            if (level instanceof ServerLevel serverLevel) com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceSheepSpawnEggItem.spawnLamb(serverLevel, player, parent, stack);
+            return;
+        }
         if (stack.is(net.minecraft.world.item.Items.MELON_SLICE) && target instanceof Sheep sheep && MELON_SKIN_PLAYER.equals(player.getUUID())) {
             feedMelonSlice(event, player, sheep, stack);
             return;

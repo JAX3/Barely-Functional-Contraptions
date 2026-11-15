@@ -122,6 +122,7 @@ public final class ModGameTests {
         TESTS.put("energy_cube_gui_values", ModGameTests::cubeGui);
         TESTS.put("energy_cube_stack_fills_bottom_up", ModGameTests::cubeStack);
         TESTS.put("creative_tabs_split_wool", ModGameTests::creativeTabs);
+        TESTS.put("resource_spawn_eggs_spawn_infused_sheep", ModGameTests::spawnEggs);
         TESTS.put("killing_infused_sheep_drops_more_than_shearing", ModGameTests::killInfused);
         TESTS.put("machines_are_built_from_functional_machine_block", ModGameTests::machineBlockRecipes);
         TESTS.put("all_blocks_use_iron_block_sounds", ModGameTests::ironSounds);
@@ -3323,13 +3324,39 @@ public final class ModGameTests {
         h.assertTrue(main.stream().anyMatch(s -> s.is(ModItems.MECHANICAL_SEPARATOR.get()))
                 && main.stream().anyMatch(s -> s.is(ModItems.HUME_ENERGY_CUBE.get())), "machines stay in the main tab");
         h.assertTrue(main.stream().noneMatch(s -> s.is(ModItems.WOOL_BALE.get())), "no bales in the main tab");
-        h.assertTrue(!wool.isEmpty() && wool.stream().allMatch(s -> s.is(ModItems.RESOURCE_WOOL.get()) || s.is(ModItems.WOOL_BALE.get())),
-                "the wool tab holds only resource wool and bales");
+        h.assertTrue(!wool.isEmpty() && wool.stream().allMatch(s -> s.is(ModItems.RESOURCE_WOOL.get()) || s.is(ModItems.WOOL_BALE.get())
+                        || s.is(ModItems.RESOURCE_SHEEP_SPAWN_EGG.get())), "the wool tab holds only resource wool, bales and spawn eggs");
+        h.assertTrue(main.stream().noneMatch(s -> s.is(ModItems.RESOURCE_SHEEP_SPAWN_EGG.get())), "no spawn eggs in the main tab");
+        long eggs = wool.stream().filter(s -> s.is(ModItems.RESOURCE_SHEEP_SPAWN_EGG.get())).count();
         long pieces = wool.stream().filter(s -> s.is(ModItems.RESOURCE_WOOL.get())).count();
         long bales = wool.stream().filter(s -> s.is(ModItems.WOOL_BALE.get())).count();
         h.assertTrue(pieces >= com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.BUILT_IN_WOOL.size(),
                 "every built-in wool type, got " + pieces);
         h.assertTrue(bales == pieces, "a bale of every wool, got " + bales + " for " + pieces);
+        h.assertTrue(eggs == pieces, "a spawn egg of every sheep, got " + eggs + " for " + pieces);
+        h.succeed();
+    }
+
+    /** A resource egg on the ground spawns a sheep already infused for its full shearings; on a sheep, an infused lamb. */
+    private static void spawnEggs(GameTestHelper h) {
+        var egg = com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceSheepSpawnEggItem.create(ResourcefulSheep.id("diamond"), 2);
+        Player player = playerHolding(h, egg);
+        h.assertTrue(egg.getHoverName().getString().equals("Diamond Sheep Spawn Egg"), "named for its sheep, was " + egg.getHoverName().getString());
+        BlockPos floor = h.absolutePos(new BlockPos(2, 0, 2));
+        var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floor), net.minecraft.core.Direction.UP, floor, false);
+        var result = egg.useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND, hit));
+        h.assertTrue(result.consumesAction(), "the egg is used, got " + result);
+        var spawned = h.getLevel().getEntitiesOfClass(Sheep.class, new net.minecraft.world.phys.AABB(floor.above()).inflate(1));
+        h.assertTrue(spawned.size() == 1, "one sheep spawns, got " + spawned.size());
+        Sheep sheep = spawned.get(0);
+        int uses = SheepResourceRegistry.server().byId(ResourcefulSheep.id("diamond")).orElseThrow().effectiveInfusionUses();
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).resource().map(ResourcefulSheep.id("diamond")::equals).orElse(false), "it comes infused with Diamond");
+        h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == uses, "for its full shearings, has " + SheepInfusionEvents.getInfusion(sheep).usesRemaining());
+        h.assertTrue(egg.getCount() == 1, "one egg used");
+
+        var lamb = com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceSheepSpawnEggItem.spawnLamb(h.getLevel(), player, sheep, egg);
+        h.assertTrue(lamb.isPresent() && lamb.get().isBaby(), "used on a sheep it gives a lamb");
+        h.assertTrue(SheepInfusionEvents.getInfusion(lamb.get()).resource().map(ResourcefulSheep.id("diamond")::equals).orElse(false), "and the lamb is infused too");
         h.succeed();
     }
 }

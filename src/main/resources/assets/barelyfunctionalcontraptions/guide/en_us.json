@@ -197,6 +197,7 @@
         "- Each infusion lasts 100 shearings by default.",
         "- Breed infused sheep with wheat and the lamb is born infused too.",
         "- Kill an infused sheep with its wool for a little extra.",
+        "- In creative, the Resource Wool tab has a spawn egg for every sheep, which spawns it already infused.",
         "Anything that isn't a resource works as normal, so wheat, dyes and shears behave as usual.",
         "## More resources",
         "Data packs can add any resource, and operators can run /barelyfunctionalcontraptions generate to make one for every metal in the modpack.",

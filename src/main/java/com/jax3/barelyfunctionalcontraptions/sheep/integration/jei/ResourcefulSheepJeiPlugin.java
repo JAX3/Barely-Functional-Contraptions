@@ -43,6 +43,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         // Each resource wool variant is a distinct JEI ingredient.
         registration.registerFromDataComponentTypes(ModItems.RESOURCE_WOOL.get(), ModDataComponents.SHEEP_RESOURCE.get());
         registration.registerFromDataComponentTypes(ModItems.WOOL_BALE.get(), ModDataComponents.SHEEP_RESOURCE.get());
+        registration.registerFromDataComponentTypes(ModItems.RESOURCE_SHEEP_SPAWN_EGG.get(), ModDataComponents.SHEEP_RESOURCE.get());
     }
 
     @Override

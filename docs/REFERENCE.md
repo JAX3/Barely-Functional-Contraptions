@@ -233,6 +233,7 @@ Right-click an **adult** sheep while holding a resource, for example an **Iron I
 - **Each infusion lasts 100 shearings by default**, whatever the resource (`infusionUsesOverride` in the config). Set that to `-1` to use each resource's own count instead: iron, gold, copper, redstone, lapis and coal last **9** shearings, and diamond, emerald, netherite scrap, cobblestone, oak log, quartz and the mushrooms last **1** or **3**.
 - Feeding an item that isn't a resource does nothing special, so wheat breeding, dyes and so on work as normal.
 - Sneak + right-click a sheep with an empty hand to see its infusion and how many shearings it has left.
+- **Spawn eggs:** the creative *Resource Wool* tab ends with a spawn egg for every sheep, coloured like its wool. The sheep it spawns is already infused, with its full shearings; used on a sheep it gives an infused lamb, and on a spawner it sets a plain sheep spawner.
 - **Breeding keeps the infusion.** Breed infused sheep with wheat as normal and the lamb is born infused with its parents' resource, with a **full set of shearings**. Its fleece shows the resource colour straight away, and the resource blocks grow in once it's an adult. Its wool, like any lamb's, can only be sheared once it has grown up.
   - Two parents with **different** resources (Diamond + Emerald) pass on **one of the two at random**.
   - **One** infused parent is enough by default, so an Iron sheep and a plain white one have an Iron lamb (set `breedingNeedsBothParents` to require both).
@@ -620,7 +621,7 @@ Put a bale on its own anywhere in a crafting grid (the inventory's 2x2 grid work
 ![A Diamond Wool Bale in the inventory's crafting grid, with 9 Diamond Wool in the result slot](screenshots/90_unpack_wool_bale.png)
 
 #### Placing bales
-A bale can be placed like a hay bale, standing up or lying down, in the colour of its wool with two steel straps round it. It softens falls the same way, breaks fastest with a hoe, and drops the same bale back. Pick-block gives the bale too. The creative Resource Wool tab has a bale of every wool after the wools.
+A bale can be placed like a hay bale, standing up or lying down, in the colour of its wool with two steel straps round it. It softens falls the same way, breaks fastest with a hoe, and drops the same bale back. Pick-block gives the bale too. The creative Resource Wool tab has a bale of every wool after the wools, then a spawn egg for every sheep.
 
 | Placed bales | The packer's window, pressing |
 |---|---|

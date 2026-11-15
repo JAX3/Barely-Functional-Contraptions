@@ -8,7 +8,7 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.0.jar` |
 | Unit tests | `./gradlew test` | ✅ 39/39 passed |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 135 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 100 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 136 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 101 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 51 screenshots and 12 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Themed sheep (the ideas in `Custom block.txt`)
@@ -255,6 +255,12 @@ The Functional Machine Block has a shaped recipe and is mined with a pickaxe, an
 ### Creative tabs (`creative_tabs_split_wool`)
 
 The machines and tools are in the *Barely Functional Contraptions* tab, and every resource wool type is in its own *Resource Wool* tab right after it. The test rebuilds the creative tabs and checks that the main tab has no resource wool but does have the machines, and that the wool tab holds only resource wool, at least every built-in type. In the real client (`28_creative_tab_main.png`, `27_creative_tab_wool.png`) the main tab shows the Functional Machine Block and the eight machines and tools, and the wool tab shows all 15 wool types, including the three made by the harness's generate commands.
+
+### Resource sheep spawn eggs (`resource_spawn_eggs_spawn_infused_sheep`)
+
+The *Resource Wool* tab ends with a spawn egg for every sheep, after the wools and the Wool Bales; the creative-tab test checks there is one egg per wool and none in the main tab. This test uses a Diamond Sheep Spawn Egg on the ground: one sheep spawns, already infused with Diamond for its full shearings, and one egg is used. Used on that sheep it gives a lamb, also infused with Diamond. In the real client the eggs show in each sheep's wool colour with their names and tooltips, and JEI lists each one separately:
+
+![The Resource Wool creative tab scrolled to its end: Wool Bales, then a spawn egg in each sheep's wool colour, with the Redstone Sheep Spawn Egg's tooltip](docs/screenshots/showcase_tab_eggs.png)
 
 ### JEI: no tag pages for this mod's own tags
 

@@ -14,7 +14,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/** The mod's creative tabs: machines and tools, then all the resource wool. */
+/** The mod's creative tabs: machines and tools, then all the resource wool, Wool Bales and resource sheep spawn eggs. */
 public final class ContraptionsCreativeTab {
     public static final DeferredRegister<CreativeModeTab> REGISTER = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, BarelyFunctionalContraptions.MOD_ID);
 
@@ -70,6 +70,8 @@ public final class ContraptionsCreativeTab {
                 ids.forEach(id -> output.accept(ResourceWoolItem.create(id, 1)));
                 // Then a bale of each.
                 ids.forEach(id -> output.accept(com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(id, 1)));
+                // Then a spawn egg of each, for a sheep that comes already infused.
+                ids.forEach(id -> output.accept(com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceSheepSpawnEggItem.create(id, 1)));
             })
             .build());
 

@@ -99,7 +99,7 @@ Presses 9 of the same resource wool into a Wool Bale. A bale in the Mechanical S
 
 ### Infusing Sheep
 
-Right-click a grown sheep with a resource, such as an Iron Ingot, a Diamond or a Red Mushroom. Its fleece takes the resource's colour, and each infusion lasts 100 shearings. Lambs of infused sheep are born infused too.
+Right-click a grown sheep with a resource, such as an Iron Ingot, a Diamond or a Red Mushroom. Its fleece takes the resource's colour, and each infusion lasts 100 shearings. Lambs of infused sheep are born infused too. In creative, the Resource Wool tab has a spawn egg for every sheep, which spawns it already infused.
 
 ![Infused sheep, with one showing what it is infused with](docs/screenshots/07_sheep_closeup.png)
 
@@ -112,6 +112,8 @@ Ten resources turn sheep into little versions of their mob: dragon wings, Wither
 All 24 built-in sheep:
 
 ![All 24 built-in resource sheep standing in rows, each labelled with its resource](docs/screenshots/showcase_sheep.png)
+
+![The Resource Wool creative tab scrolled to its end: Wool Bales, then a spawn egg in each sheep's wool colour, with the Redstone Sheep Spawn Egg's tooltip](docs/screenshots/showcase_tab_eggs.png)
 
 ### Infusion Altar
 

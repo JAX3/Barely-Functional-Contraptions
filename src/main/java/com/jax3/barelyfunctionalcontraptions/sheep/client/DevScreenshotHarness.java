@@ -1678,10 +1678,18 @@ public final class DevScreenshotHarness {
             case 252 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get());
             case 256, 236 -> mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // no tooltip in the shot
             case 270 -> shot(mc, "showcase_tab_wool");
-            case 280 -> mc.stop();
+            case 272 -> {
+                // Scroll to the bottom of the tab, where the spawn eggs are, and point at one for its tooltip.
+                if (mc.gui.screen() != null) mc.gui.screen().mouseScrolled(213, 120, 0, -20);
+            }
+            case 276 -> mc.mouseHandler.onMove(mc.getWindow().handle(), EGG_MOUSE_X, EGG_MOUSE_Y, 0, 0);
+            case 290 -> shot(mc, "showcase_tab_eggs");
+            case 300 -> mc.stop();
             default -> {}
         }
     }
+
+    static final int EGG_MOUSE_X = 455, EGG_MOUSE_Y = 455;
 
     private static final String[][] SHOWCASE_ROWS = {
             {"mechanical_separator", "automatic_shears", "wool_packer", "infusion_altar", "wool_bale"},
