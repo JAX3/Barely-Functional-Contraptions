@@ -67,7 +67,7 @@ Craft a **Contraptions Manual** (a book and a Functional Machine Block) and righ
 - **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, and data packs and commands.
 - **Recipes:** built from the game itself, so it matches any data-pack or modpack changes. *Machines* and *Parts and Tools* show every crafting recipe of the mod as a 3x3 grid; *Infusion* shows what each sheep is fed and the wool it grows; *Infusion Altar* shows the catalysts round the feeding item, with the tier and power; *Mechanical Separator* shows what every wool separates into, with the power and time; *Wool Bales* shows packing, unpacking and what every bale separates into. Ingredients that take any of several items cycle through them, and hovering over an item shows its tooltip.
-- **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned late-game generators that need upkeep: *Hume's Fork*, *Echo Chamber* (a Warden sheep in a sculk room), *Lightning Array* and *Fleece Fusion*. None of them is in the game yet. A resource pack's guide file puts a chapter here with `"tab": "wip"`.
+- **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned late-game generators that need upkeep: *Hume Field Generator*, *Echo Chamber* (a Warden sheep in a sculk room), *Lightning Array* and *Fleece Fusion*. None of them is in the game yet. A resource pack's guide file puts a chapter here with `"tab": "wip"`.
 
 Hover over a tab to see its name. A resource pack's guide file can still use the tab's old name, `"productive"`; it now means Production.
 
