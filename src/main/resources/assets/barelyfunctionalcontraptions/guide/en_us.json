@@ -228,7 +228,7 @@
       "tab": "production",
       "text": [
         "Most resources are tier 1 and can be fed to a sheep by hand. The Wither, Dragon and Warden sheep are tier 2: their Nether Star, Dragon's Breath or Echo Shard only works at an Infusion Altar.",
-        "Put the feeding item in the centre slot and the catalysts in the four slots round it, power the altar, and stand a grown sheep within 2 blocks of it. The sheep takes the resource when the bar fills, and the items are used up then.",
+        "Put the feeding item in the centre slot and the catalysts in the four slots round it, power the altar, and stand a grown sheep within 2 blocks of it. The sheep takes the resource when the bar fills, and the items are used up then. The altar slows the sheep down while it works, so it doesn't wander off, and lets it go once it's done.",
         "## Tier 2 catalysts",
         "- Wither: 4 Soul Sand, 2 Bone Blocks, 1 Wither Rose.",
         "- Dragon: 4 End Stone, 4 Popped Chorus Fruit, 2 Eyes of Ender.",

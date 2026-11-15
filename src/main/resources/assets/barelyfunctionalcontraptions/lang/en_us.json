@@ -894,6 +894,7 @@
   "barelyfunctionalcontraptions.configuration.altarOnlyFromTier": "Altar-only from tier",
   "barelyfunctionalcontraptions.configuration.baseEnergy": "Tier 1 energy (FE)",
   "barelyfunctionalcontraptions.configuration.highTierEnergy": "Tier 2+ energy (FE)",
+  "barelyfunctionalcontraptions.configuration.sheepSlowness": "Sheep Slowness while infusing",
   "barelyfunctionalcontraptions.configuration.ticks": "Ticks per infusion",
   "jei.barelyfunctionalcontraptions.altar_catalyst": "Catalyst: used up when the infusion finishes",
   "jei.barelyfunctionalcontraptions.altar_line": "Tier %s · %s FE"

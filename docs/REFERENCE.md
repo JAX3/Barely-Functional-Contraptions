@@ -258,7 +258,7 @@ Every sheep has three stats from **1 to 10**. Wild sheep are all 1s, and you rai
 ### Infusion tiers and the Infusion Altar
 Most resources are **tier 1** and are fed by hand. The **Wither, Dragon and Warden sheep are tier 2**: right-clicking a sheep with a Nether Star, Dragon's Breath or Echo Shard now only tells you it needs an altar, and the item isn't used.
 
-The **Infusion Altar** is a powered pedestal. Put the feeding item in its **centre slot** and the **catalysts** in the four slots around it, give it power, and stand a grown sheep **within 2 blocks** of it. A stream of the resource's colour runs from the altar to the sheep, and when the bar fills the sheep is infused. The items and power are only used when it finishes.
+The **Infusion Altar** is a powered pedestal. Put the feeding item in its **centre slot** and the **catalysts** in the four slots around it, give it power, and stand a grown sheep **within 2 blocks** of it. A stream of the resource's colour runs from the altar to the sheep, which is held nearly still with Slowness (only the sheep, and only until the infusion ends). When the bar fills the sheep is infused. The items and power are only used when it finishes.
 
 | Sheep | Feeding item | Catalysts | Power |
 |---|---|---|---|
@@ -907,6 +907,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `baseEnergy` / `highTierEnergy` | 20000 / 200000 | FE for a tier 1 / tier 2+ infusion when the definition doesn't say |
 | `ticks` | 100 | Ticks one infusion takes |
 | `energyCapacity` / `maxEnergyInput` | 250000 / 5000 | The altar's buffer and input rate |
+| `sheepSlowness` | 5 | Slowness level on the sheep while it is infused, taken off when it ends (0 = off) |
 
 **`[wool_packer]`**
 

@@ -927,10 +927,17 @@ public final class ModGameTests {
         var be = altar(h, pos, true, new ItemStack(Items.NETHER_STAR, 2), new ItemStack(Items.SOUL_SAND, 5),
                 new ItemStack(Items.BONE_BLOCK, 2), new ItemStack(Items.WITHER_ROSE, 1));
         Sheep sheep = sheepAt(h, new BlockPos(3, 1, 2), null);
+        Player watcher = playerHolding(h, ItemStack.EMPTY);
         int start = be.getEnergyHandler().getAmountAsInt();
-        h.runAfterDelay(20, () -> h.assertTrue(be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AltarStatus.INFUSING, "it infuses, was " + be.status()));
+        h.runAfterDelay(20, () -> {
+            h.assertTrue(be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AltarStatus.INFUSING, "it infuses, was " + be.status());
+            var slow = sheep.getEffect(net.minecraft.world.effect.MobEffects.SLOWNESS);
+            h.assertTrue(slow != null && slow.getAmplifier() == 4, "the sheep is slowed while it's infused, has " + slow);
+            h.assertTrue(watcher.getEffect(net.minecraft.world.effect.MobEffects.SLOWNESS) == null, "only the sheep is slowed");
+        });
         h.succeedWhen(() -> {
             h.assertTrue(SheepInfusionEvents.getInfusion(sheep).resource().map(wither::equals).orElse(false), "the sheep beside it becomes a Wither sheep");
+            h.assertTrue(sheep.getEffect(net.minecraft.world.effect.MobEffects.SLOWNESS) == null, "the Slowness is taken off when it's done");
             h.assertTrue(be.getItem(0).getCount() == 1, "one Nether Star used, left " + be.getItem(0));
             h.assertTrue(be.getItem(1).getCount() == 1 && be.getItem(2).isEmpty() && be.getItem(3).isEmpty(), "4 soul sand, 2 bone blocks and the rose used");
             h.assertTrue(start - be.getEnergyHandler().getAmountAsInt() == 200_000, "200,000 FE used, used " + (start - be.getEnergyHandler().getAmountAsInt()));

@@ -24,6 +24,8 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -69,6 +71,8 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
     private int energyPerTick;
     private AltarStatus status = AltarStatus.IDLE;
     private int sheepId = -1;
+    /** The sheep this altar slowed down, whose Slowness it takes off again; not saved: the effect wears off by itself. */
+    private int slowedId = -1;
 
     private final ContainerData data = new ContainerData() {
         @Override
@@ -135,15 +139,54 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
                 energy.consume(energyPerTick);
                 progress++;
                 if (level.getGameTime() % 4 == 0) beam(level, pos, sheep, r);
+                slow(level, sheep);
                 if (progress >= maxProgress) {
                     finish(level, pos, sheep, r);
                     progress = 0;
+                    unslow(level);
                 }
                 setChanged();
             }
         }
         boolean active = status == AltarStatus.INFUSING;
+        if (!active) unslow(level);
         if (state.getValue(InfusionAltarBlock.ACTIVE) != active) level.setBlock(pos, state.setValue(InfusionAltarBlock.ACTIVE, active), Block.UPDATE_ALL);
+    }
+
+    /** How long each refresh of the altar's Slowness lasts; it is refreshed well before it runs out. */
+    static final int SLOW_TICKS = 30;
+
+    /** Holds the sheep being infused nearly still with Slowness, and lets go of any other one it was holding. */
+    private void slow(ServerLevel level, LivingEntity sheep) {
+        if (slowedId != sheep.getId()) unslow(level);
+        int amplifier = ModConfigs.getInt(ModConfigs.SERVER.altarSlowness) - 1;
+        if (amplifier < 0) return;
+        slowedId = sheep.getId();
+        MobEffectInstance current = sheep.getEffect(MobEffects.SLOWNESS);
+        if (current == null || (isOurs(current) && current.getDuration() < SLOW_TICKS - 10)) {
+            sheep.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, SLOW_TICKS, amplifier, true, false, false));
+        }
+    }
+
+    /** Takes the altar's Slowness off the sheep it was on, leaving any Slowness from elsewhere alone. */
+    private void unslow(Level level) {
+        if (slowedId < 0) return;
+        if (level.getEntity(slowedId) instanceof LivingEntity sheep) {
+            MobEffectInstance current = sheep.getEffect(MobEffects.SLOWNESS);
+            if (current != null && isOurs(current)) sheep.removeEffect(MobEffects.SLOWNESS);
+        }
+        slowedId = -1;
+    }
+
+    /** The altar's Slowness is short, ambient and has no particles; a potion or another mob's is not. */
+    private static boolean isOurs(MobEffectInstance effect) {
+        return effect.isAmbient() && !effect.isVisible() && effect.getDuration() <= SLOW_TICKS;
+    }
+
+    @Override
+    public void setRemoved() {
+        if (level != null && !level.isClientSide()) unslow(level);
+        super.setRemoved();
     }
 
     private void set(AltarStatus status, int progress) {

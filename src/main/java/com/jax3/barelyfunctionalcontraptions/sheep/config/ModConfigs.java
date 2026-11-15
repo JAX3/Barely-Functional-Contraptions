@@ -122,6 +122,7 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue altarTicks;
         public final ModConfigSpec.IntValue altarCapacity;
         public final ModConfigSpec.IntValue altarMaxInput;
+        public final ModConfigSpec.IntValue altarSlowness;
         public final ModConfigSpec.IntValue woolPackerCapacity;
         public final ModConfigSpec.IntValue woolPackerMaxInput;
         public final ModConfigSpec.IntValue woolPackerEnergyPerBale;
@@ -318,6 +319,8 @@ public final class ModConfigs {
                     .defineInRange("energyCapacity", 250_000, 1, Integer.MAX_VALUE);
             altarMaxInput = b.comment("Most FE the altar accepts per tick.")
                     .defineInRange("maxEnergyInput", 5_000, 1, Integer.MAX_VALUE);
+            altarSlowness = b.comment("Level of Slowness on the sheep while the altar infuses it, so it doesn't wander off; taken off when the infusion ends. Only the sheep is slowed. 5 = nearly still, 0 = off.")
+                    .defineInRange("sheepSlowness", 5, 0, 10);
             b.pop();
 
             b.comment("Wool Packer (FE-powered; presses 9 of the same resource wool into a Wool Bale) and Wool Bales in the Mechanical Separator").push("wool_packer");
