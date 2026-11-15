@@ -961,6 +961,12 @@ public final class ModGameTests {
         Sheep tough = sheepAt(h, new BlockPos(6, 1, 5), null);
         SheepInfusionEvents.setStats(tough, new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats(1, 1, 10));
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity.isCatalyst(h.getLevel(), new ItemStack(Items.SOUL_SAND)), "soul sand is a catalyst");
+        // Its area outline: off at first, toggled like the shears' and furnace's, and the 5x5x3 box the sheep search uses.
+        h.assertFalse(iron.showsArea(), "the area outline starts hidden");
+        h.assertTrue(iron.toggleArea() && iron.showsArea(), "and toggles on");
+        var box = iron.displayedArea();
+        h.assertTrue(box.getXsize() == 5 && box.getZsize() == 5 && box.getYsize() == 3 && box.contains(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(new BlockPos(6, 1, 5)))),
+                "it covers 5x5 columns, 3 high, round the altar, was " + box);
         h.assertFalse(iron.canPlaceItem(0, new ItemStack(Items.DIRT)), "dirt isn't a feeding item");
         h.runAfterDelay(130, () -> {
             h.assertTrue(noRose.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AltarStatus.MISSING_CATALYSTS, "waits for the Wither Rose, was " + noRose.status());

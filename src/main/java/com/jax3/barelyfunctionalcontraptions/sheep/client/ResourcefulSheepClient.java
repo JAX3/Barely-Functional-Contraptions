@@ -65,6 +65,8 @@ public final class ResourcefulSheepClient {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.AUTOMATIC_SHEARS.get(), context -> new AreaOutlineRenderer<>());
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.BLAZE_FURNACE.get(), context -> new AreaOutlineRenderer<>());
+            event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.INFUSION_ALTAR.get(), context -> new AreaOutlineRenderer<>());
         });
 
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onRecipesReceived);

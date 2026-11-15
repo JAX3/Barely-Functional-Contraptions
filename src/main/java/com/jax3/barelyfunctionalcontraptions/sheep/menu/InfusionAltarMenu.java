@@ -25,6 +25,9 @@ public class InfusionAltarMenu extends AbstractContainerMenu {
     private static final int PLAYER_START = InfusionAltarBlockEntity.SIZE;
     private static final int PLAYER_END = PLAYER_START + 36;
 
+    /** Menu button: show or hide the area a sheep must stand in. */
+    public static final int BUTTON_AREA = 0;
+
     private final ContainerLevelAccess access;
     private final ContainerData data;
     private final Player player;
@@ -85,6 +88,15 @@ public class InfusionAltarMenu extends AbstractContainerMenu {
     }
 
     @Override
+    public boolean clickMenuButton(Player player, int id) {
+        if (id != BUTTON_AREA) return false;
+        access.execute((level, pos) -> {
+            if (level.getBlockEntity(pos) instanceof InfusionAltarBlockEntity be) be.toggleArea(player);
+        });
+        return true;
+    }
+
+    @Override
     public boolean stillValid(Player player) {
         return stillValid(access, player, ModBlocks.INFUSION_ALTAR.get());
     }
@@ -100,6 +112,7 @@ public class InfusionAltarMenu extends AbstractContainerMenu {
     public int getEnergyPerTick() { return int32(6); }
     public AltarStatus getStatus() { return AltarStatus.byId(data.get(8)); }
     public boolean hasSheep() { return data.get(9) != 0; }
+    public boolean isShowingArea() { return data.get(10) != 0; }
 
     public float getEnergyFraction() {
         int capacity = getCapacity();

@@ -266,6 +266,8 @@ Most resources are **tier 1** and are fed by hand. The **Wither, Dragon and Ward
 
 The **Infusion Altar** is a powered pedestal. Put the feeding item in its **centre slot** and the **catalysts** in the four slots around it, give it power, and stand a grown sheep **within 2 blocks** of it. A stream of the resource's colour runs from the altar to the sheep, which is held nearly still with Slowness (only the sheep, and only until the infusion ends). When the bar fills the sheep is infused. The items and power are only used when it finishes.
 
+**Showing the area:** click the spyglass button right of the status line in the altar's window, or sneak-right-click the altar with an empty hand, to outline in purple where a sheep must stand: 5x5 columns centred on the altar, from one block below it to one above. Do it again to hide it. The setting is saved with the altar, like the Automatic Shears' and Blaze Sheep Furnace's.
+
 | Sheep | Feeding item | Catalysts | Power |
 |---|---|---|---|
 | Wither | Nether Star | 4 Soul Sand, 2 Bone Blocks, 1 Wither Rose | 200,000 FE |
@@ -287,7 +289,7 @@ The **Infusion Altar** is a powered pedestal. Put the feeding item in its **cent
 |---|---|
 | ![The Infusion Altar window with a Nether Star in the centre and Soul Sand above; the tooltip lists Needs 1 x Nether Star, 4 x Soul Sand, then 2 x Bone Block and 1 x Wither Rose in red, and 200,000 FE](screenshots/92_altar_catalyst_tooltip.png) | ![The window with all four catalysts in, Tier 2, 2,000 FE/t, the progress bar filling and status Infusing](screenshots/93_altar_infusing_gui.png) |
 
-![The Infusion Altar, a steel and amethyst pedestal, with a sheep beside it being infused](screenshots/94_altar_infusing.png)
+![The Infusion Altar, a steel and amethyst pedestal, with a sheep beside it being infused, inside the purple outline of the area a sheep must stand in](screenshots/94_altar_infusing.png)
 
 ### 2. Shear it
 Shears and dispensers both work. An infused sheep drops **resource wool** (e.g. *Iron Wool*) **instead of** its normal wool. When the infusion runs out the sheep goes back to normal.

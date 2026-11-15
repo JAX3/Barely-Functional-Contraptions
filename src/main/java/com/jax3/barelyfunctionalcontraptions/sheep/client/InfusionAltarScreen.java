@@ -35,6 +35,8 @@ public class InfusionAltarScreen extends AbstractContainerScreen<InfusionAltarMe
     private static final int TEXT_COLOR = 0xFFDFE4F5, TEXT_DIM = 0xFFAEB4C6, TIER_COLOR = 0xFFC27CFF, USE_COLOR = 0xFFFFD25A;
     private static final int INFO_CENTRE = 142;
     private static final int LAMP_X = 9, LAMP_Y = 87, LAMP_U = 186, LAMP_V = 194;
+    /** The show-area button, right of the status line; its background is at (176, 146) in the texture. */
+    private static final int AREA_X = 154, AREA_Y = 87, BUTTON_U = 176, BUTTON_V = 146;
 
     public InfusionAltarScreen(InfusionAltarMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, 193);
@@ -45,6 +47,8 @@ public class InfusionAltarScreen extends AbstractContainerScreen<InfusionAltarMe
     protected void init() {
         super.init();
         this.titleLabelX = (imageWidth - font.width(title)) / 2;
+        addRenderableWidget(new AreaToggleButton(leftPos + AREA_X, topPos + AREA_Y, TEXTURE, BUTTON_U, BUTTON_V,
+                menu::isShowingArea, InfusionAltarBlockEntity.AREA_COLOR, menu.containerId, InfusionAltarMenu.BUTTON_AREA));
     }
 
     private Optional<SheepResource> resource() {

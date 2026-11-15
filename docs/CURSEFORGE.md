@@ -125,9 +125,9 @@ All 24 built-in sheep:
 
 ### Infusion Altar
 
-The Wither, Dragon and Warden sheep are tier 2 and can only be infused at a powered Infusion Altar. Put the feeding item in the centre and the catalysts round it, and stand a sheep within 2 blocks. The altar slows the sheep while it works. Tier 1 resources work there too, so it can infuse a pen on its own.
+The Wither, Dragon and Warden sheep are tier 2 and can only be infused at a powered Infusion Altar. Put the feeding item in the centre and the catalysts round it, and stand a sheep within 2 blocks. The altar slows the sheep while it works, and can outline the area the sheep must stand in, like the Automatic Shears and Blaze Furnace. Tier 1 resources work there too, so it can infuse a pen on its own.
 
-![An Infusion Altar streaming particles into the sheep beside it](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/94_altar_infusing.png)
+![An Infusion Altar streaming particles into the sheep beside it, inside the purple outline of its area](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/94_altar_infusing.png)
 
 ### Breeding Sheep
 

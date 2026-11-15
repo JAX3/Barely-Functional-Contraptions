@@ -58,10 +58,12 @@ import org.jspecify.annotations.Nullable;
  *     <li>Hoppers and pipes can put feeding items and catalysts in from any side, but can't take anything out.</li>
  * </ul>
  */
-public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider {
+public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, AreaDisplay {
+    /** The area outline's colour: the altar's amethyst purple. */
+    public static final int AREA_COLOR = 0xFFB574FF;
     public static final int FEED = 0, SIZE = 1 + AltarRitual.MAX_CATALYSTS;
     public static final int REACH = 2;
-    public static final int DATA_COUNT = 10;
+    public static final int DATA_COUNT = 11;
     private static final int[] SLOTS = {0, 1, 2, 3, 4};
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
@@ -73,6 +75,8 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
     private int sheepId = -1;
     /** The sheep this altar slowed down, whose Slowness it takes off again; not saved: the effect wears off by itself. */
     private int slowedId = -1;
+    /** Whether the area a sheep must stand in is outlined; saved, and synced to clients. */
+    private boolean showArea;
 
     private final ContainerData data = new ContainerData() {
         @Override
@@ -88,6 +92,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
                 case 7 -> energyPerTick >>> 16;
                 case 8 -> status.ordinal();
                 case 9 -> sheepId >= 0 ? 1 : 0;
+                case 10 -> showArea ? 1 : 0;
                 default -> 0;
             };
         }
@@ -227,9 +232,39 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
         return used;
     }
 
+    /**
+     * Where a sheep must stand to be infused: within {@link #REACH} blocks sideways (5x5 columns) and one block up or
+     * down, so a sheep on the floor beside the pedestal or on a step counts.
+     */
+    public static AABB sheepArea(BlockPos pos) {
+        return new AABB(pos).inflate(REACH, 1, REACH);
+    }
+
+    @Override
+    public boolean showsArea() {
+        return showArea;
+    }
+
+    @Override
+    public void setShowsArea(boolean show) {
+        showArea = show;
+        setChanged();
+        if (level != null) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+    }
+
+    @Override
+    public AABB displayedArea() {
+        return sheepArea(worldPosition);
+    }
+
+    @Override
+    public int areaColor() {
+        return AREA_COLOR;
+    }
+
     /** The nearest grown, infusable sheep within reach that can take {@code resource} now. */
     private static @Nullable LivingEntity findSheep(ServerLevel level, BlockPos pos, SheepResource resource) {
-        AABB area = new AABB(pos).inflate(REACH, 1, REACH);
+        AABB area = sheepArea(pos);
         Vec3 centre = Vec3.atCenterOf(pos);
         return level.getEntitiesOfClass(LivingEntity.class, area, e -> ModTags.isInfusable(e) && e.isAlive()
                         && SheepInfusionEvents.checkSheep(e, resource, false) == null)
@@ -403,6 +438,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
         ContainerHelper.loadAllItems(in, items);
         in.child("energy").ifPresent(energy::deserialize);
         progress = in.getIntOr("progress", 0);
+        showArea = in.getBooleanOr("show_area", false);
     }
 
     @Override
@@ -411,5 +447,31 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
         ContainerHelper.saveAllItems(out, items);
         energy.serialize(out.child("energy"));
         out.putInt("progress", progress);
+        out.putBoolean("show_area", showArea);
+    }
+
+    // ------------------------------------------------------------------ client sync (the area outline)
+
+    @Override
+    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    /** Clients only need the area setting. */
+    @Override
+    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+        tag.putBoolean("show_area", showArea);
+        return tag;
+    }
+
+    @Override
+    public void onDataPacket(net.minecraft.network.Connection net, ValueInput input) {
+        showArea = input.getBooleanOr("show_area", false);
+    }
+
+    @Override
+    public void handleUpdateTag(ValueInput input) {
+        showArea = input.getBooleanOr("show_area", false);
     }
 }

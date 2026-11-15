@@ -3048,6 +3048,7 @@ def generate_infusion_altar():
 
 def generate_infusion_altar_gui():
     sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    shears = Image.open(out("gui/automatic_shears.png")).convert("RGBA")
     img = Image.new("RGBA", (256, 256), CLEAR)
     panel(img, 0, 0, 176, 193)
     inset(img, 10, 18, 42, 84, GUI["gauge"])          # energy gauge, fill 11..40 x 19..82
@@ -3099,6 +3100,7 @@ def generate_infusion_altar_gui():
         img.putpixel((176 + x, 80), mix(c, WHITE, 0.4))
         img.putpixel((176 + x, 81), c)
         img.putpixel((176 + x, 82), shade(c, 0.7))
+    img.paste(shears.crop((176, 64, 208, 80)), (176, 146))          # show-area button background, normal and hovered
     img.save(out("gui/infusion_altar.png"))
 
 

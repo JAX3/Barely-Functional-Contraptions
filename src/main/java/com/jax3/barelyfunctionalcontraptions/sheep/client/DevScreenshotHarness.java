@@ -1801,6 +1801,11 @@ public final class DevScreenshotHarness {
                     }
                 });
             }
+            // Show the area a sheep must stand in, with the window's spyglass button, as a player would.
+            case 124 -> {
+                if (mc.player != null && mc.gameMode != null) mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,
+                        com.jax3.barelyfunctionalcontraptions.sheep.menu.InfusionAltarMenu.BUTTON_AREA);
+            }
             case 150 -> shot(mc, "93_altar_infusing_gui");
             case 152 -> {
                 if (mc.player != null) mc.player.closeContainer();

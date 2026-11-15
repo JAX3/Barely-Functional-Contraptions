@@ -102,7 +102,7 @@
         "It pushes its energy into every block around it, and a comparator reads one level per 20 FE/t.",
         "Right-click it with an empty hand to open its window. The fire in the middle column rises with the heat; each line is one more heat source, and its pip lights while that source is in use.",
         "## Showing the area",
-        "Click the spyglass button in the furnace's or the Automatic Shears' window, or sneak-right-click either block with an empty hand, to show or hide its working area."
+        "Click the spyglass button in the furnace's, the Automatic Shears' or the Infusion Altar's window, or sneak-right-click any of them with an empty hand, to show or hide its working area."
       ],
       "tab": "power"
     },
@@ -235,7 +235,7 @@
         "- Dragon: 4 End Stone, 4 Popped Chorus Fruit, 2 Eyes of Ender.",
         "- Warden: 4 Sculk, 4 Amethyst Shards, 1 Sculk Catalyst.",
         "Tier 2 takes 200,000 FE over 5 seconds. Tier 1 resources work at the altar too, with no catalysts and 20,000 FE, so it can infuse a pen without you.",
-        "The catalysts still needed show faded in the empty slots. Hoppers and pipes can feed it from any side.",
+        "The catalysts still needed show faded in the empty slots. Hoppers and pipes can feed it from any side. The spyglass button in its window, or a sneak-right-click with an empty hand, outlines the area the sheep must stand in.",
         "Data packs set a resource's tier, catalysts and power in its \"altar\" block."
       ]
     },

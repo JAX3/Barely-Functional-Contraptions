@@ -64,7 +64,10 @@ public class InfusionAltarBlock extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof InfusionAltarBlockEntity be) player.openMenu(be, pos);
+        if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof InfusionAltarBlockEntity be)) return InteractionResult.SUCCESS;
+        // Sneak-right-click with an empty hand shows or hides the area a sheep must stand in.
+        if (player.isSecondaryUseActive()) be.toggleArea(player);
+        else player.openMenu(be, pos);
         return InteractionResult.SUCCESS;
     }
 
