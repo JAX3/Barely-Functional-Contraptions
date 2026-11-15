@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "${loader_version_range}"
 license = "${mod_license}"
-issueTrackerURL = ""
+issueTrackerURL = "https://forms.gle/c78e6rBVE9spT6Ku6"
 
 [[mods]]
 modId = "${mod_id}"
