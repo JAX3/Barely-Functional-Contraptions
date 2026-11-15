@@ -142,6 +142,7 @@ public final class ModGameTests {
         TESTS.put("sheep_stats_yield_endurance_growth", ModGameTests::sheepStatsEffects);
         TESTS.put("infusion_altar_infuses_a_wither_sheep", ModGameTests::altarWither);
         TESTS.put("infusion_altar_waits_for_what_it_needs", ModGameTests::altarWaits);
+        TESTS.put("infusion_altar_pulses_when_ready", ModGameTests::altarPulse);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -942,6 +943,34 @@ public final class ModGameTests {
             h.assertTrue(be.getItem(0).getCount() == 1, "one Nether Star used, left " + be.getItem(0));
             h.assertTrue(be.getItem(1).getCount() == 1 && be.getItem(2).isEmpty() && be.getItem(3).isEmpty(), "4 soul sand, 2 bone blocks and the rose used");
             h.assertTrue(start - be.getEnergyHandler().getAmountAsInt() == 200_000, "200,000 FE used, used " + (start - be.getEnergyHandler().getAmountAsInt()));
+        });
+    }
+
+    /**
+     * The altar gives one redstone-tick pulse (2 game ticks) when its items become complete: nothing while a catalyst
+     * is missing, one pulse when the last one goes in, and no more while it stays complete.
+     */
+    private static void altarPulse(GameTestHelper h) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        var be = altar(h, pos, false, new ItemStack(Items.IRON_INGOT), new ItemStack(Items.IRON_BLOCK, 2));
+        int[] poweredTicks = {0};
+        boolean[] lampLit = {false};
+        h.setBlock(pos.east(), Blocks.REDSTONE_LAMP);
+        h.onEachTick(() -> {
+            if (h.getBlockState(pos).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock.POWERED)) {
+                poweredTicks[0]++;
+                if (h.getLevel().hasNeighborSignal(h.absolutePos(pos.east()))) lampLit[0] = true;
+            }
+        });
+        h.runAfterDelay(10, () -> {
+            h.assertTrue(poweredTicks[0] == 0, "no pulse while the Golden Carrot is missing, got " + poweredTicks[0]);
+            be.setItem(2, new ItemStack(Items.GOLDEN_CARROT));
+        });
+        h.runAfterDelay(40, () -> {
+            h.assertTrue(poweredTicks[0] == 2, "one redstone tick (2 game ticks) of power once it's complete, got " + poweredTicks[0]);
+            h.assertTrue(lampLit[0], "the pulse reaches the block beside it");
+            h.assertFalse(h.getBlockState(pos).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock.POWERED), "and then it's off");
+            h.succeed();
         });
     }
 

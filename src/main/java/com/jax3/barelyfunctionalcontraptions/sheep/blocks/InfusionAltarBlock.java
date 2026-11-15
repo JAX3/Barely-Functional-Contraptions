@@ -32,17 +32,19 @@ import org.jspecify.annotations.Nullable;
  */
 public class InfusionAltarBlock extends BaseEntityBlock {
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
+    /** On for one redstone tick when the items for an infusion are all in, for automation. */
+    public static final BooleanProperty POWERED = net.minecraft.world.level.block.state.properties.BlockStateProperties.POWERED;
     /** A wide base, a narrower column and a wide top: 16 px tall like a full block. */
     private static final VoxelShape SHAPE = Shapes.or(Block.box(0, 0, 0, 16, 4, 16), Block.box(3, 4, 3, 13, 12, 13), Block.box(1, 12, 1, 15, 16, 15));
 
     public InfusionAltarBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(ACTIVE, false));
+        registerDefaultState(stateDefinition.any().setValue(ACTIVE, false).setValue(POWERED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(ACTIVE);
+        builder.add(ACTIVE, POWERED);
     }
 
     @Override
@@ -79,6 +81,17 @@ public class InfusionAltarBlock extends BaseEntityBlock {
             level.addParticle(ParticleTypes.ENCHANT, x + random.nextGaussian() * 0.3, y + random.nextDouble() * 0.6, z + random.nextGaussian() * 0.3, 0, 0.05, 0);
         }
         if (random.nextInt(20) == 0) level.playLocalSound(x, y, z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 0.5F, 1.2F, false);
+    }
+
+    @Override
+    protected boolean isSignalSource(BlockState state) {
+        return true;
+    }
+
+    /** A redstone pulse on every side for one redstone tick when the resource and its catalysts are all in. */
+    @Override
+    protected int getSignal(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, net.minecraft.core.Direction direction) {
+        return state.getValue(POWERED) ? 15 : 0;
     }
 
     @Override

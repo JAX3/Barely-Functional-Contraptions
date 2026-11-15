@@ -247,6 +247,7 @@
         "- Warden: Echo Shard, with 4 Sculk, 4 Amethyst Shards, 1 Sculk Catalyst.",
         "Tier 2 takes 200,000 FE over 5 seconds.",
         "The catalysts still needed show faded in the empty slots, and the Recipes tab lists every sheep's. Hoppers and pipes can feed it from any side, so it can infuse a pen without you. The spyglass button in its window, or a sneak-right-click with an empty hand, outlines the area the sheep must stand in.",
+        "When the resource and all its catalysts are in, the altar gives a one-tick redstone pulse on every side, so a dispenser or piston can bring the next sheep, or a circuit can stop the hoppers. A comparator reads its progress.",
         "Data packs set a resource's tier, catalysts and power in its \"altar\" block."
       ]
     },

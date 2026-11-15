@@ -77,6 +77,12 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
     private int slowedId = -1;
     /** Whether the area a sheep must stand in is outlined; saved, and synced to clients. */
     private boolean showArea;
+    /** Whether the centre slot and the catalysts were complete last tick: the redstone pulse fires when they become so. */
+    private boolean ready;
+    /** Game ticks left of the redstone pulse (one redstone tick is 2). */
+    private int pulseTicks;
+    /** Length of the pulse: one redstone tick. */
+    public static final int PULSE_TICKS = 2;
 
     private final ContainerData data = new ContainerData() {
         @Override
@@ -155,7 +161,15 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
         }
         boolean active = status == AltarStatus.INFUSING;
         if (!active) unslow(level);
-        if (state.getValue(InfusionAltarBlock.ACTIVE) != active) level.setBlock(pos, state.setValue(InfusionAltarBlock.ACTIVE, active), Block.UPDATE_ALL);
+        // A one-redstone-tick pulse when the items for an infusion are all in: the resource and every catalyst.
+        boolean nowReady = resource.isPresent() && feed.getCount() >= resource.get().effectiveFeedingAmount()
+                && catalystSlots(resource.get().altar()) != null;
+        if (nowReady && !ready) pulseTicks = PULSE_TICKS;
+        else if (pulseTicks > 0) pulseTicks--;
+        ready = nowReady;
+        boolean powered = pulseTicks > 0;
+        BlockState wanted = state.setValue(InfusionAltarBlock.ACTIVE, active).setValue(InfusionAltarBlock.POWERED, powered);
+        if (wanted != state) level.setBlock(pos, wanted, Block.UPDATE_ALL);
     }
 
     /** How long each refresh of the altar's Slowness lasts; it is refreshed well before it runs out. */
@@ -438,6 +452,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
         ContainerHelper.loadAllItems(in, items);
         in.child("energy").ifPresent(energy::deserialize);
         progress = in.getIntOr("progress", 0);
+        ready = in.getBooleanOr("ready", false);
         showArea = in.getBooleanOr("show_area", false);
     }
 
@@ -447,6 +462,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
         ContainerHelper.saveAllItems(out, items);
         energy.serialize(out.child("energy"));
         out.putInt("progress", progress);
+        out.putBoolean("ready", ready);
         out.putBoolean("show_area", showArea);
     }
 
