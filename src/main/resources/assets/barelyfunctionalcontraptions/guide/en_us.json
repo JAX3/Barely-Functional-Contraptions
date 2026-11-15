@@ -285,8 +285,67 @@
       "icon": "minecraft:scaffolding",
       "tab": "wip",
       "text": [
-        "Features still being built will be written up here as they arrive, so you can try them early.",
-        "Nothing is in progress right now. Expect what appears here to change, and back up your world before trying it."
+        "Features still being built are written up here as they arrive, so you can see what's coming.",
+        "These are the planned late-game generators: they make a lot of power but need looking after. None of them can be built yet, and their numbers may change. Back up your world before trying anything here once it arrives."
+      ]
+    },
+    {
+      "title": "Hume's Fork",
+      "icon": "barelyfunctionalcontraptions:hume_energy_cube",
+      "tab": "wip",
+      "text": [
+        "Planned. Not in the game yet; the numbers may change.",
+        "A paired machine that isn't sure whether it makes power. Its output follows the infused sheep in its observation pen, whether they're watched or not.",
+        "## Power",
+        "- Around 10,000-60,000 FE/t on average, but it jumps around from moment to moment.",
+        "## Upkeep",
+        "- Smooth it out with a bank of Hume Energy Cubes, or the swings are hard to use.",
+        "- Re-infuse the sheep in its pen regularly, or its output averages down."
+      ]
+    },
+    {
+      "title": "Echo Chamber",
+      "icon": "minecraft:sculk_shrieker",
+      "tab": "wip",
+      "text": [
+        "Planned. Not in the game yet; the numbers may change.",
+        "A Warden sheep in a sculk-lined room. The chamber turns the sheep's vibrations into energy.",
+        "## Power",
+        "- Around 20,000 FE/t, more while it's noisy nearby.",
+        "## Upkeep",
+        "- Keep the noise steady: note blocks, a redstone clock, or a Wool Burner's crackle.",
+        "- Too quiet and the Warden sheep falls asleep and it stops. Too loud and the room shrieks, then stops for a cooldown.",
+        "- The sculk catalysts in the room wear out and need replacing."
+      ]
+    },
+    {
+      "title": "Lightning Array",
+      "icon": "minecraft:lightning_rod",
+      "tab": "wip",
+      "text": [
+        "Planned. Not in the game yet; the numbers may change.",
+        "A tall copper mast, barely grounded, that catches lightning and stores it.",
+        "## Power",
+        "- Each strike gives a huge burst, around 5,000,000 FE, into Hume Energy Cubes that drain it out slowly.",
+        "## Upkeep",
+        "- It only works in thunderstorms, unless you call a strike with a Trident or a Charged Creeper head.",
+        "- Each strike oxidises the mast one stage. Scrape it with an axe or wax it; fully oxidised, it stops working.",
+        "- Sheep near a strike become Charged sheep with a crackling fleece, worth more in the Mechanical Separator."
+      ]
+    },
+    {
+      "title": "Fleece Fusion",
+      "icon": "minecraft:blast_furnace",
+      "tab": "wip",
+      "text": [
+        "Planned. Not in the game yet; the numbers may change.",
+        "Fuses two different resource wools into power, such as Iron and Gold, or Coal and Netherite.",
+        "## Power",
+        "- Set by the pair: from about 5,000 FE/t for common pairs up to 50,000 FE/t for Dragon and Warden.",
+        "- The pairs and their power will be data, like Wool Burner fuels.",
+        "## Upkeep",
+        "- A steady flow of resource wool or Wool Bales, so it keeps a sheep farm busy.",
+        "- Lint builds up in its chamber. Clear it out with shears every so often; it comes out as plain wool for the Wool Burner."
       ]
     }
   ]
