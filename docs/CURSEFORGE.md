@@ -6,7 +6,7 @@
 
 A NeoForge mod for **Minecraft 26.3** about sheep and slightly questionable machinery.
 
-**Found a bug?** [Report it on the bug report form](https://forms.gle/c78e6rBVE9spT6Ku6).
+**Found a bug?** [Report it on the bug report form](https://forms.gle/8xG9pMoQnTG6MVo1A).
 
 **Feed a sheep an ingot, a gem or a block and its wool takes on that resource.** Shear it for resource wool, and turn the wool back into the resource in a **Mechanical Separator**. Breed your best sheep to raise their Yield, Growth and Endurance. Higher-tier sheep, such as the Wither, Dragon and Warden sheep, are infused at a powered **Infusion Altar** with catalysts.
 
@@ -165,4 +165,4 @@ Sheep, Wool Burner fuels, furnace heat sources and separator recipes are all dat
 
 ---
 
-Requires NeoForge 26.3 and Java 25; JEI and Jade are optional. The full guide to every block, setting and data-pack format is in [docs/REFERENCE.md](https://github.com/JAX3/Barely-Functional-Contraptions/blob/main/docs/REFERENCE.md). Test results are in [TESTING.md](https://github.com/JAX3/Barely-Functional-Contraptions/blob/main/TESTING.md). Report bugs on the [bug report form](https://forms.gle/c78e6rBVE9spT6Ku6). MIT licensed. Source code: [GitHub](https://github.com/JAX3/Barely-Functional-Contraptions).
+Requires NeoForge 26.3 and Java 25; JEI and Jade are optional. The full guide to every block, setting and data-pack format is in [docs/REFERENCE.md](https://github.com/JAX3/Barely-Functional-Contraptions/blob/main/docs/REFERENCE.md). Test results are in [TESTING.md](https://github.com/JAX3/Barely-Functional-Contraptions/blob/main/TESTING.md). Report bugs on the [bug report form](https://forms.gle/8xG9pMoQnTG6MVo1A). MIT licensed. Source code: [GitHub](https://github.com/JAX3/Barely-Functional-Contraptions).
