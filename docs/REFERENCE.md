@@ -62,7 +62,7 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](.
 ### Contraptions Manual (in-game guide)
 Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game. Its chapters are sorted into six tabs along the top of the left panel:
 
-- **Power:** the generators (Mycelial Generator, Zero Point Module, Glow Panels, Blaze Sheep Furnace, Wool Burner) and energy storage.
+- **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Wool Burner), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator) and *Late Game* (Zero Point Module), then energy storage. A guide chapter's optional `"group"` field sets the heading it is listed under.
 - **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
 - **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, and data packs and commands.
@@ -73,7 +73,7 @@ Hover over a tab to see its name. A resource pack's guide file can still use the
 
 | Power tab | Production tab |
 |---|---|
-| ![The Contraptions Manual on its Power tab: four tab icons along the top with Power framed, its six chapters below, and the Wool Burner chapter open](screenshots/83_guide_power_tab.png) | ![The Production tab: Infusing Sheep, Themed Sheep, Infusion Altar, Breeding Sheep, Wool Machines and Fluid Reservoir, with Infusing Sheep open](screenshots/84_guide_production_tab.png) |
+| ![The Contraptions Manual on its Power tab: six tab icons along the top with Power framed, its chapters below under Early Game, Mid Game, Late Game and Storage headings, and the Wool Burner chapter open](screenshots/83_guide_power_tab.png) | ![The Production tab: Infusing Sheep, Themed Sheep, Infusion Altar, Breeding Sheep, Wool Machines and Fluid Reservoir, with Infusing Sheep open](screenshots/84_guide_production_tab.png) |
 
 | Recipes: Machines | Recipes: Mechanical Separator |
 |---|---|

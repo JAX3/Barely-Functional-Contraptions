@@ -57,9 +57,25 @@ public class GuideScreen extends Screen {
         return result;
     }
 
-    /** Height of one chapter button: 15, or less so that a longer list still fits in the window. */
+    /** One line of the chapter list: a chapter (its index in {@link #chapters}), or a group heading. */
+    private record Row(int chapter, String heading) {}
+
+    /** The open tab's list: its chapters, with a heading wherever the group changes (the Power tab's tiers). */
+    private List<Row> rows() {
+        List<Row> rows = new ArrayList<>();
+        String group = "";
+        for (int index : inTab()) {
+            String g = chapters.get(index).group();
+            if (!g.isEmpty() && !g.equals(group)) rows.add(new Row(-1, g));
+            group = g;
+            rows.add(new Row(index, ""));
+        }
+        return rows;
+    }
+
+    /** Height of one list row: 15, or less so that a longer list still fits in the window. */
     private int row() {
-        return Math.min(ROW, LIST_HEIGHT / Math.max(1, inTab().size()));
+        return Math.min(ROW, LIST_HEIGHT / Math.max(1, rows().size()));
     }
 
     private int left() {
@@ -81,9 +97,11 @@ public class GuideScreen extends Screen {
                     .bounds(left() + 6 + i * (TAB_W + 1), top() + TAB_Y, TAB_W, TAB_H).build()));
         }
         List<Integer> list = inTab();
+        List<Row> rows = rows();
         int y = top() + LIST_Y;
-        for (int i = 0; i < list.size(); i++) {
-            int index = list.get(i);
+        for (int i = 0; i < rows.size(); i++) {
+            int index = rows.get(i).chapter();
+            if (index < 0) continue;
             addRenderableWidget(Button.builder(Component.literal(chapters.get(index).title()), b -> openChapter(index))
                     .bounds(x + 18, y + i * row(), LIST_WIDTH - 20, row() - 1).build());
         }
@@ -282,9 +300,20 @@ public class GuideScreen extends Screen {
         }
         Component tabName = tab.title().copy().withStyle(ChatFormatting.BOLD);
         g.text(font, tabName, x + 4 + (LIST_WIDTH - 2 - font.width(tabName)) / 2, y + TAB_NAME_Y, 0xFFFFE58A, false);
-        List<Integer> list = inTab();
-        for (int i = 0; i < list.size(); i++) {
-            g.item(chapters.get(list.get(i)).icon(), x + 6, y + LIST_Y + i * row() - 1);
+        List<Row> rows = rows();
+        for (int i = 0; i < rows.size(); i++) {
+            Row r = rows.get(i);
+            int rowY = y + LIST_Y + i * row();
+            if (r.chapter() >= 0) {
+                g.item(chapters.get(r.chapter()).icon(), x + 6, rowY - 1);
+            } else {
+                // A group heading: its name centred between two rules.
+                Component heading = Component.literal(r.heading());
+                int w = font.width(heading), cx = x + 4 + (LIST_WIDTH - 2) / 2, ty = rowY + (row() - 9) / 2 + 1;
+                g.fill(x + 8, ty + 3, cx - w / 2 - 3, ty + 4, 0xFF6A6F80);
+                g.fill(cx + w / 2 + 3, ty + 3, x + LIST_WIDTH - 2, ty + 4, 0xFF6A6F80);
+                g.text(font, heading, cx - w / 2, ty, 0xFF9AA3C4, false);
+            }
         }
         if (chapters.isEmpty()) {
             g.text(font, Component.translatable("guide.barelyfunctionalcontraptions.missing"), x + LIST_WIDTH + 12, y + 24, 0xFFFF8080, false);

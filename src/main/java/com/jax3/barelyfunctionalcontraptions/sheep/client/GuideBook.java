@@ -21,17 +21,26 @@ import net.minecraft.world.item.Items;
  * <pre>{@code
  * { "chapters": [
  *     { "title": "Mycelial Generator", "icon": "barelyfunctionalcontraptions:mycelial_generator", "tab": "power",
- *       "text": ["A paragraph.", "## A heading", "- A list item"] } ] }
+ *       "group": "Mid Game", "text": ["A paragraph.", "## A heading", "- A list item"] } ] }
  * }</pre>
+ * {@code group} is optional: within a tab, chapters are listed under a heading for each group, in file order.
  * Paragraphs are wrapped and split into pages by the screen. A paragraph starting with {@code ## } is a heading.
  * {@code tab} is one of {@code power}, {@code logistics}, {@code production}, {@code utility} (the default) or {@code wip}
  * (work-in-progress features). The
  * Recipes tab isn't in the JSON: {@link GuideRecipes} builds it from the game.
  */
 public final class GuideBook {
-    public record Chapter(String title, ItemStack icon, Tab tab, List<String> text, List<GuideRecipes.Recipe> recipes) {
+    /**
+     * @param group a heading the chapter is listed under within its tab ("Early Game"...), or empty; chapters of one
+     *              group should follow each other in the file
+     */
+    public record Chapter(String title, ItemStack icon, Tab tab, String group, List<String> text, List<GuideRecipes.Recipe> recipes) {
         public Chapter(String title, ItemStack icon, Tab tab, List<String> text) {
-            this(title, icon, tab, text, List.of());
+            this(title, icon, tab, "", text, List.of());
+        }
+
+        public Chapter(String title, ItemStack icon, Tab tab, List<String> text, List<GuideRecipes.Recipe> recipes) {
+            this(title, icon, tab, "", text, recipes);
         }
 
         /** A chapter of recipes (the Recipes tab), drawn as slots rather than text. */
@@ -112,7 +121,8 @@ public final class GuideBook {
             List<String> text = new ArrayList<>();
             for (JsonElement line : chapter.getAsJsonArray("text")) text.add(line.getAsString());
             Tab tab = Tab.byKey(chapter.has("tab") ? chapter.get("tab").getAsString() : "");
-            chapters.add(new Chapter(title, icon, tab, List.copyOf(text)));
+            String group = chapter.has("group") ? chapter.get("group").getAsString() : "";
+            chapters.add(new Chapter(title, icon, tab, group, List.copyOf(text), List.of()));
         }
         return chapters;
     }

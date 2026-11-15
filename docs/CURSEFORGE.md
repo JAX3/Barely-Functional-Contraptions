@@ -41,17 +41,9 @@ Craft a book with a Functional Machine Block to get the in-game guide. Its chapt
 
 ## Power
 
-### Mycelial Generator
+The manual sorts the generators into tiers.
 
-Burns red or brown mushrooms and water for 200–250 FE/t. Generators that touch form a network, and each running one boosts the whole network's output. Running generators slowly turn nearby dirt into mycelium and sometimes grow huge mushrooms, so they make more of their own fuel.
-
-![Machine fronts, idle and running](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/14_machine_fronts.png)
-
-### Zero Point Module
-
-Two modules facing each other across open space link with a beam and make 1,000 FE/t for every block of gap, up to 64. Stained glass in the gap colours the beam, and the beam burns anything that walks into it.
-
-![Two Zero Point Energy Modules joined by a beam coloured by stained glass](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/34_zero_point_coloured_beam.png)
+**Early game:** Glow Panel and Wool Burner. Cheap to build, but weak.
 
 ### Glow Panels
 
@@ -59,17 +51,33 @@ Make up to 60 FE/t from sunlight and up to 40 FE/t from block light; a Glow Lamp
 
 ![Glow Panels in the sun with a Glow Lamp](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/55_glow_panels.png)
 
+### Wool Burner
+
+Burns spare wool for power, one item at a time: plain wool and string give 30 FE/t, Coal Wool 120 FE/t. It waits while its buffer is full, so nothing is wasted.
+
+![A row of Wool Burners, one fed by a hopper](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/80_wool_burners.png)
+
+**Mid game:** Blaze Furnace and Mycelial Generator. They need the Nether or a mushroom farm, and Mycelial networks grow fast.
+
 ### Blaze Furnace
 
 Makes power from the heat of Blaze sheep standing round it: 80 FE/t for one, up to 260 FE/t for four. Only a sheep with its blazing fleece on counts, and each Blaze Rod doubles the output for 30 seconds.
 
 ![A Blaze Sheep Furnace beside a burning Blaze sheep, with its area shown](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/70_blaze_furnace.png)
 
-### Wool Burner
+### Mycelial Generator
 
-Burns spare wool for power, one item at a time: plain wool and string give 30 FE/t, Coal Wool 120 FE/t. It waits while its buffer is full, so nothing is wasted.
+Burns red or brown mushrooms and water for 200–250 FE/t. Generators that touch form a network, and each running one boosts the whole network's output. Running generators slowly turn nearby dirt into mycelium and sometimes grow huge mushrooms, so they make more of their own fuel.
 
-![A row of Wool Burners, one fed by a hopper](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/80_wool_burners.png)
+![Machine fronts, idle and running](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/14_machine_fronts.png)
+
+**Late game:** Zero Point Module. It costs a Nether Star and makes the most power, with no fuel.
+
+### Zero Point Module
+
+Two modules facing each other across open space link with a beam and make 1,000 FE/t for every block of gap, up to 64. Stained glass in the gap colours the beam, and the beam burns anything that walks into it.
+
+![Two Zero Point Energy Modules joined by a beam coloured by stained glass](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/34_zero_point_coloured_beam.png)
 
 ### Energy Storage
 
