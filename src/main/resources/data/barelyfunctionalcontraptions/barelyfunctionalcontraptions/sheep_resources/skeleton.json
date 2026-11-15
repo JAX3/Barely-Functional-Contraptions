@@ -25,5 +25,18 @@
       "bones"
     ],
     "skull_texture": "minecraft:textures/entity/skeleton/skeleton.png"
+  },
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:bone_block",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:golden_carrot",
+        "count": 1
+      }
+    ]
   }
 }

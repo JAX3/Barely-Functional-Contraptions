@@ -945,18 +945,29 @@ public final class ModGameTests {
         });
     }
 
-    /** It waits for catalysts, a sheep, power and enough items; tier 1 needs no catalysts; Endurance still counts. */
+    /**
+     * It waits for catalysts, a sheep, power and enough items; tier 1 Iron takes 2 Blocks of Iron and a Golden Carrot
+     * round the ingot; Endurance still counts. By default no sheep can be fed by hand, Iron included.
+     */
     private static void altarWaits(GameTestHelper h) {
         // Missing a catalyst.
         var noRose = altar(h, new BlockPos(1, 1, 1), true, new ItemStack(Items.NETHER_STAR), new ItemStack(Items.SOUL_SAND, 4), new ItemStack(Items.BONE_BLOCK, 2));
         sheepAt(h, new BlockPos(1, 1, 2), null);
         // No sheep.
-        var alone = altar(h, new BlockPos(5, 1, 1), true, new ItemStack(Items.IRON_INGOT));
+        var alone = altar(h, new BlockPos(5, 1, 1), true, new ItemStack(Items.IRON_INGOT), new ItemStack(Items.IRON_BLOCK, 2), new ItemStack(Items.GOLDEN_CARROT));
         // No power.
-        var unpowered = altar(h, new BlockPos(1, 1, 5), false, new ItemStack(Items.IRON_INGOT));
+        var unpowered = altar(h, new BlockPos(1, 1, 5), false, new ItemStack(Items.IRON_INGOT), new ItemStack(Items.IRON_BLOCK, 2), new ItemStack(Items.GOLDEN_CARROT));
         sheepAt(h, new BlockPos(1, 1, 6), null);
         // Tier 1 Iron at a powered altar, an already-Gold sheep next to it is skipped for a plain Endurance-10 one.
-        var iron = altar(h, new BlockPos(5, 1, 5), true, new ItemStack(Items.IRON_INGOT, 3));
+        var iron = altar(h, new BlockPos(5, 1, 5), true, new ItemStack(Items.IRON_INGOT, 3), new ItemStack(Items.IRON_BLOCK, 2), new ItemStack(Items.GOLDEN_CARROT));
+        // Without its catalysts, Iron waits too.
+        var noBlocks = altar(h, new BlockPos(3, 1, 3), true, new ItemStack(Items.IRON_INGOT), new ItemStack(Items.GOLDEN_CARROT));
+        // And it can't be fed by hand any more.
+        Sheep handFed = sheepAt(h, new BlockPos(7, 1, 1), null);
+        Player feeder = playerHolding(h, new ItemStack(Items.IRON_INGOT));
+        feeder.interactOn(handFed, InteractionHand.MAIN_HAND, handFed.position());
+        h.assertFalse(SheepInfusionEvents.getInfusion(handFed).isInfused(), "an Iron Ingot can't be fed by hand");
+        h.assertTrue(feeder.getMainHandItem().getCount() == 1, "and isn't used");
         sheepAt(h, new BlockPos(5, 1, 6), ResourcefulSheep.id("gold"));
         Sheep tough = sheepAt(h, new BlockPos(6, 1, 5), null);
         SheepInfusionEvents.setStats(tough, new com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStats(1, 1, 10));
@@ -973,7 +984,9 @@ public final class ModGameTests {
             h.assertTrue(alone.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AltarStatus.NO_SHEEP, "waits for a sheep, was " + alone.status());
             h.assertTrue(unpowered.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AltarStatus.NO_ENERGY, "waits for power, was " + unpowered.status());
             h.assertTrue(noRose.getItem(0).getCount() == 1 && noRose.getItem(1).getCount() == 4, "nothing is used while it waits");
-            h.assertTrue(SheepInfusionEvents.getInfusion(tough).resource().map(IRON::equals).orElse(false), "tier 1 Iron needs no catalysts");
+            h.assertTrue(SheepInfusionEvents.getInfusion(tough).resource().map(IRON::equals).orElse(false), "tier 1 Iron is infused with its catalysts");
+            h.assertTrue(iron.getItem(1).isEmpty() && iron.getItem(2).isEmpty(), "the 2 Blocks of Iron and the Golden Carrot are used");
+            h.assertTrue(noBlocks.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AltarStatus.MISSING_CATALYSTS, "Iron waits for its blocks, was " + noBlocks.status());
             int base = SheepResourceRegistry.server().byId(IRON).orElseThrow().effectiveInfusionUses();
             h.assertTrue(SheepInfusionEvents.getInfusion(tough).usesRemaining() == Math.round(base * 1.9), "its Endurance still counts");
             h.assertTrue(iron.getItem(0).getCount() == 2, "one ingot used, then it waits: no other sheep can take Iron");
@@ -1209,8 +1222,19 @@ public final class ModGameTests {
         return player;
     }
 
+    /**
+     * Feeds the sheep by hand, the quick way most tests infuse a sheep. Every sheep needs the altar by default now, so
+     * this allows hand feeding for tier 1 (as it used to be) for the one interaction; tier 2 still can't be fed by hand.
+     */
     private static void feed(Player player, Sheep sheep) {
-        player.interactOn(sheep, InteractionHand.MAIN_HAND, sheep.position());
+        var setting = com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.handFeedingMaxTier;
+        int old = setting.get();
+        setting.set(Math.max(old, 1));
+        try {
+            player.interactOn(sheep, InteractionHand.MAIN_HAND, sheep.position());
+        } finally {
+            setting.set(old);
+        }
     }
 
     private static List<ItemStack> shear(GameTestHelper h, Sheep sheep) {
@@ -1587,7 +1611,7 @@ public final class ModGameTests {
                 .thenWaitUntil(() -> h.assertTrue(SheepResourceRegistry.server().byId(slime).isPresent(), "generated slime resource loaded"))
                 .thenExecute(() -> {
                     sheep[0] = sheep(h);
-                    feed(playerHolding(h, new ItemStack(Items.SLIME_BLOCK)), sheep[0]);
+                    feed(playerHolding(h, new ItemStack(Items.SLIME_BLOCK, 2)), sheep[0]); // generated resources take 2 blocks
                     var infusion = SheepInfusionEvents.getInfusion(sheep[0]);
                     ResourcefulSheep.LOGGER.info("[generated test] after feeding: {}", infusion);
                     h.assertTrue(infusion.resource().map(slime::equals).orElse(false), "fed a slime block: infused with generated slime, got " + infusion);
@@ -1622,7 +1646,7 @@ public final class ModGameTests {
                 .thenWaitUntil(() -> h.assertTrue(SheepResourceRegistry.server().byId(AMETHYST_GEN).isPresent(), "generated amethyst loaded"))
                 .thenExecute(() -> {
                     sheep[0] = sheepAt(h, 1, 5);
-                    feed(playerHolding(h, new ItemStack(Items.AMETHYST_BLOCK)), sheep[0]);
+                    feed(playerHolding(h, new ItemStack(Items.AMETHYST_BLOCK, 2)), sheep[0]);
                     h.assertTrue(SheepInfusionEvents.getInfusion(sheep[0]).resource().map(AMETHYST_GEN::equals).orElse(false),
                             "infused with generated amethyst: " + SheepInfusionEvents.getInfusion(sheep[0]));
                     // ...followed by a plain "generate", which used to delete every generated file it didn't plan itself.

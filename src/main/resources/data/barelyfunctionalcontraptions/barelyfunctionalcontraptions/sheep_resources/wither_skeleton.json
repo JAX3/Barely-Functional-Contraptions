@@ -28,5 +28,18 @@
     ],
     "feature_color": "#4A4A4A",
     "skull_texture": "minecraft:textures/entity/skeleton/wither_skeleton.png"
+  },
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:nether_bricks",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:ender_eye",
+        "count": 1
+      }
+    ]
   }
 }

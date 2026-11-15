@@ -44,7 +44,9 @@ import net.minecraft.world.level.material.MapColor;
  *     else the block itself;</li>
  *     <li><b>uses:</b> 9 when a storage block was broken down into one of those units (a block holds 9), else 1;</li>
  *     <li><b>colours:</b> from the block's map colour;</li>
- *     <li><b>category:</b> ore / gem / dust / material from which tag supplied the output.</li>
+ *     <li><b>category:</b> ore / gem / dust / material from which tag supplied the output;</li>
+ *     <li><b>altar:</b> 2 of the block in the centre, with an ingot, gem or dust of the material and a Golden Carrot
+ *     round it.</li>
  * </ul>
  * The result is plain JSON in a world data pack, so it can be reviewed and hand-edited afterwards.
  */
@@ -245,7 +247,9 @@ public final class ResourceGenerator {
         JsonObject json = new JsonObject();
         json.addProperty("_generated", "by /barelyfunctionalcontraptions generate; safe to edit");
         json.add("feeding_item", feedingJson);
-        json.addProperty("feeding_amount", 1);
+        // Infused at the altar like the built-in sheep: 2 of the block in the centre, round it an ingot (or gem or
+        // dust) of the material when there is one, and a Golden Carrot.
+        json.addProperty("feeding_amount", 2);
         json.addProperty("display_name", title(material));
         json.addProperty("wool_color", hex(color));
         json.addProperty("accent_color", hex(accent));
@@ -261,7 +265,32 @@ public final class ResourceGenerator {
         sep.addProperty("secondary_output", "minecraft:string");
         sep.addProperty("secondary_count", 2);
         json.add("separator", sep);
+        json.add("altar", altar(items, material, filter));
         return new Generated(material, feeding, output, uses, category, json);
+    }
+
+    /** The altar block: tier 1, an ingot, gem or dust of the material (when it has one) and a Golden Carrot. */
+    private static JsonObject altar(HolderLookup.RegistryLookup<Item> items, String material, GeneratorItemFilter filter) {
+        JsonArray catalysts = new JsonArray();
+        for (String prefix : new String[]{"ingots/", "gems/", "dusts/"}) {
+            Identifier tag = Identifier.fromNamespaceAndPath("c", prefix + material);
+            if (firstOfTag(items, tag, filter).isPresent()) {
+                catalysts.add(catalyst("#" + tag, 1));
+                break;
+            }
+        }
+        catalysts.add(catalyst("minecraft:golden_carrot", 1));
+        JsonObject altar = new JsonObject();
+        altar.addProperty("tier", 1);
+        altar.add("catalysts", catalysts);
+        return altar;
+    }
+
+    private static JsonObject catalyst(String ingredient, int count) {
+        JsonObject c = new JsonObject();
+        c.addProperty("ingredient", ingredient);
+        c.addProperty("count", count);
+        return c;
     }
 
     private static Optional<Item> firstOfTag(HolderLookup.RegistryLookup<Item> items, Identifier tagId, GeneratorItemFilter filter) {

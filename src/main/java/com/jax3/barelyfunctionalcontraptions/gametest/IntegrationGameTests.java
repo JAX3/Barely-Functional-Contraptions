@@ -309,7 +309,15 @@ public final class IntegrationGameTests {
         sheep.setColor(DyeColor.WHITE);
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.RED_MUSHROOM, 2));
-        player.interactOn(sheep, InteractionHand.MAIN_HAND, sheep.position());
+        // Every sheep needs the Infusion Altar by default; this test feeds by hand, as tier 1 sheep could before.
+        var handFeeding = com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.handFeedingMaxTier;
+        int oldHandFeeding = handFeeding.get();
+        handFeeding.set(Math.max(oldHandFeeding, 1));
+        try {
+            player.interactOn(sheep, InteractionHand.MAIN_HAND, sheep.position());
+        } finally {
+            handFeeding.set(oldHandFeeding);
+        }
 
         h.assertTrue(SheepInfusionEvents.getInfusedResource(sheep).map(SheepResource::id).map(RED_MUSHROOM::equals).orElse(false),
                 "feeding a red mushroom should infuse the sheep with red mushroom");

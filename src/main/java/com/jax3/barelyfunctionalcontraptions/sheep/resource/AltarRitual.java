@@ -13,14 +13,14 @@ import net.neoforged.neoforge.common.crafting.SizedIngredient;
  *
  * <pre>{@code
  * "altar": {
- *   "tier": 2,                                                      // 2+ can't be fed by hand
+ *   "tier": 2,                                                      // above [infusion_altar] handFeedingMaxTier (0) it can't be fed by hand
  *   "catalysts": [ { "ingredient": "minecraft:soul_sand", "count": 4 } ],  // up to 4, used up
  *   "energy": 200000                                                // FE, optional
  * }
  * }</pre>
  *
  * Every resource can be infused at an altar (tier 1 with no catalysts by default); only tier
- * {@code [infusion_altar] altarOnlyFromTier} and up (2 by default) must be.
+ * those above {@code [infusion_altar] handFeedingMaxTier} must be (0 by default, so every resource).
  */
 public record AltarRitual(int tier, List<SizedIngredient> catalysts, Optional<Integer> energy) {
     public static final int MAX_CATALYSTS = 4;
@@ -34,7 +34,7 @@ public record AltarRitual(int tier, List<SizedIngredient> catalysts, Optional<In
 
     /** Whether this resource can only be infused at an altar, not by hand. */
     public boolean altarOnly() {
-        return tier >= ModConfigs.getInt(ModConfigs.SERVER.altarOnlyFromTier);
+        return tier > ModConfigs.getInt(ModConfigs.SERVER.handFeedingMaxTier);
     }
 
     /** FE for one infusion: the definition's {@code energy}, else the config's default for its tier. */

@@ -8,7 +8,7 @@ A NeoForge mod for **Minecraft 26.3** about sheep and slightly questionable mach
 
 **Found a bug?** [Report it on the bug report form](https://forms.gle/8xG9pMoQnTG6MVo1A).
 
-**Feed a sheep an ingot, a gem or a block and its wool takes on that resource.** Shear it for resource wool, and turn the wool back into the resource in a **Mechanical Separator**. Breed your best sheep to raise their Yield, Growth and Endurance. Higher-tier sheep, such as the Wither, Dragon and Warden sheep, are infused at a powered **Infusion Altar** with catalysts.
+**Infuse a sheep with an ingot, a gem or a block at the Infusion Altar and its wool takes on that resource.** Shear it for resource wool, and turn the wool back into the resource in a **Mechanical Separator**. Breed your best sheep to raise their Yield, Growth and Endurance. Every sheep is infused at a powered **Infusion Altar**: the resource, two of its blocks and an item for its rarity. The legendary Wither, Dragon and Warden sheep take more.
 
 Everything runs on Forge Energy. You can make it from mushrooms in a network of **Mycelial Generators**, from sunlight on **Glow Panels**, from Blaze sheep warming a **Blaze Sheep Furnace**, or from burning spare wool. Store it in **Hume Energy Cubes** and move it, along with fluids and items, through cables and pipes. **Automatic Shears**, **Wool Packers** and hoppers can run a whole farm without you.
 
@@ -115,7 +115,7 @@ Presses 9 of the same resource wool into a Wool Bale. A bale in the Mechanical S
 
 ### Infusing Sheep
 
-Right-click a grown sheep with a resource, such as an Iron Ingot, a Diamond or a Red Mushroom. Its fleece takes the resource's colour, and each infusion lasts 100 shearings. Lambs of infused sheep are born infused too. In creative, the Resource Wool tab has a spawn egg for every sheep, which spawns it already infused.
+Put a resource in the Infusion Altar, such as an Iron Ingot, a Diamond or a Red Mushroom, with 2 of its blocks and a rarity item, and stand a grown sheep beside it. Its fleece takes the resource's colour, and each infusion lasts 100 shearings. Lambs of infused sheep are born infused too. In creative, the Resource Wool tab has a spawn egg for every sheep, which spawns it already infused.
 
 ![Infused sheep, with one showing what it is infused with](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/07_sheep_closeup.png)
 
@@ -133,7 +133,7 @@ All 24 built-in sheep:
 
 ### Infusion Altar
 
-The Wither, Dragon and Warden sheep are tier 2 and can only be infused at a powered Infusion Altar. Put the feeding item in the centre and the catalysts round it, and stand a sheep within 2 blocks. The altar slows the sheep while it works, and can outline the area the sheep must stand in, like the Automatic Shears and Blaze Furnace. Tier 1 resources work there too, so it can infuse a pen on its own.
+Every sheep is infused here. The resource goes in the centre with 2 of its blocks and a rarity item round it: Wheat for common sheep, a Golden Carrot for uncommon, a Golden Apple for rare and an Eye of Ender for epic. The legendary Wither, Dragon and Warden sheep take bigger catalysts and more power. Stand a sheep within 2 blocks. The altar slows the sheep while it works, and can outline the area the sheep must stand in, like the Automatic Shears and Blaze Furnace. Tier 1 resources work there too, so it can infuse a pen on its own.
 
 ![An Infusion Altar streaming particles into the sheep beside it, inside the purple outline of its area](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/94_altar_infusing.png)
 

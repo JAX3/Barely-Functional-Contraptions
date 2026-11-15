@@ -21,5 +21,18 @@
     "features": [
       "glowing"
     ]
+  },
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:glowstone",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:golden_carrot",
+        "count": 1
+      }
+    ]
   }
 }

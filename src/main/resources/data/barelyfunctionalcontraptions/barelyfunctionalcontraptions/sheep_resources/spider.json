@@ -23,5 +23,18 @@
       "glowing_eyes"
     ],
     "feature_color": "#4A3A34"
+  },
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:cobweb",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:golden_carrot",
+        "count": 1
+      }
+    ]
   }
 }

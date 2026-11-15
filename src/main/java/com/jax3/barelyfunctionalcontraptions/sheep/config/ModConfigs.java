@@ -116,7 +116,7 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue statsYieldPerPoint;
         public final ModConfigSpec.DoubleValue statsGrowthPerPoint;
         public final ModConfigSpec.DoubleValue statsEndurancePerPoint;
-        public final ModConfigSpec.IntValue altarOnlyFromTier;
+        public final ModConfigSpec.IntValue handFeedingMaxTier;
         public final ModConfigSpec.IntValue altarBaseEnergy;
         public final ModConfigSpec.IntValue altarHighTierEnergy;
         public final ModConfigSpec.IntValue altarTicks;
@@ -307,8 +307,10 @@ public final class ModConfigs {
             b.pop();
 
             b.comment("Infusion Altar (FE-powered; infuses the sheep beside it, with catalysts for the higher tiers; each resource's tier and catalysts are in its definition's 'altar' block)").push("infusion_altar");
-            altarOnlyFromTier = b.comment("Resources of this tier and up can only be infused at an altar, not fed by hand. The Wither, Dragon and Warden sheep are tier 2. 4 = every resource can be fed by hand.")
-                    .defineInRange("altarOnlyFromTier", 2, 1, 4);
+            // Replaces altarOnlyFromTier (tier 2 and up altar-only), under a new name so older config files pick up the new default.
+            handFeedingMaxTier = b.comment("The highest tier of sheep that can still be fed by hand; everything above it is infused at an Infusion Altar. Most sheep are tier 1; the Wither, Dragon and Warden sheep are tier 2.",
+                            "0 = every sheep needs the altar (the default). 1 = tier 1 sheep can be fed by hand again, as before. 3 = every sheep can be fed by hand.")
+                    .defineInRange("handFeedingMaxTier", 0, 0, 3);
             altarBaseEnergy = b.comment("FE a tier 1 infusion takes at the altar, when its definition doesn't say.")
                     .defineInRange("baseEnergy", 20_000, 0, Integer.MAX_VALUE);
             altarHighTierEnergy = b.comment("FE a tier 2 or 3 infusion takes, when its definition doesn't say.")

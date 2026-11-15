@@ -29,5 +29,18 @@
       "hurt": "minecraft:entity.ghast.hurt",
       "death": "minecraft:entity.ghast.death"
     }
+  },
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:soul_sand",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:golden_apple",
+        "count": 1
+      }
+    ]
   }
 }

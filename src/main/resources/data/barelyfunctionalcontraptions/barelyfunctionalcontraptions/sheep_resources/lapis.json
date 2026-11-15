@@ -16,5 +16,18 @@
     "secondary_count": 2,
     "energy_cost": 12000,
     "processing_ticks": 80
+  },
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:lapis_block",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:golden_carrot",
+        "count": 1
+      }
+    ]
   }
 }

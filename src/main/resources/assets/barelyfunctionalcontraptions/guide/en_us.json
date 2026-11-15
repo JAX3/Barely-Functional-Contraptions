@@ -9,7 +9,7 @@
         "Every machine is built around a Functional Machine Block: craft it from iron ingots, copper ingots and redstone, and use it in the machine recipes.",
         "## The loop",
         "- Mycelial Generators burn mushrooms and water to make Forge Energy (FE).",
-        "- Feed sheep a resource (an iron ingot, a diamond...) to infuse their wool.",
+        "- Infuse sheep with a resource (an iron ingot, a diamond...) at an Infusion Altar to change their wool.",
         "- Shear them for resource wool, and turn the wool back into resources in a Mechanical Separator powered by FE.",
         "- Mushroom sheep give the generators their fuel, which closes the loop.",
         "Sneak and right-click a sheep with an empty hand to see what it is infused with. JEI and Jade, if installed, show recipes and machine details."
@@ -198,16 +198,15 @@
       "title": "Infusing Sheep",
       "icon": "minecraft:iron_ingot",
       "text": [
-        "Right-click a grown sheep holding a resource, such as an Iron Ingot, a Diamond or a Red Mushroom.",
+        "Sheep are infused at a powered Infusion Altar (see its chapter): the resource in the centre, two of its blocks and a rarity item round it, and a grown sheep standing beside it.",
         "- Its fleece takes the resource's colour, and small blocks of the resource grow out of it.",
         "- Each infusion lasts 100 shearings by default.",
         "- Breed infused sheep with wheat and the lamb is born infused too.",
         "- Kill an infused sheep with its wool for a little extra.",
         "- In creative, the Resource Wool tab has a spawn egg for every sheep, which spawns it already infused.",
-        "Anything that isn't a resource works as normal, so wheat, dyes and shears behave as usual.",
+        "Right-clicking a sheep with a resource does nothing now; wheat, dyes and shears behave as usual. A server can bring hand feeding back in the config ([infusion_altar] handFeedingMaxTier).",
         "## More resources",
-        "Data packs can add any resource, and operators can run /barelyfunctionalcontraptions generate to make one for every metal in the modpack.",
-        "The Wither, Dragon and Warden sheep are tier 2 and need an Infusion Altar instead."
+        "Data packs can add any resource, and operators can run /barelyfunctionalcontraptions generate to make one for every metal in the modpack. Generated sheep take 2 of the block, an ingot and a Golden Carrot."
       ],
       "tab": "production"
     },
@@ -234,14 +233,20 @@
       "icon": "barelyfunctionalcontraptions:infusion_altar",
       "tab": "production",
       "text": [
-        "Most resources are tier 1 and can be fed to a sheep by hand. The Wither, Dragon and Warden sheep are tier 2: their Nether Star, Dragon's Breath or Echo Shard only works at an Infusion Altar.",
-        "Put the feeding item in the centre slot and the catalysts in the four slots round it, power the altar, and stand a grown sheep within 2 blocks of it. The sheep takes the resource when the bar fills, and the items are used up then. The altar slows the sheep down while it works, so it doesn't wander off, and lets it go once it's done.",
-        "## Tier 2 catalysts",
-        "- Wither: 4 Soul Sand, 2 Bone Blocks, 1 Wither Rose.",
-        "- Dragon: 4 End Stone, 4 Popped Chorus Fruit, 2 Eyes of Ender.",
-        "- Warden: 4 Sculk, 4 Amethyst Shards, 1 Sculk Catalyst.",
-        "Tier 2 takes 200,000 FE over 5 seconds. Tier 1 resources work at the altar too, with no catalysts and 20,000 FE, so it can infuse a pen without you.",
-        "The catalysts still needed show faded in the empty slots. Hoppers and pipes can feed it from any side. The spyglass button in its window, or a sneak-right-click with an empty hand, outlines the area the sheep must stand in.",
+        "Every sheep is infused at the Infusion Altar. Put the resource in the centre slot and its catalysts in the slots round it, power the altar, and stand a grown sheep within 2 blocks of it. The sheep takes the resource when the bar fills, and the items are used up then. The altar slows the sheep down while it works, so it doesn't wander off, and lets it go once it's done.",
+        "## The recipe",
+        "Most sheep take the same pattern: the ingot (or gem, dust or item) in the centre, 2 of its blocks, and one more item for how rare the sheep is.",
+        "- Common, a Wheat: Stone, Wood, Coal, Copper, Hay, Red and Brown Mushroom.",
+        "- Uncommon, a Golden Carrot: Iron, Gold, Redstone, Lapis, Quartz, Glow Ink, Spider, Skeleton.",
+        "- Rare, a Golden Apple: Diamond, Emerald, Blaze, Ghast.",
+        "- Epic, an Eye of Ender: Netherite (with Ancient Debris), Wither Skeleton (with Nether Bricks).",
+        "For example, Iron is an Iron Ingot in the centre with 2 Blocks of Iron and a Golden Carrot. They take 20,000 FE over 5 seconds.",
+        "## Tier 2: legendary sheep",
+        "- Wither: Nether Star, with 4 Soul Sand, 2 Bone Blocks, 1 Wither Rose.",
+        "- Dragon: Dragon's Breath, with 4 End Stone, 4 Popped Chorus Fruit, 2 Eyes of Ender.",
+        "- Warden: Echo Shard, with 4 Sculk, 4 Amethyst Shards, 1 Sculk Catalyst.",
+        "Tier 2 takes 200,000 FE over 5 seconds.",
+        "The catalysts still needed show faded in the empty slots, and the Recipes tab lists every sheep's. Hoppers and pipes can feed it from any side, so it can infuse a pen without you. The spyglass button in its window, or a sneak-right-click with an empty hand, outlines the area the sheep must stand in.",
         "Data packs set a resource's tier, catalysts and power in its \"altar\" block."
       ]
     },

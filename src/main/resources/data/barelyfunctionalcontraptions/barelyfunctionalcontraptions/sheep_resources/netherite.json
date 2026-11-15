@@ -17,5 +17,18 @@
     "energy_cost": 80000,
     "processing_ticks": 200
   },
-  "growth_item": "minecraft:ancient_debris"
+  "growth_item": "minecraft:ancient_debris",
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:ancient_debris",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:ender_eye",
+        "count": 1
+      }
+    ]
+  }
 }

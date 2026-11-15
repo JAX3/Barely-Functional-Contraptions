@@ -25,5 +25,18 @@
     "features": [
       "on_fire"
     ]
+  },
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:magma_block",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:golden_apple",
+        "count": 1
+      }
+    ]
   }
 }

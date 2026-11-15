@@ -18,5 +18,18 @@
   },
   "appearance": {
     "wool_texture": "barelyfunctionalcontraptions:textures/entity/sheep/hay_wool.png"
+  },
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:hay_block",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:wheat",
+        "count": 1
+      }
+    ]
   }
 }
