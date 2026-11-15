@@ -11,8 +11,8 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * The in-game guide (the Contraptions Manual). Five tabs along the top of the left panel (Power, Logistics, Production,
- * Utility, Recipes), the open tab's chapters below them with their icons, and the chapter's text on the right, wrapped and
+ * The in-game guide (the Contraptions Manual). Six tabs along the top of the left panel (Power, Logistics, Production,
+ * Utility, Recipes, WIP), the open tab's chapters below them with their icons, and the chapter's text on the right, wrapped and
  * split into pages, with page buttons below. Recipes chapters show their recipes as slots instead, with item tooltips.
  * Drawn in the mod's dark slate style.
  */
@@ -22,7 +22,7 @@ public class GuideScreen extends Screen {
     private static final int LIST_WIDTH = 118;
     private static final int ROW = 15;
     /** The tab buttons along the top of the left panel. */
-    private static final int TAB_Y = 21, TAB_W = 21, TAB_H = 20;
+    private static final int TAB_Y = 21, TAB_W = 17, TAB_H = 20;
     /** The open tab's name, then its chapter list. */
     private static final int TAB_NAME_Y = 46, LIST_Y = 58;
     /** Space for the chapter list, below the tab name. */

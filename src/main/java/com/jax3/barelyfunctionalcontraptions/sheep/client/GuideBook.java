@@ -24,7 +24,8 @@ import net.minecraft.world.item.Items;
  *       "text": ["A paragraph.", "## A heading", "- A list item"] } ] }
  * }</pre>
  * Paragraphs are wrapped and split into pages by the screen. A paragraph starting with {@code ## } is a heading.
- * {@code tab} is one of {@code power}, {@code logistics}, {@code production} or {@code utility} (the default). The
+ * {@code tab} is one of {@code power}, {@code logistics}, {@code production}, {@code utility} (the default) or {@code wip}
+ * (work-in-progress features). The
  * Recipes tab isn't in the JSON: {@link GuideRecipes} builds it from the game.
  */
 public final class GuideBook {
@@ -41,7 +42,7 @@ public final class GuideBook {
 
     /** The guide's tabs, in the order they're shown. */
     public enum Tab {
-        POWER, LOGISTICS, PRODUCTION, UTILITY, RECIPES;
+        POWER, LOGISTICS, PRODUCTION, UTILITY, RECIPES, WIP;
 
         public String key() {
             return name().toLowerCase(java.util.Locale.ROOT);
@@ -59,6 +60,7 @@ public final class GuideBook {
                 case PRODUCTION -> com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get();
                 case UTILITY -> com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get();
                 case RECIPES -> Items.CRAFTING_TABLE;
+                case WIP -> Items.SCAFFOLDING;
             });
         }
 

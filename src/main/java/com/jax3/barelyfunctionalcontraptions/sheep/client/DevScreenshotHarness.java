@@ -1699,7 +1699,9 @@ public final class DevScreenshotHarness {
             case 336 -> shot(mc, "99_guide_recipes_altar");
             case 338 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Bales"); }
             case 348 -> shot(mc, "99_guide_recipes_bales");
-            case 352 -> mc.stop();
+            case 350 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openTab(GuideBook.Tab.WIP); }
+            case 360 -> shot(mc, "99_guide_wip");
+            case 364 -> mc.stop();
             default -> {}
         }
     }

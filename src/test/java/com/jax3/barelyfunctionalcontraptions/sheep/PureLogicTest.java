@@ -38,13 +38,13 @@ class PureLogicTest {
             for (var element : chapters) {
                 var chapter = element.getAsJsonObject();
                 String tab = chapter.get("tab").getAsString();
-                assertTrue(java.util.List.of("power", "logistics", "production", "utility").contains(tab), chapter.get("title") + " has a known tab: " + tab);
+                assertTrue(java.util.List.of("power", "logistics", "production", "utility", "wip").contains(tab), chapter.get("title") + " has a known tab: " + tab);
                 perTab.merge(tab, 1, Integer::sum);
                 assertFalse(chapter.get("title").getAsString().isBlank());
                 assertTrue(Identifier.tryParse(chapter.get("icon").getAsString()) != null, "icon id " + chapter.get("icon"));
                 assertFalse(chapter.getAsJsonArray("text").isEmpty(), chapter.get("title") + " has text");
             }
-            assertEquals(4, perTab.size(), "every tab has chapters: " + perTab);
+            assertEquals(5, perTab.size(), "every tab has chapters: " + perTab);
             perTab.forEach((tab, count) -> assertTrue(count <= 9, "the " + tab + " tab's list fits under the tabs: " + count));
         }
     }

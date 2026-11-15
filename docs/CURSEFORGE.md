@@ -25,7 +25,7 @@ Everything runs on Forge Energy. You can make it from mushrooms in a network of 
 
 ## The Contraptions Manual
 
-Craft a book with a Functional Machine Block to get the in-game guide. Its chapters are sorted into **Power**, **Logistics**, **Production** and **Utility** tabs, and the rest of this page follows them in the same order. A fifth tab, **Recipes**, shows every crafting recipe, what each sheep is fed, the altar's catalysts and what every wool and bale separates into, all read from the game so data-pack changes show too.
+Craft a book with a Functional Machine Block to get the in-game guide. Its chapters are sorted into **Power**, **Logistics**, **Production** and **Utility** tabs, and the rest of this page follows them in the same order. A fifth tab, **Recipes**, shows every crafting recipe, what each sheep is fed, the altar's catalysts and what every wool and bale separates into, all read from the game so data-pack changes show too. A **WIP** tab is kept for work-in-progress features as they arrive.
 
 **Power**
 

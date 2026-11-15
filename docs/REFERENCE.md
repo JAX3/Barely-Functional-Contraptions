@@ -60,13 +60,14 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](.
 | ![Main creative tab](screenshots/28_creative_tab_main.png) | ![Resource Wool creative tab](screenshots/27_creative_tab_wool.png) |
 
 ### Contraptions Manual (in-game guide)
-Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game. Its chapters are sorted into five tabs along the top of the left panel:
+Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game. Its chapters are sorted into six tabs along the top of the left panel:
 
 - **Power:** the generators (Mycelial Generator, Zero Point Module, Glow Panels, Blaze Sheep Furnace, Wool Burner) and energy storage.
 - **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
 - **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, and data packs and commands.
 - **Recipes:** built from the game itself, so it matches any data-pack or modpack changes. *Machines* and *Parts and Tools* show every crafting recipe of the mod as a 3x3 grid; *Infusion* shows what each sheep is fed and the wool it grows; *Infusion Altar* shows the catalysts round the feeding item, with the tier and power; *Mechanical Separator* shows what every wool separates into, with the power and time; *Wool Bales* shows packing, unpacking and what every bale separates into. Ingredients that take any of several items cycle through them, and hovering over an item shows its tooltip.
+- **WIP:** work-in-progress features, written up here as they arrive. It's empty for now apart from a short note. A resource pack's guide file puts a chapter here with `"tab": "wip"`.
 
 Hover over a tab to see its name. A resource pack's guide file can still use the tab's old name, `"productive"`; it now means Production.
 

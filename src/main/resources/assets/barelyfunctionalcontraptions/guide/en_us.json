@@ -273,6 +273,15 @@
       "text": [
         "Place it on top of an infinite water source and it fills with a bucket of water a second, which it pushes into tanks and generators beside it."
       ]
+    },
+    {
+      "title": "Work in Progress",
+      "icon": "minecraft:scaffolding",
+      "tab": "wip",
+      "text": [
+        "Features still being built will be written up here as they arrive, so you can try them early.",
+        "Nothing is in progress right now. Expect what appears here to change, and back up your world before trying it."
+      ]
     }
   ]
 }
