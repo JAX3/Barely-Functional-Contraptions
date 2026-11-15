@@ -164,3 +164,5 @@ Sheep, Wool Burner fuels, furnace heat sources and separator recipes are all dat
 ---
 
 Requires NeoForge 26.3 and Java 25; JEI and Jade are optional. The full guide to every block, setting and data-pack format is in [docs/REFERENCE.md](docs/REFERENCE.md). Test results are in [TESTING.md](TESTING.md). Report bugs on the [bug report form](https://forms.gle/8xG9pMoQnTG6MVo1A). MIT licensed.
+
+Automated test provided by Claude

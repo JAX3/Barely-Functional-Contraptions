@@ -170,3 +170,5 @@ Sheep, Wool Burner fuels, furnace heat sources and separator recipes are all dat
 ---
 
 Requires NeoForge 26.3 and Java 25; JEI and Jade are optional. The full guide to every block, setting and data-pack format is in [docs/REFERENCE.md](https://github.com/JAX3/Barely-Functional-Contraptions/blob/main/docs/REFERENCE.md). Test results are in [TESTING.md](https://github.com/JAX3/Barely-Functional-Contraptions/blob/main/TESTING.md). Report bugs on the [bug report form](https://forms.gle/8xG9pMoQnTG6MVo1A). MIT licensed. Source code: [GitHub](https://github.com/JAX3/Barely-Functional-Contraptions).
+
+Automated test provided by Claude
