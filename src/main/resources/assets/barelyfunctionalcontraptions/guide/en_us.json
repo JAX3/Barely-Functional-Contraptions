@@ -286,7 +286,7 @@
       "tab": "wip",
       "text": [
         "Features still being built are written up here as they arrive, so you can see what's coming.",
-        "These are the planned late-game generators: they make a lot of power but need looking after. None of them can be built yet, and their numbers may change. Back up your world before trying anything here once it arrives."
+        "Here are the planned late-game generators, which make a lot of power but need looking after, and the Quantum Sheep. None of them can be built yet, and their numbers may change. Back up your world before trying anything here once it arrives."
       ]
     },
     {
@@ -346,6 +346,23 @@
         "## Upkeep",
         "- A steady flow of resource wool or Wool Bales, so it keeps a sheep farm busy.",
         "- Lint builds up in its chamber. Clear it out with shears every so often; it comes out as plain wool for the Wool Burner."
+      ]
+    },
+    {
+      "title": "Quantum Sheep",
+      "icon": "minecraft:popped_chorus_fruit",
+      "tab": "wip",
+      "text": [
+        "Planned. Not in the game yet; how it works may change.",
+        "A sheep that isn't sure whether it exists. Nobody is quite sure what it's infused with either, least of all the sheep.",
+        "## What it does",
+        "- Now and then it blinks out of existence for a few seconds, then pops back a few blocks away, or in the same place as if it never left.",
+        "- Each time it comes back, its wool may have changed to another resource at random.",
+        "- Shear it and every piece of wool can be a different resource, so one shearing can give Iron, Diamond and Coal Wool at once.",
+        "## The catch",
+        "- You can't choose what it gives, and the rarer resources turn up less often.",
+        "- It can't be relied on for an Automatic Shears farm: if it isn't there when the blades come round, nothing is sheared.",
+        "- Breeding two Quantum Sheep might give a Quantum lamb, a normal sheep, or both and neither."
       ]
     }
   ]

@@ -1699,7 +1699,7 @@ public final class DevScreenshotHarness {
             case 336 -> shot(mc, "99_guide_recipes_altar");
             case 338 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Bales"); }
             case 348 -> shot(mc, "99_guide_recipes_bales");
-            case 350 -> { if (mc.gui.screen() instanceof GuideScreen guide) { guide.openTab(GuideBook.Tab.WIP); guide.openChapter("Hume Field Generator"); } }
+            case 350 -> { if (mc.gui.screen() instanceof GuideScreen guide) { guide.openTab(GuideBook.Tab.WIP); guide.openChapter("Quantum Sheep"); } }
             case 360 -> shot(mc, "99_guide_wip");
             case 362 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Burner"); }
             case 372 -> shot(mc, "83_guide_power_tab");
