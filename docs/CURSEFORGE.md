@@ -25,7 +25,7 @@ Everything runs on Forge Energy. You can make it from mushrooms in a network of 
 
 ## The Contraptions Manual
 
-Craft a book with a Functional Machine Block to get the in-game guide. Its chapters are sorted into four tabs, and the rest of this page follows them in the same order: **Power**, **Logistics**, **Production** and **Utility**.
+Craft a book with a Functional Machine Block to get the in-game guide. Its chapters are sorted into **Power**, **Logistics**, **Production** and **Utility** tabs, and the rest of this page follows them in the same order. A fifth tab, **Recipes**, shows every crafting recipe, what each sheep is fed, the altar's catalysts and what every wool and bale separates into, all read from the game so data-pack changes show too.
 
 **Power**
 
@@ -36,6 +36,8 @@ Craft a book with a Functional Machine Block to get the in-game guide. Its chapt
 ![The Production tab: Infusing Sheep, Themed Sheep, Infusion Altar, Breeding Sheep, Wool Machines and Fluid Reservoir](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/84_guide_production_tab.png)
 
 ![Every block in the mod on stepped rows, each with its name: the Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar and a Wool Bale in front; the Mycelial Generator, Zero Point Energy Module, Glow Panel, Glow Lamp and Blaze Sheep Furnace; the Wool Burner, Hume Energy Cube, Fluid Tank, Fluid Reservoir and Creative Generator; and the Energy Cable, Fluid Pipe, Item Pipe, Energy Meter and Functional Machine Block at the back](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/showcase_blocks.png)
+
+![The Recipes tab's Mechanical Separator chapter: Blaze, Brown Mushroom and Coal wool with their outputs, power and time](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/99_guide_recipes_separator.png)
 
 ## Power
 

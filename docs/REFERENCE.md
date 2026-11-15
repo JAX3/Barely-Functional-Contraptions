@@ -60,18 +60,23 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](.
 | ![Main creative tab](screenshots/28_creative_tab_main.png) | ![Resource Wool creative tab](screenshots/27_creative_tab_wool.png) |
 
 ### Contraptions Manual (in-game guide)
-Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game. Its chapters are sorted into four tabs along the top of the left panel:
+Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game. Its chapters are sorted into five tabs along the top of the left panel:
 
 - **Power:** the generators (Mycelial Generator, Zero Point Module, Glow Panels, Blaze Sheep Furnace, Wool Burner) and energy storage.
 - **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
 - **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, and data packs and commands.
+- **Recipes:** built from the game itself, so it matches any data-pack or modpack changes. *Machines* and *Parts and Tools* show every crafting recipe of the mod as a 3x3 grid; *Infusion* shows what each sheep is fed and the wool it grows; *Infusion Altar* shows the catalysts round the feeding item, with the tier and power; *Mechanical Separator* shows what every wool separates into, with the power and time; *Wool Bales* shows packing, unpacking and what every bale separates into. Ingredients that take any of several items cycle through them, and hovering over an item shows its tooltip.
 
 Hover over a tab to see its name. A resource pack's guide file can still use the tab's old name, `"productive"`; it now means Production.
 
 | Power tab | Production tab |
 |---|---|
 | ![The Contraptions Manual on its Power tab: four tab icons along the top with Power framed, its six chapters below, and the Wool Burner chapter open](screenshots/83_guide_power_tab.png) | ![The Production tab: Infusing Sheep, Themed Sheep, Infusion Altar, Breeding Sheep, Wool Machines and Fluid Reservoir, with Infusing Sheep open](screenshots/84_guide_production_tab.png) |
+
+| Recipes: Machines | Recipes: Mechanical Separator |
+|---|---|
+| ![The Recipes tab's Machines chapter: the Mycelial Generator and Mechanical Separator crafting grids](screenshots/99_guide_recipes_machines.png) | ![The Recipes tab's Mechanical Separator chapter: Blaze, Brown Mushroom and Coal wool with their outputs, power and time](screenshots/99_guide_recipes_separator.png) |
 
 - Pick a tab, then a chapter on the left; long chapters turn over with the arrow buttons.
 - The text lives in `assets/barelyfunctionalcontraptions/guide/en_us.json`. A resource pack can replace it or add a translation (`guide/<language>.json`, e.g. `de_de.json`), which is used when the game is in that language. Each chapter has a `title`, an `icon` item, a `tab` (`power`, `logistics`, `production` or `utility`) and a list of `text` paragraphs; a paragraph starting with `## ` is a heading and one starting with `- ` is a list item.

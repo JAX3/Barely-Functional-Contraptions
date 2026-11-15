@@ -24,14 +24,24 @@ import net.minecraft.world.item.Items;
  *       "text": ["A paragraph.", "## A heading", "- A list item"] } ] }
  * }</pre>
  * Paragraphs are wrapped and split into pages by the screen. A paragraph starting with {@code ## } is a heading.
- * {@code tab} is one of {@code power}, {@code logistics}, {@code production} or {@code utility} (the default).
+ * {@code tab} is one of {@code power}, {@code logistics}, {@code production} or {@code utility} (the default). The
+ * Recipes tab isn't in the JSON: {@link GuideRecipes} builds it from the game.
  */
 public final class GuideBook {
-    public record Chapter(String title, ItemStack icon, Tab tab, List<String> text) {}
+    public record Chapter(String title, ItemStack icon, Tab tab, List<String> text, List<GuideRecipes.Recipe> recipes) {
+        public Chapter(String title, ItemStack icon, Tab tab, List<String> text) {
+            this(title, icon, tab, text, List.of());
+        }
+
+        /** A chapter of recipes (the Recipes tab), drawn as slots rather than text. */
+        public boolean hasRecipes() {
+            return !recipes.isEmpty();
+        }
+    }
 
     /** The guide's tabs, in the order they're shown. */
     public enum Tab {
-        POWER, LOGISTICS, PRODUCTION, UTILITY;
+        POWER, LOGISTICS, PRODUCTION, UTILITY, RECIPES;
 
         public String key() {
             return name().toLowerCase(java.util.Locale.ROOT);
@@ -48,6 +58,7 @@ public final class GuideBook {
                 case LOGISTICS -> com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ITEM_PIPE.get();
                 case PRODUCTION -> com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get();
                 case UTILITY -> com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get();
+                case RECIPES -> Items.CRAFTING_TABLE;
             });
         }
 
@@ -64,7 +75,15 @@ public final class GuideBook {
     public static List<Chapter> load() {
         String language = Minecraft.getInstance().getLanguageManager().getSelected();
         List<Chapter> chapters = read(ResourcefulSheep.id("guide/" + language + ".json"));
-        return chapters.isEmpty() ? read(ResourcefulSheep.id("guide/en_us.json")) : chapters;
+        if (chapters.isEmpty()) chapters = read(ResourcefulSheep.id("guide/en_us.json"));
+        // The Recipes tab is built from the game's recipes and resources, after the written chapters.
+        List<Chapter> all = new ArrayList<>(chapters);
+        try {
+            all.addAll(GuideRecipes.chapters());
+        } catch (RuntimeException e) {
+            ResourcefulSheep.LOGGER.warn("Couldn't build the guide's Recipes tab", e);
+        }
+        return all;
     }
 
     private static List<Chapter> read(Identifier file) {

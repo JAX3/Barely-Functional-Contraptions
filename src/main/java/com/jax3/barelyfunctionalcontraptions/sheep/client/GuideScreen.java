@@ -8,11 +8,13 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.ItemStack;
 
 /**
- * The in-game guide (the Contraptions Manual). Four tabs along the top of the left panel (Power, Logistics, Production,
- * Utility), the open tab's chapters below them with their icons, and the chapter's text on the right, wrapped and split
- * into pages, with page buttons below. Drawn in the mod's dark slate style.
+ * The in-game guide (the Contraptions Manual). Five tabs along the top of the left panel (Power, Logistics, Production,
+ * Utility, Recipes), the open tab's chapters below them with their icons, and the chapter's text on the right, wrapped and
+ * split into pages, with page buttons below. Recipes chapters show their recipes as slots instead, with item tooltips.
+ * Drawn in the mod's dark slate style.
  */
 public class GuideScreen extends Screen {
     private static final int WIDTH = 330;
@@ -20,7 +22,7 @@ public class GuideScreen extends Screen {
     private static final int LIST_WIDTH = 118;
     private static final int ROW = 15;
     /** The tab buttons along the top of the left panel. */
-    private static final int TAB_Y = 21, TAB_W = 27, TAB_H = 20;
+    private static final int TAB_Y = 21, TAB_W = 21, TAB_H = 20;
     /** The open tab's name, then its chapter list. */
     private static final int TAB_NAME_Y = 46, LIST_Y = 58;
     /** Space for the chapter list, below the tab name. */
@@ -35,6 +37,10 @@ public class GuideScreen extends Screen {
     private final List<Button> tabButtons = new ArrayList<>();
     private int page;
     private List<List<FormattedCharSequence>> pages = List.of();
+    /** The open chapter's recipes split into pages, for a Recipes chapter. */
+    private List<List<GuideRecipes.Recipe>> recipePages = List.of();
+    /** Height of the right panel's page area. */
+    private static final int PAGE_HEIGHT = LINES * 9;
     private Button back;
     private Button forward;
 
@@ -108,8 +114,14 @@ public class GuideScreen extends Screen {
         updateButtons();
     }
 
-    /** Shows the chapter titled {@code title}, if there is one. */
+    /** Shows the chapter titled {@code title}, if there is one; the open tab's chapter first, when two share a title. */
     public void openChapter(String title) {
+        for (int i : inTab()) {
+            if (chapters.get(i).title().equals(title)) {
+                openChapter(i);
+                return;
+            }
+        }
         for (int i = 0; i < chapters.size(); i++) {
             if (chapters.get(i).title().equals(title)) {
                 openChapter(i);
@@ -147,7 +159,14 @@ public class GuideScreen extends Screen {
      */
     private List<List<FormattedCharSequence>> paginate() {
         List<List<FormattedCharSequence>> result = new ArrayList<>();
+        recipePages = List.of();
         if (chapters.isEmpty()) return result;
+        if (chapters.get(chapter).hasRecipes()) {
+            recipePages = paginateRecipes(chapters.get(chapter).recipes());
+            // One empty text page per recipe page, so the page count and buttons work the same.
+            for (int i = 0; i < recipePages.size(); i++) result.add(List.of());
+            return result;
+        }
         List<FormattedCharSequence> current = new ArrayList<>();
         boolean afterBullet = false;
         for (String paragraph : chapters.get(chapter).text()) {
@@ -176,6 +195,63 @@ public class GuideScreen extends Screen {
         }
         if (!current.isEmpty()) result.add(current);
         return result;
+    }
+
+    /** As many whole recipes on each page as fit. */
+    private static List<List<GuideRecipes.Recipe>> paginateRecipes(List<GuideRecipes.Recipe> recipes) {
+        List<List<GuideRecipes.Recipe>> result = new ArrayList<>();
+        List<GuideRecipes.Recipe> current = new ArrayList<>();
+        int used = 0;
+        for (GuideRecipes.Recipe recipe : recipes) {
+            if (!current.isEmpty() && used + recipe.height() > PAGE_HEIGHT) {
+                result.add(current);
+                current = new ArrayList<>();
+                used = 0;
+            }
+            current.add(recipe);
+            used += recipe.height();
+        }
+        if (!current.isEmpty()) result.add(current);
+        return result;
+    }
+
+    /** Draws a page of recipes from {@code (left, top)}, and the tooltip of the item under the mouse. */
+    private void drawRecipes(GuiGraphicsExtractor g, List<GuideRecipes.Recipe> recipes, int left, int top, int mouseX, int mouseY) {
+        long tick = net.minecraft.util.Util.getMillis() / 1000;
+        ItemStack hovered = ItemStack.EMPTY;
+        int y = top;
+        for (GuideRecipes.Recipe recipe : recipes) {
+            g.text(font, recipe.title().copy().withStyle(ChatFormatting.BOLD), left, y, 0xFFE8D8FF, false);
+            int bodyTop = y + 11;
+            int bodyLeft = left + 4;
+            for (GuideRecipes.Slot slot : recipe.slots()) {
+                int sx = bodyLeft + slot.x(), sy = bodyTop + slot.y();
+                g.fill(sx, sy, sx + GuideRecipes.SLOT, sy + GuideRecipes.SLOT, 0xFF0F1013);
+                g.fill(sx + 1, sy + 1, sx + GuideRecipes.SLOT - 1, sy + GuideRecipes.SLOT - 1, 0xFF2C2F37);
+                ItemStack stack = slot.shown(tick);
+                if (stack.isEmpty()) continue;
+                g.item(stack, sx + 1, sy + 1);
+                g.itemDecorations(font, stack, sx + 1, sy + 1, slot.label());
+                if (mouseX >= sx && mouseX < sx + GuideRecipes.SLOT && mouseY >= sy && mouseY < sy + GuideRecipes.SLOT) hovered = stack;
+            }
+            drawArrow(g, bodyLeft + recipe.arrowX(), bodyTop + recipe.arrowY());
+            int noteY = bodyTop + recipe.bodyHeight() + 3;
+            for (Component note : recipe.notes()) {
+                for (FormattedCharSequence line : font.split(note, TEXT_WIDTH - 4)) {
+                    g.text(font, line, bodyLeft, noteY, 0xFF9AA3C4, false);
+                    noteY += 9;
+                }
+            }
+            y += recipe.height();
+        }
+        if (!hovered.isEmpty()) g.setTooltipForNextFrame(font, hovered, mouseX, mouseY);
+    }
+
+    /** A small brass arrow, 22 wide, pointing right. */
+    private static void drawArrow(GuiGraphicsExtractor g, int x, int y) {
+        int colour = 0xFFD9B44A;
+        g.fill(x, y + 7, x + 16, y + 9, colour);
+        for (int i = 0; i < 6; i++) g.fill(x + 16 + i, y + 2 + i, x + 17 + i, y + 14 - i, colour);
     }
 
     @Override
@@ -216,6 +292,7 @@ public class GuideScreen extends Screen {
         }
         int textLeft = x + LIST_WIDTH + 12;
         g.text(font, Component.literal(chapters.get(chapter).title()).withStyle(ChatFormatting.BOLD), textLeft, y + 6, 0xFFFFE58A, false);
+        if (!recipePages.isEmpty()) drawRecipes(g, recipePages.get(Math.min(page, recipePages.size() - 1)), textLeft, y + 22, mouseX, mouseY);
         if (!pages.isEmpty()) {
             List<FormattedCharSequence> lines = pages.get(page);
             for (int i = 0; i < lines.size(); i++) g.text(font, lines.get(i), textLeft, y + 24 + i * 9, 0xFFDDE2EE, false);

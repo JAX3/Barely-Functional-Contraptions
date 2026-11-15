@@ -34,6 +34,11 @@ public final class SeparationLookup {
         clientRecipes = map;
     }
 
+    /** Every recipe the client was sent (separating and crafting), for the guide's Recipes tab. */
+    public static RecipeMap clientRecipeMap() {
+        return clientRecipes;
+    }
+
     public static Optional<Separation> find(Level level, ItemStack stack) {
         if (stack.isEmpty()) return Optional.empty();
         Optional<SeparatingRecipe> recipe = findRecipe(level, stack);

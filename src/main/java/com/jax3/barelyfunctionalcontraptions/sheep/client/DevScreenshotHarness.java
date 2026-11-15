@@ -1684,7 +1684,22 @@ public final class DevScreenshotHarness {
             }
             case 276 -> mc.mouseHandler.onMove(mc.getWindow().handle(), EGG_MOUSE_X, EGG_MOUSE_Y, 0, 0);
             case 290 -> shot(mc, "showcase_tab_eggs");
-            case 300 -> mc.stop();
+            case 294 -> {
+                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+                mc.gui.setScreen(new GuideScreen());
+            }
+            case 300 -> {
+                if (mc.gui.screen() instanceof GuideScreen guide) guide.openTab(GuideBook.Tab.RECIPES);
+                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // no tooltip in the shots
+            }
+            case 310 -> shot(mc, "99_guide_recipes_machines");
+            case 312 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Mechanical Separator"); }
+            case 322 -> shot(mc, "99_guide_recipes_separator");
+            case 324 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Infusion Altar"); }
+            case 336 -> shot(mc, "99_guide_recipes_altar");
+            case 338 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Bales"); }
+            case 348 -> shot(mc, "99_guide_recipes_bales");
+            case 352 -> mc.stop();
             default -> {}
         }
     }
