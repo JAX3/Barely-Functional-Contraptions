@@ -34,8 +34,12 @@ z = -9.
 | New blocks: Glow Panels and a Glow Lamp, an Energy Meter, Item and Fluid Pipes with Pull and Push sides | `/tp @s 167 38 -0.5` |
 | Themed sheep: hay, wither, dragon, glow ink, skeleton, wither skeleton, spider, sculk, blaze, ghast | `/tp @s 202.5 37 0.5` |
 | Blaze Sheep Furnace with four Blaze sheep, and Automatic Shears, both with their working area shown | `/tp @s 237.5 40 -3.5` |
+| Wool Burners on wool, string and Coal Wool, and one fed by a hopper | `/tp @s 262.5 37 -4.5 180 25` |
+| Wool Packers fed by hoppers, a separator working a bale, and placed Wool Bales of every wool | `/tp @s 282.5 37 -2.5 180 30` |
+| Infusion Altar that has made a Wither sheep (powered by a Creative Generator), and a bred sheep with high stats | `/tp @s 302.5 37 -5.5 180 25` |
+| Snow Sheep Chiller with three Snow sheep, a hopper and chest under it, and its area shown | `/tp @s 322.5 37 -5.5 180 30` |
 
-The last three scenes were added to the existing world with
+The scenes from the New blocks on were added to the existing world with
 `./gradlew runClient -PscreenshotHarness -PharnessScene=extend_world "-PharnessWorld=BFC Test World"` (unzip this
 world into `run/saves` first). This file is updated whenever a new contraption is added.
 

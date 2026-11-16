@@ -1550,43 +1550,51 @@ public final class DevScreenshotHarness {
      * -PharnessWorld="BFC Test World"}.
      */
     private static final Object[][] EXTRA_SCENES = {
-            {"new blocks", 166},
-            {"themed sheep", 202},
-            {"blaze furnace", 234},
+            // Added before, and already in the world: new blocks (x 166), themed sheep (202), blaze furnace (234).
+            {"wool burner", 262},
+            {"wool packer", 282},
+            {"infusion altar", 302},
+            {"snow sheep chiller", 322},
     };
+    /** A Snow Sheep Chiller with three Snow sheep round it, water in its tank, a hopper and chest under it, and its area shown. */
+    private static void chillerScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos at = origin.offset(0, 0, -4);
+        for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, 0, -10), origin.offset(6, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, -1, -10), origin.offset(6, -1, 2))) level.setBlock(p, Blocks.SNOW_BLOCK.defaultBlockState(), 2);
+        level.setBlock(at, ModBlocks.CHILLER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ChillerBlock.FACING, net.minecraft.core.Direction.SOUTH), 3);
+        level.setBlock(at.below(), Blocks.HOPPER.defaultBlockState(), 3);
+        level.setBlock(at.below().south(), Blocks.CHEST.defaultBlockState(), 3);
+        if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity be) {
+            for (int i = 0; i < 8; i++) be.fillFromBucket();
+            be.setShowsArea(true);
+        }
+        var snow = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(ResourcefulSheep.id("snow")).orElseThrow();
+        double[][] spots = {{-1.5, -0.5}, {1.5, 0.5}, {0.5, -2.0}};
+        for (double[] s : spots) {
+            var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            sheep.snapTo(at.getX() + 0.5 + s[0], at.getY(), at.getZ() + 0.5 + s[1], 200, 0);
+            sheep.setNoAi(true);
+            level.addFreshEntity(sheep);
+            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
+                    com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(snow.id(), snow.effectiveInfusionUses()));
+        }
+        label(server, at.above(), "Snow Sheep Chiller", "aqua");
+    }
+
     /** A Snow Sheep Chiller with three Snow sheep, its area shown, and its window: {@code -PharnessScene=chiller}. */
     private static void chillerTick(Minecraft mc, MinecraftServer server) {
         BlockPos chiller = origin == null ? null : origin.offset(0, 0, -4);
         switch (tick) {
             case 60 -> server.execute(() -> {
-                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
-                ServerLevel level = player.level();
-                origin = player.blockPosition();
-                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
-                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
-                }
-                BlockPos at = origin.offset(0, 0, -4);
-                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, 0, -10), origin.offset(6, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
-                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, -1, -10), origin.offset(6, -1, 2))) level.setBlock(p, Blocks.SNOW_BLOCK.defaultBlockState(), 2);
-                level.setBlock(at, ModBlocks.CHILLER.get().defaultBlockState()
-                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ChillerBlock.FACING, net.minecraft.core.Direction.SOUTH), 3);
-                level.setBlock(at.below(), Blocks.HOPPER.defaultBlockState(), 3);
-                level.setBlock(at.below().south(), Blocks.CHEST.defaultBlockState(), 3);
-                if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity be) {
-                    for (int i = 0; i < 8; i++) be.fillFromBucket();
-                    be.setShowsArea(true);
-                }
-                var snow = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(ResourcefulSheep.id("snow")).orElseThrow();
-                double[][] spots = {{-1.5, -0.5}, {1.5, 0.5}, {0.5, -2.0}};
-                for (double[] s : spots) {
-                    var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-                    sheep.snapTo(at.getX() + 0.5 + s[0], at.getY(), at.getZ() + 0.5 + s[1], 200, 0);
-                    sheep.setNoAi(true);
-                    level.addFreshEntity(sheep);
-                    com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
-                            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(snow.id(), snow.effectiveInfusionUses()));
-                }
-                label(server, at.above(), "Snow Sheep Chiller", "aqua");
+                chillerScene(server);
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamemode spectator @a");
             });
             case 70 -> setHudHidden(mc, true);
             case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 28", origin.getX() + 0.5, origin.getY() + 1.0, origin.getZ() + 1.0));
@@ -1699,8 +1707,12 @@ public final class DevScreenshotHarness {
 
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
-        String[] tps = {"tp @a 167.0 38 -0.5 180 15", "tp @a 202.5 37 0.5 180 18", "tp @a 237.5 40 -3.5 170 30"};
-        if (tick == 30) setHudHidden(mc, true);
+        // The latest scenes: Wool Burners, Wool Packers, the Infusion Altar and the Snow Sheep Chiller.
+        String[] tps = {"tp @a 262.5 37 -4.5 180 25", "tp @a 282.5 37 -2.5 180 30", "tp @a 302.5 37 -5.5 180 25", "tp @a 322.5 37 -5.5 180 30"};
+        if (tick == 30) {
+            setHudHidden(mc, true);
+            command(server, "gamemode spectator @a");
+        }
         for (int i = 0; i < tps.length; i++) {
             if (tick == 40 + i * 60) command(server, tps[i]);
             if (tick == 90 + i * 60) shot(mc, "tour_" + i);
@@ -1738,15 +1750,17 @@ public final class DevScreenshotHarness {
                     ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                     player.teleportTo(x + 0.5, 35, -8.5); // exactly on the spot, in case it drifted
                     switch (i) {
-                        case 0 -> newBlocksScene(server);
-                        case 1 -> {
-                            themedSheepScene(server);
-                            // The skinned (Melon Slice) sheep are a private easter egg: keep them out of the shared world.
-                            var level = player.level();
-                            level.getEntitiesOfClass(Sheep.class, new net.minecraft.world.phys.AABB(origin).inflate(20),
-                                    sh -> sh.hasData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.SHEEP_SKIN)).forEach(Sheep::discard);
+                        case 0 -> woolBurnerScene(server);
+                        case 1 -> woolPackerScene(server);
+                        case 2 -> {
+                            altarScene(server);
+                            // All its catalysts in, so the sheep beside it is infused with the Wither.
+                            if (player.level().getBlockEntity(origin.offset(0, 0, -3)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity be) {
+                                be.setItem(2, new ItemStack(Items.BONE_BLOCK, 2));
+                                be.setItem(3, new ItemStack(Items.WITHER_ROSE, 1));
+                            }
                         }
-                        default -> blazeFurnaceScene(server);
+                        default -> chillerScene(server);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
                 });
