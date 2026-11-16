@@ -145,6 +145,7 @@ public final class ModGameTests {
         TESTS.put("infusion_altar_pulses_when_ready", ModGameTests::altarPulse);
         TESTS.put("list_command_lists_every_sheep", ModGameTests::listCommand);
         TESTS.put("snow_sheep_leaves_snow", ModGameTests::snowSheep);
+        TESTS.put("chiller_freezes_water_with_snow_sheep", ModGameTests::chiller);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
@@ -987,6 +988,52 @@ public final class ModGameTests {
                     h.assertTrue(h.getBlockState(at).isAir(), "corner " + p + " layer " + l + " is gone too, was " + h.getBlockState(at));
                 }
             }
+            h.succeed();
+        });
+    }
+
+    /**
+     * The Snow Sheep Chiller freezes water into Ice with the Snow sheep around it: two of them make Ice from its water,
+     * a bucket each; one with only a sheared one stays idle; pipes fill it with water and can't empty it.
+     */
+    private static void chiller(GameTestHelper h) {
+        Identifier snowId = ResourcefulSheep.id("snow");
+        var chillerBlock = ModBlocks.CHILLER.get();
+        // A chiller with two Snow sheep and three buckets of water.
+        BlockPos pos = new BlockPos(2, 1, 2);
+        h.setBlock(pos, chillerBlock);
+        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.class);
+        for (int i = 0; i < 3; i++) h.assertTrue(be.fillFromBucket(), "a bucket goes in");
+        sheepAt(h, new BlockPos(1, 1, 2), snowId);
+        sheepAt(h, new BlockPos(3, 1, 2), snowId);
+        // One with only a sheared Snow sheep and water: too warm.
+        BlockPos warm = new BlockPos(6, 1, 6);
+        h.setBlock(warm, chillerBlock);
+        var warmBe = h.getBlockEntity(warm, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.class);
+        warmBe.fillFromBucket();
+        Sheep sheared = sheepAt(h, new BlockPos(6, 1, 5), snowId);
+        sheared.setSheared(true);
+        // Pipes and a Fluid Reservoir fill it through its fluid capability: water goes in, nothing comes out, lava doesn't fit.
+        BlockPos fed = new BlockPos(6, 1, 1);
+        h.setBlock(fed, chillerBlock);
+        var handler = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, h.absolutePos(fed), net.minecraft.core.Direction.UP);
+        h.assertTrue(handler != null, "it has a fluid handler");
+        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+            h.assertTrue(handler.insert(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.WATER, 2000, tx) == 2000, "water goes in");
+            h.assertTrue(handler.insert(net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.LAVA), 1000, tx) == 0, "lava doesn't");
+            h.assertTrue(handler.extract(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.WATER, 1000, tx) == 0, "and water doesn't come out");
+            tx.commit();
+        }
+        var fedBe = h.getBlockEntity(fed, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.class);
+        h.runAfterDelay(260, () -> {
+            int ice = be.output().is(Items.ICE) ? be.output().getCount() : 0;
+            h.assertTrue(ice >= 2, "two Snow sheep freeze Ice, got " + be.output());
+            h.assertTrue(be.getTank().getAmount() == 3000 - ice * 1000, "a bucket of water each, left " + be.getTank().getAmount());
+            h.assertTrue(be.coldSourceCount() == 2, "it counts the two Snow sheep, got " + be.coldSourceCount());
+            h.assertTrue(warmBe.output().isEmpty() && warmBe.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus.IDLE,
+                    "a sheared Snow sheep gives no cold, status " + warmBe.status());
+            h.assertTrue(fedBe.getTank().getAmount() == 2000, "the piped water stays, with no sheep to freeze it: " + fedBe.getTank().getAmount());
+            h.assertTrue(be.comparatorSignal() > 0, "a comparator reads the Ice");
             h.succeed();
         });
     }

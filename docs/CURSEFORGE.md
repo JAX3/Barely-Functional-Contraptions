@@ -143,6 +143,12 @@ Every sheep has Yield, Growth and Endurance from 1 to 10. A lamb gets its parent
 
 ![A Gold sheep's Yield 7, Growth 4 and Endurance 9](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/95_sheep_stats.png)
 
+### Snow Sheep Chiller
+
+The Blaze Furnace's icy opposite: Snow sheep standing round it freeze water into Ice, one every 10 seconds with one sheep and about every 3 with four. It needs no power, just a bucket of water per Ice, and hoppers can take the Ice out.
+
+![A Snow Sheep Chiller on a snowy floor with three Snow sheep round it inside its blue area outline, snowflakes drifting in, and a hopper underneath](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/100_chiller.png)
+
 ### Wool Machines
 
 The Mechanical Separator turns resource wool back into 2–4 of its resource, string and sometimes a bonus. Automatic Shears shear every sheep in front of them and keep the wool for hoppers and pipes.

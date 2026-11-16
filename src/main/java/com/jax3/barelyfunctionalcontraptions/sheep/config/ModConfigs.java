@@ -130,6 +130,13 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue baleYield;
         public final ModConfigSpec.DoubleValue baleEnergy;
         public final ModConfigSpec.DoubleValue baleTime;
+        public final ModConfigSpec.IntValue chillerRadius;
+        public final ModConfigSpec.IntValue chillerMaxSources;
+        public final ModConfigSpec.DoubleValue chillerFalloff;
+        public final ModConfigSpec.IntValue chillerTicksPerIce;
+        public final ModConfigSpec.IntValue chillerWaterPerIce;
+        public final ModConfigSpec.IntValue chillerTankCapacity;
+        public final ModConfigSpec.ConfigValue<List<? extends String>> chillerColdSources;
         public final ModConfigSpec.IntValue blazeFurnaceRadius;
         public final ModConfigSpec.IntValue blazeFurnaceMaxHeaters;
         public final ModConfigSpec.DoubleValue blazeFurnaceFalloff;
@@ -353,6 +360,23 @@ public final class ModConfigs {
                     .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
             blazeFurnaceOutput = b.comment("Most FE a furnace pushes into the blocks around it per tick, in total.")
                     .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Snow Sheep Chiller (freezes water into Ice with the cold of Snow sheep in the area around and above it; needs no power)").push("chiller");
+            chillerRadius = b.comment("How far out the chilling area reaches, in blocks: 2 = the 5x5 columns around it (default). It covers the chiller's own level and the block above.")
+                    .defineInRange("radius", 2, 0, 8);
+            chillerMaxSources = b.comment("Most Snow sheep one chiller counts.")
+                    .defineInRange("maxColdSources", 4, 1, 64);
+            chillerFalloff = b.comment("How much less each extra Snow sheep adds to the speed: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on. 0 = no falloff.")
+                    .defineInRange("falloff", 0.125, 0.0, 1.0);
+            chillerTicksPerIce = b.comment("Ticks to freeze one Ice with one Snow sheep (200 = 10 seconds). More sheep freeze faster.")
+                    .defineInRange("ticksPerIce", 200, 1, 72_000);
+            chillerWaterPerIce = b.comment("mB of water each Ice takes (1000 = a bucket).")
+                    .defineInRange("waterPerIce", 1_000, 0, 1_000_000);
+            chillerTankCapacity = b.comment("mB of water a chiller holds.")
+                    .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
+            chillerColdSources = b.comment("Sheep resources whose sheep chill it (with their fleece on).")
+                    .defineListAllowEmpty("coldSources", List.of("barelyfunctionalcontraptions:snow"), () -> "barelyfunctionalcontraptions:snow", o -> o instanceof String);
             b.pop();
 
             b.comment("Automatic Shears (FE-powered; shears sheep in the 3x3 area in front of it into its inventory)").push("automatic_shears");

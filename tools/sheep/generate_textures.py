@@ -3139,6 +3139,128 @@ def generate_infusion_altar_gui():
     img.save(out("gui/infusion_altar.png"))
 
 
+ICE = [hexc("#0f2a4a"), hexc("#1f5a8c"), hexc("#3f8fcf"), hexc("#7fc8f0"), hexc("#bfe8ff"), hexc("#f2fbff")]
+
+
+def generate_chiller_gui():
+    """Snow Sheep Chiller window: water gauge, cold column (frost rising with the cold), info window, Ice slot."""
+    shears = Image.open(out("gui/automatic_shears.png")).convert("RGBA")
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # water gauge, fill 11..40 x 19..82
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 46, 16, 76, 84, GUI["gauge"])          # cold column, 47..74 x 17..82
+    inset(img, 80, 16, 168, 78, GUI["panel"])         # info window
+    slot(img, 134, 41)                                # Ice slot
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    rnd = random.Random(77)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice(ICE[3:6]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    img.paste(shears.crop((176, 64, 208, 80)), (176, 146))          # area button background, normal and hovered
+    for y in range(64):                                             # water fill: deep blue, lighter at the top
+        for x in range(30):
+            c = mix(hexc("#2f6fd0"), hexc("#163a8a"), y / 63.0)
+            if (x * 3 + y) % 11 == 0:
+                c = mix(c, hexc("#7fb8ff"), 0.35)
+            img.putpixel((176 + x, y), c)
+    for f in range(4):                                              # water surface ripple
+        for x in range(30):
+            img.putpixel((176 + x, 66 + f * 2), hexc("#bfe0ff") if (x + f * 3) % 8 < 2 else hexc("#5f9bf0"))
+            img.putpixel((176 + x, 67 + f * 2), hexc("#2f6fd0"))
+    # Cold column: 3 frames of 26x64 at (176 + 26f, 80): frost crystals rising, icicle points along the top.
+    for f in range(3):
+        ox = 176 + f * 26
+        for x in range(26):
+            tip = 4 + 3.0 * abs(math.sin(f * 1.7 + x * 0.8)) + 1.5 * math.sin(f * 0.9 + x * 2.1)
+            for y in range(64):
+                d = y - (8 - tip)
+                if d < 0:
+                    continue
+                centre = 1 - abs(x - 12.5) / 13.0
+                cold = min(1.0, d / 40.0) * 0.5 + centre * 0.35 + 0.08 * math.sin(y * 0.6 + f * 2 + x * 1.3)
+                c = ICE[1 + max(0, min(3, int(cold * 4.2)))] if d > 2 else ICE[4]
+                if d > 4 and (x * 5 + y * 7 + f * 3) % 19 == 0:
+                    c = ICE[5]  # a frost glint
+                img.putpixel((ox + x, 80 + y), c)
+    # Freezing arrow (empty and full) at (176, 162) and (176, 172), 24x9.
+    arrow = ["....................#...", "....................##..", "#####################.#.", "#####################..#",
+             "#####################.#.", "....................##..", "....................#...", "........................", "........................"]
+    for i, (fill, edge) in enumerate(((GUI["gauge"], GUI["inset_light"]), (ICE[3], ICE[5]))):
+        for y, row in enumerate(arrow):
+            for x, ch in enumerate(row):
+                if ch == "#":
+                    img.putpixel((176 + x, 162 + i * 10 + y), edge if y in (2, 4) or x in (20, 21, 22, 23) else fill)
+    img.save(out("gui/chiller.png"))
+
+
+def generate_chiller_block():
+    """Snow Sheep Chiller block: frosted blue-steel casing, an ice window at the front (frosting over while it
+    freezes), and a vent grate with icicles on top."""
+    STEEL, STEEL_L, STEEL_D, DARK = hexc("#4f6a8a"), hexc("#7f9cbf"), hexc("#2f4560"), hexc("#16202e")
+
+    def casing():
+        img = Image.new("RGBA", (16, 16), STEEL)
+        rnd = random.Random(5)
+        for y in range(16):
+            for x in range(16):
+                c = STEEL
+                if rnd.random() < 0.12:
+                    c = mix(STEEL, ICE[4], 0.35)  # frost spots
+                img.putpixel((x, y), c)
+        for i in range(16):
+            img.putpixel((i, 0), STEEL_L); img.putpixel((0, i), STEEL_L)
+            img.putpixel((i, 15), STEEL_D); img.putpixel((15, i), STEEL_D)
+        for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
+            img.putpixel((x, y), ICE[5]); img.putpixel((x + 1, y + 1), STEEL_D)
+        return img
+
+    side = casing()
+    for x in range(1, 15):  # a frosty band
+        side.putpixel((x, 6), ICE[3]); side.putpixel((x, 7), ICE[2])
+    side.save(out("block/chiller_side.png"))
+    top = casing()
+    for y in range(4, 12):
+        for x in range(4, 12):
+            top.putpixel((x, y), DARK if (y % 2 == 0) else STEEL_D)  # vent grate
+    top.save(out("block/chiller_top.png"))
+
+    def front(active):
+        img = casing()
+        for y in range(3, 13):
+            for x in range(3, 13):
+                if x in (3, 12) or y in (3, 12):
+                    img.putpixel((x, y), STEEL_D)  # window frame
+                else:
+                    d = abs(x - 7.5) + abs(y - 7.5)
+                    if active:
+                        c = ICE[5] if d < 2 else ICE[4] if d < 4 else ICE[3]
+                        if (x + y) % 4 == 0:
+                            c = ICE[5]
+                    else:
+                        c = ICE[2] if d < 3 else ICE[1]
+                    img.putpixel((x, y), c)
+        # An ice crystal in the window.
+        for i in range(4, 12):
+            img.putpixel((i, 7), ICE[5] if active else ICE[3])
+            img.putpixel((7, i), ICE[5] if active else ICE[3])
+        return img
+
+    front(False).save(out("block/chiller_front.png"))
+    front(True).save(out("block/chiller_front_active.png"))
+
+
 def generate_hume_field_generator():
     """Hume Field Generator (WIP preview): a steel base and cap on four pillars, two glowing field coils, a glass
     shell round a core that flickers between "on" (cyan) and "off" (magenta), and an observing lens on top."""
@@ -3285,6 +3407,8 @@ def main():
     generate_wool_packer_gui()
     generate_infusion_altar()
     generate_hume_field_generator()
+    generate_chiller_gui()
+    generate_chiller_block()
     generate_infusion_altar_gui()
     generate_advancement_background()
     generate_jei()

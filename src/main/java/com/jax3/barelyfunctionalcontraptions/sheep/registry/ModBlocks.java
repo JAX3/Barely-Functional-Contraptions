@@ -151,6 +151,14 @@ public final class ModBlocks {
                     .sound(SoundType.IRON)
                     .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.LIT) ? 13 : 0));
 
+    /** Freezes water into Ice with the cold of the Snow sheep around it. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.ChillerBlock> CHILLER = REGISTER.registerBlock("chiller",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.ChillerBlock::new,
+            p -> p.mapColor(MapColor.ICE)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.IRON));
+
     /** Infuses the sheep beside it, with catalysts and power: the only way to infuse tier 2 resources. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock> INFUSION_ALTAR = REGISTER.registerBlock("infusion_altar",
             com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock::new,

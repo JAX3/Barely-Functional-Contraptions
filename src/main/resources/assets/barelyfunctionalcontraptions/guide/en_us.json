@@ -267,6 +267,19 @@
       ]
     },
     {
+      "title": "Snow Sheep Chiller",
+      "icon": "barelyfunctionalcontraptions:chiller",
+      "tab": "production",
+      "text": [
+        "The Blaze Sheep Furnace's icy opposite: it freezes water into Ice with the cold of Snow sheep standing in the 5x5 area around it, on its own level or on top of it. It needs no power.",
+        "- One Snow sheep freezes a block of Ice every 10 seconds. Each extra one adds a little less: about 5.3, 3.8 and 3.1 seconds for two, three and four. It counts up to four.",
+        "- Only a grown sheep with its snowy fleece on counts; a sheared one or a lamb gives nothing until its wool grows back.",
+        "- Each Ice takes a bucket of water. Pour Water Buckets in, pipe water in, or place a Fluid Reservoir beside it. It holds 8 buckets.",
+        "- The Ice goes in its slot; a hopper or pipe can take it out of any side, and a comparator reads how full the slot is.",
+        "Right-click it with an empty hand to open its window: the water gauge, the cold column with a pip for each Snow sheep, the freezing arrow and how long each Ice takes. Its spyglass button, or a sneak-right-click with an empty hand, outlines the area."
+      ]
+    },
+    {
       "title": "Wool Machines",
       "icon": "barelyfunctionalcontraptions:mechanical_separator",
       "tab": "production",

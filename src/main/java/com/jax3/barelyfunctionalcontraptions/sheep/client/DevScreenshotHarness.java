@@ -136,6 +136,10 @@ public final class DevScreenshotHarness {
             worldTourTick(mc, server);
             return;
         }
+        if ("chiller".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            chillerTick(mc, server);
+            return;
+        }
         if ("snow_sheep".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             snowSheepTick(mc, server);
             return;
@@ -1550,6 +1554,54 @@ public final class DevScreenshotHarness {
             {"themed sheep", 202},
             {"blaze furnace", 234},
     };
+    /** A Snow Sheep Chiller with three Snow sheep, its area shown, and its window: {@code -PharnessScene=chiller}. */
+    private static void chillerTick(Minecraft mc, MinecraftServer server) {
+        BlockPos chiller = origin == null ? null : origin.offset(0, 0, -4);
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                BlockPos at = origin.offset(0, 0, -4);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, 0, -10), origin.offset(6, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, -1, -10), origin.offset(6, -1, 2))) level.setBlock(p, Blocks.SNOW_BLOCK.defaultBlockState(), 2);
+                level.setBlock(at, ModBlocks.CHILLER.get().defaultBlockState()
+                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ChillerBlock.FACING, net.minecraft.core.Direction.SOUTH), 3);
+                level.setBlock(at.below(), Blocks.HOPPER.defaultBlockState(), 3);
+                level.setBlock(at.below().south(), Blocks.CHEST.defaultBlockState(), 3);
+                if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity be) {
+                    for (int i = 0; i < 8; i++) be.fillFromBucket();
+                    be.setShowsArea(true);
+                }
+                var snow = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(ResourcefulSheep.id("snow")).orElseThrow();
+                double[][] spots = {{-1.5, -0.5}, {1.5, 0.5}, {0.5, -2.0}};
+                for (double[] s : spots) {
+                    var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    sheep.snapTo(at.getX() + 0.5 + s[0], at.getY(), at.getZ() + 0.5 + s[1], 200, 0);
+                    sheep.setNoAi(true);
+                    level.addFreshEntity(sheep);
+                    com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
+                            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(snow.id(), snow.effectiveInfusionUses()));
+                }
+                label(server, at.above(), "Snow Sheep Chiller", "aqua");
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 28", origin.getX() + 0.5, origin.getY() + 1.0, origin.getZ() + 1.0));
+            case 180 -> shot(mc, "100_chiller");
+            case 182 -> {
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 0.5, origin.getY(), origin.getZ() - 1.5));
+            }
+            case 190 -> openAt(server, chiller);
+            case 215 -> shot(mc, "100_chiller_gui");
+            case 220 -> mc.stop();
+            default -> {}
+        }
+    }
+
     /** Snow sheep walking a grass field and leaving snow behind them: {@code -PharnessScene=snow_sheep}. */
     private static void snowSheepTick(Minecraft mc, MinecraftServer server) {
         switch (tick) {

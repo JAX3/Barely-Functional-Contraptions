@@ -64,7 +64,7 @@ Craft a **Contraptions Manual** (a book and a Functional Machine Block) and righ
 
 - **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Wool Burner), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator) and *Late Game* (Zero Point Module), then energy storage. A guide chapter's optional `"group"` field sets the heading it is listed under.
 - **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
-- **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
+- **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Snow Sheep Chiller, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, and data packs and commands.
 - **Recipes:** built from the game itself, so it matches any data-pack or modpack changes. *Machines* and *Parts and Tools* show every crafting recipe of the mod as a 3x3 grid; *Infusion* shows what each sheep is fed and the wool it grows; *Infusion Altar* shows the catalysts round the feeding item, with the tier and power; *Mechanical Separator* shows what every wool separates into, with the power and time; *Wool Bales* shows packing, unpacking and what every bale separates into. Ingredients that take any of several items cycle through them, and hovering over an item shows its tooltip.
 - **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned late-game generators that need upkeep: *Hume Field Generator*, *Echo Chamber* (a Warden sheep in a sculk room), *Lightning Array* and *Fleece Fusion*, and the *Quantum Sheep*, which blinks in and out of existence, changes its wool type and drops random resource wool. None of them is in the game yet. The Hume Field Generator has a first model, a 2x2 machine two and a half blocks tall: in development builds (`runClient`) it can be placed with `/give @s barelyfunctionalcontraptions:hume_field_generator` to look at. It fills the 2x2x3 space east, south and above where it's placed (and won't place if any of it is taken), breaking any part removes the whole machine, and it does nothing yet. Released jars don't include it.
@@ -561,6 +561,22 @@ When several files match, the most specific one wins: `sheep`, then `entity`, th
 
 `duration` is in ticks. Only the Blaze Rod is a boost item by default.
 
+### Snow Sheep Chiller
+The Blaze Sheep Furnace's icy opposite: it **freezes water into Ice with the cold of Snow sheep** standing around it, and needs no power.
+
+| In the world | Its window |
+|---|---|
+| ![A Snow Sheep Chiller on a snowy floor with three Snow sheep round it inside its blue area outline, snowflakes drifting in, and a hopper underneath](screenshots/100_chiller.png) | ![The chiller's window: the water gauge, the cold column with pips for 3 of 4 Snow sheep, Speed x2.63, the freezing arrow into the Ice slot and 3.8 s per Ice, status Freezing](screenshots/100_chiller_gui.png) |
+
+- **Cold:** every half second it counts the grown **Snow sheep with their fleece on** whose feet are in the **5x5 columns around it**, on its level or the block above (the Blaze Furnace's area). A sheared sheep or a lamb gives nothing until its wool grows back. Snowflakes drift from each one into it.
+- **Speed:** one Snow sheep freezes an Ice every **10 seconds** (`ticksPerIce`); each one after the first adds 12.5% less (`falloff`), up to four (`maxColdSources`): about 5.3, 3.8 and 3.1 seconds for two, three and four.
+- **Water:** each Ice takes **1 bucket** (`waterPerIce`) from its **8-bucket tank** (`tankCapacity`). Right-click it with a Water Bucket, pipe water in from any side, or place a **Fluid Reservoir** beside it. Water can't be taken back out.
+- **Ice:** it goes in the chiller's one slot (a stack of 64). Hoppers and pipes take it out of any side; a comparator reads how full the slot is. While the slot is full it stops and keeps its water.
+- **Window:** right-click with an empty hand. The water gauge, the **cold column** (frost rising with the cold, a mark and pip for each Snow sheep), the speed, the freezing arrow into the Ice slot, how long each Ice takes, and the status (*Too warm*, *Freezing*, *No water*, *Ice slot full*).
+- **Area:** its spyglass button, or a sneak-right-click with an empty hand, outlines the area in light blue.
+- **Recipe:** iron ingots in the four corners, a Snow Block above a Functional Machine Block, Packed Ice either side of it, and a Cauldron below. Mine it with a pickaxe.
+- **Config:** `[chiller]` sets the radius, the most Snow sheep counted, the falloff, the time and water per Ice, the tank, and which sheep resources give cold (`coldSources`, the Snow sheep by default).
+
 ### Wool Burner
 A simple generator that **burns spare wool** for Forge Energy: plain wool, string, and Coal Wool from coal-infused sheep.
 
@@ -929,6 +945,16 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `ticks` | 100 | Ticks one infusion takes |
 | `energyCapacity` / `maxEnergyInput` | 250000 / 5000 | The altar's buffer and input rate |
 | `sheepSlowness` | 5 | Slowness level on the sheep while it is infused, taken off when it ends (0 = off) |
+
+**`[chiller]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `radius` | 2 | How far the chilling area reaches (2 = 5x5), at its level and the block above |
+| `maxColdSources` / `falloff` | 4 / 0.125 | Most Snow sheep counted, and how much less each extra one adds |
+| `ticksPerIce` | 200 | Ticks per Ice with one Snow sheep |
+| `waterPerIce` / `tankCapacity` | 1000 / 8000 | mB of water per Ice, and the tank |
+| `coldSources` | `barelyfunctionalcontraptions:snow` | Sheep resources whose sheep give cold |
 
 **`[wool_packer]`**
 
