@@ -151,6 +151,15 @@ public final class ModBlocks {
                     .sound(SoundType.IRON)
                     .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.LIT) ? 13 : 0));
 
+    /** Smelts on FE, faster than a Furnace, faster still with Blaze sheep around it. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.PoweredFurnaceBlock> POWERED_FURNACE = REGISTER.registerBlock("powered_furnace",
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.PoweredFurnaceBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.IRON)
+                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.PoweredFurnaceBlock.LIT) ? 13 : 0));
+
     /** Freezes water into Ice with the cold of the Snow sheep around it. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.ChillerBlock> CHILLER = REGISTER.registerBlock("chiller",
             com.jax3.barelyfunctionalcontraptions.sheep.blocks.ChillerBlock::new,

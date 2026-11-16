@@ -3261,6 +3261,79 @@ def generate_chiller_block():
     front(True).save(out("block/chiller_front_active.png"))
 
 
+def generate_powered_furnace():
+    """Powered Furnace: block (the machine casing with a furnace mouth at the front, glowing while it smelts) and its
+    window (energy gauge, input slot with a flame that lights while Blaze sheep heat it, arrow, output slot, info)."""
+    casing = Image.open(out("block/functional_machine_block.png")).convert("RGBA")
+    casing.save(out("block/powered_furnace_side.png"))
+    top = casing.copy()
+    for y in range(5, 11):  # a chimney grate
+        for x in range(5, 11):
+            top.putpixel((x, y), hexc("#17181c") if y % 2 else hexc("#3a3d45"))
+    top.save(out("block/powered_furnace_top.png"))
+
+    def front(lit):
+        img = casing.copy()
+        for y in range(6, 13):
+            for x in range(3, 13):
+                if y == 6 or x in (3, 12):
+                    img.putpixel((x, y), hexc("#2a2c33"))  # the mouth's frame
+                elif lit:
+                    d = abs(x - 7.5) + (12 - y) * 0.8
+                    img.putpixel((x, y), FIRE[5] if d < 2 else FIRE[4] if d < 3.5 else FIRE[3] if d < 5 else FIRE[2])
+                else:
+                    img.putpixel((x, y), hexc("#17181c"))
+        for x in range(4, 12):  # the grate bars
+            img.putpixel((x, 9), hexc("#2a2c33"))
+        for x, y in ((5, 3), (7, 3), (9, 3)):  # a vent row above the mouth
+            img.putpixel((x, y), hexc("#17181c"))
+        return img
+
+    front(False).save(out("block/powered_furnace_front.png"))
+    front(True).save(out("block/powered_furnace_front_lit.png"))
+
+    shears = Image.open(out("gui/automatic_shears.png")).convert("RGBA")
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # energy gauge, fill 11..40 x 19..82
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    slot(img, 56, 22)                                 # input
+    grid(BURNER_FLAME, {"F": GUI["tick"], "Y": GUI["tick"], "W": GUI["tick"]}, img, 57, 42)   # flame, unlit
+    img.alpha_composite(arrow_shape(hexc("#2c2e36"), hexc("#17181c")), (82, 31))
+    slot(img, 124, 31)                                # output
+    inset(img, 46, 60, 168, 84, GUI["panel"])         # info window
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    rnd = random.Random(53)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice(FIRE[2:5]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    img.paste(shears.crop((176, 64, 208, 80)), (176, 146))          # area button background
+    for y in range(64):                                             # energy fill: amber
+        for x in range(30):
+            c = mix(FIRE[4], FIRE[1], y / 63.0)
+            if (x + y) % 4 == 0:
+                c = mix(c, FIRE[5], 0.2)
+            img.putpixel((176 + x, y), c)
+    for f in range(4):                                              # energy surface shimmer
+        for x in range(30):
+            img.putpixel((176 + x, 66 + f * 2), FIRE[5] if (x + f * 2) % 8 == 0 else FIRE[4])
+            img.putpixel((176 + x, 67 + f * 2), FIRE[3])
+    img.alpha_composite(arrow_shape(FIRE[3], FIRE[1]), (176, 80))   # arrow fill
+    grid(BURNER_FLAME, {"F": FIRE[2], "Y": FIRE[4], "W": FIRE[5]}, img, 176, 100)  # lit flame
+    img.save(out("gui/powered_furnace.png"))
+
+
 def generate_hume_field_generator():
     """Hume Field Generator (WIP preview): a steel base and cap on four pillars, two glowing field coils, a glass
     shell round a core that flickers between "on" (cyan) and "off" (magenta), and an observing lens on top."""
@@ -3409,6 +3482,7 @@ def main():
     generate_hume_field_generator()
     generate_chiller_gui()
     generate_chiller_block()
+    generate_powered_furnace()
     generate_infusion_altar_gui()
     generate_advancement_background()
     generate_jei()

@@ -146,6 +146,7 @@ public final class ModGameTests {
         TESTS.put("list_command_lists_every_sheep", ModGameTests::listCommand);
         TESTS.put("snow_sheep_leaves_snow", ModGameTests::snowSheep);
         TESTS.put("chiller_freezes_water_with_snow_sheep", ModGameTests::chiller);
+        TESTS.put("powered_furnace_smelts_faster_with_blaze_sheep", ModGameTests::poweredFurnace);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
@@ -988,6 +989,46 @@ public final class ModGameTests {
                     h.assertTrue(h.getBlockState(at).isAir(), "corner " + p + " layer " + l + " is gone too, was " + h.getBlockState(at));
                 }
             }
+            h.succeed();
+        });
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity poweredFurnace(GameTestHelper h, BlockPos pos, boolean powered, ItemStack input) {
+        h.setBlock(pos, ModBlocks.POWERED_FURNACE.get());
+        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity.class);
+        be.setItem(0, input);
+        if (powered) {
+            var energy = (net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler) be.getEnergyHandler();
+            energy.set(energy.getCapacityAsInt());
+        }
+        return be;
+    }
+
+    /**
+     * The Powered Furnace smelts in three quarters of a Furnace's time (Raw Iron: 150 ticks instead of 200), faster with
+     * Blaze sheep around it (two: x1.47, about 102 ticks), not at all without power, and only what a Furnace can smelt.
+     */
+    private static void poweredFurnace(GameTestHelper h) {
+        var alone = poweredFurnace(h, new BlockPos(1, 1, 1), true, new ItemStack(Items.RAW_IRON, 4));
+        var blazing = poweredFurnace(h, new BlockPos(6, 1, 1), true, new ItemStack(Items.RAW_IRON, 4));
+        sheepAt(h, new BlockPos(5, 1, 1), ResourcefulSheep.id("blaze"));
+        sheepAt(h, new BlockPos(6, 1, 2), ResourcefulSheep.id("blaze"));
+        var unpowered = poweredFurnace(h, new BlockPos(1, 1, 6), false, new ItemStack(Items.RAW_IRON, 4));
+        h.assertFalse(alone.canPlaceItem(0, new ItemStack(Items.DIRT)), "dirt can't be smelted, so it doesn't go in");
+        h.assertTrue(alone.canPlaceItem(0, new ItemStack(Items.RAW_IRON)), "raw iron can");
+        int start = alone.getEnergyHandler().getAmountAsInt();
+        h.runAfterDelay(125, () -> {
+            h.assertTrue(blazing.heaterCount() == 2 && blazing.speed() > 140, "two Blaze sheep speed it up, speed " + blazing.speed() + " from " + blazing.heaterCount());
+            h.assertTrue(blazing.output().is(Items.IRON_INGOT), "with Blaze sheep the first ingot is out by 125 ticks, got " + blazing.output());
+            h.assertTrue(alone.output().isEmpty(), "alone it's not done yet (150 ticks), got " + alone.output());
+        });
+        h.runAfterDelay(170, () -> {
+            h.assertTrue(alone.output().is(Items.IRON_INGOT) && alone.output().getCount() == 1, "alone, one ingot by 170 ticks (a Furnace takes 200), got " + alone.output());
+            h.assertTrue(alone.storedExperience() > 0, "and it keeps the experience for whoever takes it");
+            int used = start - alone.getEnergyHandler().getAmountAsInt();
+            h.assertTrue(used >= 150 * 20 && used <= 170 * 20, "20 FE/t while smelting, used " + used);
+            h.assertTrue(unpowered.output().isEmpty() && unpowered.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus.NO_ENERGY,
+                    "nothing without power, status " + unpowered.status());
             h.succeed();
         });
     }

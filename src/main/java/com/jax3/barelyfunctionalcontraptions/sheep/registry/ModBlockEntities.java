@@ -30,6 +30,9 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity>> BLAZE_FURNACE = REGISTER.register("blaze_furnace",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity::new, ModBlocks.BLAZE_FURNACE.get()));
 
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity>> POWERED_FURNACE = REGISTER.register("powered_furnace",
+            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity::new, ModBlocks.POWERED_FURNACE.get()));
+
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity>> CHILLER = REGISTER.register("chiller",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity::new, ModBlocks.CHILLER.get()));
 

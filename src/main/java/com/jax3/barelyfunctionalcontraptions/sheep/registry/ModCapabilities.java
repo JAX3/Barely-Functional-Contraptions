@@ -38,6 +38,10 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.BLAZE_FURNACE.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.BLAZE_FURNACE.get(),
                 (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
+        // Powered Furnace: power in on every face; items in to the input and out of the output, on every face.
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.POWERED_FURNACE.get(), (be, side) -> be.getEnergyHandler());
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.POWERED_FURNACE.get(),
+                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Snow Sheep Chiller: water in on every face (buckets, pipes, a Fluid Reservoir), and its Ice out for hoppers and pipes.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.CHILLER.get(), (be, side) -> be.getTank());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.CHILLER.get(),

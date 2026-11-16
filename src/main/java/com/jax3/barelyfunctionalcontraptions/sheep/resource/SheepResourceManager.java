@@ -99,9 +99,9 @@ public final class SheepResourceManager extends SimplePreparableReloadListener<M
         public static void onDatapackSync(OnDatapackSyncEvent event) {
             var payload = new SyncSheepResourcesPayload(java.util.List.copyOf(SheepResourceRegistry.server().all()));
             event.getRelevantPlayers().forEach(player -> PacketDistributor.sendToPlayer(player, payload));
-            // Crafting recipes too, for the Contraptions Manual's Recipes tab.
+            // Crafting recipes too, for the Contraptions Manual's Recipes tab, and smelting for the Powered Furnace's slot.
             event.sendRecipes(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModRecipes.SEPARATING_TYPE.get(),
-                    net.minecraft.world.item.crafting.RecipeType.CRAFTING);
+                    net.minecraft.world.item.crafting.RecipeType.CRAFTING, net.minecraft.world.item.crafting.RecipeType.SMELTING);
         }
 
         /** Runs once the reload has bound tags: warn about definitions whose feeding tag is empty. */

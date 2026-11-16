@@ -137,6 +137,12 @@ Every sheep has Yield, Growth and Endurance from 1 to 10. A lamb gets its parent
 
 ![A Gold sheep's Yield 7, Growth 4 and Endurance 9](docs/screenshots/95_sheep_stats.png)
 
+### Powered Furnace
+
+Smelts anything a Furnace can, on power instead of fuel, in three quarters of the time. Blaze sheep standing round it speed it up further: about x1.5 with two, x1.8 with four.
+
+![Two Powered Furnaces fed by hoppers, the one on the right with two burning Blaze sheep beside it inside its orange area outline](docs/screenshots/101_powered_furnace.png)
+
 ### Snow Sheep Chiller
 
 The Blaze Furnace's icy opposite: Snow sheep standing round it freeze water into Ice, one every 10 seconds with one sheep and about every 3 with four. It needs no power, just a bucket of water per Ice, and hoppers can take the Ice out.

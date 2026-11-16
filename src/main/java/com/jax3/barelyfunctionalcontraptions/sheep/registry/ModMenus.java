@@ -36,6 +36,9 @@ public final class ModMenus {
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu>> BLAZE_FURNACE = REGISTER.register("blaze_furnace",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu::new));
 
+    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.PoweredFurnaceMenu>> POWERED_FURNACE = REGISTER.register("powered_furnace",
+            () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.PoweredFurnaceMenu::new));
+
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.ChillerMenu>> CHILLER = REGISTER.register("chiller",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.ChillerMenu::new));
 

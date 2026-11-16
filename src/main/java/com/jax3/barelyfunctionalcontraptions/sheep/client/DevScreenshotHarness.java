@@ -136,6 +136,10 @@ public final class DevScreenshotHarness {
             worldTourTick(mc, server);
             return;
         }
+        if ("powered_furnace".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            poweredFurnaceTick(mc, server);
+            return;
+        }
         if ("chiller".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             chillerTick(mc, server);
             return;
@@ -1556,6 +1560,66 @@ public final class DevScreenshotHarness {
             {"infusion altar", 302},
             {"snow sheep chiller", 322},
     };
+    /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
+    private static void poweredFurnaceScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(8, 6, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(8, -1, 4))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
+        var blaze = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(ResourcefulSheep.id("blaze")).orElseThrow();
+        String[] names = {"Powered Furnace", "With 2 Blaze sheep"};
+        for (int i = 0; i < 2; i++) {
+            BlockPos at = o.offset(-3 + i * 6, 0, -4);
+            level.setBlock(at, ModBlocks.POWERED_FURNACE.get().defaultBlockState()
+                    .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.PoweredFurnaceBlock.FACING, Direction.SOUTH), 3);
+            level.setBlock(at.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+            level.setBlock(at.above(), Blocks.HOPPER.defaultBlockState(), 3);
+            level.setBlock(at.above(2), Blocks.CHEST.defaultBlockState(), 3);
+            if (level.getBlockEntity(at.above(2)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity chest) {
+                chest.setItem(0, new ItemStack(Items.RAW_IRON, 64));
+                chest.setItem(1, new ItemStack(Items.RAW_GOLD, 32));
+            }
+            label(server, at.above(3), names[i], i == 0 ? "white" : "gold");
+            if (i == 1) {
+                if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity be) be.setShowsArea(true);
+                for (int side : new int[]{-1, 1}) {
+                    var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    sheep.snapTo(at.getX() + 0.5 + side, at.getY(), at.getZ() + 0.5, 180, 0);
+                    sheep.setNoAi(true);
+                    level.addFreshEntity(sheep);
+                    com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
+                            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(blaze.id(), blaze.effectiveInfusionUses()));
+                }
+            }
+        }
+    }
+
+    /** The Powered Furnace scene, then the window of the one with Blaze sheep: {@code -PharnessScene=powered_furnace}. */
+    private static void poweredFurnaceTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                poweredFurnaceScene(server);
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamemode spectator @a");
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 25", origin.getX() + 0.5, origin.getY() + 1.5, origin.getZ() + 1.5));
+            case 200 -> shot(mc, "101_powered_furnace");
+            case 202 -> {
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 3.5, origin.getY(), origin.getZ() - 1.5));
+            }
+            case 210 -> openAt(server, origin.offset(3, 0, -4));
+            case 235 -> shot(mc, "101_powered_furnace_gui");
+            case 240 -> mc.stop();
+            default -> {}
+        }
+    }
+
     /** A Snow Sheep Chiller with three Snow sheep round it, water in its tank, a hopper and chest under it, and its area shown. */
     private static void chillerScene(MinecraftServer server) {
         ServerPlayer player = server.getPlayerList().getPlayers().getFirst();

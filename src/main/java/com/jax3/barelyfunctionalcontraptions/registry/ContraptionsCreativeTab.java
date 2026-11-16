@@ -46,6 +46,7 @@ public final class ContraptionsCreativeTab {
                 // Processing
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_PACKER.get());
+                output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.POWERED_FURNACE.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.INFUSION_ALTAR.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.AUTOMATIC_SHEARS.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_RESERVOIR.get());

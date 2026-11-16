@@ -267,6 +267,19 @@
       ]
     },
     {
+      "title": "Powered Furnace",
+      "icon": "barelyfunctionalcontraptions:powered_furnace",
+      "tab": "production",
+      "text": [
+        "Smelts anything a Furnace can, on power instead of fuel, in three quarters of the time: Raw Iron takes 7.5 seconds instead of 10.",
+        "- It uses 20 FE/t while smelting, from any side.",
+        "- Blaze sheep with their fleece on, standing in the 5x5 area around it or on top, speed it up: x1.25 with one, about x1.47, x1.66 and x1.81 with two, three and four. They don't use any more power, so they save power too.",
+        "- Hoppers and pipes put items in and take results out from any side. A comparator reads the input.",
+        "- Take the results out of its window to get the smelting experience, as from a Furnace.",
+        "Its spyglass button, or a sneak-right-click with an empty hand, outlines the Blaze sheep's area. JEI shows it as a station for every smelting recipe."
+      ]
+    },
+    {
       "title": "Snow Sheep Chiller",
       "icon": "barelyfunctionalcontraptions:chiller",
       "tab": "production",

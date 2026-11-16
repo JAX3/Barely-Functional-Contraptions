@@ -164,5 +164,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addCraftingStation(InfusionCategory.TYPE, Items.SHEARS);
         registration.addCraftingStation(InfusionCategory.TYPE, ModItems.INFUSION_ALTAR.get()); // tier 1 works there too
         registration.addCraftingStation(AltarCategory.TYPE, ModItems.INFUSION_ALTAR.get());
+        // The Powered Furnace smelts everything a Furnace does.
+        registration.addCraftingStation(mezz.jei.api.constants.RecipeTypes.SMELTING, ModItems.POWERED_FURNACE.get());
     }
 }

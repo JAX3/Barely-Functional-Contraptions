@@ -130,6 +130,12 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue baleYield;
         public final ModConfigSpec.DoubleValue baleEnergy;
         public final ModConfigSpec.DoubleValue baleTime;
+        public final ModConfigSpec.DoubleValue poweredFurnaceCookTime;
+        public final ModConfigSpec.IntValue poweredFurnaceEnergyPerTick;
+        public final ModConfigSpec.DoubleValue poweredFurnaceBlazeBonus;
+        public final ModConfigSpec.IntValue poweredFurnaceMaxHeaters;
+        public final ModConfigSpec.IntValue poweredFurnaceCapacity;
+        public final ModConfigSpec.IntValue poweredFurnaceMaxInput;
         public final ModConfigSpec.IntValue chillerRadius;
         public final ModConfigSpec.IntValue chillerMaxSources;
         public final ModConfigSpec.DoubleValue chillerFalloff;
@@ -360,6 +366,21 @@ public final class ModConfigs {
                     .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
             blazeFurnaceOutput = b.comment("Most FE a furnace pushes into the blocks around it per tick, in total.")
                     .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Powered Furnace (smelts anything a Furnace can, on FE; Blaze sheep around it speed it up)").push("powered_furnace");
+            poweredFurnaceCookTime = b.comment("Its smelting time as a share of a Furnace's: 0.75 = three quarters of the time (a 10 s smelt takes 7.5 s).")
+                    .defineInRange("cookTimeMultiplier", 0.75, 0.01, 10.0);
+            poweredFurnaceEnergyPerTick = b.comment("FE it uses per tick while smelting.")
+                    .defineInRange("energyPerTick", 20, 0, 1_000_000);
+            poweredFurnaceBlazeBonus = b.comment("Extra speed from each Blaze sheep (heat source) in the area around it: 0.25 = 25% faster for the first; each one after it adds less, with the Blaze Sheep Furnace's falloff. The area is the furnace's ([blaze_furnace] radius).")
+                    .defineInRange("blazeBonus", 0.25, 0.0, 10.0);
+            poweredFurnaceMaxHeaters = b.comment("Most Blaze sheep it counts.")
+                    .defineInRange("maxBlazeSheep", 4, 0, 64);
+            poweredFurnaceCapacity = b.comment("FE it stores.")
+                    .defineInRange("energyCapacity", 20_000, 1, Integer.MAX_VALUE);
+            poweredFurnaceMaxInput = b.comment("Most FE it accepts per tick.")
+                    .defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
             b.pop();
 
             b.comment("Snow Sheep Chiller (freezes water into Ice with the cold of Snow sheep in the area around and above it; needs no power)").push("chiller");

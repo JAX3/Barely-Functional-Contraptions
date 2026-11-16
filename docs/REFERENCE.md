@@ -64,7 +64,7 @@ Craft a **Contraptions Manual** (a book and a Functional Machine Block) and righ
 
 - **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Wool Burner), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator) and *Late Game* (Zero Point Module), then energy storage. A guide chapter's optional `"group"` field sets the heading it is listed under.
 - **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
-- **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Snow Sheep Chiller, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
+- **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Powered Furnace, the Snow Sheep Chiller, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, and data packs and commands.
 - **Recipes:** built from the game itself, so it matches any data-pack or modpack changes. *Machines* and *Parts and Tools* show every crafting recipe of the mod as a 3x3 grid; *Infusion* shows what each sheep is fed and the wool it grows; *Infusion Altar* shows the catalysts round the feeding item, with the tier and power; *Mechanical Separator* shows what every wool separates into, with the power and time; *Wool Bales* shows packing, unpacking and what every bale separates into. Ingredients that take any of several items cycle through them, and hovering over an item shows its tooltip.
 - **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned late-game generators that need upkeep: *Hume Field Generator*, *Echo Chamber* (a Warden sheep in a sculk room), *Lightning Array* and *Fleece Fusion*, and the *Quantum Sheep*, which blinks in and out of existence, changes its wool type and drops random resource wool. None of them is in the game yet. The Hume Field Generator has a first model, a 2x2 machine two and a half blocks tall: in development builds (`runClient`) it can be placed with `/give @s barelyfunctionalcontraptions:hume_field_generator` to look at. It fills the 2x2x3 space east, south and above where it's placed (and won't place if any of it is taken), breaking any part removes the whole machine, and it does nothing yet. Released jars don't include it.
@@ -561,6 +561,22 @@ When several files match, the most specific one wins: `sheep`, then `entity`, th
 
 `duration` is in ticks. Only the Blaze Rod is a boost item by default.
 
+### Powered Furnace
+**Smelts anything a Furnace can, on Forge Energy instead of fuel, in three quarters of the time**, and faster still with Blaze sheep around it.
+
+| In the world | Its window |
+|---|---|
+| ![Two Powered Furnaces fed by hoppers, the one on the right with two burning Blaze sheep beside it inside its orange area outline](screenshots/101_powered_furnace.png) | ![The Powered Furnace's window: the energy gauge, Raw Iron in the input with a lit flame under it, the smelting arrow, an Iron Ingot out, Speed x1.47 and Blaze sheep 2 / 4, status Smelting](screenshots/101_powered_furnace_gui.png) |
+
+- **Speed:** each item takes **0.75 of its Furnace time** (`cookTimeMultiplier`): Raw Iron 7.5 s instead of 10.
+- **Blaze sheep:** heat sources (the Blaze Sheep Furnace's: Blaze sheep with their fleece on, by default) with their feet in the furnace's area (`[blaze_furnace] radius`, 5x5 by default, on its level and the block above) speed it up by **25%** for the first (`blazeBonus`), each one after it adding a little less (the Blaze Furnace's falloff), up to four (`maxBlazeSheep`): x1.25, about x1.47, x1.66 and x1.81. The flame under its input slot lights while they do. They don't add to its power use, so they save power too.
+- **Power:** **20 FE/t while smelting** (`energyPerTick`), from any face; it stores 20,000 FE and accepts 1,000 FE/t. It pauses without power.
+- **Items:** hoppers and pipes put smeltable items in on any side and take only the results out. A comparator reads the input. Only items a Furnace can smelt go in.
+- **Experience:** kept until a player takes the results from its window, like a Furnace's (and dropped if it's broken).
+- **Area:** its spyglass button, or a sneak-right-click with an empty hand, outlines the Blaze sheep's area in orange.
+- **JEI:** it's listed as a station for every smelting recipe.
+- **Recipe:** iron ingots in the corners and a redstone dust top middle, Furnaces either side of a Functional Machine Block, and a copper ingot bottom middle.
+
 ### Snow Sheep Chiller
 The Blaze Sheep Furnace's icy opposite: it **freezes water into Ice with the cold of Snow sheep** standing around it, and needs no power.
 
@@ -945,6 +961,15 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `ticks` | 100 | Ticks one infusion takes |
 | `energyCapacity` / `maxEnergyInput` | 250000 / 5000 | The altar's buffer and input rate |
 | `sheepSlowness` | 5 | Slowness level on the sheep while it is infused, taken off when it ends (0 = off) |
+
+**`[powered_furnace]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `cookTimeMultiplier` | 0.75 | Its smelting time as a share of a Furnace's |
+| `energyPerTick` | 20 | FE/t while smelting |
+| `blazeBonus` / `maxBlazeSheep` | 0.25 / 4 | Extra speed from the first Blaze sheep (each one after adds less), and the most counted |
+| `energyCapacity` / `maxEnergyInput` | 20000 / 1000 | Its buffer and input rate |
 
 **`[chiller]`**
 
