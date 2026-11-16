@@ -1,7 +1,16 @@
 {
   "variants": {
-    "": {
+    "part=0": {
       "model": "barelyfunctionalcontraptions:block/hume_field_generator"
+    },
+    "part=1": {
+      "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
+    },
+    "part=2": {
+      "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
+    },
+    "part=3": {
+      "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
     }
   }
 }

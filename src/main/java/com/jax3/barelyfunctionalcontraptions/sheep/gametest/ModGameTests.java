@@ -144,6 +144,7 @@ public final class ModGameTests {
         TESTS.put("infusion_altar_waits_for_what_it_needs", ModGameTests::altarWaits);
         TESTS.put("infusion_altar_pulses_when_ready", ModGameTests::altarPulse);
         TESTS.put("list_command_lists_every_sheep", ModGameTests::listCommand);
+        if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -944,6 +945,41 @@ public final class ModGameTests {
             h.assertTrue(be.getItem(0).getCount() == 1, "one Nether Star used, left " + be.getItem(0));
             h.assertTrue(be.getItem(1).getCount() == 1 && be.getItem(2).isEmpty() && be.getItem(3).isEmpty(), "4 soul sand, 2 bone blocks and the rose used");
             h.assertTrue(start - be.getEnergyHandler().getAmountAsInt() == 200_000, "200,000 FE used, used " + (start - be.getEnergyHandler().getAmountAsInt()));
+        });
+    }
+
+    /**
+     * The work-in-progress Hume Field Generator (development builds only) takes a 2x2 area: placing it fills the three
+     * blocks east and south of it, it won't place where they're taken, and breaking any corner removes all four.
+     */
+    private static void humeField(GameTestHelper h) {
+        var block = ModBlocks.HUME_FIELD_GENERATOR.get();
+        var part = com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.PART;
+        // A solid floor to click on (the empty structure's floor would be replaced instead).
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 3))) h.setBlock(p, Blocks.STONE);
+        Player player = playerHolding(h, new ItemStack(ModItems.HUME_FIELD_GENERATOR.get()));
+        BlockPos floor = h.absolutePos(new BlockPos(1, 0, 1));
+        var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floor), net.minecraft.core.Direction.UP, floor, false);
+        player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND, hit));
+        for (int p = 0; p < 4; p++) {
+            BlockPos at = new BlockPos(1 + (p & 1), 1, 1 + (p >> 1));
+            h.assertTrue(h.getBlockState(at).is(block) && h.getBlockState(at).getValue(part) == p, "corner " + p + " at " + at + ", was " + h.getBlockState(at));
+        }
+        // Blocked: a stone where a corner would go.
+        h.setBlock(new BlockPos(5, 1, 2), Blocks.STONE);
+        Player other = playerHolding(h, new ItemStack(ModItems.HUME_FIELD_GENERATOR.get()));
+        BlockPos floor2 = h.absolutePos(new BlockPos(4, 0, 1));
+        other.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(other, InteractionHand.MAIN_HAND,
+                new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floor2), net.minecraft.core.Direction.UP, floor2, false)));
+        h.assertFalse(h.getBlockState(new BlockPos(4, 1, 1)).is(block), "it won't place where a corner is taken");
+        // Breaking the south-east corner takes the rest with it.
+        h.getLevel().destroyBlock(h.absolutePos(new BlockPos(2, 1, 2)), false);
+        h.runAfterDelay(2, () -> {
+            for (int p = 0; p < 4; p++) {
+                BlockPos at = new BlockPos(1 + (p & 1), 1, 1 + (p >> 1));
+                h.assertTrue(h.getBlockState(at).isAir(), "corner " + p + " is gone too, was " + h.getBlockState(at));
+            }
+            h.succeed();
         });
     }
 

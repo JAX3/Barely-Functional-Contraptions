@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "barelyfunctionalcontraptions:block/hume_field_generator"
+    "model": "barelyfunctionalcontraptions:item/hume_field_generator"
   }
 }
