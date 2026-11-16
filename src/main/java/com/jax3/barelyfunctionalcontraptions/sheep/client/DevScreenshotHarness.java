@@ -1556,24 +1556,27 @@ public final class DevScreenshotHarness {
                 for (String c : new String[]{"time set noon", "weather clear", "gamemode spectator @a"}) {
                     server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
                 }
-                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-4, 0, -6), origin.offset(4, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-4, 0, -6), origin.offset(4, 5, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
                 for (BlockPos p : BlockPos.betweenClosed(origin.offset(-4, -1, -6), origin.offset(4, -1, 2))) level.setBlock(p, Blocks.POLISHED_DEEPSLATE.defaultBlockState(), 2);
                 // The 2x2 machine: corner 0 at the north-west, the other three corners east and south of it.
                 BlockPos at = origin.offset(-1, 0, -4);
                 var block = ModBlocks.HUME_FIELD_GENERATOR.get();
                 for (int part = 0; part < 4; part++) {
-                    level.setBlock(at.offset(part & 1, 0, part >> 1), block.defaultBlockState()
-                            .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.PART, part), 3);
+                    for (int layer = 0; layer < 3; layer++) {
+                        level.setBlock(at.offset(part & 1, layer, part >> 1), block.defaultBlockState()
+                                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.PART, part)
+                                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.LAYER, layer), 3);
+                    }
                 }
                 level.setBlock(origin.offset(2, 0, -3), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
             });
             case 70 -> setHudHidden(mc, true);
             // Eye height is 1.62 above these, so the camera sits about level with the cap.
-            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 22", origin.getX() + 0.5, origin.getY() + 0.2, origin.getZ() + 0.6));
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 15", origin.getX() + 0.5, origin.getY() + 0.4, origin.getZ() + 1.8));
             case 110 -> shot(mc, "wip_hume_field_front");
             case 112 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 145 38", origin.getX() + 2.5, origin.getY() + 1.4, origin.getZ() + 0.5));
             case 140 -> shot(mc, "wip_hume_field_above");
-            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 10", origin.getX() + 0.0, origin.getY() - 0.7, origin.getZ() - 0.9));
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 2", origin.getX() + 0.0, origin.getY() - 0.4, origin.getZ() - 0.2));
             case 170 -> shot(mc, "wip_hume_field_close");
             case 176 -> mc.stop();
             default -> {}

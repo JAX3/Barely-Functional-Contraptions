@@ -949,8 +949,8 @@ public final class ModGameTests {
     }
 
     /**
-     * The work-in-progress Hume Field Generator (development builds only) takes a 2x2 area: placing it fills the three
-     * blocks east and south of it, it won't place where they're taken, and breaking any corner removes all four.
+     * The work-in-progress Hume Field Generator (development builds only) takes a 2x2 area three blocks high: placing it
+     * fills the eleven blocks east, south and above it, it won't place where one is taken, and breaking any removes all.
      */
     private static void humeField(GameTestHelper h) {
         var block = ModBlocks.HUME_FIELD_GENERATOR.get();
@@ -961,23 +961,29 @@ public final class ModGameTests {
         BlockPos floor = h.absolutePos(new BlockPos(1, 0, 1));
         var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floor), net.minecraft.core.Direction.UP, floor, false);
         player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND, hit));
+        var layer = com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.LAYER;
         for (int p = 0; p < 4; p++) {
-            BlockPos at = new BlockPos(1 + (p & 1), 1, 1 + (p >> 1));
-            h.assertTrue(h.getBlockState(at).is(block) && h.getBlockState(at).getValue(part) == p, "corner " + p + " at " + at + ", was " + h.getBlockState(at));
+            for (int l = 0; l < 3; l++) {
+                BlockPos at = new BlockPos(1 + (p & 1), 1 + l, 1 + (p >> 1));
+                h.assertTrue(h.getBlockState(at).is(block) && h.getBlockState(at).getValue(part) == p && h.getBlockState(at).getValue(layer) == l,
+                        "corner " + p + " layer " + l + " at " + at + ", was " + h.getBlockState(at));
+            }
         }
         // Blocked: a stone where a corner would go.
-        h.setBlock(new BlockPos(5, 1, 2), Blocks.STONE);
+        h.setBlock(new BlockPos(5, 3, 2), Blocks.STONE); // in its top layer
         Player other = playerHolding(h, new ItemStack(ModItems.HUME_FIELD_GENERATOR.get()));
         BlockPos floor2 = h.absolutePos(new BlockPos(4, 0, 1));
         other.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(other, InteractionHand.MAIN_HAND,
                 new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floor2), net.minecraft.core.Direction.UP, floor2, false)));
         h.assertFalse(h.getBlockState(new BlockPos(4, 1, 1)).is(block), "it won't place where a corner is taken");
-        // Breaking the south-east corner takes the rest with it.
-        h.getLevel().destroyBlock(h.absolutePos(new BlockPos(2, 1, 2)), false);
+        // Breaking the middle of the south-east column takes the rest with it.
+        h.getLevel().destroyBlock(h.absolutePos(new BlockPos(2, 2, 2)), false);
         h.runAfterDelay(2, () -> {
             for (int p = 0; p < 4; p++) {
-                BlockPos at = new BlockPos(1 + (p & 1), 1, 1 + (p >> 1));
-                h.assertTrue(h.getBlockState(at).isAir(), "corner " + p + " is gone too, was " + h.getBlockState(at));
+                for (int l = 0; l < 3; l++) {
+                    BlockPos at = new BlockPos(1 + (p & 1), 1 + l, 1 + (p >> 1));
+                    h.assertTrue(h.getBlockState(at).isAir(), "corner " + p + " layer " + l + " is gone too, was " + h.getBlockState(at));
+                }
             }
             h.succeed();
         });

@@ -1,15 +1,39 @@
 {
   "variants": {
-    "part=0": {
+    "layer=0,part=0": {
       "model": "barelyfunctionalcontraptions:block/hume_field_generator"
     },
-    "part=1": {
+    "layer=1,part=0": {
       "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
     },
-    "part=2": {
+    "layer=2,part=0": {
+      "model": "barelyfunctionalcontraptions:block/hume_field_generator_top"
+    },
+    "layer=0,part=1": {
       "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
     },
-    "part=3": {
+    "layer=1,part=1": {
+      "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
+    },
+    "layer=2,part=1": {
+      "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
+    },
+    "layer=0,part=2": {
+      "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
+    },
+    "layer=1,part=2": {
+      "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
+    },
+    "layer=2,part=2": {
+      "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
+    },
+    "layer=0,part=3": {
+      "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
+    },
+    "layer=1,part=3": {
+      "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
+    },
+    "layer=2,part=3": {
       "model": "barelyfunctionalcontraptions:block/hume_field_generator_part"
     }
   }
