@@ -144,6 +144,7 @@ public final class ModGameTests {
         TESTS.put("infusion_altar_waits_for_what_it_needs", ModGameTests::altarWaits);
         TESTS.put("infusion_altar_pulses_when_ready", ModGameTests::altarPulse);
         TESTS.put("list_command_lists_every_sheep", ModGameTests::listCommand);
+        TESTS.put("snow_sheep_leaves_snow", ModGameTests::snowSheep);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
@@ -588,6 +589,7 @@ public final class ModGameTests {
         var registry = SheepResourceRegistry.server();
         java.util.Map<String, List<Feature>> expected = new java.util.LinkedHashMap<>();
         expected.put("hay", List.of());
+        expected.put("snow", List.of());
         expected.put("wither", List.of(Feature.EXTRA_HEADS));
         expected.put("dragon", List.of(Feature.WINGS));
         expected.put("glow_ink", List.of(Feature.GLOWING));
@@ -666,13 +668,13 @@ public final class ModGameTests {
 
     private static void themedAdvancements(GameTestHelper h) {
         var server = h.getLevel().getServer();
-        for (String name : List.of("hay", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast")) {
+        for (String name : List.of("hay", "snow", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast")) {
             var adv = server.getAdvancements().get(ResourcefulSheep.id("contraptions/sheep/" + name));
             h.assertTrue(adv != null && adv.value().parent().map(ResourcefulSheep.id("contraptions/infuse_sheep")::equals).orElse(false),
                     "themed advancement " + name + " is loaded under Infuse a Sheep");
         }
         var every = server.getAdvancements().get(ResourcefulSheep.id("contraptions/every_wool"));
-        h.assertTrue(every != null && every.value().criteria().size() == 24, "the every-wool challenge has one criterion per built-in wool");
+        h.assertTrue(every != null && every.value().criteria().size() == 25, "the every-wool challenge has one criterion per built-in wool");
         h.assertTrue(every.value().criteria().keySet().containsAll(SheepResourceRegistry.server().all().stream()
                 .filter(r -> r.id().getNamespace().equals(ResourcefulSheep.MOD_ID)).map(r -> r.id().getPath()).toList()), "every built-in resource is in the challenge");
 
@@ -985,6 +987,40 @@ public final class ModGameTests {
                     h.assertTrue(h.getBlockState(at).isAir(), "corner " + p + " layer " + l + " is gone too, was " + h.getBlockState(at));
                 }
             }
+            h.succeed();
+        });
+    }
+
+    /**
+     * A Snow sheep is infused at the altar with a Snow Block (2 more and a Wheat round it), and leaves snow where it
+     * walks while its fleece is on; a sheared one, or a plain sheep, leaves none.
+     */
+    private static void snowSheep(GameTestHelper h) {
+        Identifier snowId = ResourcefulSheep.id("snow");
+        var snow = SheepResourceRegistry.server().byId(snowId).orElseThrow();
+        h.assertTrue(snow.trailBlock().map(Blocks.SNOW::equals).orElse(false), "the Snow sheep's trail is snow");
+        h.assertTrue(snow.feedingItem().test(new ItemStack(Items.SNOW_BLOCK)) && snow.altar().catalysts().size() == 2, "fed Snow Blocks at the altar");
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(8, 0, 6))) h.setBlock(p, Blocks.STONE);
+        Sheep walker = sheepAt(h, new BlockPos(1, 1, 1), snowId);
+        walker.setNoAi(false);
+        Sheep sheared = sheepAt(h, new BlockPos(1, 1, 3), snowId);
+        sheared.setNoAi(false);
+        sheared.setSheared(true);
+        Sheep plain = sheepAt(h, new BlockPos(1, 1, 5), null);
+        plain.setNoAi(false);
+        h.onEachTick(() -> {
+            walker.getNavigation().moveTo(h.absoluteVec(new net.minecraft.world.phys.Vec3(7.5, 1, 1.5)).x, h.absolutePos(new BlockPos(0, 1, 0)).getY(), h.absoluteVec(new net.minecraft.world.phys.Vec3(7.5, 1, 1.5)).z, 1.0);
+            sheared.getNavigation().moveTo(h.absoluteVec(new net.minecraft.world.phys.Vec3(7.5, 1, 3.5)).x, h.absolutePos(new BlockPos(0, 1, 0)).getY(), h.absoluteVec(new net.minecraft.world.phys.Vec3(7.5, 1, 3.5)).z, 1.0);
+            plain.getNavigation().moveTo(h.absoluteVec(new net.minecraft.world.phys.Vec3(7.5, 1, 5.5)).x, h.absolutePos(new BlockPos(0, 1, 0)).getY(), h.absoluteVec(new net.minecraft.world.phys.Vec3(7.5, 1, 5.5)).z, 1.0);
+        });
+        h.runAfterDelay(100, () -> {
+            int[] rows = new int[7];
+            for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 1, 0), new BlockPos(8, 1, 6))) {
+                if (h.getBlockState(p).is(Blocks.SNOW)) rows[p.getZ()]++;
+            }
+            ResourcefulSheep.LOGGER.info("[snow test] snow per row {} walker at {}", java.util.Arrays.toString(rows), h.relativePos(walker.blockPosition()));
+            h.assertTrue(rows[0] + rows[1] + rows[2] >= 3, "the Snow sheep leaves a trail of snow, rows " + java.util.Arrays.toString(rows));
+            h.assertTrue(rows[3] + rows[4] + rows[5] + rows[6] == 0, "a sheared Snow sheep and a plain sheep leave none, rows " + java.util.Arrays.toString(rows));
             h.succeed();
         });
     }

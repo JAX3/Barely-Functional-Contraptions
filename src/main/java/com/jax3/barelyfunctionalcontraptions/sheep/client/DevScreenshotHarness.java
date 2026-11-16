@@ -136,6 +136,10 @@ public final class DevScreenshotHarness {
             worldTourTick(mc, server);
             return;
         }
+        if ("snow_sheep".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            snowSheepTick(mc, server);
+            return;
+        }
         if ("hume_field".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             humeFieldTick(mc, server);
             return;
@@ -1546,6 +1550,50 @@ public final class DevScreenshotHarness {
             {"themed sheep", 202},
             {"blaze furnace", 234},
     };
+    /** Snow sheep walking a grass field and leaving snow behind them: {@code -PharnessScene=snow_sheep}. */
+    private static void snowSheepTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, 0, -14), origin.offset(8, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, -1, -14), origin.offset(8, -1, 2))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                var snow = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(ResourcefulSheep.id("snow")).orElseThrow();
+                for (int i = 0; i < 3; i++) {
+                    var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    sheep.snapTo(origin.getX() - 5.5 + i * 4, origin.getY(), origin.getZ() - 10.5 + i * 2, 0, 0);
+                    level.addFreshEntity(sheep);
+                    com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
+                            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(snow.id(), snow.effectiveInfusionUses()));
+                    snowWalkers.add(sheep);
+                }
+                label(server, origin.offset(0, 1, -12), "Snow Sheep", "aqua");
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 30", origin.getX() + 0.5, origin.getY() + 2.0, origin.getZ() + 1.5));
+            default -> {}
+        }
+        // Walk them back and forth across the field for the trail.
+        if (tick >= 80 && tick < 400 && tick % 20 == 0) {
+            server.execute(() -> {
+                for (int i = 0; i < snowWalkers.size(); i++) {
+                    var sheep = snowWalkers.get(i);
+                    double tx = origin.getX() + ((tick / 100 + i) % 2 == 0 ? 6.5 : -6.5);
+                    double tz = origin.getZ() - 12.5 + ((tick / 60 + i) % 3) * 4;
+                    sheep.getNavigation().moveTo(tx, origin.getY(), tz, 1.1);
+                }
+            });
+        }
+        if (tick == 420) shot(mc, "99_snow_sheep");
+        if (tick == 426) mc.stop();
+    }
+
+    private static final java.util.List<net.minecraft.world.entity.animal.sheep.Sheep> snowWalkers = new java.util.ArrayList<>();
+
     /** The work-in-progress Hume Field Generator model, from the front and from above: {@code -PharnessScene=hume_field}. */
     private static void humeFieldTick(Minecraft mc, MinecraftServer server) {
         switch (tick) {
@@ -1820,11 +1868,12 @@ public final class DevScreenshotHarness {
         // Every built-in sheep in a pen further back, each with its name.
         var resources = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().all().stream()
                 .filter(r -> r.id().getNamespace().equals(ResourcefulSheep.MOD_ID)).toList();
-        int perRow = 6;
+        // As square a grid as the count allows (5 x 5 for the 25 built-in sheep), so no row is left nearly empty.
+        int perRow = (int) Math.ceil(Math.sqrt(resources.size()));
         for (int i = 0; i < resources.size(); i++) {
             var r = resources.get(i);
             int col = i % perRow, row = i / perRow;
-            double x = o.getX() + 0.5 + (col - (perRow - 1) / 2.0) * 3.4;
+            double x = o.getX() + 0.5 + (col - (perRow - 1) / 2.0) * 3.8;
             double z = o.getZ() + 16.5 + row * 4.0;
             Sheep sh = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             sh.snapTo(x, o.getY(), z, 160, 0); // facing the camera, which looks south from in front of the pen
@@ -2403,7 +2452,7 @@ public final class DevScreenshotHarness {
     }
 
     /** The themed sheep (wings, extra heads, legs...) only: {@code -PharnessScene=themed_sheep}. */
-    private static final String[] THEMED = {"hay", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast"};
+    private static final String[] THEMED = {"hay", "snow", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast"};
 
     private static void themedSheepTick(Minecraft mc, MinecraftServer server) {
         // 60: stage; 120: overview; then one close-up per sheep every 25 ticks; then the overview again at night.

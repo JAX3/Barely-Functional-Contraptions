@@ -126,7 +126,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Wool You Look at That | Infuse a sheep with any resource |
 | Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
 | ⭐ **Three Heads Are Better Than One**, **Here Be Dragons**, **Shh... It's Sculking** (goals) | Infuse a sheep with a Nether Star, Dragon's Breath or Echo Shard |
-| ⭐ **Fleece of Every Colour** (challenge) | Collect one of each of the 24 built-in resource wools. Its progress shows which ones you still need, and it gives 100 experience. |
+| ⭐ **Fleece of Every Colour** (challenge) | Collect one of each of the 25 built-in resource wools. Its progress shows which ones you still need, and it gives 100 experience. |
 
 A data pack's own resource can have an advancement too: put it at `data/barelyfunctionalcontraptions/advancement/contraptions/sheep/<name>.json` with a `minecraft:impossible` criterion named `done`, and infusing a sheep with `barelyfunctionalcontraptions:<name>` grants it.
 
@@ -279,7 +279,7 @@ The **Infusion Altar** is a powered pedestal. Put the feeding item in its **cent
 | Wither | Nether Star | 4 Soul Sand, 2 Bone Blocks, 1 Wither Rose | 200,000 FE |
 | Dragon | Dragon's Breath | 4 End Stone, 4 Popped Chorus Fruit, 2 Eyes of Ender | 200,000 FE |
 | Warden | Echo Shard | 4 Sculk, 4 Amethyst Shards, 1 Sculk Catalyst | 200,000 FE |
-| Common: Stone, Wood, Coal, Copper, Hay, Red and Brown Mushroom | the resource | 2 of its blocks (Stone, logs, Block of Coal, Block of Copper, Hay Bales, mushroom blocks), 1 Wheat | 20,000 FE |
+| Common: Stone, Wood, Coal, Copper, Hay, Snow, Red and Brown Mushroom | the resource | 2 of its blocks (Stone, logs, Block of Coal, Block of Copper, Hay Bales, Snow Blocks, mushroom blocks), 1 Wheat | 20,000 FE |
 | Uncommon: Iron, Gold, Redstone, Lapis, Quartz, Glow Ink, Spider, Skeleton | the resource | 2 of its blocks (Blocks of Iron, Gold, Redstone, Lapis, Quartz; Glowstone; Cobwebs; Bone Blocks), 1 Golden Carrot | 20,000 FE |
 | Rare: Diamond, Emerald, Blaze, Ghast | the resource | 2 of its blocks (Blocks of Diamond, Emerald; Magma Blocks; Soul Sand), 1 Golden Apple | 20,000 FE |
 | Epic: Netherite, Wither Skeleton | the resource | 2 Ancient Debris or 2 Nether Bricks, 1 Eye of Ender | 20,000 FE |
@@ -787,13 +787,14 @@ Every resource also gives 2 String, unless its row says otherwise. Plain wool (`
 
 ### Themed sheep
 
-Ten more built-in resources turn the sheep into a little version of the mob the resource comes from. Each one grows extra body parts or gets an extra behaviour while it has its infused fleece. Lambs and sheared sheep look normal.
+Eleven more built-in resources turn the sheep into a little version of the mob the resource comes from. Each one grows extra body parts or gets an extra behaviour while it has its infused fleece. Lambs and sheared sheep look normal.
 
 ![The ten themed sheep](screenshots/52_themed_sheep.png)
 
 | Fed item | Sheep | What's different | Separator output (per wool) | FE / time |
 |---|---|---|---|---|
 | Hay Bale | Hay | A hay-bale fleece with binding bands | 2–4 Wheat | 4,000 / 2 s |
+| Snow Block | Snow | A snowy fleece, and it **leaves snow wherever it walks** like a Snow Golem (while its fleece is on, onto any block snow can lie on, when mobs may change blocks) | 2–4 Snowball (+5% Ice) | 4,000 / 2 s |
 | Nether Star | Wither | Two Wither Skeleton Skulls either side of its own head that look around on their own, and glowing eyes | 2–4 Nether Star + 1 Soul Sand | 400,000 / 20 s |
 | Dragon's Breath | Dragon | Flapping dragon wings, glowing purple eyes | 2–4 Dragon's Breath (+5% Ender Pearl) | 80,000 / 10 s |
 | Glow Ink Sac | Glow Ink | Its fleece glows in the dark and **lights up the block it stands in** (light level 12) | 2–4 Glow Ink Sac | 8,000 / 3 s |
@@ -805,6 +806,8 @@ Ten more built-in resources turn the sheep into a little version of the mob the 
 | Ghast Tear | Ghast | **Twice the size**, ghast tentacles under its belly, and it **screams like a ghast** (the ghast's scream instead of a bleat, and its hurt and death sounds) | 2–4 Ghast Tear + 1 Gunpowder | 40,000 / 8 s |
 
 ![The themed sheep at night](screenshots/53_themed_sheep_night.png)
+
+![Three Snow sheep walking a grass field, leaving a sheet of snow behind them](screenshots/99_snow_sheep.png)
 
 *At night: the Glow Ink sheep lights up the grass around it, and the Sculk sheep's strands, the eyes and the fire still glow.*
 
@@ -1061,6 +1064,7 @@ Definitions live in `data/<namespace>/barelyfunctionalcontraptions/sheep_resourc
     "processing_ticks": 100                  // default: config
   },
   "growth_item": "mekanism:raw_tin",         // optional: block shown growing out of the fleece; default: the storage block of the fed item or output
+  "trail_block": "minecraft:snow",           // optional: a block the sheep leaves where it walks while its fleece is on (the Snow sheep's snow)
   "altar": {                                 // optional: its tier and what it takes at an Infusion Altar
     "tier": 2,                               // 1-3; above [infusion_altar] handFeedingMaxTier (0) it can't be fed by hand
     "catalysts": [ { "ingredient": "minecraft:soul_sand", "count": 4 } ],  // up to 4, used up

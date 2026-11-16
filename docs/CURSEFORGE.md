@@ -121,13 +121,13 @@ Put a resource in the Infusion Altar, such as an Iron Ingot, a Diamond or a Red 
 
 ### Themed Sheep
 
-Ten resources turn sheep into little versions of their mob: dragon wings, Wither skulls, a giant screaming Ghast, a burning Blaze, a glowing Glow Ink sheep and more. Each has its own advancement.
+Eleven resources turn sheep into little versions of their mob: dragon wings, Wither skulls, a giant screaming Ghast, a burning Blaze, a glowing Glow Ink sheep, a Snow sheep that leaves snow where it walks, and more. Each has its own advancement.
 
 ![The themed sheep, each labelled](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/52_themed_sheep.png)
 
-All 24 built-in sheep:
+All 25 built-in sheep:
 
-![All 24 built-in resource sheep standing in rows, each labelled with its resource](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/showcase_sheep.png)
+![All 25 built-in resource sheep standing in rows, each labelled with its resource](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/showcase_sheep.png)
 
 ![The Resource Wool creative tab scrolled to its end: Wool Bales, then a spawn egg in each sheep's wool colour, with the Redstone Sheep Spawn Egg's tooltip](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/showcase_tab_eggs.png)
 

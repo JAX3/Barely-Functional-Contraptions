@@ -2380,6 +2380,41 @@ def generate_hay_wool():
     img.save(out("entity/sheep/hay_wool.png"))
 
 
+def generate_snow_wool():
+    """Snow fleece in the vanilla sheep wool layout: bright, slightly blue-white snow with soft drifts and glints."""
+    rnd = random.Random(1212)
+    img = Image.new("RGBA", (64, 32), CLEAR)
+    snow = [hexc("#FFFFFF"), hexc("#F4FBFF"), hexc("#E6F2FB"), hexc("#D8E8F5")]
+
+    def fill(rect, mask=None, drift=False):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                if mask and not mask(x - x0, y - y0, x1 - x0, y1 - y0):
+                    continue
+                c = snow[min(3, int(rnd.random() * 2.2) + ((x * 3 + y * 5) % 11 == 0))]
+                if drift and (y - y0) >= (y1 - y0) - 2 - ((x // 3) % 2):
+                    c = hexc("#C9DEEF")  # the drift's shaded underside
+                if rnd.random() < 0.03:
+                    c = hexc("#BFE3FF")  # an icy glint
+                img.putpixel((x, y), c)
+
+    head = box_faces(0, 0, 6, 6, 6)
+    for face in ("top", "east", "west", "south"):
+        fill(head[face])
+    fill(head["north"], lambda x, y, w, h: y < 2 or (y < 3 and x in (0, w - 1)))
+    body = box_faces(28, 8, 8, 16, 6)
+    for face in ("east", "west", "north", "south"):
+        fill(body[face], drift=True)
+    for face in ("top", "bottom"):
+        fill(body[face])
+    legs = box_faces(0, 16, 4, 6, 4)
+    fill(legs["top"])
+    for face in ("east", "north", "west", "south"):
+        fill(legs[face], lambda x, y, w, h: y < 4)
+    img.save(out("entity/sheep/snow_wool.png"))
+
+
 def generate_melon_wool():
     """Melon-rind fleece in the vanilla sheep wool layout: green rind with dark stripes running along the body."""
     rnd = random.Random(6262)
@@ -3219,6 +3254,7 @@ def main():
     generate_wool_items()
     generate_sheep_fur()
     generate_hay_wool()
+    generate_snow_wool()
     generate_melon_wool()
     generate_sheep_bones()
     generate_sheep_extras()

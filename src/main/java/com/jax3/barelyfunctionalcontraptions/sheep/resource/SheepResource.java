@@ -43,6 +43,7 @@ import net.minecraft.world.item.crafting.Ingredient;
  * @param growthItem    optional item shown growing out of the fleece; defaults to the storage block of the feeding item or output
  * @param appearance    optional extra looks and behaviours (wings, extra heads, glowing...), see {@link SheepAppearance}
  * @param altar         its tier, and the catalysts and power it takes at an Infusion Altar, see {@link AltarRitual}
+ * @param trailBlock    optional block the sheep leaves where it walks while its fleece is on, like a Snow Golem's snow
  */
 public record SheepResource(
         Identifier id,
@@ -58,7 +59,8 @@ public record SheepResource(
         Separator separator,
         Optional<ItemStackTemplate> growthItem,
         SheepAppearance appearance,
-        AltarRitual altar) {
+        AltarRitual altar,
+        Optional<net.minecraft.world.level.block.Block> trailBlock) {
 
     /** Accepts {@code "#RRGGBB"}, {@code "RRGGBB"}, an integer, or an {@code [r, g, b]} array. */
     public static final Codec<Integer> COLOR_CODEC = Codec.withAlternative(
@@ -82,7 +84,8 @@ public record SheepResource(
             Separator.CODEC.optionalFieldOf("separator", Separator.DEFAULT).forGetter(Definition::separator),
             ItemStackTemplate.CODEC.optionalFieldOf("growth_item").forGetter(Definition::growthItem),
             SheepAppearance.CODEC.optionalFieldOf("appearance", SheepAppearance.NONE).forGetter(Definition::appearance),
-            AltarRitual.CODEC.optionalFieldOf("altar", AltarRitual.NONE).forGetter(Definition::altar)
+            AltarRitual.CODEC.optionalFieldOf("altar", AltarRitual.NONE).forGetter(Definition::altar),
+            net.minecraft.core.registries.BuiltInRegistries.BLOCK.byNameCodec().optionalFieldOf("trail_block").forGetter(Definition::trailBlock)
     ).apply(i, Definition::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SheepResource> STREAM_CODEC = StreamCodec.composite(
@@ -92,12 +95,12 @@ public record SheepResource(
 
     public static SheepResource withId(Identifier id, Definition d) {
         return new SheepResource(id, d.feedingItem, d.feedingAmount, d.displayName, d.woolName, d.woolColor,
-                d.accentColor, d.category, d.woolDropCount, d.infusionUses, d.separator, d.growthItem, d.appearance, d.altar);
+                d.accentColor, d.category, d.woolDropCount, d.infusionUses, d.separator, d.growthItem, d.appearance, d.altar, d.trailBlock);
     }
 
     public Definition definition() {
         return new Definition(feedingItem, feedingAmount, displayName, woolName, woolColor, accentColor, category,
-                woolDropCount, infusionUses, separator, growthItem, appearance, altar);
+                woolDropCount, infusionUses, separator, growthItem, appearance, altar, trailBlock);
     }
 
     // ------------------------------------------------------------------ derived values (with config applied)
@@ -212,7 +215,8 @@ public record SheepResource(
     public record Definition(
             Ingredient feedingItem, int feedingAmount, Optional<Component> displayName, Optional<Component> woolName,
             int woolColor, int accentColor, Category category, int woolDropCount, int infusionUses, Separator separator,
-            Optional<ItemStackTemplate> growthItem, SheepAppearance appearance, AltarRitual altar) {}
+            Optional<ItemStackTemplate> growthItem, SheepAppearance appearance, AltarRitual altar,
+            Optional<net.minecraft.world.level.block.Block> trailBlock) {}
 
     /** What kind of material a resource is. Ores should normally separate into their raw material. */
     public enum Category implements StringRepresentable {
