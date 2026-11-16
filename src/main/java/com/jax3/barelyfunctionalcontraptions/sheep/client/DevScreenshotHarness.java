@@ -136,6 +136,10 @@ public final class DevScreenshotHarness {
             worldTourTick(mc, server);
             return;
         }
+        if ("list_command".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            listCommandTick(mc);
+            return;
+        }
         if ("extend_world".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             extendWorldTick(mc, server);
             return;
@@ -1538,6 +1542,20 @@ public final class DevScreenshotHarness {
             {"themed sheep", 202},
             {"blaze furnace", 234},
     };
+    /**
+     * Runs {@code /barelyfunctionalcontraptions list} as the player, the way it's typed in chat, and photographs the
+     * chat: {@code -PharnessScene=list_command} (with {@code -PharnessWorld="BFC Test World"} to check that world).
+     */
+    private static void listCommandTick(Minecraft mc) {
+        switch (tick) {
+            case 60 -> { if (mc.player != null) mc.player.connection.sendCommand(ResourcefulSheep.MOD_ID + " list"); }
+            case 70 -> mc.gui.setScreen(new net.minecraft.client.gui.screens.ChatScreen("", false));
+            case 90 -> shot(mc, "list_command");
+            case 96 -> mc.stop();
+            default -> {}
+        }
+    }
+
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
         String[] tps = {"tp @a 167.0 38 -0.5 180 15", "tp @a 202.5 37 0.5 180 18", "tp @a 237.5 40 -3.5 170 30"};
@@ -1597,6 +1615,9 @@ public final class DevScreenshotHarness {
             server.execute(() -> {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                 player.teleportTo(player.level(), extendReturn.x, extendReturn.y, extendReturn.z, java.util.Set.of(), extendYaw, extendPitch, true);
+                // The scenes turn command feedback off for clean shots; the shared world must keep it on, or commands
+                // such as /barelyfunctionalcontraptions list show nothing.
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamerule send_command_feedback true");
                 ResourcefulSheep.LOGGER.info("EXTEND player back at {}", player.position());
             });
         }
