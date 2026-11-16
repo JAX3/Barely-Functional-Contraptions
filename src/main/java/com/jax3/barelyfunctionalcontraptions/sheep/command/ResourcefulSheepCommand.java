@@ -247,10 +247,19 @@ public final class ResourcefulSheepCommand {
         var all = SheepResourceRegistry.server().all();
         ctx.getSource().sendSuccess(() -> Component.translatable("command.barelyfunctionalcontraptions.list.header", all.size()).withStyle(ChatFormatting.GOLD), false);
         for (SheepResource r : all) {
-            ctx.getSource().sendSuccess(() -> Component.literal(" - ").append(r.name().copy().withColor(r.woolColor()))
+            ctx.getSource().sendSuccess(() -> Component.literal(" - ").append(r.name().copy().withColor(readable(r.woolColor())))
                     .append(Component.literal("  " + r.id()).withStyle(ChatFormatting.DARK_GRAY)), false);
         }
         return all.size();
+    }
+
+    /** The wool colour, lightened if it's too dark to read on the chat's dark background (Netherite, Wither...). */
+    static int readable(int rgb) {
+        int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+        double luma = 0.299 * r + 0.587 * g + 0.114 * b;
+        if (luma >= 110) return rgb & 0xFFFFFF;
+        double t = (110 - luma) / (255 - luma); // mix towards white just enough to reach a readable brightness
+        return ((int) Math.round(r + (255 - r) * t) << 16) | ((int) Math.round(g + (255 - g) * t) << 8) | (int) Math.round(b + (255 - b) * t);
     }
 
     /** One line saying what the generator is limited to (from the [generator] config). */

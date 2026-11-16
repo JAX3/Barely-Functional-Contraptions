@@ -143,6 +143,7 @@ public final class ModGameTests {
         TESTS.put("infusion_altar_infuses_a_wither_sheep", ModGameTests::altarWither);
         TESTS.put("infusion_altar_waits_for_what_it_needs", ModGameTests::altarWaits);
         TESTS.put("infusion_altar_pulses_when_ready", ModGameTests::altarPulse);
+        TESTS.put("list_command_lists_every_sheep", ModGameTests::listCommand);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -944,6 +945,24 @@ public final class ModGameTests {
             h.assertTrue(be.getItem(1).getCount() == 1 && be.getItem(2).isEmpty() && be.getItem(3).isEmpty(), "4 soul sand, 2 bone blocks and the rose used");
             h.assertTrue(start - be.getEnergyHandler().getAmountAsInt() == 200_000, "200,000 FE used, used " + (start - be.getEnergyHandler().getAmountAsInt()));
         });
+    }
+
+    /** {@code /barelyfunctionalcontraptions list} prints a header and one line per loaded sheep. */
+    private static void listCommand(GameTestHelper h) {
+        var server = h.getLevel().getServer();
+        List<String> lines = new java.util.ArrayList<>();
+        net.minecraft.commands.CommandSource collector = new net.minecraft.commands.CommandSource() {
+            @Override public void sendSystemMessage(net.minecraft.network.chat.Component message) { lines.add(message.getString()); }
+            @Override public boolean acceptsSuccess() { return true; }
+            @Override public boolean acceptsFailure() { return true; }
+            @Override public boolean shouldInformAdmins() { return false; }
+        };
+        var source = server.createCommandSourceStack().withSource(collector);
+        server.getCommands().performPrefixedCommand(source, "barelyfunctionalcontraptions list");
+        ResourcefulSheep.LOGGER.info("[list test] {}", lines);
+        int loaded = SheepResourceRegistry.server().all().size();
+        h.assertTrue(lines.size() == loaded + 1, "a header and " + loaded + " sheep, got " + lines);
+        h.succeed();
     }
 
     /**
