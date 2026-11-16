@@ -3107,8 +3107,9 @@ def generate_infusion_altar_gui():
 def generate_hume_field_generator():
     """Hume Field Generator (WIP preview): a steel base and cap on four pillars, two glowing field coils, a glass
     shell round a core that flickers between "on" (cyan) and "off" (magenta), and an observing lens on top."""
-    DARK, STEEL, STEEL_L, STEEL_D, STEEL_DD = hexc("#231c35"), hexc("#8d97bc"), hexc("#9aa3c4"), hexc("#5d6687"), hexc("#3f4766")
-    PURPLE, PURPLE_D, HI = hexc("#9a52f0"), hexc("#5c2aa6"), hexc("#dfe4f5")
+    # Dark blue steel with purple trim, like the Hume Energy Cube.
+    DARK, STEEL, STEEL_L, STEEL_D, STEEL_DD = hexc("#1a1528"), hexc("#3f4766"), hexc("#5d6687"), hexc("#2c324c"), hexc("#231c35")
+    PURPLE, PURPLE_D, HI = hexc("#9a52f0"), hexc("#5c2aa6"), hexc("#8d97bc")
     CYAN, CYAN_L, CYAN_D, MAGENTA, MAGENTA_D = hexc("#69d6ff"), hexc("#cbf4ff"), hexc("#1b5fa8"), hexc("#ff6ae6"), hexc("#9c2f8f")
 
     def panel(rivets=True):

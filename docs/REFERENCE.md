@@ -71,7 +71,7 @@ Craft a **Contraptions Manual** (a book and a Functional Machine Block) and righ
 
   | Hume Field Generator (WIP model) | Close up |
   |---|---|
-  | ![The 2x2 Hume Field Generator beside a one-block Hume Energy Cube: a steel base and cap on four pillars, three purple field coils round a tall glass shell, and a lens on top](screenshots/wip_hume_field_front.png) | ![Close up of the Hume Field Generator: the core inside the glass shell between the two glowing coils](screenshots/wip_hume_field_close.png) | A resource pack's guide file puts a chapter here with `"tab": "wip"`.
+  | ![The 2x2 Hume Field Generator beside a one-block Hume Energy Cube: a dark blue steel base and cap on four pillars, three purple field coils round a tall glass shell, and a lens on top](screenshots/wip_hume_field_front.png) | ![Close up of the Hume Field Generator: the core inside the glass shell between the two glowing coils](screenshots/wip_hume_field_close.png) | A resource pack's guide file puts a chapter here with `"tab": "wip"`.
 
 Hover over a tab to see its name. A resource pack's guide file can still use the tab's old name, `"productive"`; it now means Production.
 
