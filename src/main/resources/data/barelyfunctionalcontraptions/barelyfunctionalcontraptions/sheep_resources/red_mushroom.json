@@ -25,7 +25,7 @@
     "tier": 1,
     "catalysts": [
       {
-        "ingredient": "minecraft:red_mushroom_block",
+        "ingredient": "minecraft:red_wool",
         "count": 2
       },
       {

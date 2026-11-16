@@ -15,11 +15,11 @@
     "secondary_output": "minecraft:string",
     "secondary_count": 2,
     "energy_cost": 80000,
-    "processing_ticks": 200
+    "processing_ticks": 300
   },
   "growth_item": "minecraft:ancient_debris",
   "altar": {
-    "tier": 1,
+    "tier": 2,
     "catalysts": [
       {
         "ingredient": "minecraft:ancient_debris",

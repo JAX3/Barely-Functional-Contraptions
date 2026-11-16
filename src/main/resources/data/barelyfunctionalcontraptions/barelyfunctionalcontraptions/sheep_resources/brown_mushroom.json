@@ -25,7 +25,7 @@
     "tier": 1,
     "catalysts": [
       {
-        "ingredient": "minecraft:brown_mushroom_block",
+        "ingredient": "minecraft:brown_wool",
         "count": 2
       },
       {

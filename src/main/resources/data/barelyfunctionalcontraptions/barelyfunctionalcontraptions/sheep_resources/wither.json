@@ -25,7 +25,7 @@
     ]
   },
   "altar": {
-    "tier": 2,
+    "tier": 3,
     "catalysts": [
       {
         "ingredient": "minecraft:soul_sand",

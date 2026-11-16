@@ -18,7 +18,7 @@
       "chance": 0.05
     },
     "energy_cost": 80000,
-    "processing_ticks": 200
+    "processing_ticks": 400
   },
   "growth_item": "minecraft:purpur_block",
   "appearance": {
@@ -29,7 +29,7 @@
     "feature_color": "#7A5C99"
   },
   "altar": {
-    "tier": 2,
+    "tier": 3,
     "catalysts": [
       {
         "ingredient": "minecraft:end_stone",
