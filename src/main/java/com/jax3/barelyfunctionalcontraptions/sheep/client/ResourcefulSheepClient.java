@@ -131,6 +131,11 @@ public final class ResourcefulSheepClient {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.creative_generator")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
+        if (com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_FIELD_GENERATOR != null
+                && event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_FIELD_GENERATOR.get())) {
+            event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.hume_field_generator")
+                    .withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE, net.minecraft.ChatFormatting.ITALIC));
+        }
         if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ZERO_POINT_ENERGY_MODULE.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.zero_point_energy_module")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));

@@ -136,6 +136,10 @@ public final class DevScreenshotHarness {
             worldTourTick(mc, server);
             return;
         }
+        if ("hume_field".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            humeFieldTick(mc, server);
+            return;
+        }
         if ("list_command".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             listCommandTick(mc);
             return;
@@ -1542,6 +1546,35 @@ public final class DevScreenshotHarness {
             {"themed sheep", 202},
             {"blaze furnace", 234},
     };
+    /** The work-in-progress Hume Field Generator model, from the front and from above: {@code -PharnessScene=hume_field}. */
+    private static void humeFieldTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-4, 0, -6), origin.offset(4, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-4, -1, -6), origin.offset(4, -1, 2))) level.setBlock(p, Blocks.POLISHED_DEEPSLATE.defaultBlockState(), 2);
+                level.setBlock(origin.offset(0, 0, -3), ModBlocks.HUME_FIELD_GENERATOR.get().defaultBlockState(), 3);
+                level.setBlock(origin.offset(-2, 0, -3), ModBlocks.HUME_FIELD_GENERATOR.get().defaultBlockState(), 3);
+                level.setBlock(origin.offset(2, 0, -3), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+            });
+            case 70 -> setHudHidden(mc, true);
+            // Eye height is 1.62 above these, so the camera sits about level with the cap.
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 25", origin.getX() + 0.5, origin.getY() - 0.3, origin.getZ() - 0.9));
+            case 110 -> shot(mc, "wip_hume_field_front");
+            case 112 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 145 40", origin.getX() - 0.4, origin.getY() + 0.3, origin.getZ() - 1.3));
+            case 140 -> shot(mc, "wip_hume_field_above");
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 8", origin.getX() + 0.5, origin.getY() - 1.05, origin.getZ() - 1.55));
+            case 170 -> shot(mc, "wip_hume_field_close");
+            case 176 -> mc.stop();
+            default -> {}
+        }
+    }
+
     /**
      * Runs {@code /barelyfunctionalcontraptions list} as the player, the way it's typed in chat, and photographs the
      * chat: {@code -PharnessScene=list_command} (with {@code -PharnessWorld="BFC Test World"} to check that world).

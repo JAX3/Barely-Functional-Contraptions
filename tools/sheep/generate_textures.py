@@ -3104,6 +3104,116 @@ def generate_infusion_altar_gui():
     img.save(out("gui/infusion_altar.png"))
 
 
+def generate_hume_field_generator():
+    """Hume Field Generator (WIP preview): a steel base and cap on four pillars, two glowing field coils, a glass
+    shell round a core that flickers between "on" (cyan) and "off" (magenta), and an observing lens on top."""
+    DARK, STEEL, STEEL_L, STEEL_D, STEEL_DD = hexc("#231c35"), hexc("#8d97bc"), hexc("#9aa3c4"), hexc("#5d6687"), hexc("#3f4766")
+    PURPLE, PURPLE_D, HI = hexc("#9a52f0"), hexc("#5c2aa6"), hexc("#dfe4f5")
+    CYAN, CYAN_L, CYAN_D, MAGENTA, MAGENTA_D = hexc("#69d6ff"), hexc("#cbf4ff"), hexc("#1b5fa8"), hexc("#ff6ae6"), hexc("#9c2f8f")
+
+    def panel(rivets=True):
+        img = Image.new("RGBA", (16, 16), STEEL)
+        for i in range(16):
+            img.putpixel((i, 0), STEEL_L); img.putpixel((0, i), STEEL_L)
+            img.putpixel((i, 15), STEEL_DD); img.putpixel((15, i), STEEL_DD)
+        if rivets:
+            for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
+                img.putpixel((x, y), HI); img.putpixel((x + 1, y + 1), STEEL_D)
+        return img
+
+    # Base: side (bottom 3 px used) with a purple trim line; top a plate with an inset ring under the coils.
+    side = panel(False)
+    for x in range(16):
+        side.putpixel((x, 13), PURPLE); side.putpixel((x, 12), PURPLE_D)
+    for x in (2, 13):
+        side.putpixel((x, 14), HI)
+    side.save(out("block/hume_field_generator/base_side.png"))
+    top = panel()
+    for i in range(4, 12):
+        for j in (4, 11):
+            top.putpixel((i, j), PURPLE_D); top.putpixel((j, i), PURPLE_D)
+    for i in range(5, 11):
+        for j in range(5, 11):
+            top.putpixel((i, j), DARK)
+    top.save(out("block/hume_field_generator/base_top.png"))
+
+    # Pillar: a steel strut with a purple groove.
+    pillar = Image.new("RGBA", (16, 16), STEEL)
+    for y in range(16):
+        pillar.putpixel((0, y), STEEL_L); pillar.putpixel((1, y), PURPLE if y % 4 else HI)
+        for x in range(2, 16):
+            pillar.putpixel((x, y), STEEL_D if x > 2 else STEEL)
+    pillar.save(out("block/hume_field_generator/pillar.png"))
+
+    # Coil: glowing purple windings.
+    coil = Image.new("RGBA", (16, 16), PURPLE_D)
+    for y in range(16):
+        for x in range(16):
+            coil.putpixel((x, y), PURPLE if (x + y) % 3 else MAGENTA)
+    coil.save(out("block/hume_field_generator/coil.png"))
+
+    # Glass shell: mostly clear, a faint tint and bright edges.
+    glass = Image.new("RGBA", (16, 16), (200, 220, 255, 16))
+    for i in range(16):
+        for c in ((i, 0), (0, i), (i, 15), (15, i)):
+            glass.putpixel(c, (223, 228, 245, 110))
+    for i in range(3, 7):
+        glass.putpixel((i, 9 - i), (255, 255, 255, 120))
+    glass.save(out("block/hume_field_generator/glass.png"))
+
+    # Core: animated; each frame is a mix of "is" (cyan) and "isn't" (magenta), never settling.
+    import random as _r
+    rnd = _r.Random(1776)
+    frames = []
+    states = [0.0, 0.15, 0.5, 0.85, 1.0, 0.7, 0.3, 0.9, 0.05, 0.6, 1.0, 0.4]
+    for t in states:
+        f = Image.new("RGBA", (16, 16), DARK)
+        for y in range(16):
+            for x in range(16):
+                on = rnd.random() < t
+                d = abs(x - 7.5) + abs(y - 7.5)
+                if d < 4:
+                    c = CYAN_L if on else hexc("#ffc2f4")
+                elif d < 7:
+                    c = CYAN if on else MAGENTA
+                else:
+                    c = CYAN_D if on else MAGENTA_D
+                f.putpixel((x, y), c)
+        frames.append(f)
+    strip = Image.new("RGBA", (16, 16 * len(frames)))
+    for i, f in enumerate(frames):
+        strip.paste(f, (0, 16 * i))
+    strip.save(out("block/hume_field_generator/core.png"))
+    with open(out("block/hume_field_generator/core.png.mcmeta"), "w") as m:
+        m.write('{\n  "animation": {\n    "frametime": 3,\n    "interpolate": true\n  }\n}\n')
+
+    # Cap: like the base top, with a ring of rivets; its side a slim trimmed band.
+    cap = panel()
+    for i in range(3, 13):
+        cap.putpixel((i, 3), PURPLE_D); cap.putpixel((i, 12), PURPLE_D); cap.putpixel((3, i), PURPLE_D); cap.putpixel((12, i), PURPLE_D)
+    cap.save(out("block/hume_field_generator/cap_top.png"))
+    capside = panel(False)
+    for x in range(16):
+        capside.putpixel((x, 1), PURPLE)
+    capside.save(out("block/hume_field_generator/cap_side.png"))
+
+    # Lens: an eye looking up, the "observer" whose watching decides whether it makes power.
+    lens = Image.new("RGBA", (16, 16), DARK)
+    for y in range(16):
+        for x in range(16):
+            d = ((x - 7.5) ** 2 + (y - 7.5) ** 2) ** 0.5
+            if d < 2.2:
+                lens.putpixel((x, y), DARK)
+            elif d < 4.5:
+                lens.putpixel((x, y), CYAN)
+            elif d < 6.5:
+                lens.putpixel((x, y), CYAN_D)
+            elif d < 8:
+                lens.putpixel((x, y), STEEL_D)
+    lens.putpixel((6, 6), HI); lens.putpixel((5, 5), CYAN_L)
+    lens.save(out("block/hume_field_generator/lens.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -3137,6 +3247,7 @@ def main():
     generate_wool_packer()
     generate_wool_packer_gui()
     generate_infusion_altar()
+    generate_hume_field_generator()
     generate_infusion_altar_gui()
     generate_advancement_background()
     generate_jei()

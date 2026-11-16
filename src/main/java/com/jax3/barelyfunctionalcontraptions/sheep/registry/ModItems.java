@@ -42,6 +42,9 @@ public final class ModItems {
 
     public static final DeferredItem<BlockItem> WOOL_PACKER = REGISTER.registerSimpleBlockItem(ModBlocks.WOOL_PACKER);
     public static final DeferredItem<BlockItem> INFUSION_ALTAR = REGISTER.registerSimpleBlockItem(ModBlocks.INFUSION_ALTAR);
+    /** Work in progress, development builds only (see {@link ModBlocks#HUME_FIELD_GENERATOR}); get it with /give. */
+    public static final DeferredItem<BlockItem> HUME_FIELD_GENERATOR = ModBlocks.HUME_FIELD_GENERATOR == null ? null
+            : REGISTER.registerSimpleBlockItem(ModBlocks.HUME_FIELD_GENERATOR);
 
     /** 9 resource wool in one; like resource wool, the {@link ModDataComponents#SHEEP_RESOURCE} component says which. */
     public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem> WOOL_BALE = REGISTER.registerItem("wool_bale",

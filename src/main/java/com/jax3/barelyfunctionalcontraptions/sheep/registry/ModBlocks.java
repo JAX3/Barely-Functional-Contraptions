@@ -161,6 +161,15 @@ public final class ModBlocks {
                     .noOcclusion()
                     .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock.ACTIVE) ? 10 : 4));
 
+    /**
+     * Work in progress: the planned Hume Field Generator, a model preview only. Registered in development builds alone
+     * ({@code runClient}), so released jars don't get a block that does nothing.
+     */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock> HUME_FIELD_GENERATOR =
+            net.neoforged.fml.loading.FMLEnvironment.isProduction() ? null : REGISTER.registerBlock("hume_field_generator",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock::new,
+                    p -> p.mapColor(MapColor.COLOR_PURPLE).strength(3.5F, 6.0F).sound(SoundType.IRON).noOcclusion().lightLevel(state -> 7));
+
     /** Presses 9 of one resource wool into a Wool Bale. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock> WOOL_PACKER = REGISTER.registerBlock("wool_packer",
             com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock::new,
