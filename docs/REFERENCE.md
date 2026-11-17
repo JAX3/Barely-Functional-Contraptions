@@ -75,7 +75,7 @@ Craft a **Contraptions Manual** (a book and a Functional Machine Block) and righ
 
   | Sheep Treadmill (WIP model) | From the side |
   |---|---|
-  | ![Three Sheep Treadmills side by side and one turned the other way: dark belts between blue steel side rails, an oak gantry at the front with a bundle of wheat hanging on a string, and a slate generator housing at the back with a yellow lamp; a sheep stands on the middle one facing the wheat](screenshots/wip_sheep_treadmill.png) | ![A Sheep Treadmill from the side: the slatted belt between blue steel side rails, the wheat gantry at the front and the generator housing at the back](screenshots/wip_sheep_treadmill_side.png) |
+  | ![Three Sheep Treadmills side by side and one turned the other way: dark belts in blue steel frames, a gantry at the front with a bundle of wheat hanging on a string, and a slate generator housing at the back with a yellow lamp; a sheep stands on the middle one facing the wheat](screenshots/wip_sheep_treadmill.png) | ![A Sheep Treadmill from the side: the slatted belt between blue steel side rails, the blue steel wheat gantry at the front and the generator housing at the back](screenshots/wip_sheep_treadmill_side.png) |
 
   A resource pack's guide file puts a chapter here with `"tab": "wip"`, and can give it a `"fallback_icon"` to show when its `"icon"` item isn't in the game.
 

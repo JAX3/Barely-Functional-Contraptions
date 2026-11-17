@@ -3675,11 +3675,10 @@ def generate_woollen_icons():
 
 
 def generate_sheep_treadmill():
-    """Sheep Treadmill (WIP preview): a belt between blue steel side rails and steel rollers, an oak gantry with wheat hanging on a
+    """Sheep Treadmill (WIP preview): a belt between steel rollers in a blue steel frame, a gantry with wheat hanging on a
     string, and a slate generator housing at the back with a copper flywheel. Also writes its block and item models."""
     import json
     rnd = random.Random(31)
-    OAK, OAK_L, OAK_D, OAK_DD = hexc("#a77e4c"), hexc("#c29a62"), hexc("#7d5b33"), hexc("#5a4024")
     BELT, BELT_L, BELT_D = hexc("#3b3a3f"), hexc("#55545b"), hexc("#26252a")
     STEEL, STEEL_L, STEEL_D = hexc("#8d929c"), hexc("#c3c8d0"), hexc("#5c616b")
     SLATE, SLATE_L, SLATE_D = hexc("#3d4250"), hexc("#565c6e"), hexc("#272a34")
@@ -3687,23 +3686,7 @@ def generate_sheep_treadmill():
     WHEAT, WHEAT_L, WHEAT_D, STRING = hexc("#d9b44a"), hexc("#f1d77a"), hexc("#9c7a2a"), hexc("#e8e2d0")
     LAMP, LAMP_D = hexc("#ffd75e"), hexc("#c9952a")
 
-    # Frame: oak planks running along the rails, with grain and a nail at each end.
-    frame = Image.new("RGBA", (16, 16), OAK)
-    for y in range(16):
-        for x in range(16):
-            c = OAK
-            if y % 4 == 3:
-                c = OAK_D
-            elif (x * 3 + y * 7 + rnd.randint(0, 3)) % 9 == 0:
-                c = OAK_L
-            elif (x + 2 * y) % 11 == 0:
-                c = shade(OAK, 0.88)
-            frame.putpixel((x, y), c)
-    for y in (1, 5, 9, 13):
-        frame.putpixel((1, y), OAK_DD); frame.putpixel((14, y), OAK_DD)
-    frame.save(out("block/sheep_treadmill/frame.png"))
-
-    # Side rails: dark blue steel, like the Hume machines, with a bright top edge, a groove and bolts.
+    # Side rails and gantry: dark blue steel, like the Hume machines, with a bright top edge, a groove and bolts.
     BSTEEL, BSTEEL_L, BSTEEL_D, BSTEEL_DD, BOLT = hexc("#3f4766"), hexc("#5d6687"), hexc("#2c324c"), hexc("#1f2338"), hexc("#8d97bc")
     rail = Image.new("RGBA", (16, 16), BSTEEL)
     for x in range(16):
@@ -3818,25 +3801,25 @@ def generate_sheep_treadmill():
         box([2, 1, -15], [14, 5, -11], "roller"),                    # front roller
         box([2, 5, -14], [14, 6, 10], "belt"),                       # belt
         box([2, 1, -11], [14, 2, 10], "belt"),                       # the belt's return run
-        box([0, 7, -16], [2, 24, -14], "frame"),                     # gantry uprights
-        box([14, 7, -16], [16, 24, -14], "frame"),
-        box([0, 22, -16], [16, 24, -14], "frame"),                   # crossbar
+        box([0, 7, -16], [2, 24, -14], "rail"),                     # gantry uprights
+        box([14, 7, -16], [16, 24, -14], "rail"),
+        box([0, 22, -16], [16, 24, -14], "rail"),                   # crossbar
         box([7.5, 16, -15.5], [8.5, 22, -14.5], "rope"),             # string
         box([0, 0, 10], [16, 12, 16], "housing_side", {"north": "housing_front", "up": "housing_top", "down": "housing_side"}),
-        box([16, 1, 9], [17, 11, 15], "flywheel", {"north": "frame", "south": "frame", "up": "frame", "down": "frame"}),
+        box([16, 1, 9], [17, 11, 15], "flywheel", {"north": "rail", "south": "rail", "up": "rail", "down": "rail"}),
         box([6, 12, 12], [10, 13, 14], "lamp"),                      # running light
     ]
     # The wheat: two crossed planes, so it looks like a bundle from any side.
     for rot in (45, -45):
         elements.append({"from": [5, 8, -15], "to": [11, 16, -15], "rotation": {"angle": rot, "axis": "y", "origin": [8, 12, -15]},
                          "faces": {"north": {"uv": [3, 1, 13, 15], "texture": "#wheat"}, "south": {"uv": [3, 1, 13, 15], "texture": "#wheat"}}})
-    textures = {k: T + k for k in ("frame", "rail", "belt", "roller", "housing_side", "housing_front", "housing_top", "flywheel", "wheat", "rope", "lamp")}
-    textures["particle"] = T + "frame"
+    textures = {k: T + k for k in ("rail", "belt", "roller", "housing_side", "housing_front", "housing_top", "flywheel", "wheat", "rope", "lamp")}
+    textures["particle"] = T + "rail"
     models = os.path.join(ROOT, "..", "models")
     with open(os.path.join(models, "block", "sheep_treadmill.json"), "w") as fh:
         fh.write(json.dumps({"parent": "minecraft:block/block", "textures": textures, "elements": elements}, indent=2) + "\n")
     with open(os.path.join(models, "block", "sheep_treadmill_front.json"), "w") as fh:
-        fh.write(json.dumps({"textures": {"particle": T + "frame"}}, indent=2) + "\n")
+        fh.write(json.dumps({"textures": {"particle": T + "rail"}}, indent=2) + "\n")
     # Item: the whole model moved half a block back so it's centred, then turned and shrunk to fit a slot.
     import copy
     centred = copy.deepcopy(elements)

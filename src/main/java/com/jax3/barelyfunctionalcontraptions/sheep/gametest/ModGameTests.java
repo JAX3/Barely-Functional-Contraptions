@@ -1650,7 +1650,7 @@ public final class ModGameTests {
         return drops.stream().filter(filter).mapToInt(ItemStack::getCount).sum();
     }
 
-    /** Every block in the mod places, breaks and steps with the vanilla Iron Block's sounds, except the wool bale and the wooden Sheep Treadmill. */
+    /** Every block in the mod places, breaks and steps with the vanilla Iron Block's sounds, except the wool bale. */
     private static void ironSounds(GameTestHelper h) {
         var ironPlace = net.minecraft.world.level.block.Blocks.IRON_BLOCK.defaultBlockState().getSoundType().getPlaceSound();
         int checked = 0;
@@ -1659,10 +1659,6 @@ public final class ModGameTests {
             if (!id.getNamespace().equals(ResourcefulSheep.MOD_ID)) continue;
             if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.SHEEP_GLOW.get()) continue; // invisible light, never placed by hand
             if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.WOOL_BALE.get()) continue; // wool, so it sounds like wool
-            if (block == (com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.SHEEP_TREADMILL == null ? null : com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.SHEEP_TREADMILL.get())) {
-                h.assertTrue(block.defaultBlockState().getSoundType() == net.minecraft.world.level.block.SoundType.WOOD, "the Sheep Treadmill is wooden, so it sounds like wood");
-                continue;
-            }
             var sound = block.defaultBlockState().getSoundType();
             h.assertTrue(sound == net.minecraft.world.level.block.SoundType.IRON && sound.getPlaceSound() == ironPlace,
                     id + " should use the iron block sound type");

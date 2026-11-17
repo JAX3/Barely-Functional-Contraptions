@@ -27,7 +27,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Work in progress: the planned Sheep Treadmill, so far only its model. A wooden belt between two rollers, one block
+ * Work in progress: the planned Sheep Treadmill, so far only its model. A belt between two rollers in a blue steel frame, one block
  * wide and two long, with a gantry at the front where a bundle of wheat hangs just out of a sheep's reach, and a
  * generator housing at the back with a copper flywheel. It does nothing yet; it's registered in development builds only.
  *
