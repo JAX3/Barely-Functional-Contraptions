@@ -77,6 +77,7 @@ public final class ResourcefulSheepClient {
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onLoggingOut);
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onEntityTick);
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onItemTooltip);
+        NeoForge.EVENT_BUS.register(CreativeTabSections.class);
 
         com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.clientTickHandler = ZeroPointHumSound::tick;
         com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem.openGuide = () -> net.minecraft.client.Minecraft.getInstance().gui.setScreen(new GuideScreen());

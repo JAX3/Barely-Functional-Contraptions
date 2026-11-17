@@ -74,5 +74,13 @@ public final class ModItems {
                 p.humanoidArmor(com.jax3.barelyfunctionalcontraptions.sheep.armor.WoollenArmor.MATERIAL, type)));
     }
 
+    /**
+     * An invisible placeholder for the main creative tab's section banners and the blanks after each section; the
+     * {@link ModDataComponents#TAB_SECTION} component says which. It's never meant to be held: the tab won't let you
+     * pick it up, and JEI and the search tab leave it out.
+     */
+    public static final DeferredItem<net.minecraft.world.item.Item> TAB_SECTION = REGISTER.registerItem("tab_section",
+            net.minecraft.world.item.Item::new, p -> p.stacksTo(1));
+
     private ModItems() {}
 }

@@ -167,7 +167,9 @@ Placed on an infinite water source, it makes a bucket of water a second and push
 
 Every machine is built round a Functional Machine Block, crafted from iron, copper and redstone. Generators make FE, sheep grow resources, and Mushroom sheep feed the generators. Sneak-right-click a sheep with an empty hand to see what it is infused with.
 
-![The mod's creative tab: the Contraptions Manual, every machine, the wrench, cables and pipes](docs/screenshots/showcase_tab_main.png)
+The mod's creative tab is split into the same sections as the manual. Click a section's banner to fold it away, or open it again.
+
+![The mod's creative tab split into the manual's sections, each under a coloured banner with a fold button: Power, Logistics and Production](docs/screenshots/showcase_tab_main.png)
 
 ### Wrench and Links
 

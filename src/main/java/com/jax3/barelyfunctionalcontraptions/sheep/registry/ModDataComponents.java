@@ -15,6 +15,11 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Identifier>> SHEEP_RESOURCE = REGISTER.registerComponentType(
             "sheep_resource", b -> b.persistent(Identifier.CODEC).networkSynchronized(Identifier.STREAM_CODEC).cacheEncoding());
 
+    /** A creative tab's section banner or padding placeholder (see {@link com.jax3.barelyfunctionalcontraptions.registry.TabSection}). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<com.jax3.barelyfunctionalcontraptions.registry.TabSection>> TAB_SECTION = REGISTER.registerComponentType(
+            "tab_section", b -> b.persistent(com.jax3.barelyfunctionalcontraptions.registry.TabSection.CODEC)
+                    .networkSynchronized(com.jax3.barelyfunctionalcontraptions.registry.TabSection.STREAM_CODEC));
+
     /** Stored energy/redstone mode kept on a broken Mechanical Separator item. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<MachineContents>> MACHINE_CONTENTS = REGISTER.registerComponentType(
             "machine_contents", b -> b.persistent(MachineContents.CODEC).networkSynchronized(MachineContents.STREAM_CODEC));

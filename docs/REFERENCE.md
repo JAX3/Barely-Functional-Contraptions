@@ -55,9 +55,11 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](.
 
 ![Machine fronts, idle and running](screenshots/14_machine_fronts.png)
 
+The main creative tab is split into the Contraptions Manual's sections (Power, Logistics, Production and Utility), each starting on its own row under a coloured banner with the tab's icon and title. Clicking a banner folds that section away or opens it again; folded sections stay folded until the game closes. The banner rows and the blanks after each section are an invisible placeholder item (`barelyfunctionalcontraptions:tab_section`) that the tab won't let you take, and that JEI and the search tab leave out.
+
 | Creative tab: machines and tools | Creative tab: Resource Wool |
 |---|---|
-| ![Main creative tab](screenshots/28_creative_tab_main.png) | ![Resource Wool creative tab](screenshots/27_creative_tab_wool.png) |
+| ![Main creative tab, in sections](screenshots/28_creative_tab_main.png) | ![Resource Wool creative tab](screenshots/27_creative_tab_wool.png) |
 
 ### Contraptions Manual (in-game guide)
 Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game. Its chapters are sorted into six tabs along the top of the left panel:

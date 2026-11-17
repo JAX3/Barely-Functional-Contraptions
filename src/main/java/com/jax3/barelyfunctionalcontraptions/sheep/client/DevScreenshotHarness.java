@@ -140,6 +140,19 @@ public final class DevScreenshotHarness {
             poweredFurnaceTick(mc, server);
             return;
         }
+        if ("creative_sections".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            switch (tick) {
+                case 60 -> command(server, "gamemode creative @a");
+                case 80 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.MAIN.get());
+                case 110 -> shot(mc, "28_creative_tab_main");
+                case 112 -> CreativeTabSections.toggle("power");
+                case 130 -> shot(mc, "28_creative_tab_main_folded");
+                case 132 -> CreativeTabSections.toggle("power");
+                case 135 -> mc.stop();
+                default -> {}
+            }
+            return;
+        }
         if ("woollen_armor".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             woollenArmorTick(mc, server);
             return;

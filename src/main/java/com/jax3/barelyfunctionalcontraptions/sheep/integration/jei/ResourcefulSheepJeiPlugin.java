@@ -129,6 +129,9 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
     public void onRuntimeAvailable(mezz.jei.api.runtime.IJeiRuntime jeiRuntime) {
         JeiDevHook.runtime = jeiRuntime;
         hideOwnTagPages(jeiRuntime.getRecipeManager());
+        // The creative tab's invisible section placeholder isn't an item anyone should see.
+        jeiRuntime.getIngredientManager().removeIngredientsAtRuntime(mezz.jei.api.constants.VanillaTypes.ITEM_STACK,
+                java.util.List.of(new net.minecraft.world.item.ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.TAB_SECTION.get())));
     }
 
     /**
