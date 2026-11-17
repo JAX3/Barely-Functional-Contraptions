@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -19,17 +18,16 @@ import net.neoforged.neoforge.client.event.ScreenEvent;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The main creative tab's sections, drawn the way the Contraptions Manual sorts the machines: each section starts on
+ * The creative tabs' sections: the main tab sorted the way the Contraptions Manual sorts the machines, and the
+ * Resource Wool tab split into wool, bales and spawn eggs. Each section starts on
  * its own row under a coloured banner with its icon and title, and clicking the banner folds the section away (or
  * opens it again). The tab holds placeholder stacks for the banner rows and the blanks after each section
- * ({@link ContraptionsCreativeTab#SECTIONS}); here they're drawn over, kept out of tooltips, and can't be taken.
+ * ({@link ContraptionsCreativeTab#sectionedTabs()}); here they're drawn over, kept out of tooltips, and can't be taken.
  * Folded sections are remembered until the game closes.
  */
 public final class CreativeTabSections {
     /** The 9x5 grid of the creative screen's item picker. */
     private static final int ROW = 9, GRID = 45, SLOT = 18;
-    private static final Map<String, Integer> COLOURS = Map.of(
-            "power", 0xFFB8792A, "logistics", 0xFF2E86A0, "production", 0xFF468F46, "utility", 0xFF7552AE);
     private static final Set<String> folded = new HashSet<>();
     private static @Nullable Field scrollField;
 
@@ -39,20 +37,31 @@ public final class CreativeTabSections {
         return stack.isEmpty() ? null : ContraptionsCreativeTab.section(stack);
     }
 
-    /** Whether the open creative screen shows the main tab: only it holds section placeholders. */
-    private static boolean showsSections(CreativeModeInventoryScreen screen) {
+    /** The section with this key, in any sectioned tab. */
+    private static ContraptionsCreativeTab.@Nullable Section info(String key) {
+        for (var tab : ContraptionsCreativeTab.sectionedTabs()) {
+            for (var section : tab.getValue()) if (section.key().equals(key)) return section;
+        }
+        return null;
+    }
+
+    /** The sectioned tab the open creative screen shows, found by its first banner, or null for any other tab. */
+    private static net.minecraft.world.item.@Nullable CreativeModeTab shownTab(CreativeModeInventoryScreen screen) {
         for (ItemStack stack : screen.getMenu().items) {
             TabSection section = section(stack);
-            if (section != null && section.isBanner()) return true;
+            if (section == null || !section.isBanner()) continue;
+            for (var tab : ContraptionsCreativeTab.sectionedTabs()) {
+                if (tab.getValue().stream().anyMatch(s -> s.key().equals(section.section()))) return tab.getKey().get();
+            }
         }
-        return false;
+        return null;
     }
 
     /** The tab's stacks, leaving out what's under folded banners (the banners themselves always stay). */
-    private static List<ItemStack> visible() {
+    private static List<ItemStack> visible(net.minecraft.world.item.CreativeModeTab tab) {
         List<ItemStack> visible = new ArrayList<>();
         String current = "";
-        for (ItemStack stack : ContraptionsCreativeTab.MAIN.get().getDisplayItems()) {
+        for (ItemStack stack : tab.getDisplayItems()) {
             TabSection section = section(stack);
             if (section != null && section.isBanner()) {
                 current = section.section();
@@ -79,8 +88,10 @@ public final class CreativeTabSections {
     /** Keeps the grid in step with the folded sections: the screen refills it from the whole tab whenever it opens it. */
     @SubscribeEvent
     public static void onRender(ScreenEvent.Render.Pre event) {
-        if (!(event.getScreen() instanceof CreativeModeInventoryScreen screen) || !showsSections(screen)) return;
-        List<ItemStack> want = visible();
+        if (!(event.getScreen() instanceof CreativeModeInventoryScreen screen)) return;
+        var tab = shownTab(screen);
+        if (tab == null) return;
+        List<ItemStack> want = visible(tab);
         var items = screen.getMenu().items;
         boolean same = items.size() == want.size();
         for (int i = 0; same && i < want.size(); i++) same = items.get(i) == want.get(i);
@@ -92,7 +103,7 @@ public final class CreativeTabSections {
 
     @SubscribeEvent
     public static void onForeground(ScreenEvent.Render.Foreground event) {
-        if (!(event.getScreen() instanceof CreativeModeInventoryScreen screen) || !showsSections(screen)) return;
+        if (!(event.getScreen() instanceof CreativeModeInventoryScreen screen) || shownTab(screen) == null) return;
         GuiGraphicsExtractor graphics = event.getGuiGraphics();
         var font = Minecraft.getInstance().font;
         List<Slot> slots = screen.getMenu().slots;
@@ -100,12 +111,11 @@ public final class CreativeTabSections {
             Slot slot = slots.get(i);
             TabSection section = section(slot.getItem());
             if (section == null || !section.isBanner()) continue;
-            ContraptionsCreativeTab.Section info = ContraptionsCreativeTab.SECTIONS.stream()
-                    .filter(s -> s.key().equals(section.section())).findFirst().orElse(null);
+            ContraptionsCreativeTab.Section info = info(section.section());
             if (info == null) continue;
             int x = screen.getLeftPos() + slot.x - 1, y = screen.getTopPos() + slot.y - 1, w = ROW * SLOT, h = SLOT;
             boolean hovered = event.getMouseX() >= x && event.getMouseX() < x + w && event.getMouseY() >= y && event.getMouseY() < y + h;
-            int colour = COLOURS.getOrDefault(info.key(), 0xFF6A6A6A);
+            int colour = info.colour();
             if (hovered) colour = blend(colour, 0xFFFFFFFF, 0.18F);
             graphics.fill(x, y, x + w, y + h, 0xFF1C1B22);                      // frame
             graphics.fill(x + 1, y + 1, x + w - 1, y + h - 1, colour);

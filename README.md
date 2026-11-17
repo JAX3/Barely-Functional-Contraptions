@@ -123,7 +123,7 @@ All 25 built-in sheep:
 
 ![All 25 built-in resource sheep standing in rows, each labelled with its resource](docs/screenshots/showcase_sheep.png)
 
-![The Resource Wool creative tab scrolled to its end: Wool Bales, then a spawn egg in each sheep's wool colour, with the Redstone Sheep Spawn Egg's tooltip](docs/screenshots/showcase_tab_eggs.png)
+![The Resource Wool creative tab with its Resource Wool and Wool Bales sections folded, showing the Spawn Eggs section: an egg in each sheep's wool colour](docs/screenshots/showcase_tab_eggs.png)
 
 ### Infusion Altar
 
@@ -167,7 +167,7 @@ Placed on an infinite water source, it makes a bucket of water a second and push
 
 Every machine is built round a Functional Machine Block, crafted from iron, copper and redstone. Generators make FE, sheep grow resources, and Mushroom sheep feed the generators. Sneak-right-click a sheep with an empty hand to see what it is infused with.
 
-The mod's creative tab is split into the same sections as the manual. Click a section's banner to fold it away, or open it again.
+The mod's creative tab is split into the same sections as the manual, and the Resource Wool tab into wool, bales and spawn eggs. Click a section's banner to fold it away, or open it again.
 
 ![The mod's creative tab split into the manual's sections, each under a coloured banner with a fold button: Power, Logistics and Production](docs/screenshots/showcase_tab_main.png)
 
@@ -189,7 +189,7 @@ While you wear the **Woollen Boots** you're **Muffled**: you make no sound, from
 
 Sheep, Wool Burner fuels, furnace heat sources and separator recipes are all data. `/barelyfunctionalcontraptions generate` makes a sheep for every material in the modpack, and every number can be changed in the config (see *Make it your own* above).
 
-![The Resource Wool creative tab: a wool for every built-in sheep, then a Wool Bale of each](docs/screenshots/showcase_tab_wool.png)
+![The Resource Wool creative tab in sections: Resource Wool, a wool for every built-in sheep, then the Wool Bales banner](docs/screenshots/showcase_tab_wool.png)
 
 ---
 

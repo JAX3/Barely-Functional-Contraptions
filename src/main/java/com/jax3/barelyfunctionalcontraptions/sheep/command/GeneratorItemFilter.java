@@ -59,7 +59,9 @@ public record GeneratorItemFilter(@Nullable Set<Item> tabItems, List<Identifier>
                 ResourcefulSheep.LOGGER.warn("[generator] allowedCreativeTabs: unknown creative tab '{}' ignored", id);
                 continue;
             }
-            for (ItemStack stack : tab.get().getDisplayItems()) items.add(stack.getItem());
+            for (ItemStack stack : tab.get().getDisplayItems()) {
+                if (com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.section(stack) == null) items.add(stack.getItem()); // not a section placeholder
+            }
         }
         return new GeneratorItemFilter(Set.copyOf(items), List.copyOf(tabs), requireStackable);
     }

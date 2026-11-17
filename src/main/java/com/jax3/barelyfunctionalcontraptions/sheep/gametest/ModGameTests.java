@@ -3676,7 +3676,15 @@ public final class ModGameTests {
         var level = h.getLevel();
         net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(level.enabledFeatures(), true, level.registryAccess());
         var main = com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.MAIN.get().getDisplayItems();
-        var wool = com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get().getDisplayItems();
+        // Leave out the section banners and blanks (an invisible placeholder item), and check each tab has them.
+        var allWool = com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get().getDisplayItems();
+        var wool = allWool.stream().filter(s -> !s.is(ModItems.TAB_SECTION.get())).toList();
+        java.util.function.Function<java.util.Collection<ItemStack>, java.util.List<String>> banners = stacks -> stacks.stream()
+                .map(com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab::section)
+                .filter(s -> s != null && s.isBanner() && s.index() == 0).map(com.jax3.barelyfunctionalcontraptions.registry.TabSection::section).toList();
+        h.assertTrue(banners.apply(main).equals(java.util.List.of("power", "logistics", "production", "utility")), "the main tab's sections, got " + banners.apply(main));
+        h.assertTrue(banners.apply(allWool).equals(java.util.List.of("wool", "bales", "eggs")), "the wool tab's sections, got " + banners.apply(allWool));
+        h.assertTrue(main.size() % 9 == 0 && allWool.size() % 9 == 0, "every section fills whole rows");
         h.assertTrue(main.stream().noneMatch(s -> s.is(ModItems.RESOURCE_WOOL.get())), "no resource wool in the main tab");
         h.assertTrue(main.stream().anyMatch(s -> s.is(ModItems.MECHANICAL_SEPARATOR.get()))
                 && main.stream().anyMatch(s -> s.is(ModItems.HUME_ENERGY_CUBE.get())), "machines stay in the main tab");

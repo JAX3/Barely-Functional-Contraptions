@@ -148,7 +148,17 @@ public final class DevScreenshotHarness {
                 case 112 -> CreativeTabSections.toggle("power");
                 case 130 -> shot(mc, "28_creative_tab_main_folded");
                 case 132 -> CreativeTabSections.toggle("power");
-                case 135 -> mc.stop();
+                case 140 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get());
+                case 170 -> shot(mc, "27_creative_tab_wool");
+                case 172 -> CreativeTabSections.toggle("wool");
+                case 190 -> shot(mc, "27_creative_tab_wool_folded");
+                case 192 -> CreativeTabSections.toggle("bales"); // wool and bales folded: the eggs
+                case 210 -> shot(mc, "27_creative_tab_eggs");
+                case 212 -> {
+                    CreativeTabSections.toggle("wool");
+                    CreativeTabSections.toggle("bales");
+                }
+                case 215 -> mc.stop();
                 default -> {}
             }
             return;
