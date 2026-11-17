@@ -3459,7 +3459,7 @@ def grey(v, a=255):
     return (v, v, v, a)
 
 
-WOOLLEN_ICONS = {  # # knit, r ribbing, o pom-pom
+WOOLLEN_ICONS = {  # # knit, r ribbing, o pom-pom (only the boots are used now, for the Muffled icon)
     "helmet": [
         "................",
         "................",
@@ -3535,23 +3535,6 @@ WOOLLEN_ICONS = {  # # knit, r ribbing, o pom-pom
 }
 
 
-def woollen_icon(rows):
-    img = Image.new("RGBA", (16, 16), CLEAR)
-    filled = {(x, y) for y, row in enumerate(rows) for x, ch in enumerate(row) if ch != "."}
-    for (x, y) in filled:
-        ch = rows[y][x]
-        edge = any((x + dx, y + dy) not in filled for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
-        if edge:
-            v = 104
-        elif ch == "r":
-            v = rib(x, y)
-        elif ch == "o":
-            v = 250 if (x + y) % 2 else 226
-        else:
-            v = knit(x, y)
-        img.putpixel((x, y), grey(v))
-    return img
-
 
 def _fill_faces(img, faces, rows_of_face, pattern):
     """Paints each named face of a box; rows_of_face(face, h) gives the local rows to cover and which are ribbed."""
@@ -3567,8 +3550,7 @@ def _fill_faces(img, faces, rows_of_face, pattern):
 
 
 def generate_woollen_armor():
-    for piece, rows in WOOLLEN_ICONS.items():
-        woollen_icon(rows).save(out(f"item/woollen_{piece}.png"))
+    # The item icons are vanilla's leather armour sprites (see assets/.../items/woollen_*.json), tinted the wool's colour.
 
     # The humanoid layer (helmet, jumper, boots) and the leggings layer, at the player model's texture offsets.
     head, body = box_faces(0, 0, 8, 8, 8), box_faces(16, 16, 8, 12, 4)
