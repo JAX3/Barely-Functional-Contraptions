@@ -3698,15 +3698,21 @@ def generate_sheep_treadmill():
             rail.putpixel((x, y), BOLT); rail.putpixel((x + 1, y + 1), BSTEEL_DD)
     rail.save(out("block/sheep_treadmill/rail.png"))
 
-    # Belt: dark slats across it with a lighter tread on each.
-    belt = Image.new("RGBA", (16, 16), BELT)
-    for y in range(16):
-        for x in range(16):
-            if y % 3 == 2:
-                belt.putpixel((x, y), BELT_D)
-            elif y % 3 == 0 and 1 < x < 14:
-                belt.putpixel((x, y), BELT_L)
+    # Belt: dark slats across it with a lighter tread on each, animated: the slats repeat every 3 pixels, so 3 frames
+    # each one pixel further on scroll the belt from front to back (north to south on the model), under the sheep's feet.
+    frames = 3
+    belt = Image.new("RGBA", (16, 16 * frames), BELT)
+    for f in range(frames):
+        for y in range(16):
+            row = (y - f) % 3
+            for x in range(16):
+                if row == 2:
+                    belt.putpixel((x, f * 16 + y), BELT_D)
+                elif row == 0 and 1 < x < 14:
+                    belt.putpixel((x, f * 16 + y), BELT_L)
     belt.save(out("block/sheep_treadmill/belt.png"))
+    with open(out("block/sheep_treadmill/belt.png.mcmeta"), "w") as fh:
+        fh.write('{\n  "animation": {\n    "frametime": 2\n  }\n}\n')
 
     # Roller: banded steel.
     roller = Image.new("RGBA", (16, 16), STEEL)
