@@ -1066,6 +1066,12 @@ public final class ModGameTests {
         h.assertTrue(dyed.is(ModItems.WOOLLEN_HELMET.get()) && dyedColour != null && dyedColour.rgb() != allRed, "it can be dyed like leather, got " + dyedColour);
         h.assertTrue(helmet.is(net.minecraft.tags.ItemTags.HEAD_ARMOR) && ModItems.WOOLLEN_BOOTS.get().getDefaultInstance().is(net.minecraft.tags.ItemTags.FREEZE_IMMUNE_WEARABLES),
                 "it's armour, and wool keeps you warm in powder snow");
+        // A little better than leather: more armour on the jumper and leggings, and more durability.
+        java.util.function.ToDoubleFunction<net.minecraft.world.item.Item> armour = item -> item.getDefaultInstance()
+                .getOrDefault(net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS, net.minecraft.world.item.component.ItemAttributeModifiers.EMPTY)
+                .compute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR, 0, net.minecraft.world.entity.EquipmentSlot.CHEST);
+        h.assertTrue(armour.applyAsDouble(ModItems.WOOLLEN_CHESTPLATE.get()) > armour.applyAsDouble(Items.LEATHER_CHESTPLATE), "the jumper protects more than a leather tunic");
+        h.assertTrue(ModItems.WOOLLEN_BOOTS.get().getDefaultInstance().getMaxDamage() > Items.LEATHER_BOOTS.getDefaultInstance().getMaxDamage(), "and it lasts longer");
         h.succeed();
     }
 

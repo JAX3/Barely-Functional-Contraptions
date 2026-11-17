@@ -28,8 +28,11 @@ public final class WoollenArmor {
     /** The look on the body: {@code assets/barelyfunctionalcontraptions/equipment/wool.json}. */
     public static final ResourceKey<EquipmentAsset> ASSET = ResourceKey.create(EquipmentAssets.ROOT_ID, ResourcefulSheep.id("wool"));
 
-    /** As tough as leather (it's soft), a little more enchantable, and mended with any wool. */
-    public static final ArmorMaterial MATERIAL = new ArmorMaterial(5, defense(1, 2, 3, 1, 3), 17,
+    /**
+     * A little better than leather: one more armour point on the jumper and leggings (9 for the set; leather gives 7),
+     * longer lasting (7x durability, leather's is 5x), a little more enchantable, and mended with any wool.
+     */
+    public static final ArmorMaterial MATERIAL = new ArmorMaterial(7, defense(1, 3, 4, 1, 3), 17,
             SoundEvents.ARMOR_EQUIP_LEATHER, 0.0F, 0.0F, ItemTags.WOOL, ASSET);
 
     /** The colour of undyed pieces (white wool's dye colour). */

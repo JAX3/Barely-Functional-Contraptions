@@ -183,7 +183,7 @@ The Barely Functional Wrench links generators into one network and powers machin
 
 ### Woollen Armour
 
-Knit a full set from any coloured wool, in the leather armour shapes: a Beanie, a Jumper, Leggings and Boots. Each piece takes the colour of the wool it's made from, and mixed wool blends the colours. It can be dyed like leather afterwards, protects as much as leather, mends with wool, and keeps you from freezing in powder snow.
+Knit a full set from any coloured wool, in the leather armour shapes: a Beanie, a Jumper, Leggings and Boots. Each piece takes the colour of the wool it's made from, and mixed wool blends the colours. It can be dyed like leather afterwards, is a little tougher and longer lasting than leather, mends with wool, and keeps you from freezing in powder snow.
 
 While you wear the **Woollen Boots** you're **Muffled**: you make no sound, from footsteps and landing to eating and getting hurt, and sculk sensors, shriekers and Wardens can't hear you. It wears off 2 seconds after you take them off.
 
