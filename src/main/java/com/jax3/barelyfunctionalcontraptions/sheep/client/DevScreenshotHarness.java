@@ -145,19 +145,17 @@ public final class DevScreenshotHarness {
                 case 60 -> command(server, "gamemode creative @a");
                 case 80 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.MAIN.get());
                 case 110 -> shot(mc, "28_creative_tab_main");
-                case 112 -> CreativeTabSections.toggle("power");
+                case 112 -> clickCreativeRow(mc, 0); // a real click on the Power banner
                 case 130 -> shot(mc, "28_creative_tab_main_folded");
-                case 132 -> CreativeTabSections.toggle("power");
+                case 132 -> clickCreativeRow(mc, 0);
                 case 140 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get());
                 case 170 -> shot(mc, "27_creative_tab_wool");
-                case 172 -> CreativeTabSections.toggle("wool");
+                case 172 -> clickCreativeRow(mc, 0); // Resource Wool
                 case 190 -> shot(mc, "27_creative_tab_wool_folded");
-                case 192 -> CreativeTabSections.toggle("bales"); // wool and bales folded: the eggs
+                case 192 -> clickCreativeRow(mc, 1); // then Wool Bales, now on the second row: the eggs show
                 case 210 -> shot(mc, "27_creative_tab_eggs");
-                case 212 -> {
-                    CreativeTabSections.toggle("wool");
-                    CreativeTabSections.toggle("bales");
-                }
+                case 212 -> clickCreativeRow(mc, 0);
+                case 214 -> clickCreativeRow(mc, 1);
                 case 215 -> mc.stop();
                 default -> {}
             }
@@ -2634,6 +2632,18 @@ public final class DevScreenshotHarness {
             ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
             if (player.level().getBlockEntity(pos) instanceof net.minecraft.world.MenuProvider provider) player.openMenu(provider, pos);
         });
+    }
+
+    /** A real left click on the middle of row {@code row} of the open creative screen's item grid, on its banner's title. */
+    private static void clickCreativeRow(Minecraft mc, int row) {
+        if (!(mc.gui.screen() instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen screen)) return;
+        var window = mc.getWindow();
+        double scale = window.getGuiScale();
+        long handle = window.handle();
+        mc.mouseHandler.onMove(handle, (screen.getLeftPos() + 60) * scale, (screen.getTopPos() + 26 + row * 18) * scale, 0, 0);
+        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
+        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
+        mc.mouseHandler.onMove(handle, 4, 4, 0, 0);
     }
 
     /** A real left click at ({@code gx}, {@code gy}) inside a centred 176x193 container window, then the cursor parked. */

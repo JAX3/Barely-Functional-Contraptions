@@ -138,15 +138,30 @@ public final class CreativeTabSections {
         return 0xFF000000 | r << 16 | g << 8 | bl;
     }
 
+    /**
+     * The picker slot at a point, counting the 1-pixel border round each slot, so a whole banner row is clickable.
+     * Worked out from the point rather than the hovered slot, which only updates when the screen is drawn.
+     */
+    private static @Nullable Slot slotAt(CreativeModeInventoryScreen screen, double mouseX, double mouseY) {
+        List<Slot> slots = screen.getMenu().slots;
+        for (int i = 0; i < Math.min(GRID, slots.size()); i++) {
+            Slot slot = slots.get(i);
+            int x = screen.getLeftPos() + slot.x - 1, y = screen.getTopPos() + slot.y - 1;
+            if (mouseX >= x && mouseX < x + SLOT && mouseY >= y && mouseY < y + SLOT) return slot;
+        }
+        return null;
+    }
+
     /** Clicking a banner folds or opens its section; placeholders can't be picked up, moved or copied. */
     @SubscribeEvent
     public static void onClick(ScreenEvent.MouseButtonPressed.Pre event) {
-        if (!(event.getScreen() instanceof CreativeModeInventoryScreen screen)) return;
-        Slot slot = screen.getHoveredSlot();
+        if (!(event.getScreen() instanceof CreativeModeInventoryScreen screen) || shownTab(screen) == null) return;
+        Slot slot = slotAt(screen, event.getMouseX(), event.getMouseY());
         TabSection section = slot == null ? null : section(slot.getItem());
         if (section == null) return;
         event.setCanceled(true);
-        if (section.isBanner() && event.getButton() == 0) {
+        // The left button is 1 in this version's numbering (MOUSE_BUTTON_LEFT), not GLFW's 0.
+        if (section.isBanner() && event.getButton() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT) {
             toggle(section.section());
             Minecraft.getInstance().getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(
                     net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK, 1.0F));
