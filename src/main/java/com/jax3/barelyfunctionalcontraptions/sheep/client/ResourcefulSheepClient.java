@@ -80,7 +80,9 @@ public final class ResourcefulSheepClient {
 
         com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.clientTickHandler = ZeroPointHumSound::tick;
         com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem.openGuide = () -> net.minecraft.client.Minecraft.getInstance().gui.setScreen(new GuideScreen());
-        DevScreenshotHarness.registerIfEnabled();
+        if (Boolean.getBoolean("barelyfunctionalcontraptions.screenshotHarness")) {
+            com.jax3.barelyfunctionalcontraptions.BarelyFunctionalContraptions.devOnly("sheep.client.DevScreenshotHarness", "registerIfEnabled", null, null);
+        }
     }
 
     private static void registerScreens(RegisterMenuScreensEvent event) {

@@ -3,7 +3,6 @@ package com.jax3.barelyfunctionalcontraptions.sheep;
 import com.jax3.barelyfunctionalcontraptions.BarelyFunctionalContraptions;
 import com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs;
 import com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents;
-import com.jax3.barelyfunctionalcontraptions.sheep.gametest.ModGameTests;
 import com.jax3.barelyfunctionalcontraptions.sheep.network.ModNetwork;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
@@ -55,9 +54,6 @@ public final class ResourcefulSheep {
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements::onLivingDeath);
         modBus.addListener(ModNetwork::register);
 
-        // Game tests (only active when the game test framework is enabled, e.g. ./gradlew runGameTestServer).
-        ModGameTests.FUNCTIONS.register(modBus);
-        modBus.addListener(ModGameTests::registerTests);
 
         container.registerConfig(ModConfig.Type.SYNCED, ModConfigs.SERVER_SPEC, BarelyFunctionalContraptions.MOD_ID + "-sheep-synced.toml");
         container.registerConfig(ModConfig.Type.CLIENT, ModConfigs.CLIENT_SPEC, BarelyFunctionalContraptions.MOD_ID + "-sheep-client.toml");

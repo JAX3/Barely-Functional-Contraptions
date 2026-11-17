@@ -5,7 +5,6 @@ import com.jax3.barelyfunctionalcontraptions.mycelial.capability.ModCapabilities
 import com.jax3.barelyfunctionalcontraptions.mycelial.config.ClientConfig;
 import com.jax3.barelyfunctionalcontraptions.mycelial.config.ServerConfig;
 import com.jax3.barelyfunctionalcontraptions.mycelial.event.CommonEvents;
-import com.jax3.barelyfunctionalcontraptions.mycelial.gametest.ModGameTests;
 import com.jax3.barelyfunctionalcontraptions.mycelial.net.ModNetworking;
 import com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlockEntities;
 import com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks;
@@ -36,7 +35,6 @@ public final class MycelialPower {
         ModMenus.MENUS.register(modBus);
         ModSounds.SOUNDS.register(modBus);
         ModDataComponents.COMPONENTS.register(modBus);
-        ModGameTests.register(modBus);
 
         container.registerConfig(ModConfig.Type.SYNCED, ServerConfig.SPEC, BarelyFunctionalContraptions.MOD_ID + "-mycelial-synced.toml");
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, BarelyFunctionalContraptions.MOD_ID + "-mycelial-client.toml");

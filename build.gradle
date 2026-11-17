@@ -147,6 +147,14 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 jar {
+    // Dev tools stay out of the released jar so the game doesn't load them: the GameTests with their test data,
+    // and the screenshot harness. Dev runs (runClient, runGameTestServer) use the build folders and keep them.
+    exclude 'com/jax3/barelyfunctionalcontraptions/gametest/**',
+            'com/jax3/barelyfunctionalcontraptions/*/gametest/**',
+            'com/jax3/barelyfunctionalcontraptions/sheep/client/DevScreenshotHarness*',
+            'data/barelyfunctionalcontraptions/test_instance/**',
+            'data/barelyfunctionalcontraptions/test_environment/**',
+            'data/barelyfunctionalcontraptions/structure/**'
     manifest {
         attributes([
                 'Specification-Title'     : mod_id,

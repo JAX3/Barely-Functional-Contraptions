@@ -1,6 +1,5 @@
 package com.jax3.barelyfunctionalcontraptions;
 
-import com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests;
 import com.jax3.barelyfunctionalcontraptions.mycelial.MycelialPower;
 import com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
@@ -32,7 +31,21 @@ public final class BarelyFunctionalContraptions {
         MycelialPower.init(modBus, container);
         ResourcefulSheep.init(modBus, container);
         ContraptionsCreativeTab.REGISTER.register(modBus);
-        IntegrationGameTests.register(modBus);
+        // GameTests and the screenshot harness are dev tools: released jars leave them out (see build.gradle).
+        if (!net.neoforged.fml.loading.FMLEnvironment.isProduction()) {
+            devOnly("gametest.DevGameTests", "register", IEventBus.class, modBus);
+        }
+    }
+
+    /** Calls a dev-only class by name, so production code never refers to the classes the released jar leaves out. */
+    public static void devOnly(String className, String method, Class<?> argType, Object arg) {
+        try {
+            Class<?> type = Class.forName("com.jax3.barelyfunctionalcontraptions." + className);
+            if (argType == null) type.getMethod(method).invoke(null);
+            else type.getMethod(method, argType).invoke(null, arg);
+        } catch (ReflectiveOperationException e) {
+            LOGGER.warn("Dev-only {} is not available", className, e);
+        }
     }
 
     public static Identifier id(String path) {

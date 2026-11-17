@@ -328,6 +328,8 @@ These cover the pure logic: the network formula and its overflow guards, energy 
 
 This starts a headless server, runs every `@GameTest` in `GeneratorGameTests`, then exits. A non-zero exit code means a failure; the log names the failing test. The tests assume the **default server config**.
 
+The GameTests, their test structures and the screenshot harness only exist in dev runs. The released jar leaves them out (see the `jar` block in `build.gradle`), so players' games don't load them.
+
 | GameTest | Checks |
 |---|---|
 | `singleGeneratorProducesEnergy` | A generator burns one mushroom, uses water and produces 250 FE/t on red mushrooms |
