@@ -2,6 +2,7 @@
   "parent": "minecraft:block/block",
   "textures": {
     "frame": "barelyfunctionalcontraptions:block/sheep_treadmill/frame",
+    "rail": "barelyfunctionalcontraptions:block/sheep_treadmill/rail",
     "belt": "barelyfunctionalcontraptions:block/sheep_treadmill/belt",
     "roller": "barelyfunctionalcontraptions:block/sheep_treadmill/roller",
     "housing_side": "barelyfunctionalcontraptions:block/sheep_treadmill/housing_side",
@@ -33,7 +34,7 @@
             2,
             7
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         },
         "south": {
           "uv": [
@@ -42,7 +43,7 @@
             2,
             7
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         },
         "east": {
           "uv": [
@@ -51,7 +52,7 @@
             16,
             7
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         },
         "west": {
           "uv": [
@@ -60,7 +61,7 @@
             16,
             7
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         },
         "up": {
           "uv": [
@@ -69,7 +70,7 @@
             2,
             16
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         },
         "down": {
           "uv": [
@@ -78,7 +79,7 @@
             2,
             16
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         }
       }
     },
@@ -101,7 +102,7 @@
             2,
             7
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         },
         "south": {
           "uv": [
@@ -110,7 +111,7 @@
             2,
             7
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         },
         "east": {
           "uv": [
@@ -119,7 +120,7 @@
             16,
             7
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         },
         "west": {
           "uv": [
@@ -128,7 +129,7 @@
             16,
             7
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         },
         "up": {
           "uv": [
@@ -137,7 +138,7 @@
             2,
             16
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         },
         "down": {
           "uv": [
@@ -146,7 +147,7 @@
             2,
             16
           ],
-          "texture": "#frame"
+          "texture": "#rail"
         }
       }
     },

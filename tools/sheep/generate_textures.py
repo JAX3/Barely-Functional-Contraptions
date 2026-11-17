@@ -3675,7 +3675,7 @@ def generate_woollen_icons():
 
 
 def generate_sheep_treadmill():
-    """Sheep Treadmill (WIP preview): an oak frame and belt between steel rollers, a gantry with wheat hanging on a
+    """Sheep Treadmill (WIP preview): a belt between blue steel side rails and steel rollers, an oak gantry with wheat hanging on a
     string, and a slate generator housing at the back with a copper flywheel. Also writes its block and item models."""
     import json
     rnd = random.Random(31)
@@ -3702,6 +3702,18 @@ def generate_sheep_treadmill():
     for y in (1, 5, 9, 13):
         frame.putpixel((1, y), OAK_DD); frame.putpixel((14, y), OAK_DD)
     frame.save(out("block/sheep_treadmill/frame.png"))
+
+    # Side rails: dark blue steel, like the Hume machines, with a bright top edge, a groove and bolts.
+    BSTEEL, BSTEEL_L, BSTEEL_D, BSTEEL_DD, BOLT = hexc("#3f4766"), hexc("#5d6687"), hexc("#2c324c"), hexc("#1f2338"), hexc("#8d97bc")
+    rail = Image.new("RGBA", (16, 16), BSTEEL)
+    for x in range(16):
+        rail.putpixel((x, 0), BSTEEL_L); rail.putpixel((x, 1), BSTEEL_L if x % 7 else BOLT)
+        rail.putpixel((x, 15), BSTEEL_DD); rail.putpixel((x, 14), BSTEEL_D)
+        rail.putpixel((x, 7), BSTEEL_D); rail.putpixel((x, 8), BSTEEL_DD)
+    for x in (2, 13):
+        for y in (4, 11):
+            rail.putpixel((x, y), BOLT); rail.putpixel((x + 1, y + 1), BSTEEL_DD)
+    rail.save(out("block/sheep_treadmill/rail.png"))
 
     # Belt: dark slats across it with a lighter tread on each.
     belt = Image.new("RGBA", (16, 16), BELT)
@@ -3801,8 +3813,8 @@ def generate_sheep_treadmill():
             el["faces"][face] = {"uv": [0, 0, min(w, 16), min(h, 16)], "texture": "#" + faces.get(face, tex)}
         return el
     elements = [
-        box([0, 0, -16], [2, 7, 10], "frame"),                       # left rail
-        box([14, 0, -16], [16, 7, 10], "frame"),                     # right rail
+        box([0, 0, -16], [2, 7, 10], "rail"),                        # left rail
+        box([14, 0, -16], [16, 7, 10], "rail"),                      # right rail
         box([2, 1, -15], [14, 5, -11], "roller"),                    # front roller
         box([2, 5, -14], [14, 6, 10], "belt"),                       # belt
         box([2, 1, -11], [14, 2, 10], "belt"),                       # the belt's return run
@@ -3818,7 +3830,7 @@ def generate_sheep_treadmill():
     for rot in (45, -45):
         elements.append({"from": [5, 8, -15], "to": [11, 16, -15], "rotation": {"angle": rot, "axis": "y", "origin": [8, 12, -15]},
                          "faces": {"north": {"uv": [3, 1, 13, 15], "texture": "#wheat"}, "south": {"uv": [3, 1, 13, 15], "texture": "#wheat"}}})
-    textures = {k: T + k for k in ("frame", "belt", "roller", "housing_side", "housing_front", "housing_top", "flywheel", "wheat", "rope", "lamp")}
+    textures = {k: T + k for k in ("frame", "rail", "belt", "roller", "housing_side", "housing_front", "housing_top", "flywheel", "wheat", "rope", "lamp")}
     textures["particle"] = T + "frame"
     models = os.path.join(ROOT, "..", "models")
     with open(os.path.join(models, "block", "sheep_treadmill.json"), "w") as fh:
