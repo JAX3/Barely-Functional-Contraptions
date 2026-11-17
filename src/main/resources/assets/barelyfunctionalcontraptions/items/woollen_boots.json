@@ -5,7 +5,7 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/leather_boots_quartz_trim",
+          "model": "barelyfunctionalcontraptions:item/woollen_boots_quartz_trim",
           "tints": [
             {
               "type": "minecraft:dye",
@@ -18,7 +18,7 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/leather_boots_iron_trim",
+          "model": "barelyfunctionalcontraptions:item/woollen_boots_iron_trim",
           "tints": [
             {
               "type": "minecraft:dye",
@@ -31,7 +31,7 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/leather_boots_netherite_trim",
+          "model": "barelyfunctionalcontraptions:item/woollen_boots_netherite_trim",
           "tints": [
             {
               "type": "minecraft:dye",
@@ -44,7 +44,7 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/leather_boots_redstone_trim",
+          "model": "barelyfunctionalcontraptions:item/woollen_boots_redstone_trim",
           "tints": [
             {
               "type": "minecraft:dye",
@@ -57,7 +57,7 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/leather_boots_copper_trim",
+          "model": "barelyfunctionalcontraptions:item/woollen_boots_copper_trim",
           "tints": [
             {
               "type": "minecraft:dye",
@@ -70,7 +70,7 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/leather_boots_gold_trim",
+          "model": "barelyfunctionalcontraptions:item/woollen_boots_gold_trim",
           "tints": [
             {
               "type": "minecraft:dye",
@@ -83,7 +83,7 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/leather_boots_emerald_trim",
+          "model": "barelyfunctionalcontraptions:item/woollen_boots_emerald_trim",
           "tints": [
             {
               "type": "minecraft:dye",
@@ -96,7 +96,7 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/leather_boots_diamond_trim",
+          "model": "barelyfunctionalcontraptions:item/woollen_boots_diamond_trim",
           "tints": [
             {
               "type": "minecraft:dye",
@@ -109,7 +109,7 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/leather_boots_lapis_trim",
+          "model": "barelyfunctionalcontraptions:item/woollen_boots_lapis_trim",
           "tints": [
             {
               "type": "minecraft:dye",
@@ -122,7 +122,7 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/leather_boots_amethyst_trim",
+          "model": "barelyfunctionalcontraptions:item/woollen_boots_amethyst_trim",
           "tints": [
             {
               "type": "minecraft:dye",
@@ -135,7 +135,7 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/leather_boots_resin_trim",
+          "model": "barelyfunctionalcontraptions:item/woollen_boots_resin_trim",
           "tints": [
             {
               "type": "minecraft:dye",
@@ -148,7 +148,7 @@
     ],
     "fallback": {
       "type": "minecraft:model",
-      "model": "minecraft:item/leather_boots",
+      "model": "barelyfunctionalcontraptions:item/woollen_boots",
       "tints": [
         {
           "type": "minecraft:dye",

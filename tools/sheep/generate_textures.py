@@ -3550,7 +3550,7 @@ def _fill_faces(img, faces, rows_of_face, pattern):
 
 
 def generate_woollen_armor():
-    # The item icons are vanilla's leather armour sprites (see assets/.../items/woollen_*.json), tinted the wool's colour.
+    # The item icons are in generate_woollen_icons.
 
     # The humanoid layer (helmet, jumper, boots) and the leggings layer, at the player model's texture offsets.
     head, body = box_faces(0, 0, 8, 8, 8), box_faces(16, 16, 8, 12, 4)
@@ -3615,6 +3615,65 @@ def generate_woollen_armor():
     icon.save(out("mob_effect/muffled.png"))
 
 
+# Woollen Armour icons: vanilla's leather sprites (tinted the wool's colour) with a subtle knit laid over them. The
+# knit is drawn here, only inside the leather sprite's silhouette (read from the dev jar, not copied), as faint light
+# and dark stitches that shade any colour. Also writes the item models, including one per armour trim.
+VANILLA_JAR = os.path.join(os.path.dirname(__file__), "..", "..", "build", "moddev", "artifacts", "minecraft-patched-26.3.0.101-merged.jar")
+MODELS = os.path.join(ROOT, "..", "models", "item")
+ITEMS = os.path.join(ROOT, "..", "items")
+
+
+def generate_woollen_icons():
+    import io, json, zipfile
+    if not os.path.exists(VANILLA_JAR):
+        print("Skipping Woollen Armour icons: run ./gradlew build first so", VANILLA_JAR, "exists")
+        return
+    jar = zipfile.ZipFile(VANILLA_JAR)
+    def sprite(name):
+        return Image.open(io.BytesIO(jar.read(f"assets/minecraft/textures/item/{name}.png"))).convert("RGBA")
+    for piece in ("helmet", "chestplate", "leggings", "boots"):
+        base, over = sprite(f"leather_{piece}"), sprite(f"leather_{piece}_overlay")
+        cloth = {(x, y) for x in range(16) for y in range(16) if base.getpixel((x, y))[3] and not over.getpixel((x, y))[3]}
+        knit_img = Image.new("RGBA", (16, 16), CLEAR)
+        for (x, y) in cloth:
+            if not all((x + dx, y + dy) in cloth for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                continue  # leave the outline crisp
+            # A V stitch: the two pixels of each stitch column swap light and dark row by row.
+            knit_img.putpixel((x, y), (255, 255, 255, 46) if (x % 2 == 0) == (y % 2 == 0) else (0, 0, 0, 30))
+        knit_img.save(out(f"item/woollen_{piece}_knit.png"))
+
+        layers = {"layer0": f"minecraft:item/leather_{piece}", "layer1": f"minecraft:item/leather_{piece}_overlay",
+                  "layer2": f"barelyfunctionalcontraptions:item/woollen_{piece}_knit"}
+        os.makedirs(MODELS, exist_ok=True)
+        def model(name, extra=None):
+            textures = dict(layers)
+            if extra:
+                textures["layer3"] = extra
+            with open(os.path.join(MODELS, name + ".json"), "w") as fh:
+                fh.write(json.dumps({"parent": "minecraft:item/generated", "textures": textures}, indent=2) + "\n")
+        model(f"woollen_{piece}")
+        # The item definition: vanilla leather's, with each model swapped for the knitted one.
+        item = json.loads(jar.read(f"assets/minecraft/items/leather_{piece}.json"))
+        def swap(o):
+            if isinstance(o, dict):
+                if o.get("type") == "minecraft:dye":
+                    o["default"] = (0xFF000000 | 0xF9FFFE) - (1 << 32)  # white wool
+                ref = o.get("model")
+                if isinstance(ref, str) and ref.startswith(f"minecraft:item/leather_{piece}"):
+                    vanilla = json.loads(jar.read("assets/minecraft/models/item/" + ref.split("/", 1)[1] + ".json"))
+                    name = "woollen_" + ref.split("leather_", 1)[1]
+                    model(name, vanilla["textures"].get("layer2"))
+                    o["model"] = "barelyfunctionalcontraptions:item/" + name
+                for v in o.values():
+                    swap(v)
+            elif isinstance(o, list):
+                for v in o:
+                    swap(v)
+        swap(item)
+        with open(os.path.join(ITEMS, f"woollen_{piece}.json"), "w") as fh:
+            fh.write(json.dumps(item, indent=2) + "\n")
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -3654,6 +3713,7 @@ def main():
     generate_chiller_block()
     generate_powered_furnace()
     generate_woollen_armor()
+    generate_woollen_icons()
     generate_infusion_altar_gui()
     generate_advancement_background()
     generate_jei()
