@@ -3445,6 +3445,194 @@ def generate_hume_field_generator():
     lens.save(out("block/hume_field_generator/lens.png"))
 
 
+# ---- Woollen Armour. Everything is greyscale, so the dye tint (the wool's colour) colours it, as leather is coloured.
+# Knit: a V stitch, two pixels wide, that zigzags row to row; ribbing (cuffs, hems, the beanie's brim): vertical ribs.
+def knit(lx, ly):
+    return 238 if (lx % 2 == 0) == (ly % 2 == 0) else 206
+
+
+def rib(lx, ly):
+    return 240 if lx % 2 == 0 else 188
+
+
+def grey(v, a=255):
+    return (v, v, v, a)
+
+
+WOOLLEN_ICONS = {  # # knit, r ribbing, o pom-pom
+    "helmet": [
+        "................",
+        "................",
+        ".......oo.......",
+        "......oooo......",
+        ".......oo.......",
+        ".....######.....",
+        "....########....",
+        "...##########...",
+        "...##########...",
+        "..############..",
+        "..############..",
+        "..rrrrrrrrrrrr..",
+        "..rrrrrrrrrrrr..",
+        "................",
+        "................",
+        "................",
+    ],
+    "chestplate": [
+        "................",
+        "................",
+        "...####..####...",
+        ".######rr######.",
+        "################",
+        "################",
+        "###.########.###",
+        "###.########.###",
+        "###.########.###",
+        "rrr.########.rrr",
+        "rrr.########.rrr",
+        "....########....",
+        "....rrrrrrrr....",
+        "....rrrrrrrr....",
+        "................",
+        "................",
+    ],
+    "leggings": [
+        "................",
+        "................",
+        "..rrrrrrrrrrrr..",
+        "..rrrrrrrrrrrr..",
+        "..############..",
+        "..#####..#####..",
+        "..#####..#####..",
+        "..####....####..",
+        "..####....####..",
+        "..####....####..",
+        "..####....####..",
+        "..####....####..",
+        "..rrrr....rrrr..",
+        "..rrrr....rrrr..",
+        "................",
+        "................",
+    ],
+    "boots": [
+        "................",
+        "................",
+        "................",
+        "................",
+        "....rrrr..rrrr..",
+        "....rrrr..rrrr..",
+        "....####..####..",
+        "....####..####..",
+        "....####..####..",
+        "..######.#####..",
+        ".#############..",
+        ".#######.#####..",
+        "................",
+        "................",
+        "................",
+        "................",
+    ],
+}
+
+
+def woollen_icon(rows):
+    img = Image.new("RGBA", (16, 16), CLEAR)
+    filled = {(x, y) for y, row in enumerate(rows) for x, ch in enumerate(row) if ch != "."}
+    for (x, y) in filled:
+        ch = rows[y][x]
+        edge = any((x + dx, y + dy) not in filled for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        if edge:
+            v = 104
+        elif ch == "r":
+            v = rib(x, y)
+        elif ch == "o":
+            v = 250 if (x + y) % 2 else 226
+        else:
+            v = knit(x, y)
+        img.putpixel((x, y), grey(v))
+    return img
+
+
+def _fill_faces(img, faces, rows_of_face, pattern):
+    """Paints each named face of a box; rows_of_face(face, h) gives the local rows to cover and which are ribbed."""
+    for name, (x0, y0, x1, y1) in faces.items():
+        h = y1 - y0
+        for ly in range(h):
+            kind = rows_of_face(name, ly, h)
+            if kind is None:
+                continue
+            for lx in range(x1 - x0):
+                v = rib(lx, ly) if kind == "rib" else pattern(lx, ly)
+                img.putpixel((x0 + lx, y0 + ly), grey(v))
+
+
+def generate_woollen_armor():
+    for piece, rows in WOOLLEN_ICONS.items():
+        woollen_icon(rows).save(out(f"item/woollen_{piece}.png"))
+
+    # The humanoid layer (helmet, jumper, boots) and the leggings layer, at the player model's texture offsets.
+    head, body = box_faces(0, 0, 8, 8, 8), box_faces(16, 16, 8, 12, 4)
+    arm, leg = box_faces(40, 16, 4, 12, 4), box_faces(0, 16, 4, 12, 4)
+    sides = ("north", "south", "east", "west")
+
+    layer = Image.new("RGBA", (64, 32), CLEAR)
+
+    def beanie(face, ly, h):  # the top, and the upper 5 rows of the sides with a 2-row brim; the face stays open
+        if face == "top":
+            return "knit"
+        if face in sides and ly < 5:
+            return "rib" if ly >= 3 else "knit"
+        return None
+
+    def jumper(face, ly, h):  # all round, with a ribbed hem and cuffs
+        if face == "bottom":
+            return None
+        if face in sides and ly >= h - 2:
+            return "rib"
+        return "knit"
+
+    def booties(face, ly, h):  # the lowest 5 rows and the sole, with a ribbed top
+        if face == "bottom":
+            return "knit"
+        if face in sides and ly >= h - 5:
+            return "rib" if ly == h - 5 else "knit"
+        return None
+
+    _fill_faces(layer, head, beanie, knit)
+    _fill_faces(layer, body, jumper, knit)
+    _fill_faces(layer, arm, jumper, knit)
+    _fill_faces(layer, leg, booties, knit)
+    layer.save(out("entity/equipment/humanoid/wool.png"))
+
+    legs = Image.new("RGBA", (64, 32), CLEAR)
+
+    def waistband(face, ly, h):
+        return "rib" if face in sides and ly >= h - 3 else None
+
+    def trouser_legs(face, ly, h):  # down to where the booties start, with a ribbed ankle
+        if face in sides and ly < h - 4:
+            return "rib" if ly >= h - 6 else "knit"
+        return None
+
+    _fill_faces(legs, body, waistband, knit)
+    _fill_faces(legs, leg, trouser_legs, knit)
+    legs.save(out("entity/equipment/humanoid_leggings/wool.png"))
+
+    # The Muffled effect icon: a cream bootie with its sound fading out behind it.
+    icon = Image.new("RGBA", (18, 18), CLEAR)
+    boot = WOOLLEN_ICONS["boots"]
+    cream, outline = hexc("#efe6d2"), hexc("#4b4036")
+    filled = {(x, y) for y in range(16) for x in range(8) if boot[y][x + 1] != "." and x + 1 < 9}
+    for (x, y) in filled:
+        edge = any((x + dx, y + dy) not in filled for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        rows_kind = boot[y][x + 1]
+        c = outline if edge else shade(cream, (knit(x, y) if rows_kind == "#" else rib(x, y)) / 240)
+        icon.putpixel((x + 2, y + 1), c)
+    for i, (x, y) in enumerate([(12, 8), (13, 9), (13, 10), (12, 11), (14, 7), (15, 8), (15, 9), (15, 10), (15, 11), (14, 12)]):
+        icon.putpixel((x, y), hexc("#cfc6b4", 150 if i < 4 else 70))
+    icon.save(out("mob_effect/muffled.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -3483,6 +3671,7 @@ def main():
     generate_chiller_gui()
     generate_chiller_block()
     generate_powered_furnace()
+    generate_woollen_armor()
     generate_infusion_altar_gui()
     generate_advancement_background()
     generate_jei()

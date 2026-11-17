@@ -65,6 +65,7 @@ public final class GuideRecipes {
     private static final int OUT = 64, OUT_GAP = 32;
     /** Items that aren't machines: they go in Parts and Tools. */
     private static final Set<String> PARTS = Set.of("functional_machine_block", "contraptions_manual", "mycelium_wrench",
+            "woollen_helmet", "woollen_chestplate", "woollen_leggings", "woollen_boots",
             "energy_cable", "fluid_pipe", "item_pipe", "glow_lamp");
 
     private GuideRecipes() {}
@@ -87,6 +88,8 @@ public final class GuideRecipes {
         List<Recipe> machines = new ArrayList<>(), parts = new ArrayList<>();
         List<RecipeHolder<?>> crafting = new ArrayList<>(SeparationLookup.clientRecipeMap().byType(RecipeType.CRAFTING));
         crafting.removeIf(h -> !h.id().identifier().getNamespace().equals(BarelyFunctionalContraptions.MOD_ID));
+        // Dyeing Woollen Armour works as it does for leather; one recipe per piece is enough to show.
+        crafting.removeIf(h -> h.id().identifier().getPath().endsWith("_dyed"));
         crafting.sort(Comparator.comparingInt(h -> sortKey(h, context)));
         for (RecipeHolder<?> holder : crafting) {
             for (RecipeDisplay display : holder.value().display()) {

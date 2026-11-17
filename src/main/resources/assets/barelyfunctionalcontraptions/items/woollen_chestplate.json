@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "barelyfunctionalcontraptions:item/woollen_chestplate",
+    "tints": [
+      {
+        "type": "minecraft:dye",
+        "default": -393218
+      }
+    ]
+  }
+}

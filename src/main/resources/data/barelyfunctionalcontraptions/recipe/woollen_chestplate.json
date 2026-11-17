@@ -1,0 +1,15 @@
+{
+  "type": "barelyfunctionalcontraptions:woollen_armor",
+  "category": "equipment",
+  "key": {
+    "W": "#minecraft:wool"
+  },
+  "pattern": [
+    "W W",
+    "WWW",
+    "WWW"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:woollen_chestplate"
+  }
+}

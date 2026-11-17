@@ -30,6 +30,20 @@
       "tab": "utility"
     },
     {
+      "title": "Woollen Armour",
+      "icon": "barelyfunctionalcontraptions:woollen_boots",
+      "tab": "utility",
+      "text": [
+        "## Woollen Armour",
+        "Knit a full set from wool, in the same shapes as leather armour: a Beanie (5 wool), a Jumper (8), Leggings (7) and Boots (4).",
+        "Each piece takes the colour of the wool it's made from. One colour gives that colour; mixed wool blends the colours, as dyes do on leather. You can dye it afterwards like leather, or wash it in a water cauldron to make it white again.",
+        "It protects as much as leather, takes enchantments a little better, mends with any wool on an anvil, and keeps you from freezing in powder snow.",
+        "## Muffled",
+        "While you wear Woollen Boots you're Muffled: you make no sound. No footsteps, landings, eating or hurt sounds, and sculk sensors, shriekers and Wardens can't hear you.",
+        "Take the boots off and it wears off 2 seconds later."
+      ]
+    },
+    {
       "title": "Data Packs",
       "icon": "minecraft:command_block",
       "tab": "utility",

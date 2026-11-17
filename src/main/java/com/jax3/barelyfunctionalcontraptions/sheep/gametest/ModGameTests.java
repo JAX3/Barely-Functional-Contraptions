@@ -147,6 +147,8 @@ public final class ModGameTests {
         TESTS.put("snow_sheep_leaves_snow", ModGameTests::snowSheep);
         TESTS.put("chiller_freezes_water_with_snow_sheep", ModGameTests::chiller);
         TESTS.put("powered_furnace_smelts_faster_with_blaze_sheep", ModGameTests::poweredFurnace);
+        TESTS.put("woollen_armor_takes_the_wool_colour", ModGameTests::woollenArmorColour);
+        TESTS.put("woollen_boots_muffle_the_wearer", ModGameTests::woollenBootsMuffle);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
@@ -1029,6 +1031,76 @@ public final class ModGameTests {
             h.assertTrue(used >= 150 * 20 && used <= 170 * 20, "20 FE/t while smelting, used " + used);
             h.assertTrue(unpowered.output().isEmpty() && unpowered.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus.NO_ENERGY,
                     "nothing without power, status " + unpowered.status());
+            h.succeed();
+        });
+    }
+
+    /** Crafts with whatever crafting recipe matches the grid, or EMPTY. */
+    private static ItemStack craft(GameTestHelper h, int width, int height, List<ItemStack> grid) {
+        var input = net.minecraft.world.item.crafting.CraftingInput.of(width, height, grid);
+        return h.getLevel().recipeAccess().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, h.getLevel())
+                .map(r -> r.value().assemble(input)).orElse(ItemStack.EMPTY);
+    }
+
+    /**
+     * Woollen Armour takes the colour of its wool: all red gives red, red and blue blend, and every piece crafts from
+     * its leather shape. Dyeing it afterwards works like leather.
+     */
+    private static void woollenArmorColour(GameTestHelper h) {
+        ItemStack red = new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.RED)), blue = new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.BLUE)), e = ItemStack.EMPTY;
+        ItemStack helmet = craft(h, 3, 2, List.of(red, red, red, red, e, red));
+        h.assertTrue(helmet.is(ModItems.WOOLLEN_HELMET.get()), "five wool make a Woollen Beanie, got " + helmet);
+        int allRed = net.minecraft.world.item.component.DyedItemColor.applyDyes((net.minecraft.world.item.component.DyedItemColor) null,
+                java.util.Collections.nCopies(5, net.minecraft.world.item.DyeColor.RED)).rgb();
+        var colour = helmet.get(net.minecraft.core.component.DataComponents.DYED_COLOR);
+        h.assertTrue(colour != null && colour.rgb() == allRed, "red wool gives a red beanie, got " + colour);
+        ItemStack mixed = craft(h, 3, 2, List.of(red, blue, red, blue, e, red));
+        var mixedColour = mixed.get(net.minecraft.core.component.DataComponents.DYED_COLOR);
+        h.assertTrue(mixedColour != null && mixedColour.rgb() != allRed, "red and blue wool blend, got " + mixedColour);
+        ItemStack w = new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.WHITE));
+        h.assertTrue(craft(h, 3, 3, List.of(w, e, w, w, w, w, w, w, w)).is(ModItems.WOOLLEN_CHESTPLATE.get()), "eight wool make a jumper");
+        h.assertTrue(craft(h, 3, 3, List.of(w, w, w, w, e, w, w, e, w)).is(ModItems.WOOLLEN_LEGGINGS.get()), "seven wool make leggings");
+        h.assertTrue(craft(h, 3, 2, List.of(w, e, w, w, e, w)).is(ModItems.WOOLLEN_BOOTS.get()), "four wool make boots");
+        ItemStack dyed = craft(h, 2, 1, List.of(helmet, new ItemStack(Items.DYE.pick(net.minecraft.world.item.DyeColor.YELLOW))));
+        var dyedColour = dyed.get(net.minecraft.core.component.DataComponents.DYED_COLOR);
+        h.assertTrue(dyed.is(ModItems.WOOLLEN_HELMET.get()) && dyedColour != null && dyedColour.rgb() != allRed, "it can be dyed like leather, got " + dyedColour);
+        h.assertTrue(helmet.is(net.minecraft.tags.ItemTags.HEAD_ARMOR) && ModItems.WOOLLEN_BOOTS.get().getDefaultInstance().is(net.minecraft.tags.ItemTags.FREEZE_IMMUNE_WEARABLES),
+                "it's armour, and wool keeps you warm in powder snow");
+        h.succeed();
+    }
+
+    /**
+     * Woollen Boots give Muffled: a husk wearing them makes no sounds (positioned or from the entity) and no
+     * vibrations, while one without them does; take them off and Muffled wears off.
+     */
+    private static void woollenBootsMuffle(GameTestHelper h) {
+        var quiet = h.spawn(net.minecraft.world.entity.EntityTypes.HUSK, new BlockPos(1, 1, 1));
+        var loud = h.spawn(net.minecraft.world.entity.EntityTypes.HUSK, new BlockPos(5, 1, 5));
+        quiet.setNoAi(true);
+        loud.setNoAi(true);
+        quiet.setItemSlot(net.minecraft.world.entity.EquipmentSlot.FEET, new ItemStack(ModItems.WOOLLEN_BOOTS.get()));
+        var step = net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(net.minecraft.sounds.SoundEvents.HUSK_STEP);
+        java.util.function.Function<net.minecraft.world.entity.LivingEntity, Boolean> silencedAtFeet = e -> net.neoforged.neoforge.event.EventHooks.onPlaySoundAtPosition(
+                h.getLevel(), e.getX(), e.getY(), e.getZ(), step, net.minecraft.sounds.SoundSource.HOSTILE, 1, 1).isCanceled();
+        java.util.function.Function<net.minecraft.world.entity.LivingEntity, Boolean> silencedFromIt = e -> net.neoforged.neoforge.event.EventHooks.onPlaySoundAtEntity(
+                e, step, net.minecraft.sounds.SoundSource.HOSTILE, 1, 1).isCanceled();
+        java.util.function.Function<net.minecraft.world.entity.LivingEntity, Boolean> vibrates = e -> net.neoforged.neoforge.common.CommonHooks.onVanillaGameEvent(
+                h.getLevel(), net.minecraft.world.level.gameevent.GameEvent.STEP, e.position(), net.minecraft.world.level.gameevent.GameEvent.Context.of(e));
+        h.runAfterDelay(15, () -> {
+            h.assertTrue(quiet.hasEffect(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModEffects.MUFFLED), "the boots make it Muffled");
+            h.assertFalse(loud.hasEffect(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModEffects.MUFFLED), "the other one isn't");
+            h.assertTrue(silencedAtFeet.apply(quiet) && silencedFromIt.apply(quiet), "its sounds are cancelled");
+            h.assertFalse(vibrates.apply(quiet), "and its steps don't reach sculk");
+            h.assertFalse(silencedAtFeet.apply(loud) || silencedFromIt.apply(loud), "the other one's sounds play");
+            h.assertTrue(vibrates.apply(loud), "and it sets off sculk");
+            var away = h.absolutePos(new BlockPos(3, 1, 3));
+            h.assertFalse(net.neoforged.neoforge.event.EventHooks.onPlaySoundAtPosition(h.getLevel(), away.getX() + 0.5, away.getY(), away.getZ() + 0.5,
+                    step, net.minecraft.sounds.SoundSource.BLOCKS, 1, 1).isCanceled(), "sounds elsewhere still play");
+            quiet.setItemSlot(net.minecraft.world.entity.EquipmentSlot.FEET, ItemStack.EMPTY);
+        });
+        h.runAfterDelay(70, () -> {
+            h.assertFalse(quiet.hasEffect(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModEffects.MUFFLED), "without the boots Muffled wears off");
+            h.assertFalse(silencedAtFeet.apply(quiet), "and it makes sounds again");
             h.succeed();
         });
     }

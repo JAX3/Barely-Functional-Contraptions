@@ -49,6 +49,7 @@ public final class ResourcefulSheep {
         ModRecipes.INGREDIENT_TYPES.register(modBus);
         ModLootModifiers.REGISTER.register(modBus);
         com.jax3.barelyfunctionalcontraptions.sheep.registry.ModSounds.REGISTER.register(modBus);
+        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModEffects.REGISTER.register(modBus);
 
         modBus.addListener(ModCapabilities::register);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements::onLivingDeath);
@@ -66,6 +67,7 @@ public final class ResourcefulSheep {
         NeoForge.EVENT_BUS.register(SheepInfusionEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStatsEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepTrailEvents.class);
+        NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.armor.MuffledEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.command.ResourcefulSheepCommand.class);
     }

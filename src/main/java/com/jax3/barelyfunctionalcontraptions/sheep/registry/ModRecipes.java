@@ -31,5 +31,9 @@ public final class ModRecipes {
     public static final Supplier<RecipeSerializer<com.jax3.barelyfunctionalcontraptions.sheep.recipe.UnpackWoolBaleRecipe>> UNPACK_WOOL_BALE_SERIALIZER =
             SERIALIZERS.register("unpack_wool_bale", () -> com.jax3.barelyfunctionalcontraptions.sheep.recipe.UnpackWoolBaleRecipe.SERIALIZER);
 
+    /** Woollen Armour: a shaped recipe whose result takes the colour of the wool used. */
+    public static final Supplier<RecipeSerializer<net.minecraft.world.item.crafting.ShapedRecipe>> WOOLLEN_ARMOR_SERIALIZER =
+            SERIALIZERS.register("woollen_armor", () -> com.jax3.barelyfunctionalcontraptions.sheep.recipe.WoollenArmorRecipe.SERIALIZER);
+
     private ModRecipes() {}
 }

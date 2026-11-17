@@ -136,6 +136,8 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue poweredFurnaceMaxHeaters;
         public final ModConfigSpec.IntValue poweredFurnaceCapacity;
         public final ModConfigSpec.IntValue poweredFurnaceMaxInput;
+        public final ModConfigSpec.BooleanValue woollenBootsMuffle;
+        public final ModConfigSpec.BooleanValue muffleVibrations;
         public final ModConfigSpec.IntValue chillerRadius;
         public final ModConfigSpec.IntValue chillerMaxSources;
         public final ModConfigSpec.DoubleValue chillerFalloff;
@@ -381,6 +383,13 @@ public final class ModConfigs {
                     .defineInRange("energyCapacity", 20_000, 1, Integer.MAX_VALUE);
             poweredFurnaceMaxInput = b.comment("Most FE it accepts per tick.")
                     .defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Woollen Armour (crafted from wool, in the wool's colour)").push("woollen_armor");
+            woollenBootsMuffle = b.comment("Whether Woollen Boots give the Muffled effect while worn (no sounds from the wearer).")
+                    .define("bootsMuffle", true);
+            muffleVibrations = b.comment("Whether Muffled also hides the wearer's vibrations from sculk sensors, shriekers and Wardens.")
+                    .define("muffleVibrations", true);
             b.pop();
 
             b.comment("Snow Sheep Chiller (freezes water into Ice with the cold of Snow sheep in the area around and above it; needs no power)").push("chiller");

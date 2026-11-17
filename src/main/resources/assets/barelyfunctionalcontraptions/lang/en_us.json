@@ -509,7 +509,7 @@
   "barelyfunctionalcontraptions.configuration.fuel": "Fuel",
   "barelyfunctionalcontraptions.configuration.fuels": "Mushroom Fuels",
   "barelyfunctionalcontraptions.configuration.water": "Water Tank",
-  "barelyfunctionalcontraptions.configuration.tankCapacity": "Tank Capacity (mB)",
+  "barelyfunctionalcontraptions.configuration.tankCapacity": "Water Tank (mB)",
   "barelyfunctionalcontraptions.configuration.consumptionAmount": "Water Used per Drink (mB)",
   "barelyfunctionalcontraptions.configuration.consumptionInterval": "Ticks Between Drinks",
   "barelyfunctionalcontraptions.configuration.scaleConsumptionWithNetwork": "Network Scales Water Use",
@@ -819,7 +819,7 @@
   "guide.barelyfunctionalcontraptions.tab.recipes": "Recipes",
   "guide.barelyfunctionalcontraptions.tab.wip": "WIP",
   "guide.barelyfunctionalcontraptions.recipes.machines": "Machines",
-  "guide.barelyfunctionalcontraptions.recipes.items": "Parts and Tools",
+  "guide.barelyfunctionalcontraptions.recipes.items": "Parts, Tools and Armour",
   "guide.barelyfunctionalcontraptions.recipes.infusion": "Infusion",
   "guide.barelyfunctionalcontraptions.recipes.altar": "Infusion Altar",
   "guide.barelyfunctionalcontraptions.recipes.separator": "Mechanical Separator",
@@ -937,7 +937,6 @@
   "barelyfunctionalcontraptions.configuration.maxColdSources": "Most Snow Sheep Counted",
   "barelyfunctionalcontraptions.configuration.ticksPerIce": "Ticks per Ice (one sheep)",
   "barelyfunctionalcontraptions.configuration.waterPerIce": "Water per Ice (mB)",
-  "barelyfunctionalcontraptions.configuration.tankCapacity": "Water Tank (mB)",
   "barelyfunctionalcontraptions.configuration.coldSources": "Cold Sheep Resources",
   "block.barelyfunctionalcontraptions.infusion_altar": "Infusion Altar",
   "message.barelyfunctionalcontraptions.needs_altar": "%s sheep are infused at an Infusion Altar (tier %s)",
@@ -976,5 +975,11 @@
   "barelyfunctionalcontraptions.configuration.sheepSlowness": "Sheep Slowness while infusing",
   "barelyfunctionalcontraptions.configuration.ticks": "Ticks per infusion",
   "jei.barelyfunctionalcontraptions.altar_catalyst": "Catalyst: used up when the infusion finishes",
-  "jei.barelyfunctionalcontraptions.altar_line": "Tier %s · %s FE"
+  "jei.barelyfunctionalcontraptions.altar_line": "Tier %s · %s FE",
+  "item.barelyfunctionalcontraptions.woollen_helmet": "Woollen Beanie",
+  "item.barelyfunctionalcontraptions.woollen_chestplate": "Woollen Jumper",
+  "item.barelyfunctionalcontraptions.woollen_leggings": "Woollen Leggings",
+  "item.barelyfunctionalcontraptions.woollen_boots": "Woollen Boots",
+  "effect.barelyfunctionalcontraptions.muffled": "Muffled",
+  "tooltip.barelyfunctionalcontraptions.woollen_boots": "When worn: Muffled (you make no sound)"
 }

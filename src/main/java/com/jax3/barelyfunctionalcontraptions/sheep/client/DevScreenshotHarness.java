@@ -140,6 +140,10 @@ public final class DevScreenshotHarness {
             poweredFurnaceTick(mc, server);
             return;
         }
+        if ("woollen_armor".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            woollenArmorTick(mc, server);
+            return;
+        }
         if ("chiller".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             chillerTick(mc, server);
             return;
@@ -1616,6 +1620,98 @@ public final class DevScreenshotHarness {
             case 210 -> openAt(server, origin.offset(3, 0, -4));
             case 235 -> shot(mc, "101_powered_furnace_gui");
             case 240 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    /** A Woollen Armour set in the given wool colours (helmet, jumper, leggings, boots), coloured as crafting would. */
+    private static ItemStack[] woollenSet(net.minecraft.world.item.DyeColor... colours) {
+        var items = new net.minecraft.world.item.Item[]{com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_HELMET.get(),
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_CHESTPLATE.get(),
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_LEGGINGS.get(),
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_BOOTS.get()};
+        ItemStack[] set = new ItemStack[4];
+        for (int i = 0; i < 4; i++) {
+            set[i] = new ItemStack(items[i]);
+            set[i].set(net.minecraft.core.component.DataComponents.DYED_COLOR, net.minecraft.world.item.component.DyedItemColor.applyDyes(
+                    (net.minecraft.world.item.component.DyedItemColor) null, java.util.List.of(colours[Math.min(i, colours.length - 1)])));
+        }
+        return set;
+    }
+
+    private static final net.minecraft.world.entity.EquipmentSlot[] ARMOUR_SLOTS = {net.minecraft.world.entity.EquipmentSlot.HEAD,
+            net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.EquipmentSlot.LEGS, net.minecraft.world.entity.EquipmentSlot.FEET};
+
+    /** Four armour stands in Woollen Armour of different wool, on a meadow. */
+    private static void woollenArmorScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(8, 6, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(8, -1, 4))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        ItemStack[][] sets = {
+                woollenSet(net.minecraft.world.item.DyeColor.WHITE),
+                woollenSet(net.minecraft.world.item.DyeColor.RED),
+                woollenSet(net.minecraft.world.item.DyeColor.LIGHT_BLUE),
+                woollenSet(net.minecraft.world.item.DyeColor.YELLOW, net.minecraft.world.item.DyeColor.GREEN, net.minecraft.world.item.DyeColor.BLUE, net.minecraft.world.item.DyeColor.BROWN)};
+        for (int i = 0; i < sets.length; i++) {
+            var stand = net.minecraft.world.entity.EntityTypes.ARMOR_STAND.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            stand.snapTo(o.getX() - 3.75 + i * 2.5, o.getY(), o.getZ() - 4 + 0.5, 180, 0);
+            stand.setYHeadRot(180);
+            stand.setYBodyRot(180);
+            stand.setShowArms(true);
+            for (int s = 0; s < 4; s++) stand.setItemSlot(ARMOUR_SLOTS[s], sets[i][s]);
+            level.addFreshEntity(stand);
+        }
+        label(server, o.offset(0, 2, -5), "Woollen Armour", "white");
+    }
+
+    /** Woollen Armour on stands, a red jumper being crafted, and a player in a set with the Muffled icon: {@code -PharnessScene=woollen_armor}. */
+    private static void woollenArmorTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                woollenArmorScene(server);
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamemode spectator @a");
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 12", origin.getX() + 0.5, origin.getY() + 0.6, origin.getZ() + 1.0));
+            case 200 -> shot(mc, "102_woollen_armor");
+            case 202 -> {
+                setHudHidden(mc, false);
+                command(server, "gamemode survival @a");
+                server.execute(() -> {
+                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                    player.getInventory().clearContent();
+                    ItemStack[] set = woollenSet(net.minecraft.world.item.DyeColor.PURPLE);
+                    for (int s = 0; s < 4; s++) player.setItemSlot(ARMOUR_SLOTS[s], set[s]);
+                    player.getInventory().add(new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.RED), 16));
+                    player.getInventory().add(new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.BLUE), 16));
+                });
+            }
+            case 230 -> mc.execute(() -> mc.gui.setScreen(new InventoryScreen(mc.player)));
+            case 260 -> shot(mc, "102_muffled");
+            case 262 -> mc.execute(() -> mc.gui.setScreen(null));
+            case 266 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                BlockPos table = player.blockPosition().above(2);
+                player.level().setBlock(table, Blocks.CRAFTING_TABLE.defaultBlockState(), 3);
+                player.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inventory, p) -> new net.minecraft.world.inventory.CraftingMenu(
+                        id, inventory, net.minecraft.world.inventory.ContainerLevelAccess.create(player.level(), table)),
+                        net.minecraft.network.chat.Component.translatable("container.crafting")));
+                if (!(player.containerMenu instanceof net.minecraft.world.inventory.CraftingMenu menu)) return;
+                ItemStack red = new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.RED));
+                ItemStack blue = new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.BLUE));
+                int[] slots = {1, 3, 4, 5, 6, 7, 8, 9};
+                for (int i = 0; i < slots.length; i++) menu.getSlot(slots[i]).set((i % 2 == 0 ? red : blue).copy());
+                menu.slotsChanged(menu.getSlot(1).container);
+                menu.broadcastChanges();
+            });
+            case 300 -> shot(mc, "102_woollen_armor_crafting");
+            case 305 -> mc.stop();
             default -> {}
         }
     }

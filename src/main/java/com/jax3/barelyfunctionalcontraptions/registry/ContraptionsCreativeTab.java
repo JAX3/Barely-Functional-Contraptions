@@ -53,6 +53,11 @@ public final class ContraptionsCreativeTab {
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_TANK.get());
                 output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CREATIVE_GENERATOR.get());
+                // Woollen Armour (white; craft or dye it for other colours)
+                output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_HELMET.get());
+                output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_CHESTPLATE.get());
+                output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_LEGGINGS.get());
+                output.accept(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_BOOTS.get());
             })
             .build());
 

@@ -181,6 +181,14 @@ The Barely Functional Wrench links generators into one network and powers machin
 
 ![Generators powering machines wirelessly across a gap](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/17_wireless_power.png)
 
+### Woollen Armour
+
+Knit a full set from any coloured wool, in the leather armour shapes: a Beanie, a Jumper, Leggings and Boots. Each piece takes the colour of the wool it's made from, and mixed wool blends the colours. It can be dyed like leather afterwards, protects as much as leather, mends with wool, and keeps you from freezing in powder snow.
+
+While you wear the **Woollen Boots** you're **Muffled**: you make no sound, from footsteps and landing to eating and getting hurt, and sculk sensors, shriekers and Wardens can't hear you. It wears off 2 seconds after you take them off.
+
+![Four armour stands in Woollen Armour: a white set, a red set, a light blue set, and a mixed set with a yellow beanie, green jumper, blue leggings and brown boots](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/102_woollen_armor.png)
+
 ### Data Packs
 
 Sheep, Wool Burner fuels, furnace heat sources and separator recipes are all data. `/barelyfunctionalcontraptions generate` makes a sheep for every material in the modpack, and every number can be changed in the config (see *Make it your own* above).

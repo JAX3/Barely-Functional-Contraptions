@@ -135,6 +135,10 @@ public final class ResourcefulSheepClient {
     }
 
     private static void onItemTooltip(net.neoforged.neoforge.event.entity.player.ItemTooltipEvent event) {
+        if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_BOOTS.get())) {
+            event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.woollen_boots")
+                    .withStyle(net.minecraft.ChatFormatting.GRAY));
+        }
         if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CREATIVE_GENERATOR.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.creative_generator")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));

@@ -65,8 +65,8 @@ Craft a **Contraptions Manual** (a book and a Functional Machine Block) and righ
 - **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Wool Burner), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator) and *Late Game* (Zero Point Module), then energy storage. A guide chapter's optional `"group"` field sets the heading it is listed under.
 - **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
 - **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Powered Furnace, the Snow Sheep Chiller, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
-- **Utility:** getting started, the wrench and its links, and data packs and commands.
-- **Recipes:** built from the game itself, so it matches any data-pack or modpack changes. *Machines* and *Parts and Tools* show every crafting recipe of the mod as a 3x3 grid; *Infusion* shows what each sheep is fed and the wool it grows; *Infusion Altar* shows the catalysts round the feeding item, with the tier and power; *Mechanical Separator* shows what every wool separates into, with the power and time; *Wool Bales* shows packing, unpacking and what every bale separates into. Ingredients that take any of several items cycle through them, and hovering over an item shows its tooltip.
+- **Utility:** getting started, the wrench and its links, Woollen Armour and the Muffled effect, and data packs and commands.
+- **Recipes:** built from the game itself, so it matches any data-pack or modpack changes. *Machines* and *Parts, Tools and Armour* show every crafting recipe of the mod as a 3x3 grid; *Infusion* shows what each sheep is fed and the wool it grows; *Infusion Altar* shows the catalysts round the feeding item, with the tier and power; *Mechanical Separator* shows what every wool separates into, with the power and time; *Wool Bales* shows packing, unpacking and what every bale separates into. Ingredients that take any of several items cycle through them, and hovering over an item shows its tooltip.
 - **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned late-game generators that need upkeep: *Hume Field Generator*, *Echo Chamber* (a Warden sheep in a sculk room), *Lightning Array* and *Fleece Fusion*, and the *Quantum Sheep*, which blinks in and out of existence, changes its wool type and drops random resource wool. None of them is in the game yet. The Hume Field Generator has a first model, a 2x2 machine two and a half blocks tall: in development builds (`runClient`) it can be placed with `/give @s barelyfunctionalcontraptions:hume_field_generator` to look at. It fills the 2x2x3 space east, south and above where it's placed (and won't place if any of it is taken), breaking any part removes the whole machine, and it does nothing yet. Released jars don't include it.
 
   | Hume Field Generator (WIP model) | Close up |
@@ -783,6 +783,19 @@ Each side where a Fluid or Item Pipe meets a block can be set up on its own, wit
 - **Jade** lists every side that isn't plain Normal, with its filter. The settings are saved with the pipe.
 - Energy Cables have no modes or filters.
 
+### Woollen Armour and Muffled
+A full armour set knitted from wool: the **Woollen Beanie** (helmet), **Woollen Jumper** (chestplate), **Woollen Leggings** and **Woollen Boots**.
+
+| | | |
+|---|---|---|
+| ![Four armour stands in Woollen Armour: a white set, a red set, a light blue set, and a mixed set with a yellow beanie, green jumper, blue leggings and brown boots](screenshots/102_woollen_armor.png) | ![A crafting grid of alternating red and blue wool in the jumper shape, making a purple Woollen Jumper](screenshots/102_woollen_armor_crafting.png) | ![The inventory of a player in a purple Woollen Armour set, with the Muffled effect icon (a woollen bootie) beside it](screenshots/102_muffled.png) |
+
+- **Crafting:** any wool (`#minecraft:wool`) in the leather armour shapes: 5 for the beanie, 8 for the jumper, 7 for the leggings and 4 for the boots. The recipe type is `barelyfunctionalcontraptions:woollen_armor`, an ordinary shaped recipe whose result takes the wool's colour: one colour gives that colour, and mixed colours blend the way dyes do on leather (red and blue make purple). Wool from other mods counts as white.
+- **Colour:** stored as the vanilla `minecraft:dyed_color` component, so the pieces can be dyed in a crafting grid like leather and washed back to white in a water cauldron.
+- **Protection:** the same as leather (1 / 3 / 2 / 1 armour, 5x durability multiplier), enchantability 17 (leather's is 15), repaired with any wool on an anvil. The pieces are in the vanilla armour tags, so they take armour enchantments and trims (a trim shows on the body but not on the item icon), and in `minecraft:freeze_immune_wearables`, so they keep you from freezing in powder snow.
+- **Muffled:** worn **Woollen Boots** give the *Muffled* effect, topped up every half second and lasting 2 seconds, so it wears off soon after they come off. A muffled entity makes no sound: sounds it plays (footsteps, landing, swimming, eating, hurt and death sounds) are cancelled on the server and on its own client. Its vibrations don't reach sculk sensors, shriekers or Wardens either. Mobs wearing the boots are muffled too. Sounds from blocks it breaks or places still play.
+- **Config:** `[woollen_armor] bootsMuffle` turns the boots' effect off; `muffleVibrations` lets muffled entities set off sculk again.
+
 ### Creative Generator (testing)
 An endless power source for creative mode, for testing builds without setting up mushroom farms. It's a slate block with a pulsing magenta energy core on every side, and it glows in the dark.
 
@@ -970,6 +983,13 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `energyPerTick` | 20 | FE/t while smelting |
 | `blazeBonus` / `maxBlazeSheep` | 0.25 / 4 | Extra speed from the first Blaze sheep (each one after adds less), and the most counted |
 | `energyCapacity` / `maxEnergyInput` | 20000 / 1000 | Its buffer and input rate |
+
+**`[woollen_armor]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `bootsMuffle` | true | Whether Woollen Boots give the Muffled effect while worn |
+| `muffleVibrations` | true | Whether Muffled also hides the wearer's vibrations from sculk and Wardens |
 
 **`[chiller]`**
 
