@@ -109,15 +109,19 @@ public final class GuideBook {
     }
 
     /** Parses guide JSON; entries that aren't valid are skipped. */
+    private static java.util.Optional<ItemStack> icon(JsonObject chapter, String key) {
+        if (!chapter.has(key) || !(Identifier.tryParse(chapter.get(key).getAsString()) instanceof Identifier id)) return java.util.Optional.empty();
+        return BuiltInRegistries.ITEM.getOptional(id).map(ItemStack::new);
+    }
+
     public static List<Chapter> parse(JsonElement json) {
         List<Chapter> chapters = new ArrayList<>();
         JsonArray array = json.getAsJsonObject().getAsJsonArray("chapters");
         for (JsonElement element : array) {
             JsonObject chapter = element.getAsJsonObject();
             String title = chapter.get("title").getAsString();
-            ItemStack icon = Identifier.tryParse(chapter.has("icon") ? chapter.get("icon").getAsString() : "")
-                    instanceof Identifier id ? BuiltInRegistries.ITEM.getOptional(id).map(ItemStack::new).orElse(new ItemStack(Items.BOOK))
-                    : new ItemStack(Items.BOOK);
+            // "fallback_icon" is shown when "icon" isn't in the game, e.g. a dev-only block in a released jar.
+            ItemStack icon = icon(chapter, "icon").or(() -> icon(chapter, "fallback_icon")).orElse(new ItemStack(Items.BOOK));
             List<String> text = new ArrayList<>();
             for (JsonElement line : chapter.getAsJsonArray("text")) text.add(line.getAsString());
             Tab tab = Tab.byKey(chapter.has("tab") ? chapter.get("tab").getAsString() : "");
