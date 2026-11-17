@@ -333,7 +333,24 @@
       "tab": "wip",
       "text": [
         "Features still being built are written up here as they arrive, so you can see what's coming.",
-        "Here are the planned late-game generators, which make a lot of power but need looking after, and the Quantum Sheep. None of them can be built yet, and their numbers may change. Back up your world before trying anything here once it arrives."
+        "Here are the planned generators: the Sheep Treadmill for the early game, and late-game ones that make a lot of power but need looking after. Then there's the Quantum Sheep. None of them can be built yet, and their numbers may change. Back up your world before trying anything here once it arrives."
+      ]
+    },
+    {
+      "title": "Sheep Treadmill",
+      "icon": "minecraft:wheat",
+      "tab": "wip",
+      "text": [
+        "Planned. Not in the game yet; the numbers may change.",
+        "A wooden belt in a little pen. Lead a sheep onto it, dangle some wheat just out of reach, and it walks for ever without getting anywhere.",
+        "## Power",
+        "- Around 20 FE/t per sheep while it walks, so a few treadmills in a row match a Glow Panel.",
+        "- Faster sheep make more: a sheep with Speed, or one just sheared and running lighter, turns the belt quicker.",
+        "- Lambs are too small for the belt.",
+        "## Upkeep",
+        "- The sheep gets hungry. Keep wheat in the feeder in front of it, or it stops for a rest and the power drops to nothing.",
+        "- It tires after a while and needs a break on grass. Sheep bred for Endurance walk for longer.",
+        "- The belt wears out and needs a new strip of leather now and then."
       ]
     },
     {
