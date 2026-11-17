@@ -187,6 +187,15 @@ public final class ModBlocks {
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock::new,
                     p -> p.mapColor(MapColor.COLOR_PURPLE).strength(3.5F, 6.0F).sound(SoundType.IRON).noOcclusion().lightLevel(state -> 7));
 
+    /**
+     * Work in progress: the Sheep Treadmill's model, to look at. Registered in development builds only
+     * ({@code runClient}), like the Hume Field Generator.
+     */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock> SHEEP_TREADMILL =
+            net.neoforged.fml.loading.FMLEnvironment.isProduction() ? null : REGISTER.registerBlock("sheep_treadmill",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock::new,
+                    p -> p.mapColor(MapColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.IRON).noOcclusion());
+
     /** Presses 9 of one resource wool into a Wool Bale. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock> WOOL_PACKER = REGISTER.registerBlock("wool_packer",
             com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock::new,

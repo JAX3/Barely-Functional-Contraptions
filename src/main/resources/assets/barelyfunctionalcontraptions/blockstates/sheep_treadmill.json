@@ -1,0 +1,31 @@
+{
+  "variants": {
+    "facing=north,part=0": {
+      "model": "barelyfunctionalcontraptions:block/sheep_treadmill"
+    },
+    "facing=north,part=1": {
+      "model": "barelyfunctionalcontraptions:block/sheep_treadmill_front"
+    },
+    "facing=east,part=0": {
+      "model": "barelyfunctionalcontraptions:block/sheep_treadmill",
+      "y": 90
+    },
+    "facing=east,part=1": {
+      "model": "barelyfunctionalcontraptions:block/sheep_treadmill_front"
+    },
+    "facing=south,part=0": {
+      "model": "barelyfunctionalcontraptions:block/sheep_treadmill",
+      "y": 180
+    },
+    "facing=south,part=1": {
+      "model": "barelyfunctionalcontraptions:block/sheep_treadmill_front"
+    },
+    "facing=west,part=0": {
+      "model": "barelyfunctionalcontraptions:block/sheep_treadmill",
+      "y": 270
+    },
+    "facing=west,part=1": {
+      "model": "barelyfunctionalcontraptions:block/sheep_treadmill_front"
+    }
+  }
+}

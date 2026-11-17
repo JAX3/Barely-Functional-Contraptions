@@ -152,6 +152,10 @@ public final class DevScreenshotHarness {
             snowSheepTick(mc, server);
             return;
         }
+        if ("sheep_treadmill".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            sheepTreadmillTick(mc, server);
+            return;
+        }
         if ("hume_field".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             humeFieldTick(mc, server);
             return;
@@ -1813,6 +1817,56 @@ public final class DevScreenshotHarness {
     }
 
     private static final java.util.List<net.minecraft.world.entity.animal.sheep.Sheep> snowWalkers = new java.util.ArrayList<>();
+
+    /** The work-in-progress Sheep Treadmill model with a sheep on it, two empty ones, and the item: {@code -PharnessScene=sheep_treadmill}. */
+    private static void sheepTreadmillTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, 0, -8), origin.offset(6, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, -1, -8), origin.offset(6, -1, 3))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                var block = ModBlocks.SHEEP_TREADMILL.get();
+                var facing = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.FACING;
+                var part = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.PART;
+                // Three treadmills side by side facing north, the middle one with a sheep walking towards the wheat.
+                for (int i = -1; i <= 1; i++) {
+                    BlockPos back = origin.offset(i * 2, 0, -3);
+                    level.setBlock(back, block.defaultBlockState().setValue(facing, Direction.NORTH).setValue(part, 0), 3);
+                    level.setBlock(back.north(), block.defaultBlockState().setValue(facing, Direction.NORTH).setValue(part, 1), 3);
+                }
+                var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                sheep.snapTo(origin.getX() + 0.5, origin.getY() + 0.375, origin.getZ() - 3.1, 180, 0);
+                sheep.setYHeadRot(180);
+                sheep.setYBodyRot(180);
+                sheep.setNoAi(true);
+                level.addFreshEntity(sheep);
+                // One turned east, to show it faces the way it's placed.
+                BlockPos turned = origin.offset(4, 0, -6);
+                level.setBlock(turned, block.defaultBlockState().setValue(facing, Direction.EAST).setValue(part, 0), 3);
+                level.setBlock(turned.east(), block.defaultBlockState().setValue(facing, Direction.EAST).setValue(part, 1), 3);
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 205 28", origin.getX() - 1.5, origin.getY() + 1.2, origin.getZ() + 1.5));
+            case 120 -> shot(mc, "wip_sheep_treadmill");
+            case 122 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 270 20", origin.getX() - 3.2, origin.getY() + 0.2, origin.getZ() - 3.5));
+            case 150 -> shot(mc, "wip_sheep_treadmill_side");
+            case 152 -> {
+                setHudHidden(mc, false);
+                command(server, "gamemode creative @a");
+                command(server, "item replace entity @a hotbar.0 with barelyfunctionalcontraptions:sheep_treadmill");
+                command(server, "item replace entity @a hotbar.1 with barelyfunctionalcontraptions:hume_field_generator");
+            }
+            case 160 -> mc.execute(() -> mc.gui.setScreen(new InventoryScreen(mc.player)));
+            case 185 -> shot(mc, "wip_sheep_treadmill_item");
+            case 190 -> mc.stop();
+            default -> {}
+        }
+    }
 
     /** The work-in-progress Hume Field Generator model, from the front and from above: {@code -PharnessScene=hume_field}. */
     private static void humeFieldTick(Minecraft mc, MinecraftServer server) {

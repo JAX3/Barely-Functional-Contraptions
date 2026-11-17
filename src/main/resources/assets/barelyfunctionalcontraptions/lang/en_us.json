@@ -981,5 +981,7 @@
   "item.barelyfunctionalcontraptions.woollen_leggings": "Woollen Leggings",
   "item.barelyfunctionalcontraptions.woollen_boots": "Woollen Boots",
   "effect.barelyfunctionalcontraptions.muffled": "Muffled",
-  "tooltip.barelyfunctionalcontraptions.woollen_boots": "When worn: Muffled (you make no sound)"
+  "tooltip.barelyfunctionalcontraptions.woollen_boots": "When worn: Muffled (you make no sound)",
+  "block.barelyfunctionalcontraptions.sheep_treadmill": "Sheep Treadmill",
+  "tooltip.barelyfunctionalcontraptions.sheep_treadmill": "Work in progress: a model preview in development builds. It doesn't do anything yet."
 }

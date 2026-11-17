@@ -150,6 +150,7 @@ public final class ModGameTests {
         TESTS.put("woollen_armor_takes_the_wool_colour", ModGameTests::woollenArmorColour);
         TESTS.put("woollen_boots_muffle_the_wearer", ModGameTests::woollenBootsMuffle);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
+        if (ModBlocks.SHEEP_TREADMILL != null) TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -951,6 +952,40 @@ public final class ModGameTests {
             h.assertTrue(be.getItem(0).getCount() == 1, "one Nether Star used, left " + be.getItem(0));
             h.assertTrue(be.getItem(1).getCount() == 1 && be.getItem(2).isEmpty() && be.getItem(3).isEmpty(), "4 soul sand, 2 bone blocks and the rose used");
             h.assertTrue(start - be.getEnergyHandler().getAmountAsInt() == 200_000, "200,000 FE used, used " + (start - be.getEnergyHandler().getAmountAsInt()));
+        });
+    }
+
+    /**
+     * The work-in-progress Sheep Treadmill (development builds only) is two blocks long: placed facing the way the player
+     * looks, it fills the block in front, won't place when that's taken, and breaking either half removes both.
+     */
+    private static void sheepTreadmill(GameTestHelper h) {
+        var block = ModBlocks.SHEEP_TREADMILL.get();
+        var part = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.PART;
+        var facing = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.FACING;
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.STONE);
+        java.util.function.BiConsumer<Player, BlockPos> use = (player, rel) -> {
+            BlockPos floor = h.absolutePos(rel);
+            player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND,
+                    new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floor), net.minecraft.core.Direction.UP, floor, false)));
+        };
+        Player player = playerHolding(h, new ItemStack(ModItems.SHEEP_TREADMILL.get()));
+        Direction looking = player.getDirection();
+        use.accept(player, new BlockPos(3, 0, 3));
+        BlockPos back = new BlockPos(3, 1, 3), front = back.relative(looking);
+        h.assertTrue(h.getBlockState(back).is(block) && h.getBlockState(back).getValue(part) == 0 && h.getBlockState(back).getValue(facing) == looking,
+                "the back is where it was placed, facing " + looking + ", was " + h.getBlockState(back));
+        h.assertTrue(h.getBlockState(front).is(block) && h.getBlockState(front).getValue(part) == 1, "the front is the next block that way, was " + h.getBlockState(front));
+        // Blocked: something in the way in front.
+        BlockPos back2 = new BlockPos(1, 1, 1);
+        h.setBlock(back2.relative(looking), Blocks.STONE);
+        Player other = playerHolding(h, new ItemStack(ModItems.SHEEP_TREADMILL.get()));
+        use.accept(other, new BlockPos(1, 0, 1));
+        h.assertFalse(h.getBlockState(back2).is(block), "it won't place when the block in front is taken");
+        h.getLevel().destroyBlock(h.absolutePos(front), false);
+        h.runAfterDelay(2, () -> {
+            h.assertTrue(h.getBlockState(back).isAir(), "breaking the front removes the back too, was " + h.getBlockState(back));
+            h.succeed();
         });
     }
 
