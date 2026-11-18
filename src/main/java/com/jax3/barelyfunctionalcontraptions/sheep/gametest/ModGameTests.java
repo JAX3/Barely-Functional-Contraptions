@@ -1166,6 +1166,8 @@ public final class ModGameTests {
             h.assertTrue(tired.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.State.RESTING
                     && weary.getData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.TREADMILL_WALKER).resting(h.getLevel().getGameTime()),
                     "a worn-out sheep stops to rest, was " + tired.state());
+            h.assertTrue(h.getLevel().getServer().getAdvancements().get(ResourcefulSheep.id(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.SHEEP_TREADMILL)) != null, "its advancement, Running Ewe Ragged, is loaded");
             h.assertTrue(empty.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.State.NO_SHEEP
                     && empty.food().getCount() == 1, "with no sheep nothing happens and no wheat is eaten");
             h.succeed();

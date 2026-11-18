@@ -1006,5 +1006,7 @@
   "gui.barelyfunctionalcontraptions.sheep_treadmill.energy.desc": "Pushed into the blocks around the generator housing.",
   "gui.barelyfunctionalcontraptions.sheep_treadmill.how": "A sheep walks for the wheat",
   "gui.barelyfunctionalcontraptions.sheep_treadmill.how.desc": "More power with Speed, or while it's sheared. Endurance lets it walk for longer.",
-  "tooltip.barelyfunctionalcontraptions.sheep_treadmill": "A sheep walks its belt for wheat: 20 FE/t."
+  "tooltip.barelyfunctionalcontraptions.sheep_treadmill": "A sheep walks its belt for wheat: 20 FE/t.",
+  "advancements.barelyfunctionalcontraptions.sheep_treadmill.title": "Running Ewe Ragged",
+  "advancements.barelyfunctionalcontraptions.sheep_treadmill.description": "Make power from a sheep walking a Sheep Treadmill"
 }

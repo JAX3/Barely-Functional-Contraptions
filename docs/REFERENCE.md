@@ -103,7 +103,7 @@ Every machine is built around a **Functional Machine Block**: the blue-steel cas
 
 ### Advancements
 
-The mod has its own advancement tab, **Barely Functional Contraptions**, with one advancement for making each machine, three special ones, one for each themed sheep and a wool-collecting challenge:
+The mod has its own advancement tab, **Barely Functional Contraptions**, with one advancement for making each machine, a few special ones, one for each themed sheep and a wool-collecting challenge:
 
 | Advancement | How to get it |
 |---|---|
@@ -128,6 +128,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Bale Out | Press a Wool Bale in a Wool Packer |
 | Altar-ed States | Craft an Infusion Altar |
 | ⭐ **Sheepish Combustion** (goal) | Be within 16 blocks of a Blaze Sheep Furnace when it starts making power from a Blaze sheep |
+| ⭐ **Running Ewe Ragged** (goal) | Be within 16 blocks of a Sheep Treadmill when a sheep starts walking it |
 | Wool You Look at That | Infuse a sheep with any resource |
 | Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
 | ⭐ **Three Heads Are Better Than One**, **Here Be Dragons**, **Shh... It's Sculking** (goals) | Infuse a sheep with a Nether Star, Dragon's Breath or Echo Shard |

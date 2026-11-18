@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:sheep_treadmill"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.sheep_treadmill.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.sheep_treadmill.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

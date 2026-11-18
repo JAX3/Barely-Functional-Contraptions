@@ -175,6 +175,12 @@ public class SheepTreadmillBlockEntity extends BlockEntity implements WorldlyCon
         }
         push(level, pos);
         boolean running = state == State.WALKING;
+        if (running && !blockState.getValue(SheepTreadmillBlock.RUNNING)) {
+            // A sheep has just started walking it: everyone nearby earns "Running Ewe Ragged".
+            com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.awardNearby(level, pos,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.AUTO_SHEAR_RADIUS,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.SHEEP_TREADMILL);
+        }
         if (blockState.getValue(SheepTreadmillBlock.RUNNING) != running) {
             level.setBlock(pos, blockState.setValue(SheepTreadmillBlock.RUNNING, running), Block.UPDATE_ALL);
         }

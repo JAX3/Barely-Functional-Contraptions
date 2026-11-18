@@ -13,12 +13,13 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 
 /**
  * The mod's advancement tab (data/barelyfunctionalcontraptions/advancement/contraptions/). Crafting each machine uses
- * vanilla's inventory_changed trigger; the three special advancements have a single {@code minecraft:impossible}
+ * vanilla's inventory_changed trigger; the special advancements have a single {@code minecraft:impossible}
  * criterion named "done" and are granted from code here:
  * <ul>
  *     <li>{@link #LINK_GENERATORS}: linking two Mycelial Generators with the Barely Functional Wrench;</li>
  *     <li>{@link #AUTO_SHEAR}: Automatic Shears shearing a sheep within {@link #AUTO_SHEAR_RADIUS} blocks of you;</li>
  *     <li>{@link #ZERO_POINT_DEATH}: being killed by a Zero Point beam;</li>
+ *     <li>{@link #BLAZE_FURNACE} and {@link #SHEEP_TREADMILL}: that machine starting to make power near you;</li>
  *     <li>{@link #INFUSE_SHEEP}: infusing any sheep, and {@code contraptions/sheep/<name>} for infusing one with the
  *     mod's resource {@code <name>} (the themed sheep have one each; a data pack can add more the same way).</li>
  * </ul>
@@ -30,6 +31,8 @@ public final class ModAdvancements {
     /** A Blaze Sheep Furnace starting to make power from heat within {@link #AUTO_SHEAR_RADIUS} blocks of you. */
     public static final String BLAZE_FURNACE = "contraptions/blaze_furnace";
     public static final String ZERO_POINT_DEATH = "contraptions/zero_point_death";
+    /** A sheep starting to walk a Sheep Treadmill within {@link #AUTO_SHEAR_RADIUS} blocks of you. */
+    public static final String SHEEP_TREADMILL = "contraptions/sheep_treadmill";
     public static final String INFUSE_SHEEP = "contraptions/infuse_sheep";
     /** Players this close to Automatic Shears when they shear a sheep get {@link #AUTO_SHEAR}. */
     public static final double AUTO_SHEAR_RADIUS = 16;

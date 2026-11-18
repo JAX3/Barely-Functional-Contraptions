@@ -1945,7 +1945,7 @@ public final class DevScreenshotHarness {
                     level.addFreshEntity(sheep);
                 });
                 setHudHidden(mc, true);
-                command(server, "gamemode spectator @a");
+                // Creative, not spectator, so the player nearby earns "Running Ewe Ragged" when the sheep starts walking.
                 command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 205 28", origin.getX() - 1.5, origin.getY() + 1.2, origin.getZ() + 1.5));
             }
             case 205 -> shot(mc, "103_sheep_treadmill_called_0");
@@ -1954,7 +1954,9 @@ public final class DevScreenshotHarness {
                 server.execute(() -> {
                     var level = server.getPlayerList().getPlayers().getFirst().level();
                     var be = level.getBlockEntity(origin.offset(2, 0, -3));
-                    ResourcefulSheep.LOGGER.warn("CALLED state {}", be instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity t ? t.state() : null);
+                    ResourcefulSheep.LOGGER.warn("CALLED state {}, advancement {}", be instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity t ? t.state() : null,
+                            com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(server.getPlayerList().getPlayers().getFirst(),
+                                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.SHEEP_TREADMILL));
                 });
             }
             case 405 -> mc.stop();
