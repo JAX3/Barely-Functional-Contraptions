@@ -64,20 +64,17 @@ The main creative tab is split into the Contraptions Manual's sections (Power, L
 ### Contraptions Manual (in-game guide)
 Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game. Its chapters are sorted into six tabs along the top of the left panel:
 
-- **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Wool Burner), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator) and *Late Game* (Zero Point Module), then energy storage. A guide chapter's optional `"group"` field sets the heading it is listed under.
+- **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Wool Burner, Sheep Treadmill), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator) and *Late Game* (Zero Point Module), then energy storage. A guide chapter's optional `"group"` field sets the heading it is listed under.
 - **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
 - **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Powered Furnace, the Snow Sheep Chiller, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, Woollen Armour and the Muffled effect, and data packs and commands.
 - **Recipes:** built from the game itself, so it matches any data-pack or modpack changes. *Machines* and *Parts, Tools and Armour* show every crafting recipe of the mod as a 3x3 grid; *Infusion* shows what each sheep is fed and the wool it grows; *Infusion Altar* shows the catalysts round the feeding item, with the tier and power; *Mechanical Separator* shows what every wool separates into, with the power and time; *Wool Bales* shows packing, unpacking and what every bale separates into. Ingredients that take any of several items cycle through them, and hovering over an item shows its tooltip.
-- **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned *Sheep Treadmill*, an early-game generator run by a sheep walking a belt for wheat (around 20 FE/t per sheep, more for faster sheep; it needs feeding and rest breaks), and the planned late-game generators that need upkeep: *Hume Field Generator*, *Echo Chamber* (a Warden sheep in a sculk room), *Lightning Array* and *Fleece Fusion*, and the *Quantum Sheep*, which blinks in and out of existence, changes its wool type and drops random resource wool. None of them is in the game yet. The Hume Field Generator has a first model, a 2x2 machine two and a half blocks tall: in development builds (`runClient`) it can be placed with `/give @s barelyfunctionalcontraptions:hume_field_generator` to look at. It fills the 2x2x3 space east, south and above where it's placed (and won't place if any of it is taken), breaking any part removes the whole machine, and it does nothing yet. The Sheep Treadmill has a first model too, a belt one block wide and two long (it runs, scrolling from front to back) with a wheat gantry at the front and a generator housing at the back: `/give @s barelyfunctionalcontraptions:sheep_treadmill` in development builds. It faces the way you look when placing it, fills the block in front (and won't place if that's taken), breaking either half removes both, and it does nothing yet. Released jars don't include either of them.
+- **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned late-game generators that need upkeep: *Hume Field Generator*, *Echo Chamber* (a Warden sheep in a sculk room), *Lightning Array* and *Fleece Fusion*, and the *Quantum Sheep*, which blinks in and out of existence, changes its wool type and drops random resource wool. None of them is in the game yet. The Hume Field Generator has a first model, a 2x2 machine two and a half blocks tall: in development builds (`runClient`) it can be placed with `/give @s barelyfunctionalcontraptions:hume_field_generator` to look at. It fills the 2x2x3 space east, south and above where it's placed (and won't place if any of it is taken), breaking any part removes the whole machine, and it does nothing yet. Released jars don't include it.
 
   | Hume Field Generator (WIP model) | Close up |
   |---|---|
   | ![The 2x2 Hume Field Generator beside a one-block Hume Energy Cube: a dark blue steel base and cap on four pillars, three purple field coils round a tall glass shell, and a lens on top](screenshots/wip_hume_field_front.png) | ![Close up of the Hume Field Generator: the core inside the glass shell between the two glowing coils](screenshots/wip_hume_field_close.png) |
 
-  | Sheep Treadmill (WIP model) | From the side |
-  |---|---|
-  | ![Three Sheep Treadmills side by side and one turned the other way: dark belts in blue steel frames, a gantry at the front with a bundle of wheat hanging on a string, and a generator housing in the machines' casing at the back, with a glowing purple port and a yellow lamp; a sheep stands on the middle one facing the wheat](screenshots/wip_sheep_treadmill.png) | ![A Sheep Treadmill from the side: the slatted belt between blue steel side rails, the blue steel wheat gantry at the front and the generator housing at the back](screenshots/wip_sheep_treadmill_side.png) |
 
   A resource pack's guide file puts a chapter here with `"tab": "wip"`, and can give it a `"fallback_icon"` to show when its `"icon"` item isn't in the game.
 
@@ -602,6 +599,28 @@ The Blaze Sheep Furnace's icy opposite: it **freezes water into Ice with the col
 - **Recipe:** iron ingots in the four corners, a Snow Block above a Functional Machine Block, Packed Ice either side of it, and a Cauldron below. Mine it with a pickaxe.
 - **Config:** `[chiller]` sets the radius, the most Snow sheep counted, the falloff, the time and water per Ice, the tank, and which sheep resources give cold (`coldSources`, the Snow sheep by default).
 
+### Sheep Treadmill
+A generator a sheep runs: a belt one block wide and two long in the machines' blue-steel casing, with a bundle of wheat hanging from a gantry at the front and the generator housing at the back. Crafted from two Iron Ingots, three wool (the belt), two Copper Ingots and a Functional Machine Block:
+
+```
+I . I      I = Iron Ingot
+W W W      W = any wool
+C M C      C = Copper Ingot, M = Functional Machine Block
+```
+
+| A sheep walking, a sheared one, and an empty treadmill | Its window |
+|---|---|
+| ![Three Sheep Treadmills: a sheep walking the left one, a sheared sheep the middle one, and the right one empty](screenshots/103_sheep_treadmill.png) | ![The Sheep Treadmill window: the energy gauge, the golden wheat over the food slot with 31 Wheat, the stamina bar, 3,150 FE stored, 25 FE/t, Stamina 95% and status Walking](screenshots/103_sheep_treadmill_gui.png) |
+
+- **Placing:** it faces the way you look, and fills the block in front of where you place it (it won't place if that's taken). Your end is the generator housing; the far end has the wheat. Breaking either half breaks both and drops the treadmill and its food.
+- **A sheep:** any grown sheep standing on the belt (lead it on, or let one wander on) walks it. The treadmill holds it in the middle of the belt facing the wheat, the belt runs and its legs go. Lambs are too small. One sheep per treadmill.
+- **Power:** 20 FE/t while it walks, +20% for each level of Speed (Slowness takes as much off), and +25% while the sheep is sheared and running light. It stores 20,000 FE and pushes up to 200 FE/t into every block around its back half; cables and machines can also pull from either half.
+- **Food:** Wheat or Hay Bales in its slot: right-click it with them, or feed it with a hopper or pipe from any side (they can't take food back out). A Wheat lasts 30 seconds of walking, a Hay Bale nine times that. With nothing to eat the sheep stops and wanders off. A comparator reads how full the slot is.
+- **Stamina:** after 2 minutes of walking the sheep is worn out: it steps off the back and rests for 30 seconds, and won't walk any treadmill until then. Its tiredness stays with the sheep, so a fresh sheep can take over at once. Each Endurance point above 1 (from breeding) adds 25% to how long it walks.
+- **Buffer full:** the sheep stands still on the belt and eats nothing until power is used.
+- **Window:** the energy gauge, the wheat (golden while a sheep walks) over the food slot, the walking sheep's stamina bar, the FE stored and made, and the sheep's stamina or rest. The status line reads *Walking*, *No sheep*, *Hungry: needs Wheat*, *Resting* or *Buffer full*.
+- **Config:** `[sheep_treadmill]` (see below).
+
 ### Wool Burner
 A simple generator that **burns spare wool** for Forge Energy: plain wool, string, and Coal Wool from coal-infused sheep.
 
@@ -992,6 +1011,17 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `energyPerTick` | 20 | FE/t while smelting |
 | `blazeBonus` / `maxBlazeSheep` | 0.25 / 4 | Extra speed from the first Blaze sheep (each one after adds less), and the most counted |
 | `energyCapacity` / `maxEnergyInput` | 20000 / 1000 | Its buffer and input rate |
+
+**`[sheep_treadmill]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `power` | 20 | FE/t while a sheep walks it, before bonuses |
+| `ticksPerWheat` | 600 | Ticks of walking one Wheat feeds (a Hay Bale nine times as long) |
+| `walkTicks` / `restTicks` | 2400 / 600 | How long a sheep walks before it's worn out, and how long it then rests |
+| `enduranceBonus` | 0.25 | How much longer it walks per Endurance point above 1 |
+| `speedBonus` / `shearedBonus` | 0.2 / 0.25 | Extra power per level of Speed (Slowness takes as much off), and while sheared |
+| `capacity` / `output` | 20000 / 200 | Its buffer, and the most FE/t it pushes out |
 
 **`[woollen_armor]`**
 

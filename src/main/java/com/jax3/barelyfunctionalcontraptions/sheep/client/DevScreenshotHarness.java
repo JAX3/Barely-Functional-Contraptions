@@ -1870,14 +1870,17 @@ public final class DevScreenshotHarness {
 
     private static final java.util.List<net.minecraft.world.entity.animal.sheep.Sheep> snowWalkers = new java.util.ArrayList<>();
 
-    /** The work-in-progress Sheep Treadmill model with a sheep on it, two empty ones, and the item: {@code -PharnessScene=sheep_treadmill}. */
+    /**
+     * Three Sheep Treadmills with wheat, a sheep walking the left one and a sheared sheep the middle one, the right one
+     * empty, and one turned east; then the middle one's window: {@code -PharnessScene=sheep_treadmill}.
+     */
     private static void sheepTreadmillTick(Minecraft mc, MinecraftServer server) {
         switch (tick) {
             case 60 -> server.execute(() -> {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                 ServerLevel level = player.level();
                 origin = player.blockPosition();
-                for (String c : new String[]{"time set noon", "weather clear", "gamemode spectator @a"}) {
+                for (String c : new String[]{"time set noon", "weather clear", "gamemode spectator @a", "gamerule send_command_feedback false"}) {
                     server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
                 }
                 for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, 0, -8), origin.offset(6, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
@@ -1885,18 +1888,19 @@ public final class DevScreenshotHarness {
                 var block = ModBlocks.SHEEP_TREADMILL.get();
                 var facing = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.FACING;
                 var part = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.PART;
-                // Three treadmills side by side facing north, the middle one with a sheep walking towards the wheat.
                 for (int i = -1; i <= 1; i++) {
                     BlockPos back = origin.offset(i * 2, 0, -3);
                     level.setBlock(back, block.defaultBlockState().setValue(facing, Direction.NORTH).setValue(part, 0), 3);
                     level.setBlock(back.north(), block.defaultBlockState().setValue(facing, Direction.NORTH).setValue(part, 1), 3);
+                    if (level.getBlockEntity(back) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity be) {
+                        be.setItem(0, new ItemStack(Items.WHEAT, 32));
+                    }
+                    if (i == 1) continue; // the right one waits for a sheep
+                    var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    sheep.snapTo(back.getX() + 0.5, back.getY() + 0.4, back.getZ() + 0.1, 180, 0);
+                    if (i == 0) sheep.setSheared(true);
+                    level.addFreshEntity(sheep);
                 }
-                var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-                sheep.snapTo(origin.getX() + 0.5, origin.getY() + 0.375, origin.getZ() - 3.1, 180, 0);
-                sheep.setYHeadRot(180);
-                sheep.setYBodyRot(180);
-                sheep.setNoAi(true);
-                level.addFreshEntity(sheep);
                 // One turned east, to show it faces the way it's placed.
                 BlockPos turned = origin.offset(4, 0, -6);
                 level.setBlock(turned, block.defaultBlockState().setValue(facing, Direction.EAST).setValue(part, 0), 3);
@@ -1904,18 +1908,18 @@ public final class DevScreenshotHarness {
             });
             case 70 -> setHudHidden(mc, true);
             case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 205 28", origin.getX() - 1.5, origin.getY() + 1.2, origin.getZ() + 1.5));
-            case 120 -> shot(mc, "wip_sheep_treadmill");
-            case 122 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 270 20", origin.getX() - 3.2, origin.getY() + 0.2, origin.getZ() - 3.5));
-            case 150 -> shot(mc, "wip_sheep_treadmill_side");
-            case 152 -> {
+            case 120 -> shot(mc, "103_sheep_treadmill");
+            case 122 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 270 20", origin.getX() - 4.2, origin.getY() + 0.4, origin.getZ() - 3.5));
+            case 150 -> shot(mc, "103_sheep_treadmill_side");
+            case 153 -> shot(mc, "103_sheep_treadmill_side_b"); // a moment later: the legs and belt have moved
+            case 156 -> {
                 setHudHidden(mc, false);
                 command(server, "gamemode creative @a");
-                command(server, "item replace entity @a hotbar.0 with barelyfunctionalcontraptions:sheep_treadmill");
-                command(server, "item replace entity @a hotbar.1 with barelyfunctionalcontraptions:hume_field_generator");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 0.5, origin.getY(), origin.getZ() - 0.5));
             }
-            case 160 -> mc.execute(() -> mc.gui.setScreen(new InventoryScreen(mc.player)));
-            case 185 -> shot(mc, "wip_sheep_treadmill_item");
-            case 190 -> mc.stop();
+            case 165 -> openAt(server, origin.offset(0, 0, -3));
+            case 190 -> shot(mc, "103_sheep_treadmill_gui");
+            case 195 -> mc.stop();
             default -> {}
         }
     }
@@ -2134,7 +2138,7 @@ public final class DevScreenshotHarness {
             case 336 -> shot(mc, "99_guide_recipes_altar");
             case 338 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Bales"); }
             case 348 -> shot(mc, "99_guide_recipes_bales");
-            case 350 -> { if (mc.gui.screen() instanceof GuideScreen guide) { guide.openTab(GuideBook.Tab.WIP); guide.openChapter("Sheep Treadmill"); } }
+            case 350 -> { if (mc.gui.screen() instanceof GuideScreen guide) { guide.openTab(GuideBook.Tab.WIP); guide.openChapter("Quantum Sheep"); } }
             case 360 -> shot(mc, "99_guide_wip");
             case 362 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Burner"); }
             case 372 -> shot(mc, "83_guide_power_tab");

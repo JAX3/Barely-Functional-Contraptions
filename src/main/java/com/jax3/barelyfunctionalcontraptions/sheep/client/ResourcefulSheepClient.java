@@ -78,6 +78,7 @@ public final class ResourcefulSheepClient {
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onEntityTick);
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onItemTooltip);
         NeoForge.EVENT_BUS.register(CreativeTabSections.class);
+        NeoForge.EVENT_BUS.register(TreadmillWalkAnimation.class);
 
         com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.clientTickHandler = ZeroPointHumSound::tick;
         com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem.openGuide = () -> net.minecraft.client.Minecraft.getInstance().gui.setScreen(new GuideScreen());
@@ -98,6 +99,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.CHILLER.get(), ChillerScreen::new);
         event.register(ModMenus.POWERED_FURNACE.get(), PoweredFurnaceScreen::new);
         event.register(ModMenus.WOOL_BURNER.get(), WoolBurnerScreen::new);
+        event.register(ModMenus.SHEEP_TREADMILL.get(), SheepTreadmillScreen::new);
         event.register(ModMenus.WOOL_PACKER.get(), WoolPackerScreen::new);
         event.register(ModMenus.INFUSION_ALTAR.get(), InfusionAltarScreen::new);
     }
@@ -144,11 +146,6 @@ public final class ResourcefulSheepClient {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.creative_generator")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
-        if (com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_TREADMILL != null
-                && event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_TREADMILL.get())) {
-            event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.sheep_treadmill")
-                    .withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE, net.minecraft.ChatFormatting.ITALIC));
-        }
         if (com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_FIELD_GENERATOR != null
                 && event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_FIELD_GENERATOR.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.hume_field_generator")
@@ -166,7 +163,8 @@ public final class ResourcefulSheepClient {
         for (var item : java.util.List.of(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_LAMP,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLAZE_FURNACE, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CHILLER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.POWERED_FURNACE,
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BURNER)) {
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BURNER,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_TREADMILL)) {
             if (event.getItemStack().is(item.get())) {
                 event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions." + item.getId().getPath())
                         .withStyle(net.minecraft.ChatFormatting.GRAY));

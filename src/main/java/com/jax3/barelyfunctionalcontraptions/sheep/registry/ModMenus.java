@@ -44,6 +44,8 @@ public final class ModMenus {
 
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolBurnerMenu>> WOOL_BURNER = REGISTER.register("wool_burner",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolBurnerMenu::new));
+    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.SheepTreadmillMenu>> SHEEP_TREADMILL = REGISTER.register("sheep_treadmill",
+            () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.SheepTreadmillMenu::new));
 
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolPackerMenu>> WOOL_PACKER = REGISTER.register("wool_packer",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolPackerMenu::new));

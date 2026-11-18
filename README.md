@@ -37,7 +37,7 @@ Craft a book with a Functional Machine Block to get the in-game guide. Its chapt
 
 The manual sorts the generators into tiers.
 
-**Early game:** Glow Panel and Wool Burner. Cheap to build, but weak.
+**Early game:** Glow Panel, Wool Burner and Sheep Treadmill. Cheap to build, but weak.
 
 ### Glow Panels
 
@@ -50,6 +50,12 @@ Make up to 60 FE/t from sunlight and up to 40 FE/t from block light; a Glow Lamp
 Burns spare wool for power, one item at a time: plain wool and string give 30 FE/t, Coal Wool 120 FE/t. It waits while its buffer is full, so nothing is wasted.
 
 ![A row of Wool Burners, one fed by a hopper](docs/screenshots/80_wool_burners.png)
+
+### Sheep Treadmill
+
+A sheep walks its belt for the wheat hanging at the front and makes 20 FE/t, more with Speed or while it's sheared. Keep Wheat or Hay Bales in it, and swap in a fresh sheep when one gets tired: after 2 minutes it rests for 30 seconds, longer walks for sheep bred for Endurance.
+
+![Three Sheep Treadmills: a sheep walking the left one, a sheared sheep the middle one, and the right one empty, each with wheat hanging at the front](docs/screenshots/103_sheep_treadmill.png)
 
 **Mid game:** Blaze Furnace and Mycelial Generator. They need the Nether or a mushroom farm, and Mycelial networks grow fast.
 

@@ -22,6 +22,15 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.CREATIVE_GENERATOR.get(), (be, side) -> be.getEnergyHandler());
         // Glow Panel: its buffer, on every face (it only pushes sideways and down itself).
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.GLOW_PANEL.get(), (be, side) -> be.getEnergyHandler());
+        // Sheep Treadmill: its buffer and food slot (in only), from either of its blocks.
+        event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, be, side) -> {
+            var treadmill = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.entity(level, pos, state);
+            return treadmill == null ? null : treadmill.getEnergyHandler();
+        }, ModBlocks.SHEEP_TREADMILL.get());
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, be, side) -> {
+            var treadmill = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.entity(level, pos, state);
+            return treadmill == null ? null : new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(treadmill, side);
+        }, ModBlocks.SHEEP_TREADMILL.get());
         // Wool Burner: its buffer on every face, and its fuel slot (in only) for hoppers and pipes.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.WOOL_BURNER.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.WOOL_BURNER.get(),

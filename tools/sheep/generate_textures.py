@@ -3710,6 +3710,7 @@ def generate_sheep_treadmill():
                 elif row == 0 and 1 < x < 14:
                     belt.putpixel((x, f * 16 + y), BELT_L)
     belt.save(out("block/sheep_treadmill/belt.png"))
+    belt.crop((0, 0, 16, 16)).save(out("block/sheep_treadmill/belt_still.png"))  # the first frame, for a stopped belt
     with open(out("block/sheep_treadmill/belt.png.mcmeta"), "w") as fh:
         fh.write('{\n  "animation": {\n    "frametime": 2\n  }\n}\n')
 
@@ -3831,6 +3832,10 @@ def generate_sheep_treadmill():
     models = os.path.join(ROOT, "..", "models")
     with open(os.path.join(models, "block", "sheep_treadmill.json"), "w") as fh:
         fh.write(json.dumps({"parent": "minecraft:block/block", "textures": textures, "elements": elements}, indent=2) + "\n")
+    # Stopped: the same model with the still belt.
+    still = dict(textures, belt=T + "belt_still")
+    with open(os.path.join(models, "block", "sheep_treadmill_still.json"), "w") as fh:
+        fh.write(json.dumps({"parent": "barelyfunctionalcontraptions:block/sheep_treadmill", "textures": still}, indent=2) + "\n")
     with open(os.path.join(models, "block", "sheep_treadmill_front.json"), "w") as fh:
         fh.write(json.dumps({"textures": {"particle": T + "rail"}}, indent=2) + "\n")
     # Item: the whole model moved half a block back so it's centred, then turned and shrunk to fit a slot.
@@ -3847,6 +3852,71 @@ def generate_sheep_treadmill():
             "fixed": {"rotation": [0, 90, 0], "translation": [0, 0, 0], "scale": [0.4, 0.4, 0.4]},
             "thirdperson_righthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.3, 0.3, 0.3]},
             "firstperson_righthand": {"rotation": [0, 45, 0], "translation": [0, 0, 0], "scale": [0.3, 0.3, 0.3]}}}, indent=2) + "\n")
+
+
+TREADMILL_WHEAT = [  # a sheaf of wheat tied round the middle, 14x14
+    "...Y..Y..Y....",
+    "..YWY.WY.YWY..",
+    "..YYWYYWYWYY..",
+    "...YYWYYWYY...",
+    "....YYWWYY....",
+    ".....YWWY.....",
+    ".....FYYF.....",
+    ".....SSSS.....",
+    ".....FYYF.....",
+    "....FF..FF....",
+    "....F.FF.F....",
+    "...FF.F.F.F...",
+    "...F..F..FF...",
+    "..F...F...F...",
+]
+
+
+def generate_sheep_treadmill_gui():
+    """Sheep Treadmill window: energy gauge, food box (wheat over the food slot, a stamina bar), info window."""
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # energy gauge, fill 11..40 x 19..82
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 46, 16, 88, 84, GUI["gauge"])          # food box
+    grid(TREADMILL_WHEAT, {"S": GUI["tick"], "Y": GUI["tick"], "W": GUI["tick"], "F": GUI["tick"]}, img, 60, 24)
+    slot(img, 59, 56)                                 # food slot
+    inset(img, 48, 77, 86, 82, GUI["panel"])          # stamina bar, fill 49..84 x 78..80
+    inset(img, 92, 16, 168, 78, GUI["panel"])         # info window
+    for x in range(96, 164):
+        img.putpixel((x, 44), hexc("#2c2e36"))
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    rnd = random.Random(41)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice([hexc("#e3e1ea"), hexc("#b7b3c6"), hexc("#d9b44a")]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    low, high, shine = hexc("#7a5a1a"), hexc("#f1d77a"), hexc("#fff3c4")
+    for y in range(64):                                             # energy fill: golden, like the wheat
+        for x in range(30):
+            c = mix(high, low, y / 63.0)
+            if (x + y) % 4 == 0:
+                c = mix(c, shine, 0.2)
+            img.putpixel((176 + x, y), c)
+    for f in range(4):                                              # energy surface shimmer
+        for x in range(30):
+            img.putpixel((176 + x, 66 + f * 2), shine if (x + f * 2) % 8 == 0 else high)
+            img.putpixel((176 + x, 67 + f * 2), mix(high, low, 0.3))
+    grid(TREADMILL_WHEAT, {"S": hexc("#e8e2d0"), "Y": hexc("#d9b44a"), "W": hexc("#f1d77a"), "F": hexc("#9c7a2a")}, img, 176, 80)
+    for x in range(36):                                             # stamina fill
+        for y in range(3):
+            img.putpixel((176 + x, 96 + y), hexc("#8fd5ff") if y == 0 else hexc("#3f8fd0"))
+    img.save(out("gui/sheep_treadmill.png"))
 
 
 def main():
@@ -3885,6 +3955,7 @@ def main():
     generate_infusion_altar()
     generate_hume_field_generator()
     generate_sheep_treadmill()
+    generate_sheep_treadmill_gui()
     generate_chiller_gui()
     generate_chiller_block()
     generate_powered_furnace()

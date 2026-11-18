@@ -96,6 +96,25 @@
       ]
     },
     {
+      "title": "Sheep Treadmill",
+      "icon": "barelyfunctionalcontraptions:sheep_treadmill",
+      "tab": "power",
+      "group": "Early Game",
+      "text": [
+        "A belt for a sheep to walk on, two blocks long. Place it facing the way you want the sheep to walk: the wheat hangs at the far end, the generator housing is at your end.",
+        "Lead a grown sheep onto the belt and put Wheat or Hay Bales in it (right-click, or a hopper or pipe). The sheep walks for the wheat and turns the belt.",
+        "## Power",
+        "- 20 FE/t while a sheep walks. Each level of Speed adds a fifth more; Slowness takes as much off.",
+        "- A sheared sheep runs lighter: a quarter more.",
+        "- It pushes its power into the blocks around the generator housing, up to 200 FE/t, and stores 20,000 FE.",
+        "## Upkeep",
+        "- One Wheat lasts 30 seconds of walking, a Hay Bale four and a half minutes. Without food the sheep wanders off.",
+        "- After 2 minutes the sheep is worn out. It steps off and rests for 30 seconds before it will walk again; put a fresh sheep on meanwhile. Sheep bred for Endurance walk for longer.",
+        "- While its buffer is full the sheep stands still and eats nothing.",
+        "Lambs are too small for the belt."
+      ]
+    },
+    {
       "title": "Blaze Furnace",
       "icon": "barelyfunctionalcontraptions:blaze_furnace",
       "tab": "power",
@@ -335,24 +354,7 @@
       "tab": "wip",
       "text": [
         "Features still being built are written up here as they arrive, so you can see what's coming.",
-        "Here are the planned generators: the Sheep Treadmill for the early game, and late-game ones that make a lot of power but need looking after. Then there's the Quantum Sheep. None of them can be built yet, and their numbers may change. Back up your world before trying anything here once it arrives."
-      ]
-    },
-    {
-      "title": "Sheep Treadmill",
-      "icon": "barelyfunctionalcontraptions:sheep_treadmill",
-      "fallback_icon": "minecraft:wheat",
-      "tab": "wip",
-      "text": [
-        "Planned. Not in the game yet; the numbers may change. Development builds have its model to look at.",
-        "A belt in a blue steel frame. Lead a sheep onto it, dangle some wheat just out of reach, and it walks for ever without getting anywhere.",
-        "## Power",
-        "- Around 20 FE/t per sheep while it walks, so a few treadmills in a row match a Glow Panel.",
-        "- Faster sheep make more: a sheep with Speed, or one just sheared and running lighter, turns the belt quicker.",
-        "- Lambs are too small for the belt.",
-        "## Upkeep",
-        "- The sheep gets hungry. Keep wheat in the feeder in front of it, or it stops for a rest and the power drops to nothing.",
-        "- It tires after a while and needs a break on grass. Sheep bred for Endurance walk for longer."
+        "Here are the planned late-game generators, which make a lot of power but need looking after, and the Quantum Sheep. None of them can be built yet, and their numbers may change. Back up your world before trying anything here once it arrives."
       ]
     },
     {

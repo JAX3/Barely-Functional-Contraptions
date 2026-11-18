@@ -31,5 +31,12 @@ public final class ModAttachments {
                     .sync(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepSkin.STREAM_CODEC)
                     .build());
 
+    /** How tired a sheep is from the Sheep Treadmill. Persisted while it isn't fresh; the server alone needs it. */
+    public static final Supplier<AttachmentType<com.jax3.barelyfunctionalcontraptions.sheep.entity.TreadmillWalker>> TREADMILL_WALKER = REGISTER.register("treadmill_walker",
+            () -> AttachmentType.builder(() -> com.jax3.barelyfunctionalcontraptions.sheep.entity.TreadmillWalker.FRESH)
+                    .serialize(com.jax3.barelyfunctionalcontraptions.sheep.entity.TreadmillWalker.CODEC,
+                            walker -> !walker.equals(com.jax3.barelyfunctionalcontraptions.sheep.entity.TreadmillWalker.FRESH))
+                    .build());
+
     private ModAttachments() {}
 }

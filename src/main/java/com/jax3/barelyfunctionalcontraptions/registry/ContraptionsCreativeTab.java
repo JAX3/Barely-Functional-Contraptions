@@ -57,6 +57,7 @@ public final class ContraptionsCreativeTab {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_LAMP,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BURNER,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_TREADMILL,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLAZE_FURNACE,
                     com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIAL_GENERATOR,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ZERO_POINT_ENERGY_MODULE,

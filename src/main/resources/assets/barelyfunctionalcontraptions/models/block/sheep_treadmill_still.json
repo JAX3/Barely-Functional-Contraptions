@@ -1,0 +1,17 @@
+{
+  "parent": "barelyfunctionalcontraptions:block/sheep_treadmill",
+  "textures": {
+    "rail": "barelyfunctionalcontraptions:block/sheep_treadmill/rail",
+    "strut": "barelyfunctionalcontraptions:block/sheep_treadmill/strut",
+    "belt": "barelyfunctionalcontraptions:block/sheep_treadmill/belt_still",
+    "roller": "barelyfunctionalcontraptions:block/sheep_treadmill/roller",
+    "housing_side": "barelyfunctionalcontraptions:block/sheep_treadmill/housing_side",
+    "housing_front": "barelyfunctionalcontraptions:block/sheep_treadmill/housing_front",
+    "housing_top": "barelyfunctionalcontraptions:block/sheep_treadmill/housing_top",
+    "flywheel": "barelyfunctionalcontraptions:block/sheep_treadmill/flywheel",
+    "wheat": "barelyfunctionalcontraptions:block/sheep_treadmill/wheat",
+    "rope": "barelyfunctionalcontraptions:block/sheep_treadmill/rope",
+    "lamp": "barelyfunctionalcontraptions:block/sheep_treadmill/lamp",
+    "particle": "barelyfunctionalcontraptions:block/sheep_treadmill/rail"
+  }
+}

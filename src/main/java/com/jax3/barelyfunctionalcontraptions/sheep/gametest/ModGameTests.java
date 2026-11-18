@@ -151,7 +151,8 @@ public final class ModGameTests {
         TESTS.put("wrench_dismantles_machines_into_the_inventory", ModGameTests::wrenchDismantles);
         TESTS.put("woollen_boots_muffle_the_wearer", ModGameTests::woollenBootsMuffle);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
-        if (ModBlocks.SHEEP_TREADMILL != null) TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
+        TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
+        TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -957,7 +958,7 @@ public final class ModGameTests {
     }
 
     /**
-     * The work-in-progress Sheep Treadmill (development builds only) is two blocks long: placed facing the way the player
+     * The Sheep Treadmill is two blocks long: placed facing the way the player
      * looks, it fills the block in front, won't place when that's taken, and breaking either half removes both.
      */
     private static void sheepTreadmill(GameTestHelper h) {
@@ -1100,6 +1101,65 @@ public final class ModGameTests {
         var around = new net.minecraft.world.phys.AABB(h.absolutePos(burnerPos)).inflate(2);
         h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, around).isEmpty(), "nothing is left on the ground");
         h.succeed();
+    }
+
+    /** A Sheep Treadmill facing north with its back at {@code back}, and a grown sheep on its belt (or none). */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity treadmill(GameTestHelper h, BlockPos back,
+                                                                                                             boolean withSheep, int wheat) {
+        var block = ModBlocks.SHEEP_TREADMILL.get();
+        var base = block.defaultBlockState().setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.FACING, Direction.NORTH);
+        h.setBlock(back, base);
+        h.setBlock(back.north(), base.setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.PART, 1));
+        var be = h.getBlockEntity(back, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.class);
+        if (wheat > 0) be.setItem(0, new ItemStack(Items.WHEAT, wheat));
+        if (withSheep) {
+            Sheep sheep = h.spawn(EntityTypes.SHEEP, new net.minecraft.world.phys.Vec3(back.getX() + 0.5, back.getY() + 0.4, back.getZ() + 0.1));
+            sheep.setNoAi(true);
+        }
+        return be;
+    }
+
+    private static Sheep sheepOn(GameTestHelper h, BlockPos back) {
+        var area = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.beltArea(h.absolutePos(back), Direction.NORTH);
+        return h.getLevel().getEntitiesOfClass(Sheep.class, area.inflate(0.5)).getFirst();
+    }
+
+    /**
+     * The Sheep Treadmill: a sheep on the belt with wheat walks it for 20 FE/t, held in the middle of the belt; a sheared
+     * one runs lighter for 25; with no wheat it's hungry and makes nothing; a worn-out sheep stops to rest; and wheat is
+     * eaten as it walks.
+     */
+    private static void sheepTreadmillPower(GameTestHelper h) {
+        BlockPos plainPos = new BlockPos(1, 1, 2), shornPos = new BlockPos(3, 1, 2), hungryPos = new BlockPos(5, 1, 2), tiredPos = new BlockPos(1, 1, 5);
+        var plain = treadmill(h, plainPos, true, 1);
+        var shorn = treadmill(h, shornPos, true, 1);
+        var hungry = treadmill(h, hungryPos, true, 0);
+        var tired = treadmill(h, tiredPos, true, 1);
+        var empty = treadmill(h, new BlockPos(5, 1, 5), false, 1);
+        sheepOn(h, shornPos).setSheared(true);
+        // This one has nearly walked its limit.
+        Sheep weary = sheepOn(h, tiredPos);
+        weary.setData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.TREADMILL_WALKER,
+                new com.jax3.barelyfunctionalcontraptions.sheep.entity.TreadmillWalker(
+                        com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.walkLimit(weary) - 5, 0));
+        h.runAfterDelay(20, () -> {
+            h.assertTrue(plain.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.State.WALKING
+                    && plain.generating() == 20, "a sheep walks it for 20 FE/t, was " + plain.state() + " " + plain.generating());
+            h.assertTrue(plain.getEnergyHandler().getAmountAsInt() >= 19 * 20, "and it stores what it makes, " + plain.getEnergyHandler().getAmountAsInt());
+            h.assertTrue(plain.food().isEmpty(), "the sheep ate the wheat to walk");
+            h.assertTrue(h.getBlockState(plainPos).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.RUNNING), "the belt runs");
+            var lane = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.lane(h.absolutePos(plainPos), Direction.NORTH);
+            h.assertTrue(sheepOn(h, plainPos).position().distanceTo(lane) < 0.01, "the sheep is held in the middle of the belt");
+            h.assertTrue(shorn.generating() == 25, "a sheared sheep runs lighter: 25 FE/t, got " + shorn.generating());
+            h.assertTrue(hungry.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.State.HUNGRY
+                    && hungry.getEnergyHandler().getAmountAsInt() == 0, "without wheat it's hungry and makes nothing, was " + hungry.state());
+            h.assertTrue(tired.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.State.RESTING
+                    && weary.getData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.TREADMILL_WALKER).resting(h.getLevel().getGameTime()),
+                    "a worn-out sheep stops to rest, was " + tired.state());
+            h.assertTrue(empty.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.State.NO_SHEEP
+                    && empty.food().getCount() == 1, "with no sheep nothing happens and no wheat is eaten");
+            h.succeed();
+        });
     }
 
     /**

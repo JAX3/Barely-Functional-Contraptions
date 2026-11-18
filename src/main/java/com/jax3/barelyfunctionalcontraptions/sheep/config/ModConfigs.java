@@ -137,6 +137,15 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue poweredFurnaceCapacity;
         public final ModConfigSpec.IntValue poweredFurnaceMaxInput;
         public final ModConfigSpec.BooleanValue woollenBootsMuffle;
+        public final ModConfigSpec.IntValue treadmillPower;
+        public final ModConfigSpec.IntValue treadmillTicksPerWheat;
+        public final ModConfigSpec.IntValue treadmillWalkTicks;
+        public final ModConfigSpec.IntValue treadmillRestTicks;
+        public final ModConfigSpec.DoubleValue treadmillEnduranceBonus;
+        public final ModConfigSpec.DoubleValue treadmillSpeedBonus;
+        public final ModConfigSpec.DoubleValue treadmillShearedBonus;
+        public final ModConfigSpec.IntValue treadmillCapacity;
+        public final ModConfigSpec.IntValue treadmillOutput;
         public final ModConfigSpec.BooleanValue muffleVibrations;
         public final ModConfigSpec.IntValue chillerRadius;
         public final ModConfigSpec.IntValue chillerMaxSources;
@@ -383,6 +392,27 @@ public final class ModConfigs {
                     .defineInRange("energyCapacity", 20_000, 1, Integer.MAX_VALUE);
             poweredFurnaceMaxInput = b.comment("Most FE it accepts per tick.")
                     .defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Sheep Treadmill (a sheep walks its belt for wheat and makes FE)").push("sheep_treadmill");
+            treadmillPower = b.comment("FE/t while a sheep walks it, before the bonuses below.")
+                    .defineInRange("power", 20, 0, 1_000_000);
+            treadmillTicksPerWheat = b.comment("Ticks of walking one Wheat feeds (600 = 30 seconds). A Hay Bale feeds nine times as long.")
+                    .defineInRange("ticksPerWheat", 600, 1, 72_000);
+            treadmillWalkTicks = b.comment("Ticks a sheep walks before it's worn out and needs a rest (2400 = 2 minutes), for a sheep with 1 Endurance.")
+                    .defineInRange("walkTicks", 2400, 1, 720_000);
+            treadmillRestTicks = b.comment("Ticks a worn-out sheep rests before it will walk again (600 = 30 seconds).")
+                    .defineInRange("restTicks", 600, 0, 720_000);
+            treadmillEnduranceBonus = b.comment("How much longer a sheep walks for each Endurance point above 1: 0.25 = 25% longer per point.")
+                    .defineInRange("enduranceBonus", 0.25, 0.0, 10.0);
+            treadmillSpeedBonus = b.comment("Extra power for each level of Speed the sheep has: 0.2 = 20% more per level. Slowness takes as much off.")
+                    .defineInRange("speedBonus", 0.2, 0.0, 10.0);
+            treadmillShearedBonus = b.comment("Extra power while the sheep is sheared and running light: 0.25 = 25% more.")
+                    .defineInRange("shearedBonus", 0.25, 0.0, 10.0);
+            treadmillCapacity = b.comment("FE it stores.")
+                    .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
+            treadmillOutput = b.comment("Most FE it pushes into the blocks around it per tick.")
+                    .defineInRange("output", 200, 0, Integer.MAX_VALUE);
             b.pop();
 
             b.comment("Woollen Armour (crafted from wool, in the wool's colour)").push("woollen_armor");
