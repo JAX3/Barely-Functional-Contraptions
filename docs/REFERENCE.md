@@ -535,6 +535,12 @@ C T C      C = Copper Block, T = Fluid Tank
 - **Fatigue:** each sheep can react for an hour (`fatigueTicks`) before its fleece is spent. A spent sheep stops counting (the thermometer's tooltip shows how many are spent). Infusing it again with its own resource, at the Infusion Altar or by hand, renews the fleece, even if its infusion hasn't run out.
 - **Buffer full:** it waits without using water, boosts or fleece until its power is used.
 - **Window:** the energy gauge, the hot thermometer, the centre panel (pairs, FE/t, the balance needle and the danger bar), the cold thermometer, the water gauge, the two boost slots with their burn bars, and the status: *Needs both herds*, *Reacting*, *Running hot*, *Running cold*, *No water*, *Buffer full*, *Overheated* or *Frozen solid*.
+- **Jade:** looking at it shows its status, the FE/t from how many pairs, each herd, how far off balance it is, how close it is to a meltdown or a freeze (as a percentage), the seconds left on each boost, and any sheep with spent fleece. Jade's own lines add the water, the stored energy and the boost slots. Looking at a Blaze or Snow sheep shows how much of its thermal fleece is left (*Thermal fleece: 73% left*), or that it is spent and needs infusing again.
+- **JEI:** a **Thermal Reaction** page shows the hot side (Blaze sheep and a Blaze Rod), the chamber with the 250 mB of water it drinks, the cold side (Blue Ice and Snow sheep), and a table of the FE/t for one to six pairs, with and without both boosts. The numbers come from the server's config. Hover over *Hot* and *Cold* for what happens when it runs hot or cold. Press **U** on a Blaze Rod, Blue Ice or the chamber to find it; the chamber also has an information page.
+
+| JEI: Thermal Reaction | Jade on the chamber and on a Blaze sheep |
+|---|---|
+| ![JEI's Thermal Reaction page: Blaze sheep and a Blaze Rod on the hot side, the chamber over 250 mB of water, Blue Ice and Snow sheep on the cold side, and a table from 1 pair at 2,500 FE/t to 6 pairs at 10,125 FE/t, or 20,250 with both boosts](screenshots/105_thermal_jei.png) | ![Jade on a reacting chamber: Reacting, 13,050 FE/t from 3 / 6 pairs, Blaze sheep 3, Snow sheep 3, boosts 22s each](screenshots/105_thermal_jade_chamber.png) ![Jade on a Blaze sheep: Infused Blaze, 9 shearings left, Thermal fleece 99% left](screenshots/105_thermal_jade_sheep.png) |
 - **Advancement:** ⭐ **Thermal Shock** (challenge), for being within 16 blocks when one starts reacting.
 - Mine it with a pickaxe. **Config:** `[thermal_reaction_chamber]` (see below).
 
@@ -948,6 +954,7 @@ With JEI installed, click the Mechanical Separator in JEI (or press **U** over i
 With [Jade](https://www.curseforge.com/minecraft/mc-mods/jade) installed (26.3.x for NeoForge), looking at things shows:
 - **Infused sheep:** the resource (in its colour) and how many shearings are left. A permanent infusion or a resting cooldown is shown instead when that applies.
 - **Mechanical Separator:** its status (Processing, No Energy, Output Full...), the FE/t it is using, a non-default redstone mode, and a live progress bar. The energy bar and slot contents come from Jade's built-in support.
+- **Thermal Reaction Chamber:** its status, output and pairs, each herd, the balance, the meltdown or freeze danger, the boosts and any spent sheep. On a Blaze or Snow sheep that has reacted, how much of its thermal fleece is left.
 
 Each part can be switched off in Jade's settings under *Plugins → Barely Functional Contraptions*. Jade is optional: the mod runs fine without it.
 

@@ -2202,7 +2202,28 @@ public final class DevScreenshotHarness {
             case 760 -> shot(mc, "105_thermal_reaction_chamber_frozen");
             case 762 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 32", origin.getX() - 14.5, origin.getY() + 6.5, origin.getZ() + 5.5));
             case 790 -> shot(mc, "105_thermal_reaction_chamber_meltdown");
-            case 795 -> mc.stop();
+            // Jade on a Blaze sheep (its fleece wear) and on the balanced chamber, then the JEI pages.
+            case 792 -> {
+                setHudHidden(mc, false);
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 40", origin.getX() - 1.1, origin.getY(), origin.getZ() - 2.6));
+            }
+            case 815 -> shot(mc, "105_thermal_jade_sheep");
+            case 817 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 35", origin.getX() + 0.5, origin.getY(), origin.getZ() - 2.6));
+            case 840 -> shot(mc, "105_thermal_jade_chamber");
+            case 842 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
+                    com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showThermal();
+                }
+            }
+            case 865 -> shot(mc, "105_thermal_jei");
+            case 867 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
+                    com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showThermalInfo();
+                }
+            }
+            case 890 -> shot(mc, "105_thermal_jei_info");
+            case 895 -> mc.stop();
             default -> {}
         }
     }

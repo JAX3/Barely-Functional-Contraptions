@@ -505,7 +505,24 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
         return spent;
     }
 
-    public boolean frozen() {
+    /** Ticks left on the Blaze Rod and the Blue Ice burning now. */
+    public int hotBurn() {
+        return hotBurn;
+    }
+
+    public int coldBurn() {
+        return coldBurn;
+    }
+
+    public int hotCount() {
+        return hotIds.length;
+    }
+
+    public int coldCount() {
+        return coldIds.length;
+    }
+
+        public boolean frozen() {
         return frozen;
     }
 

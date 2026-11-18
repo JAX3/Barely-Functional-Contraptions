@@ -49,7 +49,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         var gui = registration.getJeiHelpers().getGuiHelper();
-        registration.addRecipeCategories(new InfusionCategory(gui), new AltarCategory(gui), new SeparationCategory(gui));
+        registration.addRecipeCategories(new InfusionCategory(gui), new AltarCategory(gui), new SeparationCategory(gui), new ThermalCategory(gui));
     }
 
     @Override
@@ -73,6 +73,12 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addItemStackInfo(new ItemStack(ModItems.WOOL_PACKER.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.wool_packer"));
         registration.addItemStackInfo(new ItemStack(ModItems.MECHANICAL_SEPARATOR.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.separator"));
         registration.addItemStackInfo(new ItemStack(ModItems.CREATIVE_GENERATOR.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.creative_generator"));
+        registration.addRecipes(ThermalCategory.TYPE, List.of(new ThermalDisplay()));
+        registration.addItemStackInfo(new ItemStack(ModItems.THERMAL_REACTION_CHAMBER.get()),
+                Component.translatable("jei.barelyfunctionalcontraptions.info.thermal_reaction_chamber.1"),
+                Component.translatable("jei.barelyfunctionalcontraptions.info.thermal_reaction_chamber.2"),
+                Component.translatable("jei.barelyfunctionalcontraptions.info.thermal_reaction_chamber.3"),
+                Component.translatable("jei.barelyfunctionalcontraptions.info.thermal_reaction_chamber.4"));
     }
 
     /**
@@ -167,6 +173,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addCraftingStation(InfusionCategory.TYPE, Items.SHEARS);
         registration.addCraftingStation(InfusionCategory.TYPE, ModItems.INFUSION_ALTAR.get()); // tier 1 works there too
         registration.addCraftingStation(AltarCategory.TYPE, ModItems.INFUSION_ALTAR.get());
+        registration.addCraftingStation(ThermalCategory.TYPE, ModItems.THERMAL_REACTION_CHAMBER.get());
         // The Powered Furnace smelts everything a Furnace does.
         registration.addCraftingStation(mezz.jei.api.constants.RecipeTypes.SMELTING, ModItems.POWERED_FURNACE.get());
     }

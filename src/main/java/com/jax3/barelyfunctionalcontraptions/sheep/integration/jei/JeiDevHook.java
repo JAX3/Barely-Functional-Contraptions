@@ -86,4 +86,24 @@ public final class JeiDevHook {
         rt.getRecipesGui().showTypes(java.util.List.of(infusion ? InfusionCategory.TYPE : SeparationCategory.TYPE));
         return true;
     }
+
+    /** Opens the Thermal Reaction page. */
+    public static boolean showThermal() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        rt.getRecipesGui().showTypes(java.util.List.of(ThermalCategory.TYPE));
+        return true;
+    }
+
+    /** Opens the Thermal Reaction Chamber's information page. */
+    public static boolean showThermalInfo() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        var focus = rt.getJeiHelpers().getFocusFactory().createFocus(RecipeIngredientRole.OUTPUT, VanillaTypes.ITEM_STACK,
+                new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.THERMAL_REACTION_CHAMBER.get()));
+        var type = mezz.jei.api.constants.RecipeTypes.INFORMATION;
+        var pages = rt.getRecipeManager().createRecipeLookup(type).limitFocus(java.util.List.of(focus)).get().toList();
+        rt.getRecipesGui().showRecipes(rt.getRecipeManager().getRecipeCategory(type), pages, java.util.List.of(focus));
+        return true;
+    }
 }

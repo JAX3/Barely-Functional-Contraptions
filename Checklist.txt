@@ -19,7 +19,7 @@ Resource generation
 
 Next goal
 15. Explosive Sheep Implosion Chamber.
-16. [STARTED] Thermal Reaction Chamber: late-game power from Blaze sheep and Snow sheep together. Built and working (pairs, water, boosts, balance with meltdown and freezing, fleece fatigue, window, model, manual chapter). Still to do: Jade info, JEI page, a test-world scene.
+16. [STARTED] Thermal Reaction Chamber: late-game power from Blaze sheep and Snow sheep together. Built and working (pairs, water, boosts, balance with meltdown and freezing, fleece fatigue, window, model, manual chapter). Jade info and a JEI page done. Still to do: a test-world scene.
 17. Explosive Rock Cracker: cobblestone to gravel to sand.
 18. Fluid sheep: lava, water and honey (maybe).
 From the manual's WIP tab:
