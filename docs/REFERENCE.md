@@ -693,6 +693,8 @@ So a bale gives a third more of everything for two-thirds more power. Every coun
 
 All of this is in `[wool_packer]` in the synced config: `baleYield` (12 = 12 wool's worth of outputs), `baleEnergy` (15 = 15 wool's energy) and `baleTime` (9 = 9 wool's time). A separating recipe whose ingredient matches a Wool Bale with its `sheep_resource` component gives that bale its own outputs instead.
 
+**Power for costly bales:** a bale uses its wool's FE a tick times `baleEnergy ÷ baleTime` (15 ÷ 9 by default), so a Wither Wool Bale needs about **1,667 FE/t**. The separator's input rate rises to twice what the bale in it uses (over its usual 1,000 FE/t), so any bale runs at full speed when the power is there. That much takes a big supply: a Hume Energy Cube bank, a Zero Point Module or several generators on one cable.
+
 #### Unpacking bales
 Put a bale on its own anywhere in a crafting grid (the inventory's 2x2 grid works) to get its **9 wool** back, of the same resource. JEI lists this for every wool type. The recipe is `data/barelyfunctionalcontraptions/recipe/unpack_wool_bale.json`; a data pack can remove it by overriding that file.
 
@@ -958,7 +960,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | Key | Default | Meaning |
 |---|---|---|
 | `energyCapacity` | 100000 | FE buffer |
-| `maxEnergyInput` | 1000 | FE accepted per tick |
+| `maxEnergyInput` | 1000 | FE accepted per tick; it always takes at least twice what the wool or bale in it uses a tick, so a costly one is never starved |
 | `defaultEnergyCost` | 20000 | FE per operation when a resource doesn't set one |
 | `energyPerTickOverride` | 0 | Fixed FE/t for every recipe (0 = derive from cost ÷ time) |
 | `defaultProcessingTicks` | 100 | Time when a resource doesn't set one |

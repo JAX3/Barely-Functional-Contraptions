@@ -154,6 +154,7 @@ public final class ModGameTests {
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
+        TESTS.put("separator_takes_power_fast_enough_for_a_wither_bale", ModGameTests::separatorFeedsCostlyBales);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -1123,6 +1124,35 @@ public final class ModGameTests {
     private static Sheep sheepOn(GameTestHelper h, BlockPos back) {
         var area = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.beltArea(h.absolutePos(back), Direction.NORTH);
         return h.getLevel().getEntitiesOfClass(Sheep.class, area.inflate(0.5)).getFirst();
+    }
+
+    /**
+     * A Wither Wool Bale needs more FE a tick than the separator's 1,000 FE/t input limit: the limit rises to twice what
+     * the bale needs, so a Creative Generator beside it keeps it running without a pause.
+     */
+    private static void separatorFeedsCostlyBales(GameTestHelper h) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        h.setBlock(pos, ModBlocks.MECHANICAL_SEPARATOR.get());
+        var sep = h.getBlockEntity(pos, MechanicalSeparatorBlockEntity.class);
+        sep.getInventory().setStack(SeparatorInventory.INPUT, com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("wither"), 1));
+        h.setBlock(pos.east(), ModBlocks.CREATIVE_GENERATOR.get());
+        java.util.List<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus> seen = new java.util.ArrayList<>();
+        h.onEachTick(() -> seen.add(sep.getStatus()));
+        h.runAfterDelay(60, () -> {
+            int perTick = sep.getEnergyPerTick();
+            h.assertTrue(perTick > 1_000, "a Wither bale needs more than 1,000 FE/t, needs " + perTick);
+            var handler = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, h.absolutePos(pos), Direction.UP);
+            int accepted;
+            try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                accepted = handler.insert(Integer.MAX_VALUE, tx); // not committed: just how much it would take
+            }
+            h.assertTrue(accepted >= Math.min(2 * perTick, handler.getCapacityAsInt() - handler.getAmountAsInt()) || accepted == 0,
+                    "it takes up to twice that a tick, took " + accepted);
+            long waiting = seen.stream().skip(5).filter(st -> st == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus.NO_ENERGY).count();
+            h.assertTrue(waiting == 0, "and never runs short of power, short " + waiting + " ticks: " + seen);
+            h.assertTrue(sep.getProgress() >= 50, "it keeps going, progress " + sep.getProgress());
+            h.succeed();
+        });
     }
 
     /** A treadmill with food calls a grown sheep standing a few blocks away over to its belt, where it starts walking. */

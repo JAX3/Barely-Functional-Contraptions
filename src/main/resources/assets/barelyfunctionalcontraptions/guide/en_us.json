@@ -335,7 +335,7 @@
         "## Mechanical Separator",
         "Put resource wool in and supply FE. Each wool gives 2 to 4 of its resource, 2 string and sometimes a bonus. Iron wool takes 20,000 FE over 5 seconds.",
         "Its redstone button sets whether redstone turns it on or off. Hoppers and pipes can feed it and empty it.",
-        "It also separates Wool Bales from the Wool Packer, for more resources (see Wool Packer under Logistics).",
+        "It also separates Wool Bales from the Wool Packer, for more resources (see Wool Packer under Logistics). Bales use more power a tick, so it takes power in faster for them: a Wither Wool Bale needs about 1,700 FE/t.",
         "## Automatic Shears",
         "Shears every sheep in the 3x3 area in front of its blades, using 2,000 FE per sheep, and keeps the wool in 9 slots. Put a hopper or pipe under it to collect the wool."
       ]

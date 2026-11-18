@@ -107,7 +107,7 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
     }
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
-        energy.refreshLimits();
+        energy.refreshLimits(energyPerTick); // what it used last tick: the wool or bale in it now
         powered = level.hasNeighborSignal(pos);
         RedstoneMode mode = ModConfigs.getBool(ModConfigs.SERVER.redstoneControlEnabled) ? redstoneMode : ModConfigs.get(ModConfigs.SERVER.defaultRedstoneMode);
 
