@@ -153,6 +153,7 @@ public final class ModGameTests {
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
+        TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -1122,6 +1123,15 @@ public final class ModGameTests {
     private static Sheep sheepOn(GameTestHelper h, BlockPos back) {
         var area = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.beltArea(h.absolutePos(back), Direction.NORTH);
         return h.getLevel().getEntitiesOfClass(Sheep.class, area.inflate(0.5)).getFirst();
+    }
+
+    /** A treadmill with food calls a grown sheep standing a few blocks away over to its belt, where it starts walking. */
+    private static void sheepTreadmillAttracts(GameTestHelper h) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.STONE);
+        var be = treadmill(h, new BlockPos(1, 1, 2), false, 4);
+        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(5, 1, 5));
+        h.succeedWhen(() -> h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.State.WALKING,
+                "the sheep came over and is walking it, state " + be.state() + ", sheep at " + h.relativePos(sheep.blockPosition())));
     }
 
     /**

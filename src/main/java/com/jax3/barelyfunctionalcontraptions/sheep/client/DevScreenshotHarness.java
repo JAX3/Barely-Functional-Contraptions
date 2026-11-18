@@ -1934,7 +1934,30 @@ public final class DevScreenshotHarness {
             }
             case 165 -> openAt(server, origin.offset(0, 0, -3));
             case 190 -> shot(mc, "103_sheep_treadmill_gui");
-            case 195 -> mc.stop();
+            case 192 -> {
+                mc.execute(() -> mc.gui.setScreen(null));
+                // A loose sheep a few blocks from the empty treadmill: it should be called over and hop on.
+                server.execute(() -> {
+                    ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                    var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    sheep.snapTo(origin.getX() + 5.5, origin.getY(), origin.getZ() + 1.5, 90, 0);
+                    sheep.setColor(net.minecraft.world.item.DyeColor.PINK);
+                    level.addFreshEntity(sheep);
+                });
+                setHudHidden(mc, true);
+                command(server, "gamemode spectator @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 205 28", origin.getX() - 1.5, origin.getY() + 1.2, origin.getZ() + 1.5));
+            }
+            case 205 -> shot(mc, "103_sheep_treadmill_called_0");
+            case 400 -> {
+                shot(mc, "103_sheep_treadmill_called_1");
+                server.execute(() -> {
+                    var level = server.getPlayerList().getPlayers().getFirst().level();
+                    var be = level.getBlockEntity(origin.offset(2, 0, -3));
+                    ResourcefulSheep.LOGGER.warn("CALLED state {}", be instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity t ? t.state() : null);
+                });
+            }
+            case 405 -> mc.stop();
             default -> {}
         }
     }

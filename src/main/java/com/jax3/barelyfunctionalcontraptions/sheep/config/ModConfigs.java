@@ -138,6 +138,7 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue poweredFurnaceMaxInput;
         public final ModConfigSpec.BooleanValue woollenBootsMuffle;
         public final ModConfigSpec.IntValue treadmillPower;
+        public final ModConfigSpec.IntValue treadmillAttractRadius;
         public final ModConfigSpec.IntValue treadmillTicksPerWheat;
         public final ModConfigSpec.IntValue treadmillWalkTicks;
         public final ModConfigSpec.IntValue treadmillRestTicks;
@@ -397,6 +398,8 @@ public final class ModConfigs {
             b.comment("Sheep Treadmill (a sheep walks its belt for wheat and makes FE)").push("sheep_treadmill");
             treadmillPower = b.comment("FE/t while a sheep walks it, before the bonuses below.")
                     .defineInRange("power", 20, 0, 1_000_000);
+            treadmillAttractRadius = b.comment("How far away, in blocks, a treadmill with food in it calls a grown sheep over to its belt. 0 = it doesn't.")
+                    .defineInRange("attractRadius", 8, 0, 32);
             treadmillTicksPerWheat = b.comment("Ticks of walking one Wheat feeds (600 = 30 seconds). A Hay Bale feeds nine times as long.")
                     .defineInRange("ticksPerWheat", 600, 1, 72_000);
             treadmillWalkTicks = b.comment("Ticks a sheep walks before it's worn out and needs a rest (2400 = 2 minutes), for a sheep with 1 Endurance.")

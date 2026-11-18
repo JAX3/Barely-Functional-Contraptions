@@ -102,7 +102,7 @@
       "group": "Early Game",
       "text": [
         "A belt for a sheep to walk on, two blocks long. Place it facing the way you want the sheep to walk: the wheat hangs at the far end, the generator housing is at your end.",
-        "Lead a grown sheep onto the belt and put Wheat or Hay Bales in it (right-click, or a hopper or pipe). The sheep walks for the wheat and turns the belt.",
+        "Put Wheat or Hay Bales in it (right-click, or a hopper or pipe). While it has food and no sheep, it calls the nearest grown sheep within 8 blocks over, and the sheep hops onto the belt. You can also lead one on. The sheep walks for the wheat and turns the belt.",
         "## Power",
         "- 20 FE/t while a sheep walks. Each level of Speed adds a fifth more; Slowness takes as much off.",
         "- A sheared sheep runs lighter: a quarter more.",

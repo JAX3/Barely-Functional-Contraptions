@@ -49,6 +49,7 @@ import org.jspecify.annotations.Nullable;
  *     <li>after {@code walkTicks} (longer for each Endurance point above 1) the sheep is worn out, steps off and rests
  *     for {@code restTicks} before it will walk again. Its tiredness stays with the sheep, so a fresh one can take over.</li>
  * </ul>
+ * While it waits for a sheep, with food in it, it calls the nearest grown sheep over to the belt ({@code attractRadius}).
  * While it walks, the treadmill keeps the sheep in the middle of the belt facing the wheat. It doesn't make power, or
  * use up wheat or the sheep's stamina, while its buffer is full. It pushes its energy into every block around it.
  */
@@ -141,6 +142,9 @@ public class SheepTreadmillBlockEntity extends BlockEntity implements WorldlyCon
                 Sheep tired = level.getEntitiesOfClass(Sheep.class, beltArea(pos, facing), s -> s.isAlive() && !s.isBaby()).getFirst();
                 restLeft = (int) Math.max(0, tired.getData(ModAttachments.TREADMILL_WALKER).restUntil() - now);
             }
+            if ((now + Math.floorMod(pos.hashCode(), ATTRACT_INTERVAL)) % ATTRACT_INTERVAL == 0) { // spread over the ticks
+                attract(level, pos, facing, now);
+            }
         } else {
             TreadmillWalker walker = sheep.getData(ModAttachments.TREADMILL_WALKER);
             int walkLimit = walkLimit(sheep);
@@ -189,6 +193,56 @@ public class SheepTreadmillBlockEntity extends BlockEntity implements WorldlyCon
         Sheep chosen = candidates.getFirst();
         walkerId = chosen.getUUID();
         return chosen;
+    }
+
+    /** How often a treadmill waiting for a sheep calls one over, in ticks. */
+    private static final int ATTRACT_INTERVAL = 20;
+    /** How close to the middle of the belt a called sheep must get before it hops on. */
+    private static final double HOP_ON = 2.0;
+    /** Sheep already called to a treadmill, and until when: so two treadmills don't call the same one. */
+    private static final java.util.Map<UUID, Long> CALLED = new java.util.HashMap<>();
+
+    /**
+     * With food in it and room for power, the treadmill calls the nearest rested, grown sheep within
+     * {@code [sheep_treadmill] attractRadius} over to its belt, as wheat in a player's hand does. Sheep walking or
+     * waiting on another treadmill, and ones being led on a lead, are left alone.
+     */
+    private void attract(ServerLevel level, BlockPos pos, Direction facing, long now) {
+        int radius = ModConfigs.getInt(ModConfigs.SERVER.treadmillAttractRadius);
+        if (radius <= 0 || (fed <= 0 && feedValue(food) <= 0) || energy.getAmountAsInt() >= energy.getCapacityAsInt()) return;
+        CALLED.values().removeIf(until -> until < now);
+        Vec3 lane = lane(pos, facing);
+        Sheep nearest = null;
+        double best = Double.MAX_VALUE;
+        for (Sheep sheep : level.getEntitiesOfClass(Sheep.class, new AABB(lane, lane).inflate(radius), s -> s.isAlive() && !s.isBaby() && !s.isLeashed())) {
+            if (sheep.getData(ModAttachments.TREADMILL_WALKER).resting(now) || CALLED.containsKey(sheep.getUUID())) continue;
+            if (level.getBlockState(sheep.blockPosition()).getBlock() instanceof SheepTreadmillBlock) continue; // on a treadmill already
+            double distance = sheep.distanceToSqr(lane);
+            if (distance < best && distance <= radius * radius) {
+                best = distance;
+                nearest = sheep;
+            }
+        }
+        if (nearest == null) return;
+        CALLED.put(nearest.getUUID(), now + ATTRACT_INTERVAL + 5);
+        nearest.getLookControl().setLookAt(lane.x, pos.getY() + 1, lane.z);
+        if (best <= HOP_ON * HOP_ON && clearWay(level, nearest, lane)) {
+            // Beside the belt: pathfinding stops short of a block that isn't a full one, so it hops on.
+            nearest.getNavigation().stop();
+            nearest.snapTo(lane.x, lane.y, lane.z, facing.toYRot(), nearest.getXRot());
+            level.playSound(null, lane.x, lane.y, lane.z, net.minecraft.sounds.SoundEvents.SHEEP_STEP, net.minecraft.sounds.SoundSource.NEUTRAL, 0.6F, 1.0F);
+        } else {
+            nearest.getNavigation().moveTo(lane.x, pos.getY(), lane.z, 1.0);
+        }
+    }
+
+    /** Nothing but the treadmill between the sheep and the belt, so it never hops through a fence or wall. */
+    private static boolean clearWay(ServerLevel level, Sheep sheep, Vec3 lane) {
+        Vec3 from = sheep.position().add(0, 0.5, 0), to = lane.add(0, 0.5, 0);
+        var hit = level.clip(new net.minecraft.world.level.ClipContext(from, to, net.minecraft.world.level.ClipContext.Block.COLLIDER,
+                net.minecraft.world.level.ClipContext.Fluid.NONE, sheep));
+        return hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS
+                || level.getBlockState(hit.getBlockPos()).getBlock() instanceof SheepTreadmillBlock;
     }
 
     /** Whether a sheep has rested enough to walk; a finished rest starts it fresh. */

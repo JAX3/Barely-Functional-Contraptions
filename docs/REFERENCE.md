@@ -613,7 +613,7 @@ C M C      C = Copper Ingot, M = Functional Machine Block
 | ![Three Sheep Treadmills: a sheep walking the left one, a sheared sheep the middle one, and the right one empty](screenshots/103_sheep_treadmill.png) | ![The Sheep Treadmill window: the energy gauge, the golden wheat over the food slot with 31 Wheat, the stamina bar, 3,150 FE stored, 25 FE/t, Stamina 95% and status Walking](screenshots/103_sheep_treadmill_gui.png) |
 
 - **Placing:** it faces the way you look, and fills the block in front of where you place it (it won't place if that's taken). Your end is the generator housing; the far end has the wheat. Breaking either half breaks both and drops the treadmill and its food.
-- **A sheep:** any grown sheep standing on the belt (lead it on, or let one wander on) walks it. The treadmill holds it in the middle of the belt facing the wheat, the belt runs and its legs go. Lambs are too small. One sheep per treadmill.
+- **A sheep:** any grown sheep standing on the belt walks it. While the treadmill has food, no sheep and room for power, it calls the nearest rested, grown sheep within 8 blocks over, about once a second, as wheat in a player's hand does; once beside the belt the sheep hops on (never through a fence or wall). Sheep on a lead, resting, or already on another treadmill are left alone, and two treadmills don't call the same sheep. You can also lead one on. The treadmill holds it in the middle of the belt facing the wheat, the belt runs and its legs go. Lambs are too small. One sheep per treadmill.
 - **Power:** 20 FE/t while it walks, +20% for each level of Speed (Slowness takes as much off), and +25% while the sheep is sheared and running light. It stores 20,000 FE and pushes up to 200 FE/t into every block around its back half; cables and machines can also pull from either half.
 - **Food:** Wheat or Hay Bales in its slot: right-click it with them, or feed it with a hopper or pipe from any side (they can't take food back out). A Wheat lasts 30 seconds of walking, a Hay Bale nine times that. With nothing to eat the sheep stops and wanders off. A comparator reads how full the slot is.
 - **Stamina:** after 2 minutes of walking the sheep is worn out: it steps off the back and rests for 30 seconds, and won't walk any treadmill until then. Its tiredness stays with the sheep, so a fresh sheep can take over at once. Each Endurance point above 1 (from breeding) adds 25% to how long it walks.
@@ -1017,6 +1017,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | Key | Default | Meaning |
 |---|---|---|
 | `power` | 20 | FE/t while a sheep walks it, before bonuses |
+| `attractRadius` | 8 | How far it calls a sheep over from while it waits with food; 0 = it doesn't |
 | `ticksPerWheat` | 600 | Ticks of walking one Wheat feeds (a Hay Bale nine times as long) |
 | `walkTicks` / `restTicks` | 2400 / 600 | How long a sheep walks before it's worn out, and how long it then rests |
 | `enduranceBonus` | 0.25 | How much longer it walks per Endurance point above 1 |

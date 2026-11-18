@@ -59,7 +59,7 @@ Burns spare wool for power, one item at a time: plain wool and string give 30 FE
 
 ### Sheep Treadmill
 
-A sheep walks its belt for the wheat hanging at the front and makes 20 FE/t, more with Speed or while it's sheared. Keep Wheat or Hay Bales in it, and swap in a fresh sheep when one gets tired: after 2 minutes it rests for 30 seconds, longer walks for sheep bred for Endurance.
+A sheep walks its belt for the wheat hanging at the front and makes 20 FE/t, more with Speed or while it's sheared. With food in it, it calls the nearest sheep over to hop on. Keep Wheat or Hay Bales in it, and swap in a fresh sheep when one gets tired: after 2 minutes it rests for 30 seconds, longer walks for sheep bred for Endurance.
 
 ![Three Sheep Treadmills: a sheep walking the left one, a sheared sheep the middle one, and the right one empty, each with wheat hanging at the front](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/103_sheep_treadmill.png)
 
