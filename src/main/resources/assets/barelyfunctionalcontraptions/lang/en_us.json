@@ -987,5 +987,6 @@
   "item.barelyfunctionalcontraptions.tab_section": "Creative Tab Section",
   "itemGroup.barelyfunctionalcontraptions.section.wool": "Resource Wool",
   "itemGroup.barelyfunctionalcontraptions.section.bales": "Wool Bales",
-  "itemGroup.barelyfunctionalcontraptions.section.eggs": "Spawn Eggs"
+  "itemGroup.barelyfunctionalcontraptions.section.eggs": "Spawn Eggs",
+  "item.barelyfunctionalcontraptions.mycelium_wrench.help.dismantle": "Hit any contraption to pick it up at once, with what's inside."
 }

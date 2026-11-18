@@ -48,6 +48,7 @@ public final class ServerConfig {
     public static final ModConfigSpec.BooleanValue ALLOW_CROSS_DIMENSION_LINKS;
     public static final ModConfigSpec.BooleanValue REQUIRE_SAME_DIMENSION;
     public static final ModConfigSpec.IntValue WRENCH_DURABILITY;
+    public static final ModConfigSpec.BooleanValue WRENCH_DISMANTLE;
     public static final ModConfigSpec.BooleanValue ALLOW_LINK_MERGING;
     public static final ModConfigSpec.BooleanValue SHOW_LINK_PARTICLES;
 
@@ -178,6 +179,9 @@ public final class ServerConfig {
                 .define("require_same_dimension", true);
         WRENCH_DURABILITY = b.comment("Number of successful links a wrench can make before breaking. 0 = unlimited.")
                 .defineInRange("wrench_durability", 0, 0, 1_000_000);
+        WRENCH_DISMANTLE = b.comment("Hitting any of this mod's blocks with the wrench breaks it at once and puts it, and anything that",
+                        "spills out of it, straight into the player's inventory. Dismantling doesn't use up the wrench.")
+                .define("dismantle_blocks", true);
         ALLOW_LINK_MERGING = b.comment("If true, a link may join two existing multi-generator networks into one.",
                         "If false, such links are refused; a single generator can still be linked into a network.")
                 .define("allow_network_merging", true);

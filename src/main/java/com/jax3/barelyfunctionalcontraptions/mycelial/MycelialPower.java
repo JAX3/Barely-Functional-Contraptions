@@ -45,6 +45,7 @@ public final class MycelialPower {
         modBus.addListener(CommonEvents::onConfigReloading);
 
         NeoForge.EVENT_BUS.addListener(CommonEvents::onServerStopped);
+        NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.mycelial.item.WrenchDismantling.class);
         NeoForge.EVENT_BUS.addListener(CommonEvents::onLevelUnload);
         NeoForge.EVENT_BUS.addListener(CommonEvents::onTagsUpdated);
         modBus.addListener((net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent event) ->

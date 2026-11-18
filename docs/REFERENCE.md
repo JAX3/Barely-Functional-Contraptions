@@ -181,6 +181,7 @@ A stylized crowbar, in the same art style as the blocks: purple-painted shaft, s
 * By default, links reach **64 blocks**, each generator can have **8** links, links stay in one dimension, and wrenches never wear out. All of this is configurable in `[network.wrench]`.
 * Links are saved with the world. Breaking a generator removes its links. A link to a generator in an unloaded chunk is kept, and only counts while both chunks are loaded; the mod never loads chunks to keep a link working.
 * The generator GUI's status line shows how it is connected (*Physical*, *Manual*, *Physical + manual* or *Standalone*) and its link count.
+* **Dismantling:** hit (left-click) any of the mod's blocks with the wrench and it breaks at once. The block, with anything that spills out of it (a machine's fuel, wool, input or output), goes straight into your inventory; what doesn't fit drops as usual. It works on every block of the mod, needs no pickaxe, doesn't wear the wrench out, and leaves other mods' blocks alone. Blocks that can't be broken in survival (the Creative Generator) still can't be. Turn it off with `dismantle_blocks = false` in `[network.wrench]`.
 
 #### Wireless power to machines
 The wrench can also power a **Mechanical Separator** or **Automatic Shears** from a generator that isn't touching it.

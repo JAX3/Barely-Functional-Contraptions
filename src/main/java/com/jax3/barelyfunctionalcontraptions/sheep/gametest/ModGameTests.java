@@ -148,6 +148,7 @@ public final class ModGameTests {
         TESTS.put("chiller_freezes_water_with_snow_sheep", ModGameTests::chiller);
         TESTS.put("powered_furnace_smelts_faster_with_blaze_sheep", ModGameTests::poweredFurnace);
         TESTS.put("woollen_armor_takes_the_wool_colour", ModGameTests::woollenArmorColour);
+        TESTS.put("wrench_dismantles_machines_into_the_inventory", ModGameTests::wrenchDismantles);
         TESTS.put("woollen_boots_muffle_the_wearer", ModGameTests::woollenBootsMuffle);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
         if (ModBlocks.SHEEP_TREADMILL != null) TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
@@ -1075,6 +1076,30 @@ public final class ModGameTests {
         var input = net.minecraft.world.item.crafting.CraftingInput.of(width, height, grid);
         return h.getLevel().recipeAccess().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, h.getLevel())
                 .map(r -> r.value().assemble(input)).orElse(ItemStack.EMPTY);
+    }
+
+    /**
+     * Hitting a machine with the wrench breaks it at once and puts it, with what spills out of it, in the player's
+     * inventory; other blocks aren't sped up, and without the wrench a machine breaks normally.
+     */
+    private static void wrenchDismantles(GameTestHelper h) {
+        var player = (net.minecraft.server.level.ServerPlayer) h.makeMockServerPlayer(GameType.SURVIVAL);
+        player.getInventory().clearContent();
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()));
+        BlockPos burnerPos = new BlockPos(2, 1, 2);
+        h.setBlock(burnerPos, ModBlocks.WOOL_BURNER.get());
+        var burner = h.getBlockEntity(burnerPos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity.class);
+        burner.setItem(0, new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.WHITE), 5));
+        var state = h.getBlockState(burnerPos);
+        h.assertTrue(player.getDestroySpeed(state) >= state.getDestroySpeed(h.getLevel(), h.absolutePos(burnerPos)) * 30, "the wrench breaks it in one hit");
+        h.assertTrue(player.getDestroySpeed(Blocks.STONE.defaultBlockState()) <= 1.0F, "but doesn't speed up breaking stone");
+        h.assertTrue(player.gameMode.destroyBlock(h.absolutePos(burnerPos)), "it breaks");
+        h.assertTrue(h.getBlockState(burnerPos).isAir(), "the Wool Burner is gone");
+        h.assertTrue(player.getInventory().contains(new ItemStack(ModItems.WOOL_BURNER.get())), "and in the player's inventory");
+        h.assertTrue(player.getInventory().countItem(Items.WOOL.pick(net.minecraft.world.item.DyeColor.WHITE).asItem()) == 5, "with the wool that was in it");
+        var around = new net.minecraft.world.phys.AABB(h.absolutePos(burnerPos)).inflate(2);
+        h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, around).isEmpty(), "nothing is left on the ground");
+        h.succeed();
     }
 
     /**

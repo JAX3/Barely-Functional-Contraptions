@@ -140,6 +140,38 @@ public final class DevScreenshotHarness {
             poweredFurnaceTick(mc, server);
             return;
         }
+        if ("wrench_dismantle".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            // A survival player with the wrench hits a Powered Furnace (with Raw Iron in it) once, through the real
+            // attack key: it should break at once and both go into the inventory.
+            switch (tick) {
+                case 60 -> server.execute(() -> {
+                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                    origin = player.blockPosition();
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamemode survival @a");
+                    player.getInventory().clearContent();
+                    player.getInventory().setItem(0, new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()));
+                    player.getInventory().setSelectedSlot(0);
+                    BlockPos at = origin.offset(0, 0, -2);
+                    player.level().setBlock(at, ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+                    if (player.level().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity be) {
+                        be.setItem(0, new ItemStack(Items.RAW_IRON, 7));
+                    }
+                });
+                case 70 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 35", origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5));
+                case 90 -> net.minecraft.client.KeyMapping.click(mc.options.keyAttack.getKey());
+                case 110 -> server.execute(() -> {
+                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                    ResourcefulSheep.LOGGER.warn("DISMANTLE block now {}, furnaces {}, raw iron {}",
+                            player.level().getBlockState(origin.offset(0, 0, -2)).getBlock(),
+                            player.getInventory().countItem(ModItems.POWERED_FURNACE.get()), player.getInventory().countItem(Items.RAW_IRON));
+                });
+                case 115 -> mc.execute(() -> mc.gui.setScreen(new InventoryScreen(mc.player)));
+                case 135 -> shot(mc, "wrench_dismantle");
+                case 140 -> mc.stop();
+                default -> {}
+            }
+            return;
+        }
         if ("creative_sections".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             switch (tick) {
                 case 60 -> command(server, "gamemode creative @a");

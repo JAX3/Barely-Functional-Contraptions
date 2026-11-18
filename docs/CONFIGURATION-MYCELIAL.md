@@ -74,6 +74,7 @@ Settings for the **Barely Functional Wrench**, which links generators that are n
 | `allow_cross_dimension_links` | `false` | | Allow links between dimensions (distance is ignored for these). Only works when `require_same_dimension = false`. |
 | `require_same_dimension` | `true` | | Keep links within one dimension. **Overrides** `allow_cross_dimension_links`. |
 | `wrench_durability` | `0` | 0–1,000,000 | Successful links per wrench before it breaks. `0` = unlimited. Creative-mode players never use it up. |
+| `dismantle_blocks` | `true` | | Hitting any of the mod's blocks with the wrench breaks it at once and puts it, with what spills out of it, in the player's inventory. Dismantling doesn't use up the wrench. |
 | `allow_network_merging` | `true` | | If `false`, a link that would join two different multi-generator networks is refused. A lone generator can still be linked into a network. |
 | `show_link_particles` | `true` | | Red and white particles along new links, and a purple outline on the selected generator. |
 

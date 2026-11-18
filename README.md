@@ -173,7 +173,7 @@ The mod's creative tab is split into the same sections as the manual, and the Re
 
 ### Wrench and Links
 
-The Barely Functional Wrench links generators into one network and powers machines wirelessly, up to 64 blocks away. It also sets the sides of pipes.
+The Barely Functional Wrench links generators into one network and powers machines wirelessly, up to 64 blocks away. It also sets the sides of pipes, and hitting any contraption with it picks it up at once, straight into your inventory with whatever was inside.
 
 ![Generators powering machines wirelessly across a gap](docs/screenshots/17_wireless_power.png)
 

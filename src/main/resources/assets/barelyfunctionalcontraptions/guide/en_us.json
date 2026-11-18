@@ -25,7 +25,9 @@
         "- Right-click a generator, then a Mechanical Separator, Automatic Shears or Hume Energy Cube, to power it wirelessly.",
         "- Sneak and right-click a block to remove its links. Sneak and right-click the air to clear your selection.",
         "The generator's screen shows how it is connected and which machines it is powering.",
-        "The wrench also sets each side of a Fluid or Item Pipe: see Pipe Sides."
+        "The wrench also sets each side of a Fluid or Item Pipe: see Pipe Sides.",
+        "## Dismantling",
+        "Hit any contraption with the wrench to pick it up at once. It goes straight into your inventory with whatever was inside it, such as fuel, wool or what it made. What doesn't fit drops on the ground."
       ],
       "tab": "utility"
     },

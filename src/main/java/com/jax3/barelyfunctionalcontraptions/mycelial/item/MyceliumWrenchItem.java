@@ -308,6 +308,9 @@ public class MyceliumWrenchItem extends Item {
         tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.link").withStyle(ChatFormatting.WHITE));
         tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.power").withStyle(ChatFormatting.WHITE));
         tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.unlink").withStyle(ChatFormatting.WHITE));
+        if (ServerConfig.get(ServerConfig.WRENCH_DISMANTLE)) {
+            tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.dismantle").withStyle(ChatFormatting.WHITE));
+        }
         tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.limits",
                 ServerConfig.get(ServerConfig.MAX_LINK_DISTANCE), ServerConfig.get(ServerConfig.MAX_MANUAL_CONNECTIONS))
                 .withStyle(ChatFormatting.DARK_GRAY));
