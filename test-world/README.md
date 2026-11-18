@@ -14,7 +14,7 @@ Cheats are on, so you can use `/tp` to jump between the scenes below. You start 
 
 ## What's where
 
-Every scene except the first two stands on its own stone platform floating at y = 34, in a row running east along
+Every scene except the first two stands on its own platform floating at y = 34, in a row running east along
 z = -9.
 
 | Scene | Teleport |
@@ -38,6 +38,8 @@ z = -9.
 | Wool Packers fed by hoppers, a separator working a bale, and placed Wool Bales of every wool | `/tp @s 282.5 37 -2.5 180 30` |
 | Infusion Altar that has made a Wither sheep (powered by a Creative Generator), and a bred sheep with high stats | `/tp @s 302.5 37 -5.5 180 25` |
 | Snow Sheep Chiller with three Snow sheep, a hopper and chest under it, and its area shown | `/tp @s 322.5 37 -5.5 180 30` |
+| Powered Furnaces fed by hoppers, one alone and one sped up by two Blaze sheep (its area shown) | `/tp @s 342.5 37 -6.5 180 25` |
+| Woollen Armour on armour stands: white, red, light blue and a mixed set | `/tp @s 362.5 35.6 -8 180 12` |
 
 The scenes from the New blocks on were added to the existing world with
 `./gradlew runClient -PscreenshotHarness -PharnessScene=extend_world "-PharnessWorld=BFC Test World"` (unzip this

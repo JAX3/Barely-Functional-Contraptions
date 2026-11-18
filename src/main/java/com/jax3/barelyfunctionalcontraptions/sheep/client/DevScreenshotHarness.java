@@ -1583,11 +1583,10 @@ public final class DevScreenshotHarness {
      * -PharnessWorld="BFC Test World"}.
      */
     private static final Object[][] EXTRA_SCENES = {
-            // Added before, and already in the world: new blocks (x 166), themed sheep (202), blaze furnace (234).
-            {"wool burner", 262},
-            {"wool packer", 282},
-            {"infusion altar", 302},
-            {"snow sheep chiller", 322},
+            // Added before, and already in the world: new blocks (x 166), themed sheep (202), blaze furnace (234),
+            // wool burner (262), wool packer (282), infusion altar (302), snow sheep chiller (322).
+            {"powered furnace", 342},
+            {"woollen armour", 362},
     };
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
@@ -1942,8 +1941,8 @@ public final class DevScreenshotHarness {
 
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
-        // The latest scenes: Wool Burners, Wool Packers, the Infusion Altar and the Snow Sheep Chiller.
-        String[] tps = {"tp @a 262.5 37 -4.5 180 25", "tp @a 282.5 37 -2.5 180 30", "tp @a 302.5 37 -5.5 180 25", "tp @a 322.5 37 -5.5 180 30"};
+        // The latest scenes: the Powered Furnaces and the Woollen Armour.
+        String[] tps = {"tp @a 342.5 37 -6.5 180 25", "tp @a 362.5 35.6 -8 180 12"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -1984,18 +1983,11 @@ public final class DevScreenshotHarness {
                 server.execute(() -> {
                     ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                     player.teleportTo(x + 0.5, 35, -8.5); // exactly on the spot, in case it drifted
+                    // Earlier runs built woolBurnerScene, woolPackerScene, altarScene (with bone blocks and a
+                    // wither rose in its catalyst slots 2 and 3) and chillerScene here.
                     switch (i) {
-                        case 0 -> woolBurnerScene(server);
-                        case 1 -> woolPackerScene(server);
-                        case 2 -> {
-                            altarScene(server);
-                            // All its catalysts in, so the sheep beside it is infused with the Wither.
-                            if (player.level().getBlockEntity(origin.offset(0, 0, -3)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity be) {
-                                be.setItem(2, new ItemStack(Items.BONE_BLOCK, 2));
-                                be.setItem(3, new ItemStack(Items.WITHER_ROSE, 1));
-                            }
-                        }
-                        default -> chillerScene(server);
+                        case 0 -> poweredFurnaceScene(server);
+                        default -> woollenArmorScene(server);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
                 });
