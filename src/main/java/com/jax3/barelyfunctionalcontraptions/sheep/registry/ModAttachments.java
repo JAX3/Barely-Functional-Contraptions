@@ -38,5 +38,12 @@ public final class ModAttachments {
                             walker -> !walker.equals(com.jax3.barelyfunctionalcontraptions.sheep.entity.TreadmillWalker.FRESH))
                     .build());
 
+    /** How worn a sheep's fleece is from a Thermal Reaction Chamber. Persisted while it isn't fresh; server only. */
+    public static final Supplier<AttachmentType<com.jax3.barelyfunctionalcontraptions.sheep.entity.ThermalFatigue>> THERMAL_FATIGUE = REGISTER.register("thermal_fatigue",
+            () -> AttachmentType.builder(() -> com.jax3.barelyfunctionalcontraptions.sheep.entity.ThermalFatigue.FRESH)
+                    .serialize(com.jax3.barelyfunctionalcontraptions.sheep.entity.ThermalFatigue.CODEC,
+                            fatigue -> fatigue.ticks() > 0)
+                    .build());
+
     private ModAttachments() {}
 }

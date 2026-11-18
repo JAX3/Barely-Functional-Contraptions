@@ -3919,6 +3919,265 @@ def generate_sheep_treadmill_gui():
     img.save(out("gui/sheep_treadmill.png"))
 
 
+# ---------------------------------------------------------------------------
+# Thermal Reaction Chamber: the machines' blue-steel casing split down the middle (hot on the left as you face it,
+# cold on the right). Red-hot vent slats on the hot side, frosted ones on the cold side, a gauge panel at the front
+# (two thermometers and the balance needle), water and power ports at the back, and a window on top where flame and
+# snow chase each other while it reacts. Each texture also comes "frozen", frosted over, for when it freezes solid.
+# ---------------------------------------------------------------------------
+TRC_VENTS = [
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSOOOOOOOOSSSO",
+    "OHMOVVVVVVVVOMSO",
+    "OHMOkkkkkkkkOMSO",
+    "OHMOVVVVVVVVOMSO",
+    "OHMOkkkkkkkkOMSO",
+    "OHMOVVVVVVVVOMSO",
+    "OHMOkkkkkkkkOMSO",
+    "OHMOVVVVVVVVOMSO",
+    "OHMOkkkkkkkkOMSO",
+    "OHbSOOOOOOOOSSSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+TRC_FRONT = [
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMMMMMMMbSSO",
+    "OHMOOMOOOOMOOMSO",
+    "OHMOrMOWWOMOuMSO",
+    "OHMOrMOWWOMOuMSO",
+    "OHMOrMOXNOMOuMSO",
+    "OHMOrMOXXOMOuMSO",
+    "OHMORMOOOOMOUMSO",
+    "OHMORMMMMMMOUMSO",
+    "OHMOOMOOOOMOOMSO",
+    "OHMMMMOLLOMMMMSO",
+    "OHBbMMOOOOMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+TRC_BACK = [
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSMMMMMMMMbSSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHOOOOMMMMOOOOSO",
+    "OOuUUuOMMOeEEeOO",
+    "OOUKKUOMMOEKKEOO",
+    "OOUKKUOMMOEKKEOO",
+    "OOuUUuOMMOeEEeOO",
+    "OHOOOOMMMMOOOOSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHMMMMMMMMMMMMSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+TRC_TOP = [
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHMO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbOOOOOOOOOOSSO",
+    "OHMOggggggggOMSO",
+    "OHMOggggggggOMSO",
+    "OHMOggggggggOMSO",
+    "OHMOggggggggOMSO",
+    "OHMOggggggggOMSO",
+    "OHMOggggggggOMSO",
+    "OHMOggggggggOMSO",
+    "OHMOggggggggOMSO",
+    "OHbOOOOOOOOOOSSO",
+    "OHBbMMMMMMMMBbSO",
+    "OHbSSSSSSSSSbSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+TRC_PAL = dict(CARTOON)
+TRC_PAL.update({
+    "r": hexc("#7d3a44"), "R": hexc("#e8561a"),   # hot thermometer: tube / bulb
+    "u": hexc("#2f4560"), "U": hexc("#3f8fcf"),   # cold thermometer / water port ring
+    "W": hexc("#e3e1ea"), "X": hexc("#2a2238"), "N": hexc("#ffffff"),  # dial face / needle
+    "L": hexc("#55d66b"),                          # status light
+    "e": hexc("#c98a12"), "E": hexc("#ffe14a"),   # power port ring
+    "g": hexc("#2a3550"),                          # dark glass
+})
+
+
+def _trc_frost(img, seed):
+    """Frosts a texture over: pale ice creeping in from the edges, with glints."""
+    rnd = random.Random(seed)
+    out_img = img.copy()
+    for y in range(16):
+        for x in range(16):
+            c = img.getpixel((x, y))
+            edge = min(x, y, 15 - x, 15 - y)
+            amount = 0.7 if edge == 0 else 0.55 if edge <= 2 else 0.35
+            amount += rnd.random() * 0.15
+            f = mix(c, ICE[4], amount)
+            if rnd.random() < 0.06:
+                f = ICE[5]
+            out_img.putpixel((x, y), f)
+    return out_img
+
+
+def _trc_window_frame(f, frames):
+    """One frame of the top window: a flame and a snow swirl chasing each other round the glass."""
+    img = Image.new("RGBA", (8, 8), hexc("#2a3550"))
+    angle = 2 * math.pi * f / frames
+    for y in range(8):
+        for x in range(8):
+            dx, dy = x - 3.5, y - 3.5
+            a = math.atan2(dy, dx)
+            r = math.hypot(dx, dy)
+            # Two arms of a spiral, 180 degrees apart: fire and frost.
+            for arm, pal in ((0.0, FIRE), (math.pi, ICE)):
+                d = (a - angle - arm - r * 0.9) % (2 * math.pi)
+                if d < 1.1 and r < 4.2:
+                    t = 1 - d / 1.1
+                    c = pal[3 + min(2, int(t * 3))] if pal is FIRE else pal[2 + min(3, int(t * 4))]
+                    img.putpixel((x, y), mix(img.getpixel((x, y)), c, 0.4 + 0.6 * t))
+            if r < 1.2:
+                img.putpixel((x, y), mix(FIRE[5], ICE[5], 0.5))  # the white-hot, ice-cold core
+    return img
+
+
+def generate_thermal_reaction_chamber():
+    base = "block/thermal_reaction_chamber/"
+    os.makedirs(out(base), exist_ok=True)
+    hot_idle = dict(TRC_PAL, V=hexc("#5a2a22"))
+    cold_idle = dict(TRC_PAL, V=hexc("#2f4560"))
+    textures = {
+        "front": grid(TRC_FRONT, TRC_PAL),
+        "back": grid(TRC_BACK, TRC_PAL),
+        "top": grid(TRC_TOP, TRC_PAL),
+        "bottom": grid(MACHINE_BLOCK, CARTOON),
+        "hot": grid(TRC_VENTS, hot_idle),
+        "cold": grid(TRC_VENTS, cold_idle),
+    }
+    # The hot side has a warm cast, the cold side a frosty one.
+    for x, y in [(x, y) for x in range(16) for y in range(16)]:
+        textures["hot"].putpixel((x, y), mix(textures["hot"].getpixel((x, y)), FIRE[1], 0.12))
+        textures["cold"].putpixel((x, y), mix(textures["cold"].getpixel((x, y)), ICE[3], 0.15))
+    for name, img in textures.items():
+        img.save(out(base + name + ".png"))
+        _trc_frost(img, sum(map(ord, name))).save(out(base + name + "_frozen.png"))
+
+    # Active vents: glowing slats that flicker (4 frames, animated).
+    for side, pal, rows in (("hot", FIRE, (2, 3, 4, 5)), ("cold", ICE, (2, 3, 4, 5))):
+        strip = Image.new("RGBA", (16, 64))
+        for f in range(4):
+            frame = textures[side].copy()
+            for i, y in enumerate((4, 6, 8, 10)):
+                for x in range(4, 12):
+                    flicker = (x * 3 + i * 5 + f * 7) % 9
+                    c = pal[5] if flicker == 0 else pal[4] if flicker < 4 else pal[3]
+                    frame.putpixel((x, y), c)
+                for x in range(4, 12):  # the glow spills onto the slat below
+                    frame.putpixel((x, y + 1), mix(frame.getpixel((x, y + 1)), pal[2], 0.45))
+            strip.paste(frame, (0, f * 16))
+        strip.save(out(base + side + "_active.png"))
+        with open(out(base + side + "_active.png.mcmeta"), "w") as fh:
+            fh.write('{\n  "animation": {\n    "frametime": 3,\n    "interpolate": true\n  }\n}\n')
+
+    # Active top: the window's swirl, 16 frames.
+    frames = 16
+    strip = Image.new("RGBA", (16, 16 * frames))
+    for f in range(frames):
+        frame = textures["top"].copy()
+        frame.paste(_trc_window_frame(f, frames), (4, 4))
+        strip.paste(frame, (0, f * 16))
+    strip.save(out(base + "top_active.png"))
+    with open(out(base + "top_active.png.mcmeta"), "w") as fh:
+        fh.write('{\n  "animation": {\n    "frametime": 2\n  }\n}\n')
+
+    # Fins on the sides: plain casing metal for the hot side (scorched) and the cold side (frosted).
+    fin = Image.new("RGBA", (16, 16), CARTOON["M"])
+    for x in range(16):
+        fin.putpixel((x, 0), CARTOON["H"]); fin.putpixel((x, 15), CARTOON["O"])
+    for name, tint, amount in (("fin_hot", FIRE[1], 0.25), ("fin_cold", ICE[4], 0.35)):
+        img = fin.copy()
+        for x in range(16):
+            for y in range(16):
+                img.putpixel((x, y), mix(img.getpixel((x, y)), tint, amount))
+        img.save(out(base + name + ".png"))
+        _trc_frost(img, len(name)).save(out(base + name + "_frozen.png"))
+
+
+def generate_thermal_reaction_chamber_gui():
+    """Thermal Reaction Chamber window: energy gauge, hot thermometer, centre panel (pairs, output, balance scale,
+    danger bar), cold thermometer, water gauge, the two boost slots with burn bars."""
+    shears = Image.open(out("gui/automatic_shears.png")).convert("RGBA")
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    for gx in (10, 135):                              # energy and water gauges, fill 30x64 at (11|136, 19)
+        inset(img, gx, 18, gx + 32, 84, GUI["gauge"])
+        for k in range(1, 8):
+            ty = 19 + round(64 * k / 8)
+            for x in range(gx + 26, gx + 31):
+                img.putpixel((x, ty), GUI["tick"])
+    inset(img, 47, 18, 57, 84, GUI["gauge"])          # hot thermometer, fill 8x64 at (48, 19)
+    inset(img, 121, 18, 131, 84, GUI["gauge"])        # cold thermometer, fill 8x64 at (122, 19)
+    inset(img, 61, 16, 117, 57, GUI["panel"])         # centre panel
+    inset(img, 61, 49, 117, 57, GUI["gauge"])         # danger bar housing, fill 62..115 x 51..54
+    slot(img, 67, 62)                                 # Blaze Rod
+    slot(img, 95, 62)                                 # Blue Ice
+    inset(img, 65, 80, 84, 85, GUI["gauge"])          # burn bars, fill 66..82 x 81..83
+    inset(img, 93, 80, 112, 85, GUI["gauge"])
+    # Faint item hints in the empty boost slots: a rod and a block of ice.
+    for i in range(10):
+        img.putpixel((70 + i, 74 - i), mix(GUI["gauge"], FIRE[3], 0.35))
+    for y in range(66, 74):
+        for x in range(99, 107):
+            if x in (99, 106) or y in (66, 73):
+                img.putpixel((x, y), mix(GUI["gauge"], ICE[3], 0.35))
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    rnd = random.Random(97)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 190), rnd.choice(FIRE[2:5] if x < 88 else ICE[2:5]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    img.paste(shears.crop((176, 64, 208, 80)), (176, 146))          # area button background
+    for u, top, bottom, shine in ((176, FIRE[4], FIRE[1], FIRE[5]), (206, hexc("#2f6fd0"), hexc("#163a8a"), hexc("#7fb8ff"))):
+        for y in range(64):                                         # energy (amber) and water (blue) fills
+            for x in range(30):
+                c = mix(top, bottom, y / 63.0)
+                if (x + y) % 4 == 0:
+                    c = mix(c, shine, 0.2)
+                img.putpixel((u + x, y), c)
+        for f in range(4):                                          # surface shimmer
+            for x in range(30):
+                img.putpixel((u + x, 66 + f * 2), shine if (x + f * 2) % 8 == 0 else top)
+                img.putpixel((u + x, 67 + f * 2), mix(top, bottom, 0.3))
+    for x in range(50):                                             # balance scale: hot (left) to cold (right)
+        t = x / 49.0
+        c = mix(FIRE[3], hexc("#8a8e9a"), t * 2) if t < 0.5 else mix(hexc("#8a8e9a"), ICE[3], (t - 0.5) * 2)
+        for y in range(6):
+            img.putpixel((176 + x, 80 + y), mix(c, CARTOON["O"], 0.35) if y in (0, 5) else c)
+        if x in (24, 25):
+            for y in range(6):
+                img.putpixel((176 + x, 80 + y), hexc("#e3e1ea"))   # the balanced mark
+    for u, pal in ((176, FIRE), (186, ICE)):                        # thermometer fills, 8x64
+        for y in range(64):
+            for x in range(8):
+                c = mix(pal[4], pal[1], y / 63.0)
+                if x == 1:
+                    c = mix(c, pal[5], 0.5)
+                img.putpixel((u + x, 90 + y), c)
+    img.save(out("gui/thermal_reaction_chamber.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -3959,6 +4218,8 @@ def main():
     generate_chiller_gui()
     generate_chiller_block()
     generate_powered_furnace()
+    generate_thermal_reaction_chamber()
+    generate_thermal_reaction_chamber_gui()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

@@ -71,13 +71,19 @@ Burns red or brown mushrooms and water for 200–250 FE/t. Generators that touch
 
 ![Machine fronts, idle and running](docs/screenshots/14_machine_fronts.png)
 
-**Late game:** Zero Point Module. It costs a Nether Star and makes the most power, with no fuel.
+**Late game:** Zero Point Module and Thermal Reaction Chamber. They cost a Nether Star and make the most power.
 
 ### Zero Point Module
 
 Two modules facing each other across open space link with a beam and make 1,000 FE/t for every block of gap, up to 64. Stained glass in the gap colours the beam, and the beam burns anything that walks into it.
 
 ![Two Zero Point Energy Modules joined by a beam coloured by stained glass](docs/screenshots/34_zero_point_coloured_beam.png)
+
+### Thermal Reaction Chamber
+
+Makes power from the difference between hot and cold: Blaze sheep in a pen against its hot side, Snow sheep in a pen against its cold side, and water through the middle. Each Blaze sheep matched by a Snow sheep is a pair: 2,500 FE/t for one, up to about 10,100 FE/t for six, doubled while a Blaze Rod and Blue Ice burn together. Keep the herds even. Left running hot for 30 seconds it melts down and explodes; left running cold, it freezes itself into Packed Ice. It drinks 250 mB of water a tick, and after an hour each sheep's fleece is spent until you infuse it again.
+
+![Three Thermal Reaction Chambers, the middle one with three Blaze sheep and three Snow sheep in its outlined pens](docs/screenshots/105_thermal_reaction_chamber.png)
 
 ### Energy Storage
 

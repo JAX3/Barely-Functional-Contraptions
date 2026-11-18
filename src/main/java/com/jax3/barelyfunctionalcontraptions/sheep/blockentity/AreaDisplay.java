@@ -19,6 +19,16 @@ public interface AreaDisplay {
     /** Outline colour, ARGB. */
     int areaColor();
 
+    /** Every area to outline: the one {@link #displayedArea()} unless a machine works on more than one (two pens). */
+    default java.util.List<AABB> displayedAreas() {
+        return java.util.List.of(displayedArea());
+    }
+
+    /** Outline colour of {@code displayedAreas().get(index)}, ARGB. */
+    default int areaColor(int index) {
+        return areaColor();
+    }
+
     default boolean toggleArea() {
         setShowsArea(!showsArea());
         return showsArea();

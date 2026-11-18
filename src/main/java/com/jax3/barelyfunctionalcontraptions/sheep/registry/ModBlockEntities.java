@@ -26,6 +26,8 @@ public final class ModBlockEntities {
 
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity>> SHEEP_TREADMILL = REGISTER.register("sheep_treadmill",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity::new, ModBlocks.SHEEP_TREADMILL.get()));
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity>> THERMAL_REACTION_CHAMBER = REGISTER.register("thermal_reaction_chamber",
+            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity::new, ModBlocks.THERMAL_REACTION_CHAMBER.get()));
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity>> WOOL_BURNER = REGISTER.register("wool_burner",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity::new, ModBlocks.WOOL_BURNER.get()));
 

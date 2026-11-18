@@ -48,6 +48,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> HUME_FIELD_GENERATOR = ModBlocks.HUME_FIELD_GENERATOR == null ? null
             : REGISTER.registerSimpleBlockItem(ModBlocks.HUME_FIELD_GENERATOR);
     public static final DeferredItem<BlockItem> SHEEP_TREADMILL = REGISTER.registerSimpleBlockItem(ModBlocks.SHEEP_TREADMILL);
+    public static final DeferredItem<BlockItem> THERMAL_REACTION_CHAMBER = REGISTER.registerSimpleBlockItem(ModBlocks.THERMAL_REACTION_CHAMBER);
 
     /** 9 resource wool in one; like resource wool, the {@link ModDataComponents#SHEEP_RESOURCE} component says which. */
     public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem> WOOL_BALE = REGISTER.registerItem("wool_bale",

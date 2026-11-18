@@ -220,6 +220,8 @@ public final class SheepInfusionEvents {
             if (same) {
                 int max = infusionUses(sheep, resource);
                 boolean canRefresh = ModConfigs.getBool(ModConfigs.SERVER.sameResourceRefreshesUses) && max > 0 && current.usesRemaining() < max;
+                // A fleece spent in a Thermal Reaction Chamber can always be infused again to renew it.
+                if (sheep.getData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.THERMAL_FATIGUE).spent()) canRefresh = true;
                 if (!canRefresh) return Component.translatable("message.barelyfunctionalcontraptions.already_infused", resource.name());
             } else if (!creativeBypass && !ModConfigs.getBool(ModConfigs.SERVER.allowReplacingInfusion)) {
                 return Component.translatable("message.barelyfunctionalcontraptions.already_infused_other",
@@ -232,6 +234,7 @@ public final class SheepInfusionEvents {
     /** Infuses {@code sheep} with {@code resource} without a player (the Infusion Altar), with the usual effects. */
     public static void infuseFromAltar(ServerLevel level, LivingEntity sheep, SheepResource resource) {
         setInfusion(sheep, getInfusion(sheep).withResource(resource.id(), infusionUses(sheep, resource)));
+        sheep.removeData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.THERMAL_FATIGUE); // a fresh fleece
         sheep.gameEvent(GameEvent.EAT);
         level.playSound(null, sheep, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.NEUTRAL, 1.0F, 0.8F);
         level.playSound(null, sheep, SoundEvents.SHEEP_AMBIENT, SoundSource.NEUTRAL, 1.0F, 1.3F);
@@ -244,6 +247,7 @@ public final class SheepInfusionEvents {
     static void infuse(ServerLevel level, Player player, LivingEntity sheep, SheepResource resource, ItemStack stack) {
         SheepInfusion current = getInfusion(sheep);
         setInfusion(sheep, current.withResource(resource.id(), infusionUses(sheep, resource)));
+        sheep.removeData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.THERMAL_FATIGUE); // a fresh fleece
 
         boolean consume = !player.hasInfiniteMaterials() || ModConfigs.getBool(ModConfigs.SERVER.creativeConsumesItems);
         if (consume) stack.shrink(resource.effectiveFeedingAmount());

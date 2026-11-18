@@ -163,6 +163,30 @@
       ]
     },
     {
+      "title": "Thermal Reaction Chamber",
+      "icon": "barelyfunctionalcontraptions:thermal_reaction_chamber",
+      "tab": "power",
+      "group": "Late Game",
+      "text": [
+        "Makes power from the difference between hot and cold. Blaze sheep stand in a pen against its hot side, Snow sheep in a pen against its cold side, and water runs through the middle.",
+        "Looking at its gauge panel, the hot side (red vents) is on the left and the cold side (blue vents) on the right. Each pen is 5x5 and starts one block out from that side. Sneak-right-click it with an empty hand to outline both. Water and power go in and out of any face, but the back has the ports.",
+        "## Power",
+        "- A Blaze sheep matched by a Snow sheep is a pair. The first pair makes 2,500 FE/t and each one after it a little less: about 4,700 for two, 8,000 for four and 10,100 for six, the most it counts.",
+        "- Only grown sheep with their fleece on count.",
+        "- A Blaze Rod in the hot slot and Blue Ice in the cold slot each burn for 30 seconds. While both burn, the output doubles. Hoppers and pipes can fill both slots.",
+        "- It stores 2,000,000 FE and pushes up to 40,000 FE/t into the blocks around it.",
+        "## Keeping it balanced",
+        "The needle in its window shows the balance. Every sheep without a partner on the other side, or a boost burning alone, tips it one step and costs a quarter of the output.",
+        "- Running hot for 30 seconds causes a meltdown. The Blaze sheep are singed bare and it explodes like TNT.",
+        "- Running cold for 30 seconds freezes it solid. It encases itself in Packed Ice and won't restart until you mine every block of it away.",
+        "- Running balanced counts the danger back down. The danger bar under the needle shows how close it is, and a comparator reads it (0 is steady, 15 is about to go), so you can wire up a safety cut-off.",
+        "## Upkeep",
+        "- Water: 250 mB a tick while it reacts, what five Fluid Reservoirs make. If it runs dry it stops and blasts scalding steam out of its front for a few seconds.",
+        "- Fatigue: after an hour of reacting, a sheep's fleece is spent and it stops counting. Infuse it again, at the Infusion Altar or by hand, to renew it.",
+        "If neither pen has a partner for the other, it just waits: a pen of Blaze sheep on their own can't melt it down."
+      ]
+    },
+    {
       "title": "Energy Storage",
       "icon": "barelyfunctionalcontraptions:hume_energy_cube",
       "tab": "power",

@@ -72,6 +72,7 @@ public final class ModGameTests {
     private static final Identifier STRUCTURE = ResourcefulSheep.id("test_platform");
     private static final Map<String, Consumer<GameTestHelper>> TESTS = new java.util.LinkedHashMap<>();
     private static final java.util.Map<String, Consumer<GameTestHelper>> RELOAD_TESTS = new java.util.LinkedHashMap<>();
+    private static final java.util.Map<String, Consumer<GameTestHelper>> SOLO_TESTS = new java.util.LinkedHashMap<>();
 
     /** The one test that needs more than 400 ticks: a whole bale takes 45 seconds. */
     private static final String LONG_BALE_TEST = "separator_separates_a_whole_bale";
@@ -155,6 +156,11 @@ public final class ModGameTests {
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
         TESTS.put("separator_takes_power_fast_enough_for_a_wither_bale", ModGameTests::separatorFeedsCostlyBales);
+        TESTS.put("thermal_reaction_chamber_makes_power_from_pairs", ModGameTests::thermalPower);
+        TESTS.put("thermal_reaction_chamber_runs_dry_and_vents_steam", ModGameTests::thermalDry);
+        TESTS.put("thermal_reaction_chamber_spent_fleece_stops_counting", ModGameTests::thermalFatigue);
+        SOLO_TESTS.put("thermal_reaction_chamber_melts_down_when_hot", ModGameTests::thermalMeltdown);
+        SOLO_TESTS.put("thermal_reaction_chamber_freezes_solid_when_cold", ModGameTests::thermalFreeze);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
         TESTS.put("energy_cable_carries_generator_power", ModGameTests::cableCarriesPower);
         TESTS.put("energy_cable_cube_powers_machines_not_cubes", ModGameTests::cableCubeToMachine);
@@ -193,6 +199,7 @@ public final class ModGameTests {
         RELOAD_TESTS.put("generated_resource_keeps_infusion", ModGameTests::generatedResourceKeepsInfusion);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
+        SOLO_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
     }
 
     private ModGameTests() {}
@@ -210,6 +217,12 @@ public final class ModGameTests {
         for (String name : RELOAD_TESTS.keySet()) {
             ResourceKey<Consumer<GameTestHelper>> fn = ResourceKey.create(Registries.TEST_FUNCTION, ResourcefulSheep.id(name));
             event.registerTest(ResourcefulSheep.id(name), new FunctionGameTestInstance(fn, new TestData<>(reloadEnv, STRUCTURE, 1200, 0, true)));
+        }
+        // Long tests that explode or freeze the blocks around them each get a batch of their own, away from the others.
+        for (String name : SOLO_TESTS.keySet()) {
+            Holder<TestEnvironmentDefinition<?>> soloEnv = event.registerEnvironment(ResourcefulSheep.id("solo_" + name), new TestEnvironmentDefinition.AllOf());
+            ResourceKey<Consumer<GameTestHelper>> fn = ResourceKey.create(Registries.TEST_FUNCTION, ResourcefulSheep.id(name));
+            event.registerTest(ResourcefulSheep.id(name), new FunctionGameTestInstance(fn, new TestData<>(soloEnv, STRUCTURE, 1200, 0, true)));
         }
     }
 
@@ -1270,6 +1283,152 @@ public final class ModGameTests {
             h.assertFalse(quiet.hasEffect(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModEffects.MUFFLED), "without the boots Muffled wears off");
             h.assertFalse(silencedAtFeet.apply(quiet), "and it makes sounds again");
             h.succeed();
+        });
+    }
+
+    // ------------------------------------------------------------------ Thermal Reaction Chamber
+
+    private static final BlockPos TRC = new BlockPos(3, 1, 3);
+
+    /**
+     * A Thermal Reaction Chamber facing north in the middle of the platform with water, and Blaze sheep on its hot
+     * (east) side and Snow sheep on its cold (west) side, one and two blocks out.
+     */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity chamber(GameTestHelper h, int blaze, int snow, int buckets) {
+        h.setBlock(TRC, ModBlocks.THERMAL_REACTION_CHAMBER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock.FACING, Direction.NORTH));
+        var be = h.getBlockEntity(TRC, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.class);
+        for (int i = 0; i < buckets; i++) be.fillFromBucket();
+        for (int i = 0; i < blaze; i++) sheepAt(h, new BlockPos(4 + i % 2, 1, 1 + i / 2 * 2 + i % 2), ResourcefulSheep.id("blaze"));
+        for (int i = 0; i < snow; i++) sheepAt(h, new BlockPos(2 - i % 2, 1, 1 + i / 2 * 2 + i % 2), ResourcefulSheep.id("snow"));
+        return be;
+    }
+
+    /** Keeps its tank topped up through its fluid capability, as a Fluid Reservoir would. */
+    private static void keepWatered(GameTestHelper h) {
+        h.onEachTick(() -> {
+            var handler = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, h.absolutePos(TRC), Direction.SOUTH);
+            if (handler == null) return;
+            try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                handler.insert(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.WATER, 1000, tx);
+                tx.commit();
+            }
+        });
+    }
+
+    /**
+     * Two balanced pairs make the falloff's power for two pairs and use water; a Blaze Rod and Blue Ice burning
+     * together double it; the power can be taken out of any face and water can't.
+     */
+    private static void thermalPower(GameTestHelper h) {
+        var type = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.class;
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.powerFrom(1) == 2500, "one pair makes 2,500 FE/t");
+        int two = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.powerFrom(2);
+        int six = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.powerFrom(6);
+        h.assertTrue(two > 2500 && two < 5000 && six >= 9000 && six <= 11000, "more pairs add less each: two " + two + ", six " + six);
+        var be = chamber(h, 2, 2, 16);
+        h.runAfterDelay(30, () -> {
+            h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.State.REACTING, "two pairs react, state " + be.state());
+            h.assertTrue(be.pairs() == 2 && be.balance() == 0, "it counts two balanced pairs, got " + be.pairs() + " / " + be.balance());
+            h.assertTrue(be.generating() == two, "two pairs make " + two + " FE/t, got " + be.generating());
+            h.assertTrue(be.getTank().getAmount() < 16_000, "it uses water");
+            h.assertTrue(be.getEnergyHandler().getAmountAsInt() > 0, "and stores power");
+            h.assertTrue(h.getBlockState(TRC).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock.ACTIVE), "its vents glow");
+            var energy = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, h.absolutePos(TRC), Direction.UP);
+            var fluid = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, h.absolutePos(TRC), Direction.SOUTH);
+            try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                h.assertTrue(energy.extract(1000, tx) == 1000, "power comes out");
+                h.assertTrue(energy.insert(1000, tx) == 0, "and none goes in");
+                h.assertTrue(fluid.extract(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.WATER, 1000, tx) == 0, "water doesn't come out");
+            }
+            be.setItem(0, new ItemStack(Items.BLAZE_ROD));
+            be.setItem(1, new ItemStack(Items.BLUE_ICE));
+            h.assertTrue(!be.canPlaceItem(0, new ItemStack(Items.BLUE_ICE)) && !be.canPlaceItem(1, new ItemStack(Items.BLAZE_ROD)), "each boost has its own slot");
+        });
+        h.runAfterDelay(40, () -> {
+            h.assertTrue(be.getItem(0).isEmpty() && be.getItem(1).isEmpty(), "both boosts are lit");
+            h.assertTrue(be.balance() == 0, "burning together they keep the balance");
+            h.assertTrue(be.generating() == two * 2, "and double the power: " + be.generating());
+            h.succeed();
+        });
+    }
+
+    /** One pair with a bucket of water reacts until it runs dry, then stops and scalds a sheep standing in front. */
+    private static void thermalDry(GameTestHelper h) {
+        var be = chamber(h, 1, 1, 1);
+        Sheep bystander = sheepAt(h, new BlockPos(3, 1, 2), null);
+        float health = bystander.getHealth();
+        h.runAfterDelay(60, () -> {
+            h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.State.NO_WATER, "it stops without water, state " + be.state());
+            h.assertTrue(be.generating() == 0, "and makes nothing");
+            h.assertTrue(bystander.getHealth() < health, "its steam scalds whatever is in front of it");
+            h.succeed();
+        });
+    }
+
+    /**
+     * A Snow sheep whose fleece is spent doesn't count, so the chamber waits for a partner for its Blaze sheep; infusing
+     * it again renews the fleece and it reacts.
+     */
+    private static void thermalFatigue(GameTestHelper h) {
+        var be = chamber(h, 1, 0, 16);
+        Sheep snow = sheepAt(h, new BlockPos(2, 1, 3), ResourcefulSheep.id("snow"));
+        snow.setData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.THERMAL_FATIGUE,
+                new com.jax3.barelyfunctionalcontraptions.sheep.entity.ThermalFatigue(ModConfigs.getInt(ModConfigs.SERVER.thermalFatigueTicks)));
+        h.runAfterDelay(25, () -> {
+            h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.State.NEEDS_HERDS,
+                    "a spent sheep doesn't count, state " + be.state());
+            h.assertTrue(be.spent() == 1, "it notices the spent sheep");
+            h.assertTrue(be.instability() == 0, "and a lone Blaze sheep can't overheat it");
+            var resource = SheepResourceRegistry.server().byId(ResourcefulSheep.id("snow")).orElseThrow();
+            h.assertTrue(SheepInfusionEvents.checkSheep(snow, resource, false) == null, "a spent sheep can be infused again");
+            SheepInfusionEvents.infuseFromAltar(h.getLevel(), snow, resource);
+            h.assertTrue(!com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.isSpent(snow), "which renews its fleece");
+        });
+        h.runAfterDelay(50, () -> {
+            h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.State.REACTING, "then it reacts, state " + be.state());
+            h.assertTrue(snow.getData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.THERMAL_FATIGUE).ticks() > 0, "and the fleece wears again");
+            h.succeed();
+        });
+    }
+
+    /** Two Blaze sheep against one Snow sheep run it hot: power drops, a comparator reads the danger, and it melts down. */
+    private static void thermalMeltdown(GameTestHelper h) {
+        var be = chamber(h, 2, 1, 16);
+        keepWatered(h);
+        Sheep blaze = h.getLevel().getEntitiesOfClass(Sheep.class, new net.minecraft.world.phys.AABB(h.absolutePos(new BlockPos(4, 1, 1))).inflate(0.5)).getFirst();
+        h.runAfterDelay(100, () -> {
+            h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.State.RUNNING_HOT, "it runs hot, state " + be.state());
+            h.assertTrue(be.balance() == 1, "one step hot, got " + be.balance());
+            h.assertTrue(be.generating() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.power(1, false, 1)
+                    && be.generating() < 2500, "and loses a quarter of its power: " + be.generating());
+            h.assertTrue(be.comparatorSignal() > 0, "a comparator reads the danger");
+        });
+        h.succeedWhen(() -> {
+            h.assertBlockNotPresent(ModBlocks.THERMAL_REACTION_CHAMBER.get(), TRC);
+            h.assertTrue(blaze.isSheared(), "the hot side's sheep are singed bare");
+        });
+    }
+
+    /** One Blaze sheep against two Snow sheep run it cold until it freezes solid; mining the ice away thaws it. */
+    private static void thermalFreeze(GameTestHelper h) {
+        var be = chamber(h, 1, 2, 16);
+        keepWatered(h);
+        boolean[] thawed = {false};
+        h.onEachTick(() -> {
+            if (be.frozen() && !thawed[0]) {
+                h.assertTrue(h.getBlockState(TRC.above()).is(Blocks.PACKED_ICE), "it encases itself in Packed Ice");
+                h.assertTrue(h.getBlockState(TRC).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock.FROZEN), "and frosts over");
+                h.assertTrue(be.generating() == 0, "frozen, it makes nothing");
+                thawed[0] = true;
+                for (Direction dir : Direction.values()) {
+                    if (h.getBlockState(TRC.relative(dir)).is(Blocks.PACKED_ICE)) h.setBlock(TRC.relative(dir), Blocks.AIR);
+                }
+            }
+        });
+        h.succeedWhen(() -> {
+            h.assertTrue(thawed[0], "it froze");
+            h.assertTrue(!be.frozen(), "with the ice gone it thaws");
         });
     }
 

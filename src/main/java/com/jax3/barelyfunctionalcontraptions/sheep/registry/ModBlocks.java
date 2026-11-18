@@ -187,6 +187,13 @@ public final class ModBlocks {
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock::new,
                     p -> p.mapColor(MapColor.COLOR_PURPLE).strength(3.5F, 6.0F).sound(SoundType.IRON).noOcclusion().lightLevel(state -> 7));
 
+    /** Late-game generator: power from Blaze sheep on its hot side against Snow sheep on its cold side. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock> THERMAL_REACTION_CHAMBER =
+            REGISTER.registerBlock("thermal_reaction_chamber",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock::new,
+                    p -> p.mapColor(MapColor.COLOR_BLUE).strength(5.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON)
+                            .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock.ACTIVE) ? 10 : 0));
+
     /** A sheep walks its belt for wheat and makes FE. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock> SHEEP_TREADMILL =
             REGISTER.registerBlock("sheep_treadmill",

@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "active=false,facing=north,frozen=false": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber"
+    },
+    "active=false,facing=east,frozen=false": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber",
+      "y": 90
+    },
+    "active=false,facing=south,frozen=false": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber",
+      "y": 180
+    },
+    "active=false,facing=west,frozen=false": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber",
+      "y": 270
+    },
+    "active=true,facing=north,frozen=false": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_active"
+    },
+    "active=true,facing=east,frozen=false": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_active",
+      "y": 90
+    },
+    "active=true,facing=south,frozen=false": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_active",
+      "y": 180
+    },
+    "active=true,facing=west,frozen=false": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_active",
+      "y": 270
+    },
+    "active=false,facing=north,frozen=true": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_frozen"
+    },
+    "active=false,facing=east,frozen=true": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_frozen",
+      "y": 90
+    },
+    "active=false,facing=south,frozen=true": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_frozen",
+      "y": 180
+    },
+    "active=false,facing=west,frozen=true": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_frozen",
+      "y": 270
+    },
+    "active=true,facing=north,frozen=true": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_frozen"
+    },
+    "active=true,facing=east,frozen=true": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_frozen",
+      "y": 90
+    },
+    "active=true,facing=south,frozen=true": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_frozen",
+      "y": 180
+    },
+    "active=true,facing=west,frozen=true": {
+      "model": "barelyfunctionalcontraptions:block/thermal_reaction_chamber_frozen",
+      "y": 270
+    }
+  }
+}

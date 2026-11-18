@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/blaze_furnace",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:thermal_reaction_chamber"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.thermal_reaction_chamber.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.thermal_reaction_chamber.description"
+    },
+    "frame": "challenge"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

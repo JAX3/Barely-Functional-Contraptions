@@ -209,6 +209,10 @@ public final class DevScreenshotHarness {
             oreLineTick(mc, server);
             return;
         }
+        if ("thermal_reaction_chamber".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            thermalTick(mc, server);
+            return;
+        }
         if ("sheep_treadmill".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             sheepTreadmillTick(mc, server);
             return;
@@ -2076,6 +2080,129 @@ public final class DevScreenshotHarness {
                 });
             }
             case 405 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    /** The chambers of the Thermal Reaction Chamber scene, kept topped up with water: balanced, running cold, running hot. */
+    private static final java.util.List<BlockPos> THERMAL_CHAMBERS = new java.util.ArrayList<>();
+
+    /**
+     * Three Thermal Reaction Chambers facing the camera on a stone floor, Blaze sheep in the pen on each one's hot (left)
+     * side and Snow sheep on its cold (right) side, a Fluid Reservoir behind each: the middle one balanced with three
+     * pairs and both boosts, its pens outlined; the right one with a Snow sheep too many (it freezes); the left one with a
+     * Blaze sheep too many (it runs hot).
+     */
+    private static void thermalScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        for (BlockPos p : BlockPos.betweenClosed(origin.offset(-22, 0, -12), origin.offset(22, 6, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(origin.offset(-22, -1, -12), origin.offset(22, -1, 4))) {
+            level.setBlock(p, Math.floorMod(p.getX() + p.getZ(), 2) == 0 ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
+        }
+        THERMAL_CHAMBERS.clear();
+        int[][] herds = {{3, 3}, {1, 2}, {2, 1}}; // middle, right, left
+        int[] offsets = {0, 15, -15};
+        for (int c = 0; c < 3; c++) {
+            BlockPos at = origin.offset(offsets[c], 0, -5);
+            level.setBlock(at, ModBlocks.THERMAL_REACTION_CHAMBER.get().defaultBlockState()
+                    .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock.FACING, Direction.SOUTH), 3);
+            level.setBlock(at.north(), ModBlocks.FLUID_RESERVOIR.get().defaultBlockState(), 3);
+            THERMAL_CHAMBERS.add(at);
+            if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity be) {
+                if (c == 0) {
+                    be.setItem(0, new ItemStack(Items.BLAZE_ROD, 16));
+                    be.setItem(1, new ItemStack(Items.BLUE_ICE, 16));
+                    be.setShowsArea(true);
+                }
+            }
+            // Facing south, the hot side is west (the camera's left) and the cold side east.
+            for (int side = 0; side < 2; side++) {
+                int dir = side == 0 ? -1 : 1;
+                // A low fence round the pen, on its outside edge.
+                for (BlockPos p : BlockPos.betweenClosed(at.offset(dir > 0 ? 1 : -6, 0, -3), at.offset(dir > 0 ? 6 : -1, 0, 3))) {
+                    boolean edge = p.getX() == at.getX() + dir * 6 || p.getZ() == at.getZ() - 3 || p.getZ() == at.getZ() + 3;
+                    if (edge) level.setBlock(p, (side == 0 ? Blocks.NETHER_BRICK_FENCE : Blocks.SPRUCE_FENCE).defaultBlockState(), 3);
+                }
+                for (int i = 0; i < herds[c][side]; i++) {
+                    Sheep sheep = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+                    sheep.snapTo(at.getX() + 0.5 + dir * (1.6 + (i % 2) * 2.2), at.getY(), at.getZ() + 0.5 + (i - 1) * 1.6, dir > 0 ? 90 : 270, 0);
+                    sheep.setNoAi(true);
+                    SheepInfusionEvents.setInfusion(sheep, new SheepInfusion(Optional.of(ResourcefulSheep.id(side == 0 ? "blaze" : "snow")), 9, 0));
+                    level.addFreshEntity(sheep);
+                }
+            }
+        }
+    }
+
+    /** Tops up each chamber's water, as the reservoir behind it would. */
+    private static void waterThermalChambers(MinecraftServer server) {
+        server.execute(() -> {
+            ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+            for (BlockPos at : THERMAL_CHAMBERS) {
+                var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, at, Direction.NORTH);
+                if (handler == null) continue;
+                try (Transaction tx = Transaction.openRoot()) {
+                    handler.insert(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.WATER, 1000, tx);
+                    tx.commit();
+                }
+                // And something using its power, so its buffer never fills and it keeps reacting.
+                var energy = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, at, Direction.UP);
+                if (energy != null) {
+                    try (Transaction tx = Transaction.openRoot()) {
+                        energy.extract(Integer.MAX_VALUE, tx);
+                        tx.commit();
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * The Thermal Reaction Chamber: three chambers reacting, a close-up, the middle one's window, the left one running
+     * hot and the right one frozen solid: {@code -PharnessScene=thermal_reaction_chamber}.
+     */
+    private static void thermalTick(Minecraft mc, MinecraftServer server) {
+        if (tick > 60 && !THERMAL_CHAMBERS.isEmpty()) waterThermalChambers(server);
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                thermalScene(server);
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamemode spectator @a");
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 32", origin.getX() + 0.5, origin.getY() + 6.5, origin.getZ() + 5.5));
+            case 130 -> shot(mc, "105_thermal_reaction_chamber");
+            case 132 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 205 22", origin.getX() - 1.2, origin.getY() + 1.6, origin.getZ() - 2.0));
+            case 160 -> shot(mc, "105_thermal_reaction_chamber_close");
+            case 162 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 150 22", origin.getX() + 2.2, origin.getY() + 1.6, origin.getZ() - 2.0));
+            case 190 -> shot(mc, "105_thermal_reaction_chamber_cold_side");
+            case 192 -> {
+                setHudHidden(mc, false);
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 0.5, origin.getY(), origin.getZ() - 2.5));
+            }
+            case 200 -> openAt(server, origin.offset(0, 0, -5));
+            case 230 -> shot(mc, "105_thermal_reaction_chamber_gui");
+            case 232 -> mc.execute(() -> mc.gui.setScreen(null));
+            case 236 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() - 14.5, origin.getY(), origin.getZ() - 2.5));
+            case 250 -> openAt(server, origin.offset(-15, 0, -5));
+            case 300 -> shot(mc, "105_thermal_reaction_chamber_gui_hot");
+            case 302 -> {
+                mc.execute(() -> mc.gui.setScreen(null));
+                command(server, "gamemode spectator @a");
+                setHudHidden(mc, true);
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 25", origin.getX() - 14.5, origin.getY() + 2.4, origin.getZ() - 1.5));
+            }
+            case 340 -> shot(mc, "105_thermal_reaction_chamber_running_hot");
+            case 342 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 25", origin.getX() + 15.5, origin.getY() + 2.4, origin.getZ() - 1.5));
+            case 760 -> shot(mc, "105_thermal_reaction_chamber_frozen");
+            case 762 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 32", origin.getX() - 14.5, origin.getY() + 6.5, origin.getZ() + 5.5));
+            case 790 -> shot(mc, "105_thermal_reaction_chamber_meltdown");
+            case 795 -> mc.stop();
             default -> {}
         }
     }

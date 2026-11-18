@@ -55,6 +55,11 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.CHILLER.get(), (be, side) -> be.getTank());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.CHILLER.get(),
                 (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
+        // Thermal Reaction Chamber: power out and water in on every face, and its boost slots (in only) for hoppers and pipes.
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.THERMAL_REACTION_CHAMBER.get(), (be, side) -> be.getEnergyHandler());
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.THERMAL_REACTION_CHAMBER.get(), (be, side) -> be.getTank());
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.THERMAL_REACTION_CHAMBER.get(),
+                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Energy Meter: in at the back, out at the front, nothing on the other faces.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.ENERGY_METER.get(), (be, side) -> be.getEnergyHandler(side));
         // Fluid Tank: the whole connected group, in and out, on every face.

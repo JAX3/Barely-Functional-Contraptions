@@ -64,7 +64,7 @@ The main creative tab is split into the Contraptions Manual's sections (Power, L
 ### Contraptions Manual (in-game guide)
 Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game. Its chapters are sorted into six tabs along the top of the left panel:
 
-- **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Wool Burner, Sheep Treadmill), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator) and *Late Game* (Zero Point Module), then energy storage. A guide chapter's optional `"group"` field sets the heading it is listed under.
+- **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Wool Burner, Sheep Treadmill), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator) and *Late Game* (Zero Point Module, Thermal Reaction Chamber), then energy storage. A guide chapter's optional `"group"` field sets the heading it is listed under.
 - **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
 - **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Powered Furnace, the Snow Sheep Chiller, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, Woollen Armour and the Muffled effect, and data packs and commands.
@@ -129,6 +129,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Altar-ed States | Craft an Infusion Altar |
 | ⭐ **Sheepish Combustion** (goal) | Be within 16 blocks of a Blaze Sheep Furnace when it starts making power from a Blaze sheep |
 | ⭐ **Running Ewe Ragged** (goal) | Be within 16 blocks of a Sheep Treadmill when a sheep starts walking it |
+| ⭐ **Thermal Shock** (challenge) | Be within 16 blocks of a Thermal Reaction Chamber when it starts reacting |
 | Wool You Look at That | Infuse a sheep with any resource |
 | Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
 | ⭐ **Three Heads Are Better Than One**, **Here Be Dragons**, **Shh... It's Sculking** (goals) | Infuse a sheep with a Nether Star, Dragon's Breath or Echo Shard |
@@ -503,6 +504,39 @@ At midnight the panels under the lamps still run:
   - Glow Panel: a row of glass, a daylight detector between two quartz, and iron ingots around redstone.
   - 2 Glow Lamps: glass in the corners, Glow Ink Sacs on the sides and glowstone dust in the middle.
 - Mine the panel with a pickaxe. The lamp breaks by hand.
+
+### Thermal Reaction Chamber
+A late-game generator that makes power from the **difference between hot and cold**. Blaze sheep stand in a pen against its hot side, Snow sheep in a pen against its cold side, and water runs through the middle. It is the machines' blue-steel casing split down the middle: red-hot vent slats and fins on the hot side, frosted ones on the cold side, a gauge panel at the front (two thermometers and a balance dial), water and power ports at the back, and a window on top where flame and snow chase each other while it reacts. Crafted from a Nether Star, a Hume Energy Cube, Blue Ice, a Blaze Sheep Furnace, a Functional Machine Block, a Snow Sheep Chiller, two Copper Blocks and a Fluid Tank:
+
+```
+N H I      N = Nether Star, H = Hume Energy Cube, I = Blue Ice
+B M S      B = Blaze Sheep Furnace, M = Functional Machine Block, S = Snow Sheep Chiller
+C T C      C = Copper Block, T = Fluid Tank
+```
+
+| Three chambers: balanced (middle, pens shown), running cold (right), running hot (left) | Its window |
+|---|---|
+| ![Three Thermal Reaction Chambers in fenced pens of Blaze sheep and Snow sheep, the middle one's pens outlined in orange and light blue](screenshots/105_thermal_reaction_chamber.png) | ![The Thermal Reaction Chamber window: the energy gauge, the hot and cold thermometers, 3 / 6 pairs, the balance needle in the middle, the Blaze Rod and Blue Ice slots burning, 13.1k FE/t, the water gauge, and status Reacting](screenshots/105_thermal_reaction_chamber_gui.png) |
+| Up close: embers drift in from the Blaze sheep, snowflakes from the Snow sheep | Running hot: the needle swings left and the danger bar fills |
+| ![A close view of a reacting Thermal Reaction Chamber: its gauge panel, glowing hot-side vents and the swirling window on top, between Blaze sheep and Snow sheep](screenshots/105_thermal_reaction_chamber_close.png) | ![The window of a chamber with two Blaze sheep and one Snow sheep: 1 / 6 pairs, 1,875 FE/t, the needle one step towards hot, the danger bar growing, status Running hot](screenshots/105_thermal_reaction_chamber_gui_hot.png) |
+| Left cold too long, it freezes itself into Packed Ice | Left hot too long, it melts down |
+| ![A Thermal Reaction Chamber encased in Packed Ice between a Blaze sheep and two Snow sheep](screenshots/105_thermal_reaction_chamber_frozen.png) | ![The crater and fires left where a Thermal Reaction Chamber melted down](screenshots/105_thermal_reaction_chamber_meltdown.png) |
+
+- **Sides:** it faces you when placed. Looking at its front, the **hot side is on the left** and the **cold side on the right**. Each pen is 5x5 (`radius`), starting one block out from that face, at its level and the one above. Its spyglass button, or a sneak-right-click with an empty hand, outlines the hot pen in orange and the cold pen in light blue.
+- **Sheep:** every half second it counts the grown sheep with their fleece on: Blaze sheep (`hotSources`) in the hot pen and Snow sheep (`coldSources`) in the cold pen. Sheared sheep and lambs don't count.
+- **Power:** a Blaze sheep matched by a Snow sheep is a **pair**. The first pair makes 2,500 FE/t and each one after it adds less (`falloff` 0.13): about 4,700 FE/t for two, 6,500 for three, 8,100 for four and 10,100 for six, the most it counts (`maxPairs`). It stores 2,000,000 FE and pushes up to 40,000 FE/t into every block around it; cables and machines can also pull from any face.
+- **Boosts:** a Blaze Rod in the hot slot and Blue Ice in the cold slot each burn 30 seconds while it reacts. While **both** burn the output is doubled (`boostMultiplier`). One burning alone tips the balance one step towards its side instead. Hoppers and pipes can fill both slots from any face, and can't take them out.
+- **Balance:** every unpaired sheep, or a lone boost, tips the balance one step and costs a quarter of the output (`imbalancePenalty`). The window's needle swings towards the side with too much.
+  - **Running hot** for 30 seconds (`unstableTicks`) causes a **meltdown**: the hot pen's sheep are singed bare and set alight, and it explodes like TNT (`meltdownPower`). With `meltdownExplodes` off it just shuts down as *Overheated* until it cools.
+  - **Running cold** for 30 seconds **freezes it solid**: it encases itself in Packed Ice (above and on every open side) and stays *Frozen solid* until every block of that ice is mined away.
+  - Running balanced, waiting, or out of water counts the danger back down. A comparator reads the danger: 0 when steady up to 15 just before it goes, so a redstone circuit can cut off a pen's gate.
+  - If either pen is empty, it just waits as *Needs both herds*: a pen of Blaze sheep alone can't melt it down.
+- **Water:** 250 mB a tick while it reacts (`waterPerTick`), what five Fluid Reservoirs make, from buckets, pipes or a reservoir on any face. It holds 16,000 mB. If it runs dry while reacting it **flash-boils**: it stops and blasts scalding steam out of its front for 5 seconds, hurting anything in the two blocks in front of it.
+- **Fatigue:** each sheep can react for an hour (`fatigueTicks`) before its fleece is spent. A spent sheep stops counting (the thermometer's tooltip shows how many are spent). Infusing it again with its own resource, at the Infusion Altar or by hand, renews the fleece, even if its infusion hasn't run out.
+- **Buffer full:** it waits without using water, boosts or fleece until its power is used.
+- **Window:** the energy gauge, the hot thermometer, the centre panel (pairs, FE/t, the balance needle and the danger bar), the cold thermometer, the water gauge, the two boost slots with their burn bars, and the status: *Needs both herds*, *Reacting*, *Running hot*, *Running cold*, *No water*, *Buffer full*, *Overheated* or *Frozen solid*.
+- **Advancement:** ⭐ **Thermal Shock** (challenge), for being within 16 blocks when one starts reacting.
+- Mine it with a pickaxe. **Config:** `[thermal_reaction_chamber]` (see below).
 
 ### Blaze Sheep Furnace
 A generator that makes Forge Energy from the **heat of Blaze sheep** standing around it. Their fleece is always on fire, so the sheep themselves are the fuel.
@@ -1026,6 +1060,21 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `enduranceBonus` | 0.25 | How much longer it walks per Endurance point above 1 |
 | `speedBonus` / `shearedBonus` | 0.2 / 0.25 | Extra power per level of Speed (Slowness takes as much off), and while sheared |
 | `capacity` / `output` | 20000 / 200 | Its buffer, and the most FE/t it pushes out |
+
+**`[thermal_reaction_chamber]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `powerPerPair` / `falloff` / `maxPairs` | 2500 / 0.13 / 6 | FE/t from the first pair, how much less each extra pair adds, and the most pairs counted |
+| `radius` | 2 | Size of each pen: 2 = 5x5 |
+| `waterPerTick` / `tankCapacity` | 250 / 16000 | Water it uses a tick while reacting, and how much it holds |
+| `boostTicks` / `boostMultiplier` | 600 / 2.0 | How long a Blaze Rod or Blue Ice burns, and the output multiplier while both burn |
+| `imbalancePenalty` | 0.25 | Output lost per step off balance |
+| `unstableTicks` | 600 | How long it can run hot or cold before it melts down or freezes |
+| `meltdownExplodes` / `meltdownPower` | true / 4.0 | Whether a meltdown explodes, and how big (TNT is 4) |
+| `fatigueTicks` | 72000 | Ticks a sheep can react before its fleece is spent; 0 = never |
+| `capacity` / `output` | 2000000 / 40000 | Its buffer, and the most FE/t it pushes out |
+| `hotSources` / `coldSources` | blaze / snow | Sheep resources that count on each side |
 
 **`[woollen_armor]`**
 

@@ -70,6 +70,8 @@ public final class ResourcefulSheepClient {
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.CHILLER.get(), context -> new AreaOutlineRenderer<>());
             event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.THERMAL_REACTION_CHAMBER.get(), context -> new AreaOutlineRenderer<>());
+            event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.POWERED_FURNACE.get(), context -> new AreaOutlineRenderer<>());
         });
 
@@ -100,6 +102,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.POWERED_FURNACE.get(), PoweredFurnaceScreen::new);
         event.register(ModMenus.WOOL_BURNER.get(), WoolBurnerScreen::new);
         event.register(ModMenus.SHEEP_TREADMILL.get(), SheepTreadmillScreen::new);
+        event.register(ModMenus.THERMAL_REACTION_CHAMBER.get(), ThermalReactionChamberScreen::new);
         event.register(ModMenus.WOOL_PACKER.get(), WoolPackerScreen::new);
         event.register(ModMenus.INFUSION_ALTAR.get(), InfusionAltarScreen::new);
     }
@@ -164,7 +167,8 @@ public final class ResourcefulSheepClient {
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLAZE_FURNACE, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CHILLER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.POWERED_FURNACE,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BURNER,
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_TREADMILL)) {
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_TREADMILL,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.THERMAL_REACTION_CHAMBER)) {
             if (event.getItemStack().is(item.get())) {
                 event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions." + item.getId().getPath())
                         .withStyle(net.minecraft.ChatFormatting.GRAY));

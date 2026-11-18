@@ -25,9 +25,9 @@ public class AreaOutlineRenderer<T extends BlockEntity & AreaDisplay> implements
 
     public static final class State extends BlockEntityRenderState {
         boolean show;
-        /** The area relative to the block's own corner. */
-        AABB box = new AABB(0, 0, 0, 1, 1, 1);
-        int color;
+        /** The areas relative to the block's own corner, and their colours. */
+        java.util.List<AABB> boxes = java.util.List.of();
+        int[] colors = new int[0];
     }
 
     @Override
@@ -42,15 +42,19 @@ public class AreaOutlineRenderer<T extends BlockEntity & AreaDisplay> implements
         state.show = be.showsArea();
         if (!state.show) return;
         BlockPos pos = be.getBlockPos();
-        state.box = be.displayedArea().move(-pos.getX(), -pos.getY(), -pos.getZ()).deflate(INSET);
-        state.color = be.areaColor();
+        java.util.List<AABB> areas = be.displayedAreas();
+        state.boxes = areas.stream().map(a -> a.move(-pos.getX(), -pos.getY(), -pos.getZ()).deflate(INSET)).toList();
+        state.colors = new int[areas.size()];
+        for (int i = 0; i < areas.size(); i++) state.colors[i] = be.areaColor(i);
     }
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         if (!state.show) return;
-        AABB b = state.box;
-        int color = state.color;
+        for (int i = 0; i < state.boxes.size(); i++) drawBox(state.boxes.get(i), state.colors[i], poseStack, collector);
+    }
+
+    private static void drawBox(AABB b, int color, PoseStack poseStack, SubmitNodeCollector collector) {
         int faint = (color & 0x00FFFFFF) | 0x80000000;
         collector.submitCustomGeometry(poseStack, RenderTypes.LINES, (pose, buffer) -> {
             float x0 = (float) b.minX, y0 = (float) b.minY, z0 = (float) b.minZ;
@@ -109,6 +113,8 @@ public class AreaOutlineRenderer<T extends BlockEntity & AreaDisplay> implements
 
     @Override
     public AABB getRenderBoundingBox(T be) {
-        return be.displayedArea().minmax(new AABB(be.getBlockPos()));
+        AABB box = new AABB(be.getBlockPos());
+        for (AABB area : be.displayedAreas()) box = box.minmax(area);
+        return box;
     }
 }

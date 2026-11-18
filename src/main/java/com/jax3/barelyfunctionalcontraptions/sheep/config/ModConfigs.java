@@ -148,6 +148,23 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue treadmillCapacity;
         public final ModConfigSpec.IntValue treadmillOutput;
         public final ModConfigSpec.BooleanValue muffleVibrations;
+        public final ModConfigSpec.IntValue thermalPowerPerPair;
+        public final ModConfigSpec.DoubleValue thermalFalloff;
+        public final ModConfigSpec.IntValue thermalMaxPairs;
+        public final ModConfigSpec.IntValue thermalRadius;
+        public final ModConfigSpec.IntValue thermalWaterPerTick;
+        public final ModConfigSpec.IntValue thermalTankCapacity;
+        public final ModConfigSpec.IntValue thermalBoostTicks;
+        public final ModConfigSpec.DoubleValue thermalBoostMultiplier;
+        public final ModConfigSpec.DoubleValue thermalImbalancePenalty;
+        public final ModConfigSpec.IntValue thermalUnstableTicks;
+        public final ModConfigSpec.BooleanValue thermalMeltdownExplodes;
+        public final ModConfigSpec.DoubleValue thermalMeltdownPower;
+        public final ModConfigSpec.IntValue thermalFatigueTicks;
+        public final ModConfigSpec.IntValue thermalCapacity;
+        public final ModConfigSpec.IntValue thermalOutput;
+        public final ModConfigSpec.ConfigValue<List<? extends String>> thermalHotSources;
+        public final ModConfigSpec.ConfigValue<List<? extends String>> thermalColdSources;
         public final ModConfigSpec.IntValue chillerRadius;
         public final ModConfigSpec.IntValue chillerMaxSources;
         public final ModConfigSpec.DoubleValue chillerFalloff;
@@ -416,6 +433,43 @@ public final class ModConfigs {
                     .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
             treadmillOutput = b.comment("Most FE it pushes into the blocks around it per tick.")
                     .defineInRange("output", 200, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Thermal Reaction Chamber (late-game generator: Blaze sheep against its hot side, Snow sheep against its cold side, water through the middle)").push("thermal_reaction_chamber");
+            thermalPowerPerPair = b.comment("FE/t from the first pair (a Blaze sheep matched by a Snow sheep). Each pair after it adds less, see falloff.")
+                    .defineInRange("powerPerPair", 2_500, 0, 1_000_000);
+            thermalFalloff = b.comment("How much less each extra pair adds: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on. 0 = no falloff.")
+                    .defineInRange("falloff", 0.13, 0.0, 1.0);
+            thermalMaxPairs = b.comment("Most pairs one chamber counts.")
+                    .defineInRange("maxPairs", 6, 1, 64);
+            thermalRadius = b.comment("Size of each pen beside it: 2 = 5x5 (default), 1 = 3x3. A pen sits against its side face and covers the chamber's level and the block above.")
+                    .defineInRange("radius", 2, 0, 8);
+            thermalWaterPerTick = b.comment("mB of water it uses each tick while it reacts. Without water it stops and vents scalding steam out of its front.")
+                    .defineInRange("waterPerTick", 250, 0, 100_000);
+            thermalTankCapacity = b.comment("mB of water it holds.")
+                    .defineInRange("tankCapacity", 16_000, 1_000, 1_000_000);
+            thermalBoostTicks = b.comment("Ticks one Blaze Rod (hot slot) or Blue Ice (cold slot) burns (600 = 30 seconds).")
+                    .defineInRange("boostTicks", 600, 1, 72_000);
+            thermalBoostMultiplier = b.comment("Output multiplier while both boosts burn. One boost alone tips the balance instead, like an extra sheep on that side.")
+                    .defineInRange("boostMultiplier", 2.0, 1.0, 100.0);
+            thermalImbalancePenalty = b.comment("Output lost for each step the balance is off: 0.25 = a quarter less for each unpaired sheep (or lone boost).")
+                    .defineInRange("imbalancePenalty", 0.25, 0.0, 1.0);
+            thermalUnstableTicks = b.comment("Ticks it can run hot or cold before it melts down or freezes solid (600 = 30 seconds). Running balanced counts it back down.")
+                    .defineInRange("unstableTicks", 600, 20, 72_000);
+            thermalMeltdownExplodes = b.comment("Whether a meltdown explodes. If false it only singes the hot side's sheep and shuts down until it cools.")
+                    .define("meltdownExplodes", true);
+            thermalMeltdownPower = b.comment("Size of the meltdown explosion (TNT is 4).")
+                    .defineInRange("meltdownPower", 4.0, 0.0, 16.0);
+            thermalFatigueTicks = b.comment("Ticks a sheep can react before its fleece is spent and it must be re-infused (72000 = an hour). 0 = never.")
+                    .defineInRange("fatigueTicks", 72_000, 0, Integer.MAX_VALUE);
+            thermalCapacity = b.comment("FE it stores.")
+                    .defineInRange("capacity", 2_000_000, 1, Integer.MAX_VALUE);
+            thermalOutput = b.comment("Most FE it pushes into the blocks around it per tick, in total.")
+                    .defineInRange("output", 40_000, 0, Integer.MAX_VALUE);
+            thermalHotSources = b.comment("Sheep resources whose sheep heat its hot side (with their fleece on).")
+                    .defineListAllowEmpty("hotSources", List.of("barelyfunctionalcontraptions:blaze"), () -> "barelyfunctionalcontraptions:blaze", o -> o instanceof String);
+            thermalColdSources = b.comment("Sheep resources whose sheep chill its cold side (with their fleece on).")
+                    .defineListAllowEmpty("coldSources", List.of("barelyfunctionalcontraptions:snow"), () -> "barelyfunctionalcontraptions:snow", o -> o instanceof String);
             b.pop();
 
             b.comment("Woollen Armour (crafted from wool, in the wool's colour)").push("woollen_armor");

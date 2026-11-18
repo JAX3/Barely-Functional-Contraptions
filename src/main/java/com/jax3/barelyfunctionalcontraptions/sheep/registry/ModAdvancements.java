@@ -33,6 +33,8 @@ public final class ModAdvancements {
     public static final String ZERO_POINT_DEATH = "contraptions/zero_point_death";
     /** A sheep starting to walk a Sheep Treadmill within {@link #AUTO_SHEAR_RADIUS} blocks of you. */
     public static final String SHEEP_TREADMILL = "contraptions/sheep_treadmill";
+    /** A Thermal Reaction Chamber starting to react within {@link #AUTO_SHEAR_RADIUS} blocks of you. */
+    public static final String THERMAL_REACTION_CHAMBER = "contraptions/thermal_reaction_chamber";
     public static final String INFUSE_SHEEP = "contraptions/infuse_sheep";
     /** Players this close to Automatic Shears when they shear a sheep get {@link #AUTO_SHEAR}. */
     public static final double AUTO_SHEAR_RADIUS = 16;
