@@ -2,6 +2,7 @@
   "parent": "minecraft:block/block",
   "textures": {
     "rail": "barelyfunctionalcontraptions:block/sheep_treadmill/rail",
+    "strut": "barelyfunctionalcontraptions:block/sheep_treadmill/strut",
     "belt": "barelyfunctionalcontraptions:block/sheep_treadmill/belt",
     "roller": "barelyfunctionalcontraptions:block/sheep_treadmill/roller",
     "housing_side": "barelyfunctionalcontraptions:block/sheep_treadmill/housing_side",
@@ -69,7 +70,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "down": {
           "uv": [
@@ -78,7 +79,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         }
       }
     },
@@ -137,7 +138,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "down": {
           "uv": [
@@ -146,7 +147,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         }
       }
     },
@@ -373,7 +374,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "south": {
           "uv": [
@@ -382,7 +383,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "east": {
           "uv": [
@@ -391,7 +392,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "west": {
           "uv": [
@@ -400,7 +401,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "up": {
           "uv": [
@@ -409,7 +410,7 @@
             2,
             2
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "down": {
           "uv": [
@@ -418,7 +419,7 @@
             2,
             2
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         }
       }
     },
@@ -441,7 +442,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "south": {
           "uv": [
@@ -450,7 +451,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "east": {
           "uv": [
@@ -459,7 +460,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "west": {
           "uv": [
@@ -468,7 +469,7 @@
             2,
             16
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "up": {
           "uv": [
@@ -477,7 +478,7 @@
             2,
             2
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "down": {
           "uv": [
@@ -486,7 +487,7 @@
             2,
             2
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         }
       }
     },
@@ -509,7 +510,7 @@
             16,
             2
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "south": {
           "uv": [
@@ -518,7 +519,7 @@
             16,
             2
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "east": {
           "uv": [
@@ -527,7 +528,7 @@
             2,
             2
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "west": {
           "uv": [
@@ -536,7 +537,7 @@
             2,
             2
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "up": {
           "uv": [
@@ -545,7 +546,7 @@
             16,
             2
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         },
         "down": {
           "uv": [
@@ -554,7 +555,7 @@
             16,
             2
           ],
-          "texture": "#rail"
+          "texture": "#strut"
         }
       }
     },

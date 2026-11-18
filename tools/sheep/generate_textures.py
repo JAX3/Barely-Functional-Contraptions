@@ -3676,27 +3676,26 @@ def generate_woollen_icons():
 
 def generate_sheep_treadmill():
     """Sheep Treadmill (WIP preview): a belt between steel rollers in a blue steel frame, a gantry with wheat hanging on a
-    string, and a slate generator housing at the back with a copper flywheel. Also writes its block and item models."""
+    string, and a generator housing in the machines' casing at the back with a copper flywheel. Also writes its block and item models."""
     import json
     rnd = random.Random(31)
     BELT, BELT_L, BELT_D = hexc("#3b3a3f"), hexc("#55545b"), hexc("#26252a")
     STEEL, STEEL_L, STEEL_D = hexc("#8d929c"), hexc("#c3c8d0"), hexc("#5c616b")
-    SLATE, SLATE_L, SLATE_D = hexc("#3d4250"), hexc("#565c6e"), hexc("#272a34")
     COPPER, COPPER_L, COPPER_D = hexc("#c7724a"), hexc("#e9a27a"), hexc("#8a4a2c")
     WHEAT, WHEAT_L, WHEAT_D, STRING = hexc("#d9b44a"), hexc("#f1d77a"), hexc("#9c7a2a"), hexc("#e8e2d0")
     LAMP, LAMP_D = hexc("#ffd75e"), hexc("#c9952a")
 
-    # Side rails and gantry: dark blue steel, like the Hume machines, with a bright top edge, a groove and bolts.
-    BSTEEL, BSTEEL_L, BSTEEL_D, BSTEEL_DD, BOLT = hexc("#3f4766"), hexc("#5d6687"), hexc("#2c324c"), hexc("#1f2338"), hexc("#8d97bc")
-    rail = Image.new("RGBA", (16, 16), BSTEEL)
-    for x in range(16):
-        rail.putpixel((x, 0), BSTEEL_L); rail.putpixel((x, 1), BSTEEL_L if x % 7 else BOLT)
-        rail.putpixel((x, 15), BSTEEL_DD); rail.putpixel((x, 14), BSTEEL_D)
-        rail.putpixel((x, 7), BSTEEL_D); rail.putpixel((x, 8), BSTEEL_DD)
-    for x in (2, 13):
-        for y in (4, 11):
-            rail.putpixel((x, y), BOLT); rail.putpixel((x + 1, y + 1), BSTEEL_DD)
-    rail.save(out("block/sheep_treadmill/rail.png"))
+    # Side rails and gantry: the machines' blue-steel casing (CARTOON palette): outlined, a lit top edge and bolts.
+    RAIL = ["OOOOOOOOOOOOOOOO",
+            "HHHHHHHHHHHHHHHH",
+            "MMBbMMMMMMMMBbMM",
+            "MMbSMMMMMMMMbSMM",
+            "MMMMMMMMMMMMMMMM",
+            "SSSSSSSSSSSSSSSS",
+            "OOOOOOOOOOOOOOOO"] + ["MMMMMMMMMMMMMMMM"] * 9
+    grid(RAIL, CARTOON, Image.new("RGBA", (16, 16), CLEAR)).save(out("block/sheep_treadmill/rail.png"))
+    # Strut: the thin parts (rail tops, gantry posts and crossbar) in plain casing metal, a lit edge on one side.
+    grid(["HMMMMMMMMMMMMMMS"] * 16, CARTOON, Image.new("RGBA", (16, 16), CLEAR)).save(out("block/sheep_treadmill/strut.png"))
 
     # Belt: dark slats across it with a lighter tread on each, animated: the slats repeat every 3 pixels, so 3 frames
     # each one pixel further on scroll the belt from front to back (north to south on the model), under the sheep's feet.
@@ -3724,33 +3723,41 @@ def generate_sheep_treadmill():
                 roller.putpixel((x, y), STEEL_D)
     roller.save(out("block/sheep_treadmill/roller.png"))
 
-    # Housing: slate panels with copper trim; the side has a vent, the front a belt slot, the top a copper coil.
-    def housing():
-        img = Image.new("RGBA", (16, 16), SLATE)
-        for i in range(16):
-            img.putpixel((i, 0), SLATE_L); img.putpixel((0, i), SLATE_L)
-            img.putpixel((i, 15), SLATE_D); img.putpixel((15, i), SLATE_D)
-        for i in range(1, 15):
-            img.putpixel((i, 4), COPPER_D)
-        return img
-    side = housing()
-    for y in range(7, 13, 2):
-        for x in range(4, 12):
-            side.putpixel((x, y), SLATE_D)
-    side.save(out("block/sheep_treadmill/housing_side.png"))
-    front = housing()
-    for y in range(9, 12):
-        for x in range(2, 14):
-            front.putpixel((x, y), BELT_D)
-    for x in range(2, 14):
-        front.putpixel((x, 8), COPPER)
-    front.save(out("block/sheep_treadmill/housing_front.png"))
-    top = housing()
-    for y in range(6, 12):
-        for x in range(3, 13):
-            top.putpixel((x, y), COPPER_L if (x + y) % 2 else COPPER)
-        top.putpixel((3, y), COPPER_D); top.putpixel((12, y), COPPER_D)
-    top.save(out("block/sheep_treadmill/housing_top.png"))
+    # Housing: the machines' casing (as on the Powered Furnace and Separator): frame, corner bolts and a port that
+    # glows while it runs. The housing is 12 pixels tall, so these use the top 12 rows (its top face the top 6).
+    filler = ["MMMMMMMMMMMMMMMM"] * 4
+    HOUSING_SIDE = ["OOOOOOOOOOOOOOOO",
+                    "OHHHHHHHHHHHHHMO",
+                    "OHBbMMMMMMMMBbSO",
+                    "OHbSMMOOOOMMbSSO",
+                    "OHMMMOPPPPOMMMSO",
+                    "OHMMOPpggpPOMMSO",
+                    "OHMMOPpggpPOMMSO",
+                    "OHMMMOPPPPOMMMSO",
+                    "OHMMMMOOOOMMMMSO",
+                    "OHBbMMMMMMMMBbSO",
+                    "OHbSSSSSSSSSbSSO",
+                    "OOOOOOOOOOOOOOOO"] + filler
+    HOUSING_FRONT = ["OOOOOOOOOOOOOOOO",  # the side the belt runs into
+                     "OHHHHHHHHHHHHHMO",
+                     "OHBbMMMMMMMMBbSO",
+                     "OHbSMMMMMMMMbSSO",
+                     "OHMMMMMMMMMMMMSO",
+                     "OHMOOOOOOOOOOMSO",
+                     "OHMOKKKKKKKKOMSO",
+                     "OHMOKKKKKKKKOMSO",
+                     "OHMOOOOOOOOOOMSO",
+                     "OHBbMMMMMMMMBbSO",
+                     "OHbSSSSSSSSSbSSO",
+                     "OOOOOOOOOOOOOOOO"] + filler
+    HOUSING_TOP = ["OOOOOOOOOOOOOOOO",
+                   "OHHHHHHHHHHHHHMO",
+                   "OHBbMMMMMMMMBbSO",
+                   "OHbSMMMMMMMMbSSO",
+                   "OHbSSSSSSSSSbSSO",
+                   "OOOOOOOOOOOOOOOO"] + ["MMMMMMMMMMMMMMMM"] * 10
+    for name, rows in (("housing_side", HOUSING_SIDE), ("housing_front", HOUSING_FRONT), ("housing_top", HOUSING_TOP)):
+        grid(rows, CARTOON, Image.new("RGBA", (16, 16), CLEAR)).save(out(f"block/sheep_treadmill/{name}.png"))
 
     # Flywheel: a copper wheel with four spokes and a steel hub.
     fly = Image.new("RGBA", (16, 16), CLEAR)
@@ -3802,14 +3809,14 @@ def generate_sheep_treadmill():
             el["faces"][face] = {"uv": [0, 0, min(w, 16), min(h, 16)], "texture": "#" + faces.get(face, tex)}
         return el
     elements = [
-        box([0, 0, -16], [2, 7, 10], "rail"),                        # left rail
-        box([14, 0, -16], [16, 7, 10], "rail"),                      # right rail
+        box([0, 0, -16], [2, 7, 10], "rail", {"up": "strut", "down": "strut"}),                        # left rail
+        box([14, 0, -16], [16, 7, 10], "rail", {"up": "strut", "down": "strut"}),                      # right rail
         box([2, 1, -15], [14, 5, -11], "roller"),                    # front roller
         box([2, 5, -14], [14, 6, 10], "belt"),                       # belt
         box([2, 1, -11], [14, 2, 10], "belt"),                       # the belt's return run
-        box([0, 7, -16], [2, 24, -14], "rail"),                     # gantry uprights
-        box([14, 7, -16], [16, 24, -14], "rail"),
-        box([0, 22, -16], [16, 24, -14], "rail"),                   # crossbar
+        box([0, 7, -16], [2, 24, -14], "strut"),                     # gantry uprights
+        box([14, 7, -16], [16, 24, -14], "strut"),
+        box([0, 22, -16], [16, 24, -14], "strut"),                   # crossbar
         box([7.5, 16, -15.5], [8.5, 22, -14.5], "rope"),             # string
         box([0, 0, 10], [16, 12, 16], "housing_side", {"north": "housing_front", "up": "housing_top", "down": "housing_side"}),
         box([16, 1, 9], [17, 11, 15], "flywheel", {"north": "rail", "south": "rail", "up": "rail", "down": "rail"}),
@@ -3819,7 +3826,7 @@ def generate_sheep_treadmill():
     for rot in (45, -45):
         elements.append({"from": [5, 8, -15], "to": [11, 16, -15], "rotation": {"angle": rot, "axis": "y", "origin": [8, 12, -15]},
                          "faces": {"north": {"uv": [3, 1, 13, 15], "texture": "#wheat"}, "south": {"uv": [3, 1, 13, 15], "texture": "#wheat"}}})
-    textures = {k: T + k for k in ("rail", "belt", "roller", "housing_side", "housing_front", "housing_top", "flywheel", "wheat", "rope", "lamp")}
+    textures = {k: T + k for k in ("rail", "strut", "belt", "roller", "housing_side", "housing_front", "housing_top", "flywheel", "wheat", "rope", "lamp")}
     textures["particle"] = T + "rail"
     models = os.path.join(ROOT, "..", "models")
     with open(os.path.join(models, "block", "sheep_treadmill.json"), "w") as fh:
