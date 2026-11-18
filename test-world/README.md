@@ -41,6 +41,7 @@ z = -9.
 | Powered Furnaces fed by hoppers, one alone and one sped up by two Blaze sheep (its area shown) | `/tp @s 342.5 37 -6.5 180 25` |
 | Woollen Armour on armour stands: white, red, light blue and a mixed set | `/tp @s 362.5 35.6 -8 180 12` |
 | Sheep Treadmills in a fenced pen: a sheep walking one, a sheared sheep another, one empty and one turned east, all fed Hay Bales | `/tp @s 380.5 36.2 -7.5 205 28` |
+| Ore processing line: six Iron sheep in the Automatic Shears' pen, pipes over the top to a Mechanical Separator, a pipe trench under the row to three Powered Furnaces, a Wool Burner and a chest (filtered to ingots, nuggets and String), powered by a Mycelial Generator on a Fluid Reservoir | `/tp @s 405.5 40 -1 180 34` |
 
 The scenes from the New blocks on were added to the existing world with
 `./gradlew runClient -PscreenshotHarness -PharnessScene=extend_world "-PharnessWorld=BFC Test World"` (unzip this

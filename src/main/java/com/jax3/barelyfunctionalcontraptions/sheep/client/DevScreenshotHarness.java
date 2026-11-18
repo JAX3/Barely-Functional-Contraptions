@@ -205,6 +205,10 @@ public final class DevScreenshotHarness {
             snowSheepTick(mc, server);
             return;
         }
+        if ("ore_line".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            oreLineTick(mc, server);
+            return;
+        }
         if ("sheep_treadmill".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             sheepTreadmillTick(mc, server);
             return;
@@ -1617,8 +1621,8 @@ public final class DevScreenshotHarness {
     private static final Object[][] EXTRA_SCENES = {
             // Added before, and already in the world: new blocks (x 166), themed sheep (202), blaze furnace (234),
             // wool burner (262), wool packer (282), infusion altar (302), snow sheep chiller (322),
-            // powered furnace (342), woollen armour (362).
-            {"sheep treadmill", 382},
+            // powered furnace (342), woollen armour (362), sheep treadmill (382).
+            {"ore line", 402},
     };
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
@@ -1871,6 +1875,118 @@ public final class DevScreenshotHarness {
     private static final java.util.List<net.minecraft.world.entity.animal.sheep.Sheep> snowWalkers = new java.util.ArrayList<>();
 
     /**
+     * A basic ore processing line, as planned: six Iron sheep in a pen that is exactly the Automatic Shears' 3x3 area;
+     * pipes over the top carry their wool to a Mechanical Separator; a pipe trench under the row takes its Raw Iron to
+     * three Powered Furnaces, its String to a Wool Burner, and the ingots, nuggets and spare String to a chest (the only
+     * filter, on the chest's side). A Mycelial Generator watered by a Fluid Reservoir powers it all through a cable
+     * behind the row. Machines at the player's feet level; the trench is in the floor.
+     */
+    private static void oreLineScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-4, 0, -6), o.offset(10, 4, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-4, -1, -6), o.offset(10, -1, 4))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        // The pen: a fence round exactly the shears' 3x3 area (x -1..1, z -3..-1), grass inside and all round it.
+        for (int x = -2; x <= 2; x++) for (int z = -4; z <= 0; z++) {
+            boolean edge = x == -2 || x == 2 || z == -4 || z == 0;
+            if (edge && !(z == 0 && (x == 0 || x == 2))) level.setBlock(o.offset(x, 0, z), Blocks.OAK_FENCE.defaultBlockState(), 3);
+        }
+        // The row: shears and separator facing into the pen, three Powered Furnaces, a Wool Burner, a chest.
+        level.setBlock(o, ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.NORTH), 3);
+        level.setBlock(o.east(2), ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState().setValue(MechanicalSeparatorBlock.FACING, Direction.NORTH), 3);
+        for (int x = 3; x <= 5; x++) {
+            level.setBlock(o.east(x), ModBlocks.POWERED_FURNACE.get().defaultBlockState()
+                    .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.PoweredFurnaceBlock.FACING, Direction.SOUTH), 3);
+        }
+        level.setBlock(o.east(6), ModBlocks.WOOL_BURNER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.FACING, Direction.SOUTH), 3);
+        level.setBlock(o.east(7), Blocks.CHEST.defaultBlockState().setValue(net.minecraft.world.level.block.ChestBlock.FACING, Direction.SOUTH), 3);
+        // Power: a Mycelial Generator watered by a Fluid Reservoir on a 2x2 pool, and a cable along the back of the row.
+        for (int x = 8; x <= 9; x++) for (int z = 1; z <= 2; z++) {
+            level.setBlock(o.offset(x, -2, z), Blocks.STONE.defaultBlockState(), 2);
+            level.setBlock(o.offset(x, -1, z), Blocks.WATER.defaultBlockState(), 3);
+        }
+        level.setBlock(o.offset(8, 0, 1), ModBlocks.FLUID_RESERVOIR.get().defaultBlockState(), 3);
+        level.setBlock(o.offset(7, 0, 1), com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.mycelial.block.MycelialGeneratorBlock.FACING, Direction.SOUTH), 3);
+        if (level.getBlockEntity(o.offset(7, 0, 1)) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity generator) {
+            generator.getInventory().setStackInSlot(com.jax3.barelyfunctionalcontraptions.mycelial.capability.GeneratorItemHandler.FUEL_SLOT, new ItemStack(Items.RED_MUSHROOM, 64));
+        }
+        var cable = ModBlocks.ENERGY_CABLE.get();
+        for (int x = 0; x <= 6; x++) {
+            BlockPos pos = o.offset(x, 0, 1);
+            level.setBlock(pos, cable.withConnections(cable.defaultBlockState(), level, pos), 3);
+        }
+        // Items: network A over the top (shears to the separator's top), network B in a trench under the row.
+        var pipe = ModBlocks.ITEM_PIPE.get();
+        java.util.List<BlockPos> pipes = new java.util.ArrayList<>();
+        for (int x = 0; x <= 2; x++) pipes.add(o.offset(x, 1, 0));
+        for (int x = 2; x <= 7; x++) pipes.add(o.offset(x, -1, 0));
+        for (BlockPos pos : pipes) level.setBlock(pos, pipe.withConnections(pipe.defaultBlockState(), level, pos), 3);
+        // The one filter: the chest only takes ingots, nuggets and String, so Raw Iron goes to the furnaces.
+        if (level.getBlockEntity(o.offset(7, -1, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeBlockEntity<?> chestPipe) {
+            var side = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.DEFAULT;
+            for (String id : new String[]{"iron_ingot", "iron_nugget", "string"}) side = side.toggle(net.minecraft.resources.Identifier.withDefaultNamespace(id));
+            chestPipe.setSide(Direction.UP, side);
+        }
+        // Six Iron sheep, infused for 100 shearings, in the pen.
+        int[][] spots = {{-1, -1}, {0, -1}, {1, -1}, {-1, -3}, {0, -3}, {1, -3}};
+        for (int[] spot : spots) {
+            var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            sheep.snapTo(o.getX() + spot[0] + 0.5, o.getY(), o.getZ() + spot[1] + 0.5, 180, 0);
+            level.addFreshEntity(sheep);
+            SheepInfusionEvents.setInfusion(sheep, new SheepInfusion(Optional.of(ResourcefulSheep.id("iron")), 100, 0));
+        }
+        label(server, o.offset(3, 2, -2), "Ore processing line", "white");
+    }
+
+    /** The ore line, from above the front, a while after it starts, then the chest it fills: {@code -PharnessScene=ore_line}. */
+    private static void oreLineTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                oreLineScene(server);
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamemode spectator @a");
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 34", origin.getX() + 3.5, origin.getY() + 5.0, origin.getZ() + 8.0));
+            case 600 -> shot(mc, "104_ore_line");
+            case 602 -> server.execute(() -> {
+                ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                StringBuilder report = new StringBuilder("ORELINE");
+                if (level.getBlockEntity(origin.east(7)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity chest) {
+                    for (int i = 0; i < chest.getContainerSize(); i++) if (!chest.getItem(i).isEmpty()) report.append(" chest:").append(chest.getItem(i));
+                }
+                for (int x = 3; x <= 5; x++) {
+                    if (level.getBlockEntity(origin.east(x)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity f) {
+                        report.append(" furnace").append(x).append(':').append(f.getItem(0)).append('/').append(f.output()).append('/').append(f.status());
+                    }
+                }
+                if (level.getBlockEntity(origin.east(2)) instanceof MechanicalSeparatorBlockEntity sep) report.append(" separatorIn:").append(sep.getInventory().getStack(SeparatorInventory.INPUT));
+                if (level.getBlockEntity(origin.east(6)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity burner) report.append(" burner:").append(burner.fuel()).append(" gen ").append(burner.generating());
+                ResourcefulSheep.LOGGER.warn(report.toString());
+            });
+            case 604 -> {
+                setHudHidden(mc, false);
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 7.5, origin.getY(), origin.getZ() + 2.5));
+            }
+            case 612 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                if (player.level().getBlockEntity(origin.east(7)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity chest) player.openMenu(chest);
+            });
+            case 635 -> shot(mc, "104_ore_line_chest");
+            case 640 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    /**
      * Three Sheep Treadmills fed Hay Bales in a fenced pen, a sheep walking the left one and a sheared sheep the middle
      * one, the right one empty, and one turned east.
      */
@@ -2017,8 +2133,8 @@ public final class DevScreenshotHarness {
 
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
-        // The latest scene: the Sheep Treadmills.
-        String[] tps = {"tp @a 380.5 36.2 -7.5 205 28"};
+        // The latest scene: the ore processing line.
+        String[] tps = {"tp @a 405.5 40 -1 180 34"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -2061,8 +2177,8 @@ public final class DevScreenshotHarness {
                     player.teleportTo(x + 0.5, 35, -8.5); // exactly on the spot, in case it drifted
                     // Earlier runs built woolBurnerScene, woolPackerScene, altarScene (with bone blocks and a
                     // wither rose in its catalyst slots 2 and 3) and chillerScene here.
-                    // and poweredFurnaceScene and woollenArmorScene.
-                    sheepTreadmillScene(server);
+                    // poweredFurnaceScene, woollenArmorScene and sheepTreadmillScene.
+                    oreLineScene(server);
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
                 });
             }
