@@ -157,13 +157,13 @@ Every sheep has Yield, Growth and Endurance from 1 to 10. A lamb gets its parent
 
 ### Powered Furnace
 
-Smelts anything a Furnace can, on power instead of fuel, in three quarters of the time. Blaze sheep standing round it speed it up further: about x1.5 with two, x1.8 with four.
+Smelts anything a Furnace can, on power instead of fuel, in a little over half the time. Blaze sheep standing round it speed it up further: about x1.5 with two, x1.8 with four.
 
 ![Two Powered Furnaces fed by hoppers, the one on the right with two burning Blaze sheep beside it inside its orange area outline](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/101_powered_furnace.png)
 
 ### Snow Sheep Chiller
 
-The Blaze Furnace's icy opposite: Snow sheep standing round it freeze water into Ice, one every 10 seconds with one sheep and about every 3 with four. It needs no power, just a bucket of water per Ice, and hoppers can take the Ice out.
+The Blaze Furnace's icy opposite: Snow sheep standing round it freeze water into Ice, one every 7.5 seconds with one sheep and about every 2.3 with four. It needs no power, just a bucket of water per Ice, and hoppers can take the Ice out.
 
 ![A Snow Sheep Chiller on a snowy floor with three Snow sheep round it inside its blue area outline, snowflakes drifting in, and a hopper underneath](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/100_chiller.png)
 

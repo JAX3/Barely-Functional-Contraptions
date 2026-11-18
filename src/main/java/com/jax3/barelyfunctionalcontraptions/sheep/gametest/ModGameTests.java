@@ -1059,8 +1059,8 @@ public final class ModGameTests {
     }
 
     /**
-     * The Powered Furnace smelts in three quarters of a Furnace's time (Raw Iron: 150 ticks instead of 200), faster with
-     * Blaze sheep around it (two: x1.47, about 102 ticks), not at all without power, and only what a Furnace can smelt.
+     * The Powered Furnace smelts in 0.55 of a Furnace's time (Raw Iron: 110 ticks instead of 200), faster with Blaze
+     * sheep around it (two: x1.47, about 75 ticks), not at all without power, and only what a Furnace can smelt.
      */
     private static void poweredFurnace(GameTestHelper h) {
         var alone = poweredFurnace(h, new BlockPos(1, 1, 1), true, new ItemStack(Items.RAW_IRON, 4));
@@ -1071,16 +1071,16 @@ public final class ModGameTests {
         h.assertFalse(alone.canPlaceItem(0, new ItemStack(Items.DIRT)), "dirt can't be smelted, so it doesn't go in");
         h.assertTrue(alone.canPlaceItem(0, new ItemStack(Items.RAW_IRON)), "raw iron can");
         int start = alone.getEnergyHandler().getAmountAsInt();
-        h.runAfterDelay(125, () -> {
+        h.runAfterDelay(95, () -> {
             h.assertTrue(blazing.heaterCount() == 2 && blazing.speed() > 140, "two Blaze sheep speed it up, speed " + blazing.speed() + " from " + blazing.heaterCount());
-            h.assertTrue(blazing.output().is(Items.IRON_INGOT), "with Blaze sheep the first ingot is out by 125 ticks, got " + blazing.output());
-            h.assertTrue(alone.output().isEmpty(), "alone it's not done yet (150 ticks), got " + alone.output());
+            h.assertTrue(blazing.output().is(Items.IRON_INGOT), "with Blaze sheep the first ingot is out by 95 ticks, got " + blazing.output());
+            h.assertTrue(alone.output().isEmpty(), "alone it's not done yet (110 ticks), got " + alone.output());
         });
-        h.runAfterDelay(170, () -> {
-            h.assertTrue(alone.output().is(Items.IRON_INGOT) && alone.output().getCount() == 1, "alone, one ingot by 170 ticks (a Furnace takes 200), got " + alone.output());
+        h.runAfterDelay(125, () -> {
+            h.assertTrue(alone.output().is(Items.IRON_INGOT) && alone.output().getCount() == 1, "alone, one ingot by 125 ticks (a Furnace takes 200), got " + alone.output());
             h.assertTrue(alone.storedExperience() > 0, "and it keeps the experience for whoever takes it");
             int used = start - alone.getEnergyHandler().getAmountAsInt();
-            h.assertTrue(used >= 150 * 20 && used <= 170 * 20, "20 FE/t while smelting, used " + used);
+            h.assertTrue(used >= 110 * 20 && used <= 125 * 20, "20 FE/t while smelting, used " + used);
             h.assertTrue(unpowered.output().isEmpty() && unpowered.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus.NO_ENERGY,
                     "nothing without power, status " + unpowered.status());
             h.succeed();
@@ -1895,7 +1895,7 @@ public final class ModGameTests {
         h.assertTrue(iron.primary().create().is(Items.RAW_IRON) && iron.primaryRange().equals(new com.jax3.barelyfunctionalcontraptions.sheep.resource.CountRange(2, 4)),
                 "iron separates to 2-4 raw iron, got " + iron.primaryRange());
         h.assertTrue(iron.secondary().isPresent() && iron.secondary().get().create().is(Items.STRING) && iron.secondary().get().count() == 2, "iron gives 2 string");
-        h.assertTrue(iron.effectiveEnergy() == 20000 && iron.effectiveTicks() == 100, "iron costs 20,000 FE over 100 ticks, got " + iron.effectiveEnergy() + "/" + iron.effectiveTicks());
+        h.assertTrue(iron.effectiveEnergy() == 20000 && iron.effectiveTicks() == 75, "iron costs 20,000 FE over 75 ticks (100 at the x1.35 speed), got " + iron.effectiveEnergy() + "/" + iron.effectiveTicks());
         h.succeed();
     }
 
@@ -2391,10 +2391,10 @@ public final class ModGameTests {
         BlockPos pos = new BlockPos(3, 1, 3);
         MechanicalSeparatorBlockEntity be = separator(h, pos);
         be.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(IRON, 1));
-        insertEnergy(be.getEnergy(), 5_000); // enough for 25 of 100 ticks
+        insertEnergy(be.getEnergy(), 5_000); // 20,000 FE over 75 ticks is 267 FE for the first 50: enough for 18 of them
         h.runAfterDelay(60, () -> {
             h.assertTrue(be.getStatus() == MachineStatus.NO_ENERGY, "status should be NO_ENERGY, was " + be.getStatus());
-            h.assertTrue(be.getProgress() == 25, "progress should pause at 25, was " + be.getProgress());
+            h.assertTrue(be.getProgress() == 18, "progress should pause at 18, was " + be.getProgress());
             h.assertTrue(!be.getInventory().getStack(SeparatorInventory.INPUT).isEmpty(), "input must remain");
             h.assertTrue(be.getInventory().getStack(SeparatorInventory.PRIMARY).isEmpty(), "no output without energy");
             h.assertFalse(h.getBlockState(pos).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.MechanicalSeparatorBlock.ACTIVE), "inactive when unpowered");
@@ -3622,7 +3622,7 @@ public final class ModGameTests {
                 && resource.equals(stack.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.SHEEP_RESOURCE.get()));
     }
 
-    /** 20 Iron Wool: two bales, 1,000 FE each over 40 ticks, and 2 wool left waiting. */
+    /** 20 Iron Wool: two bales, 1,000 FE each over 30 ticks, and 2 wool left waiting. */
     private static void woolPackerPresses(GameTestHelper h) {
         var be = packer(h, new BlockPos(1, 1, 1), ResourceWoolItem.create(IRON, 20), true);
         var gold = packer(h, new BlockPos(4, 1, 1), ResourceWoolItem.create(ResourcefulSheep.id("gold"), 8), true);
@@ -3632,7 +3632,7 @@ public final class ModGameTests {
         h.runAfterDelay(5, () -> h.assertTrue(h.getBlockState(new BlockPos(1, 1, 1)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.ACTIVE),
                 "the press runs"));
         h.runAfterDelay(41, () -> {
-            h.assertTrue(isBaleOf(be.output(), IRON, 1) && be.input().getCount() == 11, "one bale after 40 ticks, got " + be.output() + " / " + be.input());
+            h.assertTrue(isBaleOf(be.output(), IRON, 1) && be.input().getCount() == 11, "one bale after 30 ticks, got " + be.output() + " / " + be.input());
         });
         h.runAfterDelay(100, () -> {
             h.assertTrue(isBaleOf(be.output(), IRON, 2) && be.input().getCount() == 2, "two bales, 2 wool left, got " + be.output() + " / " + be.input());
@@ -3688,9 +3688,9 @@ public final class ModGameTests {
         h.assertTrue(iron.secondary().orElseThrow().count() == 24, "and 24 string, got " + iron.secondary());
         h.assertTrue(iron.bonus().orElseThrow().item().count() == 36 && Math.abs(iron.bonus().get().chance() - 0.1F) < 1e-6,
                 "and a 10% chance of 36 iron nuggets, got " + iron.bonus());
-        // 300,000 FE spread over 900 ticks is 334 FE/t once rounded up, so 300,600 in all.
-        h.assertTrue(iron.effectiveEnergy() >= 300_000 && iron.effectiveEnergy() < 300_900 && iron.effectiveTicks() == 900,
-                "for about 300,000 FE over 900 ticks, got " + iron.effectiveEnergy() + " / " + iron.effectiveTicks());
+        // 300,000 FE over 900 ticks of wool's time, which the x1.35 speed makes 667.
+        h.assertTrue(iron.effectiveEnergy() == 300_000 && iron.effectiveTicks() == 667,
+                "for 300,000 FE over 667 ticks, got " + iron.effectiveEnergy() + " / " + iron.effectiveTicks());
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.recipe.SeparationLookup.find(h.getLevel(),
                 new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BALE.get())).isEmpty(), "a blank bale doesn't separate");
         // Ender pearls stack to 16: a bale of pearl wool gives at most a stack.

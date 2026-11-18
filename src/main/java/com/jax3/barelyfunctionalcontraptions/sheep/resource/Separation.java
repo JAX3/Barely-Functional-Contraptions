@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.resource;
 
+import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyShare;
 import com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs;
 import java.util.Optional;
 import net.minecraft.util.Mth;
@@ -28,6 +29,19 @@ public record Separation(
     }
 
     /** FE consumed per processing tick. */
+    /** FE one whole operation takes: the recipe's cost with the multiplier, or the fixed per-tick override over its ticks. */
+    public long totalEnergy() {
+        int fixed = ModConfigs.getInt(ModConfigs.SERVER.energyPerTickOverride);
+        if (fixed > 0) return (long) fixed * effectiveTicks();
+        return (long) Math.ceil(energyCost.orElseGet(() -> ModConfigs.getInt(ModConfigs.SERVER.defaultEnergyCost))
+                * ModConfigs.getDouble(ModConfigs.SERVER.energyCostMultiplier));
+    }
+
+    /** FE for tick {@code tick} of the operation: the total spread exactly over its ticks. */
+    public int energyForTick(int tick) {
+        return EnergyShare.forTick(totalEnergy(), effectiveTicks(), tick);
+    }
+
     public int energyPerTick() {
         int fixed = ModConfigs.getInt(ModConfigs.SERVER.energyPerTickOverride);
         if (fixed > 0) return fixed;
@@ -36,9 +50,9 @@ public record Separation(
         return (int) Math.min(Integer.MAX_VALUE, (total + effectiveTicks() - 1) / effectiveTicks());
     }
 
-    /** Total FE for one operation (per-tick usage x ticks, so it is exactly what the machine draws). */
+    /** Total FE for one operation: exactly what the machine draws, spread over its ticks by {@link #energyForTick}. */
     public long effectiveEnergy() {
-        return (long) energyPerTick() * effectiveTicks();
+        return totalEnergy();
     }
 
     /** Smallest primary count before the global multiplier (the count stored in {@link #primary}). */

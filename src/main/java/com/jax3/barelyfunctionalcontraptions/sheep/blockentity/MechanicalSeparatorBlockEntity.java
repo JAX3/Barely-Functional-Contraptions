@@ -138,12 +138,12 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
                 newStatus = MachineStatus.REDSTONE_DISABLED;
             } else if (!outputsFit(sep)) {
                 newStatus = MachineStatus.OUTPUT_FULL;
-            } else if (energy.getEnergy() < energyPerTick) {
+            } else if (energy.getEnergy() < sep.energyForTick(progress)) {
                 newStatus = MachineStatus.NO_ENERGY;
                 if (ModConfigs.getBool(ModConfigs.SERVER.resetProgressWhenUnpowered)) progress = 0;
             } else {
                 newStatus = MachineStatus.PROCESSING;
-                energy.consume(energyPerTick);
+                energy.consume(sep.energyForTick(progress));
                 progress++;
                 if (progress >= maxProgress) {
                     finish(sep, level.getRandom());

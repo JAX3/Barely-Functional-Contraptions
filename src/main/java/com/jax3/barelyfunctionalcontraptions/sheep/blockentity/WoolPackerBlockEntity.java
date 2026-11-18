@@ -107,11 +107,11 @@ public class WoolPackerBlockEntity extends BlockEntity implements WorldlyContain
             progress = 0;
         } else if (!fits(bale)) {
             status = MachineStatus.OUTPUT_FULL;
-        } else if (energy.getAmountAsInt() < energyPerTick) {
+        } else if (energy.getAmountAsInt() < EnergyShare.forTick(cost, maxProgress, progress)) {
             status = MachineStatus.NO_ENERGY;
         } else {
             status = MachineStatus.PROCESSING;
-            energy.consume(energyPerTick);
+            energy.consume(EnergyShare.forTick(cost, maxProgress, progress));
             progress++;
             if (progress >= maxProgress) {
                 progress = 0;

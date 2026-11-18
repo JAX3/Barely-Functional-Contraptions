@@ -58,6 +58,9 @@ public final class ResourcefulSheep {
 
         container.registerConfig(ModConfig.Type.SYNCED, ModConfigs.SERVER_SPEC, BarelyFunctionalContraptions.MOD_ID + "-sheep-synced.toml");
         container.registerConfig(ModConfig.Type.CLIENT, ModConfigs.CLIENT_SPEC, BarelyFunctionalContraptions.MOD_ID + "-sheep-client.toml");
+        modBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Loading event) -> {
+            if (event.getConfig().getSpec() == ModConfigs.SERVER_SPEC) ModConfigs.migrate();
+        });
 
         NeoForge.EVENT_BUS.register(SheepResourceManager.Events.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceHeatManager.Events.class);

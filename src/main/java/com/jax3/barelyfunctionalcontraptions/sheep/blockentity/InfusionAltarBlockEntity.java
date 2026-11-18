@@ -141,13 +141,13 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
                 set(AltarStatus.MISSING_CATALYSTS, progress);
             } else if (sheep == null) {
                 set(AltarStatus.NO_SHEEP, progress);
-            } else if (energy.getAmountAsInt() < energyPerTick) {
+            } else if (energy.getAmountAsInt() < EnergyShare.forTick(ritual.effectiveEnergy(), maxProgress, progress)) {
                 sheepId = sheep.getId();
                 set(AltarStatus.NO_ENERGY, progress);
             } else {
                 sheepId = sheep.getId();
                 status = AltarStatus.INFUSING;
-                energy.consume(energyPerTick);
+                energy.consume(EnergyShare.forTick(ritual.effectiveEnergy(), maxProgress, progress));
                 progress++;
                 if (level.getGameTime() % 4 == 0) beam(level, pos, sheep, r);
                 slow(level, sheep);
