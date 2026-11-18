@@ -1616,9 +1616,9 @@ public final class DevScreenshotHarness {
      */
     private static final Object[][] EXTRA_SCENES = {
             // Added before, and already in the world: new blocks (x 166), themed sheep (202), blaze furnace (234),
-            // wool burner (262), wool packer (282), infusion altar (302), snow sheep chiller (322).
-            {"powered furnace", 342},
-            {"woollen armour", 362},
+            // wool burner (262), wool packer (282), infusion altar (302), snow sheep chiller (322),
+            // powered furnace (342), woollen armour (362).
+            {"sheep treadmill", 382},
     };
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
@@ -1871,40 +1871,55 @@ public final class DevScreenshotHarness {
     private static final java.util.List<net.minecraft.world.entity.animal.sheep.Sheep> snowWalkers = new java.util.ArrayList<>();
 
     /**
+     * Three Sheep Treadmills fed Hay Bales in a fenced pen, a sheep walking the left one and a sheared sheep the middle
+     * one, the right one empty, and one turned east.
+     */
+    private static void sheepTreadmillScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, 0, -8), origin.offset(6, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, -1, -8), origin.offset(6, -1, 3))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        var block = ModBlocks.SHEEP_TREADMILL.get();
+        var facing = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.FACING;
+        var part = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.PART;
+        for (int i = -1; i <= 1; i++) {
+            BlockPos back = origin.offset(i * 2, 0, -3);
+            level.setBlock(back, block.defaultBlockState().setValue(facing, Direction.NORTH).setValue(part, 0), 3);
+            level.setBlock(back.north(), block.defaultBlockState().setValue(facing, Direction.NORTH).setValue(part, 1), 3);
+            if (level.getBlockEntity(back) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity be) {
+                be.setItem(0, new ItemStack(Items.HAY_BLOCK, 16)); // over an hour of walking
+            }
+            if (i == 1) continue; // the right one waits for a sheep
+            var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            sheep.snapTo(back.getX() + 0.5, back.getY() + 0.4, back.getZ() + 0.1, 180, 0);
+            if (i == 0) sheep.setSheared(true);
+            level.addFreshEntity(sheep);
+        }
+        // A fence round the pen, so tired sheep wandering off to rest stay on the platform.
+        for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, 0, -8), origin.offset(6, 0, 3))) {
+            if (p.getX() == origin.getX() - 6 || p.getX() == origin.getX() + 6 || p.getZ() == origin.getZ() - 8 || p.getZ() == origin.getZ() + 3) {
+                level.setBlock(p, Blocks.OAK_FENCE.defaultBlockState(), 3);
+            }
+        }
+        // One turned east, to show it faces the way it's placed.
+        BlockPos turned = origin.offset(4, 0, -6);
+        level.setBlock(turned, block.defaultBlockState().setValue(facing, Direction.EAST).setValue(part, 0), 3);
+        level.setBlock(turned.east(), block.defaultBlockState().setValue(facing, Direction.EAST).setValue(part, 1), 3);
+    }
+
+    /**
      * Three Sheep Treadmills with wheat, a sheep walking the left one and a sheared sheep the middle one, the right one
      * empty, and one turned east; then the middle one's window: {@code -PharnessScene=sheep_treadmill}.
      */
     private static void sheepTreadmillTick(Minecraft mc, MinecraftServer server) {
         switch (tick) {
             case 60 -> server.execute(() -> {
-                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
-                ServerLevel level = player.level();
-                origin = player.blockPosition();
-                for (String c : new String[]{"time set noon", "weather clear", "gamemode spectator @a", "gamerule send_command_feedback false"}) {
-                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
-                }
-                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, 0, -8), origin.offset(6, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
-                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, -1, -8), origin.offset(6, -1, 3))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
-                var block = ModBlocks.SHEEP_TREADMILL.get();
-                var facing = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.FACING;
-                var part = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.PART;
-                for (int i = -1; i <= 1; i++) {
-                    BlockPos back = origin.offset(i * 2, 0, -3);
-                    level.setBlock(back, block.defaultBlockState().setValue(facing, Direction.NORTH).setValue(part, 0), 3);
-                    level.setBlock(back.north(), block.defaultBlockState().setValue(facing, Direction.NORTH).setValue(part, 1), 3);
-                    if (level.getBlockEntity(back) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity be) {
-                        be.setItem(0, new ItemStack(Items.WHEAT, 32));
-                    }
-                    if (i == 1) continue; // the right one waits for a sheep
-                    var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-                    sheep.snapTo(back.getX() + 0.5, back.getY() + 0.4, back.getZ() + 0.1, 180, 0);
-                    if (i == 0) sheep.setSheared(true);
-                    level.addFreshEntity(sheep);
-                }
-                // One turned east, to show it faces the way it's placed.
-                BlockPos turned = origin.offset(4, 0, -6);
-                level.setBlock(turned, block.defaultBlockState().setValue(facing, Direction.EAST).setValue(part, 0), 3);
-                level.setBlock(turned.east(), block.defaultBlockState().setValue(facing, Direction.EAST).setValue(part, 1), 3);
+                sheepTreadmillScene(server);
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamemode spectator @a");
             });
             case 70 -> setHudHidden(mc, true);
             case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 205 28", origin.getX() - 1.5, origin.getY() + 1.2, origin.getZ() + 1.5));
@@ -1977,8 +1992,8 @@ public final class DevScreenshotHarness {
 
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
-        // The latest scenes: the Powered Furnaces and the Woollen Armour.
-        String[] tps = {"tp @a 342.5 37 -6.5 180 25", "tp @a 362.5 35.6 -8 180 12"};
+        // The latest scene: the Sheep Treadmills.
+        String[] tps = {"tp @a 380.5 36.2 -7.5 205 28"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -2021,10 +2036,8 @@ public final class DevScreenshotHarness {
                     player.teleportTo(x + 0.5, 35, -8.5); // exactly on the spot, in case it drifted
                     // Earlier runs built woolBurnerScene, woolPackerScene, altarScene (with bone blocks and a
                     // wither rose in its catalyst slots 2 and 3) and chillerScene here.
-                    switch (i) {
-                        case 0 -> poweredFurnaceScene(server);
-                        default -> woollenArmorScene(server);
-                    }
+                    // and poweredFurnaceScene and woollenArmorScene.
+                    sheepTreadmillScene(server);
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
                 });
             }

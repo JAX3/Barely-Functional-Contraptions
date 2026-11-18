@@ -40,6 +40,7 @@ z = -9.
 | Snow Sheep Chiller with three Snow sheep, a hopper and chest under it, and its area shown | `/tp @s 322.5 37 -5.5 180 30` |
 | Powered Furnaces fed by hoppers, one alone and one sped up by two Blaze sheep (its area shown) | `/tp @s 342.5 37 -6.5 180 25` |
 | Woollen Armour on armour stands: white, red, light blue and a mixed set | `/tp @s 362.5 35.6 -8 180 12` |
+| Sheep Treadmills in a fenced pen: a sheep walking one, a sheared sheep another, one empty and one turned east, all fed Hay Bales | `/tp @s 380.5 36.2 -7.5 205 28` |
 
 The scenes from the New blocks on were added to the existing world with
 `./gradlew runClient -PscreenshotHarness -PharnessScene=extend_world "-PharnessWorld=BFC Test World"` (unzip this
