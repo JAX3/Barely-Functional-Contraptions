@@ -4179,185 +4179,192 @@ def generate_thermal_reaction_chamber_gui():
 
 
 # ---------------------------------------------------------------------------
-# Echo Chamber (WIP preview): the machines' blue-steel casing lined with sculk. A resonator dish on the front whose
-# rings pulse outward like a vibration, sound-dampening foam wedges on the sides with sculk veins creeping over them,
-# a power port and a sculk catalyst bay at the back, and a sculk grate on top between two glowing tendrils (the
-# Warden sheep's "ears", the same fronds the Warden sheep grows on its head).
+# Echo Chamber (WIP preview): a 3x3x3 machine in the blue-steel casing, lined with sculk. A big resonator dish on the
+# front whose rings pulse outward from a glowing heart, egg-crate sound-dampening foam on the side walls with sculk
+# creeping over some of it, a power port and two bays of sculk catalysts at the back, and on the roof a catalyst dome
+# between two big sculk fronds, the Warden sheep's "ears". The model is built by generate_echo_chamber_model.py; these
+# are its textures. Wall textures tile, one per block face.
 # ---------------------------------------------------------------------------
 SCULK = [hexc("#051a1f"), hexc("#0b2e36"), hexc("#10474f"), hexc("#0f7e8a"), hexc("#29dfeb"), hexc("#c9fbff")]
-ECHO_PAL = dict(CARTOON)
-ECHO_PAL.update({
-    "K": SCULK[0], "k": SCULK[1],                  # the sculk lining
-    "L": hexc("#29dfeb"),                          # status light
-    "e": hexc("#c98a12"), "E": hexc("#ffe14a"),   # power port ring
-})
-ECHO_CASING = [  # the frame and corner bolts round an open 10x10 panel (rows 3-12, columns 3-12)
-    "OOOOOOOOOOOOOOOO",
-    "OHHHHHHHHHHHHHMO",
-    "OHBbMMMMMMMMBbSO",
-    "OHbOOOOOOOOOOSSO",
-    "OHMO........OMSO",
-    "OHMO........OMSO",
-    "OHMO........OMSO",
-    "OHMO........OMSO",
-    "OHMO........OMSO",
-    "OHMO........OMSO",
-    "OHMO........OMSO",
-    "OHMO........OMSO",
-    "OHbOOOOOOOOOOSSO",
-    "OHBbMMMMMMMMBbSO",
-    "OHbSSSSSSSSSbSSO",
-    "OOOOOOOOOOOOOOOO",
-]
+ECHO_FOAM = [hexc("#161b29"), hexc("#222a3e"), hexc("#303b56"), hexc("#43507a"), hexc("#5a6a98")]
 
 
-def _echo_casing():
-    return grid(ECHO_CASING, ECHO_PAL)
+def _echo_animated(base, name, frames, frametime, draw):
+    strip = Image.new("RGBA", (draw(0).width, draw(0).height * frames))
+    for f in range(frames):
+        strip.paste(draw(f), (0, f * draw(0).height))
+    strip.save(out(base + name + ".png"))
+    with open(out(base + name + ".png.mcmeta"), "w") as fh:
+        fh.write('{\n  "animation": {\n    "frametime": %d,\n    "interpolate": true\n  }\n}\n' % frametime)
+
+
+def _echo_foam():
+    """Egg-crate foam: bumps lit from the top left. Their period is 4 pixels, so it tiles seamlessly."""
+    img = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            bump = (math.cos(math.pi * x / 2) + math.cos(math.pi * y / 2)) / 2
+            slope = math.sin(math.pi * x / 2) + math.sin(math.pi * y / 2)
+            v = 2 + bump * 1.2 - slope * 0.5
+            img.putpixel((x, y), ECHO_FOAM[max(0, min(4, int(round(v))))])
+    return img
 
 
 def _echo_patch(img, seed, centre, radius):
-    """A ragged patch of sculk spreading over the casing from {@code centre}, with a few glowing nodes."""
+    """A ragged patch of sculk spreading from {@code centre}, with a few glowing nodes."""
     rnd = random.Random(seed)
     cx, cy = centre
-    for y in range(16):
-        for x in range(16):
+    for y in range(img.height):
+        for x in range(img.width):
             d = math.hypot(x - cx, y - cy) + rnd.random() * 1.6
             if d < radius:
                 img.putpixel((x, y), SCULK[1] if rnd.random() < 0.6 else SCULK[2])
+                if d < radius * 0.7 and rnd.random() < 0.07:
+                    img.putpixel((x, y), SCULK[4])
             elif d < radius + 0.8 and rnd.random() < 0.5:
                 img.putpixel((x, y), mix(img.getpixel((x, y)), SCULK[1], 0.6))
-    # Glowing nodes: one at the heart of the patch and one partway out.
-    img.putpixel((int(cx), int(cy)), SCULK[4])
-    img.putpixel((int(cx + radius * 0.5), int(cy - radius * 0.5)), SCULK[4])
-    img.putpixel((int(cx + radius * 0.5) + 1, int(cy - radius * 0.5)), SCULK[3])
 
 
-def _echo_resonator(f, frames):
-    """The front dish: a dark sculk well with rings pulsing outward from a glowing heart, one frame."""
-    img = Image.new("RGBA", (8, 8), SCULK[0])
+def _echo_dish(f, frames):
+    """The 32x32 resonator dish: a dark sculk well in rings, a wave running outward from the middle, one frame."""
+    img = Image.new("RGBA", (32, 32), SCULK[0])
     phase = f / frames
-    for y in range(8):
-        for x in range(8):
-            r = math.hypot(x - 3.5, y - 3.5)
-            if r > 4.3:
-                img.putpixel((x, y), SCULK[1])
+    for y in range(32):
+        for x in range(32):
+            r = math.hypot(x - 15.5, y - 15.5)
+            if r > 15.6:
+                img.putpixel((x, y), SCULK[1] if (x + y) % 2 else SCULK[2])  # the corners outside the dish
                 continue
-            c = SCULK[0] if int(r) % 2 else SCULK[1]
-            # A wave running outward: bright where the ring is now, fading behind it.
-            d = (r / 4.3 - phase) % 1.0
-            if d < 0.25:
-                c = mix(c, SCULK[4], 1 - d / 0.25)
-            elif d > 0.85:
-                c = mix(c, SCULK[3], (d - 0.85) / 0.15 * 0.6)
+            ring = int(r / 2) % 2
+            c = SCULK[0] if ring else SCULK[1]
+            if int(r) % 4 == 3:
+                c = SCULK[2]  # the dish's ridges
+            d = (r / 15.6 - phase) % 1.0
+            if d < 0.12:
+                c = mix(c, SCULK[4], 1 - d / 0.12)
+            elif d > 0.9:
+                c = mix(c, SCULK[3], (d - 0.9) / 0.1 * 0.6)
             img.putpixel((x, y), c)
-    heart = mix(SCULK[4], SCULK[5], 0.5 + 0.5 * math.sin(2 * math.pi * phase))
-    for x, y in ((3, 3), (4, 3), (3, 4), (4, 4)):
-        img.putpixel((x, y), heart)
+    for a in range(0, 360, 6):  # the rim
+        x, y = 15.5 + 15.2 * math.cos(math.radians(a)), 15.5 + 15.2 * math.sin(math.radians(a))
+        img.putpixel((int(round(x)), int(round(y))), CARTOON["S"])
     return img
 
 
 def generate_echo_chamber():
     base = "block/echo_chamber/"
+    import shutil
+    shutil.rmtree(out(base), ignore_errors=True)
     os.makedirs(out(base), exist_ok=True)
 
-    # Front: the resonator in a ring bezel, with a status light under it. Animated: 12 frames.
-    frames = 12
-    front = _echo_casing()
-    for y in range(4, 12):
-        for x in range(4, 12):
-            front.putpixel((x, y), SCULK[1])
-    strip = Image.new("RGBA", (16, 16 * frames))
-    for f in range(frames):
-        frame = front.copy()
-        frame.paste(_echo_resonator(f, frames), (4, 4))
-        strip.paste(frame, (0, f * 16))
-    strip.save(out(base + "front.png"))
-    with open(out(base + "front.png.mcmeta"), "w") as fh:
-        fh.write('{\n  "animation": {\n    "frametime": 3,\n    "interpolate": true\n  }\n}\n')
-    front.paste(_echo_resonator(0, frames), (4, 4))
-    front.save(out(base + "front_still.png"))  # the particle texture
+    foam = _echo_foam()
+    foam.save(out(base + "foam.png"))
+    for i, (centre, radius) in enumerate((((2, 14), 7.5), ((14, 15), 6.0), ((3, 1), 5.0))):
+        patched = foam.copy()
+        _echo_patch(patched, 20 + i, centre, radius)
+        patched.save(out(base + "foam_sculk_%d.png" % i))
 
-    # Sides: egg-crate sound-dampening foam, bumps lit from the top left, with a patch of sculk creeping over a corner.
-    side = _echo_casing()
-    FOAM = [hexc("#161b29"), hexc("#222a3e"), hexc("#303b56"), hexc("#43507a"), hexc("#5a6a98")]
-    for y in range(4, 12):
-        for x in range(4, 12):
-            bump = (math.cos(math.pi * (x - 4) / 2) + math.cos(math.pi * (y - 4) / 2)) / 2  # +1 on a peak, -1 in a hollow
-            slope = math.sin(math.pi * (x - 4) / 2) + math.sin(math.pi * (y - 4) / 2)    # lit side of each bump
-            v = 2 + bump * 1.2 - slope * 0.5
-            side.putpixel((x, y), FOAM[max(0, min(4, int(round(v))))])
-    _echo_patch(side, 7, (2.5, 13.5), 3.6)
-    side.save(out(base + "side.png"))
+    _echo_animated(base, "dish", 16, 2, lambda f: _echo_dish(f, 16))
 
-    # Back: a power port on the left and a sculk catalyst bay on the right.
-    back = _echo_casing()
-    PORT = [
-        "eEEe",
-        "EKKE",
-        "EKKE",
-        "eEEe",
-    ]
-    for y in range(4, 12):
-        for x in range(4, 12):
-            back.putpixel((x, y), CARTOON["M"])
-    for y, row in enumerate(PORT):
-        for x, ch in enumerate(row):
-            back.putpixel((4 + x, 6 + y), ECHO_PAL[ch])
-    for y in range(5, 11):  # the catalyst bay
-        for x in range(8, 12):
-            edge = x in (8, 11) or y in (5, 10)
-            back.putpixel((x, y), CARTOON["O"] if edge else SCULK[2])
-    for x, y in ((9, 7), (10, 8), (9, 9)):
-        back.putpixel((x, y), SCULK[4])
-    for x, y in ((10, 6), (9, 8), (10, 9)):
-        back.putpixel((x, y), hexc("#d8d0b8"))  # the catalyst's bone-white teeth
-    back.save(out(base + "back.png"))
+    def heart(f):
+        img = Image.new("RGBA", (16, 16), SCULK[1])
+        glow = 0.5 + 0.5 * math.sin(2 * math.pi * f / 8)
+        for y in range(16):
+            for x in range(16):
+                r = math.hypot(x - 7.5, y - 7.5)
+                if r < 7.5:
+                    img.putpixel((x, y), mix(SCULK[3], SCULK[5], max(0.0, 1 - r / 7.5) * (0.5 + 0.5 * glow)))
+                if r >= 6.8:
+                    img.putpixel((x, y), CARTOON["O"])
+        return img
+    _echo_animated(base, "heart", 8, 3, heart)
 
-    # Top: a sculk grate in the middle, glowing where vibrations have reached it.
-    top = _echo_casing()
+    # Casing plate: plain metal panels with a seam round each block and rivets in the corners.
+    plate = Image.new("RGBA", (16, 16), CARTOON["M"])
+    for i in range(16):
+        plate.putpixel((i, 0), CARTOON["H"]); plate.putpixel((0, i), CARTOON["H"])
+        plate.putpixel((i, 15), CARTOON["S"]); plate.putpixel((15, i), CARTOON["S"])
+    for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
+        plate.putpixel((x, y), CARTOON["B"]); plate.putpixel((x + 1, y + 1), CARTOON["b"])
+    plate.save(out(base + "plate.png"))
+
+    # Pillars: a column of casing with bolts down it, lit on the left.
+    pillar = Image.new("RGBA", (16, 16), CARTOON["M"])
+    for y in range(16):
+        for x in range(16):
+            c = CARTOON["H"] if x < 3 else CARTOON["S"] if x > 12 else CARTOON["M"]
+            if x in (0, 15):
+                c = CARTOON["O"]
+            pillar.putpixel((x, y), c)
+        if y % 8 == 3:
+            for x in (6, 9):
+                pillar.putpixel((x, y), CARTOON["B"]); pillar.putpixel((x, y + 1), CARTOON["b"])
+    pillar.save(out(base + "pillar.png"))
+
+    # The plinth and the roof band: a dark rail with bright bolts, the bottom four rows of each block face.
+    band = plate.copy()
+    for y in range(12, 16):
+        for x in range(16):
+            c = CARTOON["S"] if y in (12, 15) else CARTOON["k"]
+            if y in (13, 14) and x % 8 == 3:
+                c = CARTOON["B"] if y == 13 else CARTOON["b"]
+            band.putpixel((x, y), c)
+    band.save(out(base + "band.png"))
+
+    # Roof: sculk under a grate of casing bars, glowing where vibrations have reached it.
+    grate = Image.new("RGBA", (16, 16))
     rnd = random.Random(11)
-    for y in range(4, 12):
-        for x in range(4, 12):
+    for y in range(16):
+        for x in range(16):
             c = SCULK[0] if (x + y) % 2 else SCULK[1]
-            if y in (5, 8, 10) and x not in (4, 11):
-                c = CARTOON["S"]  # grate bars
-            elif rnd.random() < 0.12:
+            if rnd.random() < 0.08:
                 c = SCULK[3]
-            top.putpixel((x, y), c)
-    top.save(out(base + "top.png"))
+            if y % 4 == 0:
+                c = CARTOON["S"] if y % 8 else CARTOON["M"]
+            grate.putpixel((x, y), c)
+    grate.save(out(base + "grate.png"))
 
-    grid(MACHINE_BLOCK, CARTOON).save(out(base + "bottom.png"))
+    # Power port: a big yellow ring on a casing plate.
+    port = plate.copy()
+    for y in range(16):
+        for x in range(16):
+            r = math.hypot(x - 7.5, y - 7.5)
+            if r < 6.5:
+                port.putpixel((x, y), CARTOON["O"] if r >= 5.6 else CARTOON["E"] if r >= 3.8 else CARTOON["e"] if r >= 2.8 else CARTOON["K"])
+    port.save(out(base + "port.png"))
 
-    # The ears: the Warden sheep's sculk frond (see generate_sheep_extras), 6x8 at pixel 5,8, with its glow breathing
-    # in and out. Animated: 8 frames.
-    def frond(x, y, glow):
-        cx = abs(x - 2.5)
-        if cx > 1.6 + y * 0.35:
-            return None
-        if y <= 1 and cx < 1.5:
-            return mix(SCULK[4], SCULK[5], glow)
-        if cx < 0.6:
-            return mix(SCULK[3], SCULK[4], 0.4 + 0.6 * glow)
-        return hexc("#0E5A63") if (x + y) % 3 else hexc("#0A3F47")
-    frames = 8
-    strip = Image.new("RGBA", (16, 16 * frames), CLEAR)
-    for f in range(frames):
-        glow = 0.5 + 0.5 * math.sin(2 * math.pi * f / frames)
-        for y in range(8):
-            for x in range(6):
-                c = frond(x, y, glow)
-                if c is not None:
-                    strip.putpixel((5 + x, f * 16 + 8 + y), c)
-    strip.save(out(base + "ear.png"))
-    with open(out(base + "ear.png.mcmeta"), "w") as fh:
-        fh.write('{\n  "animation": {\n    "frametime": 4,\n    "interpolate": true\n  }\n}\n')
-
-    # The bezel round the dish and the tendril sockets: plain casing metal.
+    # Trim: plain casing metal for bezels and edges.
     trim = Image.new("RGBA", (16, 16), CARTOON["M"])
     for x in range(16):
         trim.putpixel((x, 0), CARTOON["H"]); trim.putpixel((x, 15), CARTOON["S"])
     trim.save(out(base + "trim.png"))
 
+    grid(MACHINE_BLOCK, CARTOON).save(out(base + "bottom.png"))
+
+    # The ears: big sculk fronds like the Warden sheep's, narrow at the tip and wide at the root, their glow breathing
+    # in and out.
+    def ear(f):
+        img = Image.new("RGBA", (16, 16), CLEAR)
+        glow = 0.5 + 0.5 * math.sin(2 * math.pi * f / 8)
+        for y in range(16):
+            half = 1.2 + y * 0.42
+            for x in range(16):
+                cx = abs(x - 7.5)
+                if cx > half:
+                    continue
+                if y <= 2 and cx < 1.6:
+                    c = mix(SCULK[4], SCULK[5], glow)
+                elif cx < 0.9:
+                    c = mix(SCULK[3], SCULK[4], 0.4 + 0.6 * glow)
+                elif cx > half - 1:
+                    c = hexc("#0A3F47")
+                else:
+                    c = hexc("#0E5A63") if (x + y) % 3 else hexc("#0A3F47")
+                    if (x * 7 + y * 3) % 11 == 0:
+                        c = mix(SCULK[3], SCULK[4], glow)
+                img.putpixel((x, y), c)
+        return img
+    _echo_animated(base, "ear", 8, 4, ear)
 
 def main():
     generate_wool_items()

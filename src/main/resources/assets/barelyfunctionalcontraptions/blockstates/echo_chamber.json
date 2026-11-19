@@ -1,19 +1,334 @@
 {
   "variants": {
-    "facing=north": {
+    "facing=north,layer=0,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=0,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=0,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=0,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=0,part=4": {
       "model": "barelyfunctionalcontraptions:block/echo_chamber"
     },
-    "facing=east": {
+    "facing=north,layer=0,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=0,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=0,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=0,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=1,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=1,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=1,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=1,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=1,part=4": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=1,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=1,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=1,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=1,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=2,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=2,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=2,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=2,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=2,part=4": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_top"
+    },
+    "facing=north,layer=2,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=2,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=2,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=north,layer=2,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=0,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=0,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=0,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=0,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=0,part=4": {
       "model": "barelyfunctionalcontraptions:block/echo_chamber",
       "y": 90
     },
-    "facing=south": {
+    "facing=east,layer=0,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=0,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=0,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=0,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=1,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=1,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=1,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=1,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=1,part=4": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=1,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=1,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=1,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=1,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=2,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=2,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=2,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=2,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=2,part=4": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_top",
+      "y": 90
+    },
+    "facing=east,layer=2,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=2,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=2,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=east,layer=2,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=0,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=0,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=0,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=0,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=0,part=4": {
       "model": "barelyfunctionalcontraptions:block/echo_chamber",
       "y": 180
     },
-    "facing=west": {
+    "facing=south,layer=0,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=0,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=0,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=0,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=1,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=1,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=1,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=1,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=1,part=4": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=1,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=1,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=1,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=1,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=2,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=2,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=2,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=2,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=2,part=4": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_top",
+      "y": 180
+    },
+    "facing=south,layer=2,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=2,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=2,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=south,layer=2,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=0,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=0,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=0,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=0,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=0,part=4": {
       "model": "barelyfunctionalcontraptions:block/echo_chamber",
       "y": 270
+    },
+    "facing=west,layer=0,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=0,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=0,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=0,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=1,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=1,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=1,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=1,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=1,part=4": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=1,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=1,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=1,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=1,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=2,part=0": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=2,part=1": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=2,part=2": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=2,part=3": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=2,part=4": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_top",
+      "y": 270
+    },
+    "facing=west,layer=2,part=5": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=2,part=6": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=2,part=7": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
+    },
+    "facing=west,layer=2,part=8": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber_part"
     }
   }
 }

@@ -153,6 +153,7 @@ public final class ModGameTests {
         TESTS.put("wrench_dismantles_machines_into_the_inventory", ModGameTests::wrenchDismantles);
         TESTS.put("woollen_boots_muffle_the_wearer", ModGameTests::woollenBootsMuffle);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
+        if (ModBlocks.ECHO_CHAMBER != null) TESTS.put("echo_chamber_is_three_by_three", ModGameTests::echoChamber);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -647,15 +648,28 @@ public final class ModGameTests {
         var glow = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.SHEEP_GLOW.get();
         h.runAfterDelay(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.GLOW_PLACE_TICKS * 2, () -> {
             h.assertTrue(h.getLevel().getBlockState(at).is(glow), "a glowing sheep lights the block it stands in, found " + h.getLevel().getBlockState(at));
-            h.assertTrue(h.getLevel().getBrightness(net.minecraft.world.level.LightLayer.BLOCK, at) == com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.LIGHT_LEVEL,
-                    "the light is level 12, got " + h.getLevel().getBrightness(net.minecraft.world.level.LightLayer.BLOCK, at));
-            // Sheared: no more glow, and the light goes out on its next check.
-            sheep.setSheared(true);
-            h.runAfterDelay(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.CHECK_TICKS + 2, () -> {
-                h.assertTrue(h.getLevel().getBlockState(at).isAir(), "the light goes out once the sheep is sheared, found " + h.getLevel().getBlockState(at));
-                h.succeed();
+            // The light itself is worked out on the light engine's own thread, which can fall behind on a busy test server.
+            waitFor(h, 60, () -> h.getLevel().getBrightness(net.minecraft.world.level.LightLayer.BLOCK, at) == com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.LIGHT_LEVEL,
+                    () -> "the light is level 12, got " + h.getLevel().getBrightness(net.minecraft.world.level.LightLayer.BLOCK, at), () -> {
+                // Sheared: no more glow, and the light goes out on its next check.
+                sheep.setSheared(true);
+                h.runAfterDelay(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.CHECK_TICKS + 2, () -> {
+                    h.assertTrue(h.getLevel().getBlockState(at).isAir(), "the light goes out once the sheep is sheared, found " + h.getLevel().getBlockState(at));
+                    h.succeed();
+                });
             });
         });
+    }
+
+    /** Runs {@code then} as soon as {@code done} holds, checking every tick; fails with {@code why} after {@code ticks}. */
+    private static void waitFor(GameTestHelper h, int ticks, java.util.function.BooleanSupplier done, java.util.function.Supplier<String> why, Runnable then) {
+        if (done.getAsBoolean()) {
+            then.run();
+        } else if (ticks <= 0) {
+            h.fail(why.get());
+        } else {
+            h.runAfterDelay(1, () -> waitFor(h, ticks - 1, done, why, then));
+        }
     }
 
     private static void melonSliceSkin(GameTestHelper h) {
@@ -1052,6 +1066,53 @@ public final class ModGameTests {
                     h.assertTrue(h.getBlockState(at).isAir(), "corner " + p + " layer " + l + " is gone too, was " + h.getBlockState(at));
                 }
             }
+            h.succeed();
+        });
+    }
+
+    /**
+     * The work-in-progress Echo Chamber fills the 3x3x3 space behind and above where it's placed, facing the player;
+     * breaking any block of it removes the lot, and it won't place where any of that space is taken.
+     */
+    private static void echoChamber(GameTestHelper h) {
+        var block = ModBlocks.ECHO_CHAMBER.get();
+        var part = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.PART;
+        var layer = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.LAYER;
+        var facingProperty = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.FACING;
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.STONE);
+        // The middle of the platform, so it fits whichever way the mock player faces.
+        BlockPos floor = h.absolutePos(new BlockPos(3, 0, 3));
+        Runnable place = () -> {
+            Player player = playerHolding(h, new ItemStack(ModItems.ECHO_CHAMBER.get()));
+            player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND,
+                    new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floor), Direction.UP, floor, false)));
+        };
+        place.run();
+        BlockPos origin = floor.above();
+        net.minecraft.world.level.block.state.BlockState placed = h.getLevel().getBlockState(origin);
+        h.assertTrue(placed.is(block), "the front middle block is where it was placed, was " + placed);
+        Direction facing = placed.getValue(facingProperty);
+        java.util.List<BlockPos> all = new java.util.ArrayList<>();
+        for (int p = 0; p < 9; p++) {
+            for (int l = 0; l < 3; l++) {
+                BlockPos at = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.at(origin, facing, p, l);
+                net.minecraft.world.level.block.state.BlockState state = h.getLevel().getBlockState(at);
+                h.assertTrue(state.is(block) && state.getValue(part) == p && state.getValue(layer) == l && state.getValue(facingProperty) == facing,
+                        "column " + p + " layer " + l + " at " + at + ", was " + state);
+                all.add(at);
+            }
+        }
+        // (Test platforms can be rotated, so this checks world positions: its bottom layer stands on the stone floor.)
+        h.assertTrue(all.stream().distinct().count() == 27 && all.stream().filter(at -> at.getY() == origin.getY())
+                .allMatch(at -> h.getLevel().getBlockState(at.below()).is(Blocks.STONE)), "27 different blocks, standing on the floor");
+        // Breaking the top back corner takes the rest with it.
+        h.getLevel().destroyBlock(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.at(origin, facing, 8, 2), false);
+        h.runAfterDelay(2, () -> {
+            for (BlockPos at : all) h.assertTrue(h.getLevel().getBlockState(at).isAir(), at + " is gone too, was " + h.getLevel().getBlockState(at));
+            // Blocked: a stone where its top back corner would go.
+            h.getLevel().setBlockAndUpdate(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.at(origin, facing, 8, 2), Blocks.STONE.defaultBlockState());
+            place.run();
+            h.assertFalse(h.getLevel().getBlockState(origin).is(block), "it won't place where any of its space is taken");
             h.succeed();
         });
     }

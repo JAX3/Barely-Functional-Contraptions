@@ -8,20 +8,21 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.5-mc26.3.jar` |
 | Build for 26.2 | `./gradlew build -Pmc=26.2` | ✅ BUILD SUCCESSFUL (unit tests included), produces `build/mc26.2/libs/barelyfunctionalcontraptions-1.5.5-mc26.2.jar` |
-| GameTests on 26.2 | `./gradlew runGameTestServer -Pmc=26.2` | ✅ **All 158 required tests passed**, with no data files failing to load |
+| GameTests on 26.2 | `./gradlew runGameTestServer -Pmc=26.2` | ✅ **All 159 required tests passed**, with no data files failing to load |
 | Real client on 26.2 | `./gradlew runClient -Pmc=26.2 -PscreenshotHarness -PharnessScene=thermal_reaction_chamber` | ✅ Loads with JEI and Jade and no errors from the mod; the chamber, its window, the JEI page and Jade look the same as on 26.3 |
 | Build for 26.1 | `./gradlew build -Pmc=26.1` | ✅ BUILD SUCCESSFUL (unit tests included), produces `build/mc26.1/libs/barelyfunctionalcontraptions-1.5.5-mc26.1.jar` |
-| GameTests on 26.1 | `./gradlew runGameTestServer -Pmc=26.1` | ✅ **All 158 required tests passed**, with no data files failing to load and no warnings |
+| GameTests on 26.1 | `./gradlew runGameTestServer -Pmc=26.1` | ✅ **All 159 required tests passed**, with no data files failing to load and no warnings |
 | Real client on 26.1 | `./gradlew runClient -Pmc=26.1 -PscreenshotHarness -PharnessScene=thermal_reaction_chamber` and `-PharnessScene=creative_sections` | ✅ Loads with JEI and Jade and no errors from the mod; the chamber, its window, the JEI page, Jade and the folding creative-tab sections look the same as on 26.3 |
 | Unit tests | `./gradlew test` | ✅ 39/39 passed |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 158 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 123 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 159 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 124 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 51 screenshots and 12 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Themed sheep (the ideas in `Custom block.txt`)
 | Check | Result |
 |---|---|
 | GameTest `themed_sheep_have_their_features` | ✅ All ten themed resources load with their features; Hay uses the hay-bale fleece; a Nether Star makes a Wither sheep, whose wool separates into nether stars; the original 14 resources have no extra features |
-| GameTest `glowing_sheep_lights_the_block_it_stands_in` | ✅ A Glow Ink sheep puts a light-level-12 light where it stands; once it's sheared the light goes out on its next check |
+| GameTest `glowing_sheep_lights_the_block_it_stands_in` | ✅ A Glow Ink sheep puts a light-level-12 light where it stands; once it's sheared the light goes out on its next check. The test waits up to 3 seconds for the light, because the light engine works on its own thread and can fall a little behind on a busy test server |
+| GameTest `echo_chamber_is_three_by_three` (development builds) | ✅ The work-in-progress Echo Chamber fills the 3x3x3 space behind and above where it's placed, all 27 blocks facing the player; breaking one removes the lot, and it won't place where any of the space is taken |
 | GameTest `ghast_sheep_screams_like_a_ghast` | ✅ A Ghast sheep's bleat becomes the ghast's scream, and its hurt and death sounds the ghast's, even when sheared; a plain sheep still bleats; the `screaming` feature on its own gives the screaming goat's sounds |
 | GameTest `ghast_sheep_is_twice_the_size` | ✅ A Ghast sheep's `minecraft:scale` becomes 2 and its hitbox doubles; shearing doesn't change it, and once the infusion is gone it's back to 1 with the modifier removed |
 | GameTest `energy_meter_measures_what_passes_through` | ✅ Pushes from the back reach the block in front, pulls from the front draw from behind, nothing goes backwards, only the back and front connect, rolled-back transfers aren't counted, the reading matches the 10,000 FE/t the cube takes, and the comparator gives 10 |

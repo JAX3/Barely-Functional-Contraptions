@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "barelyfunctionalcontraptions:block/echo_chamber"
+    "model": "barelyfunctionalcontraptions:item/echo_chamber"
   }
 }
