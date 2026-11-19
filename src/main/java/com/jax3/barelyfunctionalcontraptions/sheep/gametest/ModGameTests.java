@@ -161,6 +161,7 @@ public final class ModGameTests {
         TESTS.put("thermal_reaction_chamber_spent_fleece_stops_counting", ModGameTests::thermalFatigue);
         TESTS.put("thermal_reaction_chamber_keeps_its_balance_when_full", ModGameTests::thermalFull);
         TESTS.put("chiller_calls_a_stray_snow_sheep_back", ModGameTests::chillerAttracts);
+        TESTS.put("wrench_has_its_common_tags", ModGameTests::wrenchTags);
         TESTS.put("thermal_reaction_chamber_calls_a_stray_back_to_even_its_herds", ModGameTests::thermalAttracts);
         SOLO_TESTS.put("thermal_reaction_chamber_melts_down_when_hot", ModGameTests::thermalMeltdown);
         SOLO_TESTS.put("thermal_reaction_chamber_freezes_solid_when_cold", ModGameTests::thermalFreeze);
@@ -1393,6 +1394,16 @@ public final class ModGameTests {
             h.assertTrue(snow.getData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.THERMAL_FATIGUE).ticks() > 0, "and the fleece wears again");
             h.succeed();
         });
+    }
+
+    /** The wrench is in c:tools, c:tools/wrench (so other mods treat it as a wrench) and c:storable_item. */
+    private static void wrenchTags(GameTestHelper h) {
+        ItemStack wrench = new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get());
+        for (String tag : new String[]{"tools", "tools/wrench", "storable_item"}) {
+            var key = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, Identifier.fromNamespaceAndPath("c", tag));
+            h.assertTrue(wrench.is(key), "the wrench is in #c:" + tag);
+        }
+        h.succeed();
     }
 
     /** A Snow sheep a few blocks outside a chiller's area walks back into it and is counted. */

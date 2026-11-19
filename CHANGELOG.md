@@ -87,6 +87,9 @@ ones, and anything you changed is kept.
 Mining one of the mod's blocks with the wrench breaks it instantly and puts it, with its contents, straight into your
 inventory.
 
+The wrench is now in the common tags `#c:tools`, `#c:tools/wrench` and `#c:storable_item`, so other mods that accept
+any wrench recognise it.
+
 #### Sectioned creative tabs
 - The main tab is split into the manual's sections: Power, Logistics, Production and Utility.
 - The Resource Wool tab is split into Wool, Bales and Spawn Eggs.
