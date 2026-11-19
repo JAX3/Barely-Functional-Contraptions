@@ -138,6 +138,20 @@ for x, lean in ((9, 22.5), (39, -22.5)):
     rotated.append({"name": "ear", "from": [x - 5, 46, 24], "to": [x + 5, 64, 24], "shade": False,
                     "rotation": {"angle": lean, "axis": "z", "origin": [x, 46, 24]},
                     "faces": {"north": {"uv": [0, 0, 16, 16], "texture": "#ear"}, "south": {"uv": [16, 0, 0, 16], "texture": "#ear"}}})
+# Smaller fronds along the front and back edges of the roof, leaning out over them (a +x turn tips the top towards +z).
+for x in (14, 34):
+    for z, lean in ((7, -22.5), (41, 22.5)):
+        box([x - 2, 44, z - 2], [x + 2, 45.5, z + 2], faces("trim", SIDES + ("up",)))
+        rotated.append({"name": "frond", "from": [x, 45.5, z - 4], "to": [x, 58.5, z + 4], "shade": False,
+                        "rotation": {"angle": lean, "axis": "x", "origin": [x, 45.5, z]},
+                        "faces": {"east": {"uv": [0, 0, 16, 16], "texture": "#ear"}, "west": {"uv": [16, 0, 0, 16], "texture": "#ear"}}})
+# And short tufts in the corners: two fronds crossed, like a sculk sensor's tendrils.
+for x in (6, 42):
+    for z in (6, 42):
+        for angle in (45, -45):
+            rotated.append({"name": "tuft", "from": [x - 3, 44, z], "to": [x + 3, 52, z], "shade": False,
+                            "rotation": {"angle": angle, "axis": "y", "origin": [x, 48, z]},
+                            "faces": {"north": {"uv": [0, 0, 16, 16], "texture": "#ear"}, "south": {"uv": [16, 0, 0, 16], "texture": "#ear"}}})
 
 
 # ---- Writing the models ----
