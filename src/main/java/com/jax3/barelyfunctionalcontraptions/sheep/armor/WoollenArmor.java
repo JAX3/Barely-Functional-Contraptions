@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.armor;
 
+import com.jax3.barelyfunctionalcontraptions.compat.Vanilla;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -57,7 +58,7 @@ public final class WoollenArmor {
         if (woolColours == null) {
             Map<Item, DyeColor> map = new IdentityHashMap<>();
             for (DyeColor colour : DyeColor.values()) {
-                map.put(Items.WOOL.pick(colour), colour);
+                map.put(Vanilla.wool(colour), colour);
             }
             woolColours = map;
         }

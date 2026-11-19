@@ -5,7 +5,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.148'
 }
 
-// The Minecraft version to build for: ./gradlew build -Pmc=26.2 (default 26.3). Each one has a versions/<mc>.properties
+// The Minecraft version to build for: ./gradlew build -Pmc=26.2 or -Pmc=26.1 (default 26.3). Each one has a versions/<mc>.properties
 // file (Minecraft, NeoForge, JEI and Jade versions) and a src/mc/<mc> folder of the few classes and data files that differ
 // between versions; everything else in src/main is shared.
 def mc = (findProperty('mc') ?: '26.3').toString()
@@ -111,9 +111,9 @@ neoForge {
 sourceSets.main.java.srcDir "src/mc/${mc}/java"
 sourceSets.main.resources.srcDir "src/mc/${mc}/resources"
 
-// The loot tables and advancements in src/main are in 26.3's data format; the 26.2 build converts them as it copies them
+// The loot tables and advancements in src/main are in 26.3's data format; the 26.2 and 26.1 builds convert them as they copy them
 // (see buildSrc/src/main/groovy/McDataDowngrade.groovy).
-if (mc == '26.2') {
+if (mc == '26.2' || mc == '26.1') {
     tasks.named('processResources', ProcessResources).configure {
         filesMatching(['data/*/loot_table/**/*.json', 'data/*/advancement/**/*.json']) {
             filter(McDataDowngrade)
@@ -183,6 +183,7 @@ jar {
     exclude 'com/jax3/barelyfunctionalcontraptions/gametest/**',
             'com/jax3/barelyfunctionalcontraptions/*/gametest/**',
             'com/jax3/barelyfunctionalcontraptions/sheep/client/DevScreenshotHarness*',
+            'com/jax3/barelyfunctionalcontraptions/compat/McTest*',
             'data/barelyfunctionalcontraptions/test_instance/**',
             'data/barelyfunctionalcontraptions/test_environment/**',
             'data/barelyfunctionalcontraptions/structure/**'

@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.gametest;
 
+import com.jax3.barelyfunctionalcontraptions.compat.Vanilla;
 import com.jax3.barelyfunctionalcontraptions.BarelyFunctionalContraptions;
 import com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.GeneratorState;
 import com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity;
@@ -25,7 +26,6 @@ import net.minecraft.gametest.framework.TestEnvironmentDefinition;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -150,7 +150,7 @@ public final class IntegrationGameTests {
                 .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, net.minecraft.core.Direction.SOUTH));
         var shears = h.getBlockEntity(shearsPos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.class);
         MycelialGeneratorBlockEntity generator = generator(h, new BlockPos(3, 1, 0), new ItemStack(Items.BROWN_MUSHROOM, 8), 4000);
-        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(3, 1, 3));
+        Sheep sheep = h.spawn(Vanilla.SHEEP, new BlockPos(3, 1, 3));
         sheep.setNoAi(true);
         sheep.setColor(DyeColor.WHITE);
         h.assertTrue(shears.getEnergy().getEnergy() == 0, "starts unpowered");
@@ -158,7 +158,7 @@ public final class IntegrationGameTests {
             h.assertTrue(generator.getState() == GeneratorState.RUNNING, "generator running, was " + generator.getState());
             h.assertTrue(sheep.isSheared(), "sheep sheared on mycelial power");
             boolean stored = false;
-            for (int i = 0; i < shears.getContainerSize(); i++) stored |= shears.getItem(i).is(Items.WOOL.white());
+            for (int i = 0; i < shears.getContainerSize(); i++) stored |= shears.getItem(i).is(Vanilla.wool(DyeColor.WHITE));
             h.assertTrue(stored, "wool stored in the shears");
         });
     }
@@ -268,7 +268,7 @@ public final class IntegrationGameTests {
                 .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, net.minecraft.core.Direction.SOUTH));
         var shears = h.getBlockEntity(shearsPos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.class);
         shears.getEnergy().set(shears.getEnergy().getCapacityAsInt());
-        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(3, 1, 2));
+        Sheep sheep = h.spawn(Vanilla.SHEEP, new BlockPos(3, 1, 2));
         sheep.setNoAi(true);
         h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, shear), "not before the shears run");
         // The shears look for players in the level's player list; add ours (without logging in) until the shears run.
@@ -285,7 +285,7 @@ public final class IntegrationGameTests {
         var farAway = new net.minecraft.server.level.ServerPlayer(server, h.getLevel(),
                 new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "adv-test-far"), net.minecraft.server.level.ClientInformation.createDefault());
         farAway.setPos(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(shearsPos)).add(40, 0, 0));
-        Sheep sheep2 = h.spawn(EntityTypes.SHEEP, new BlockPos(4, 1, 2));
+        Sheep sheep2 = h.spawn(Vanilla.SHEEP, new BlockPos(4, 1, 2));
         sheep2.setNoAi(true);
         h.getLevel().players().add(farAway);
         try {
@@ -304,7 +304,7 @@ public final class IntegrationGameTests {
         h.assertTrue(registry.byId(RED_MUSHROOM).isPresent(), "red mushroom resource should be loaded");
         h.assertTrue(registry.byId(BROWN_MUSHROOM).isPresent(), "brown mushroom resource should be loaded");
 
-        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(3, 1, 3));
+        Sheep sheep = h.spawn(Vanilla.SHEEP, new BlockPos(3, 1, 3));
         sheep.setNoAi(true);
         sheep.setColor(DyeColor.WHITE);
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
@@ -538,7 +538,7 @@ public final class IntegrationGameTests {
         h.setBlock(shearsPos, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
                 .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, net.minecraft.core.Direction.SOUTH));
         var shears = h.getBlockEntity(shearsPos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.class);
-        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(3, 1, 2));
+        Sheep sheep = h.spawn(Vanilla.SHEEP, new BlockPos(3, 1, 2));
         sheep.setNoAi(true);
         sheep.setColor(DyeColor.WHITE);
 

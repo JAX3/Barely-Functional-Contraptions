@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.compat.McClient;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs;
 import com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion;
@@ -83,7 +84,7 @@ public final class ResourcefulSheepClient {
         NeoForge.EVENT_BUS.register(TreadmillWalkAnimation.class);
 
         com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.clientTickHandler = ZeroPointHumSound::tick;
-        com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem.openGuide = () -> net.minecraft.client.Minecraft.getInstance().gui.setScreen(new GuideScreen());
+        com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem.openGuide = () -> McClient.setScreen(net.minecraft.client.Minecraft.getInstance(), new GuideScreen());
         if (Boolean.getBoolean("barelyfunctionalcontraptions.screenshotHarness")) {
             com.jax3.barelyfunctionalcontraptions.BarelyFunctionalContraptions.devOnly("sheep.client.DevScreenshotHarness", "registerIfEnabled", null, null);
         }

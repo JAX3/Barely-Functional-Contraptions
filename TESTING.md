@@ -1,6 +1,6 @@
 # Barely Functional Contraptions: test report
 
-Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.17.0.109, Jade 26.3.5, OpenJDK 25 on Linux (and, for the 26.2 rows, Minecraft 26.2, NeoForge 26.2.0.95, JEI 30.48.0.244, Jade 26.2.10). The client ran on Xvfb with Mesa lavapipe (software Vulkan).
+Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.17.0.109, Jade 26.3.5, OpenJDK 25 on Linux (and, for the 26.2 rows, Minecraft 26.2, NeoForge 26.2.0.95, JEI 30.48.0.244, Jade 26.2.10; for the 26.1 rows, Minecraft 26.1.2, NeoForge 26.1.2.127, JEI 29.54.0.116, Jade 26.1.12). The client ran on Xvfb with Mesa lavapipe (software Vulkan).
 
 ## Results for the merged mod
 
@@ -10,6 +10,9 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | Build for 26.2 | `./gradlew build -Pmc=26.2` | ✅ BUILD SUCCESSFUL (unit tests included), produces `build/mc26.2/libs/barelyfunctionalcontraptions-1.5.5-mc26.2.jar` |
 | GameTests on 26.2 | `./gradlew runGameTestServer -Pmc=26.2` | ✅ **All 158 required tests passed**, with no data files failing to load |
 | Real client on 26.2 | `./gradlew runClient -Pmc=26.2 -PscreenshotHarness -PharnessScene=thermal_reaction_chamber` | ✅ Loads with JEI and Jade and no errors from the mod; the chamber, its window, the JEI page and Jade look the same as on 26.3 |
+| Build for 26.1 | `./gradlew build -Pmc=26.1` | ✅ BUILD SUCCESSFUL (unit tests included), produces `build/mc26.1/libs/barelyfunctionalcontraptions-1.5.5-mc26.1.jar` |
+| GameTests on 26.1 | `./gradlew runGameTestServer -Pmc=26.1` | ✅ **All 158 required tests passed**, with no data files failing to load and no warnings |
+| Real client on 26.1 | `./gradlew runClient -Pmc=26.1 -PscreenshotHarness -PharnessScene=thermal_reaction_chamber` and `-PharnessScene=creative_sections` | ✅ Loads with JEI and Jade and no errors from the mod; the chamber, its window, the JEI page, Jade and the folding creative-tab sections look the same as on 26.3 |
 | Unit tests | `./gradlew test` | ✅ 39/39 passed |
 | In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 158 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 123 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 51 screenshots and 12 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |

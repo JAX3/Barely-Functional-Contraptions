@@ -1,5 +1,8 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.compat.McTest;
+import com.jax3.barelyfunctionalcontraptions.compat.McClient;
+import com.jax3.barelyfunctionalcontraptions.compat.Vanilla;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MechanicalSeparatorBlockEntity;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SeparatorInventory;
@@ -22,7 +25,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.FileUtil;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -75,7 +77,7 @@ public final class DevScreenshotHarness {
                 LevelSettings settings = new LevelSettings("FR Harness", GameType.CREATIVE, LevelSettings.DifficultySettings.DEFAULT, true, WorldDataConfiguration.DEFAULT);
                 String folder = FileUtil.findAvailableName(mc.getLevelSource().getBaseDir(), "FR Harness", "");
                 mc.createWorldOpenFlows().createFreshLevel(folder, settings, new WorldOptions(42L, false, false),
-                        WorldPresets::createTestWorldDimensions, new net.minecraft.client.gui.screens.TitleScreen());
+                        McTest::testWorldDimensions, new net.minecraft.client.gui.screens.TitleScreen());
             } catch (IOException e) {
                 ResourcefulSheep.LOGGER.error("Harness could not create world", e);
             }
@@ -86,9 +88,9 @@ public final class DevScreenshotHarness {
         Minecraft mc = Minecraft.getInstance();
         MinecraftServer server = mc.getSingleplayerServer();
         // Opening an existing test world (superflat test dimensions) first asks to confirm its experimental settings.
-        if (mc.player == null && mc.gui.screen() != null && System.getProperty("barelyfunctionalcontraptions.screenshotHarness.world") != null
+        if (mc.player == null && McClient.screen(mc) != null && System.getProperty("barelyfunctionalcontraptions.screenshotHarness.world") != null
                 && !confirmedExperimental) {
-            for (var child : mc.gui.screen().children()) {
+            for (var child : McClient.screen(mc).children()) {
                 if (child instanceof net.minecraft.client.gui.components.Button button && button.getMessage().getString().equals("I Know What I'm Doing!")) {
                     confirmedExperimental = true;
                     button.onPress(new net.minecraft.client.input.KeyEvent(257, 0, 0));
@@ -99,7 +101,7 @@ public final class DevScreenshotHarness {
         }
         if (mc.player == null || server == null || mc.level == null) return;
         tick++;
-        mc.gui.toastManager().clear();
+        McClient.clearToasts(mc);
         if ("meter_setups".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             meterSetupsTick(mc, server);
             return;
@@ -165,7 +167,7 @@ public final class DevScreenshotHarness {
                             player.level().getBlockState(origin.offset(0, 0, -2)).getBlock(),
                             player.getInventory().countItem(ModItems.POWERED_FURNACE.get()), player.getInventory().countItem(Items.RAW_IRON));
                 });
-                case 115 -> mc.execute(() -> mc.gui.setScreen(new InventoryScreen(mc.player)));
+                case 115 -> mc.execute(() -> McClient.setScreen(mc, new InventoryScreen(mc.player)));
                 case 135 -> shot(mc, "wrench_dismantle");
                 case 140 -> mc.stop();
                 default -> {}
@@ -264,11 +266,11 @@ public final class DevScreenshotHarness {
             case 250 -> {
                 setHudHidden(mc, false);
                 command(server, "gamemode survival @a");
-                mc.execute(() -> mc.gui.setScreen(new InventoryScreen(mc.player)));
+                mc.execute(() -> McClient.setScreen(mc, new InventoryScreen(mc.player)));
             }
             case 290 -> shot(mc, "03_inventory_jei");
             case 300 -> {
-                mc.gui.setScreen(null);
+                McClient.setScreen(mc, null);
                 server.execute(() -> openSeparator(server));
             }
             case 360 -> shot(mc, "04_separator_gui");
@@ -280,7 +282,7 @@ public final class DevScreenshotHarness {
             }
             case 410 -> shot(mc, "05_jei_infusion");
             case 420 -> {
-                mc.gui.setScreen(null);
+                McClient.setScreen(mc, null);
                 if (ModList.get().isLoaded("jei")) {
                     com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showCategory(false);
                 }
@@ -293,7 +295,7 @@ public final class DevScreenshotHarness {
                 }
             }
             case 470 -> {
-                mc.gui.setScreen(null);
+                McClient.setScreen(mc, null);
                 server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                         String.format(java.util.Locale.ROOT, "tp @a %d %d %d 200 22", origin.getX() - 1, origin.getY() + 1, origin.getZ() - 2)));
             }
@@ -310,7 +312,7 @@ public final class DevScreenshotHarness {
             case 545 -> shot(mc, "10_jade_separator");
             case 550 -> {
                 setHudHidden(mc, false);
-                mc.gui.setScreen(net.neoforged.neoforge.client.gui.modlist.ModListScreen.create(null));
+                McClient.setScreen(mc, McTest.modListScreen(null));
             }
             case 553 -> {
                 // Click the first entry (this mod, sorted A-Z) so the info panel shows its banner.
@@ -323,7 +325,7 @@ public final class DevScreenshotHarness {
             }
             case 560 -> shot(mc, "08_mod_list");
             case 565 -> {
-                mc.gui.setScreen(null);
+                McClient.setScreen(mc, null);
                 server.execute(() -> openGenerator(server));
             }
             case 600 -> shot(mc, "11_generator_gui");
@@ -428,7 +430,7 @@ public final class DevScreenshotHarness {
             case 1465 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.MAIN.get());
             case 1480 -> shot(mc, "28_creative_tab_main");
             case 1485 -> {
-                mc.gui.setScreen(null);
+                McClient.setScreen(mc, null);
                 server.execute(() -> zeroPointScene(server));
             }
             case 1530 -> shot(mc, "29_zero_point_modules");
@@ -462,15 +464,15 @@ public final class DevScreenshotHarness {
             case 1642 -> server.execute(() -> {
                 // Stained glass recolours the beam like a beacon's: red, then yellow mixing in to make orange.
                 ServerLevel level = server.overworld();
-                level.setBlock(zeroPointBase.above(2), Blocks.STAINED_GLASS.red().defaultBlockState(), 3);
-                level.setBlock(zeroPointBase.above(4), Blocks.STAINED_GLASS.yellow().defaultBlockState(), 3);
+                level.setBlock(zeroPointBase.above(2), Vanilla.stainedGlass(DyeColor.RED).defaultBlockState(), 3);
+                level.setBlock(zeroPointBase.above(4), Vanilla.stainedGlass(DyeColor.YELLOW).defaultBlockState(), 3);
                 server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), String.format(java.util.Locale.ROOT,
                         "tp @a %.1f %d %.1f 180 -12", zeroPointBase.getX() + 0.5, zeroPointBase.getY() + 1, zeroPointBase.getZ() + 8.5));
             });
             case 1670 -> shot(mc, "34_zero_point_coloured_beam");
             case 1672 -> server.execute(() -> {
                 // A pig wanders into the beam: it is hurt and set on fire.
-                var pig = net.minecraft.world.entity.EntityTypes.PIG.create(server.overworld(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                var pig = Vanilla.PIG.create(server.overworld(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
                 if (pig != null) {
                     pig.setNoAi(true);
                     pig.snapTo(zeroPointBase.getX() + 0.5, zeroPointBase.getY() + 0.5, zeroPointBase.getZ() + 0.5, 90, 0);
@@ -485,19 +487,19 @@ public final class DevScreenshotHarness {
             }
             case 1695 -> {
                 var advancements = mc.player.connection.getAdvancements();
-                mc.gui.setScreen(new net.minecraft.client.gui.screens.advancements.AdvancementsScreen(advancements));
+                McClient.setScreen(mc, new net.minecraft.client.gui.screens.advancements.AdvancementsScreen(advancements));
                 advancements.setSelectedTab(advancements.get(ResourcefulSheep.id("contraptions/root")), true);
             }
-            case 1712 -> mc.gui.toastManager().clear();
+            case 1712 -> McClient.clearToasts(mc);
             case 1715 -> shot(mc, "36_advancements");
             case 1720 -> {
-                mc.gui.setScreen(null);
+                McClient.setScreen(mc, null);
                 server.execute(() -> cableScene(server));
             }
             case 1765 -> shot(mc, "37_energy_cables");
             case 1767 -> {
                 setHudHidden(mc, false);
-                mc.gui.hud.getChat().clearMessages(false); // the advancement announcements from earlier
+                McClient.clearChat(mc); // the advancement announcements from earlier
                 command(server, "clear @a");
                 // Standing in front of the first cable, looking down at it, so Jade shows the network.
                 server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
@@ -551,7 +553,7 @@ public final class DevScreenshotHarness {
             }
             case 2065 -> shot(mc, "45_config_mycelium");
             case 2067 -> {
-                mc.gui.setScreen(null);
+                McClient.setScreen(mc, null);
                 setHudHidden(mc, true);
                 server.execute(() -> sidewaysScene(server));
             }
@@ -601,7 +603,7 @@ public final class DevScreenshotHarness {
             case 2302 -> shot(mc, "recipe_fluid_tank");
             case 2305 -> {
                 mc.player.closeContainer();
-                mc.gui.setScreen(null);
+                McClient.setScreen(mc, null);
                 setHudHidden(mc, false);
                 ResourcefulSheep.LOGGER.warn("Screenshot harness finished; client definitions loaded: {}", SheepResourceRegistry.client().size());
                 mc.stop();
@@ -619,14 +621,14 @@ public final class DevScreenshotHarness {
         }
         var parent = new net.neoforged.neoforge.client.gui.ConfigurationScreen(
                 ModList.get().getModContainerById(ResourcefulSheep.MOD_ID).orElseThrow(), null);
-        mc.gui.setScreen(new net.neoforged.neoforge.client.gui.ConfigurationScreen.ConfigurationSectionScreen(parent, config.getType(), config,
+        McClient.setScreen(mc, new net.neoforged.neoforge.client.gui.ConfigurationScreen.ConfigurationSectionScreen(parent, config.getType(), config,
                 net.minecraft.network.chat.Component.translatable("barelyfunctionalcontraptions.configuration.section." + fileName.replace("barelyfunctionalcontraptions-", "barelyfunctionalcontraptions.").replace("-", ".") + ".title")));
     }
 
     /** Presses the button labelled {@code label} on the open screen (searching nested lists), like a click. */
     private static void pressButton(Minecraft mc, String label) {
-        if (mc.gui.screen() == null || !pressIn(mc.gui.screen().children(), label)) {
-            ResourcefulSheep.LOGGER.warn("Harness: no button '{}' on {}", label, mc.gui.screen());
+        if (McClient.screen(mc) == null || !pressIn(McClient.screen(mc).children(), label)) {
+            ResourcefulSheep.LOGGER.warn("Harness: no button '{}' on {}", label, McClient.screen(mc));
         }
     }
 
@@ -658,12 +660,12 @@ public final class DevScreenshotHarness {
         } catch (ReflectiveOperationException e) {
             ResourcefulSheep.LOGGER.warn("Harness: could not preselect the creative tab", e);
         }
-        mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen(
+        McClient.setScreen(mc, new net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen(
                 mc.player, mc.player.connection.enabledFeatures(), true));
     }
 
     private static void setHudHidden(Minecraft mc, boolean hidden) {
-        if (mc.gui.hud.isHidden() != hidden) mc.gui.hud.toggle();
+        McClient.setHudHidden(mc, hidden);
     }
 
     private static void command(MinecraftServer server, String cmd) {
@@ -951,8 +953,8 @@ public final class DevScreenshotHarness {
         var facing = com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.FACING;
         level.setBlock(base.above(), module.setValue(facing, Direction.EAST), 3);
         level.setBlock(base.offset(6, 1, 0), module.setValue(facing, Direction.WEST), 3);
-        level.setBlock(base.offset(2, 1, 0), Blocks.STAINED_GLASS.red().defaultBlockState(), 3);
-        level.setBlock(base.offset(4, 1, 0), Blocks.STAINED_GLASS_PANE.yellow().defaultBlockState(), 3);
+        level.setBlock(base.offset(2, 1, 0), Vanilla.stainedGlass(DyeColor.RED).defaultBlockState(), 3);
+        level.setBlock(base.offset(4, 1, 0), Vanilla.stainedGlassPane(DyeColor.YELLOW).defaultBlockState(), 3);
         // A north-south pair higher up, hanging off two pillars.
         for (int y = 0; y <= 4; y++) {
             level.setBlock(base.offset(3, y, -4), Blocks.STONE_BRICKS.defaultBlockState(), 3);
@@ -979,7 +981,7 @@ public final class DevScreenshotHarness {
         for (int i = 0; i < pairs.length; i++) {
             Sheep a = null, b = null;
             for (int k = 0; k < 2; k++) {
-                Sheep sh = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                Sheep sh = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
                 if (sh == null) return;
                 sh.setNoAi(true);
                 sh.snapTo(base.getX() + i * 3 + 0.5 + k * 1.2, base.getY(), base.getZ() - 0.5, 200, 0);
@@ -1182,7 +1184,7 @@ public final class DevScreenshotHarness {
                 {"iron", DyeColor.WHITE, -4}, {"gold", DyeColor.WHITE, -2}, {"diamond", DyeColor.LIGHT_BLUE, 0},
                 {"red_mushroom", DyeColor.WHITE, 2}, {null, DyeColor.WHITE, 4}};
         for (Object[] s : sheep) {
-            Sheep sh = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            Sheep sh = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
             sh.snapTo(o.getX() + (int) s[2] + 0.5, o.getY(), o.getZ() - 5 + 0.5, 90, 0);
             sh.setYHeadRot(90);
             sh.setYBodyRot(90);
@@ -1220,7 +1222,7 @@ public final class DevScreenshotHarness {
         }
         Object[][] shearSheep = {{"gold", 4, 0}, {null, 4, -1}, {"diamond", 3, 1}};
         for (Object[] s : shearSheep) {
-            Sheep sh = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            Sheep sh = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
             sh.snapTo(o.getX() + (int) s[1] + 0.5, o.getY(), o.getZ() + (int) s[2] + 0.5, 90, 0);
             sh.setNoAi(true);
             sh.setColor(DyeColor.WHITE);
@@ -1462,7 +1464,7 @@ public final class DevScreenshotHarness {
             });
             case 170 -> {
                 // Sneak + right-click the pipe's west plug with the wrench.
-                mc.gui.setScreen(null);
+                McClient.setScreen(mc, null);
                 mc.player.getInventory().setSelectedSlot(1);
                 mc.options.keyShift.setDown(true);
             }
@@ -1475,7 +1477,7 @@ public final class DevScreenshotHarness {
             }
             case 195 -> {
                 mc.options.keyShift.setDown(false);
-                ResourcefulSheep.LOGGER.warn("INTERACTION screen after sneak-click: {}", mc.gui.screen());
+                ResourcefulSheep.LOGGER.warn("INTERACTION screen after sneak-click: {}", McClient.screen(mc));
                 shot(mc, "66_interaction_filter");
             }
             case 200 -> mc.stop();
@@ -1599,9 +1601,9 @@ public final class DevScreenshotHarness {
             // Sunset: the open-sky panels make less, so their cells glow dimmer.
             case 262 -> command(server, "time set 12300");
             case 320 -> shot(mc, "58_glow_panels_dusk");
-            case 322 -> mc.gui.setScreen(new GuideScreen());
+            case 322 -> McClient.setScreen(mc, new GuideScreen());
             case 335 -> shot(mc, "60_guide");
-            case 337 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Glow Panels"); }
+            case 337 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Glow Panels"); }
             case 350 -> shot(mc, "61_guide_glow_panels");
             case 360 -> mc.stop();
             default -> {}
@@ -1660,7 +1662,7 @@ public final class DevScreenshotHarness {
             if (i == 1) {
                 if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity be) be.setShowsArea(true);
                 for (int side : new int[]{-1, 1}) {
-                    var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
                     sheep.snapTo(at.getX() + 0.5 + side, at.getY(), at.getZ() + 0.5, 180, 0);
                     sheep.setNoAi(true);
                     level.addFreshEntity(sheep);
@@ -1727,7 +1729,7 @@ public final class DevScreenshotHarness {
                 woollenSet(net.minecraft.world.item.DyeColor.LIGHT_BLUE),
                 woollenSet(net.minecraft.world.item.DyeColor.YELLOW, net.minecraft.world.item.DyeColor.GREEN, net.minecraft.world.item.DyeColor.BLUE, net.minecraft.world.item.DyeColor.BROWN)};
         for (int i = 0; i < sets.length; i++) {
-            var stand = net.minecraft.world.entity.EntityTypes.ARMOR_STAND.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            var stand = Vanilla.ARMOR_STAND.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             stand.snapTo(o.getX() - 3.75 + i * 2.5, o.getY(), o.getZ() - 4 + 0.5, 180, 0);
             stand.setYHeadRot(180);
             stand.setYBodyRot(180);
@@ -1756,13 +1758,13 @@ public final class DevScreenshotHarness {
                     player.getInventory().clearContent();
                     ItemStack[] set = woollenSet(net.minecraft.world.item.DyeColor.PURPLE);
                     for (int s = 0; s < 4; s++) player.setItemSlot(ARMOUR_SLOTS[s], set[s]);
-                    player.getInventory().add(new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.RED), 16));
-                    player.getInventory().add(new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.BLUE), 16));
+                    player.getInventory().add(new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.RED), 16));
+                    player.getInventory().add(new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.BLUE), 16));
                 });
             }
-            case 230 -> mc.execute(() -> mc.gui.setScreen(new InventoryScreen(mc.player)));
+            case 230 -> mc.execute(() -> McClient.setScreen(mc, new InventoryScreen(mc.player)));
             case 260 -> shot(mc, "102_muffled");
-            case 262 -> mc.execute(() -> mc.gui.setScreen(null));
+            case 262 -> mc.execute(() -> McClient.setScreen(mc, null));
             case 266 -> server.execute(() -> {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                 BlockPos table = player.blockPosition().above(2);
@@ -1771,8 +1773,8 @@ public final class DevScreenshotHarness {
                         id, inventory, net.minecraft.world.inventory.ContainerLevelAccess.create(player.level(), table)),
                         net.minecraft.network.chat.Component.translatable("container.crafting")));
                 if (!(player.containerMenu instanceof net.minecraft.world.inventory.CraftingMenu menu)) return;
-                ItemStack red = new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.RED));
-                ItemStack blue = new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.BLUE));
+                ItemStack red = new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.RED));
+                ItemStack blue = new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.BLUE));
                 int[] slots = {1, 3, 4, 5, 6, 7, 8, 9};
                 for (int i = 0; i < slots.length; i++) menu.getSlot(slots[i]).set((i % 2 == 0 ? red : blue).copy());
                 menu.slotsChanged(menu.getSlot(1).container);
@@ -1806,7 +1808,7 @@ public final class DevScreenshotHarness {
         var snow = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(ResourcefulSheep.id("snow")).orElseThrow();
         double[][] spots = {{-1.5, -0.5}, {1.5, 0.5}, {0.5, -2.0}};
         for (double[] s : spots) {
-            var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             sheep.snapTo(at.getX() + 0.5 + s[0], at.getY(), at.getZ() + 0.5 + s[1], 200, 0);
             sheep.setNoAi(true);
             level.addFreshEntity(sheep);
@@ -1852,7 +1854,7 @@ public final class DevScreenshotHarness {
                 for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, -1, -14), origin.offset(8, -1, 2))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
                 var snow = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(ResourcefulSheep.id("snow")).orElseThrow();
                 for (int i = 0; i < 3; i++) {
-                    var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
                     sheep.snapTo(origin.getX() - 5.5 + i * 4, origin.getY(), origin.getZ() - 10.5 + i * 2, 0, 0);
                     level.addFreshEntity(sheep);
                     com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
@@ -1946,7 +1948,7 @@ public final class DevScreenshotHarness {
         // Six Iron sheep, infused for 100 shearings, in the pen.
         int[][] spots = {{-1, -1}, {0, -1}, {1, -1}, {-1, -3}, {0, -3}, {1, -3}};
         for (int[] spot : spots) {
-            var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             sheep.snapTo(o.getX() + spot[0] + 0.5, o.getY(), o.getZ() + spot[1] + 0.5, 180, 0);
             level.addFreshEntity(sheep);
             SheepInfusionEvents.setInfusion(sheep, new SheepInfusion(Optional.of(ResourcefulSheep.id("iron")), 100, 0));
@@ -2003,7 +2005,7 @@ public final class DevScreenshotHarness {
                 if (edge) level.setBlock(o.offset(side * x, 0, z), fence, 3);
             }
             for (int i = 0; i < 3; i++) {
-                Sheep sheep = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+                Sheep sheep = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
                 sheep.snapTo(at.getX() + 0.5 + side * (1.6 + (i % 2) * 2.2), at.getY(), at.getZ() + 0.5 + (i - 1) * 1.6, side > 0 ? 90 : 270, 0);
                 sheep.setNoAi(true); // they stand still, so the herds stay even
                 sheep.setPersistenceRequired();
@@ -2117,7 +2119,7 @@ public final class DevScreenshotHarness {
                 be.setItem(0, new ItemStack(Items.HAY_BLOCK, 16)); // over an hour of walking
             }
             if (i == 1) continue; // the right one waits for a sheep
-            var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             sheep.snapTo(back.getX() + 0.5, back.getY() + 0.4, back.getZ() + 0.1, 180, 0);
             if (i == 0) sheep.setSheared(true);
             level.addFreshEntity(sheep);
@@ -2158,11 +2160,11 @@ public final class DevScreenshotHarness {
             case 165 -> openAt(server, origin.offset(0, 0, -3));
             case 190 -> shot(mc, "103_sheep_treadmill_gui");
             case 192 -> {
-                mc.execute(() -> mc.gui.setScreen(null));
+                mc.execute(() -> McClient.setScreen(mc, null));
                 // A loose sheep a few blocks from the empty treadmill: it should be called over and hop on.
                 server.execute(() -> {
                     ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
-                    var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
                     sheep.snapTo(origin.getX() + 5.5, origin.getY(), origin.getZ() + 1.5, 90, 0);
                     sheep.setColor(net.minecraft.world.item.DyeColor.PINK);
                     level.addFreshEntity(sheep);
@@ -2232,7 +2234,7 @@ public final class DevScreenshotHarness {
                     if (edge) level.setBlock(p, (side == 0 ? Blocks.NETHER_BRICK_FENCE : Blocks.SPRUCE_FENCE).defaultBlockState(), 3);
                 }
                 for (int i = 0; i < herds[c][side]; i++) {
-                    Sheep sheep = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+                    Sheep sheep = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
                     sheep.snapTo(at.getX() + 0.5 + dir * (1.6 + (i % 2) * 2.2), at.getY(), at.getZ() + 0.5 + (i - 1) * 1.6, dir > 0 ? 90 : 270, 0);
                     sheep.setNoAi(true);
                     SheepInfusionEvents.setInfusion(sheep, new SheepInfusion(Optional.of(ResourcefulSheep.id(side == 0 ? "blaze" : "snow")), 9, 0));
@@ -2290,12 +2292,12 @@ public final class DevScreenshotHarness {
             }
             case 200 -> openAt(server, origin.offset(0, 0, -5));
             case 230 -> shot(mc, "105_thermal_reaction_chamber_gui");
-            case 232 -> mc.execute(() -> mc.gui.setScreen(null));
+            case 232 -> mc.execute(() -> McClient.setScreen(mc, null));
             case 236 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() - 14.5, origin.getY(), origin.getZ() - 2.5));
             case 250 -> openAt(server, origin.offset(-15, 0, -5));
             case 300 -> shot(mc, "105_thermal_reaction_chamber_gui_hot");
             case 302 -> {
-                mc.execute(() -> mc.gui.setScreen(null));
+                mc.execute(() -> McClient.setScreen(mc, null));
                 command(server, "gamemode spectator @a");
                 setHudHidden(mc, true);
                 command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 25", origin.getX() - 14.5, origin.getY() + 2.4, origin.getZ() - 1.5));
@@ -2375,7 +2377,7 @@ public final class DevScreenshotHarness {
     private static void listCommandTick(Minecraft mc) {
         switch (tick) {
             case 60 -> { if (mc.player != null) mc.player.connection.sendCommand(ResourcefulSheep.MOD_ID + " list"); }
-            case 70 -> mc.gui.setScreen(new net.minecraft.client.gui.screens.ChatScreen("", false));
+            case 70 -> McClient.setScreen(mc, new net.minecraft.client.gui.screens.ChatScreen("", false));
             case 90 -> shot(mc, "list_command");
             case 96 -> mc.stop();
             default -> {}
@@ -2516,7 +2518,7 @@ public final class DevScreenshotHarness {
                 ResourcefulSheep.LOGGER.info("BLOCKS cube={} tank={}", player.level().getBlockState(origin.offset(0, 0, -2)), player.level().getBlockState(origin.offset(1, 0, -2)));
             });
             case 115 -> command(server, "gamemode survival @a");
-            case 125 -> { if (mc.player != null) mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)); }
+            case 125 -> { if (mc.player != null) McClient.setScreen(mc, new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)); }
             case 135 -> hover(mc, 176, 166, 16, 150); // hotbar slot 1: the cube
             case 150 -> shot(mc, "97_cube_keeps_energy");
             case 152 -> hover(mc, 176, 166, 34, 150); // hotbar slot 2: the tank
@@ -2551,28 +2553,28 @@ public final class DevScreenshotHarness {
             case 270 -> shot(mc, "showcase_tab_wool");
             case 272 -> {
                 // Scroll to the bottom of the tab, where the spawn eggs are, and point at one for its tooltip.
-                if (mc.gui.screen() != null) mc.gui.screen().mouseScrolled(213, 120, 0, -20);
+                if (McClient.screen(mc) != null) McClient.screen(mc).mouseScrolled(213, 120, 0, -20);
             }
             case 276 -> com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), EGG_MOUSE_X, EGG_MOUSE_Y);
             case 290 -> shot(mc, "showcase_tab_eggs");
             case 294 -> {
                 com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
-                mc.gui.setScreen(new GuideScreen());
+                McClient.setScreen(mc, new GuideScreen());
             }
             case 300 -> {
-                if (mc.gui.screen() instanceof GuideScreen guide) guide.openTab(GuideBook.Tab.RECIPES);
+                if (McClient.screen(mc) instanceof GuideScreen guide) guide.openTab(GuideBook.Tab.RECIPES);
                 com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); // no tooltip in the shots
             }
             case 310 -> shot(mc, "99_guide_recipes_machines");
-            case 312 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Mechanical Separator"); }
+            case 312 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Mechanical Separator"); }
             case 322 -> shot(mc, "99_guide_recipes_separator");
-            case 324 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Infusion Altar"); }
+            case 324 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Infusion Altar"); }
             case 336 -> shot(mc, "99_guide_recipes_altar");
-            case 338 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Bales"); }
+            case 338 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Wool Bales"); }
             case 348 -> shot(mc, "99_guide_recipes_bales");
-            case 350 -> { if (mc.gui.screen() instanceof GuideScreen guide) { guide.openTab(GuideBook.Tab.WIP); guide.openChapter("Quantum Sheep"); } }
+            case 350 -> { if (McClient.screen(mc) instanceof GuideScreen guide) { guide.openTab(GuideBook.Tab.WIP); guide.openChapter("Quantum Sheep"); } }
             case 360 -> shot(mc, "99_guide_wip");
-            case 362 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Burner"); }
+            case 362 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Wool Burner"); }
             case 372 -> shot(mc, "83_guide_power_tab");
             case 376 -> mc.stop();
             default -> {}
@@ -2636,7 +2638,7 @@ public final class DevScreenshotHarness {
             int col = i % perRow, row = i / perRow;
             double x = o.getX() + 0.5 + (col - (perRow - 1) / 2.0) * 3.8;
             double z = o.getZ() + 16.5 + row * 4.0;
-            Sheep sh = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            Sheep sh = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             sh.snapTo(x, o.getY(), z, 160, 0); // facing the camera, which looks south from in front of the pen
             sh.setYHeadRot(160);
             sh.setYBodyRot(160);
@@ -2712,14 +2714,14 @@ public final class DevScreenshotHarness {
                 }
             });
             case 285 -> shot(mc, "95_sheep_stats");
-            case 287 -> mc.gui.setScreen(new GuideScreen());
-            case 297 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Infusion Altar"); }
+            case 287 -> McClient.setScreen(mc, new GuideScreen());
+            case 297 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Infusion Altar"); }
             case 310 -> shot(mc, "96_guide_altar");
-            case 312 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Breeding Sheep"); }
+            case 312 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Breeding Sheep"); }
             case 325 -> shot(mc, "96_guide_breeding");
             // JEI: the Infusion Altar page, and what Soul Sand is used for.
             case 327 -> {
-                mc.gui.setScreen(null);
+                McClient.setScreen(mc, null);
                 if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
                     ResourcefulSheep.LOGGER.info("JEI {}", com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showAltar());
                 }
@@ -2753,12 +2755,12 @@ public final class DevScreenshotHarness {
             be.setItem(0, new ItemStack(Items.NETHER_STAR, 1));
             be.setItem(1, new ItemStack(Items.SOUL_SAND, 4));
         }
-        var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         sheep.snapTo(altar.getX() + 1.5, altar.getY(), altar.getZ() + 0.5, 90, 0);
         sheep.setNoAi(true);
         level.addFreshEntity(sheep);
         // A well-bred sheep further along.
-        var bred = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        var bred = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         bred.snapTo(o.getX() + 9.5, o.getY(), o.getZ() - 2.5, 90, 0);
         bred.setNoAi(true);
         level.addFreshEntity(bred);
@@ -2819,13 +2821,13 @@ public final class DevScreenshotHarness {
             case 258 -> {
                 com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
                 if (mc.player != null) mc.player.closeContainer();
-                mc.gui.setScreen(new GuideScreen());
+                McClient.setScreen(mc, new GuideScreen());
             }
-            case 268 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Packer"); }
+            case 268 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Wool Packer"); }
             case 280 -> shot(mc, "89_guide_wool_packer");
             // Unpacking: a Diamond Wool Bale in the inventory's 2x2 crafting grid.
             case 282 -> {
-                mc.gui.setScreen(null);
+                McClient.setScreen(mc, null);
                 command(server, "gamemode survival @a"); // the survival inventory, with its crafting grid
                 server.execute(() -> {
                     ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
@@ -2834,7 +2836,7 @@ public final class DevScreenshotHarness {
                     player.inventoryMenu.broadcastChanges();
                 });
             }
-            case 288 -> { if (mc.player != null) mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)); }
+            case 288 -> { if (mc.player != null) McClient.setScreen(mc, new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)); }
             case 296 -> {
                 if (mc.player != null) ResourcefulSheep.LOGGER.info("UNPACK result={}", mc.player.inventoryMenu.getSlot(0).getItem());
                 com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); // no tooltip over the grid
@@ -2951,9 +2953,9 @@ public final class DevScreenshotHarness {
             case 227 -> {
                 com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
                 if (mc.player != null) mc.player.closeContainer();
-                mc.gui.setScreen(new GuideScreen());
+                McClient.setScreen(mc, new GuideScreen());
             }
-            case 237 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Wool Burner"); }
+            case 237 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Wool Burner"); }
             case 250 -> shot(mc, "79_guide_wool_burner");
             // The other tabs, opened with real clicks on their buttons.
             case 252, 266, 280 -> {
@@ -2985,7 +2987,7 @@ public final class DevScreenshotHarness {
         for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(8, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
         for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(8, -1, 6))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
         // Plain wool, string, Coal Wool, and one fed by a hopper from a chest of mixed wool. Each charges a cube behind it.
-        ItemStack[] fuels = {new ItemStack(Items.WOOL.white(), 32), new ItemStack(Items.STRING, 64),
+        ItemStack[] fuels = {new ItemStack(Vanilla.wool(DyeColor.WHITE), 32), new ItemStack(Items.STRING, 64),
                 com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("coal"), 16), ItemStack.EMPTY};
         String[] names = {"Wool: 30 FE/t", "String: 30 FE/t", "Coal Wool: 120 FE/t", "Fed by a hopper"};
         for (int i = 0; i < 4; i++) {
@@ -3000,8 +3002,8 @@ public final class DevScreenshotHarness {
         level.setBlock(fed.above(), Blocks.HOPPER.defaultBlockState(), 3);
         level.setBlock(fed.above(2), Blocks.CHEST.defaultBlockState(), 3);
         if (level.getBlockEntity(fed.above(2)) instanceof net.minecraft.world.Container chest) {
-            chest.setItem(0, new ItemStack(Items.WOOL.red(), 64));
-            chest.setItem(1, new ItemStack(Items.WOOL.blue(), 64));
+            chest.setItem(0, new ItemStack(Vanilla.wool(DyeColor.RED), 64));
+            chest.setItem(1, new ItemStack(Vanilla.wool(DyeColor.BLUE), 64));
             chest.setItem(2, new ItemStack(Items.STRING, 64));
         }
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
@@ -3077,9 +3079,9 @@ public final class DevScreenshotHarness {
             case 400 -> shot(mc, "69_furnace_area_hidden_by_button");
             case 402 -> {
                 setHudHidden(mc, false);
-                mc.gui.setScreen(new GuideScreen());
+                McClient.setScreen(mc, new GuideScreen());
             }
-            case 412 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Blaze Furnace"); }
+            case 412 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Blaze Furnace"); }
             case 426 -> shot(mc, "66_guide_blaze_furnace");
             case 436 -> mc.stop();
             default -> {}
@@ -3096,7 +3098,7 @@ public final class DevScreenshotHarness {
 
     /** A real left click on the middle of row {@code row} of the open creative screen's item grid, on its banner's title. */
     private static void clickCreativeRow(Minecraft mc, int row) {
-        if (!(mc.gui.screen() instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen screen)) return;
+        if (!(McClient.screen(mc) instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen screen)) return;
         var window = mc.getWindow();
         double scale = window.getGuiScale();
         long handle = window.handle();
@@ -3153,7 +3155,7 @@ public final class DevScreenshotHarness {
         double[][] spots = {{0.5, 1, -3.5, 160}, {-0.5, 0, -3.5, 120}, {1.5, 0, -3.5, -120}, {0.5, 0, -4.5, 0}, {-0.5, 0, -2.5, 200}};
         for (int i = 0; i < spots.length; i++) {
             double[] at = spots[i];
-            Sheep sh = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            Sheep sh = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
             float yaw = (float) at[3];
             sh.snapTo(o.getX() + at[0], o.getY() + at[1], o.getZ() + at[2], yaw, 0);
             sh.setYHeadRot(yaw);
@@ -3283,7 +3285,7 @@ public final class DevScreenshotHarness {
         for (BlockPos p : BlockPos.betweenClosed(o.offset(-16, 0, -10), o.offset(16, 5, 7))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
         for (BlockPos p : BlockPos.betweenClosed(o.offset(-16, -1, -10), o.offset(16, -1, 7))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
         for (int i = 0; i < THEMED.length; i++) {
-            Sheep sh = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            Sheep sh = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
             sh.snapTo(themedX(i), o.getY(), o.getZ() - 5 + 0.5, 90, 0);
             sh.setYHeadRot(90);
             sh.yHeadRotO = 90;
@@ -3297,7 +3299,7 @@ public final class DevScreenshotHarness {
         String melon = SheepInfusionEvents.MELON_SKIN_PLAYER.toString();
         String[][] skinned = {{melon, "", "false"}, {melon, "", "true"}, {melon, "iron", "false"}};
         for (int i = 0; i < skinned.length; i++) {
-            Sheep sh = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            Sheep sh = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
             sh.snapTo(o.getX() - 1.5 + i * 2.0, o.getY(), o.getZ() + 2.5, -20, 0);
             sh.setYHeadRot(-20);
             sh.yHeadRotO = -20;
@@ -3317,7 +3319,7 @@ public final class DevScreenshotHarness {
     }
 
     private static void shot(Minecraft mc, String name) {
-        Screenshot.grab(mc.gameDirectory, name + ".png", mc.gameRenderer.mainRenderTarget(), 1,
+        Screenshot.grab(mc.gameDirectory, name + ".png", McClient.mainTarget(mc), 1,
                 msg -> ResourcefulSheep.LOGGER.warn("Harness screenshot {}: {}", name, msg.getString()));
     }
 }

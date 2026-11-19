@@ -2,14 +2,15 @@
 
 ## 1.5.5 (17–19 November 2026)
 
-Everything added or changed in Barely Functional Contraptions from 17 November 2026 to now, for Minecraft 26.3 and
-26.2 on NeoForge. Numbers are the defaults; almost all of them can be changed in the synced config.
+Everything added or changed in Barely Functional Contraptions from 17 November 2026 to now, for Minecraft 26.3, 26.2
+and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be changed in the synced config.
 
-### Minecraft 26.2 support
-- The mod now also runs on **Minecraft 26.2** (NeoForge 26.2.x), with every feature. Download the jar for your
-  version: `barelyfunctionalcontraptions-1.5.5-mc26.3.jar` or `-mc26.2.jar`.
-- On 26.2 the synced config is a per-world server config, kept in `<world>/serverconfig/`.
-- JEI 30.x and Jade 26.2.x work on 26.2.
+### Minecraft 26.2 and 26.1 support
+- The mod now also runs on **Minecraft 26.2** (NeoForge 26.2.x) and **Minecraft 26.1.2** (NeoForge 26.1.2.x), with
+  every feature. Download the jar for your version: `barelyfunctionalcontraptions-1.5.5-mc26.3.jar`, `-mc26.2.jar` or
+  `-mc26.1.jar`.
+- On 26.2 and 26.1 the synced config is a per-world server config, kept in `<world>/serverconfig/`.
+- JEI 30.x and Jade 26.2.x work on 26.2; JEI 29.x and Jade 26.1.x work on 26.1.
 
 ### New machines
 

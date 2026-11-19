@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.items;
 
+import com.jax3.barelyfunctionalcontraptions.compat.Vanilla;
 import com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems;
@@ -20,7 +21,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.player.Player;
@@ -46,7 +46,7 @@ import org.jspecify.annotations.Nullable;
  */
 public class ResourceSheepSpawnEggItem extends SpawnEggItem {
     public ResourceSheepSpawnEggItem(Properties properties) {
-        super(properties.spawnEgg(EntityTypes.SHEEP));
+        super(properties.spawnEgg(Vanilla.SHEEP));
     }
 
     public static ItemStack create(Identifier resource, int count) {
@@ -96,7 +96,7 @@ public class ResourceSheepSpawnEggItem extends SpawnEggItem {
 
     private static InteractionResult spawn(ServerLevel level, @Nullable Player user, ItemStack stack, BlockPos pos, boolean tryMoveDown, boolean movedUp) {
         ItemStack used = stack.copy(); // the stack may be used up by the time the sheep is infused
-        Sheep sheep = EntityTypes.SHEEP.spawn(level, EntityType.<Sheep>createDefaultStackConfig(level, stack, user).andThen(s -> infuse(s, used)),
+        Sheep sheep = Vanilla.SHEEP.spawn(level, EntityType.<Sheep>createDefaultStackConfig(level, stack, user).andThen(s -> infuse(s, used)),
                 pos, EntitySpawnReason.SPAWN_ITEM_USE, tryMoveDown, movedUp);
         if (sheep == null) return InteractionResult.FAIL;
         stack.consume(1, user);
@@ -107,7 +107,7 @@ public class ResourceSheepSpawnEggItem extends SpawnEggItem {
     /** Right-clicking a sheep with the egg: an infused lamb, as a vanilla egg gives a lamb. */
     public static Optional<Sheep> spawnLamb(ServerLevel level, Player player, Sheep parent, ItemStack stack) {
         ItemStack used = stack.copy();
-        return SpawnEggItem.spawnOffspringFromSpawnEgg(player, parent, EntityTypes.SHEEP, level, parent.position(), stack)
+        return SpawnEggItem.spawnOffspringFromSpawnEgg(player, parent, Vanilla.SHEEP, level, parent.position(), stack)
                 .map(lamb -> {
                     infuse(lamb, used);
                     return (Sheep) lamb;

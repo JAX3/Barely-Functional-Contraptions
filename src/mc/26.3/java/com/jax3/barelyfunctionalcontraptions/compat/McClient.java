@@ -26,4 +26,34 @@ public final class McClient {
     public static void mouseButton(Minecraft mc, long handle, MouseButtonInfo button, int action) {
         mc.mouseHandler.onButton(handle, button, action);
     }
+
+    /** The screen that's open, or null. */
+    public static net.minecraft.client.gui.screens.@org.jspecify.annotations.Nullable Screen screen(Minecraft mc) {
+        return mc.gui.screen();
+    }
+
+    /** Opens {@code screen}, or closes the open one when it's null. */
+    public static void setScreen(Minecraft mc, net.minecraft.client.gui.screens.@org.jspecify.annotations.Nullable Screen screen) {
+        mc.gui.setScreen(screen);
+    }
+
+    /** Clears the toasts in the corner (dev harness). */
+    public static void clearToasts(Minecraft mc) {
+        mc.gui.toastManager().clear();
+    }
+
+    /** Clears the chat (dev harness). */
+    public static void clearChat(Minecraft mc) {
+        mc.gui.hud.getChat().clearMessages(false);
+    }
+
+    /** Hides or shows the HUD, as F1 does (dev harness). */
+    public static void setHudHidden(Minecraft mc, boolean hidden) {
+        if (mc.gui.hud.isHidden() != hidden) mc.gui.hud.toggle();
+    }
+
+    /** The window's main render target (dev harness screenshots). */
+    public static com.mojang.blaze3d.pipeline.RenderTarget mainTarget(Minecraft mc) {
+        return mc.gameRenderer.mainRenderTarget();
+    }
 }

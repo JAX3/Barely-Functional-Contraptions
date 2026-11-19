@@ -2,7 +2,7 @@
 
 ![Barely Functional Contraptions](docs/banner.png)
 
-A NeoForge mod for **Minecraft 26.2 and 26.3** about sheep and slightly questionable machinery.
+A NeoForge mod for **Minecraft 26.1, 26.2 and 26.3** about sheep and slightly questionable machinery.
 
 **Found a bug?** [Report it on the bug report form](https://forms.gle/8xG9pMoQnTG6MVo1A).
 
@@ -205,6 +205,6 @@ Sheep, Wool Burner fuels, furnace heat sources and separator recipes are all dat
 
 ---
 
-Requires NeoForge 26.2 or 26.3 (download the jar for your Minecraft version) and Java 25; JEI and Jade are optional. The full guide to every block, setting and data-pack format is in [docs/REFERENCE.md](docs/REFERENCE.md). Test results are in [TESTING.md](TESTING.md). Report bugs on the [bug report form](https://forms.gle/8xG9pMoQnTG6MVo1A). MIT licensed.
+Requires NeoForge 26.1, 26.2 or 26.3 (download the jar for your Minecraft version) and Java 25; JEI and Jade are optional. The full guide to every block, setting and data-pack format is in [docs/REFERENCE.md](docs/REFERENCE.md). Test results are in [TESTING.md](TESTING.md). Report bugs on the [bug report form](https://forms.gle/8xG9pMoQnTG6MVo1A). MIT licensed.
 
 Automated test provided by Claude

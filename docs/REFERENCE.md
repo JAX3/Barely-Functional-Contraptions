@@ -4,7 +4,7 @@ The complete guide to every machine, item, setting and data-pack format. The sho
 
 ![Barely Functional Contraptions](banner.png)
 
-A NeoForge mod for **Minecraft 26.2 and 26.3** (Java 25) that combines two systems, **Mycelial Power** and **Resourceful Sheep**, into one mod. They share one mod id (`barelyfunctionalcontraptions`), one jar, one config screen and two creative tabs (machines and tools, and resource wool), and they are built to work together:
+A NeoForge mod for **Minecraft 26.1, 26.2 and 26.3** (Java 25) that combines two systems, **Mycelial Power** and **Resourceful Sheep**, into one mod. They share one mod id (`barelyfunctionalcontraptions`), one jar, one config screen and two creative tabs (machines and tools, and resource wool), and they are built to work together:
 
 * **Mycelial Power:** the **Mycelial Generator** burns mushrooms and water to make **Forge Energy (FE)**. Generators that touch, or are linked with the **Barely Functional Wrench**, form networks whose output grows **exponentially**. Running generators slowly spread **mycelium** and sprout **huge mushrooms**.
 * **Resourceful Sheep:** feed sheep blocks, ingots and gems to **infuse** their wool, shear them for **resource wool**, and turn the wool back into resources in the FE-powered **Mechanical Separator**. The **Fluid Reservoir** draws water from an infinite source to keep generators supplied.
@@ -19,15 +19,15 @@ A NeoForge mod for **Minecraft 26.2 and 26.3** (Java 25) that combines two syste
 
 | | |
 |---|---|
-| | Minecraft 26.3 | Minecraft 26.2 |
-|---|---|---|
-| Jar | `barelyfunctionalcontraptions-1.5.5-mc26.3.jar` | `barelyfunctionalcontraptions-1.5.5-mc26.2.jar` |
-| NeoForge | 26.3.x (built against 26.3.0.101) | 26.2.x (built against 26.2.0.95) |
-| Java | 25 | 25 |
-| JEI (optional) | 31.x (built against 31.17.0.109) | 30.x (built against 30.48.0.244) |
-| Jade (optional) | 26.3.x (built against 26.3.5) | 26.2.x (built against 26.2.10) |
+| | Minecraft 26.3 | Minecraft 26.2 | Minecraft 26.1 (26.1.2) |
+|---|---|---|---|
+| Jar | `barelyfunctionalcontraptions-1.5.5-mc26.3.jar` | `barelyfunctionalcontraptions-1.5.5-mc26.2.jar` | `barelyfunctionalcontraptions-1.5.5-mc26.1.jar` |
+| NeoForge | 26.3.x (built against 26.3.0.101) | 26.2.x (built against 26.2.0.95) | 26.1.2.x (built against 26.1.2.127) |
+| Java | 25 | 25 | 25 |
+| JEI (optional) | 31.x (built against 31.17.0.109) | 30.x (built against 30.48.0.244) | 29.x (built against 29.54.0.116) |
+| Jade (optional) | 26.3.x (built against 26.3.5) | 26.2.x (built against 26.2.10) | 26.1.x (built against 26.1.12) |
 
-Both jars have every feature. One difference: on 26.2 the synced config (`barelyfunctionalcontraptions-sheep-synced.toml` and `-mycelial-synced.toml`) is a per-world server config, kept in `<world>/serverconfig/` rather than `config/`, because 26.2's NeoForge has no global synced config.
+Every jar has every feature. The 26.1 jar needs Minecraft 26.1.2; 26.1 and 26.1.1 aren't supported. One difference: on 26.1 and 26.2 the synced config (`barelyfunctionalcontraptions-sheep-synced.toml` and `-mycelial-synced.toml`) is a per-world server config, kept in `<world>/serverconfig/` rather than `config/`, because their NeoForge has no global synced config.
 
 ---
 
@@ -51,8 +51,8 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](.
 
 ## Installation (players and servers)
 
-1. Install NeoForge for your Minecraft version: 26.3.x for Minecraft 26.3, or 26.2.x for Minecraft 26.2.
-2. Put the jar for that version (`barelyfunctionalcontraptions-1.5.5-mc26.3.jar` or `-mc26.2.jar`) in the `mods/` folder of the client **and** the server.
+1. Install NeoForge for your Minecraft version: 26.3.x for Minecraft 26.3, 26.2.x for Minecraft 26.2, or 26.1.2.x for Minecraft 26.1.2.
+2. Put the jar for that version (`barelyfunctionalcontraptions-1.5.5-mc26.3.jar`, `-mc26.2.jar` or `-mc26.1.jar`) in the `mods/` folder of the client **and** the server.
 3. Optional: install JEI and/or Jade for the same Minecraft version. The mod runs normally without them.
 
 **Machine fronts:** all three machines share one look. Each has a purple-rimmed glass window on its front: a red mushroom in the generator, a wool block in the separator and a pair of shears in the Automatic Shears. The window is dark while the machine is idle and glows with a pulsing halo and sparkles while it runs. The separator and shears also give off a little light while running.
@@ -1432,6 +1432,7 @@ Requires **JDK 25**. Gradle 9 is downloaded by the wrapper.
 ```bash
 ./gradlew build                          # compiles, runs unit tests, outputs build/libs/barelyfunctionalcontraptions-1.5.5-mc26.3.jar
 ./gradlew build -Pmc=26.2                # the same for Minecraft 26.2: build/mc26.2/libs/barelyfunctionalcontraptions-1.5.5-mc26.2.jar
+./gradlew build -Pmc=26.1                # the same for Minecraft 26.1.2: build/mc26.1/libs/barelyfunctionalcontraptions-1.5.5-mc26.1.jar
 ./gradlew runClient                      # dev client (with JEI and Jade)
 ./gradlew runServer                      # dev dedicated server
 ./gradlew runGameTestServer              # runs every GameTest (both modules + integration) headlessly, then exits
@@ -1443,15 +1444,15 @@ Requires **JDK 25**. Gradle 9 is downloaded by the wrapper.
 To launch the dev runs **without JEI**, pass `-Puse_jei_runtime=false`.
 
 ### Building for each Minecraft version
-The mod builds for **Minecraft 26.3** (the default) and **26.2** from one source tree. Add `-Pmc=26.2` to any command above (build, runClient, runGameTestServer, ...) to target 26.2.
+The mod builds for **Minecraft 26.3** (the default), **26.2** and **26.1** (26.1.2) from one source tree. Add `-Pmc=26.2` or `-Pmc=26.1` to any command above (build, runClient, runGameTestServer, ...) to target that version.
 
 - `versions/<mc>.properties` holds each version's Minecraft, NeoForge, JEI and Jade versions and ranges.
-- `src/main` is shared by every version. The few game calls that differ live behind small classes in `com.jax3.barelyfunctionalcontraptions.compat` (`Mc`, `McClient`, `HugeMushrooms`, `CompatLootModifier`), with one copy per version in `src/mc/<mc>/java`. Shared code only calls those.
-- Data files are written once, in 26.3's format. The 26.2 build converts the loot tables and advancements as it copies them, because 26.2 still uses the older `conditions`/`functions` lists and `recipe` field (see `buildSrc/src/main/groovy/McDataDowngrade.groovy`).
-- Each version builds in its own folder (`build/` for 26.3, `build/mc26.2/` for 26.2) and runs in its own game folder (`run/` and `run-26.2/`), so a world made in 26.3 is never opened in 26.2.
-- Block entity blocks have a small `codec()` method that 26.2 needs and 26.3 ignores.
+- `src/main` is shared by every version. The few game calls that differ live behind small classes in `com.jax3.barelyfunctionalcontraptions.compat` (`Mc`, `McClient`, `Vanilla`, `HugeMushrooms`, `CompatLootModifier`, and `McTest` for the GameTests and screenshot harness), with one copy per version in `src/mc/<mc>/java`. Shared code only calls those.
+- Data files are written once, in 26.3's format. The 26.2 and 26.1 builds convert the loot tables and advancements as they copy them, because those versions still use the older `conditions`/`functions` lists and `recipe` field (see `buildSrc/src/main/groovy/McDataDowngrade.groovy`).
+- Each version builds in its own folder (`build/` for 26.3, `build/mc26.2/` and `build/mc26.1/` for the others) and runs in its own game folder (`run/`, `run-26.2/` and `run-26.1/`), so a world is never opened in an older version.
+- Block entity blocks have a small `codec()` method that 26.1 and 26.2 need and 26.3 ignores.
 
-To check a change on both versions, run the GameTests on each: `./gradlew runGameTestServer` and `./gradlew runGameTestServer -Pmc=26.2`.
+To check a change on every version, run the GameTests on each: `./gradlew runGameTestServer`, `./gradlew runGameTestServer -Pmc=26.2` and `./gradlew runGameTestServer -Pmc=26.1`.
 
 The build downloads from `maven.neoforged.net` (NeoForge), Mojang's servers (Minecraft), `maven.blamejared.com` (JEI) and `api.modrinth.com` (Jade).
 

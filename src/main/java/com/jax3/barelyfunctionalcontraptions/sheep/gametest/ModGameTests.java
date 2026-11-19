@@ -1,5 +1,7 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.gametest;
 
+import com.jax3.barelyfunctionalcontraptions.compat.McTest;
+import com.jax3.barelyfunctionalcontraptions.compat.Vanilla;
 import com.google.gson.JsonParser;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.RedstoneMode;
@@ -36,7 +38,6 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -480,7 +481,7 @@ public final class ModGameTests {
      */
     private static void itemPipeSideModes(GameTestHelper h) {
         var shears = shearsAt(h, new BlockPos(1, 1, 2), Direction.WEST);
-        shears.setItem(0, new ItemStack(Items.WOOL.white(), 8));
+        shears.setItem(0, new ItemStack(Vanilla.wool(DyeColor.WHITE), 8));
         itemPipe(h, new BlockPos(2, 1, 2));
         itemPipe(h, new BlockPos(3, 1, 2));
         var diamondsOnly = chest(h, new BlockPos(3, 1, 1));
@@ -493,13 +494,13 @@ public final class ModGameTests {
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.clickedSide(at,
                 new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at).add(0, 0.1875, 0), Direction.UP, at, false)) == Direction.UP, "a click on the top of the core picks up");
         h.runAfterDelay(20, () -> {
-            h.assertTrue(countIn(anything, Items.WOOL.white()) == 8 && countIn(diamondsOnly, Items.WOOL.white()) == 0,
-                    "all the wool went to the unfiltered chest: " + countIn(anything, Items.WOOL.white()) + " / " + countIn(diamondsOnly, Items.WOOL.white()));
+            h.assertTrue(countIn(anything, Vanilla.wool(DyeColor.WHITE)) == 8 && countIn(diamondsOnly, Vanilla.wool(DyeColor.WHITE)) == 0,
+                    "all the wool went to the unfiltered chest: " + countIn(anything, Vanilla.wool(DyeColor.WHITE)) + " / " + countIn(diamondsOnly, Vanilla.wool(DyeColor.WHITE)));
             // Push: the pipe stops taking wool out of the shears.
             setPipeSide(h, new BlockPos(2, 1, 2), Direction.WEST, side(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.PUSH));
-            shears.setItem(0, new ItemStack(Items.WOOL.white(), 8));
+            shears.setItem(0, new ItemStack(Vanilla.wool(DyeColor.WHITE), 8));
             h.runAfterDelay(20, () -> {
-                h.assertTrue(countIn(shears, Items.WOOL.white()) == 8, "a Push side is never pulled from");
+                h.assertTrue(countIn(shears, Vanilla.wool(DyeColor.WHITE)) == 8, "a Push side is never pulled from");
                 // Off: no plug and no connection.
                 setPipeSide(h, new BlockPos(4, 1, 2).west(), Direction.EAST, side(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeSide.Mode.DISABLED));
                 h.assertTrue(h.getBlockState(new BlockPos(3, 1, 2)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ConduitBlock.SIDES.get(Direction.EAST))
@@ -593,14 +594,14 @@ public final class ModGameTests {
         int old = ModConfigs.SERVER.itemPipeTransferRate.get();
         ModConfigs.SERVER.itemPipeTransferRate.set(1);
         var shears = shearsAt(h, new BlockPos(1, 1, 2), Direction.WEST);
-        shears.setItem(0, new ItemStack(Items.WOOL.white(), 64));
+        shears.setItem(0, new ItemStack(Vanilla.wool(DyeColor.WHITE), 64));
         var chest = chest(h, new BlockPos(3, 1, 2));
         itemPipe(h, new BlockPos(2, 1, 2));
         int[] start = new int[1];
-        h.runAfterDelay(2, () -> start[0] = countIn(chest, Items.WOOL.white()));
+        h.runAfterDelay(2, () -> start[0] = countIn(chest, Vanilla.wool(DyeColor.WHITE)));
         h.runAfterDelay(12, () -> {
             try {
-                int moved = countIn(chest, Items.WOOL.white()) - start[0];
+                int moved = countIn(chest, Vanilla.wool(DyeColor.WHITE)) - start[0];
                 h.assertTrue(moved > 0 && moved <= 10, "10 ticks at 1 item a tick, moved " + moved);
             } finally {
                 ModConfigs.SERVER.itemPipeTransferRate.set(old);
@@ -686,7 +687,7 @@ public final class ModGameTests {
         // The skin is saved with the sheep.
         var saved = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess());
         sheep.saveWithoutId(saved);
-        Sheep copy = EntityTypes.SHEEP.create(h.getLevel(), net.minecraft.world.entity.EntitySpawnReason.LOAD);
+        Sheep copy = Vanilla.SHEEP.create(h.getLevel(), net.minecraft.world.entity.EntitySpawnReason.LOAD);
         copy.load(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess(), saved.buildResult()));
         h.assertTrue(copy.getData(skinAttachment).profile().map(p -> p.partialProfile().id().equals(id)).orElse(false), "the skin survives saving and loading");
         h.succeed();
@@ -721,17 +722,17 @@ public final class ModGameTests {
             return stack;
         };
         for (var entry : every.value().criteria().entrySet()) {
-            var instance = (net.minecraft.advancements.triggers.InventoryChangeTrigger.TriggerInstance) entry.getValue().triggerInstance();
-            h.assertTrue(instance.matches(player.getInventory(), wool.apply(entry.getKey()), 0, 0, 1), entry.getKey() + " wool is recognised");
+            var criterion = entry.getValue();
+            h.assertTrue(McTest.inventoryChangeMatches(criterion, player.getInventory(), wool.apply(entry.getKey())), entry.getKey() + " wool is recognised");
             String other = entry.getKey().equals("iron") ? "gold" : "iron";
-            h.assertFalse(instance.matches(player.getInventory(), wool.apply(other), 0, 0, 1), entry.getKey() + " isn't met by " + other + " wool");
+            h.assertFalse(McTest.inventoryChangeMatches(criterion, player.getInventory(), wool.apply(other)), entry.getKey() + " isn't met by " + other + " wool");
         }
         h.succeed();
     }
 
     private static void ghastSheepScale(GameTestHelper h) {
         Sheep ghast = sheepAt(h, new BlockPos(2, 1, 2), ResourcefulSheep.id("ghast"));
-        float plainWidth = EntityTypes.SHEEP.getWidth();
+        float plainWidth = Vanilla.SHEEP.getWidth();
         int wait = com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.GLOW_PLACE_TICKS * 2;
         h.runAfterDelay(wait, () -> {
             h.assertTrue(Math.abs(ghast.getScale() - 2.0F) < 1.0E-4, "a Ghast sheep is twice the size, scale " + ghast.getScale());
@@ -775,7 +776,7 @@ public final class ModGameTests {
     // ------------------------------------------------------------------ breeding
 
     private static Sheep sheepAt(GameTestHelper h, BlockPos pos, @org.jspecify.annotations.Nullable Identifier infusion) {
-        Sheep sheep = h.spawn(EntityTypes.SHEEP, pos);
+        Sheep sheep = h.spawn(Vanilla.SHEEP, pos);
         sheep.setNoAi(true);
         if (infusion != null) {
             int uses = SheepResourceRegistry.server().byId(infusion).orElseThrow().effectiveInfusionUses();
@@ -902,7 +903,7 @@ public final class ModGameTests {
         // Yield on plain wool: vanilla's 1-3 becomes at least 2.
         Sheep plain = sheepAt(h, new BlockPos(3, 1, 1), null);
         SheepInfusionEvents.setStats(plain, best);
-        int white = count(shear(h, plain), st -> st.is(Items.WOOL.white()));
+        int white = count(shear(h, plain), st -> st.is(Vanilla.wool(DyeColor.WHITE)));
         h.assertTrue(white >= 2 && white <= 8, "Yield 10 shears more plain wool, got " + white);
         // Endurance: feeding Iron to an Endurance-10 sheep.
         Sheep tough = sheepAt(h, new BlockPos(5, 1, 1), null);
@@ -1107,20 +1108,20 @@ public final class ModGameTests {
      * inventory; other blocks aren't sped up, and without the wrench a machine breaks normally.
      */
     private static void wrenchDismantles(GameTestHelper h) {
-        var player = (net.minecraft.server.level.ServerPlayer) h.makeMockServerPlayer(GameType.SURVIVAL);
+        var player = McTest.mockServerPlayer(h, GameType.SURVIVAL);
         player.getInventory().clearContent();
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()));
         BlockPos burnerPos = new BlockPos(2, 1, 2);
         h.setBlock(burnerPos, ModBlocks.WOOL_BURNER.get());
         var burner = h.getBlockEntity(burnerPos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity.class);
-        burner.setItem(0, new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.WHITE), 5));
+        burner.setItem(0, new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.WHITE), 5));
         var state = h.getBlockState(burnerPos);
         h.assertTrue(player.getDestroySpeed(state) >= state.getDestroySpeed(h.getLevel(), h.absolutePos(burnerPos)) * 30, "the wrench breaks it in one hit");
         h.assertTrue(player.getDestroySpeed(Blocks.STONE.defaultBlockState()) <= 1.0F, "but doesn't speed up breaking stone");
         h.assertTrue(player.gameMode.destroyBlock(h.absolutePos(burnerPos)), "it breaks");
         h.assertTrue(h.getBlockState(burnerPos).isAir(), "the Wool Burner is gone");
         h.assertTrue(player.getInventory().contains(new ItemStack(ModItems.WOOL_BURNER.get())), "and in the player's inventory");
-        h.assertTrue(player.getInventory().countItem(Items.WOOL.pick(net.minecraft.world.item.DyeColor.WHITE).asItem()) == 5, "with the wool that was in it");
+        h.assertTrue(player.getInventory().countItem(Vanilla.wool(net.minecraft.world.item.DyeColor.WHITE).asItem()) == 5, "with the wool that was in it");
         var around = new net.minecraft.world.phys.AABB(h.absolutePos(burnerPos)).inflate(2);
         h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, around).isEmpty(), "nothing is left on the ground");
         h.succeed();
@@ -1136,7 +1137,7 @@ public final class ModGameTests {
         var be = h.getBlockEntity(back, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.class);
         if (wheat > 0) be.setItem(0, new ItemStack(Items.WHEAT, wheat));
         if (withSheep) {
-            Sheep sheep = h.spawn(EntityTypes.SHEEP, new net.minecraft.world.phys.Vec3(back.getX() + 0.5, back.getY() + 0.4, back.getZ() + 0.1));
+            Sheep sheep = h.spawn(Vanilla.SHEEP, new net.minecraft.world.phys.Vec3(back.getX() + 0.5, back.getY() + 0.4, back.getZ() + 0.1));
             sheep.setNoAi(true);
         }
         return be;
@@ -1180,7 +1181,7 @@ public final class ModGameTests {
     private static void sheepTreadmillAttracts(GameTestHelper h) {
         for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.STONE);
         var be = treadmill(h, new BlockPos(1, 1, 2), false, 4);
-        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(5, 1, 5));
+        Sheep sheep = h.spawn(Vanilla.SHEEP, new BlockPos(5, 1, 5));
         h.succeedWhen(() -> h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.State.WALKING,
                 "the sheep came over and is walking it, state " + be.state() + ", sheep at " + h.relativePos(sheep.blockPosition())));
     }
@@ -1230,7 +1231,7 @@ public final class ModGameTests {
      * its leather shape. Dyeing it afterwards works like leather.
      */
     private static void woollenArmorColour(GameTestHelper h) {
-        ItemStack red = new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.RED)), blue = new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.BLUE)), e = ItemStack.EMPTY;
+        ItemStack red = new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.RED)), blue = new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.BLUE)), e = ItemStack.EMPTY;
         ItemStack helmet = craft(h, 3, 2, List.of(red, red, red, red, e, red));
         h.assertTrue(helmet.is(ModItems.WOOLLEN_HELMET.get()), "five wool make a Woollen Beanie, got " + helmet);
         int allRed = net.minecraft.world.item.component.DyedItemColor.applyDyes((net.minecraft.world.item.component.DyedItemColor) null,
@@ -1240,11 +1241,11 @@ public final class ModGameTests {
         ItemStack mixed = craft(h, 3, 2, List.of(red, blue, red, blue, e, red));
         var mixedColour = mixed.get(net.minecraft.core.component.DataComponents.DYED_COLOR);
         h.assertTrue(mixedColour != null && mixedColour.rgb() != allRed, "red and blue wool blend, got " + mixedColour);
-        ItemStack w = new ItemStack(Items.WOOL.pick(net.minecraft.world.item.DyeColor.WHITE));
+        ItemStack w = new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.WHITE));
         h.assertTrue(craft(h, 3, 3, List.of(w, e, w, w, w, w, w, w, w)).is(ModItems.WOOLLEN_CHESTPLATE.get()), "eight wool make a jumper");
         h.assertTrue(craft(h, 3, 3, List.of(w, w, w, w, e, w, w, e, w)).is(ModItems.WOOLLEN_LEGGINGS.get()), "seven wool make leggings");
         h.assertTrue(craft(h, 3, 2, List.of(w, e, w, w, e, w)).is(ModItems.WOOLLEN_BOOTS.get()), "four wool make boots");
-        ItemStack dyed = craft(h, 2, 1, List.of(helmet, new ItemStack(Items.DYE.pick(net.minecraft.world.item.DyeColor.YELLOW))));
+        ItemStack dyed = craft(h, 2, 1, List.of(helmet, new ItemStack(Vanilla.dye(net.minecraft.world.item.DyeColor.YELLOW))));
         var dyedColour = dyed.get(net.minecraft.core.component.DataComponents.DYED_COLOR);
         h.assertTrue(dyed.is(ModItems.WOOLLEN_HELMET.get()) && dyedColour != null && dyedColour.rgb() != allRed, "it can be dyed like leather, got " + dyedColour);
         h.assertTrue(helmet.is(net.minecraft.tags.ItemTags.HEAD_ARMOR) && ModItems.WOOLLEN_BOOTS.get().getDefaultInstance().is(net.minecraft.tags.ItemTags.FREEZE_IMMUNE_WEARABLES),
@@ -1263,8 +1264,8 @@ public final class ModGameTests {
      * vibrations, while one without them does; take them off and Muffled wears off.
      */
     private static void woollenBootsMuffle(GameTestHelper h) {
-        var quiet = h.spawn(net.minecraft.world.entity.EntityTypes.HUSK, new BlockPos(1, 1, 1));
-        var loud = h.spawn(net.minecraft.world.entity.EntityTypes.HUSK, new BlockPos(5, 1, 5));
+        var quiet = h.spawn(Vanilla.HUSK, new BlockPos(1, 1, 1));
+        var loud = h.spawn(Vanilla.HUSK, new BlockPos(5, 1, 5));
         quiet.setNoAi(true);
         loud.setNoAi(true);
         quiet.setItemSlot(net.minecraft.world.entity.EquipmentSlot.FEET, new ItemStack(ModItems.WOOLLEN_BOOTS.get()));
@@ -1890,7 +1891,7 @@ public final class ModGameTests {
     private static final Identifier IRON = ResourcefulSheep.id("iron");
 
     private static Sheep sheep(GameTestHelper h) {
-        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(3, 1, 3));
+        Sheep sheep = h.spawn(Vanilla.SHEEP, new BlockPos(3, 1, 3));
         sheep.setNoAi(true);
         sheep.setColor(DyeColor.WHITE);
         return sheep;
@@ -2052,7 +2053,7 @@ public final class ModGameTests {
         h.assertTrue(count(drops, ironWool) == 2, "killed iron sheep drops 2 iron wool (1 more than shearing): " + drops);
         int raw = count(drops, st -> st.is(Items.RAW_IRON));
         h.assertTrue(raw >= 2 && raw <= 4, "killed iron sheep drops 2-4 raw iron: " + drops);
-        h.assertTrue(count(drops, st -> st.is(Items.WOOL.white())) == 0, "no plain wool from an infused sheep: " + drops);
+        h.assertTrue(count(drops, st -> st.is(Vanilla.wool(DyeColor.WHITE))) == 0, "no plain wool from an infused sheep: " + drops);
         h.assertTrue(count(drops, st -> st.is(Items.MUTTON) || st.is(Items.COOKED_MUTTON)) > 0, "mutton still drops: " + drops);
         h.assertFalse(SheepInfusionEvents.getInfusion(infused).isInfused(), "the infusion is used up by the kill");
 
@@ -2066,7 +2067,7 @@ public final class ModGameTests {
 
         // A plain sheep keeps its vanilla wool.
         List<ItemStack> plain = killDrops(h, sheep(h));
-        h.assertTrue(count(plain, st -> st.is(Items.WOOL.white())) == 1 && count(plain, ironWool) == 0, "plain sheep drops white wool: " + plain);
+        h.assertTrue(count(plain, st -> st.is(Vanilla.wool(DyeColor.WHITE))) == 1 && count(plain, ironWool) == 0, "plain sheep drops white wool: " + plain);
         h.succeed();
     }
 
@@ -2075,7 +2076,7 @@ public final class ModGameTests {
         feed(playerHolding(h, new ItemStack(Items.IRON_INGOT)), sheep);
         List<ItemStack> drops = shear(h, sheep);
         h.assertTrue(sheep.isSheared(), "sheep should be sheared");
-        h.assertTrue(drops.stream().noneMatch(s -> s.is(Items.WOOL.white())), "infused sheep must not drop normal wool: " + drops);
+        h.assertTrue(drops.stream().noneMatch(s -> s.is(Vanilla.wool(DyeColor.WHITE))), "infused sheep must not drop normal wool: " + drops);
         long ironWool = drops.stream().filter(s -> IRON.equals(ResourceWoolItem.getResourceId(s))).mapToInt(ItemStack::getCount).sum();
         h.assertTrue(ironWool == 1, "expected exactly 1 iron wool, got " + drops);
         h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 99, "one use consumed");
@@ -2117,7 +2118,7 @@ public final class ModGameTests {
         h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 99, "eating grass must not change the uses left");
 
         List<ItemStack> second = shear(h, sheep);
-        h.assertTrue(second.stream().noneMatch(s -> s.is(Items.WOOL.white())), "regrown wool must not be normal wool: " + second);
+        h.assertTrue(second.stream().noneMatch(s -> s.is(Vanilla.wool(DyeColor.WHITE))), "regrown wool must not be normal wool: " + second);
         h.assertTrue(second.stream().anyMatch(s -> IRON.equals(ResourceWoolItem.getResourceId(s))), "regrown wool shears as iron wool: " + second);
         h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == 98, "second shearing uses one more");
         h.succeed();
@@ -2142,7 +2143,7 @@ public final class ModGameTests {
     }
 
     private static Sheep sheepAt(GameTestHelper h, int x, int z) {
-        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(x, 1, z));
+        Sheep sheep = h.spawn(Vanilla.SHEEP, new BlockPos(x, 1, z));
         sheep.setNoAi(true);
         sheep.setColor(DyeColor.WHITE);
         return sheep;
@@ -2168,7 +2169,7 @@ public final class ModGameTests {
             h.assertFalse(beyond.isSheared(), "sheep beyond the area must not be sheared");
             h.assertFalse(beside.isSheared(), "sheep beside the area must not be sheared");
             h.assertTrue(countIn(shears, s -> IRON.equals(ResourceWoolItem.getResourceId(s))) == 1, "1 iron wool stored");
-            h.assertTrue(countIn(shears, s -> s.is(Items.WOOL.white())) >= 2, "plain sheep's white wool stored");
+            h.assertTrue(countIn(shears, s -> s.is(Vanilla.wool(DyeColor.WHITE))) >= 2, "plain sheep's white wool stored");
             h.assertTrue(SheepInfusionEvents.getInfusion(iron).usesRemaining() == 99, "infusion uses one shearing as usual");
             h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, h.getBounds()).isEmpty(),
                     "everything went into the inventory, nothing on the ground");
@@ -2187,7 +2188,7 @@ public final class ModGameTests {
                 .thenExecuteAfter(25, () -> h.assertFalse(sheep.isSheared(), "a full machine must not shear (and must not drop wool on the ground)"))
                 .thenExecute(() -> shears.setItem(4, ItemStack.EMPTY))
                 .thenWaitUntil(() -> h.assertTrue(sheep.isSheared(), "shears again once there is room"))
-                .thenExecute(() -> h.assertTrue(countIn(shears, s -> s.is(Items.WOOL.white())) >= 1, "wool stored in the freed slot"))
+                .thenExecute(() -> h.assertTrue(countIn(shears, s -> s.is(Vanilla.wool(DyeColor.WHITE))) >= 1, "wool stored in the freed slot"))
                 .thenSucceed();
     }
 
@@ -2254,7 +2255,7 @@ public final class ModGameTests {
         var shears = autoShears(h);
         BlockPos hopper = new BlockPos(3, 0, 0);
         h.setBlock(hopper, net.minecraft.world.level.block.Blocks.HOPPER);
-        var mooshroom = h.spawn(EntityTypes.MOOSHROOM, new BlockPos(2, 1, 2));
+        var mooshroom = h.spawn(Vanilla.MOOSHROOM, new BlockPos(2, 1, 2));
         mooshroom.setNoAi(true);
         Sheep sheep = sheepAt(h, 4, 2);
 
@@ -2269,8 +2270,8 @@ public final class ModGameTests {
         h.succeedWhen(() -> {
             h.assertTrue(sheep.isSheared(), "sheep sheared");
             var hopperBe = h.getBlockEntity(hopper, net.minecraft.world.level.block.entity.HopperBlockEntity.class);
-            h.assertTrue(countIn(hopperBe, s -> s.is(Items.WOOL.white())) >= 1, "hopper below pulls the wool out");
-            h.assertTrue(mooshroom.isAlive() && mooshroom.getType() == EntityTypes.MOOSHROOM, "mooshroom is not auto-sheared into a cow");
+            h.assertTrue(countIn(hopperBe, s -> s.is(Vanilla.wool(DyeColor.WHITE))) >= 1, "hopper below pulls the wool out");
+            h.assertTrue(mooshroom.isAlive() && mooshroom.getType() == Vanilla.MOOSHROOM, "mooshroom is not auto-sheared into a cow");
         });
     }
 
@@ -2299,7 +2300,7 @@ public final class ModGameTests {
 
                     TagValueOutput out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, h.getLevel().registryAccess());
                     sheep[0].saveWithoutId(out);
-                    Sheep loaded = (Sheep) EntityType.create(EntityTypes.SHEEP, TagValueInput.create(ProblemReporter.DISCARDING,
+                    Sheep loaded = (Sheep) EntityType.create(Vanilla.SHEEP, TagValueInput.create(ProblemReporter.DISCARDING,
                             h.getLevel().registryAccess(), out.buildResult()), h.getLevel(), EntitySpawnReason.LOAD).orElseThrow();
                     ResourcefulSheep.LOGGER.info("[generated test] after save/load: {}", SheepInfusionEvents.getInfusion(loaded));
                     h.assertTrue(SheepInfusionEvents.getInfusion(loaded).equals(infusion), "save/load kept " + SheepInfusionEvents.getInfusion(loaded));
@@ -2357,7 +2358,7 @@ public final class ModGameTests {
         Identifier missing = Identifier.fromNamespaceAndPath("some_removed_pack", "tin");
         SheepInfusionEvents.setInfusion(sheep, new SheepInfusion(Optional.of(missing), 5, 0));
         List<ItemStack> drops = shear(h, sheep);
-        h.assertTrue(drops.stream().anyMatch(st -> st.is(Items.WOOL.white())), "unloaded wool type shears as normal wool: " + drops);
+        h.assertTrue(drops.stream().anyMatch(st -> st.is(Vanilla.wool(DyeColor.WHITE))), "unloaded wool type shears as normal wool: " + drops);
         h.assertTrue(SheepInfusionEvents.getInfusion(sheep).equals(new SheepInfusion(Optional.of(missing), 5, 0)),
                 "infusion kept untouched for when the wool type returns: " + SheepInfusionEvents.getInfusion(sheep));
         sheep.ate();
@@ -2370,7 +2371,7 @@ public final class ModGameTests {
     private static void shearPlain(GameTestHelper h) {
         Sheep sheep = sheep(h);
         List<ItemStack> drops = shear(h, sheep);
-        h.assertTrue(!drops.isEmpty() && drops.stream().allMatch(s -> s.is(Items.WOOL.white())), "plain sheep drops white wool, got " + drops);
+        h.assertTrue(!drops.isEmpty() && drops.stream().allMatch(s -> s.is(Vanilla.wool(DyeColor.WHITE))), "plain sheep drops white wool, got " + drops);
         h.succeed();
     }
 
@@ -2389,7 +2390,7 @@ public final class ModGameTests {
             h.assertFalse(SheepInfusionEvents.getInfusion(sheep).isInfused(), "single-use infusion must be cleared after shearing");
             sheep.setSheared(false); // regrow
             List<ItemStack> second = shear(h, sheep);
-            h.assertTrue(second.stream().allMatch(s -> s.is(Items.WOOL.white())), "sheep returns to normal wool, got " + second);
+            h.assertTrue(second.stream().allMatch(s -> s.is(Vanilla.wool(DyeColor.WHITE))), "sheep returns to normal wool, got " + second);
         } finally {
             ModConfigs.SERVER.infusionUsesOverride.set(old);
         }
@@ -2397,7 +2398,7 @@ public final class ModGameTests {
     }
 
     private static void dispenserShears(GameTestHelper h) {
-        Sheep sheep = h.spawn(EntityTypes.SHEEP, new BlockPos(3, 1, 3));
+        Sheep sheep = h.spawn(Vanilla.SHEEP, new BlockPos(3, 1, 3));
         sheep.setNoAi(true);
         feed(playerHolding(h, new ItemStack(Items.GOLD_INGOT)), sheep);
         BlockPos dispenserPos = new BlockPos(3, 1, 2);
@@ -2410,7 +2411,7 @@ public final class ModGameTests {
             AABB box = new AABB(h.absolutePos(new BlockPos(3, 1, 3))).inflate(3);
             List<ItemEntity> items = h.getLevel().getEntitiesOfClass(ItemEntity.class, box);
             h.assertTrue(items.stream().anyMatch(e -> ResourcefulSheep.id("gold").equals(ResourceWoolItem.getResourceId(e.getItem()))), "gold wool item entity expected");
-            h.assertTrue(items.stream().noneMatch(e -> e.getItem().is(Items.WOOL.white())), "no plain wool expected");
+            h.assertTrue(items.stream().noneMatch(e -> e.getItem().is(Vanilla.wool(DyeColor.WHITE))), "no plain wool expected");
         });
     }
 
@@ -2420,7 +2421,7 @@ public final class ModGameTests {
         TagValueOutput out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, h.getLevel().registryAccess());
         sheep.saveWithoutId(out);
         CompoundTag tag = out.buildResult();
-        Sheep loaded = (Sheep) EntityType.create(EntityTypes.SHEEP, TagValueInput.create(ProblemReporter.DISCARDING, h.getLevel().registryAccess(), tag),
+        Sheep loaded = (Sheep) EntityType.create(Vanilla.SHEEP, TagValueInput.create(ProblemReporter.DISCARDING, h.getLevel().registryAccess(), tag),
                 h.getLevel(), EntitySpawnReason.LOAD).orElseThrow();
         h.assertTrue(SheepInfusionEvents.getInfusion(loaded).equals(SheepInfusionEvents.getInfusion(sheep)),
                 "infusion lost on reload: " + SheepInfusionEvents.getInfusion(loaded));
@@ -2557,7 +2558,7 @@ public final class ModGameTests {
     }
 
     private static void separatingRecipe(GameTestHelper h) {
-        var sep = SeparationLookup.find(h.getLevel(), new ItemStack(Items.WOOL.red()));
+        var sep = SeparationLookup.find(h.getLevel(), new ItemStack(Vanilla.wool(DyeColor.RED)));
         h.assertTrue(sep.isPresent() && sep.get().primary().create().is(Items.STRING) && sep.get().primary().count() == 3,
                 "separating recipe should turn wool into 3 string: " + sep);
         h.assertTrue(SeparationLookup.find(h.getLevel(), new ItemStack(Items.DIRT)).isEmpty(), "dirt is not separable");
@@ -2661,13 +2662,13 @@ public final class ModGameTests {
         // Stained glass colours the beam like a beacon's: the first sets the colour, a different one mixes in.
         int red = net.minecraft.world.item.DyeColor.RED.getTextureDiffuseColor();
         int yellow = net.minecraft.world.item.DyeColor.YELLOW.getTextureDiffuseColor();
-        h.setBlock(floor.above(1), Blocks.STAINED_GLASS.red());
-        h.setBlock(floor.above(2), Blocks.STAINED_GLASS_PANE.yellow());
+        h.setBlock(floor.above(1), Vanilla.stainedGlass(DyeColor.RED));
+        h.setBlock(floor.above(2), Vanilla.stainedGlassPane(DyeColor.YELLOW));
         int[] mixed = zpeAt(h, floor).getBeamSections();
         int[] expected = {0, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_COLOR, 1, red, 2, net.minecraft.util.ARGB.average(red, yellow)};
         h.assertTrue(java.util.Arrays.equals(mixed, expected), "red then yellow glass: " + java.util.Arrays.toString(mixed));
         h.assertTrue(zpeAt(h, floor).getBeamColor() == net.minecraft.util.ARGB.average(red, yellow), "the whole beam is drawn in the mixed colour");
-        h.setBlock(floor.above(2), Blocks.STAINED_GLASS_PANE.red());
+        h.setBlock(floor.above(2), Vanilla.stainedGlassPane(DyeColor.RED));
         int[] same = zpeAt(h, floor).getBeamSections();
         h.assertTrue(java.util.Arrays.equals(same, new int[] {0, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_COLOR, 1, red}), "the same colour twice is one section: " + java.util.Arrays.toString(same));
         h.assertTrue(zpeAt(h, floor).getPairOutput() == 2 * perBlock, "coloured beams make the same power");
@@ -2765,7 +2766,7 @@ public final class ModGameTests {
         BlockPos west = new BlockPos(0, 2, 2), east = new BlockPos(5, 2, 2);
         h.setBlock(west, zpe(Direction.EAST));
         h.setBlock(east, zpe(Direction.WEST));
-        h.setBlock(new BlockPos(2, 2, 2), Blocks.STAINED_GLASS.red());
+        h.setBlock(new BlockPos(2, 2, 2), Vanilla.stainedGlass(DyeColor.RED));
         h.setBlock(new BlockPos(3, 1, 2), Blocks.STONE);
         var lead = zpeAt(h, west);
         var other = zpeAt(h, east);
@@ -2785,7 +2786,7 @@ public final class ModGameTests {
         h.setBlock(east, zpe(Direction.WEST));
         zpeAt(h, west);
         zpeAt(h, east);
-        var pig = h.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(3, 2, 2));
+        var pig = h.spawnWithNoFreeWill(Vanilla.PIG, new BlockPos(3, 2, 2));
         float health = pig.getHealth();
         h.succeedWhen(() -> {
             h.assertTrue(pig.getHealth() < health || !pig.isAlive(), "the sideways beam hurts the pig standing in it");
@@ -2799,8 +2800,8 @@ public final class ModGameTests {
         h.setBlock(ceiling, zpe(Direction.DOWN));
         zpeAt(h, floor);
         zpeAt(h, ceiling);
-        var golem = h.spawnWithNoFreeWill(EntityTypes.IRON_GOLEM, new BlockPos(3, 2, 3));
-        var pig = h.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(5, 1, 3));
+        var golem = h.spawnWithNoFreeWill(Vanilla.IRON_GOLEM, new BlockPos(3, 2, 3));
+        var pig = h.spawnWithNoFreeWill(Vanilla.PIG, new BlockPos(5, 1, 3));
         var beamKey = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_DAMAGE;
         String beamPlayer = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_PLAYER_NAME;
 
@@ -2810,11 +2811,11 @@ public final class ModGameTests {
         h.setBlock(cowCeiling, zpe(Direction.DOWN));
         zpeAt(h, cowFloor);
         zpeAt(h, cowCeiling);
-        var cow = h.spawnWithNoFreeWill(EntityTypes.COW, new BlockPos(1, 2, 1));
+        var cow = h.spawnWithNoFreeWill(Vanilla.COW, new BlockPos(1, 2, 1));
         var cowArea = new net.minecraft.world.phys.AABB(h.absolutePos(cowFloor)).inflate(2, 3, 2);
 
         // Player-only loot: blaze rods only drop for player kills. Credited to the beam's fake player, they do.
-        var blaze = h.spawnWithNoFreeWill(EntityTypes.BLAZE, new BlockPos(5, 2, 5));
+        var blaze = h.spawnWithNoFreeWill(Vanilla.BLAZE, new BlockPos(5, 2, 5));
         var beamSource = h.getLevel().damageSources().source(beamKey);
         blaze.setLastHurtByPlayer(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity
                 .beamPlayer(h.getLevel(), h.absolutePos(cowFloor)), 100);
@@ -2852,7 +2853,7 @@ public final class ModGameTests {
     private static void zeroPointBeamLooting(GameTestHelper h) {
         int looting = ModConfigs.getInt(ModConfigs.SERVER.zpeBeamLooting);
         h.assertTrue(looting >= 1, "default beamLooting is at least 1, got " + looting);
-        var pig = h.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(3, 1, 3));
+        var pig = h.spawnWithNoFreeWill(Vanilla.PIG, new BlockPos(3, 1, 3));
         var level = h.getLevel();
         var beam = level.damageSources().source(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_DAMAGE);
         var fire = level.damageSources().inFire();
@@ -3263,7 +3264,7 @@ public final class ModGameTests {
         var gems = parse.apply("{\"neoforge:ingredient_type\": \"barelyfunctionalcontraptions:resource_wool\", \"category\": \"gem\"}");
         h.assertTrue(gems.test(diamondWool) && !gems.test(ironWool), "a category matches the wool of every resource in it");
         var any = parse.apply("{\"neoforge:ingredient_type\": \"barelyfunctionalcontraptions:resource_wool\"}");
-        h.assertTrue(any.test(ironWool) && any.test(diamondWool) && !any.test(new ItemStack(Items.WOOL.white())), "no filter matches any resource wool, not plain wool");
+        h.assertTrue(any.test(ironWool) && any.test(diamondWool) && !any.test(new ItemStack(Vanilla.wool(DyeColor.WHITE))), "no filter matches any resource wool, not plain wool");
         // It works inside the mod's own recipe type too.
         var recipe = com.jax3.barelyfunctionalcontraptions.sheep.recipe.SeparatingRecipe.MAP_CODEC.codec().parse(ops, JsonParser.parseString(
                 "{\"ingredient\": {\"neoforge:ingredient_type\": \"barelyfunctionalcontraptions:resource_wool\", \"resource\": \"barelyfunctionalcontraptions:iron\"},"
@@ -3521,7 +3522,7 @@ public final class ModGameTests {
         h.assertTrue(parse.apply("{\"sheep\": \"a:b\", \"feature\": \"on_fire\", \"power\": 5}").isError(), "two kinds at once is an error");
         h.assertTrue(parse.apply("{\"power\": 5}").isError(), "no kind is an error");
         var glowing = parse.apply("{\"feature\": \"glowing\", \"power\": 10}").getOrThrow();
-        var cow = h.spawn(EntityTypes.COW, new BlockPos(1, 1, 1));
+        var cow = h.spawn(Vanilla.COW, new BlockPos(1, 1, 1));
         cow.setNoAi(true);
         Sheep blaze = sheepAt(h, new BlockPos(3, 1, 3), ResourcefulSheep.id("blaze"));
         Sheep glowInk = sheepAt(h, new BlockPos(5, 1, 1), ResourcefulSheep.id("glow_ink"));
@@ -3613,7 +3614,7 @@ public final class ModGameTests {
     }
 
     private static void woolBurnerFuels(GameTestHelper h) {
-        var wool = burner(h, new BlockPos(1, 1, 1), new ItemStack(Items.WOOL.red(), 2));
+        var wool = burner(h, new BlockPos(1, 1, 1), new ItemStack(Vanilla.wool(DyeColor.RED), 2));
         var string = burner(h, new BlockPos(3, 1, 1), new ItemStack(Items.STRING, 4));
         var coal = burner(h, new BlockPos(5, 1, 1), com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("coal"), 1));
         var iron = burner(h, new BlockPos(1, 1, 4), com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(IRON, 1));
@@ -3638,15 +3639,15 @@ public final class ModGameTests {
 
     private static void woolBurnerFullAndHoppers(GameTestHelper h) {
         // Full buffer, nothing taking power: the wool waits.
-        var full = burner(h, new BlockPos(1, 1, 1), new ItemStack(Items.WOOL.white(), 3));
+        var full = burner(h, new BlockPos(1, 1, 1), new ItemStack(Vanilla.wool(DyeColor.WHITE), 3));
         var buffer = (net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler) full.getEnergyHandler();
         buffer.set(buffer.getCapacityAsInt());
         // Right-click with wool loads it; cobblestone doesn't go in.
         BlockPos pos = new BlockPos(4, 1, 4);
         var burner = burner(h, pos, ItemStack.EMPTY);
-        Player player = playerHolding(h, new ItemStack(Items.WOOL.blue(), 5));
+        Player player = playerHolding(h, new ItemStack(Vanilla.wool(DyeColor.BLUE), 5));
         h.getBlockState(pos).useItemOn(player.getMainHandItem(), h.getLevel(), player, InteractionHand.MAIN_HAND, hitTop(h, pos));
-        h.assertTrue(burner.fuel().is(Items.WOOL.blue()) && burner.fuel().getCount() == 5 && player.getMainHandItem().isEmpty(), "right-clicking with wool loads it");
+        h.assertTrue(burner.fuel().is(Vanilla.wool(DyeColor.BLUE)) && burner.fuel().getCount() == 5 && player.getMainHandItem().isEmpty(), "right-clicking with wool loads it");
         h.assertFalse(burner.canPlaceItem(0, new ItemStack(Items.COBBLESTONE)), "cobblestone isn't fuel");
         // A hopper pointing in adds string and keeps dirt; a hopper under it can't pull fuel out.
         BlockPos fedPos = new BlockPos(1, 1, 4);
@@ -3693,7 +3694,7 @@ public final class ModGameTests {
     private static void woolPackerPresses(GameTestHelper h) {
         var be = packer(h, new BlockPos(1, 1, 1), ResourceWoolItem.create(IRON, 20), true);
         var gold = packer(h, new BlockPos(4, 1, 1), ResourceWoolItem.create(ResourcefulSheep.id("gold"), 8), true);
-        h.assertFalse(be.canPlaceItem(0, new ItemStack(Items.WOOL.white())), "plain wool can't be baled");
+        h.assertFalse(be.canPlaceItem(0, new ItemStack(Vanilla.wool(DyeColor.WHITE))), "plain wool can't be baled");
         h.assertTrue(be.canPlaceItem(0, ResourceWoolItem.create(IRON, 1)), "resource wool can");
         h.assertFalse(be.canPlaceItem(1, com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(IRON, 1)), "nothing goes into the bale slot");
         h.runAfterDelay(5, () -> h.assertTrue(h.getBlockState(new BlockPos(1, 1, 1)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.ACTIVE),
