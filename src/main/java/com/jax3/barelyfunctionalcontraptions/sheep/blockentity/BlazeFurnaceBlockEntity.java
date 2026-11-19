@@ -210,6 +210,9 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
             found.add(entity);
         }
         int max = ModConfigs.getInt(ModConfigs.SERVER.blazeFurnaceMaxHeaters);
+        // Keep its Blaze sheep close: call strays back while it has room for more heat.
+        SheepAttraction.claim(found, level.getGameTime());
+        SheepAttraction.attract(level, area, s -> FurnaceHeatManager.heatOf(s).isPresent(), max - found.size(), level.getGameTime());
         int newHeat = combine(powers, max, ModConfigs.getDouble(ModConfigs.SERVER.blazeFurnaceFalloff));
         int[] ids = found.stream().limit(max).mapToInt(Entity::getId).sorted().toArray();
         boolean changed = !Arrays.equals(ids, heaters);
@@ -310,6 +313,12 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
         if (player == null || !player.getAbilities().instabuild) stack.shrink(move);
         setChanged();
         return move;
+    }
+
+    /** It calls its sheep back from just outside its area. */
+    @Override
+    public boolean attractsSheep() {
+        return true;
     }
 
     @Override

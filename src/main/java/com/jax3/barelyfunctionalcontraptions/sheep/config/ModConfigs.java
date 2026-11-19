@@ -121,6 +121,8 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue energyCostMultiplier;
         public final ModConfigSpec.DoubleValue processingSpeedMultiplier;
         public final ModConfigSpec.IntValue timingRevision;
+        public final ModConfigSpec.BooleanValue attractionEnabled;
+        public final ModConfigSpec.IntValue attractionRange;
         public final ModConfigSpec.BooleanValue resetProgressWhenUnpowered;
         public final ModConfigSpec.ConfigValue<List<? extends String>> energyInputSides;
         public final ModConfigSpec.ConfigValue<List<? extends String>> itemInputSides;
@@ -297,6 +299,13 @@ public final class ModConfigs {
             b.comment("Bookkeeping: which machine-speed pass this file has had. Leave it alone.").push("revision");
             timingRevision = b.comment("1 = the machines' faster timings have been applied: settings still at their old defaults were moved to the new ones; anything you had changed was left as it was.")
                     .defineInRange("timingRevision", 0, 0, 100);
+            b.pop();
+
+            b.comment("Sheep attraction: the Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller and Thermal Reaction Chamber call their sheep back into their working area when one wanders a little way out").push("sheep_attraction");
+            attractionEnabled = b.comment("Whether these machines call their sheep back.")
+                    .define("enabled", true);
+            attractionRange = b.comment("How far outside the working area, in blocks, a sheep is still called back. The area outline shows it faintly.")
+                    .defineInRange("range", 4, 0, 16);
             b.pop();
 
             b.comment("Mechanical Separator machine").push("separator");

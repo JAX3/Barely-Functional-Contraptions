@@ -186,8 +186,11 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements WorldlyCon
     /** Counts the heat sources (Blaze sheep) in the area and works out the speed. */
     public void scan(ServerLevel level, BlockPos pos, BlockState state) {
         AABB area = heatingArea(pos);
-        int[] ids = level.getEntities((Entity) null, area, e -> area.contains(e.position()) && FurnaceHeatManager.heatOf(e).isPresent()).stream()
-                .limit(maxSources()).mapToInt(Entity::getId).sorted().toArray();
+        java.util.List<Entity> found = level.getEntities((Entity) null, area, e -> area.contains(e.position()) && FurnaceHeatManager.heatOf(e).isPresent());
+        int[] ids = found.stream().limit(maxSources()).mapToInt(Entity::getId).sorted().toArray();
+        // Keep its Blaze sheep close: call strays back while it has room for more.
+        SheepAttraction.claim(found, level.getGameTime());
+        SheepAttraction.attract(level, area, s -> FurnaceHeatManager.heatOf(s).isPresent(), maxSources() - found.size(), level.getGameTime());
         speed = speedWith(ids.length);
         if (!Arrays.equals(ids, heaters)) {
             heaters = ids;
@@ -267,6 +270,12 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements WorldlyCon
     public int getComparatorSignal() {
         if (input.isEmpty()) return 0;
         return Math.max(1, Math.round(15.0F * input.getCount() / input.getMaxStackSize()));
+    }
+
+    /** It calls its sheep back from just outside its area. */
+    @Override
+    public boolean attractsSheep() {
+        return true;
     }
 
     @Override

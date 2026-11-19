@@ -28,6 +28,8 @@ public class AreaOutlineRenderer<T extends BlockEntity & AreaDisplay> implements
         /** The areas relative to the block's own corner, and their colours. */
         java.util.List<AABB> boxes = java.util.List.of();
         int[] colors = new int[0];
+        /** The attraction areas round them, drawn faintly, or none. */
+        java.util.List<AABB> reaches = java.util.List.of();
     }
 
     @Override
@@ -46,12 +48,39 @@ public class AreaOutlineRenderer<T extends BlockEntity & AreaDisplay> implements
         state.boxes = areas.stream().map(a -> a.move(-pos.getX(), -pos.getY(), -pos.getZ()).deflate(INSET)).toList();
         state.colors = new int[areas.size()];
         for (int i = 0; i < areas.size(); i++) state.colors[i] = be.areaColor(i);
+        state.reaches = be.attractsSheep() && com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepAttraction.enabled()
+                ? areas.stream().map(a -> com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepAttraction.reach(a)
+                        .move(-pos.getX(), -pos.getY(), -pos.getZ()).deflate(INSET)).toList()
+                : java.util.List.of();
     }
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         if (!state.show) return;
         for (int i = 0; i < state.boxes.size(); i++) drawBox(state.boxes.get(i), state.colors[i], poseStack, collector);
+        for (int i = 0; i < state.reaches.size(); i++) drawReach(state.reaches.get(i), state.colors[i], poseStack, collector);
+    }
+
+    /** The attraction area: a faint box with dashed edges and no floor grid, so it reads as "nearby", not "inside". */
+    private static void drawReach(AABB b, int color, PoseStack poseStack, SubmitNodeCollector collector) {
+        int faint = (color & 0x00FFFFFF) | 0x60000000;
+        collector.submitCustomGeometry(poseStack, RenderTypes.LINES, (pose, buffer) -> {
+            float x0 = (float) b.minX, y0 = (float) b.minY, z0 = (float) b.minZ;
+            float x1 = (float) b.maxX, y1 = (float) b.maxY, z1 = (float) b.maxZ;
+            float[][] edges = {
+                    {x0, y0, z0, x1, y0, z0}, {x0, y1, z0, x1, y1, z0}, {x0, y0, z1, x1, y0, z1}, {x0, y1, z1, x1, y1, z1},
+                    {x0, y0, z0, x0, y1, z0}, {x1, y0, z0, x1, y1, z0}, {x0, y0, z1, x0, y1, z1}, {x1, y0, z1, x1, y1, z1},
+                    {x0, y0, z0, x0, y0, z1}, {x1, y0, z0, x1, y0, z1}, {x0, y1, z0, x0, y1, z1}, {x1, y1, z0, x1, y1, z1}};
+            for (float[] e : edges) {
+                float length = (float) Math.sqrt((e[3] - e[0]) * (e[3] - e[0]) + (e[4] - e[1]) * (e[4] - e[1]) + (e[5] - e[2]) * (e[5] - e[2]));
+                int dashes = Math.max(1, Math.round(length * 2)); // half-block dashes with gaps
+                for (int d = 0; d < dashes; d += 2) {
+                    float t0 = d / (float) dashes, t1 = Math.min(1F, (d + 1) / (float) dashes);
+                    line(buffer, pose, e[0] + (e[3] - e[0]) * t0, e[1] + (e[4] - e[1]) * t0, e[2] + (e[5] - e[2]) * t0,
+                            e[0] + (e[3] - e[0]) * t1, e[1] + (e[4] - e[1]) * t1, e[2] + (e[5] - e[2]) * t1, faint);
+                }
+            }
+        });
     }
 
     private static void drawBox(AABB b, int color, PoseStack poseStack, SubmitNodeCollector collector) {
@@ -114,7 +143,9 @@ public class AreaOutlineRenderer<T extends BlockEntity & AreaDisplay> implements
     @Override
     public AABB getRenderBoundingBox(T be) {
         AABB box = new AABB(be.getBlockPos());
-        for (AABB area : be.displayedAreas()) box = box.minmax(area);
+        for (AABB area : be.displayedAreas()) {
+            box = box.minmax(be.attractsSheep() ? com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepAttraction.reach(area) : area);
+        }
         return box;
     }
 }

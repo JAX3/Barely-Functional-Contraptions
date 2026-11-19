@@ -29,6 +29,11 @@ public interface AreaDisplay {
         return areaColor();
     }
 
+    /** Whether it calls its sheep back from {@link SheepAttraction}'s range round its area (outlined faintly). */
+    default boolean attractsSheep() {
+        return false;
+    }
+
     default boolean toggleArea() {
         setShowsArea(!showsArea());
         return showsArea();

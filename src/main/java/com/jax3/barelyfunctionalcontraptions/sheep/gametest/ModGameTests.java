@@ -160,6 +160,8 @@ public final class ModGameTests {
         TESTS.put("thermal_reaction_chamber_runs_dry_and_vents_steam", ModGameTests::thermalDry);
         TESTS.put("thermal_reaction_chamber_spent_fleece_stops_counting", ModGameTests::thermalFatigue);
         TESTS.put("thermal_reaction_chamber_keeps_its_balance_when_full", ModGameTests::thermalFull);
+        TESTS.put("chiller_calls_a_stray_snow_sheep_back", ModGameTests::chillerAttracts);
+        TESTS.put("thermal_reaction_chamber_calls_a_stray_back_to_even_its_herds", ModGameTests::thermalAttracts);
         SOLO_TESTS.put("thermal_reaction_chamber_melts_down_when_hot", ModGameTests::thermalMeltdown);
         SOLO_TESTS.put("thermal_reaction_chamber_freezes_solid_when_cold", ModGameTests::thermalFreeze);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
@@ -1390,6 +1392,38 @@ public final class ModGameTests {
             h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.State.REACTING, "then it reacts, state " + be.state());
             h.assertTrue(snow.getData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.THERMAL_FATIGUE).ticks() > 0, "and the fleece wears again");
             h.succeed();
+        });
+    }
+
+    /** A Snow sheep a few blocks outside a chiller's area walks back into it and is counted. */
+    private static void chillerAttracts(GameTestHelper h) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.STONE);
+        BlockPos pos = new BlockPos(1, 1, 1);
+        h.setBlock(pos, ModBlocks.CHILLER.get());
+        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.class);
+        Sheep stray = sheepAt(h, new BlockPos(5, 1, 5), ResourcefulSheep.id("snow"));
+        stray.setNoAi(false);
+        stray.goalSelector.removeAllGoals(goal -> true); // no wandering off the platform: only the chiller moves it
+        var area = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.chillingArea(h.absolutePos(pos));
+        h.assertFalse(area.contains(stray.position()), "the sheep starts outside the area");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepAttraction.reach(area).contains(stray.position()), "but within the attraction area");
+        h.succeedWhen(() -> h.assertTrue(be.coldSourceCount() == 1, "it walks back in and is counted, got " + be.coldSourceCount()));
+    }
+
+    /**
+     * Two Blaze sheep against one Snow sheep: the chamber calls the Snow sheep standing just outside its cold pen in,
+     * evening the herds.
+     */
+    private static void thermalAttracts(GameTestHelper h) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.STONE);
+        var be = chamber(h, 2, 1, 16);
+        Sheep stray = sheepAt(h, new BlockPos(1, 1, 0), ResourcefulSheep.id("snow"));
+        stray.setNoAi(false);
+        stray.goalSelector.removeAllGoals(goal -> true); // only the chamber moves it
+        h.succeedWhen(() -> {
+            h.assertTrue(be.coldCount() == 2 && be.hotCount() == 2, "the stray Snow sheep joins its pen, got " + be.hotCount() + " / " + be.coldCount());
+            h.assertTrue(be.balance() == 0 || be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.State.NO_WATER,
+                    "and the herds are even, balance " + be.balance());
         });
     }
 

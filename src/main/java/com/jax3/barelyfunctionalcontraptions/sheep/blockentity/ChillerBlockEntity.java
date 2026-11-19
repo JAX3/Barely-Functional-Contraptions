@@ -175,8 +175,11 @@ public class ChillerBlockEntity extends BlockEntity implements WorldlyContainer,
     /** Counts the Snow sheep in the area. */
     public void scan(ServerLevel level, BlockPos pos, BlockState state) {
         AABB area = chillingArea(pos);
-        int[] ids = level.getEntitiesOfClass(Sheep.class, area, s -> area.contains(s.position()) && isColdSource(s)).stream()
-                .limit(maxSources()).mapToInt(Sheep::getId).sorted().toArray();
+        List<Sheep> found = level.getEntitiesOfClass(Sheep.class, area, s -> area.contains(s.position()) && isColdSource(s));
+        int[] ids = found.stream().limit(maxSources()).mapToInt(Sheep::getId).sorted().toArray();
+        // Keep its Snow sheep close: call strays back while it has room for more.
+        SheepAttraction.claim(found, level.getGameTime());
+        SheepAttraction.attract(level, area, ChillerBlockEntity::isColdSource, maxSources() - found.size(), level.getGameTime());
         cold = coldFrom(ids.length);
         if (!Arrays.equals(ids, chillers)) {
             chillers = ids;
@@ -220,6 +223,12 @@ public class ChillerBlockEntity extends BlockEntity implements WorldlyContainer,
     public boolean fillFromBucket() {
         if (tank.capacity() - tank.getAmount() < 1000) return false;
         tank.fill(1000);
+        return true;
+    }
+
+    /** It calls its sheep back from just outside its area. */
+    @Override
+    public boolean attractsSheep() {
         return true;
     }
 

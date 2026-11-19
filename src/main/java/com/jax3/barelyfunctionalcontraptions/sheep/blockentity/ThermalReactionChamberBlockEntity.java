@@ -387,11 +387,38 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
         }
         spent = worn;
         pairs = Math.min(max, Math.min(ids[0].length, ids[1].length));
+        callHerds(level, hotPen, coldPen, hot, cold, ids[0].length, ids[1].length, max);
         if (!Arrays.equals(ids[0], hotIds) || !Arrays.equals(ids[1], coldIds)) {
             hotIds = ids[0];
             coldIds = ids[1];
             setChanged();
             level.sendBlockUpdated(pos, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /**
+     * Keeps the herds close without upsetting the balance: a side with fewer sheep calls one of its own back (so a
+     * stray that wandered out comes home), and when both sides are even and below the most pairs, it calls a sheep to
+     * each side only when there is one waiting nearby for both. It never calls a sheep that would leave a side ahead.
+     */
+    private static void callHerds(ServerLevel level, AABB hotPen, AABB coldPen, List<Sheep> hot, List<Sheep> cold, int hotCount, int coldCount, int max) {
+        long now = level.getGameTime();
+        SheepAttraction.claim(hot, now);
+        SheepAttraction.claim(cold, now);
+        if (!SheepAttraction.enabled()) return;
+        java.util.function.Predicate<Sheep> hotOk = s -> isHotSource(s) && !isSpent(s);
+        java.util.function.Predicate<Sheep> coldOk = s -> isColdSource(s) && !isSpent(s);
+        if (hotCount < coldCount) {
+            SheepAttraction.attract(level, hotPen, hotOk, Math.min(coldCount, max) - hotCount, now);
+        } else if (coldCount < hotCount) {
+            SheepAttraction.attract(level, coldPen, coldOk, Math.min(hotCount, max) - coldCount, now);
+        } else if (hotCount < max) {
+            boolean hotWaiting = !level.getEntitiesOfClass(Sheep.class, SheepAttraction.reach(hotPen), s -> !hotPen.contains(s.position()) && !s.isBaby() && !s.isLeashed() && hotOk.test(s)).isEmpty();
+            boolean coldWaiting = !level.getEntitiesOfClass(Sheep.class, SheepAttraction.reach(coldPen), s -> !coldPen.contains(s.position()) && !s.isBaby() && !s.isLeashed() && coldOk.test(s)).isEmpty();
+            if (hotWaiting && coldWaiting) {
+                SheepAttraction.attract(level, hotPen, hotOk, 1, now);
+                SheepAttraction.attract(level, coldPen, coldOk, 1, now);
+            }
         }
     }
 
@@ -560,6 +587,12 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
     public boolean fillFromBucket() {
         if (tank.capacity() - tank.getAmount() < 1000) return false;
         tank.fill(1000);
+        return true;
+    }
+
+    /** It calls its sheep back from just outside its area. */
+    @Override
+    public boolean attractsSheep() {
         return true;
     }
 
