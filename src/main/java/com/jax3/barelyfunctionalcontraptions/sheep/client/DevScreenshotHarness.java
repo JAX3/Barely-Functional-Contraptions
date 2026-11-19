@@ -1625,8 +1625,8 @@ public final class DevScreenshotHarness {
     private static final Object[][] EXTRA_SCENES = {
             // Added before, and already in the world: new blocks (x 166), themed sheep (202), blaze furnace (234),
             // wool burner (262), wool packer (282), infusion altar (302), snow sheep chiller (322),
-            // powered furnace (342), woollen armour (362), sheep treadmill (382).
-            {"ore line", 402},
+            // powered furnace (342), woollen armour (362), sheep treadmill (382), ore line (402).
+            {"thermal reaction chamber", 422},
     };
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
@@ -1948,6 +1948,72 @@ public final class DevScreenshotHarness {
             SheepInfusionEvents.setInfusion(sheep, new SheepInfusion(Optional.of(ResourcefulSheep.id("iron")), 100, 0));
         }
         label(server, o.offset(3, 2, -2), "Ore processing line", "white");
+    }
+
+    /**
+     * The Thermal Reaction Chamber for the test world, built to run safely for as long as the world is open: one
+     * balanced chamber facing south with three Blaze sheep in a nether-brick pen on its hot (west) side and three Snow
+     * sheep in a spruce pen on its cold (east) side, standing still so the balance never tips, 16 Blaze Rods and Blue
+     * Ice to burn together, its pens outlined, and six Fluid Reservoirs on a 3x3 pool behind it piping in 300 mB a tick
+     * (it drinks 250).
+     */
+    private static void thermalWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, 0, -12), o.offset(7, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, -1, -12), o.offset(7, -1, 3))) {
+            level.setBlock(p, Math.floorMod(p.getX() + p.getZ(), 2) == 0 ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
+        }
+        BlockPos at = o.offset(0, 0, -4);
+        level.setBlock(at, ModBlocks.THERMAL_REACTION_CHAMBER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock.FACING, Direction.SOUTH), 3);
+        if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity be) {
+            be.setItem(0, new ItemStack(Items.BLAZE_ROD, 16));
+            be.setItem(1, new ItemStack(Items.BLUE_ICE, 16));
+            be.setShowsArea(true);
+            for (int i = 0; i < 16; i++) be.fillFromBucket(); // a full tank to start
+        }
+        // Water: a 3x3 pool sunk into the platform behind it (x -1..1, z -10..-8) with six reservoirs on it, either side of a
+        // fluid pipe that runs from the chamber's back to the end of the pool.
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-1, -2, -10), o.offset(1, -2, -8))) level.setBlock(p, Blocks.STONE.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-1, -1, -10), o.offset(1, -1, -8))) level.setBlock(p, Blocks.WATER.defaultBlockState(), 3);
+        for (int z = -10; z <= -8; z++) {
+            level.setBlock(o.offset(-1, 0, z), ModBlocks.FLUID_RESERVOIR.get().defaultBlockState(), 3);
+            level.setBlock(o.offset(1, 0, z), ModBlocks.FLUID_RESERVOIR.get().defaultBlockState(), 3);
+        }
+        var pipe = ModBlocks.FLUID_PIPE.get();
+        java.util.List<BlockPos> pipes = new java.util.ArrayList<>();
+        for (int z = -10; z <= -5; z++) pipes.add(o.offset(0, 0, z));
+        for (BlockPos pos : pipes) level.setBlock(pos, pipe.defaultBlockState(), 3);
+        for (BlockPos pos : pipes) level.setBlock(pos, pipe.withConnections(pipe.defaultBlockState(), level, pos), 3);
+        // The pens: 5x5 on each side (x -5..-1 and 1..5, z -6..-2), fenced round their outer edges.
+        for (int side = -1; side <= 1; side += 2) {
+            var fence = (side < 0 ? Blocks.NETHER_BRICK_FENCE : Blocks.SPRUCE_FENCE).defaultBlockState();
+            for (int x = 1; x <= 6; x++) for (int z = -7; z <= -1; z++) {
+                boolean edge = x == 6 || z == -7 || z == -1;
+                if (edge) level.setBlock(o.offset(side * x, 0, z), fence, 3);
+            }
+            for (int i = 0; i < 3; i++) {
+                Sheep sheep = EntityTypes.SHEEP.create(level, EntitySpawnReason.COMMAND);
+                sheep.snapTo(at.getX() + 0.5 + side * (1.6 + (i % 2) * 2.2), at.getY(), at.getZ() + 0.5 + (i - 1) * 1.6, side > 0 ? 90 : 270, 0);
+                sheep.setNoAi(true); // they stand still, so the herds stay even
+                sheep.setPersistenceRequired();
+                SheepInfusionEvents.setInfusion(sheep, new SheepInfusion(Optional.of(ResourcefulSheep.id(side < 0 ? "blaze" : "snow")), 100, 0));
+                level.addFreshEntity(sheep);
+            }
+        }
+        // Something to take its power, so it keeps reacting for a while: an Energy Meter on its front reading the flow into
+        // a bank of eight Hume Energy Cubes (8,000,000 FE, about ten minutes at full boost) between the pens' fences.
+        level.setBlock(at.south(), ModBlocks.ENERGY_METER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.SOUTH)
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN, Direction.EAST), 3);
+        for (int z = -2; z <= 1; z++) for (int y = 0; y <= 1; y++) level.setBlock(o.offset(0, y, z), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        label(server, at.above(2), "Thermal Reaction Chamber", "gold");
     }
 
     /** The ore line, from above the front, a while after it starts, then the chest it fills: {@code -PharnessScene=ore_line}. */
@@ -2281,8 +2347,8 @@ public final class DevScreenshotHarness {
 
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
-        // The latest scene: the ore processing line.
-        String[] tps = {"tp @a 405.5 40 -1 180 34"};
+        // The latest scene: the Thermal Reaction Chamber.
+        String[] tps = {"tp @a 422.5 41.5 -3.5 180 32", "tp @a 425.5 37.5 -7.5 145 25"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -2291,7 +2357,23 @@ public final class DevScreenshotHarness {
             if (tick == 40 + i * 60) command(server, tps[i]);
             if (tick == 90 + i * 60) shot(mc, "tour_" + i);
         }
-        if (tick == 40 + tps.length * 60 + 20) mc.stop();
+        // Let the latest scene run a while (it stays loaded round the player), then report how it is doing.
+        int report = 40 + tps.length * 60 + 600;
+        if (tick == report) {
+            server.execute(() -> {
+                ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                if (level.getBlockEntity(new BlockPos(422, 35, -13)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity be) {
+                    ResourcefulSheep.LOGGER.warn("TOUR chamber {} {} FE/t, {} pairs, balance {}, water {} mB, energy {}", be.state(), be.generating(), be.pairs(),
+                            be.balance(), be.getTank().getAmount(), be.getEnergyHandler().getAmountAsInt());
+                }
+                for (BlockPos p : new BlockPos[]{new BlockPos(422, 35, -12), new BlockPos(422, 35, -11)}) {
+                    ResourcefulSheep.LOGGER.warn("TOUR at {}: {} / {}", p, level.getBlockState(p), level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity m
+                            ? "meter rate " + m.rate() : String.valueOf(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.NORTH) instanceof net.neoforged.neoforge.transfer.energy.EnergyHandler h ? h.getAmountAsLong() : -1));
+                }
+            });
+        }
+        if (tick == report + 10) shot(mc, "tour_last");
+        if (tick == report + 20) mc.stop();
     }
 
     private static net.minecraft.world.phys.Vec3 extendReturn = net.minecraft.world.phys.Vec3.ZERO;
@@ -2325,8 +2407,8 @@ public final class DevScreenshotHarness {
                     player.teleportTo(x + 0.5, 35, -8.5); // exactly on the spot, in case it drifted
                     // Earlier runs built woolBurnerScene, woolPackerScene, altarScene (with bone blocks and a
                     // wither rose in its catalyst slots 2 and 3) and chillerScene here.
-                    // poweredFurnaceScene, woollenArmorScene and sheepTreadmillScene.
-                    oreLineScene(server);
+                    // poweredFurnaceScene, woollenArmorScene, sheepTreadmillScene and oreLineScene.
+                    thermalWorldScene(server);
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
                 });
             }
@@ -2338,6 +2420,17 @@ public final class DevScreenshotHarness {
                 // The scenes turn command feedback off for clean shots; the shared world must keep it on, or commands
                 // such as /barelyfunctionalcontraptions list show nothing.
                 server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamerule send_command_feedback true");
+                // Save the Thermal Reaction Chamber and its cube bank empty, so it reacts for a while when someone visits.
+                ServerLevel level = player.level();
+                for (BlockPos p : new BlockPos[]{new BlockPos(422, 35, -13), new BlockPos(422, 35, -11)}) {
+                    var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.UP);
+                    if (handler == null) continue;
+                    try (Transaction tx = Transaction.openRoot()) {
+                        handler.extract(Integer.MAX_VALUE, tx);
+                        tx.commit();
+                    }
+                    ResourcefulSheep.LOGGER.info("EXTEND drained {} to {}", p, handler.getAmountAsLong());
+                }
                 ResourcefulSheep.LOGGER.info("EXTEND player back at {}", player.position());
             });
         }
