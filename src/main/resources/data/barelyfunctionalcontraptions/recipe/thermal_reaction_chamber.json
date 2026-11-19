@@ -6,14 +6,14 @@
     "H": "barelyfunctionalcontraptions:hume_energy_cube",
     "I": "minecraft:blue_ice",
     "B": "barelyfunctionalcontraptions:blaze_furnace",
-    "M": "barelyfunctionalcontraptions:functional_machine_block",
     "S": "barelyfunctionalcontraptions:chiller",
     "C": "minecraft:copper_block",
-    "T": "barelyfunctionalcontraptions:fluid_tank"
+    "T": "barelyfunctionalcontraptions:fluid_tank",
+    "L": "minecraft:magma_block"
   },
   "pattern": [
-    "NHI",
-    "BMS",
+    "LNI",
+    "BHS",
     "CTC"
   ],
   "result": {
