@@ -506,11 +506,11 @@ At midnight the panels under the lamps still run:
 - Mine the panel with a pickaxe. The lamp breaks by hand.
 
 ### Thermal Reaction Chamber
-A late-game generator that makes power from the **difference between hot and cold**. Blaze sheep stand in a pen against its hot side, Snow sheep in a pen against its cold side, and water runs through the middle. It is the machines' blue-steel casing split down the middle: red-hot vent slats and fins on the hot side, frosted ones on the cold side, a gauge panel at the front (two thermometers and a balance dial), water and power ports at the back, and a window on top where flame and snow chase each other while it reacts. Crafted from a Nether Star, a Hume Energy Cube, Blue Ice, a Blaze Sheep Furnace, a Functional Machine Block, a Snow Sheep Chiller, two Copper Blocks and a Fluid Tank:
+A late-game generator that makes power from the **difference between hot and cold**. Blaze sheep stand in a pen against its hot side, Snow sheep in a pen against its cold side, and water runs through the middle. It is the machines' blue-steel casing split down the middle: red-hot vent slats and fins on the hot side, frosted ones on the cold side, a gauge panel at the front (two thermometers and a balance dial), water and power ports at the back, and a window on top where flame and snow chase each other while it reacts. Crafted from a Magma Block, a Nether Star, Blue Ice, a Blaze Sheep Furnace, a Hume Energy Cube, a Snow Sheep Chiller, two Copper Blocks and a Fluid Tank, hot things on the left and cold on the right:
 
 ```
-N H I      N = Nether Star, H = Hume Energy Cube, I = Blue Ice
-B M S      B = Blaze Sheep Furnace, M = Functional Machine Block, S = Snow Sheep Chiller
+L N I      L = Magma Block, N = Nether Star, I = Blue Ice
+B H S      B = Blaze Sheep Furnace, H = Hume Energy Cube, S = Snow Sheep Chiller
 C T C      C = Copper Block, T = Fluid Tank
 ```
 
