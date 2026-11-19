@@ -50,7 +50,7 @@ world into `run/saves` first). This file is updated whenever a new contraption i
 
 The Thermal Reaction Chamber is saved with its buffer and cube bank empty, and it only runs while you're near it, so
 it reacts for about 45 seconds after you arrive (the meter shows about 13,000 FE/t) and then waits as *Buffer full*.
-Take power out of the cubes, with cables to machines, to keep it going. Its sheep can't wander, so it never runs hot or
+Take power out of the cubes, with cables to machines, to keep it making power. Even while it's full, its needle and danger bar keep following the herds, so adding or removing a sheep still runs it hot or cold. Its sheep can't wander, so it never runs hot or
 cold on its own; to see a meltdown or a freeze, add or remove a sheep yourself (back up the world first).
 
 When you first open the world, Minecraft warns that it uses experimental settings, because it's a superflat test world.

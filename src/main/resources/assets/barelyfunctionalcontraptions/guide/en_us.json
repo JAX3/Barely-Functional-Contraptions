@@ -180,6 +180,7 @@
         "- Running hot for 30 seconds causes a meltdown. The Blaze sheep are singed bare and it explodes like TNT.",
         "- Running cold for 30 seconds freezes it solid. It encases itself in Packed Ice and won't restart until you mine every block of it away.",
         "- Running balanced counts the danger back down. The danger bar under the needle shows how close it is, and a comparator reads it (0 is steady, 15 is about to go), so you can wire up a safety cut-off.",
+        "- With its buffer full it makes no power and uses no water, boosts or fleece, but its herds still heat and chill it: uneven herds still melt it down or freeze it.",
         "## Upkeep",
         "- Water: 250 mB a tick while it reacts, what five Fluid Reservoirs make. If it runs dry it stops and blasts scalding steam out of its front for a few seconds.",
         "- Fatigue: after an hour of reacting, a sheep's fleece is spent and it stops counting. Infuse it again, at the Infusion Altar or by hand, to renew it.",

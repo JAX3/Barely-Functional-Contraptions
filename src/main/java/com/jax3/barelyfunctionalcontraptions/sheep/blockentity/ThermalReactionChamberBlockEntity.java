@@ -270,10 +270,14 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
                 level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.2F, 0.6F);
             }
             state = State.NO_WATER;
+            balance = hotIds.length - coldIds.length; // the needle still follows the herds
             settle();
         } else if (energy.getAmountAsInt() >= energy.getCapacityAsInt()) {
+            // Nothing is taking its power, so it makes none and uses no water, boosts or fleece. But the herds are still
+            // heating and chilling it: the balance stays live, and uneven herds still drive it towards a meltdown or a freeze.
             state = State.FULL;
-            settle();
+            balance = hotIds.length - coldIds.length;
+            if (!unbalanced(level, pos, facing, limit)) settle();
         } else {
             burnBoosts();
             boolean hotBoost = hotBurn > 0, coldBoost = coldBurn > 0;
@@ -281,18 +285,8 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
             generating = power(pairs, hotBoost && coldBoost, balance);
             tank.drain(waterPerTick());
             energy.generate(generating);
-            if (balance > 0) {
-                state = State.RUNNING_HOT;
-                instability = Math.min(limit, instability + 1);
-                if (instability >= limit) meltdown(level, pos, facing);
-            } else if (balance < 0) {
-                state = State.RUNNING_COLD;
-                instability = Math.max(-limit, instability - 1);
-                if (instability <= -limit) freeze(level, pos);
-            } else {
-                state = State.REACTING;
-                settle();
-            }
+            state = balance > 0 ? State.RUNNING_HOT : balance < 0 ? State.RUNNING_COLD : State.REACTING;
+            if (!unbalanced(level, pos, facing, limit)) settle();
             setChanged();
         }
         if (isRemoved()) return; // it melted down and exploded
@@ -322,6 +316,23 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
 
     private static int waterPerTick() {
         return ModConfigs.getInt(ModConfigs.SERVER.thermalWaterPerTick);
+    }
+
+    /**
+     * Counts the danger up towards a meltdown (running hot) or a freeze (running cold) while {@link #balance} is off,
+     * setting them off at the limit. Returns false when it is balanced, for the caller to settle instead.
+     */
+    private boolean unbalanced(ServerLevel level, BlockPos pos, Direction facing, int limit) {
+        if (balance > 0) {
+            instability = Math.min(limit, instability + 1);
+            if (instability >= limit) meltdown(level, pos, facing);
+        } else if (balance < 0) {
+            instability = Math.max(-limit, instability - 1);
+            if (instability <= -limit) freeze(level, pos);
+        } else {
+            return false;
+        }
+        return true;
     }
 
     /** Running balanced (or not at all) counts the danger back towards steady. */
@@ -538,6 +549,11 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
     /** How close it is to melting down or freezing: 0 steady, 15 about to go. */
     public int comparatorSignal() {
         return Math.abs(instability) * 15 / Math.max(1, unstableTicks());
+    }
+
+    /** Fills its power buffer, as if nothing had taken its power for a while (tests and the screenshot harness). */
+    public void fillBuffer() {
+        energy.generate(Integer.MAX_VALUE);
     }
 
     /** Pours a bucket's worth of water in, if it fits. */

@@ -1045,7 +1045,7 @@
   "gui.barelyfunctionalcontraptions.thermal_reaction_chamber.status.no_water": "No water",
   "gui.barelyfunctionalcontraptions.thermal_reaction_chamber.status.no_water.desc": "It needs 250 mB of water a tick to react.",
   "gui.barelyfunctionalcontraptions.thermal_reaction_chamber.status.full": "Buffer full",
-  "gui.barelyfunctionalcontraptions.thermal_reaction_chamber.status.full.desc": "Nothing is taking its power; it waits without using water, boosts or fleece.",
+  "gui.barelyfunctionalcontraptions.thermal_reaction_chamber.status.full.desc": "Nothing is taking its power, so it makes none and uses no water, boosts or fleece. Its herds still heat and chill it: keep them even, or it still melts down or freezes.",
   "gui.barelyfunctionalcontraptions.thermal_reaction_chamber.status.overheated": "Overheated",
   "gui.barelyfunctionalcontraptions.thermal_reaction_chamber.status.overheated.desc": "It melted down and is cooling off before it can start again.",
   "gui.barelyfunctionalcontraptions.thermal_reaction_chamber.status.frozen": "Frozen solid",

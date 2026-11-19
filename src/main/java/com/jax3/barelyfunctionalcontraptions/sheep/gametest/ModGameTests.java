@@ -159,6 +159,7 @@ public final class ModGameTests {
         TESTS.put("thermal_reaction_chamber_makes_power_from_pairs", ModGameTests::thermalPower);
         TESTS.put("thermal_reaction_chamber_runs_dry_and_vents_steam", ModGameTests::thermalDry);
         TESTS.put("thermal_reaction_chamber_spent_fleece_stops_counting", ModGameTests::thermalFatigue);
+        TESTS.put("thermal_reaction_chamber_keeps_its_balance_when_full", ModGameTests::thermalFull);
         SOLO_TESTS.put("thermal_reaction_chamber_melts_down_when_hot", ModGameTests::thermalMeltdown);
         SOLO_TESTS.put("thermal_reaction_chamber_freezes_solid_when_cold", ModGameTests::thermalFreeze);
         TESTS.put("energy_cable_connects_to_cables_and_machines", ModGameTests::cableConnects);
@@ -1388,6 +1389,23 @@ public final class ModGameTests {
         h.runAfterDelay(50, () -> {
             h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.State.REACTING, "then it reacts, state " + be.state());
             h.assertTrue(snow.getData(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAttachments.THERMAL_FATIGUE).ticks() > 0, "and the fleece wears again");
+            h.succeed();
+        });
+    }
+
+    /**
+     * With its buffer full and nothing taking its power, a chamber makes nothing and uses no water, but still follows
+     * its herds: two Blaze sheep against one Snow sheep move the needle and fill the danger bar.
+     */
+    private static void thermalFull(GameTestHelper h) {
+        var be = chamber(h, 2, 1, 16);
+        be.fillBuffer();
+        int water = be.getTank().getAmount();
+        h.runAfterDelay(60, () -> {
+            h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.State.FULL, "its buffer is full, state " + be.state());
+            h.assertTrue(be.generating() == 0 && be.getTank().getAmount() == water, "so it makes nothing and uses no water");
+            h.assertTrue(be.balance() == 1, "but the needle follows the herds: one step hot, got " + be.balance());
+            h.assertTrue(be.instability() > 0 && be.comparatorSignal() > 0, "and the danger still builds, " + be.instability());
             h.succeed();
         });
     }
