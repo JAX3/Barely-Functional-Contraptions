@@ -4181,7 +4181,7 @@ def generate_thermal_reaction_chamber_gui():
 # ---------------------------------------------------------------------------
 # Echo Chamber (WIP preview): a 3x3x3 machine in the blue-steel casing, lined with sculk. A big resonator dish on the
 # front whose rings pulse outward from a glowing heart, egg-crate sound-dampening foam on the side walls with sculk
-# creeping over some of it, a power port and two bays of sculk catalysts at the back, and a sculk-covered roof with a catalyst dome
+# creeping over some of it, a power port and a conduit at the back, and a sculk-covered roof with a catalyst dome
 # in a crown of sculk fronds, the biggest two like the Warden sheep's "ears". The model is built by generate_echo_chamber_model.py; these
 # are its textures. Wall textures tile, one per block face.
 # ---------------------------------------------------------------------------

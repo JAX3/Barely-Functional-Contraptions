@@ -121,12 +121,8 @@ for fr, to in (([6, 38, 0], [42, 40, 2]), ([6, 4, 0], [42, 6, 2]), ([6, 6, 0], [
     box(fr, to, faces("trim", ("north", "east", "west", "up", "down")))
 box([8, 6, 1], [40, 38, 2], {"north": "dish"}, {"x": (8, 32), "y": (6, 32)})
 
-# Back: a power port between two bays of sculk catalysts plugged into the wall, and a conduit across above them.
+# Back: a power port, and a conduit across above it.
 box([20, 12, 46], [28, 20, 47], faces("trim", ("east", "west", "up", "down"), south="port"), {"x": (20, 8), "y": (12, 8)})
-for x0 in (6, 30):
-    box([x0 - 1, 9, 46], [x0 + 13, 23, 46.5], faces("trim", ("south", "east", "west", "up", "down")))
-    box([x0, 10, 46], [x0 + 12, 22, 48], faces("catalyst_side", ("south", "east", "west"), up="catalyst_top", down="catalyst_top"),
-        {"x": (x0, 12), "y": (10, 12), "z": (36, 12)})
 box([5, 28, 46], [43, 31, 47.5], faces("trim", ("south", "east", "west", "up", "down")))
 for x in (12, 24, 36):  # its brackets
     box([x, 27, 45.5], [x + 2, 32, 48], faces("pillar", ("south", "east", "west", "up", "down")))
