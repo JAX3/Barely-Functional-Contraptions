@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber"
+    },
+    "facing=east": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "barelyfunctionalcontraptions:block/echo_chamber",
+      "y": 270
+    }
+  }
+}

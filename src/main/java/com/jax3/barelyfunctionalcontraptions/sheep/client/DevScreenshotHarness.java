@@ -227,6 +227,10 @@ public final class DevScreenshotHarness {
             humeFieldTick(mc, server);
             return;
         }
+        if ("echo_chamber".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            echoChamberTick(mc, server);
+            return;
+        }
         if ("list_command".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             listCommandTick(mc);
             return;
@@ -2365,6 +2369,50 @@ public final class DevScreenshotHarness {
             case 140 -> shot(mc, "wip_hume_field_above");
             case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 2", origin.getX() + 0.0, origin.getY() - 0.4, origin.getZ() - 0.2));
             case 170 -> shot(mc, "wip_hume_field_close");
+            case 176 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    /**
+     * The work-in-progress Echo Chamber model in a small sculk room with a Warden sheep beside it, from the front, from
+     * above at an angle and from the back: {@code -PharnessScene=echo_chamber}.
+     */
+    private static void echoChamberTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-5, 0, -8), origin.offset(5, 5, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-5, -1, -8), origin.offset(5, -1, 4))) {
+                    level.setBlock(p, (p.getX() + p.getZ()) % 3 == 0 ? Blocks.DEEPSLATE_TILES.defaultBlockState() : Blocks.SCULK.defaultBlockState(), 2);
+                }
+                // The chamber faces the camera (south), with a little sculk furniture round it.
+                BlockPos at = origin.offset(0, 0, -4);
+                level.setBlock(at, ModBlocks.ECHO_CHAMBER.get().defaultBlockState()
+                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.FACING, Direction.SOUTH), 3);
+                level.setBlock(at.offset(-3, 0, -1), Blocks.SCULK_SENSOR.defaultBlockState(), 3);
+                level.setBlock(at.offset(3, 0, -1), Blocks.SCULK_SHRIEKER.defaultBlockState(), 3);
+                level.setBlock(at.offset(0, 0, -2), Blocks.SCULK_CATALYST.defaultBlockState(), 3);
+                Sheep sheep = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+                sheep.snapTo(at.getX() + 2.0, at.getY(), at.getZ() + 0.5, 150, 0);
+                sheep.setYHeadRot(150);
+                sheep.setYBodyRot(150);
+                sheep.setNoAi(true);
+                SheepInfusionEvents.setInfusion(sheep, new SheepInfusion(Optional.of(ResourcefulSheep.id("warden")), 9, 0));
+                level.addFreshEntity(sheep);
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 25", origin.getX() + 0.5, origin.getY() + 0.2, origin.getZ() - 1.2));
+            case 110 -> shot(mc, "wip_echo_chamber_front");
+            case 112 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 137 40", origin.getX() + 2.3, origin.getY() + 1.2, origin.getZ() - 1.6));
+            case 140 -> shot(mc, "wip_echo_chamber_above");
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f -23 30", origin.getX() - 0.8, origin.getY() + 0.6, origin.getZ() - 6.6));
+            case 170 -> shot(mc, "wip_echo_chamber_back");
             case 176 -> mc.stop();
             default -> {}
         }

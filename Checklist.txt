@@ -24,7 +24,7 @@ Next goal
 18. Fluid sheep: lava, water and honey (maybe).
 From the manual's WIP tab:
 19. Hume Field Generator: a 2x2 machine whose power jumps around, smoothed by Hume Energy Cubes. (Model done, development builds only.)
-20. Echo Chamber: a Warden sheep in a sculk room that turns vibrations into power; keep the noise steady.
+20. Echo Chamber: a Warden sheep in a sculk room that turns vibrations into power; keep the noise steady. (Model started, development builds only.)
 21. Lightning Array: a copper mast that catches lightning into Hume Energy Cubes; scrape or wax it as it oxidises.
 22. Fleece Fusion: fuses two resource wools into power; clear the lint with shears.
 23. Quantum Sheep: blinks in and out of existence, changes its wool type and drops random resource wool.

@@ -47,6 +47,9 @@ public final class ModItems {
     /** Work in progress, development builds only (see {@link ModBlocks#HUME_FIELD_GENERATOR}); get it with /give. */
     public static final DeferredItem<BlockItem> HUME_FIELD_GENERATOR = ModBlocks.HUME_FIELD_GENERATOR == null ? null
             : REGISTER.registerSimpleBlockItem(ModBlocks.HUME_FIELD_GENERATOR);
+    /** Work in progress, development builds only (see {@link ModBlocks#ECHO_CHAMBER}); get it with /give. */
+    public static final DeferredItem<BlockItem> ECHO_CHAMBER = ModBlocks.ECHO_CHAMBER == null ? null
+            : REGISTER.registerSimpleBlockItem(ModBlocks.ECHO_CHAMBER);
     public static final DeferredItem<BlockItem> SHEEP_TREADMILL = REGISTER.registerSimpleBlockItem(ModBlocks.SHEEP_TREADMILL);
     public static final DeferredItem<BlockItem> THERMAL_REACTION_CHAMBER = REGISTER.registerSimpleBlockItem(ModBlocks.THERMAL_REACTION_CHAMBER);
 
