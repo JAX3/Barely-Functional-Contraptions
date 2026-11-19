@@ -42,10 +42,16 @@ z = -9.
 | Woollen Armour on armour stands: white, red, light blue and a mixed set | `/tp @s 362.5 35.6 -8 180 12` |
 | Sheep Treadmills in a fenced pen: a sheep walking one, a sheared sheep another, one empty and one turned east, all fed Hay Bales | `/tp @s 380.5 36.2 -7.5 205 28` |
 | Ore processing line: six Iron sheep in the Automatic Shears' pen, pipes over the top to a Mechanical Separator, a pipe trench under the row to three Powered Furnaces, a Wool Burner and a chest (filtered to ingots, nuggets and String), powered by a Mycelial Generator on a Fluid Reservoir | `/tp @s 405.5 40 -1 180 34` |
+| Thermal Reaction Chamber: three Blaze sheep in its hot pen and three Snow sheep in its cold pen (standing still, so it stays balanced), 16 Blaze Rods and Blue Ice to burn, pens outlined, six Fluid Reservoirs on a pool piping in its water, and an Energy Meter into a bank of eight Hume Energy Cubes | `/tp @s 422.5 41.5 -3.5 180 32` |
 
 The scenes from the New blocks on were added to the existing world with
 `./gradlew runClient -PscreenshotHarness -PharnessScene=extend_world "-PharnessWorld=BFC Test World"` (unzip this
 world into `run/saves` first). This file is updated whenever a new contraption is added.
+
+The Thermal Reaction Chamber is saved with its buffer and cube bank empty, and it only runs while you're near it, so
+it reacts for about 45 seconds after you arrive (the meter shows about 13,000 FE/t) and then waits as *Buffer full*.
+Take power out of the cubes, with cables to machines, to keep it going. Its sheep can't wander, so it never runs hot or
+cold on its own; to see a meltdown or a freeze, add or remove a sheep yourself (back up the world first).
 
 When you first open the world, Minecraft warns that it uses experimental settings, because it's a superflat test world.
 Choose **I Know What I'm Doing!**. The warning won't show again for this world.
