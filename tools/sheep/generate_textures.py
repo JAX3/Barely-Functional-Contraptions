@@ -4181,7 +4181,7 @@ def generate_thermal_reaction_chamber_gui():
 # ---------------------------------------------------------------------------
 # Echo Chamber (WIP preview): a 3x3x3 machine in the blue-steel casing, lined with sculk. A big resonator dish on the
 # front whose rings pulse outward from a glowing heart, egg-crate sound-dampening foam on the side walls with sculk
-# creeping over some of it, a power port and two bays of sculk catalysts at the back, and on the roof a catalyst dome
+# creeping over some of it, a power port and two bays of sculk catalysts at the back, and a sculk-covered roof with a catalyst dome
 # between two big sculk fronds, the Warden sheep's "ears". The model is built by generate_echo_chamber_model.py; these
 # are its textures. Wall textures tile, one per block face.
 # ---------------------------------------------------------------------------
@@ -4245,6 +4245,15 @@ def _echo_dish(f, frames):
             elif d > 0.9:
                 c = mix(c, SCULK[3], (d - 0.9) / 0.1 * 0.6)
             img.putpixel((x, y), c)
+    # The glowing heart in the middle, breathing in and out with the wave.
+    glow = 0.5 + 0.5 * math.cos(2 * math.pi * phase)
+    for y in range(32):
+        for x in range(32):
+            r = math.hypot(x - 15.5, y - 15.5)
+            if r < 3.6:
+                img.putpixel((x, y), mix(SCULK[4], SCULK[5], max(0.0, 1 - r / 3.6) * (0.4 + 0.6 * glow)))
+            elif r < 4.6:
+                img.putpixel((x, y), mix(SCULK[2], SCULK[3], glow))
     for a in range(0, 360, 6):  # the rim
         x, y = 15.5 + 15.2 * math.cos(math.radians(a)), 15.5 + 15.2 * math.sin(math.radians(a))
         img.putpixel((int(round(x)), int(round(y))), CARTOON["S"])
@@ -4265,19 +4274,6 @@ def generate_echo_chamber():
         patched.save(out(base + "foam_sculk_%d.png" % i))
 
     _echo_animated(base, "dish", 16, 2, lambda f: _echo_dish(f, 16))
-
-    def heart(f):
-        img = Image.new("RGBA", (16, 16), SCULK[1])
-        glow = 0.5 + 0.5 * math.sin(2 * math.pi * f / 8)
-        for y in range(16):
-            for x in range(16):
-                r = math.hypot(x - 7.5, y - 7.5)
-                if r < 7.5:
-                    img.putpixel((x, y), mix(SCULK[3], SCULK[5], max(0.0, 1 - r / 7.5) * (0.5 + 0.5 * glow)))
-                if r >= 6.8:
-                    img.putpixel((x, y), CARTOON["O"])
-        return img
-    _echo_animated(base, "heart", 8, 3, heart)
 
     # Casing plate: plain metal panels with a seam round each block and rivets in the corners.
     plate = Image.new("RGBA", (16, 16), CARTOON["M"])
@@ -4310,19 +4306,6 @@ def generate_echo_chamber():
                 c = CARTOON["B"] if y == 13 else CARTOON["b"]
             band.putpixel((x, y), c)
     band.save(out(base + "band.png"))
-
-    # Roof: sculk under a grate of casing bars, glowing where vibrations have reached it.
-    grate = Image.new("RGBA", (16, 16))
-    rnd = random.Random(11)
-    for y in range(16):
-        for x in range(16):
-            c = SCULK[0] if (x + y) % 2 else SCULK[1]
-            if rnd.random() < 0.08:
-                c = SCULK[3]
-            if y % 4 == 0:
-                c = CARTOON["S"] if y % 8 else CARTOON["M"]
-            grate.putpixel((x, y), c)
-    grate.save(out(base + "grate.png"))
 
     # Power port: a big yellow ring on a casing plate.
     port = plate.copy()

@@ -31,7 +31,7 @@ import org.jspecify.annotations.Nullable;
  * Work in progress: the planned Echo Chamber, so far only its model. A 3x3x3 machine in the blue-steel casing, lined
  * with sculk: a big resonator dish on the front whose rings pulse outward from a glowing heart, egg-crate
  * sound-dampening foam on the side walls with sculk creeping over it, a power port and two bays of sculk catalysts at
- * the back, and on the roof a catalyst dome between two big sculk fronds, the Warden sheep's "ears", which now and then
+ * the back, and a sculk-covered roof with a catalyst dome between two big sculk fronds, the Warden sheep's "ears", which now and then
  * give off a pop of sculk charge. It does nothing yet; it's registered in development builds only.
  *
  * <p>It's 27 blocks, as a bed is two. {@link #FACING} is the way its front faces; {@link #PART} says which column

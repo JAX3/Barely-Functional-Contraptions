@@ -10,14 +10,13 @@
     "foam_sculk_0": "barelyfunctionalcontraptions:block/echo_chamber/foam_sculk_0",
     "foam_sculk_1": "barelyfunctionalcontraptions:block/echo_chamber/foam_sculk_1",
     "foam_sculk_2": "barelyfunctionalcontraptions:block/echo_chamber/foam_sculk_2",
-    "grate": "barelyfunctionalcontraptions:block/echo_chamber/grate",
-    "heart": "barelyfunctionalcontraptions:block/echo_chamber/heart",
     "pillar": "barelyfunctionalcontraptions:block/echo_chamber/pillar",
     "plate": "barelyfunctionalcontraptions:block/echo_chamber/plate",
     "port": "barelyfunctionalcontraptions:block/echo_chamber/port",
     "trim": "barelyfunctionalcontraptions:block/echo_chamber/trim",
     "catalyst_side": "minecraft:block/sculk_catalyst_side_bloom",
     "catalyst_top": "minecraft:block/sculk_catalyst_top_bloom",
+    "sculk": "minecraft:block/sculk",
     "particle": "barelyfunctionalcontraptions:block/echo_chamber/plate"
   },
   "elements": [
@@ -454,7 +453,7 @@
             16,
             16
           ],
-          "texture": "#grate"
+          "texture": "#sculk"
         },
         "down": {
           "uv": [
@@ -495,7 +494,7 @@
             16,
             16
           ],
-          "texture": "#grate"
+          "texture": "#sculk"
         },
         "down": {
           "uv": [
@@ -545,7 +544,7 @@
             16,
             16
           ],
-          "texture": "#grate"
+          "texture": "#sculk"
         },
         "down": {
           "uv": [
@@ -586,7 +585,7 @@
             16,
             16
           ],
-          "texture": "#grate"
+          "texture": "#sculk"
         },
         "down": {
           "uv": [
@@ -618,7 +617,7 @@
             16,
             16
           ],
-          "texture": "#grate"
+          "texture": "#sculk"
         },
         "down": {
           "uv": [
@@ -659,7 +658,7 @@
             16,
             16
           ],
-          "texture": "#grate"
+          "texture": "#sculk"
         },
         "down": {
           "uv": [
@@ -709,7 +708,7 @@
             16,
             16
           ],
-          "texture": "#grate"
+          "texture": "#sculk"
         },
         "down": {
           "uv": [
@@ -750,7 +749,7 @@
             16,
             16
           ],
-          "texture": "#grate"
+          "texture": "#sculk"
         },
         "down": {
           "uv": [
@@ -800,7 +799,7 @@
             16,
             16
           ],
-          "texture": "#grate"
+          "texture": "#sculk"
         },
         "down": {
           "uv": [
@@ -3825,65 +3824,6 @@
             3
           ],
           "texture": "#dish"
-        }
-      }
-    },
-    {
-      "from": [
-        6.6667,
-        6,
-        0
-      ],
-      "to": [
-        9.3333,
-        8.6667,
-        0.3333
-      ],
-      "faces": {
-        "east": {
-          "uv": [
-            15,
-            0,
-            16,
-            16
-          ],
-          "texture": "#trim"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            1,
-            16
-          ],
-          "texture": "#trim"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            16,
-            1
-          ],
-          "texture": "#trim"
-        },
-        "down": {
-          "uv": [
-            0,
-            15,
-            16,
-            16
-          ],
-          "texture": "#trim"
-        },
-        "north": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#heart"
         }
       }
     },

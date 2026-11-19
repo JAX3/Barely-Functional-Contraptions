@@ -8,7 +8,6 @@
     "foam": "barelyfunctionalcontraptions:block/echo_chamber/foam",
     "foam_sculk_0": "barelyfunctionalcontraptions:block/echo_chamber/foam_sculk_0",
     "foam_sculk_1": "barelyfunctionalcontraptions:block/echo_chamber/foam_sculk_1",
-    "heart": "barelyfunctionalcontraptions:block/echo_chamber/heart",
     "pillar": "barelyfunctionalcontraptions:block/echo_chamber/pillar",
     "plate": "barelyfunctionalcontraptions:block/echo_chamber/plate",
     "port": "barelyfunctionalcontraptions:block/echo_chamber/port",
@@ -2368,65 +2367,6 @@
             11
           ],
           "texture": "#dish"
-        }
-      }
-    },
-    {
-      "from": [
-        4,
-        18,
-        -16
-      ],
-      "to": [
-        12,
-        26,
-        -15
-      ],
-      "faces": {
-        "east": {
-          "uv": [
-            15,
-            0,
-            16,
-            16
-          ],
-          "texture": "#trim"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            1,
-            16
-          ],
-          "texture": "#trim"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            16,
-            1
-          ],
-          "texture": "#trim"
-        },
-        "down": {
-          "uv": [
-            0,
-            15,
-            16,
-            16
-          ],
-          "texture": "#trim"
-        },
-        "north": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#heart"
         }
       }
     },

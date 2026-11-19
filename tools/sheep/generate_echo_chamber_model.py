@@ -15,10 +15,11 @@ import os
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..", "src", "main", "resources", "assets", "barelyfunctionalcontraptions")
 NS = "barelyfunctionalcontraptions"
 TEX = {name: f"{NS}:block/echo_chamber/{name}" for name in (
-    "band", "bottom", "dish", "ear", "foam", "foam_sculk_0", "foam_sculk_1", "foam_sculk_2", "grate", "heart", "pillar",
-    "plate", "port", "trim")}
+    "band", "bottom", "dish", "ear", "foam", "foam_sculk_0", "foam_sculk_1", "foam_sculk_2", "pillar", "plate", "port",
+    "trim")}
 TEX["catalyst_side"] = "minecraft:block/sculk_catalyst_side_bloom"
 TEX["catalyst_top"] = "minecraft:block/sculk_catalyst_top_bloom"
+TEX["sculk"] = "minecraft:block/sculk"  # the whole roof
 TEX["particle"] = TEX["plate"]
 
 SIDES = ("north", "south", "east", "west")
@@ -95,7 +96,7 @@ def faces(tex, which=ALL, **overrides):
 # ---- The machine ----
 # Plinth and roof band: the dark bolted rail (the bottom rows of "band").
 box([0, 0, 0], [48, 4, 48], faces("band", SIDES, up="plate", down="bottom"))
-box([0, 40, 0], [48, 44, 48], faces("band", SIDES, up="grate", down="plate"), {"y": (28, 16)})
+box([0, 40, 0], [48, 44, 48], faces("band", SIDES, up="sculk", down="plate"), {"y": (28, 16)})
 # Corner pillars.
 for x0 in (0, 43):
     for z0 in (0, 43):
@@ -115,11 +116,10 @@ for x0, x1 in ((0, 2), (46, 48)):
     for z in (15, 31):
         box([x0, 4, z], [x1, 40, z + 2], faces("trim", ("north", "south", "east", "west")))
 
-# Front: the resonator dish, sunk in a bezel, with its glowing heart in the middle.
+# Front: the resonator dish, sunk in a bezel; its glowing heart is part of its texture.
 for fr, to in (([6, 38, 0], [42, 40, 2]), ([6, 4, 0], [42, 6, 2]), ([6, 6, 0], [8, 38, 2]), ([40, 6, 0], [42, 38, 2])):
     box(fr, to, faces("trim", ("north", "east", "west", "up", "down")))
 box([8, 6, 1], [40, 38, 2], {"north": "dish"}, {"x": (8, 32), "y": (6, 32)})
-box([20, 18, 0], [28, 26, 1], faces("trim", ("east", "west", "up", "down"), north="heart"), {"x": (20, 8), "y": (18, 8)})
 
 # Back: a power port between two bays of sculk catalysts plugged into the wall, and a conduit across above them.
 box([20, 12, 46], [28, 20, 47], faces("trim", ("east", "west", "up", "down"), south="port"), {"x": (20, 8), "y": (12, 8)})
@@ -131,7 +131,7 @@ box([5, 28, 46], [43, 31, 47.5], faces("trim", ("south", "east", "west", "up", "
 for x in (12, 24, 36):  # its brackets
     box([x, 27, 45.5], [x + 2, 32, 48], faces("pillar", ("south", "east", "west", "up", "down")))
 
-# Roof: a big sculk catalyst dome, and two sculk fronds leaning outwards like the Warden sheep's ears.
+# Roof: covered in sculk, with a big sculk catalyst dome and two sculk fronds leaning outwards like the Warden sheep's ears.
 box([17, 44, 17], [31, 50, 31], faces("catalyst_side", SIDES, up="catalyst_top"), {"x": (17, 14), "y": (44, 14), "z": (17, 14)})
 for x, lean in ((9, 22.5), (39, -22.5)):
     box([x - 3, 44, 22], [x + 3, 46, 26], faces("trim", SIDES + ("up",)))
