@@ -209,6 +209,10 @@ public final class DevScreenshotHarness {
             oreLineTick(mc, server);
             return;
         }
+        if ("zero_point_spin".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            zeroPointSpinTick(mc, server);
+            return;
+        }
         if ("thermal_reaction_chamber".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             thermalTick(mc, server);
             return;
@@ -2014,6 +2018,39 @@ public final class DevScreenshotHarness {
                 .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN, Direction.EAST), 3);
         for (int z = -2; z <= 1; z++) for (int y = 0; y <= 1; y++) level.setBlock(o.offset(0, y, z), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
         label(server, at.above(2), "Thermal Reaction Chamber", "gold");
+    }
+
+    /**
+     * A floor and ceiling pair of Zero Point Energy Modules three blocks apart, close up from the side, shot a few ticks
+     * apart to show the emitters turning against the beam: {@code -PharnessScene=zero_point_spin}.
+     */
+    private static void zeroPointSpinTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                BlockPos o = origin.offset(0, 0, -3);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-2, 0, -2), o.offset(2, 5, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                var module = ModBlocks.ZERO_POINT_ENERGY_MODULE.get().defaultBlockState();
+                var facing = com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.FACING;
+                level.setBlock(o, module.setValue(facing, Direction.UP), 3);
+                level.setBlock(o.above(4), module.setValue(facing, Direction.DOWN), 3);
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 28", origin.getX() + 0.5, origin.getY() + 1.6, origin.getZ() - 1.2));
+            case 120 -> shot(mc, "zp_spin_0");
+            case 124 -> shot(mc, "zp_spin_1");
+            case 128 -> shot(mc, "zp_spin_2");
+            case 130 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 -28", origin.getX() + 0.5, origin.getY() + 2.6, origin.getZ() - 1.2));
+            case 160 -> shot(mc, "zp_spin_top_0");
+            case 164 -> shot(mc, "zp_spin_top_1");
+            case 170 -> mc.stop();
+            default -> {}
+        }
     }
 
     /** The ore line, from above the front, a while after it starts, then the chest it fills: {@code -PharnessScene=ore_line}. */

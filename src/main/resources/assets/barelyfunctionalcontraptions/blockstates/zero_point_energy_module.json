@@ -4,14 +4,14 @@
       "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/off"
     },
     "facing=up,linked=true": {
-      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on"
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on_plate"
     },
     "facing=down,linked=false": {
       "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/off",
       "x": 180
     },
     "facing=down,linked=true": {
-      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on",
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on_plate",
       "x": 180
     },
     "facing=north,linked=false": {
@@ -19,7 +19,7 @@
       "x": 90
     },
     "facing=north,linked=true": {
-      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on",
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on_plate",
       "x": 90
     },
     "facing=east,linked=false": {
@@ -28,7 +28,7 @@
       "y": 90
     },
     "facing=east,linked=true": {
-      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on",
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on_plate",
       "x": 90,
       "y": 90
     },
@@ -38,7 +38,7 @@
       "y": 180
     },
     "facing=south,linked=true": {
-      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on",
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on_plate",
       "x": 90,
       "y": 180
     },
@@ -48,7 +48,7 @@
       "y": 270
     },
     "facing=west,linked=true": {
-      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on",
+      "model": "barelyfunctionalcontraptions:block/zero_point_energy_module/on_plate",
       "x": 90,
       "y": 270
     }
