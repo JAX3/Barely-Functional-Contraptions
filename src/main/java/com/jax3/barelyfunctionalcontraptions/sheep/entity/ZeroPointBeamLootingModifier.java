@@ -21,21 +21,20 @@ import net.neoforged.neoforge.common.loot.LootModifier;
  * mob's own death loot table drops gets 0 to {@code beamLooting} extra items. Only the dying entity's own table is
  * touched (not equipment it was holding), and only when the killing blow was the beam.
  */
-public final class ZeroPointBeamLootingModifier extends LootModifier {
-    public static final MapCodec<ZeroPointBeamLootingModifier> CODEC = RecordCodecBuilder.mapCodec(i -> codecStart(i)
-            .apply(i, ZeroPointBeamLootingModifier::new));
+public final class ZeroPointBeamLootingModifier extends com.jax3.barelyfunctionalcontraptions.compat.CompatLootModifier {
+    public static final MapCodec<ZeroPointBeamLootingModifier> CODEC = simpleCodec(ZeroPointBeamLootingModifier::new);
 
-    public ZeroPointBeamLootingModifier(Optional<Holder<LootItemCondition>> condition, int priority) {
-        super(condition, priority);
+    public ZeroPointBeamLootingModifier(Base base) {
+        super(base);
     }
 
     @Override
     protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> loot, LootContext context) {
         int level = ModConfigs.getInt(ModConfigs.SERVER.zpeBeamLooting);
         if (level <= 0) return loot;
-        DamageSource source = context.getOptional(LootContextParams.DAMAGE_SOURCE);
+        DamageSource source = com.jax3.barelyfunctionalcontraptions.compat.Mc.lootParam(context, LootContextParams.DAMAGE_SOURCE);
         if (source == null || !source.is(ZeroPointEnergyModuleBlockEntity.BEAM_DAMAGE)) return loot;
-        Entity entity = context.getOptional(LootContextParams.THIS_ENTITY);
+        Entity entity = com.jax3.barelyfunctionalcontraptions.compat.Mc.lootParam(context, LootContextParams.THIS_ENTITY);
         if (entity == null) return loot;
         boolean ownDeathTable = entity.getLootTable()
                 .map(key -> key.identifier().equals(context.getQueriedLootTableId())).orElse(false);

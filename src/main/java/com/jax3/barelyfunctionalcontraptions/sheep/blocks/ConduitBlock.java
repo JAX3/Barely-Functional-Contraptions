@@ -42,6 +42,13 @@ import org.jspecify.annotations.Nullable;
  * reach out to joined sides, with a plug plate on each plugged-in side.
  */
 public abstract class ConduitBlock extends BaseEntityBlock {
+    /**
+     * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
+     */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     public static final Map<Direction, EnumProperty<CableConnection>> SIDES = new EnumMap<>(Direction.class);
 
     static {

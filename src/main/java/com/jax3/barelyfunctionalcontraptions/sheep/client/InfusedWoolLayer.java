@@ -210,8 +210,8 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
             coloredCutoutModelCopyLayerRender(extras, EXTRAS_TEXTURE, poseStack, collector, light, state, tint, 1);
         }
         if (appearance.has(Feature.GLOWING_EYES)) {
-            collector.order(3).submitModel(eyes, state, poseStack, RenderTypes.eyes(EXTRAS_TEXTURE), LightCoordsUtil.FULL_BRIGHT,
-                    OverlayTexture.NO_OVERLAY, ARGB.opaque(colors.accent() != 0 ? colors.accent() : 0xFF2020), null, state.outlineColor);
+            com.jax3.barelyfunctionalcontraptions.compat.McClient.submitTintedModel(collector.order(3), eyes, state, poseStack, RenderTypes.eyes(EXTRAS_TEXTURE), LightCoordsUtil.FULL_BRIGHT,
+                    OverlayTexture.NO_OVERLAY, ARGB.opaque(colors.accent() != 0 ? colors.accent() : 0xFF2020), state.outlineColor);
         }
     }
 
@@ -225,8 +225,8 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
             poseStack.pushPose();
             getParentModel().root().translateAndRotate(poseStack);
             poseStack.translate(spot[0] / 16.0F, BLOCK_FLEECE_TOP / 16.0F - scale * 0.22F, (spot[1] + 2.0F) / 16.0F);
-            poseStack.rotateDegrees(Axis.YP, spot[3]);
-            poseStack.rotateDegrees(Axis.ZP, spot[4]);
+            poseStack.rotateAround(Axis.YP.rotationDegrees(spot[3]), 0, 0, 0);
+            poseStack.rotateAround(Axis.ZP.rotationDegrees(spot[4]), 0, 0, 0);
             poseStack.scale(scale, -scale, -scale);
             colors.growth().submit(poseStack, collector, lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor);
             poseStack.popPose();

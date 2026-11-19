@@ -19,6 +19,13 @@ import org.jspecify.annotations.Nullable;
  * accept energy, and cables or machines may also pull unlimited FE from it on any side. It has no recipe.
  */
 public class CreativeGeneratorBlock extends BaseEntityBlock {
+    /**
+     * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
+     */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     public CreativeGeneratorBlock(Properties properties) {
         super(properties);
     }

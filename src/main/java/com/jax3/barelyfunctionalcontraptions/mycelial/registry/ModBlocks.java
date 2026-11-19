@@ -19,7 +19,7 @@ public final class ModBlocks {
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.IRON)
-                    .pushReaction(PushReaction.IMMOVEABLE)
+                    .pushReaction(com.jax3.barelyfunctionalcontraptions.compat.Mc.PUSH_IMMOVABLE)
                     .lightLevel(state -> state.getValue(MycelialGeneratorBlock.LIGHT)));
 
     private ModBlocks() {

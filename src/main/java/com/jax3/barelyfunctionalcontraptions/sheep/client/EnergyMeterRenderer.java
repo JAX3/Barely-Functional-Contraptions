@@ -78,7 +78,7 @@ public class EnergyMeterRenderer implements BlockEntityRenderer<EnergyMeterBlock
         if (face != state.in && face != state.out) {
             poseStack.pushPose();
             poseStack.translate(0.5F, 0.5F, 0.5F);
-            poseStack.rotateDegrees(Axis.YP, -face.toYRot());
+            poseStack.rotateAround(Axis.YP.rotationDegrees(-face.toYRot()), 0, 0, 0);
             poseStack.translate(0.0F, SCREEN_CENTRE_Y - 0.5F, 0.5F + 0.002F);
             poseStack.pushPose();
             poseStack.translate(0.0F, 0.06F, 0.0F);

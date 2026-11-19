@@ -24,6 +24,13 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
  * too. Breaking it gives the same bale back.
  */
 public class WoolBaleBlock extends BaseEntityBlock {
+    /**
+     * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
+     */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     public static final EnumProperty<Direction.Axis> AXIS = RotatedPillarBlock.AXIS;
 
     public WoolBaleBlock(Properties properties) {

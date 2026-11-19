@@ -30,6 +30,13 @@ import org.jspecify.annotations.Nullable;
  * more it makes: {@link #GLOW} 0 is dark, 1 dim (dusk, rain), 2 half (a Glow Lamp at night) and 3 full (noon sun).
  */
 public class GlowPanelBlock extends BaseEntityBlock {
+    /**
+     * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
+     */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     public static final IntegerProperty GLOW = IntegerProperty.create("glow", 0, 3);
     private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 6, 16);
 

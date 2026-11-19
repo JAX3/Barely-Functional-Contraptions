@@ -27,6 +27,13 @@ import org.jspecify.annotations.Nullable;
 
 /** The Automatic Shears block: faces the player when placed and shears sheep in the 3x3 area in front of its face. */
 public class AutomaticShearsBlock extends BaseEntityBlock {
+    /**
+     * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
+     */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     /** True while the shears are powered and allowed to run; lights the front chamber. */
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");

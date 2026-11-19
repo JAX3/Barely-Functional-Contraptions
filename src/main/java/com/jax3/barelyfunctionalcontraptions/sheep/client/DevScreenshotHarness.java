@@ -316,10 +316,10 @@ public final class DevScreenshotHarness {
                 // Click the first entry (this mod, sorted A-Z) so the info panel shows its banner.
                 var handle = mc.getWindow().handle();
                 double scale = mc.getWindow().getGuiScale();
-                mc.mouseHandler.onMove(handle, 70 * scale, 45 * scale, 0, 0);
-                mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
-                mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
-                mc.mouseHandler.onMove(handle, 2, 2, 0, 0);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, handle, 70 * scale, 45 * scale);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseButton(mc, handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseButton(mc, handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, handle, 2, 2);
             }
             case 560 -> shot(mc, "08_mod_list");
             case 565 -> {
@@ -365,7 +365,7 @@ public final class DevScreenshotHarness {
                     }
                 });
             }
-            case 1005 -> mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // park the cursor in a corner
+            case 1005 -> com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); // park the cursor in a corner
             case 1015 -> shot(mc, "19_generator_wireless_status");
             case 1020 -> {
                 // Hover the wireless button so its tooltip (the list of linked machines) shows.
@@ -375,7 +375,7 @@ public final class DevScreenshotHarness {
                 int top = (window.getGuiScaledHeight() - com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.IMAGE_HEIGHT) / 2;
                 double mx = (left + com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.WIRELESS_X + 8) * scale;
                 double my = (top + com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.WIRELESS_Y + 8) * scale;
-                mc.mouseHandler.onMove(window.handle(), mx, my, 0, 0);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, window.handle(), mx, my);
             }
             case 1030 -> shot(mc, "20_generator_wireless_tooltip");
             case 1040 -> {
@@ -1514,7 +1514,7 @@ public final class DevScreenshotHarness {
                         });
             });
             case 246 -> setHudHidden(mc, false);
-            case 248 -> mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+            case 248 -> com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
             case 265 -> shot(mc, "65_pipe_filter");
             case 275 -> mc.stop();
             default -> {}
@@ -2547,21 +2547,21 @@ public final class DevScreenshotHarness {
             }
             case 250 -> shot(mc, "showcase_tab_main");
             case 252 -> openCreativeTab(mc, com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.RESOURCE_WOOL.get());
-            case 256, 236 -> mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // no tooltip in the shot
+            case 256, 236 -> com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); // no tooltip in the shot
             case 270 -> shot(mc, "showcase_tab_wool");
             case 272 -> {
                 // Scroll to the bottom of the tab, where the spawn eggs are, and point at one for its tooltip.
                 if (mc.gui.screen() != null) mc.gui.screen().mouseScrolled(213, 120, 0, -20);
             }
-            case 276 -> mc.mouseHandler.onMove(mc.getWindow().handle(), EGG_MOUSE_X, EGG_MOUSE_Y, 0, 0);
+            case 276 -> com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), EGG_MOUSE_X, EGG_MOUSE_Y);
             case 290 -> shot(mc, "showcase_tab_eggs");
             case 294 -> {
-                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
                 mc.gui.setScreen(new GuideScreen());
             }
             case 300 -> {
                 if (mc.gui.screen() instanceof GuideScreen guide) guide.openTab(GuideBook.Tab.RECIPES);
-                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // no tooltip in the shots
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); // no tooltip in the shots
             }
             case 310 -> shot(mc, "99_guide_recipes_machines");
             case 312 -> { if (mc.gui.screen() instanceof GuideScreen guide) guide.openChapter("Mechanical Separator"); }
@@ -2669,7 +2669,7 @@ public final class DevScreenshotHarness {
             case 102 -> hover(mc, 176, 193, 100, 47); // an empty side slot: the full list, missing ones in red
             case 118 -> shot(mc, "92_altar_catalyst_tooltip");
             case 120 -> {
-                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
                 server.execute(() -> {
                     if (server.overworld().getBlockEntity(altar) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity be) {
                         be.setItem(2, new ItemStack(Items.BONE_BLOCK, 2));
@@ -2809,7 +2809,7 @@ public final class DevScreenshotHarness {
             case 208 -> hover(mc, 176, 193, 68, 60);
             case 222 -> shot(mc, "87_wool_packer_gui_pips");
             case 224 -> {
-                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
                 if (mc.player != null) mc.player.closeContainer();
                 command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 3.5, origin.getY(), origin.getZ() - 1.5));
             }
@@ -2817,7 +2817,7 @@ public final class DevScreenshotHarness {
             case 240 -> hover(mc, 176, 193, 52, 64); // the bale in the separator's input slot
             case 256 -> shot(mc, "88_separator_bale_gui");
             case 258 -> {
-                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
                 if (mc.player != null) mc.player.closeContainer();
                 mc.gui.setScreen(new GuideScreen());
             }
@@ -2837,7 +2837,7 @@ public final class DevScreenshotHarness {
             case 288 -> { if (mc.player != null) mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)); }
             case 296 -> {
                 if (mc.player != null) ResourcefulSheep.LOGGER.info("UNPACK result={}", mc.player.inventoryMenu.getSlot(0).getItem());
-                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // no tooltip over the grid
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); // no tooltip over the grid
             }
             case 310 -> shot(mc, "90_unpack_wool_bale");
             case 316 -> mc.stop();
@@ -2850,7 +2850,7 @@ public final class DevScreenshotHarness {
         var window = mc.getWindow();
         double scale = window.getGuiScale();
         int left = (window.getGuiScaledWidth() - width) / 2, top = (window.getGuiScaledHeight() - height) / 2;
-        mc.mouseHandler.onMove(window.handle(), (left + x) * scale, (top + y) * scale, 0, 0);
+        com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, window.handle(), (left + x) * scale, (top + y) * scale);
     }
 
     /** Client-side check that placed bales got their wool (and so their colour). */
@@ -2945,11 +2945,11 @@ public final class DevScreenshotHarness {
                 var window = mc.getWindow();
                 double scale = window.getGuiScale();
                 int left = (window.getGuiScaledWidth() - 176) / 2, top = (window.getGuiScaledHeight() - 193) / 2;
-                mc.mouseHandler.onMove(window.handle(), (left + 67) * scale, (top + 30) * scale, 0, 0);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, window.handle(), (left + 67) * scale, (top + 30) * scale);
             }
             case 225 -> shot(mc, "78_wool_burner_gui_fuels");
             case 227 -> {
-                mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
                 if (mc.player != null) mc.player.closeContainer();
                 mc.gui.setScreen(new GuideScreen());
             }
@@ -2961,11 +2961,11 @@ public final class DevScreenshotHarness {
                 var window = mc.getWindow();
                 double scale = window.getGuiScale();
                 int left = (window.getGuiScaledWidth() - 330) / 2, top = (window.getGuiScaledHeight() - 214) / 2;
-                mc.mouseHandler.onMove(window.handle(), (left + 6 + tabIndex * 28 + 13) * scale, (top + 21 + 10) * scale, 0, 0);
-                mc.mouseHandler.onButton(window.handle(), new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
-                mc.mouseHandler.onButton(window.handle(), new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, window.handle(), (left + 6 + tabIndex * 28 + 13) * scale, (top + 21 + 10) * scale);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseButton(mc, window.handle(), new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
+                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseButton(mc, window.handle(), new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
             }
-            case 258, 272, 286 -> mc.mouseHandler.onMove(mc.getWindow().handle(), 4, 4, 0, 0); // no tooltip in the shot
+            case 258, 272, 286 -> com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); // no tooltip in the shot
             case 262 -> shot(mc, "79_guide_tab_logistics");
             case 276 -> shot(mc, "79_guide_tab_production");
             case 290 -> shot(mc, "79_guide_tab_utility");
@@ -3100,10 +3100,10 @@ public final class DevScreenshotHarness {
         var window = mc.getWindow();
         double scale = window.getGuiScale();
         long handle = window.handle();
-        mc.mouseHandler.onMove(handle, (screen.getLeftPos() + 60) * scale, (screen.getTopPos() + 26 + row * 18) * scale, 0, 0);
-        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
-        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
-        mc.mouseHandler.onMove(handle, 4, 4, 0, 0);
+        com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, handle, (screen.getLeftPos() + 60) * scale, (screen.getTopPos() + 26 + row * 18) * scale);
+        com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseButton(mc, handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
+        com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseButton(mc, handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
+        com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, handle, 4, 4);
     }
 
     /** A real left click at ({@code gx}, {@code gy}) inside a centred 176x193 container window, then the cursor parked. */
@@ -3112,10 +3112,10 @@ public final class DevScreenshotHarness {
         double scale = window.getGuiScale();
         int left = (window.getGuiScaledWidth() - 176) / 2, top = (window.getGuiScaledHeight() - 193) / 2;
         long handle = window.handle();
-        mc.mouseHandler.onMove(handle, (left + gx) * scale, (top + gy) * scale, 0, 0);
-        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
-        mc.mouseHandler.onButton(handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
-        mc.mouseHandler.onMove(handle, 4, 4, 0, 0);
+        com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, handle, (left + gx) * scale, (top + gy) * scale);
+        com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseButton(mc, handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
+        com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseButton(mc, handle, new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
+        com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, handle, 4, 4);
     }
 
     private static void logArea(MinecraftServer server, BlockPos pos, String what) {

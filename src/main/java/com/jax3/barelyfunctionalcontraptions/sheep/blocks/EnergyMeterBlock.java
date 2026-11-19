@@ -33,6 +33,13 @@ import org.jspecify.annotations.Nullable;
  * the flow ({@link EnergyMeterBlockEntity#signalFor}).
  */
 public class EnergyMeterBlock extends BaseEntityBlock {
+    /**
+     * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
+     */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;
     /** The face with the screen: always a side, facing the player who placed it, never one of the two ports. */
     public static final EnumProperty<Direction> SCREEN = EnumProperty.create("screen", Direction.class, Direction.Plane.HORIZONTAL::test);

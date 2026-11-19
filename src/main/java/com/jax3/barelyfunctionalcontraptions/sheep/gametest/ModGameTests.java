@@ -1003,9 +1003,13 @@ public final class ModGameTests {
         Player other = playerHolding(h, new ItemStack(ModItems.SHEEP_TREADMILL.get()));
         use.accept(other, new BlockPos(1, 0, 1));
         h.assertFalse(h.getBlockState(back2).is(block), "it won't place when the block in front is taken");
-        h.getLevel().destroyBlock(h.absolutePos(front), false);
+        h.getLevel().destroyBlock(h.absolutePos(front), true);
         h.runAfterDelay(2, () -> {
             h.assertTrue(h.getBlockState(back).isAir(), "breaking the front removes the back too, was " + h.getBlockState(back));
+            // One treadmill item for the pair: only the back's loot table drops it.
+            int dropped = h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(h.absolutePos(back)).inflate(3),
+                    e -> e.getItem().is(ModItems.SHEEP_TREADMILL.get())).stream().mapToInt(e -> e.getItem().getCount()).sum();
+            h.assertTrue(dropped == 1, "breaking it drops one treadmill, got " + dropped);
             h.succeed();
         });
     }

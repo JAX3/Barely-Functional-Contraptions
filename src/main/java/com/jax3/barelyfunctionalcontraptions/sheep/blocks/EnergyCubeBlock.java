@@ -29,6 +29,13 @@ import org.jspecify.annotations.Nullable;
  */
 public class EnergyCubeBlock extends BaseEntityBlock {
     /**
+     * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
+     */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
+    /**
      * How full this cube's part of its group's "tank" is, 0..8 (one step per two pixel rows). The group fills from its
      * bottom layer up, so a stack shows one continuous energy level across its windows.
      */

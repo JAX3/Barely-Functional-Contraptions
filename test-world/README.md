@@ -7,8 +7,9 @@ screenshots in [`docs/screenshots`](../docs/screenshots).
 ## Opening it
 
 1. Unzip it into your Minecraft instance's `saves` folder, so you have `saves/BFC Test World/`.
-2. Start Minecraft 26.3 with NeoForge and the mod (JEI and Jade optional), and open
-   **Barely Functional Contraptions Test World** from the singleplayer list.
+2. Start Minecraft 26.3 with NeoForge and the mod's 26.3 jar (JEI and Jade optional), and open
+   **Barely Functional Contraptions Test World** from the singleplayer list. It's a 26.3 world, so it can't be opened in
+   Minecraft 26.2.
 
 Cheats are on, so you can use `/tp` to jump between the scenes below. You start beside the Fluid Tanks.
 

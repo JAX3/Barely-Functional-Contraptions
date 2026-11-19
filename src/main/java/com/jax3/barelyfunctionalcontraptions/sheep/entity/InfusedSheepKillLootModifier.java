@@ -30,19 +30,18 @@ import net.neoforged.neoforge.common.loot.LootModifier;
  * default loot table), so other tables that happen to carry the entity, such as shearing, are left alone. A sheared
  * sheep has no wool to give, so it drops only its normal loot.</p>
  */
-public final class InfusedSheepKillLootModifier extends LootModifier {
-    public static final MapCodec<InfusedSheepKillLootModifier> CODEC = RecordCodecBuilder.mapCodec(i -> codecStart(i)
-            .apply(i, InfusedSheepKillLootModifier::new));
+public final class InfusedSheepKillLootModifier extends com.jax3.barelyfunctionalcontraptions.compat.CompatLootModifier {
+    public static final MapCodec<InfusedSheepKillLootModifier> CODEC = simpleCodec(InfusedSheepKillLootModifier::new);
 
-    public InfusedSheepKillLootModifier(Optional<Holder<LootItemCondition>> condition, int priority) {
-        super(condition, priority);
+    public InfusedSheepKillLootModifier(Base base) {
+        super(base);
     }
 
     @Override
     protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> loot, LootContext context) {
         if (!ModConfigs.getBool(ModConfigs.SERVER.killDropsEnabled)) return loot;
-        if (context.getOptional(LootContextParams.DAMAGE_SOURCE) == null) return loot;
-        Entity entity = context.getOptional(LootContextParams.THIS_ENTITY);
+        if (com.jax3.barelyfunctionalcontraptions.compat.Mc.lootParam(context, LootContextParams.DAMAGE_SOURCE) == null) return loot;
+        Entity entity = com.jax3.barelyfunctionalcontraptions.compat.Mc.lootParam(context, LootContextParams.THIS_ENTITY);
         if (entity == null || !ModTags.isInfusable(entity)) return loot;
         boolean ownDeathTable = entity.getLootTable()
                 .map(key -> key.identifier().equals(context.getQueriedLootTableId())).orElse(false);

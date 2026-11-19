@@ -36,7 +36,7 @@ public final class MycelialPower {
         ModSounds.SOUNDS.register(modBus);
         ModDataComponents.COMPONENTS.register(modBus);
 
-        container.registerConfig(ModConfig.Type.SYNCED, ServerConfig.SPEC, BarelyFunctionalContraptions.MOD_ID + "-mycelial-synced.toml");
+        container.registerConfig(com.jax3.barelyfunctionalcontraptions.compat.Mc.SYNCED_CONFIG, ServerConfig.SPEC, BarelyFunctionalContraptions.MOD_ID + "-mycelial-synced.toml");
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, BarelyFunctionalContraptions.MOD_ID + "-mycelial-client.toml");
 
         modBus.addListener(ModCapabilities::register);

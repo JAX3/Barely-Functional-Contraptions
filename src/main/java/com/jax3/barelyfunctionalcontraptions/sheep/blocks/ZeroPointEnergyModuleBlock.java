@@ -33,6 +33,13 @@ import org.jspecify.annotations.Nullable;
  * its GUI: stored energy, generation, the beam connection and why it isn't linked.
  */
 public class ZeroPointEnergyModuleBlock extends BaseEntityBlock {
+    /**
+     * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
+     */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     /** Which way the emitter points: away from the block the module is attached to, in any of the six directions. */
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     /** True while the module has a partner and is generating. */

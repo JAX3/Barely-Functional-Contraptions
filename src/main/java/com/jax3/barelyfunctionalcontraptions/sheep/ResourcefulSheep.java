@@ -56,7 +56,7 @@ public final class ResourcefulSheep {
         modBus.addListener(ModNetwork::register);
 
 
-        container.registerConfig(ModConfig.Type.SYNCED, ModConfigs.SERVER_SPEC, BarelyFunctionalContraptions.MOD_ID + "-sheep-synced.toml");
+        container.registerConfig(com.jax3.barelyfunctionalcontraptions.compat.Mc.SYNCED_CONFIG, ModConfigs.SERVER_SPEC, BarelyFunctionalContraptions.MOD_ID + "-sheep-synced.toml");
         container.registerConfig(ModConfig.Type.CLIENT, ModConfigs.CLIENT_SPEC, BarelyFunctionalContraptions.MOD_ID + "-sheep-client.toml");
         modBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Loading event) -> {
             if (event.getConfig().getSpec() == ModConfigs.SERVER_SPEC) ModConfigs.migrate();

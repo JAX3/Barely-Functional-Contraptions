@@ -5,11 +5,8 @@ import com.jax3.barelyfunctionalcontraptions.mycelial.config.ServerConfig;
 import com.jax3.barelyfunctionalcontraptions.mycelial.util.Matchers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.features.TreeFeatures;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -17,19 +14,16 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.levelgen.feature.Feature;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
-import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.BlockGrowFeatureEvent;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -141,19 +135,8 @@ public final class MyceliumSpreadManager {
             return false;
         }
         boolean red = random.nextDouble() < ServerConfig.get(ServerConfig.HUGE_MUSHROOM_RED_RATIO);
-        ResourceKey<Feature> key = red ? TreeFeatures.HUGE_RED_MUSHROOM : TreeFeatures.HUGE_BROWN_MUSHROOM;
-        Optional<Holder.Reference<Feature>> feature =
-                level.registryAccess().lookupOrThrow(Registries.FEATURE).get(key);
-        if (feature.isEmpty()) {
-            return false;
-        }
-        BlockGrowFeatureEvent event = EventHooks.fireBlockGrowFeature(level, random, stem, feature.get());
-        Holder<Feature> chosen = event.getFeature();
-        if (event.isCanceled() || chosen == null) {
-            return false;
-        }
-        if (!chosen.value().place(level, level.getChunkSource().getGenerator(), random, stem)) {
-            return false; // not enough room; the feature places nothing in that case
+        if (!com.jax3.barelyfunctionalcontraptions.compat.HugeMushrooms.grow(level, random, stem, red)) {
+            return false; // not enough room, or stopped by another mod
         }
         level.playSound(null, stem, SoundEvents.FUNGUS_PLACE, SoundSource.BLOCKS, 1.0F, 0.6F);
         level.sendParticles(ParticleTypes.SPORE_BLOSSOM_AIR, stem.getX() + 0.5D, stem.getY() + 1.0D, stem.getZ() + 0.5D,

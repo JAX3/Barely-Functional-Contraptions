@@ -52,6 +52,13 @@ import org.jspecify.annotations.Nullable;
  * walks it: the belt moves and the sheep's legs go.</p>
  */
 public class SheepTreadmillBlock extends BaseEntityBlock {
+    /**
+     * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
+     */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final IntegerProperty PART = IntegerProperty.create("part", 0, 1);
     public static final BooleanProperty RUNNING = BooleanProperty.create("running");

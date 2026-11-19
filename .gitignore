@@ -30,3 +30,4 @@ Thumbs.db
 # Python tools
 __pycache__/
 tools/**/output/
+run-*/

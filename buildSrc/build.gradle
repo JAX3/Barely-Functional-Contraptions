@@ -1,0 +1,8 @@
+// Build helpers for the multi-version build (see McDataDowngrade).
+plugins {
+    id 'groovy'
+}
+
+dependencies {
+    implementation localGroovy()
+}

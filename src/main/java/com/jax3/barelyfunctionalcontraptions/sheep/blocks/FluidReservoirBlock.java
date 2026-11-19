@@ -30,6 +30,13 @@ import org.jspecify.annotations.Nullable;
  * bucket (or any fluid container) to take water out, or with an empty hand to open its GUI.
  */
 public class FluidReservoirBlock extends BaseEntityBlock {
+    /**
+     * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
+     */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     /** How full the tank is, 0 (empty) to 4 (full); drawn as the water level in the side windows. */
     public static final IntegerProperty FILL = IntegerProperty.create("fill", 0, 4);
 

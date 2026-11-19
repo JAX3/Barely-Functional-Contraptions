@@ -30,6 +30,13 @@ import org.jspecify.annotations.Nullable;
  * GUI.
  */
 public class FluidTankBlock extends BaseEntityBlock {
+    /**
+     * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
+     */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     public FluidTankBlock(Properties properties) {
         super(properties);
     }

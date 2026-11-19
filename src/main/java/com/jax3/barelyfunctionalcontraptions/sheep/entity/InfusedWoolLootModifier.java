@@ -31,22 +31,22 @@ import net.neoforged.neoforge.common.loot.LootModifier;
  * path starts with {@code table_prefix} (default {@code shearing/}), so modded sheep that use their own shearing
  * tables also work once their entity type is added to {@code #barelyfunctionalcontraptions:infusable}.</p>
  */
-public final class InfusedWoolLootModifier extends LootModifier {
-    public static final MapCodec<InfusedWoolLootModifier> CODEC = RecordCodecBuilder.mapCodec(i -> codecStart(i).and(
+public final class InfusedWoolLootModifier extends com.jax3.barelyfunctionalcontraptions.compat.CompatLootModifier {
+    public static final MapCodec<InfusedWoolLootModifier> CODEC = RecordCodecBuilder.mapCodec(i -> baseFields(i).and(
             Codec.STRING.optionalFieldOf("table_prefix", "shearing/").forGetter(m -> m.tablePrefix)
     ).apply(i, InfusedWoolLootModifier::new));
 
     private final String tablePrefix;
 
-    public InfusedWoolLootModifier(Optional<Holder<LootItemCondition>> condition, int priority, String tablePrefix) {
-        super(condition, priority);
+    public InfusedWoolLootModifier(Base base, String tablePrefix) {
+        super(base);
         this.tablePrefix = tablePrefix;
     }
 
     @Override
     protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> loot, LootContext context) {
         if (!context.getQueriedLootTableId().getPath().startsWith(tablePrefix)) return loot;
-        Entity entity = context.getOptional(LootContextParams.THIS_ENTITY);
+        Entity entity = com.jax3.barelyfunctionalcontraptions.compat.Mc.lootParam(context, LootContextParams.THIS_ENTITY);
         if (entity == null || !ModTags.isInfusable(entity)) return loot;
 
         SheepInfusion infusion = SheepInfusionEvents.getInfusion(entity);

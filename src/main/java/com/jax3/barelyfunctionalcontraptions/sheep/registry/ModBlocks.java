@@ -20,7 +20,7 @@ public final class ModBlocks {
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.IRON)
-                    .pushReaction(PushReaction.IMMOVEABLE)
+                    .pushReaction(com.jax3.barelyfunctionalcontraptions.compat.Mc.PUSH_IMMOVABLE)
                     .lightLevel(state -> state.getValue(MechanicalSeparatorBlock.ACTIVE) ? 7 : 0));
 
     /** Shears sheep in the 3x3 area in front of it into a 9-slot inventory. Stone pickaxe, like a dispenser. */
@@ -224,7 +224,7 @@ public final class ModBlocks {
                     .noOcclusion()
                     .noLootTable()
                     .instabreak()
-                    .pushReaction(PushReaction.POPPED)
+                    .pushReaction(com.jax3.barelyfunctionalcontraptions.compat.Mc.PUSH_BREAKS)
                     .mapColor(MapColor.NONE)
                     .lightLevel(state -> com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.LIGHT_LEVEL));
 

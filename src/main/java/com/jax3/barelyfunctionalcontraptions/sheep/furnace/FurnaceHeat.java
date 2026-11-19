@@ -9,7 +9,6 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.registries.codec.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
@@ -45,7 +44,7 @@ public record FurnaceHeat(Optional<Identifier> sheep, Optional<HolderSet<EntityT
 
     public static final Codec<FurnaceHeat> CODEC = RecordCodecBuilder.<FurnaceHeat>create(i -> i.group(
             Identifier.CODEC.optionalFieldOf("sheep").forGetter(FurnaceHeat::sheep),
-            RegistryCodecs.holderSet(Registries.ENTITY_TYPE).optionalFieldOf("entity").forGetter(FurnaceHeat::entity),
+            com.jax3.barelyfunctionalcontraptions.compat.Mc.entityTypes().optionalFieldOf("entity").forGetter(FurnaceHeat::entity),
             SheepAppearance.Feature.CODEC.optionalFieldOf("feature").forGetter(FurnaceHeat::feature),
             Codec.intRange(0, 1_000_000).fieldOf("power").forGetter(FurnaceHeat::power),
             Codec.doubleRange(0, 100).optionalFieldOf("wet_multiplier", 0.5).forGetter(FurnaceHeat::wetMultiplier)
