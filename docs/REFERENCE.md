@@ -48,7 +48,7 @@ The integration is covered by GameTests, which run in [`IntegrationGameTests`](.
 ## Installation (players and servers)
 
 1. Install NeoForge 26.3.x for Minecraft 26.3.
-2. Put `barelyfunctionalcontraptions-1.5.0.jar` in the `mods/` folder of the client **and** the server.
+2. Put `barelyfunctionalcontraptions-1.5.5.jar` in the `mods/` folder of the client **and** the server.
 3. Optional: install JEI 31.x and/or Jade 26.3.x. The mod runs normally without them.
 
 **Machine fronts:** all three machines share one look. Each has a purple-rimmed glass window on its front: a red mushroom in the generator, a wool block in the separator and a pair of shears in the Automatic Shears. The window is dark while the machine is idle and glows with a pulsing halo and sparkles while it runs. The separator and shears also give off a little light while running.
@@ -1425,7 +1425,7 @@ All four can be edited in-game from *Mods → Barely Functional Contraptions →
 Requires **JDK 25**. Gradle 9 is downloaded by the wrapper.
 
 ```bash
-./gradlew build                          # compiles, runs unit tests, outputs build/libs/barelyfunctionalcontraptions-1.5.0.jar
+./gradlew build                          # compiles, runs unit tests, outputs build/libs/barelyfunctionalcontraptions-1.5.5.jar
 ./gradlew runClient                      # dev client (with JEI and Jade)
 ./gradlew runServer                      # dev dedicated server
 ./gradlew runGameTestServer              # runs every GameTest (both modules + integration) headlessly, then exits

@@ -1,6 +1,6 @@
 # Changelog
 
-## 17–19 November 2026
+## 1.5.5 (17–19 November 2026)
 
 Everything added or changed in Barely Functional Contraptions from 17 November 2026 to now, for Minecraft 26.3 on
 NeoForge. Numbers are the defaults; almost all of them can be changed in the synced config.
