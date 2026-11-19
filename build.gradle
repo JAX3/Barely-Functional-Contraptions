@@ -178,6 +178,12 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 jar {
+    // -PjarDir=<folder>: put the finished jar there instead of build/libs (for example your Minecraft mods folder, or set
+    // jarDir=... in your own ~/.gradle/gradle.properties to make it your default). Each jar's name says its Minecraft
+    // version, so every version can share one folder.
+    if (project.hasProperty('jarDir')) {
+        destinationDirectory = file(project.property('jarDir').toString())
+    }
     // Dev tools stay out of the released jar so the game doesn't load them: the GameTests with their test data,
     // and the screenshot harness. Dev runs (runClient, runGameTestServer) use the build folders and keep them.
     exclude 'com/jax3/barelyfunctionalcontraptions/gametest/**',

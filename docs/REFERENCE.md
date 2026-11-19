@@ -1443,6 +1443,8 @@ Requires **JDK 25**. Gradle 9 is downloaded by the wrapper.
 
 To launch the dev runs **without JEI**, pass `-Puse_jei_runtime=false`.
 
+To put the finished jar in another folder, such as your Minecraft `mods` folder, pass `-PjarDir=<folder>` (for example `./gradlew build -Pmc=26.2 "-PjarDir=C:/Users/you/Desktop/BFC jars"`). To make that your default, add `jarDir=<folder>` to your own `~/.gradle/gradle.properties`. Every jar's name includes its Minecraft version, so all versions can share one folder.
+
 ### Building for each Minecraft version
 The mod builds for **Minecraft 26.3** (the default), **26.2** and **26.1** (26.1.2) from one source tree. Add `-Pmc=26.2` or `-Pmc=26.1` to any command above (build, runClient, runGameTestServer, ...) to target that version.
 
