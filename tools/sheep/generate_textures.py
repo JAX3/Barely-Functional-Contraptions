@@ -4181,7 +4181,7 @@ def generate_thermal_reaction_chamber_gui():
 # ---------------------------------------------------------------------------
 # Echo Chamber (WIP preview): a 3x3x3 machine in the blue-steel casing, lined with sculk. A big resonator dish on the
 # front whose rings pulse outward from a glowing heart, egg-crate sound-dampening foam on the side walls with sculk
-# creeping over some of it, a power port and a conduit at the back, and a sculk-covered roof with a catalyst dome
+# creeping over some of it, a power port between louvred vents at the back, and a sculk-covered roof with a catalyst dome
 # in a crown of sculk fronds, the biggest two like the Warden sheep's "ears". The model is built by generate_echo_chamber_model.py; these
 # are its textures. Wall textures tile, one per block face.
 # ---------------------------------------------------------------------------
@@ -4315,6 +4315,20 @@ def generate_echo_chamber():
             if r < 6.5:
                 port.putpixel((x, y), CARTOON["O"] if r >= 5.6 else CARTOON["E"] if r >= 3.8 else CARTOON["e"] if r >= 2.8 else CARTOON["K"])
     port.save(out(base + "port.png"))
+
+    # Vents: the dark inside of a vent housing, glowing faintly cyan towards the bottom from the sculk inside.
+    vent = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            vent.putpixel((x, y), mix(CARTOON["K"], SCULK[3], max(0.0, (y - 6) / 10) * 0.55))
+    vent.save(out(base + "vent_back.png"))
+    # The exhaust grille: dark slots between casing bars, tiling sideways; its four rows sit at the bottom.
+    grille = Image.new("RGBA", (16, 16), CARTOON["M"])
+    for x in range(16):
+        for y in range(12, 16):
+            slot = x % 4 != 0 and y in (13, 14)
+            grille.putpixel((x, y), CARTOON["K"] if slot else CARTOON["H"] if y == 12 else CARTOON["S"] if y == 15 else CARTOON["M"])
+    grille.save(out(base + "grille.png"))
 
     # Trim: plain casing metal for bezels and edges.
     trim = Image.new("RGBA", (16, 16), CARTOON["M"])

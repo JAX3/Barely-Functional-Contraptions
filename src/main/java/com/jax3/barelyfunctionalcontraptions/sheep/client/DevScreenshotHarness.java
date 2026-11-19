@@ -2376,7 +2376,7 @@ public final class DevScreenshotHarness {
 
     /**
      * The work-in-progress 3x3x3 Echo Chamber model on a sculk floor with a Warden sheep beside it, from the front, from
-     * above at an angle and from the back: {@code -PharnessScene=echo_chamber}.
+     * above at an angle, from the back and close up on the back: {@code -PharnessScene=echo_chamber}.
      */
     private static void echoChamberTick(Minecraft mc, MinecraftServer server) {
         switch (tick) {
@@ -2413,7 +2413,9 @@ public final class DevScreenshotHarness {
             case 140 -> shot(mc, "wip_echo_chamber_above");
             case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f -33 17", origin.getX() - 4.0, origin.getY() + 2.5, origin.getZ() - 12.0));
             case 170 -> shot(mc, "wip_echo_chamber_back");
-            case 176 -> mc.stop();
+            case 172 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 0 5", origin.getX() + 0.5, origin.getY() - 0.2, origin.getZ() - 9.0));
+            case 200 -> shot(mc, "wip_echo_chamber_back_close");
+            case 206 -> mc.stop();
             default -> {}
         }
     }

@@ -15,8 +15,8 @@ import os
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..", "src", "main", "resources", "assets", "barelyfunctionalcontraptions")
 NS = "barelyfunctionalcontraptions"
 TEX = {name: f"{NS}:block/echo_chamber/{name}" for name in (
-    "band", "bottom", "dish", "ear", "foam", "foam_sculk_0", "foam_sculk_1", "foam_sculk_2", "pillar", "plate", "port",
-    "trim")}
+    "band", "bottom", "dish", "ear", "foam", "foam_sculk_0", "foam_sculk_1", "foam_sculk_2", "grille", "pillar", "plate",
+    "port", "trim", "vent_back")}
 TEX["catalyst_side"] = "minecraft:block/sculk_catalyst_side_bloom"
 TEX["catalyst_top"] = "minecraft:block/sculk_catalyst_top_bloom"
 TEX["sculk"] = "minecraft:block/sculk"  # the whole roof
@@ -121,8 +121,22 @@ for fr, to in (([6, 38, 0], [42, 40, 2]), ([6, 4, 0], [42, 6, 2]), ([6, 6, 0], [
     box(fr, to, faces("trim", ("north", "east", "west", "up", "down")))
 box([8, 6, 1], [40, 38, 2], {"north": "dish"}, {"x": (8, 32), "y": (6, 32)})
 
-# Back: a power port, and a conduit across above it.
+# Back: a power port between two louvred vents, a conduit across above them, and an exhaust grille above that.
 box([20, 12, 46], [28, 20, 47], faces("trim", ("east", "west", "up", "down"), south="port"), {"x": (20, 8), "y": (12, 8)})
+for x0 in (5, 31):
+    # The housing: a frame standing out from the wall round a dark, faintly glowing interior.
+    for fr, to in (([x0, 8, 46], [x0 + 12, 9.5, 48]), ([x0, 22.5, 46], [x0 + 12, 24, 48]),
+                   ([x0, 9.5, 46], [x0 + 1.5, 22.5, 48]), ([x0 + 10.5, 9.5, 46], [x0 + 12, 22.5, 48])):
+        box(fr, to, faces("trim", ("south", "east", "west", "up", "down")))
+    box([x0 + 1.5, 9.5, 46], [x0 + 10.5, 22.5, 46.25], {"south": "vent_back"}, {"x": (x0 + 1.5, 9), "y": (9.5, 13)})
+    # Five angled blades, tipped down so you can't see straight in.
+    for i in range(5):
+        y = 11 + i * 2.5
+        rotated.append({"name": "louvre", "from": [x0 + 1.5, y - 0.5, 46.5], "to": [x0 + 10.5, y + 0.5, 47.75],
+                        "rotation": {"angle": 22.5, "axis": "x", "origin": [x0 + 6, y, 47]},
+                        "faces": {"south": {"uv": [0, 0, 9, 1], "texture": "#trim"}, "up": {"uv": [0, 0, 9, 1.25], "texture": "#trim"},
+                                  "down": {"uv": [0, 14.75, 9, 16], "texture": "#pillar"}}})
+box([8, 34, 46], [40, 38, 46.75], faces("trim", ("east", "west", "up", "down"), south="grille"), {"y": (34, 4)})
 box([5, 28, 46], [43, 31, 47.5], faces("trim", ("south", "east", "west", "up", "down")))
 for x in (12, 24, 36):  # its brackets
     box([x, 27, 45.5], [x + 2, 32, 48], faces("pillar", ("south", "east", "west", "up", "down")))
@@ -186,7 +200,11 @@ for cell, lo, hi, fcs in pieces():
         top.append(shifted(element, 16, 32, 16))
 for element in rotated:
     whole.append(element)
-    top.append(shifted(element, 16, 32, 16))
+    # Each rotated element stays whole, so it goes to whichever half it starts in.
+    if element["from"][1] < 32:
+        bottom.append(shifted(element, 16, 0, 16))
+    else:
+        top.append(shifted(element, 16, 32, 16))
 
 for e in bottom + top:
     for v in e["from"] + e["to"]:

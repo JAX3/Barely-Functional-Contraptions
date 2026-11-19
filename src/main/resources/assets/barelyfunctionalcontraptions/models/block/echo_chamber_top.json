@@ -7,6 +7,7 @@
     "ear": "barelyfunctionalcontraptions:block/echo_chamber/ear",
     "foam": "barelyfunctionalcontraptions:block/echo_chamber/foam",
     "foam_sculk_2": "barelyfunctionalcontraptions:block/echo_chamber/foam_sculk_2",
+    "grille": "barelyfunctionalcontraptions:block/echo_chamber/grille",
     "pillar": "barelyfunctionalcontraptions:block/echo_chamber/pillar",
     "plate": "barelyfunctionalcontraptions:block/echo_chamber/plate",
     "trim": "barelyfunctionalcontraptions:block/echo_chamber/trim",
@@ -1467,6 +1468,147 @@
             3
           ],
           "texture": "#dish"
+        }
+      }
+    },
+    {
+      "from": [
+        -8,
+        2,
+        30
+      ],
+      "to": [
+        0,
+        6,
+        30.75
+      ],
+      "faces": {
+        "west": {
+          "uv": [
+            14,
+            0,
+            14.75,
+            16
+          ],
+          "texture": "#trim"
+        },
+        "up": {
+          "uv": [
+            8,
+            14,
+            16,
+            14.75
+          ],
+          "texture": "#trim"
+        },
+        "down": {
+          "uv": [
+            8,
+            1.25,
+            16,
+            2
+          ],
+          "texture": "#trim"
+        },
+        "south": {
+          "uv": [
+            8,
+            0,
+            16,
+            16
+          ],
+          "texture": "#grille"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        2,
+        30
+      ],
+      "to": [
+        16,
+        6,
+        30.75
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            14,
+            16,
+            14.75
+          ],
+          "texture": "#trim"
+        },
+        "down": {
+          "uv": [
+            0,
+            1.25,
+            16,
+            2
+          ],
+          "texture": "#trim"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#grille"
+        }
+      }
+    },
+    {
+      "from": [
+        16,
+        2,
+        30
+      ],
+      "to": [
+        24,
+        6,
+        30.75
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            1.25,
+            0,
+            2,
+            16
+          ],
+          "texture": "#trim"
+        },
+        "up": {
+          "uv": [
+            0,
+            14,
+            8,
+            14.75
+          ],
+          "texture": "#trim"
+        },
+        "down": {
+          "uv": [
+            0,
+            1.25,
+            8,
+            2
+          ],
+          "texture": "#trim"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            8,
+            16
+          ],
+          "texture": "#grille"
         }
       }
     },
