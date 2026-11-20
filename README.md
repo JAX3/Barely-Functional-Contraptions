@@ -185,6 +185,12 @@ A little screen that counts the sheep in the pen in front of it (all of them, th
 
 ![A Herd Counter beside a pen of mixed sheep, its area outlined, a comparator and redstone lamp behind it](docs/screenshots/109_herd_counter.png)
 
+### Machine Status Panel
+
+A wall screen that shows how your machines are doing, all in one place: link them with the Barely Functional Wrench and each gets its name, its status (green, amber, red or grey) and a key number. A comparator reads how many have a problem, for an alarm.
+
+![A Machine Status Panel showing a Powered Furnace working, a Grass Seeder out of fuel in red, a Hume Energy Cube and a Herd Counter](docs/screenshots/110_status_panel_close.png)
+
 ### Wool Machines
 
 The Mechanical Separator turns resource wool back into 2–4 of its resource, string and sometimes a bonus. Automatic Shears shear every sheep in front of them and keep the wool for hoppers and pipes.

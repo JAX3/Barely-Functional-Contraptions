@@ -226,6 +226,9 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue staticWaxedEfficiency;
         public final ModConfigSpec.IntValue staticCapacity;
         public final ModConfigSpec.IntValue staticOutput;
+        public final ModConfigSpec.IntValue statusPanelRows;
+        public final ModConfigSpec.IntValue statusPanelRange;
+        public final ModConfigSpec.IntValue statusPanelRefresh;
         public final ModConfigSpec.IntValue herdRadius;
         public final ModConfigSpec.IntValue herdInterval;
         public final ModConfigSpec.IntValue herdSignalPerSheep;
@@ -633,6 +636,15 @@ public final class ModConfigs {
                     .defineInRange("capacity", 500_000, 1, Integer.MAX_VALUE);
             staticOutput = b.comment("Most FE it pushes into the blocks around its base per tick, in total.")
                     .defineInRange("output", 2_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Machine Status Panel (a wall screen showing how the machines linked to it with the Barely Functional Wrench are doing)").push("status_panel");
+            statusPanelRows = b.comment("Machines one panel shows.")
+                    .defineInRange("rowsPerPanel", 4, 1, 4);
+            statusPanelRange = b.comment("How far from the panel a machine can be, in blocks.")
+                    .defineInRange("range", 64, 1, 256);
+            statusPanelRefresh = b.comment("Ticks between reads of its machines (20 = every second).")
+                    .defineInRange("refreshTicks", 20, 1, 1_200);
             b.pop();
 
             b.comment("Herd Counter (counts the sheep in a pen in front of its screen, and puts any count on a comparator; needs no power)").push("herd_counter");

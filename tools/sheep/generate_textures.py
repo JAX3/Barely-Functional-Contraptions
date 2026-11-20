@@ -4654,6 +4654,32 @@ def generate_herd_counter_gui():
     img.save(out("gui/herd_counter.png"))
 
 
+def generate_status_panel():
+    """Machine Status Panel: a thin blue-steel frame round dark glass (its rows are drawn over it), bolts in the corners."""
+    base = "block/status_panel/"
+    os.makedirs(out(base), exist_ok=True)
+    front = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            if x in (0, 15) or y in (0, 15):
+                c = CARTOON["O"]
+            elif x == 1 or y == 1:
+                c = CARTOON["H"]
+            elif x == 14 or y == 14:
+                c = CARTOON["S"]
+            else:
+                c = hexc("#0d1118") if (x + y) % 6 else hexc("#121823")
+            front.putpixel((x, y), c)
+    for x, y in ((1, 1), (14, 1), (1, 14), (14, 14)):
+        front.putpixel((x, y), CARTOON["b"])
+    front.save(out(base + "front.png"))
+    back = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            back.putpixel((x, y), CARTOON["O"] if x in (0, 15) or y in (0, 15) else CARTOON["M"] if (x // 4 + y // 4) % 2 else CARTOON["S"])
+    back.save(out(base + "back.png"))
+
+
 def generate_static_generator_gui():
     """Static Generator window: energy gauge, then a panel with the herd and output, the dome's charge bar (the shock
     line marked) and four comb chips; the status lamp below."""
@@ -4740,6 +4766,7 @@ def main():
     generate_grass_seeder_gui()
     generate_herd_counter()
     generate_herd_counter_gui()
+    generate_status_panel()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

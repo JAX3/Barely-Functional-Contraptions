@@ -58,6 +58,10 @@ public class MyceliumWrenchItem extends Item {
      */
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        // Machine Status Panel: clicking one starts (or finishes) linking machines to it; while linking, clicking a
+        // machine links or unlinks it, before anything else the wrench or the machine would do.
+        InteractionResult panel = linkToPanel(stack, context);
+        if (panel != InteractionResult.PASS) return panel;
         // Energy Meter: the wrench flips it (sneak: turns it).
         if (context.getPlayer() != null && context.getLevel().getBlockState(context.getClickedPos()).getBlock()
                 instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock) {
@@ -78,6 +82,54 @@ public class MyceliumWrenchItem extends Item {
             return InteractionResult.PASS;
         }
         return handle(context);
+    }
+
+    private InteractionResult linkToPanel(ItemStack stack, UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Player player = context.getPlayer();
+        if (player == null) return InteractionResult.PASS;
+        boolean onPanel = level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity;
+        GlobalPos linking = stack.get(ModDataComponents.LINKING_PANEL.get());
+        if (!onPanel && linking == null) return InteractionResult.PASS;
+        if (level.isClientSide() || !(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
+        GlobalPos clicked = GlobalPos.of(level.dimension(), pos);
+        if (onPanel) {
+            if (clicked.equals(linking)) {
+                stack.remove(ModDataComponents.LINKING_PANEL.get());
+                ok(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.done"));
+            } else {
+                stack.set(ModDataComponents.LINKING_PANEL.get(), clicked);
+                ok(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.linking"));
+            }
+            level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 0.8F, 1.4F);
+            return InteractionResult.SUCCESS;
+        }
+        if (!linking.dimension().equals(level.dimension())
+                || !(level.getBlockEntity(linking.pos()) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel)) {
+            stack.remove(ModDataComponents.LINKING_PANEL.get());
+            fail(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.gone"));
+            return InteractionResult.SUCCESS;
+        }
+        var result = panel.toggleLink(serverLevel, pos);
+        Component name = level.getBlockState(pos).getBlock().getName();
+        switch (result) {
+            case LINKED -> {
+                ok(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.linked", name, panel.links().size(),
+                        com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.maxLinks()));
+                level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 0.8F, 1.8F);
+            }
+            case UNLINKED -> {
+                ok(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.unlinked", name));
+                level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.BLOCKS, 0.8F, 0.9F);
+            }
+            case FULL -> fail(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.full",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.maxLinks()));
+            case TOO_FAR -> fail(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.too_far",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.range()));
+            case NOT_A_MACHINE -> fail(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.not_a_machine", name));
+        }
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -254,7 +306,8 @@ public class MyceliumWrenchItem extends Item {
      */
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.has(ModDataComponents.SELECTED_GENERATOR.get()) || stack.has(ModDataComponents.LINK_GLOW_UNTIL.get());
+        return stack.has(ModDataComponents.SELECTED_GENERATOR.get()) || stack.has(ModDataComponents.LINK_GLOW_UNTIL.get())
+                || stack.has(ModDataComponents.LINKING_PANEL.get());
     }
 
     /** Ends the post-link glint once its time is up (server side; the change syncs to the client). */

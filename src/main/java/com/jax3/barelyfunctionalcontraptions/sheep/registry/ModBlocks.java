@@ -200,6 +200,13 @@ public final class ModBlocks {
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock::new,
                     p -> p.mapColor(MapColor.COLOR_ORANGE).strength(2.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion());
 
+    /** A wall screen showing how the machines linked to it are doing. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock> STATUS_PANEL =
+            REGISTER.registerBlock("status_panel",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock::new,
+                    p -> p.mapColor(MapColor.COLOR_BLUE).strength(1.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion()
+                            .lightLevel(state -> 4));
+
     /** Counts the sheep in the pen in front of its screen, and puts any count on a comparator. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock> HERD_COUNTER =
             REGISTER.registerBlock("herd_counter",

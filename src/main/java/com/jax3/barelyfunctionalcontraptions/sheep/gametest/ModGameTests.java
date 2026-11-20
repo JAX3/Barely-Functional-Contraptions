@@ -180,6 +180,7 @@ public final class ModGameTests {
         ECHO_TESTS.put("herd_counter_counts_its_pen", ModGameTests::herdCounterCounts);
         ECHO_TESTS.put("herd_counter_full_mode_waits_for_its_target", ModGameTests::herdCounterFull);
         ECHO_TESTS.put("herd_counter_double_counts_dashing_sheep_unless_steady", ModGameTests::herdCounterSteady);
+        ECHO_TESTS.put("status_panel_shows_its_linked_machines", ModGameTests::statusPanel);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -1638,6 +1639,52 @@ public final class ModGameTests {
             be.count(level, at, state);
         }
         h.assertTrue(be.value() == 1, "steady once it stops: 1, got " + be.value());
+        h.succeed();
+    }
+
+    /**
+     * A Machine Status Panel shows each machine linked to it with its status and key number, counts the ones with a
+     * problem on its comparator, reads a broken one as Missing, unlinks on a second click, refuses a block that isn't a
+     * machine, and holds 4.
+     */
+    private static void statusPanel(GameTestHelper h) {
+        var level = h.getLevel();
+        BlockPos base = h.absolutePos(new BlockPos(1, 1, 1));
+        for (BlockPos p : BlockPos.betweenClosed(base.offset(0, -1, 0), base.offset(5, -1, 5))) level.setBlockAndUpdate(p, Blocks.DIRT.defaultBlockState());
+        BlockPos panelPos = base.offset(0, 1, 0);
+        level.setBlockAndUpdate(panelPos, ModBlocks.STATUS_PANEL.get().defaultBlockState());
+        var panel = (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity) level.getBlockEntity(panelPos);
+        BlockPos furnace = base.offset(2, 0, 0), seeder = base.offset(4, 0, 3), cube = base.offset(2, 0, 3), stone = base.offset(0, 0, 4);
+        level.setBlockAndUpdate(furnace, ModBlocks.POWERED_FURNACE.get().defaultBlockState());
+        level.setBlockAndUpdate(seeder, ModBlocks.GRASS_SEEDER.get().defaultBlockState());
+        level.setBlockAndUpdate(cube, ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState());
+        level.setBlockAndUpdate(stone, Blocks.STONE.defaultBlockState());
+        ((com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity) level.getBlockEntity(seeder)).work(level, seeder); // bare dirt, no fuel
+        var LINKED = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.LinkResult.LINKED;
+        h.assertTrue(panel.toggleLink(level, furnace) == LINKED && panel.toggleLink(level, seeder) == LINKED && panel.toggleLink(level, cube) == LINKED,
+                "three machines linked");
+        h.assertTrue(panel.toggleLink(level, stone) == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.LinkResult.NOT_A_MACHINE,
+                "stone isn't a machine");
+        var rows = panel.rows();
+        h.assertTrue(rows.size() == 3, "three rows, got " + rows.size());
+        h.assertTrue(rows.get(0).name().equals(ModBlocks.POWERED_FURNACE.get().getDescriptionId()) && rows.get(0).report().status().equals("idle"),
+                "the furnace, idle: got " + rows.get(0));
+        h.assertTrue(rows.get(1).report().status().equals("no_fuel")
+                        && rows.get(1).report().level() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.Level.PROBLEM,
+                "the seeder, out of fuel (a problem): got " + rows.get(1).report());
+        h.assertTrue(rows.get(2).report().number().equals("0%"), "the cube, 0% stored: got " + rows.get(2).report());
+        h.assertTrue(panel.comparatorSignal() == 1, "one problem on its comparator, got " + panel.comparatorSignal());
+        level.setBlockAndUpdate(furnace, Blocks.AIR.defaultBlockState());
+        panel.refresh(level, panelPos, level.getBlockState(panelPos));
+        h.assertTrue(panel.rows().get(0).report().status().equals("missing") && panel.comparatorSignal() == 2, "the broken furnace reads Missing: two problems");
+        h.assertTrue(panel.toggleLink(level, furnace) == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.LinkResult.UNLINKED
+                && panel.rows().size() == 2, "a second click unlinks it");
+        BlockPos[] more = {base.offset(5, 0, 0), base.offset(5, 0, 1), base.offset(5, 0, 2)};
+        for (BlockPos m : more) level.setBlockAndUpdate(m, ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState());
+        panel.toggleLink(level, more[0]);
+        panel.toggleLink(level, more[1]);
+        h.assertTrue(panel.toggleLink(level, more[2]) == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.LinkResult.FULL,
+                "a panel holds 4");
         h.succeed();
     }
 

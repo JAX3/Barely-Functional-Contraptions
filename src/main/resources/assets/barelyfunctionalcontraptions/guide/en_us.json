@@ -423,6 +423,18 @@
       ]
     },
     {
+      "title": "Machine Status Panel",
+      "icon": "barelyfunctionalcontraptions:status_panel",
+      "tab": "utility",
+      "text": [
+        "A thin screen that hangs on a wall and shows how up to 4 machines are doing, all in one place. It needs no power.",
+        "- Link machines with the Barely Functional Wrench: click the panel with it (the wrench glows), then each machine within 64 blocks (again to unlink it), then the panel again to finish.",
+        "- Each machine gets two lines: its name with a lamp, then its status and one number that suits it (FE/t for a generator, progress or stored energy for the rest). Green is working, amber waiting, red a problem, grey idle. A machine that's been broken reads Missing.",
+        "- A comparator reads how many of its machines have a problem, up to 15: put a lamp or a bell on it for an alarm.",
+        "Right-click it with an empty hand to see how many machines it has."
+      ]
+    },
+    {
       "title": "Herd Counter",
       "icon": "barelyfunctionalcontraptions:herd_counter",
       "tab": "utility",

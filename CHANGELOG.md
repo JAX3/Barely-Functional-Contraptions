@@ -31,6 +31,14 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
   from three Copper Ingots and a Brush.
 - New config section `[static_generator]`.
 
+#### Machine Status Panel (utility)
+- A thin wall screen that shows how up to 4 machines are doing: their name, status (green working, amber waiting,
+  red a problem, grey idle) and one key number each. Link them with the Barely Functional Wrench (click the panel,
+  then each machine, then the panel). A broken machine reads Missing. No power.
+- A comparator reads how many of its machines have a problem, for an alarm.
+- **Recipe:** four Glass Panes, two Redstone, a Functional Machine Block, a Comparator and an Iron Ingot.
+- New config section `[status_panel]`, and a chapter in the Contraptions Manual (Utility).
+
 #### Herd Counter (utility)
 - A little screen that counts the sheep in the 7x7 pen in front of it every second, and puts the count on a comparator
   (1 a sheep, up to 15). It needs no power.

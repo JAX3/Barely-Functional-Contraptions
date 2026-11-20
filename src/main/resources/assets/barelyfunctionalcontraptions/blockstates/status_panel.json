@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "barelyfunctionalcontraptions:block/status_panel"
+    },
+    "facing=east": {
+      "model": "barelyfunctionalcontraptions:block/status_panel",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "barelyfunctionalcontraptions:block/status_panel",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "barelyfunctionalcontraptions:block/status_panel",
+      "y": 270
+    }
+  }
+}

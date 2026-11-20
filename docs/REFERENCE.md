@@ -1007,6 +1007,26 @@ O M C      O = Observer, M = Functional Machine Block, C = Comparator
 - **Advancement:** ⭐ *Count Your Sheep* (goal), for being near a Herd Counter counting 20 sheep at once.
 - Mine it with a pickaxe. **Config:** `[herd_counter]`: `radius` (3), `interval` (20 ticks), `signalPerSheep` (1), `lowInfusion` (0.25), `fullTarget` (6), `doubleCount` (true), `steadySeconds` (5).
 
+### Machine Status Panel
+A thin **wall screen** that shows how the machines linked to it are doing, all in one place. It needs no power.
+
+```
+G G G      G = Glass Pane
+R M R      R = Redstone, M = Functional Machine Block
+G C I      C = Comparator, I = Iron Ingot
+```
+
+| A panel on a wall, its alarm lamp lit | Its screen |
+|---|---|
+| ![A Machine Status Panel on a stone-brick wall, a comparator and lit redstone lamp in front of it, and the machines it shows round it: Hume Energy Cubes, a Grass Seeder on dirt, a Powered Furnace](screenshots/110_status_panel.png) | ![Its screen: Powered Furnace Working 100%, Grass Seeder No fuel 0/8 in red, Hume Energy Cube Stored 50%, Herd Counter Counting 3](screenshots/110_status_panel_close.png) |
+
+- **Placing it:** on a wall it faces out from the wall; on the ground it faces you.
+- **Linking:** with the **Barely Functional Wrench**: click the panel (the wrench glows), then each machine within **64 blocks** (`range`), again to unlink one, then the panel again to finish. A panel shows **4 machines** (`rowsPerPanel`). It refuses blocks that aren't machines, and says when it's full or a machine is too far.
+- **Its screen:** two lines for each machine: its name with a status lamp, then its **status** in colour and **one key number** that suits it (FE/t for generators; progress, stored energy, Ice made, wool held or grass for the rest). **Green** working, **amber** waiting (full, asleep, all green), **red** a problem (no power, no fuel, no water, output full, overcharged, overgrown...), **grey** idle. A broken machine reads *Missing*; one in an unloaded chunk *Out of range*. It reads its machines every second (`refreshTicks`).
+- **Comparator:** reads how many of its machines have a **problem**, up to 15, for an alarm lamp or bell.
+- **Machines it shows:** every generator (Blaze Sheep Furnace, Wool Burner, Thermal Reaction Chamber, Echo Chamber, Static Generator, Sheep Treadmill, Glow Panel, Mycelial Generator), the Powered Furnace, Snow Sheep Chiller, Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Herd Counter, Hume Energy Cubes, Energy Meter and Zero Point Energy Module.
+- Mine it with a pickaxe. **Config:** `[status_panel]`: `rowsPerPanel` (4), `range` (64), `refreshTicks` (20).
+
 ### Woollen Armour and Muffled
 A full armour set knitted from wool: the **Woollen Beanie** (helmet), **Woollen Jumper** (chestplate), **Woollen Leggings** and **Woollen Boots**.
 

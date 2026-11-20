@@ -20,6 +20,13 @@ public final class ModDataComponents {
                     .networkSynchronized(GlobalPos.STREAM_CODEC)
                     .build());
 
+    /** The Machine Status Panel a Barely Functional Wrench is linking machines to. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<GlobalPos>> LINKING_PANEL =
+            COMPONENTS.register("linking_panel", () -> DataComponentType.<GlobalPos>builder()
+                    .persistent(GlobalPos.CODEC)
+                    .networkSynchronized(GlobalPos.STREAM_CODEC)
+                    .build());
+
     /** Successful links made with a Barely Functional Wrench (for the configurable durability). */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> WRENCH_USES =
             COMPONENTS.register("wrench_uses", () -> DataComponentType.<Integer>builder()

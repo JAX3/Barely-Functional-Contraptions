@@ -232,6 +232,10 @@ public final class DevScreenshotHarness {
             echoChamberTick(mc, server);
             return;
         }
+        if ("status_panel".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            statusPanelTick(mc, server);
+            return;
+        }
         if ("herd_counter".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             herdCounterTick(mc, server);
             return;
@@ -3130,6 +3134,89 @@ public final class DevScreenshotHarness {
             case 274 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
             case 284 -> shot(mc, "109_herd_counter_jei");
             case 290 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    /**
+     * A Machine Status Panel on a stone wall, linked to a running Powered Furnace, a Grass Seeder out of fuel, a half-full
+     * Hume Energy Cube and a Herd Counter (that one through the real wrench clicks), with a comparator lighting a lamp
+     * while anything has a problem: {@code -PharnessScene=status_panel}.
+     */
+    private static void statusPanelTick(Minecraft mc, MinecraftServer server) {
+        BlockPos at = origin == null ? null : origin.offset(0, 0, -5);
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                BlockPos o = origin;
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, 0, -9), o.offset(7, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, -1, -9), o.offset(7, -1, 3))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-2, 0, -6), o.offset(2, 3, -6))) level.setBlock(p, Blocks.STONE_BRICKS.defaultBlockState(), 2);
+                BlockPos panel = o.offset(0, 0, -5);
+                level.setBlock(panel, ModBlocks.STATUS_PANEL.get().defaultBlockState()
+                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.FACING, Direction.SOUTH), 3);
+                // Its alarm: a comparator reading it, to a lamp that's lit while anything has a problem.
+                level.setBlock(panel.south(), Blocks.COMPARATOR.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.NORTH), 3);
+                level.setBlock(panel.south(2), Blocks.REDSTONE_LAMP.defaultBlockState(), 3);
+                // The machines.
+                BlockPos furnace = o.offset(-4, 0, -3), seeder = o.offset(4, 0, -3), cube = o.offset(-4, 0, 0), counter = o.offset(4, 0, 0);
+                level.setBlock(furnace, ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+                level.setBlock(furnace.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+                if (level.getBlockEntity(furnace) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity f) f.setItem(0, new ItemStack(Items.RAW_IRON, 64));
+                for (BlockPos p : BlockPos.betweenClosed(seeder.offset(-1, -1, -1), seeder.offset(1, -1, 1))) level.setBlock(p, Blocks.DIRT.defaultBlockState(), 2);
+                level.setBlock(seeder, ModBlocks.GRASS_SEEDER.get().defaultBlockState(), 3);
+                level.setBlock(cube, ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+                if (level.getBlockEntity(cube) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity c) {
+                    var handler = c.getEnergyHandler();
+                    for (int k = 0; k < 400 && handler.getAmountAsLong() < handler.getCapacityAsLong() / 2; k++) {
+                        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                            handler.insert((int) Math.min(Integer.MAX_VALUE, handler.getCapacityAsLong() / 2 - handler.getAmountAsLong()), tx);
+                            tx.commit();
+                        }
+                    }
+                }
+                level.setBlock(counter, ModBlocks.HERD_COUNTER.get().defaultBlockState()
+                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock.FACING, Direction.EAST), 3);
+                for (int i = 0; i < 3; i++) {
+                    Sheep sheep = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+                    sheep.snapTo(counter.getX() + 2.5 + i, counter.getY(), counter.getZ() + 0.5, 90, 0);
+                    sheep.setNoAi(true);
+                    level.addFreshEntity(sheep);
+                }
+                if (level.getBlockEntity(panel) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity be) {
+                    be.toggleLink(level, furnace);
+                    be.toggleLink(level, seeder);
+                    be.toggleLink(level, cube);
+                }
+                // The last one through the wrench, as a player does it: the panel, the machine, the panel.
+                ItemStack wrench = new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get());
+                player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, wrench);
+                for (BlockPos click : new BlockPos[]{panel, counter, panel}) {
+                    var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(click), Direction.UP, click, false);
+                    var result = wrench.getItem().onItemUseFirst(wrench, new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, hit));
+                    ResourcefulSheep.LOGGER.warn("PANEL wrench click on {}: {}", level.getBlockState(click).getBlock(), result);
+                }
+                player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 25", origin.getX() + 0.5, origin.getY() + 2.0, origin.getZ() + 2.5));
+            case 140 -> shot(mc, "110_status_panel");
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 12", at.getX() + 0.5, at.getY() - 0.9, at.getZ() + 1.9));
+            case 170 -> shot(mc, "110_status_panel_close");
+            case 172 -> server.execute(() -> {
+                ServerLevel level = server.overworld();
+                if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity be) {
+                    for (var row : be.rows()) ResourcefulSheep.LOGGER.warn("PANEL row {} {} {} {}", row.name(), row.report().status(), row.report().level(), row.report().number());
+                    ResourcefulSheep.LOGGER.warn("PANEL signal {} lamp {}", be.comparatorSignal(), level.getBlockState(at.south(2)));
+                }
+            });
+            case 176 -> mc.stop();
             default -> {}
         }
     }

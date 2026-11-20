@@ -87,6 +87,7 @@ public final class ContraptionsCreativeTab {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FUNCTIONAL_MACHINE_BLOCK,
                     com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HERD_COUNTER,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATUS_PANEL,
                     // Woollen Armour (white; craft or dye it for other colours)
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_HELMET,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_CHESTPLATE,
