@@ -42,6 +42,9 @@ public final class ModMenus {
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.ChillerMenu>> CHILLER = REGISTER.register("chiller",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.ChillerMenu::new));
 
+    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.GrassSeederMenu>> GRASS_SEEDER = REGISTER.register("grass_seeder",
+            () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.GrassSeederMenu::new));
+
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolBurnerMenu>> WOOL_BURNER = REGISTER.register("wool_burner",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolBurnerMenu::new));
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.ThermalReactionChamberMenu>> THERMAL_REACTION_CHAMBER = REGISTER.register("thermal_reaction_chamber",

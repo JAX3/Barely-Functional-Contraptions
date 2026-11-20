@@ -5,14 +5,11 @@ import com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -57,12 +54,18 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * Its comparator signal reads how green its area is.
  */
-public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContainer, AreaDisplay {
+public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
     public static final int AREA_COLOR = 0xFF6FCF4A;
+    /** The ground map in its window covers areas up to 7x7 (radius 3), two bits a block, seven blocks to a value. */
+    public static final int MAP_MAX = 7, MAP_VALUES = 7, MAP_PER_VALUE = 7;
+    /** What a block on the ground map is. */
+    public static final int TILE_OTHER = 0, TILE_DIRT = 1, TILE_GRASS = 2, TILE_SHORT = 3;
+    /** Values synced to the window ({@link com.jax3.barelyfunctionalcontraptions.sheep.menu.GrassSeederMenu}). */
+    public static final int DATA_COUNT = 18 + MAP_VALUES;
     private static final int[] SLOTS = {0};
     public static final FluidResource WATER = FluidResource.of(Fluids.WATER);
 
-    /** What it's doing, for its readout and its sprinkler. */
+    /** What it's doing, for its window, Jade and its sprinkler. */
     public enum Status {
         /** Turning dirt back to grass or growing short grass. */
         TENDING(0xFF8FE07A),
@@ -78,6 +81,11 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
         Status(int color) {
             this.color = color;
         }
+
+        public static Status byId(int id) {
+            Status[] all = values();
+            return all[Math.floorMod(id, all.length)];
+        }
     }
 
     private final SeederEnergy energy = new SeederEnergy();
@@ -92,6 +100,46 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
     /** Blocks it has tended in all. */
     private long tended;
     private int lastSignal;
+    /** Sheared, grown sheep in its area at the last check. */
+    private int grazing;
+    private final int[] map = new int[MAP_VALUES];
+
+    private final net.minecraft.world.inventory.ContainerData data = new net.minecraft.world.inventory.ContainerData() {
+        @Override
+        public int get(int index) {
+            if (index >= 18) return map[index - 18];
+            long tendedCapped = Math.min(Integer.MAX_VALUE, tended);
+            return switch (index) {
+                case 0 -> energy.getAmountAsInt() & 0xFFFF;
+                case 1 -> energy.getAmountAsInt() >>> 16;
+                case 2 -> energy.getCapacityAsInt() & 0xFFFF;
+                case 3 -> energy.getCapacityAsInt() >>> 16;
+                case 4 -> tank.getAmount() & 0xFFFF;
+                case 5 -> tank.getAmount() >>> 16;
+                case 6 -> tank.capacity() & 0xFFFF;
+                case 7 -> tank.capacity() >>> 16;
+                case 8 -> status.ordinal();
+                case 9 -> showArea ? 1 : 0;
+                case 10 -> grass;
+                case 11 -> dirt;
+                case 12 -> shortGrass;
+                case 13 -> boneCharges;
+                case 14 -> radius();
+                case 15 -> grazing;
+                case 16 -> (int) (tendedCapped & 0xFFFF);
+                case 17 -> (int) (tendedCapped >>> 16);
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int index, int value) {}
+
+        @Override
+        public int getCount() {
+            return DATA_COUNT;
+        }
+    };
 
     public GrassSeederBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.GRASS_SEEDER.get(), pos, state);
@@ -176,6 +224,7 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
                 else if (above.isAir()) plantable.add(p);
             }
         }
+        grazing = level.getEntitiesOfClass(Sheep.class, area(pos), s -> s.isAlive() && s.isSheared() && !s.isBaby()).size();
         BlockPos target = null;
         boolean regrass = false;
         if (!bare.isEmpty()) {
@@ -204,6 +253,30 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
             setChanged();
         }
         if (status != Status.NO_FUEL && hasFuel()) graze(level, pos);
+        updateMap(level, pos);
+    }
+
+    /** What each block of its ground is, for the map in its window (areas up to {@link #MAP_MAX} across). */
+    private void updateMap(ServerLevel level, BlockPos pos) {
+        java.util.Arrays.fill(map, 0);
+        int r = radius();
+        if (r * 2 + 1 > MAP_MAX) return;
+        int i = 0;
+        for (int dz = -r; dz <= r; dz++) {
+            for (int dx = -r; dx <= r; dx++, i++) {
+                if (dx == 0 && dz == 0) continue;
+                BlockPos p = pos.offset(dx, -1, dz);
+                BlockState state = level.getBlockState(p);
+                int tile = state.is(Blocks.DIRT) ? TILE_DIRT
+                        : state.is(Blocks.GRASS_BLOCK) ? (level.getBlockState(p.above()).is(Blocks.SHORT_GRASS) ? TILE_SHORT : TILE_GRASS) : TILE_OTHER;
+                map[i / MAP_PER_VALUE] |= tile << ((i % MAP_PER_VALUE) * 2);
+            }
+        }
+    }
+
+    /** The tile at {@code index} (row by row from the north-west) of a packed ground map. */
+    public static int tile(int[] packed, int index) {
+        return (packed[index / MAP_PER_VALUE] >> ((index % MAP_PER_VALUE) * 2)) & 3;
     }
 
     /** Sheared, grown sheep in its area graze sooner: they eat the short grass or the grass under them, and regrow. */
@@ -286,6 +359,21 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
         return boneCharges;
     }
 
+    /** Sheared, grown sheep in its area at the last check. */
+    public int grazing() {
+        return grazing;
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("block.barelyfunctionalcontraptions.grass_seeder");
+    }
+
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int containerId, net.minecraft.world.entity.player.Inventory inventory, Player player) {
+        return new com.jax3.barelyfunctionalcontraptions.sheep.menu.GrassSeederMenu(containerId, inventory, this, data);
+    }
+
     public ItemStack boneMeal() {
         return boneMeal;
     }
@@ -322,17 +410,6 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
         if (tank.capacity() - tank.getAmount() < 1000) return false;
         tank.fill(1000);
         return true;
-    }
-
-    /** One line on how it's doing, for a right-click: its status, how green its area is, and its fuel. */
-    public Component describe() {
-        String key = "message.barelyfunctionalcontraptions.grass_seeder.";
-        MutableComponent line = Component.translatable(key + "status." + status.name().toLowerCase(Locale.ROOT)).withColor(status.color);
-        line.append(Component.literal("  ")).append(Component.translatable(key + "grass", grass, grass + dirt).withStyle(ChatFormatting.GREEN));
-        line.append(Component.literal("  ")).append(Component.translatable(key + "bone_meal", boneMeal.getCount(), boneCharges).withStyle(ChatFormatting.GRAY));
-        line.append(Component.literal("  ")).append(Component.translatable(key + "power",
-                String.format(Locale.ROOT, "%,d", energy.getAmountAsInt()), String.format(Locale.ROOT, "%,d", tank.getAmount())).withStyle(ChatFormatting.GRAY));
-        return line;
     }
 
     @Override

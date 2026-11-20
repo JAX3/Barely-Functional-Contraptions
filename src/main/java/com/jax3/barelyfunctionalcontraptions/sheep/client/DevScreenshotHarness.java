@@ -1667,8 +1667,8 @@ public final class DevScreenshotHarness {
      * saves: {@code -PharnessScene=extend_world -PharnessWorld="BFC Test World"}. With no scenes listed it only drains.
      */
     private static final Object[][] EXTRA_SCENES = {
-            // Every cell up to (1, 5) is taken; (2, 5), (3, 5) and (4, 5) are free. For example:
-            // {"next contraption", 2, 5},
+            // Every cell up to (1, 5) is taken, and (2, 5) by the Grass Seeder; (3, 5) and (4, 5) are free.
+            {"grass seeder", 2, 5},
     };
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
@@ -2170,6 +2170,51 @@ public final class DevScreenshotHarness {
                 .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN, Direction.EAST), 3);
         for (int z = -5; z <= -2; z++) for (int y = 0; y <= 1; y++) level.setBlock(g.offset(0, y, z), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
         label(server, g.above(3), "Static Generator", "gold");
+    }
+
+    /**
+     * The Grass Seeder for the test world: one in the middle of a fenced 5x5 pen of grass eaten into patches of dirt,
+     * with a gate at the front, 64 Bone Meal, its area outlined, and four plain sheep free to wander and graze. Automatic
+     * Shears in the back fence (powered by a Creative Generator behind them) shear the sheep that wander in front of
+     * them, and the Seeder gets them grazing and regrowing their wool: the pen runs itself.
+     */
+    private static void seederWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin, g = o.offset(0, 0, -3);
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-6, 0, -6), g.offset(6, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        var rnd = new java.util.Random(8);
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-6, -1, -6), g.offset(6, -1, 6))) {
+            boolean inPen = Math.abs(p.getX() - g.getX()) <= 2 && Math.abs(p.getZ() - g.getZ()) <= 2;
+            level.setBlock(p, (inPen && rnd.nextInt(5) < 2 ? Blocks.DIRT : Blocks.GRASS_BLOCK).defaultBlockState(), 2);
+        }
+        level.setBlock(g, ModBlocks.GRASS_SEEDER.get().defaultBlockState(), 3);
+        if (level.getBlockEntity(g) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity be) {
+            be.setShowsArea(true);
+            be.insertBoneMeal(new ItemStack(Items.BONE_MEAL, 64));
+        }
+        // The fence round the pen, a gate at the front, and the shears in the middle of the back.
+        var fence = Blocks.OAK_FENCE.defaultBlockState();
+        for (int d = -3; d <= 3; d++) {
+            level.setBlock(g.offset(-3, 0, d), fence, 3);
+            level.setBlock(g.offset(3, 0, d), fence, 3);
+            if (d != 0) level.setBlock(g.offset(d, 0, -3), fence, 3);
+            level.setBlock(g.offset(d, 0, 3), d == 0 ? Blocks.OAK_FENCE_GATE.defaultBlockState() : fence, 3);
+        }
+        level.setBlock(g.offset(0, 0, -3), ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.SOUTH), 3);
+        level.setBlock(g.offset(0, 0, -4), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+        for (double[] p : new double[][]{{-1.5, -1.2}, {1.6, -0.9}, {-1.2, 1.7}, {1.4, 1.5}}) {
+            Sheep sheep = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            sheep.snapTo(g.getX() + 0.5 + p[0], g.getY(), g.getZ() + 0.5 + p[1], (float) (p[0] * 60), 0);
+            sheep.setPersistenceRequired();
+            level.addFreshEntity(sheep);
+        }
+        label(server, g.above(3), "Grass Seeder", "green");
     }
 
     /** Swaps the redstone block that started the Echo Chamber's clock back for stone, leaving the pulse going round. */
@@ -2795,40 +2840,76 @@ public final class DevScreenshotHarness {
             case 62 -> setHudHidden(mc, true);
             case 64 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 160 40", origin.getX() + 2.5, origin.getY() + 3.5, origin.getZ() + 1.5));
             case 90 -> shot(mc, "108_grass_seeder_bare");
+            // Its window on the bare pen, with some power and water in as well as its Bone Meal.
+            case 92 -> {
+                command(server, "gamemode creative @a");
+                server.execute(() -> {
+                    if (server.overworld().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity be) {
+                        be.fillEnergy();
+                        be.getTank().fill(2_500);
+                        be.work(server.overworld(), at);
+                    }
+                });
+            }
+            case 98 -> openSeederWindow(server, at);
+            case 104 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 110 -> shot(mc, "108_grass_seeder_gui_bare");
+            case 112 -> McClient.setScreen(mc, null);
             // Hurry it along: tend a block every few ticks (the sheep graze as they would).
-            case 92 -> server.execute(() -> {
-                ServerLevel level = server.overworld();
-                if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity be) {
-                    for (int i = 0; i < 26; i++) be.work(level, at);
-                }
-            });
+            case 114 -> {
+                command(server, "gamemode spectator @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 160 40", origin.getX() + 2.5, origin.getY() + 3.5, origin.getZ() + 1.5));
+                server.execute(() -> {
+                    ServerLevel level = server.overworld();
+                    if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity be) {
+                        for (int i = 0; i < 26; i++) be.work(level, at);
+                    }
+                });
+            }
             case 140 -> shot(mc, "108_grass_seeder");
             case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 160 30", origin.getX() + 1.0, origin.getY() + 0.9, origin.getZ() - 1.6));
             case 170 -> shot(mc, "108_grass_seeder_close");
             case 172 -> server.execute(() -> {
                 ServerLevel level = server.overworld();
                 if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity be) {
-                    ResourcefulSheep.LOGGER.warn("SEEDER {} grass {} dirt {} short {} tended {} bone {}+{} sheared sheep left {}", be.status(), be.grass(), be.dirt(),
-                            be.shortGrass(), be.tended(), be.boneMeal().getCount(), be.boneCharges(),
+                    ResourcefulSheep.LOGGER.warn("SEEDER {} grass {} dirt {} short {} tended {} bone {}+{} grazing {} sheared sheep left {}", be.status(), be.grass(), be.dirt(),
+                            be.shortGrass(), be.tended(), be.boneMeal().getCount(), be.boneCharges(), be.grazing(),
                             level.getEntitiesOfClass(Sheep.class, new net.minecraft.world.phys.AABB(at).inflate(4), Sheep::isSheared).size());
-                    ResourcefulSheep.LOGGER.warn("SEEDER readout: {}", be.describe().getString());
                 }
             });
-            // Its readout, as a right-click shows it.
+            // Its window again, green, then Jade on it, then its JEI page and recipe.
             case 174 -> {
                 command(server, "gamemode creative @a");
                 command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 35", origin.getX() + 0.5, origin.getY() + 0.0, origin.getZ() - 1.5));
             }
-            case 180 -> { setHudHidden(mc, false); server.execute(() -> {
-                ServerLevel level = server.overworld();
-                if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity be) {
-                    server.getPlayerList().getPlayers().getFirst().sendOverlayMessage(be.describe());
+            case 180 -> openSeederWindow(server, at);
+            case 186 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 192 -> shot(mc, "108_grass_seeder_gui");
+            case 194 -> { McClient.setScreen(mc, null); setHudHidden(mc, false); McClient.clearChat(mc); }
+            case 210 -> shot(mc, "108_grass_seeder_jade");
+            case 212 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showGrassSeeder();
+            }
+            case 220 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 230 -> shot(mc, "108_grass_seeder_jei");
+            case 232 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
+                    com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.show(new ItemStack(ModItems.GRASS_SEEDER.get()), true);
                 }
-            }); }
-            case 186 -> shot(mc, "108_grass_seeder_readout");
-            case 190 -> mc.stop();
+            }
+            case 240 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 250 -> shot(mc, "108_grass_seeder_jei_recipe");
+            case 256 -> mc.stop();
             default -> {}
         }
+    }
+
+    private static void openSeederWindow(MinecraftServer server, BlockPos at) {
+        server.execute(() -> {
+            if (server.overworld().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity be) {
+                server.getPlayerList().getPlayers().getFirst().openMenu(be, be.getBlockPos());
+            }
+        });
     }
 
     private static void openStaticWindow(MinecraftServer server, BlockPos at) {
@@ -2869,7 +2950,7 @@ public final class DevScreenshotHarness {
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
         // The whole square platform from above its south edge and from straight overhead, then the latest scene.
-        String[] tps = {"tp @a 73.5 95 205.5 180 40", "tp @a 73.5 175 97 180 90", "tp @a 45.5 46 66 180 35", "tp @a 31.5 44 176 180 30"};
+        String[] tps = {"tp @a 73.5 95 205.5 180 40", "tp @a 73.5 175 97 180 90", "tp @a 73.5 41 163.5 180 38", "tp @a 80.5 39 160.5 125 28"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -2885,6 +2966,15 @@ public final class DevScreenshotHarness {
         if (tick == report) {
             server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                if (level.getBlockEntity(new BlockPos(73, 35, 154)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity seeder) {
+                    ResourcefulSheep.LOGGER.warn("TOUR seeder {} grass {}/{} short {} tended {} grazing {} bone {}+{}", seeder.status(), seeder.grass(),
+                            seeder.grass() + seeder.dirt(), seeder.shortGrass(), seeder.tended(), seeder.grazing(), seeder.boneMeal().getCount(), seeder.boneCharges());
+                }
+                if (level.getBlockEntity(new BlockPos(73, 35, 151)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity shears) {
+                    int wool = 0;
+                    for (int i = 0; i < shears.getContainerSize(); i++) wool += shears.getItem(i).getCount();
+                    ResourcefulSheep.LOGGER.warn("TOUR shears hold {} wool", wool);
+                }
                 if (level.getBlockEntity(new BlockPos(17, 35, 154)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity be) {
                     ResourcefulSheep.LOGGER.warn("TOUR static {} {} FE/t, {} sheep, {} combs, comb wear {}", be.state(), be.generating(), be.herd(),
                             be.combs().size(), be.combs().isEmpty() ? 0 : be.wear(be.combs().getFirst()));
@@ -3143,7 +3233,8 @@ public final class DevScreenshotHarness {
                     // wither rose in its catalyst slots 2 and 3) and chillerScene here.
                     // poweredFurnaceScene, woollenArmorScene, sheepTreadmillScene, oreLineScene, thermalWorldScene,
                     // echoWorldScene (then echoWorldKick, two ticks later) and staticWorldScene, all since moved onto
-                    // the square platform by squareWorld. The next new scene's builder goes here.
+                    // the square platform by squareWorld.
+                    seederWorldScene(server);
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
                 });
             }

@@ -35,6 +35,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(ThermalReactionChamberProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.class);
         registration.registerBlockDataProvider(EchoChamberProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.class);
         registration.registerBlockDataProvider(StaticGeneratorProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.class);
+        registration.registerBlockDataProvider(GrassSeederProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.class);
         registration.registerEntityDataProvider(ThermalFatigueProvider.Server.INSTANCE, net.minecraft.world.entity.animal.sheep.Sheep.class);
     }
 
@@ -58,6 +59,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         EchoChamberProvider.redirect(registration);
         registration.registerBlockComponent(StaticGeneratorProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.class);
         StaticGeneratorProvider.redirect(registration);
+        registration.registerBlockComponent(GrassSeederProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.GrassSeederBlock.class);
         registration.registerEntityComponent(ThermalFatigueProvider.Client.INSTANCE, net.minecraft.world.entity.animal.sheep.Sheep.class);
     }
 }

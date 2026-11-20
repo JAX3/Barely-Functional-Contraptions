@@ -4551,6 +4551,49 @@ def generate_grass_seeder():
     brass.save(out(base + "brass.png"))
 
 
+def generate_grass_seeder_gui():
+    """Grass Seeder window: energy and water gauges, a map of its ground, a grass bar under it, an info panel with the
+    Bone Meal slot, the status lamp and the player inventory."""
+    shears = Image.open(out("gui/automatic_shears.png")).convert("RGBA")
+    sep = Image.open(out("gui/mechanical_separator.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 8, 18, 24, 84, GUI["gauge"])           # energy, fill 14x64 at (9, 19)
+    inset(img, 26, 18, 42, 84, GUI["gauge"])          # water, fill 14x64 at (27, 19)
+    for k in range(1, 4):
+        ty = 19 + round(64 * k / 4)
+        for x in list(range(19, 23)) + list(range(37, 41)):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 46, 18, 99, 71, GUI["gauge"])          # ground map, 51x51 at (47, 19)
+    inset(img, 46, 74, 99, 84, GUI["gauge"])          # grass bar, 51x8 at (47, 75)
+    inset(img, 102, 18, 170, 84, GUI["panel"])        # info panel
+    slot(img, 128, 22)                                # Bone Meal
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    rnd = random.Random(31)
+    for x in range(4, 172):                           # a fringe of grass along the bottom edge
+        if rnd.random() < 0.35:
+            img.putpixel((x, 190), rnd.choice([hexc("#3f7a2a"), hexc("#5aa13a"), hexc("#7cc24e")]))
+    # ---- sprites ----
+    img.paste(sep.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    img.paste(shears.crop((176, 64, 208, 80)), (176, 146))          # area button background, normal and hovered
+    for y in range(64):
+        for x in range(14):
+            e = mix(hexc("#ffd84a"), hexc("#d0601c"), y / 63.0)     # energy: amber, deeper at the bottom
+            if (x * 2 + y) % 9 == 0:
+                e = mix(e, hexc("#fff0a0"), 0.35)
+            img.putpixel((176 + x, y), e)
+            w = mix(hexc("#2f6fd0"), hexc("#163a8a"), y / 63.0)     # water: deep blue, lighter at the top
+            if (x * 3 + y) % 11 == 0:
+                w = mix(w, hexc("#7fb8ff"), 0.35)
+            img.putpixel((192 + x, y), w)
+    img.save(out("gui/grass_seeder.png"))
+
+
 def generate_static_generator_gui():
     """Static Generator window: energy gauge, then a panel with the herd and output, the dome's charge bar (the shock
     line marked) and four comb chips; the status lamp below."""
@@ -4634,6 +4677,7 @@ def main():
     generate_static_generator()
     generate_static_generator_gui()
     generate_grass_seeder()
+    generate_grass_seeder_gui()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

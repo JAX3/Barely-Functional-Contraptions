@@ -103,6 +103,14 @@ public final class JeiDevHook {
         return true;
     }
 
+    /** Opens the Grass Seeder page. */
+    public static boolean showGrassSeeder() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        rt.getRecipesGui().showTypes(java.util.List.of(GrassSeederCategory.TYPE));
+        return true;
+    }
+
     /** Opens the Echo Chamber page. */
     public static boolean showEcho() {
         IJeiRuntime rt = runtime;

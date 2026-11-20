@@ -39,7 +39,7 @@ import org.jspecify.annotations.Nullable;
  * <ul>
  *     <li>right-click with Bone Meal to load it, or with a Water Bucket to pour water in;</li>
  *     <li>sneak-right-click with an empty hand to show or hide its area;</li>
- *     <li>right-click with an empty hand to see how it's doing.</li>
+ *     <li>right-click with an empty hand to open its window.</li>
  * </ul>
  */
 public class GrassSeederBlock extends BaseEntityBlock {
@@ -107,7 +107,7 @@ public class GrassSeederBlock extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof GrassSeederBlockEntity be)) return InteractionResult.SUCCESS;
         if (player.isSecondaryUseActive()) be.toggleArea(player);
-        else player.sendOverlayMessage(be.describe());
+        else player.openMenu(be, pos);
         return InteractionResult.SUCCESS;
     }
 

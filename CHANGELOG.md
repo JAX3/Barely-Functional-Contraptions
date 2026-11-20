@@ -36,7 +36,10 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
   grows short grass on up to 40% of it. While it has fuel, sheared sheep in its area graze four times as often, so
   their wool grows back much sooner.
 - **Fuel:** Bone Meal (8 blocks each), or 800 FE and 10 mB of water a block, which it uses first.
-- Right-click it for a readout; sneak-right-click to outline its area; a comparator reads how green it is.
+- **Window:** energy and water gauges, a map of its ground, how green it is, its Bone Meal and the sheep grazing.
+  **JEI:** a Grass Seeder page and an information page. **Jade:** its status, grass, sheep grazing and open Bone Meal.
+- Sneak-right-click to outline its area; a comparator reads how green it is.
+- **Test world:** a Grass Seeder pen with Automatic Shears, which runs itself.
 - **Recipe:** Wheat Seeds, a Composter, two Bone Blocks, a Functional Machine Block, two Iron Ingots and a Hopper.
 - New config section `[grass_seeder]`, and a chapter in the Contraptions Manual (Production).
 

@@ -418,7 +418,7 @@
         "- While it has fuel, sheared sheep standing in its area graze four times as often, so their wool comes back much sooner. Sheep with their fleece on are left alone.",
         "- Fuel: right-click it with Bone Meal (one tends 8 blocks), or feed it from a hopper or pipe. Or give it FE and water: 800 FE and 10 mB a block, from cables, pipes or a Water Bucket. It uses power and water first and saves its Bone Meal.",
         "- A comparator reads how green its area is.",
-        "Right-click it with an empty hand to see how it's doing: its status, how much of its ground is grass, and its fuel. Sneak-right-click with an empty hand to outline its area. It pairs well with Automatic Shears on the same pen, and with a Static Generator, whose sheep only count with their fleece on."
+        "Right-click it with an empty hand to open its window: power and water, a map of its ground (grass, short grass, bare dirt), how green it is, its Bone Meal, and how many sheep are grazing. Its spyglass button, or a sneak-right-click with an empty hand, outlines its area. It pairs well with Automatic Shears on the same pen, and with a Static Generator, whose sheep only count with their fleece on."
       ]
     },
     {
