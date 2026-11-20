@@ -224,7 +224,9 @@ public class StatusPanelBlockEntity extends BlockEntity implements net.minecraft
     }
 
     /** Links {@code machine} to it, or unlinks it if it's linked already. */
-    public LinkResult toggleLink(ServerLevel level, BlockPos machine) {
+    public LinkResult toggleLink(ServerLevel level, BlockPos clicked) {
+        // Any block of a bigger machine links the machine: its dome, its core, its back.
+        BlockPos machine = MachineReports.machinePos(level, clicked);
         int index = indexOf(machine);
         if (index >= 0) {
             links.remove(index);

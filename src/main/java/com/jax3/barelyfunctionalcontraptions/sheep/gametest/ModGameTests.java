@@ -183,6 +183,7 @@ public final class ModGameTests {
         ECHO_TESTS.put("status_panel_shows_its_linked_machines", ModGameTests::statusPanel);
         ECHO_TESTS.put("status_panels_join_into_one_screen_up_to_3x3", ModGameTests::statusPanelJoin);
         ECHO_TESTS.put("status_panel_window_names_orders_and_alerts", ModGameTests::statusPanelWindow);
+        ECHO_TESTS.put("status_panel_links_big_machines_from_any_of_their_blocks", ModGameTests::statusPanelBigMachines);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -1785,6 +1786,47 @@ public final class ModGameTests {
             h.assertTrue(panel.rows().stream().noneMatch(r -> r.link() == 0 && !r.custom().isEmpty()), "an empty name: its own name again");
             h.succeed();
         });
+    }
+
+    /**
+     * A Static Generator links from its dome as well as its base (both are one machine: the second click unlinks it), and
+     * an Echo Chamber from any of its blocks.
+     */
+    private static void statusPanelBigMachines(GameTestHelper h) {
+        var level = h.getLevel();
+        BlockPos base = h.absolutePos(new BlockPos(1, 1, 1));
+        level.setBlockAndUpdate(base, ModBlocks.STATUS_PANEL.get().defaultBlockState());
+        var panel = (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity) level.getBlockEntity(base);
+        BlockPos generator = base.offset(3, 0, 0);
+        var gen = ModBlocks.STATIC_GENERATOR.get().defaultBlockState();
+        level.setBlockAndUpdate(generator, gen);
+        level.setBlockAndUpdate(generator.above(), gen.setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.HALF,
+                net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+        var LINKED = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.LinkResult.LINKED;
+        var UNLINKED = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.LinkResult.UNLINKED;
+        h.assertTrue(panel.toggleLink(level, generator.above()) == LINKED && panel.links().equals(java.util.List.of(generator)),
+                "the dome links the generator (its base): got " + panel.links());
+        h.assertTrue(panel.rows().get(0).name().equals(ModBlocks.STATIC_GENERATOR.get().getDescriptionId()), "it shows the Static Generator");
+        h.assertTrue(panel.toggleLink(level, generator) == UNLINKED && panel.links().isEmpty(), "the base is the same machine: unlinked");
+        // And with the wrench, the way a player does it: the panel, the dome, the panel again.
+        var player = net.neoforged.neoforge.common.util.FakePlayerFactory.getMinecraft(level);
+        player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(base.south(2)));
+        ItemStack wrench = new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get());
+        player.setItemInHand(InteractionHand.MAIN_HAND, wrench);
+        for (BlockPos click : new BlockPos[]{base, generator.above(), base}) {
+            var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(click), Direction.NORTH, click, false);
+            player.gameMode.useItemOn(player, level, wrench, InteractionHand.MAIN_HAND, hit);
+        }
+        h.assertTrue(panel.links().equals(java.util.List.of(generator)), "a wrench click on the dome links it: got " + panel.links());
+        panel.toggleLink(level, generator);
+        BlockPos front = base.offset(5, 0, 0);
+        com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.fill(level, front, ModBlocks.ECHO_CHAMBER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.FACING, Direction.SOUTH));
+        BlockPos corner = front.offset(1, 2, 0);
+        h.assertTrue(level.getBlockState(corner).is(ModBlocks.ECHO_CHAMBER.get()), "the chamber's top corner");
+        h.assertTrue(panel.toggleLink(level, corner) == LINKED && panel.rows().get(0).name().equals(ModBlocks.ECHO_CHAMBER.get().getDescriptionId()),
+                "a corner of the Echo Chamber links it: got " + panel.links());
+        h.succeed();
     }
 
     /** Full mode reads 0 until it counts its target, then 15. */

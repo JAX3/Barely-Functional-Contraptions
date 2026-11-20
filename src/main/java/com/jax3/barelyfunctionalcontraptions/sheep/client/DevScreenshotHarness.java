@@ -2336,7 +2336,7 @@ public final class DevScreenshotHarness {
                 }
             }
         }
-        nearest.values().stream().sorted(java.util.Comparator.comparingDouble(p -> p.distSqr(topLeft))).limit(14)
+        nearest.values().stream().sorted(java.util.Comparator.comparingDouble(p -> p.distSqr(topLeft))).limit(20)
                 .forEach(p -> panel.toggleLink(level, p));
         label(server, g.above(4).relative(Direction.NORTH, 2), "Machine Status Panel", "aqua");
         ResourcefulSheep.LOGGER.info("EXTEND status panel linked {} machines: {}", panel.links().size(), panel.rows().stream()

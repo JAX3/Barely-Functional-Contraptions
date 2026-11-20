@@ -72,6 +72,25 @@ public final class MachineReports {
         return percent(energy.getAmountAsLong(), energy.getCapacityAsLong());
     }
 
+    /**
+     * The block that holds a machine's block entity, from any of its blocks: a Static Generator's base from its dome, an
+     * Echo Chamber's core from any of its 27 blocks, a Sheep Treadmill's back from its front. Anything else: itself.
+     */
+    public static net.minecraft.core.BlockPos machinePos(net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos) {
+        var state = level.getBlockState(pos);
+        var block = state.getBlock();
+        if (block instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock) {
+            return com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.base(pos, state);
+        }
+        if (block instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock) {
+            return com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.core(pos, state);
+        }
+        if (block instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock) {
+            return com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.back(pos, state);
+        }
+        return pos;
+    }
+
     /** Whether a panel can show {@code be}. */
     public static boolean supports(@Nullable BlockEntity be) {
         return report(be) != null;

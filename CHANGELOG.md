@@ -44,7 +44,9 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 - **JEI:** a Machine Status Panel page and an information page. **Jade:** machines linked, screen size, problems and the
   first two, and its signal.
 - **Advancement:** *Mission Control* (goal), for linking 8 machines to one screen.
-- **Test world:** a 3x3 screen in the last cell, showing 13 of the machines round it on the platform.
+- **Test world:** a 3x3 screen in the last cell, showing 20 of the machines on the platform.
+- **Range:** machines link from up to 128 blocks away (was 64), so a panel reaches across a base: the Static Generator
+  at the far side of the test world was too far to link. A config file made before keeps its old `range`.
 - **Recipe:** four Glass Panes, two Redstone, a Functional Machine Block, a Comparator and an Iron Ingot.
 - New config section `[status_panel]`, and a chapter in the Contraptions Manual (Utility).
 
