@@ -21,6 +21,8 @@
     "barelyfunctionalcontraptions:thermal_reaction_chamber",
     "barelyfunctionalcontraptions:powered_furnace",
     "barelyfunctionalcontraptions:sheep_treadmill",
-    "barelyfunctionalcontraptions:echo_chamber"
+    "barelyfunctionalcontraptions:echo_chamber",
+    "barelyfunctionalcontraptions:static_generator",
+    "barelyfunctionalcontraptions:copper_comb"
   ]
 }

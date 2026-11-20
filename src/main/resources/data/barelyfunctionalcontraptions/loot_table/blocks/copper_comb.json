@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "barelyfunctionalcontraptions:copper_comb",
+          "modifier": {
+            "type": "minecraft:copy_state",
+            "block": "barelyfunctionalcontraptions:copper_comb",
+            "properties": [
+              "age",
+              "waxed"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "random_sequence": "barelyfunctionalcontraptions:blocks/copper_comb"
+}

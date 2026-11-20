@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "I": "minecraft:copper_ingot",
+    "B": "minecraft:brush"
+  },
+  "pattern": [
+    "III",
+    " B "
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:copper_comb"
+  }
+}

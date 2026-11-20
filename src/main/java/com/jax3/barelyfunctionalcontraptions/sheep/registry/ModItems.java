@@ -48,6 +48,8 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> HUME_FIELD_GENERATOR = ModBlocks.HUME_FIELD_GENERATOR == null ? null
             : REGISTER.registerSimpleBlockItem(ModBlocks.HUME_FIELD_GENERATOR);
     public static final DeferredItem<BlockItem> ECHO_CHAMBER = REGISTER.registerSimpleBlockItem(ModBlocks.ECHO_CHAMBER);
+    public static final DeferredItem<BlockItem> STATIC_GENERATOR = REGISTER.registerSimpleBlockItem(ModBlocks.STATIC_GENERATOR);
+    public static final DeferredItem<BlockItem> COPPER_COMB = REGISTER.registerSimpleBlockItem(ModBlocks.COPPER_COMB);
     public static final DeferredItem<BlockItem> SHEEP_TREADMILL = REGISTER.registerSimpleBlockItem(ModBlocks.SHEEP_TREADMILL);
     public static final DeferredItem<BlockItem> THERMAL_REACTION_CHAMBER = REGISTER.registerSimpleBlockItem(ModBlocks.THERMAL_REACTION_CHAMBER);
 

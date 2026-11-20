@@ -45,7 +45,7 @@ class PureLogicTest {
                 assertFalse(chapter.getAsJsonArray("text").isEmpty(), chapter.get("title") + " has text");
             }
             assertEquals(5, perTab.size(), "every tab has chapters: " + perTab);
-            perTab.forEach((tab, count) -> assertTrue(count <= 9, "the " + tab + " tab's list fits under the tabs: " + count));
+            perTab.forEach((tab, count) -> assertTrue(count <= 10, "the " + tab + " tab's list fits under the tabs: " + count));
         }
     }
 

@@ -31,6 +31,8 @@ public final class ModCapabilities {
             var treadmill = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.entity(level, pos, state);
             return treadmill == null ? null : new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(treadmill, side);
         }, ModBlocks.SHEEP_TREADMILL.get());
+        // Static Generator: its buffer (out only), on every face of its base.
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.STATIC_GENERATOR.get(), (be, side) -> be.getEnergyHandler());
         // Echo Chamber: power out of its port, the middle of its back, on the back face only.
         event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, be, side) -> {
             if (!com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.isPort(state)

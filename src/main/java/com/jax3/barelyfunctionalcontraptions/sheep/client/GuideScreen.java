@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack;
  */
 public class GuideScreen extends Screen {
     private static final int WIDTH = 330;
-    private static final int HEIGHT = 214;
+    private static final int HEIGHT = 236;
     private static final int LIST_WIDTH = 118;
     private static final int ROW = 15;
     /** The tab buttons along the top of the left panel. */

@@ -1,0 +1,206 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "copper": "minecraft:block/oxidized_copper",
+    "bristles": "barelyfunctionalcontraptions:block/static_generator/bristles",
+    "particle": "minecraft:block/oxidized_copper"
+  },
+  "elements": [
+    {
+      "from": [
+        6,
+        0,
+        6
+      ],
+      "to": [
+        10,
+        14,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "south": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper",
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        14,
+        5
+      ],
+      "to": [
+        11,
+        16,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "south": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      }
+    },
+    {
+      "from": [
+        1,
+        12,
+        7
+      ],
+      "to": [
+        15,
+        13.5,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "south": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      }
+    },
+    {
+      "from": [
+        7,
+        12,
+        1
+      ],
+      "to": [
+        9,
+        13.5,
+        15
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "south": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      }
+    },
+    {
+      "from": [
+        1,
+        6,
+        8
+      ],
+      "to": [
+        15,
+        12,
+        8
+      ],
+      "shade": false,
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            5,
+            15,
+            11
+          ],
+          "texture": "#bristles"
+        },
+        "south": {
+          "uv": [
+            15,
+            5,
+            1,
+            11
+          ],
+          "texture": "#bristles"
+        }
+      }
+    },
+    {
+      "from": [
+        8,
+        6,
+        1
+      ],
+      "to": [
+        8,
+        12,
+        15
+      ],
+      "shade": false,
+      "faces": {
+        "east": {
+          "uv": [
+            1,
+            5,
+            15,
+            11
+          ],
+          "texture": "#bristles"
+        },
+        "west": {
+          "uv": [
+            15,
+            5,
+            1,
+            11
+          ],
+          "texture": "#bristles"
+        }
+      }
+    }
+  ]
+}

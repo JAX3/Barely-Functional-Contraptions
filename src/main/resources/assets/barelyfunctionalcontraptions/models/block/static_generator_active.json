@@ -1,0 +1,129 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "front": "barelyfunctionalcontraptions:block/static_generator/front",
+    "side": "barelyfunctionalcontraptions:block/static_generator/side",
+    "top": "barelyfunctionalcontraptions:block/static_generator/top",
+    "belt": "barelyfunctionalcontraptions:block/static_generator/belt_active",
+    "trim": "barelyfunctionalcontraptions:block/echo_chamber/trim",
+    "particle": "barelyfunctionalcontraptions:block/static_generator/side"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        12,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            4,
+            16,
+            16
+          ],
+          "texture": "#front",
+          "cullface": "north"
+        },
+        "south": {
+          "uv": [
+            0,
+            4,
+            16,
+            16
+          ],
+          "texture": "#side",
+          "cullface": "south"
+        },
+        "east": {
+          "uv": [
+            0,
+            4,
+            16,
+            16
+          ],
+          "texture": "#side",
+          "cullface": "east"
+        },
+        "west": {
+          "uv": [
+            0,
+            4,
+            16,
+            16
+          ],
+          "texture": "#side",
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#top"
+        },
+        "down": {
+          "texture": "#top",
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        12,
+        5
+      ],
+      "to": [
+        11,
+        16,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#belt"
+        },
+        "south": {
+          "texture": "#belt"
+        },
+        "east": {
+          "texture": "#belt"
+        },
+        "west": {
+          "texture": "#belt"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        12,
+        4
+      ],
+      "to": [
+        12,
+        13,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#trim"
+        },
+        "south": {
+          "texture": "#trim"
+        },
+        "east": {
+          "texture": "#trim"
+        },
+        "west": {
+          "texture": "#trim"
+        },
+        "up": {
+          "texture": "#trim"
+        }
+      }
+    }
+  ]
+}

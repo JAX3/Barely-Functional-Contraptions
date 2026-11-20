@@ -4416,6 +4416,134 @@ def generate_echo_chamber_gui():
     img.save(out("gui/echo_chamber.png"))
 
 
+# ---------------------------------------------------------------------------
+# Static Generator: a blue-steel base with a charge gauge on its front, a rubber belt running up a column into a
+# polished copper dome that crackles while it charges. The Copper Comb's post uses vanilla's copper textures (one for
+# each oxidation stage); its bristles are drawn here.
+# ---------------------------------------------------------------------------
+COPPER = [hexc("#5a2a1c"), hexc("#8a4630"), hexc("#b4684a"), hexc("#d88a63"), hexc("#efb08a"), hexc("#fbe0c8")]
+SPARK = [hexc("#5fb8ff"), hexc("#bfe6ff"), hexc("#ffffff")]
+
+
+def generate_static_generator():
+    base = "block/static_generator/"
+    os.makedirs(out(base), exist_ok=True)
+
+    side = grid(MACHINE_BLOCK, CARTOON)  # the casing with its corner bolts; a lightning bolt in the socket
+    for y in range(4, 12):
+        for x in range(4, 12):
+            side.putpixel((x, y), CARTOON["k"])
+    for x, y in ((8, 5), (7, 6), (8, 6), (6, 7), (7, 7), (7, 8), (8, 8), (9, 8), (8, 9), (7, 10), (8, 10), (7, 11)):
+        if 4 <= y < 12:
+            side.putpixel((x, y), CARTOON["E"] if (x + y) % 3 else CARTOON["Y"])
+    side.save(out(base + "side.png"))
+
+    # Front: a charge gauge, a tall glass tube that glows blue as the dome charges (dark here; the window shows the level).
+    front = grid(MACHINE_BLOCK, CARTOON)
+    for y in range(4, 12):
+        for x in range(4, 12):
+            front.putpixel((x, y), CARTOON["k"])
+    for y in range(5, 11):
+        for x in range(6, 10):
+            front.putpixel((x, y), hexc("#1b2a3a") if x in (6, 9) else hexc("#24405e"))
+    for x in range(5, 11):
+        front.putpixel((x, 11), CARTOON["S"])
+    front.save(out(base + "front.png"))
+
+    top = grid(MACHINE_BLOCK, CARTOON)
+    top.save(out(base + "top.png"))
+
+    # The belt: dark rubber with ribs. Running, the ribs climb (8 frames).
+    def belt(f):
+        img = Image.new("RGBA", (16, 16))
+        for y in range(16):
+            for x in range(16):
+                c = hexc("#26222a") if (y + f) % 4 else hexc("#3a3440")
+                if x in (0, 15):
+                    c = hexc("#141218")
+                img.putpixel((x, y), c)
+        return img
+    belt(0).save(out(base + "belt.png"))
+    strip = Image.new("RGBA", (16, 16 * 4))
+    for f in range(4):
+        strip.paste(belt(f), (0, 16 * f))
+    strip.save(out(base + "belt_active.png"))
+    with open(out(base + "belt_active.png.mcmeta"), "w") as fh:
+        fh.write('{\n  "animation": {\n    "frametime": 2\n  }\n}\n')
+
+    # The dome: polished copper, lit from the top left. Running, sparks crawl over it (8 frames).
+    rnd = random.Random(5)
+    def dome(spark_frame=None):
+        img = Image.new("RGBA", (16, 16))
+        for y in range(16):
+            for x in range(16):
+                v = 3.3 - (x + y) / 14.0 + rnd.random() * 0.4
+                img.putpixel((x, y), COPPER[max(0, min(5, int(round(v))))])
+        img.putpixel((4, 3), COPPER[5]); img.putpixel((5, 3), COPPER[5]); img.putpixel((4, 4), COPPER[5])
+        if spark_frame is not None:
+            r = random.Random(100 + spark_frame)
+            for _ in range(3):
+                x, y = r.randrange(16), r.randrange(16)
+                for k in range(r.randrange(2, 5)):
+                    if 0 <= x < 16 and 0 <= y < 16:
+                        img.putpixel((x, y), SPARK[2] if k == 0 else SPARK[r.randrange(2)])
+                    x += r.choice((-1, 0, 1)); y += r.choice((-1, 0, 1))
+        return img
+    dome().save(out(base + "dome.png"))
+    strip = Image.new("RGBA", (16, 16 * 8))
+    for f in range(8):
+        strip.paste(dome(f), (0, 16 * f))
+    strip.save(out(base + "dome_active.png"))
+    with open(out(base + "dome_active.png.mcmeta"), "w") as fh:
+        fh.write('{\n  "animation": {\n    "frametime": 2\n  }\n}\n')
+
+    # The Copper Comb's bristles: a row of stiff dark bristles hanging from a copper back, transparent between them.
+    comb = Image.new("RGBA", (16, 16), CLEAR)
+    for x in range(16):
+        for y in range(2, 5):
+            comb.putpixel((x, y), COPPER[2] if y == 2 else COPPER[1])
+        if x % 2 == 0:
+            for y in range(5, 14 - (x % 4 == 0)):
+                comb.putpixel((x, y), hexc("#4a3b2e") if y < 12 else hexc("#2e241c"))
+    comb.save(out(base + "bristles.png"))
+
+
+def generate_static_generator_gui():
+    """Static Generator window: energy gauge, then a panel with the herd and output, the dome's charge bar (the shock
+    line marked) and four comb chips; the status lamp below."""
+    trc = Image.open(out("gui/thermal_reaction_chamber.png")).convert("RGBA")
+    shears = Image.open(out("gui/automatic_shears.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 108)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # energy gauge, fill 30x64 at (11, 19)
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 48, 16, 166, 84, GUI["panel"])         # the panel
+    inset(img, 50, 42, 164, 52, GUI["gauge"])         # dome charge, fill 112x8 at (51, 43)
+    for i in range(4):                                # comb chips, 22x18 at (52 + 28i, 58), copper square 12x12 at (57 + 28i, 61)
+        inset(img, 52 + 28 * i, 58, 74 + 28 * i, 76, GUI["gauge"])
+    inset(img, 8, 89, 18, 99, GUI["gauge"])           # status lamp housing, lamp at (9, 90)
+    rnd = random.Random(43)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 105), rnd.choice((SPARK[0], SPARK[1], COPPER[3])))
+    # ---- sprites ----
+    img.paste(trc.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    img.paste(shears.crop((176, 64, 208, 80)), (176, 146))          # area button background
+    img.paste(trc.crop((176, 0, 206, 74)), (176, 0))                # energy fill (amber) and its shimmer
+    for y in range(8):                                              # dome charge fill, 112x8 at (0, 200): blue to white
+        for x in range(112):
+            c = mix(SPARK[0], SPARK[2], x / 111.0 * 0.8)
+            if y == 0:
+                c = mix(c, SPARK[2], 0.5)
+            if (x + y) % 6 == 0:
+                c = mix(c, SPARK[2], 0.3)
+            img.putpixel((x, 200 + y), c)
+    img.save(out("gui/static_generator.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -4460,6 +4588,8 @@ def main():
     generate_thermal_reaction_chamber_gui()
     generate_echo_chamber()
     generate_echo_chamber_gui()
+    generate_static_generator()
+    generate_static_generator_gui()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

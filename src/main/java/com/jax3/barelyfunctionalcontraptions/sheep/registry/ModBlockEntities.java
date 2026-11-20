@@ -26,6 +26,9 @@ public final class ModBlockEntities {
 
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity>> SHEEP_TREADMILL = REGISTER.register("sheep_treadmill",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity::new, ModBlocks.SHEEP_TREADMILL.get()));
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity>> STATIC_GENERATOR =
+            REGISTER.register("static_generator",
+                    () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity::new, ModBlocks.STATIC_GENERATOR.get()));
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity>> ECHO_CHAMBER =
             REGISTER.register("echo_chamber",
                     () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity::new, ModBlocks.ECHO_CHAMBER.get()));

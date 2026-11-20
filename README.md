@@ -57,7 +57,7 @@ A sheep walks its belt for the wheat hanging at the front and makes 20 FE/t, mor
 
 ![Three Sheep Treadmills: a sheep walking the left one, a sheared sheep the middle one, and the right one empty, each with wheat hanging at the front](docs/screenshots/103_sheep_treadmill.png)
 
-**Mid game:** Blaze Furnace and Mycelial Generator. They need the Nether or a mushroom farm, and Mycelial networks grow fast.
+**Mid game:** Blaze Furnace, Mycelial Generator and Static Generator. They need the Nether, a mushroom farm or some copper, and Mycelial networks grow fast.
 
 ### Blaze Furnace
 
@@ -70,6 +70,12 @@ Makes power from the heat of Blaze sheep standing round it: 80 FE/t for one, up 
 Burns red or brown mushrooms and water for 200–250 FE/t. Generators that touch form a network, and each running one boosts the whole network's output. Running generators slowly turn nearby dirt into mycelium and sometimes grow huge mushrooms, so they make more of their own fuel.
 
 ![Machine fronts, idle and running](docs/screenshots/14_machine_fronts.png)
+
+### Static Generator
+
+Two blocks tall, like a Van de Graaff generator. Sheep rubbing against Copper Combs in its pen build up static, and its copper dome arcs it into power: 75 FE/t a sheep, 150 for Copper sheep, about 400–800 FE/t from six. The combs oxidise as they're worked, so scrape them with an axe or wax them. If nothing takes its power the dome overcharges and shocks anything in its pen, knocking it back; Woollen Armour insulates.
+
+![A Static Generator with four Copper Combs and five sheep in its outlined pen](docs/screenshots/107_static_generator.png)
 
 **Late game:** Zero Point Module, Thermal Reaction Chamber and Echo Chamber. They make the most power.
 

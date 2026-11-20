@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "L": "minecraft:lightning_rod",
+    "C": "minecraft:copper_block",
+    "R": "minecraft:redstone",
+    "W": "#minecraft:wool",
+    "M": "barelyfunctionalcontraptions:functional_machine_block"
+  },
+  "pattern": [
+    " L ",
+    "CRC",
+    "WMW"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:static_generator"
+  }
+}

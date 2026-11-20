@@ -46,6 +46,8 @@ public final class ModMenus {
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolBurnerMenu::new));
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.ThermalReactionChamberMenu>> THERMAL_REACTION_CHAMBER = REGISTER.register("thermal_reaction_chamber",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.ThermalReactionChamberMenu::new));
+    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.StaticGeneratorMenu>> STATIC_GENERATOR =
+            REGISTER.register("static_generator", () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.StaticGeneratorMenu::new));
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.EchoChamberMenu>> ECHO_CHAMBER =
             REGISTER.register("echo_chamber", () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.EchoChamberMenu::new));
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.SheepTreadmillMenu>> SHEEP_TREADMILL = REGISTER.register("sheep_treadmill",

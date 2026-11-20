@@ -187,6 +187,19 @@ public final class ModBlocks {
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock::new,
                     p -> p.mapColor(MapColor.COLOR_PURPLE).strength(3.5F, 6.0F).sound(SoundType.IRON).noOcclusion().lightLevel(state -> 7));
 
+    /** Mid-game generator, two blocks tall: sheep rubbing against Copper Combs build static, which its dome arcs into power. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock> STATIC_GENERATOR =
+            REGISTER.registerBlock("static_generator",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock::new,
+                    p -> p.mapColor(MapColor.COLOR_ORANGE).strength(3.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion()
+                            .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.ACTIVE) ? 6 : 0));
+
+    /** A copper post with bristles for a Static Generator's sheep to rub against; oxidises while it's worked. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock> COPPER_COMB =
+            REGISTER.registerBlock("copper_comb",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock::new,
+                    p -> p.mapColor(MapColor.COLOR_ORANGE).strength(2.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion());
+
     /** Late-game generator, 3x3x3: Warden sheep in front of its dish turn the vibrations they hear into power. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock> ECHO_CHAMBER =
             REGISTER.registerBlock("echo_chamber",

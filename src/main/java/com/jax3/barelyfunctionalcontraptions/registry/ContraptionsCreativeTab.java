@@ -60,6 +60,8 @@ public final class ContraptionsCreativeTab {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_TREADMILL,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLAZE_FURNACE,
                     com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIAL_GENERATOR,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATIC_GENERATOR,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.COPPER_COMB,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ZERO_POINT_ENERGY_MODULE,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.THERMAL_REACTION_CHAMBER,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ECHO_CHAMBER,

@@ -14,6 +14,20 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 
 ### New machines
 
+#### Static Generator and Copper Comb (mid-game generator)
+- Two blocks tall, like a Van de Graaff generator. Sheep rubbing against Copper Combs in its 5x5 pen build up static,
+  and its copper dome arcs the charge into its buffer every 3 seconds.
+- **Power:** a grown sheep with its fleece on gives 75 FE/t; Copper sheep 150, Redstone sheep 125. Up to six count,
+  each after the best a little less: about 400 FE/t from plain sheep, about 800 from Copper sheep.
+- **Copper Combs:** up to 4 in its pen. They oxidise as they're worked (100, 75, 50, 25%), about every 20 minutes. An
+  axe scrapes one back a stage; Honeycomb waxes it so it stops ageing, at 85%. A broken comb keeps its stage and wax.
+- **Shocks:** with its buffer full the dome keeps charging; past half full it shocks players and mobs in its pen,
+  knocking them back. Woollen Armour insulates, a quarter per piece. A comparator reads the dome's charge.
+- **Window:** energy, herd and output, the dome's charge with the shock line, and a chip for each comb.
+- **Recipes:** a Lightning Rod, two Copper Blocks, Redstone, two wool and a Functional Machine Block; a Copper Comb
+  from three Copper Ingots and a Brush.
+- New config section `[static_generator]`.
+
 #### Echo Chamber (late-game generator)
 - A 3x3x3 machine that turns noise into power. Place it facing you: it fills the space behind and above, and
   breaking any part takes it all down (it drops one, with a pickaxe).
@@ -104,7 +118,7 @@ Older config files are updated once, the first time they load. Settings still at
 ones, and anything you changed is kept.
 
 #### Machines keep their sheep close
-- The Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Thermal Reaction Chamber and Echo Chamber call their sheep back when
+- The Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction Chamber and Echo Chamber call their sheep back when
   one wanders up to 4 blocks out of the working area.
 - A machine only calls sheep while it has room for more.
 - The chamber only calls sheep in a way that keeps its herds even, so the attraction can never set off a meltdown or a

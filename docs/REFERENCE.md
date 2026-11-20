@@ -511,6 +511,32 @@ At midnight the panels under the lamps still run:
   - 2 Glow Lamps: glass in the corners, Glow Ink Sacs on the sides and glowstone dust in the middle.
 - Mine the panel with a pickaxe. The lamp breaks by hand.
 
+### Static Generator
+A mid-game generator, **two blocks tall**, that turns **friction** into power, like a Van de Graaff generator. Sheep rubbing against **Copper Combs** in its pen build up static, and its polished copper dome collects the charge and arcs it into power. Its blue-steel base has a charge gauge on the front, and a rubber belt runs up a column into the dome, which crackles with sparks while it charges.
+
+```
+  L        L = Lightning Rod
+C R C      C = Copper Block, R = Redstone
+W M W      W = any wool, M = Functional Machine Block
+
+I I I      Copper Comb: I = Copper Ingot
+  B        B = Brush
+```
+
+- **Pen and combs:** its pen is 5x5, centred on it (`radius`), at its level and the one above. Put up to 4 Copper Combs in it (`maxCombs`; it uses the nearest). A sheep standing within 1.5 blocks of a comb (`combReach`) gets rubbed. Sneak-right-click it, or the window's button, to outline the pen.
+- **Herd:** every half second it counts the grown sheep with their fleece on next to a comb. Each gives 75 FE/t (`powerPerSheep`); Copper sheep give 150 and Redstone sheep 125 (`sheepPower`). The best counts in full and each one after it a little less (`falloff` 0.05), up to six (`maxSheep`): about 400 FE/t from plain sheep, about 800 from Copper sheep. Sheared sheep and lambs don't count, so give the pen grass to regrow their wool. It calls back sheep that wander just out of its pen.
+- **Combs:** a comb passes on 100% of a sheep's charge fresh, then 75, 50 and 25% as it oxidises (exposed, weathered, oxidised). Each comb a sheep is rubbing against wears, and after 20 minutes of it (`wearTicks`) it oxidises a stage. An axe takes it back a stage; Honeycomb waxes it, which stops it ageing for good but insulates it a little (85%, `waxedEfficiency`). The axe takes wax off first, as on vanilla copper. Combs only age while they're worked, and a broken comb keeps its stage and wax.
+- **Dome and power:** the charge builds in its dome, which arcs into its buffer every 3 seconds (`arcTicks`), with a crackle of sparks down to a comb. It stores 500,000 FE and pushes up to 2,000 FE/t out of every face of its base but the top.
+- **Shocks:** with nothing taking its power, its buffer fills and the dome keeps charging (up to 100,000 FE, `domeCapacity`). Past half full (`shockAt`) it's *Overcharged*: it shocks every player and mob in its pen (not sheep, not creative players), knocking them back away from the dome (`shockStrength`). Each piece of **Woollen Armour** takes a quarter off a shock, and a full set stops it. Each shock bleeds a little charge off.
+- **Window:** the energy gauge, the herd and output, the dome's charge bar with the shock line marked in red, a chip for each comb (coloured by its stage, with a sheen when waxed), and the status. Every part has a tooltip.
+- **Comparator:** reads how charged its dome is, 0-15, for a circuit that keeps people out or switches on a load.
+- Mine it with a pickaxe; breaking either half removes both. **Config:** `[static_generator]` (see below).
+
+| In its pen: four combs at different stages, five sheep | Its window |
+|---|---|
+| ![A Static Generator on grass with its pen outlined, four Copper Combs round it at different stages of oxidation, and Copper, Redstone and plain sheep at them](screenshots/107_static_generator.png) | ![Its window: 5 / 6 sheep rubbing, 389 FE/t, the dome's charge bar, and four comb chips coloured by stage, one waxed](screenshots/107_static_generator_gui.png) |
+| ![Close up of the Static Generator: the belt column and the copper dome above its base](screenshots/107_static_generator_close.png) | ![Its window overcharged: the dome's charge bar past the red shock line, and Overcharged: keep clear!](screenshots/107_static_generator_gui_overcharged.png) |
+
 ### Thermal Reaction Chamber
 A late-game generator that makes power from the **difference between hot and cold**. Blaze sheep stand in a pen against its hot side, Snow sheep in a pen against its cold side, and water runs through the middle. It is the machines' blue-steel casing split down the middle: red-hot vent slats and fins on the hot side, frosted ones on the cold side, a gauge panel at the front (two thermometers and a balance dial), water and power ports at the back, and a window on top where flame and snow chase each other while it reacts. Crafted from a Magma Block, a Nether Star, Blue Ice, a Blaze Sheep Furnace, a Hume Energy Cube, a Snow Sheep Chiller, two Copper Blocks and a Fluid Tank, hot things on the left and cold on the right:
 
@@ -591,7 +617,7 @@ B M B      B = Blackstone, M = Functional Machine Block
 <a id="sheep-attraction"></a>
 
 ### Sheep attraction
-The Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Thermal Reaction Chamber and Echo Chamber keep the sheep they use close by. Every half second, a sheep of the right kind that has wandered out of the working area, but is still within 4 blocks of it (`range` in `[sheep_attraction]`, one block up or down too), walks back to a spot inside it, the way sheep follow wheat.
+The Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction Chamber and Echo Chamber keep the sheep they use close by. Every half second, a sheep of the right kind that has wandered out of the working area, but is still within 4 blocks of it (`range` in `[sheep_attraction]`, one block up or down too), walks back to a spot inside it, the way sheep follow wheat.
 
 - Each machine calls only as many as it still has room for, so it never takes sheep it wouldn't use. The chamber also keeps its herds even (see above).
 - A sheep standing in one of these machines' areas belongs to that machine for a couple of seconds, so two machines side by side don't pull the same sheep back and forth.
@@ -1143,6 +1169,18 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `capacity` / `output` | 2000000 / 40000 | Its buffer, and the most FE/t it pushes out |
 | `hotSources` / `coldSources` | blaze / snow | Sheep resources that count on each side |
 
+**`[static_generator]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `powerPerSheep` / `falloff` / `maxSheep` | 75 / 0.05 / 6 | FE/t of charge from a sheep against a fresh comb, how much less each extra one adds, and the most counted |
+| `sheepPower` | copper=150, redstone=125 | Charge from sheep of particular resources, as `resource=power` |
+| `radius` / `maxCombs` / `combReach` | 2 / 4 / 1.5 | Its pen (2 = 5x5), the most combs it uses, and how close a sheep must stand to one |
+| `arcTicks` / `domeCapacity` | 60 / 100000 | Ticks between arcs into its buffer, and the charge its dome holds |
+| `shockAt` / `shockStrength` | 0.5 / 1.2 | How full the dome is before it shocks things in its pen, and how hard a shock knocks them back |
+| `wearTicks` / `waxedEfficiency` | 24000 / 0.85 | How long a comb is worked before it oxidises a stage, and what a waxed comb passes on |
+| `capacity` / `output` | 500000 / 2000 | Its buffer, and the most FE/t it pushes out |
+
 **`[echo_chamber]`**
 
 | Key | Default | Meaning |
@@ -1162,7 +1200,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 
 | Key | Default | Meaning |
 |---|---|---|
-| `enabled` | true | Whether the furnaces, chiller, Thermal Reaction Chamber and Echo Chamber call their sheep back |
+| `enabled` | true | Whether the furnaces, chiller, Static Generator, Thermal Reaction Chamber and Echo Chamber call their sheep back |
 | `range` | 4 | How far outside the working area, in blocks, a sheep is still called back |
 
 **`[woollen_armor]`**

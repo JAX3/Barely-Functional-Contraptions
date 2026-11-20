@@ -211,6 +211,21 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue echoCapacity;
         public final ModConfigSpec.IntValue echoOutput;
         public final ModConfigSpec.ConfigValue<List<? extends String>> echoSources;
+        public final ModConfigSpec.IntValue staticPowerPerSheep;
+        public final ModConfigSpec.DoubleValue staticFalloff;
+        public final ModConfigSpec.IntValue staticMaxSheep;
+        public final ModConfigSpec.IntValue staticRadius;
+        public final ModConfigSpec.IntValue staticMaxCombs;
+        public final ModConfigSpec.DoubleValue staticCombReach;
+        public final ModConfigSpec.ConfigValue<List<? extends String>> staticSheepPower;
+        public final ModConfigSpec.IntValue staticArcTicks;
+        public final ModConfigSpec.IntValue staticDomeCapacity;
+        public final ModConfigSpec.DoubleValue staticShockAt;
+        public final ModConfigSpec.DoubleValue staticShockStrength;
+        public final ModConfigSpec.IntValue staticWearTicks;
+        public final ModConfigSpec.DoubleValue staticWaxedEfficiency;
+        public final ModConfigSpec.IntValue staticCapacity;
+        public final ModConfigSpec.IntValue staticOutput;
         public final ModConfigSpec.IntValue chillerRadius;
         public final ModConfigSpec.IntValue chillerMaxSources;
         public final ModConfigSpec.DoubleValue chillerFalloff;
@@ -318,7 +333,7 @@ public final class ModConfigs {
                     .defineInRange("timingRevision", 0, 0, 100);
             b.pop();
 
-            b.comment("Sheep attraction: the Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Thermal Reaction Chamber and Echo Chamber call their sheep back into their working area when one wanders a little way out").push("sheep_attraction");
+            b.comment("Sheep attraction: the Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Thermal Reaction Chamber, Echo Chamber and Static Generator call their sheep back into their working area when one wanders a little way out").push("sheep_attraction");
             attractionEnabled = b.comment("Whether these machines call their sheep back.")
                     .define("enabled", true);
             attractionRange = b.comment("How far outside the working area, in blocks, a sheep is still called back. The area outline shows it faintly.")
@@ -565,6 +580,40 @@ public final class ModConfigs {
                     .defineInRange("output", 40_000, 0, Integer.MAX_VALUE);
             echoSources = b.comment("Sheep resources whose sheep listen for it (with their fleece on).")
                     .defineListAllowEmpty("sources", List.of("barelyfunctionalcontraptions:warden"), () -> "barelyfunctionalcontraptions:warden", o -> o instanceof String);
+            b.pop();
+
+            b.comment("Static Generator (mid-game generator: sheep rubbing against Copper Combs in its pen build static, which its dome arcs into power)").push("static_generator");
+            staticPowerPerSheep = b.comment("FE/t of charge from a sheep against a fresh comb, unless sheepPower lists its resource. Each sheep after the best adds less, see falloff.")
+                    .defineInRange("powerPerSheep", 75, 0, 1_000_000);
+            staticFalloff = b.comment("How much less each extra sheep adds: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on.")
+                    .defineInRange("falloff", 0.05, 0.0, 1.0);
+            staticMaxSheep = b.comment("Most sheep one generator counts.")
+                    .defineInRange("maxSheep", 6, 1, 64);
+            staticRadius = b.comment("Size of its pen, centred on it: 2 = 5x5 (default). Combs and sheep count anywhere in it, at its level and the one above.")
+                    .defineInRange("radius", 2, 1, 8);
+            staticMaxCombs = b.comment("Most Copper Combs one generator uses (the nearest).")
+                    .defineInRange("maxCombs", 4, 1, 16);
+            staticCombReach = b.comment("How close a sheep must stand to a comb to be rubbed by it, in blocks from the comb's centre.")
+                    .defineInRange("combReach", 1.5, 0.5, 4.0);
+            staticSheepPower = b.comment("FE/t of charge from sheep of particular resources, as \"resource=power\".")
+                    .defineListAllowEmpty("sheepPower", List.of("barelyfunctionalcontraptions:copper=150", "barelyfunctionalcontraptions:redstone=125"),
+                            () -> "barelyfunctionalcontraptions:copper=150", o -> o instanceof String str && str.contains("="));
+            staticArcTicks = b.comment("Ticks between arcs, when its dome discharges into its buffer (60 = 3 seconds).")
+                    .defineInRange("arcTicks", 60, 1, 6_000);
+            staticDomeCapacity = b.comment("FE of charge its dome holds. With its buffer full the dome keeps charging, up to this.")
+                    .defineInRange("domeCapacity", 100_000, 1, Integer.MAX_VALUE);
+            staticShockAt = b.comment("How full its dome is (0-1) before it starts shocking anything in its pen: players and mobs get knocked back. Sheep don't.")
+                    .defineInRange("shockAt", 0.5, 0.0, 1.0);
+            staticShockStrength = b.comment("How hard a shock knocks things back. Each piece of Woollen Armour takes a quarter off; a full set stops it.")
+                    .defineInRange("shockStrength", 1.2, 0.0, 10.0);
+            staticWearTicks = b.comment("Ticks a comb can be worked before it oxidises a stage (24000 = 20 minutes). Waxed combs don't age.")
+                    .defineInRange("wearTicks", 24_000, 1, Integer.MAX_VALUE);
+            staticWaxedEfficiency = b.comment("How much charge a waxed comb gives, against a fresh one: the wax insulates a little.")
+                    .defineInRange("waxedEfficiency", 0.85, 0.0, 1.0);
+            staticCapacity = b.comment("FE it stores.")
+                    .defineInRange("capacity", 500_000, 1, Integer.MAX_VALUE);
+            staticOutput = b.comment("Most FE it pushes into the blocks around its base per tick, in total.")
+                    .defineInRange("output", 2_000, 0, Integer.MAX_VALUE);
             b.pop();
 
             b.comment("Woollen Armour (crafted from wool, in the wool's colour)").push("woollen_armor");

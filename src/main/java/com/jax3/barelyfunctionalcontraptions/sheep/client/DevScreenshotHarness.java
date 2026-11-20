@@ -231,6 +231,10 @@ public final class DevScreenshotHarness {
             echoChamberTick(mc, server);
             return;
         }
+        if ("static_generator".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            staticGeneratorTick(mc, server);
+            return;
+        }
         if ("list_command".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             listCommandTick(mc);
             return;
@@ -2571,6 +2575,88 @@ public final class DevScreenshotHarness {
                 level.setBlockAndUpdate(switchAt, on ? Blocks.AIR.defaultBlockState() : Blocks.REDSTONE_BLOCK.defaultBlockState());
             });
         }
+    }
+
+    /**
+     * A Static Generator on grass with four Copper Combs round it (fresh, exposed, weathered and waxed, oxidised) and five
+     * sheep at them, two of them Copper sheep: from the front at an angle, its dome close up, its window charging, and
+     * then overcharged (its buffer full and its dome sparking): {@code -PharnessScene=static_generator}.
+     */
+    private static void staticGeneratorTick(Minecraft mc, MinecraftServer server) {
+        BlockPos at = origin == null ? null : origin.offset(0, 0, -4);
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                BlockPos g = origin.offset(0, 0, -4);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, 0, -10), origin.offset(6, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, -1, -10), origin.offset(6, -1, 3))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                var gen = ModBlocks.STATIC_GENERATOR.get().defaultBlockState().setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.FACING, Direction.SOUTH);
+                level.setBlock(g, gen, 3);
+                level.setBlock(g.above(), gen.setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.HALF,
+                        net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER), 3);
+                var comb = ModBlocks.COPPER_COMB.get().defaultBlockState();
+                var age = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock.AGE;
+                level.setBlock(g.offset(-2, 0, 1), comb, 3);
+                level.setBlock(g.offset(2, 0, 1), comb.setValue(age, 1), 3);
+                level.setBlock(g.offset(-2, 0, -1), comb.setValue(age, 2).setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock.WAXED, true), 3);
+                level.setBlock(g.offset(2, 0, -1), comb.setValue(age, 3), 3);
+                String[] kinds = {"copper", "iron", "copper", "iron", "redstone"};
+                double[][] spots = {{-1.2, 1.9}, {1.2, 1.9}, {-1.3, -0.4}, {1.3, -0.4}, {-1.7, 2.4}};
+                for (int i = 0; i < kinds.length; i++) {
+                    Sheep sheep = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+                    sheep.snapTo(g.getX() + 0.5 + spots[i][0], g.getY(), g.getZ() + 0.5 + spots[i][1], i % 2 == 0 ? 90 : 270, 0);
+                    sheep.setNoAi(true);
+                    SheepInfusionEvents.setInfusion(sheep, new SheepInfusion(Optional.of(ResourcefulSheep.id(kinds[i])), 9, 0));
+                    level.addFreshEntity(sheep);
+                }
+                if (level.getBlockEntity(g) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity be) be.setShowsArea(true);
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 150 30", origin.getX() + 3.5, origin.getY() + 2.4, origin.getZ() + 0.5));
+            case 140 -> shot(mc, "107_static_generator");
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 10", origin.getX() + 0.5, origin.getY() + 0.6, origin.getZ() - 1.6));
+            case 170 -> shot(mc, "107_static_generator_close");
+            case 172 -> command(server, "gamemode creative @a"); // spectators can't open machine windows
+            case 182 -> openStaticWindow(server, at);
+            case 190 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 196 -> shot(mc, "107_static_generator_gui");
+            case 198 -> McClient.setScreen(mc, null);
+            // Overcharged: its buffer full and its dome brimming, so it sparks and would shock anyone stepping in.
+            case 200 -> server.execute(() -> {
+                if (server.overworld().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity be) {
+                    be.fillBuffer();
+                    be.setCharge(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.domeCapacity());
+                }
+            });
+            case 201 -> command(server, "gamemode spectator @a");
+            case 202 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 150 30", origin.getX() + 3.5, origin.getY() + 2.4, origin.getZ() + 0.5));
+            case 228 -> command(server, "gamemode creative @a");
+            case 226 -> shot(mc, "107_static_generator_overcharged");
+            case 232 -> openStaticWindow(server, at);
+            case 240 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 246 -> shot(mc, "107_static_generator_gui_overcharged");
+            // Its chapter in the Contraptions Manual (Power, Mid Game).
+            case 248 -> McClient.setScreen(mc, null);
+            case 250 -> McClient.setScreen(mc, new GuideScreen());
+            case 254 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Static Generator"); }
+            case 258 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 266 -> shot(mc, "107_guide_static_generator");
+            case 272 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    private static void openStaticWindow(MinecraftServer server, BlockPos at) {
+        server.execute(() -> {
+            if (server.overworld().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity be) {
+                server.getPlayerList().getPlayers().getFirst().openMenu(be, be.getBlockPos());
+            }
+        });
     }
 
     /** Opens the scene's Echo Chamber's window for the player, as a right-click does. */

@@ -74,7 +74,10 @@ public final class ModGameTests {
     private static final Map<String, Consumer<GameTestHelper>> TESTS = new java.util.LinkedHashMap<>();
     private static final java.util.Map<String, Consumer<GameTestHelper>> RELOAD_TESTS = new java.util.LinkedHashMap<>();
     private static final java.util.Map<String, Consumer<GameTestHelper>> SOLO_TESTS = new java.util.LinkedHashMap<>();
-    /** Echo Chamber tests: each in a batch of its own (so no other test's noise reaches it), on a bigger empty structure. */
+    /**
+     * Echo Chamber and Static Generator tests: each in a batch of its own (so no other test's noise reaches an Echo
+     * Chamber, and a Static Generator calling sheep can't lure another test's away), on a bigger empty structure.
+     */
     private static final java.util.Map<String, Consumer<GameTestHelper>> ECHO_TESTS = new java.util.LinkedHashMap<>();
     private static final Identifier BIG_STRUCTURE = ResourcefulSheep.id("tall_empty");
 
@@ -164,6 +167,10 @@ public final class ModGameTests {
         ECHO_TESTS.put("echo_chamber_falls_asleep_in_silence", ModGameTests::echoSleep);
         ECHO_TESTS.put("echo_chamber_shrieks_when_too_loud", ModGameTests::echoShriek);
         TESTS.put("echo_chamber_recipe_and_drop", ModGameTests::echoRecipeAndDrop);
+        ECHO_TESTS.put("static_generator_counts_sheep_at_its_combs", ModGameTests::staticCountsSheep);
+        ECHO_TESTS.put("static_generator_combs_oxidise_and_wax", ModGameTests::staticCombs);
+        ECHO_TESTS.put("static_generator_arcs_into_its_buffer", ModGameTests::staticArcs);
+        ECHO_TESTS.put("static_generator_shocks_knock_back_unless_insulated", ModGameTests::staticShocks);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -1329,6 +1336,127 @@ public final class ModGameTests {
                 h.assertTrue(h.getLevel().getBlockState(front.south()).isAir(), "and it's all gone");
                 h.succeed();
             });
+        });
+    }
+
+    // ------------------------------------------------------------------ Static Generator
+
+    /** A Static Generator in the middle of the platform (world positions, as test platforms can be turned). */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity buildStaticGenerator(GameTestHelper h) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.GRASS_BLOCK);
+        BlockPos at = h.absolutePos(new BlockPos(3, 1, 3));
+        var block = ModBlocks.STATIC_GENERATOR.get();
+        var half = com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.HALF;
+        h.getLevel().setBlockAndUpdate(at, block.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(at.above(), block.defaultBlockState().setValue(half, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+        return (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity) h.getLevel().getBlockEntity(at);
+    }
+
+    /** It counts grown sheep with their fleece on next to a comb in its pen, at their resource's charge, and no others. */
+    private static void staticCountsSheep(GameTestHelper h) {
+        var be = buildStaticGenerator(h);
+        BlockPos at = be.getBlockPos(), comb = at.east(2);
+        var level = h.getLevel();
+        be.scan(level, at);
+        h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.State.NEEDS_COMBS
+                || be.combs().isEmpty(), "no combs yet");
+        level.setBlockAndUpdate(comb, ModBlocks.COPPER_COMB.get().defaultBlockState());
+        echoSheep(h, comb.south(), "iron");            // next to the comb: 75
+        echoSheep(h, comb.north(), "copper");          // next to the comb: 150
+        echoSheep(h, comb.west(), "iron").setSheared(true); // no fleece
+        echoSheep(h, at.west(2).north(2), "iron");     // in the pen but nowhere near a comb
+        be.scan(level, at);
+        h.assertTrue(be.combs().size() == 1 && be.herd() == 2, "one comb and two sheep at it, got " + be.combs().size() + " and " + be.herd());
+        int expected = (int) Math.round(150 + 75 * 0.95);
+        h.assertTrue(be.generating() == expected, "Copper 150 and plain 75 (a little less as the second) make " + expected + ", got " + be.generating());
+        h.succeed();
+    }
+
+    /** Comb stages give 100/75/50/25%, waxed 85% of that; an axe scrapes and Honeycomb waxes; worked combs wear, waxed ones don't. */
+    private static void staticCombs(GameTestHelper h) {
+        var comb = ModBlocks.COPPER_COMB.get().defaultBlockState();
+        var age = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock.AGE;
+        var waxed = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock.WAXED;
+        double[] expected = {1.0, 0.75, 0.5, 0.25};
+        for (int a = 0; a < 4; a++) {
+            h.assertTrue(Math.abs(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.efficiency(comb.setValue(age, a)) - expected[a]) < 1e-9,
+                    "stage " + a + " gives " + expected[a]);
+        }
+        h.assertTrue(Math.abs(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.efficiency(comb.setValue(waxed, true)) - 0.85) < 1e-9, "waxed fresh gives 85%");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock.aged(comb.setValue(age, 1)).getValue(age) == 2, "it ages a stage");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock.aged(comb.setValue(waxed, true)).getValue(age) == 0, "but not when waxed");
+        // Honeycomb waxes it; an axe takes the wax off, then scrapes a stage back.
+        var be = buildStaticGenerator(h);
+        BlockPos at = be.getBlockPos().east(2);
+        var level = h.getLevel();
+        level.setBlockAndUpdate(at, comb.setValue(age, 2));
+        Player player = h.makeMockPlayer(GameType.SURVIVAL);
+        java.util.function.Consumer<ItemStack> use = stack -> {
+            player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+            level.getBlockState(at).useItemOn(stack, level, player, InteractionHand.MAIN_HAND,
+                    new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at), Direction.UP, at, false));
+        };
+        use.accept(new ItemStack(Items.HONEYCOMB));
+        h.assertTrue(level.getBlockState(at).getValue(waxed) && level.getBlockState(at).getValue(age) == 2, "Honeycomb waxes it");
+        use.accept(new ItemStack(Items.IRON_AXE));
+        h.assertTrue(!level.getBlockState(at).getValue(waxed) && level.getBlockState(at).getValue(age) == 2, "an axe takes the wax off first");
+        use.accept(new ItemStack(Items.IRON_AXE));
+        h.assertTrue(level.getBlockState(at).getValue(age) == 1, "then scrapes a stage back");
+        // Worked by a sheep, it wears; a waxed comb beside it, also worked, doesn't.
+        BlockPos other = be.getBlockPos().west(2);
+        level.setBlockAndUpdate(other, comb.setValue(waxed, true));
+        echoSheep(h, at.south(), "iron");
+        echoSheep(h, other.south(), "iron");
+        h.runAfterDelay(25, () -> {
+            h.assertTrue(be.wear(at) > 0 && be.wear(other) == 0, "the bare comb wears and the waxed one doesn't, got " + be.wear(at) + " and " + be.wear(other));
+            h.succeed();
+        });
+    }
+
+    /** Its dome arcs the charge into its buffer, which goes out of its base into a Hume Energy Cube beside it. */
+    private static void staticArcs(GameTestHelper h) {
+        var be = buildStaticGenerator(h);
+        BlockPos at = be.getBlockPos();
+        var level = h.getLevel();
+        level.setBlockAndUpdate(at.east(2), ModBlocks.COPPER_COMB.get().defaultBlockState());
+        echoSheep(h, at.east(2).south(), "copper");
+        level.setBlockAndUpdate(at.west(), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState());
+        h.succeedWhen(() -> {
+            var cube = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, at.west(), Direction.EAST);
+            h.assertTrue(be.generating() == 150, "a Copper sheep makes 150 FE/t, got " + be.generating());
+            h.assertTrue(cube != null && cube.getAmountAsLong() > 0, "the cube beside its base fills");
+        });
+    }
+
+    /** Overcharged, it knocks anything in its pen back; one in a full set of Woollen Armour stays put. Sheep are left alone. */
+    private static void staticShocks(GameTestHelper h) {
+        var be = buildStaticGenerator(h);
+        BlockPos at = be.getBlockPos();
+        var level = h.getLevel();
+        be.fillBuffer();
+        be.setCharge(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.domeCapacity());
+        // Armor stands: they don't wander, wear armour, and get pushed like anything else.
+        var bare = Vanilla.ARMOR_STAND.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        var wrapped = Vanilla.ARMOR_STAND.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        bare.snapTo(at.getX() + 1.5, at.getY(), at.getZ() + 0.5, 0, 0);
+        wrapped.snapTo(at.getX() - 0.5, at.getY(), at.getZ() + 0.5, 0, 0);
+        wrapped.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, new ItemStack(ModItems.WOOLLEN_HELMET.get()));
+        wrapped.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(ModItems.WOOLLEN_CHESTPLATE.get()));
+        wrapped.setItemSlot(net.minecraft.world.entity.EquipmentSlot.LEGS, new ItemStack(ModItems.WOOLLEN_LEGGINGS.get()));
+        wrapped.setItemSlot(net.minecraft.world.entity.EquipmentSlot.FEET, new ItemStack(ModItems.WOOLLEN_BOOTS.get()));
+        level.addFreshEntity(bare);
+        level.addFreshEntity(wrapped);
+        Sheep sheep = echoSheep(h, at.south(2), "iron");
+        double sheepStart = sheep.getZ();
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.insulation(wrapped) == 4, "a full set of Woollen Armour");
+        double bareStart = bare.getX(), wrappedStart = wrapped.getX();
+        h.runAfterDelay(14, () -> {
+            h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.State.OVERCHARGED
+                    || be.charge() < com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.domeCapacity(), "it's overcharged and shocking");
+            h.assertTrue(bare.getX() - bareStart > 1.0, "the bare stand is knocked away from the dome, moved " + (bare.getX() - bareStart));
+            h.assertTrue(Math.abs(wrapped.getX() - wrappedStart) < 0.6, "the insulated one isn't, moved " + (wrapped.getX() - wrappedStart));
+            h.assertTrue(Math.abs(sheep.getZ() - sheepStart) < 0.1, "and the sheep is left alone");
+            h.succeed();
         });
     }
 
