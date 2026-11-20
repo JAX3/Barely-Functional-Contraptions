@@ -1,10 +1,4 @@
 {
-  "neoforge:conditions": [
-    {
-      "type": "neoforge:registered",
-      "value": "barelyfunctionalcontraptions:echo_chamber"
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_echo_shard": {

@@ -31,15 +31,13 @@ public final class ModCapabilities {
             var treadmill = com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.entity(level, pos, state);
             return treadmill == null ? null : new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(treadmill, side);
         }, ModBlocks.SHEEP_TREADMILL.get());
-        // Echo Chamber (development builds only): power out of its port, the middle of its back, on the back face only.
-        if (ModBlocks.ECHO_CHAMBER != null) {
-            event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, be, side) -> {
-                if (!com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.isPort(state)
-                        || side != state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.FACING).getOpposite()) return null;
-                var chamber = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.entity(level, pos, state);
-                return chamber == null ? null : chamber.getEnergyHandler();
-            }, ModBlocks.ECHO_CHAMBER.get());
-        }
+        // Echo Chamber: power out of its port, the middle of its back, on the back face only.
+        event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, be, side) -> {
+            if (!com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.isPort(state)
+                    || side != state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.FACING).getOpposite()) return null;
+            var chamber = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.entity(level, pos, state);
+            return chamber == null ? null : chamber.getEnergyHandler();
+        }, ModBlocks.ECHO_CHAMBER.get());
         // Wool Burner: its buffer on every face, and its fuel slot (in only) for hoppers and pipes.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.WOOL_BURNER.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.WOOL_BURNER.get(),

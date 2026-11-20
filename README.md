@@ -71,7 +71,7 @@ Burns red or brown mushrooms and water for 200–250 FE/t. Generators that touch
 
 ![Machine fronts, idle and running](docs/screenshots/14_machine_fronts.png)
 
-**Late game:** Zero Point Module and Thermal Reaction Chamber. They cost a Nether Star and make the most power.
+**Late game:** Zero Point Module, Thermal Reaction Chamber and Echo Chamber. They make the most power.
 
 ### Zero Point Module
 
@@ -84,6 +84,12 @@ Two modules facing each other across open space link with a beam and make 1,000 
 Makes power from the difference between hot and cold: Blaze sheep in a pen against its hot side, Snow sheep in a pen against its cold side, and water through the middle. Each Blaze sheep matched by a Snow sheep is a pair: 2,500 FE/t for one, up to about 10,100 FE/t for six, doubled while a Blaze Rod and Blue Ice burn together. Keep the herds even. Left running hot for 30 seconds it melts down and explodes; left running cold, it freezes itself into Packed Ice. It drinks 250 mB of water a tick, and after an hour each sheep's fleece is spent until you infuse it again.
 
 ![Three Thermal Reaction Chambers, the middle one with three Blaze sheep and three Snow sheep in its outlined pens](docs/screenshots/105_thermal_reaction_chamber.png)
+
+### Echo Chamber
+
+A 3x3x3 generator that turns noise into power. Warden sheep in a pen in front of its dish listen for vibrations, the way a sculk sensor does: one makes 8,000 FE/t, up to 20,000 FE/t from four. Keep the noise steady and in its sweet spot. A note block on a redstone clock works well, and wool walls keep stray noise out. Too quiet for 30 seconds and the sheep fall asleep; too loud for 10 and the room shrieks, giving players nearby Darkness and stopping for a minute. Made from two Echo Shards, a Warden Wool Bale and a Functional Machine Block.
+
+![The Echo Chamber listening: three Warden sheep in its outlined pen and a note block beside it](docs/screenshots/wip_echo_chamber_listening.png)
 
 ### Energy Storage
 

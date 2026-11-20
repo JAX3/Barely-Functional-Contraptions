@@ -2479,7 +2479,14 @@ public final class DevScreenshotHarness {
             }
             case 755 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
             case 770 -> shot(mc, "wip_echo_chamber_jei_recipe");
-            case 776 -> mc.stop();
+            // Its chapter in the Contraptions Manual (Power, Late Game), and the WIP tab without it.
+            case 772 -> McClient.setScreen(mc, new GuideScreen());
+            case 776 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Echo Chamber"); }
+            case 780 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 790 -> shot(mc, "106_guide_echo_chamber");
+            case 792 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Work in Progress"); }
+            case 804 -> shot(mc, "106_guide_wip");
+            case 810 -> mc.stop();
             default -> {}
         }
         if (tick >= 80 && tick < 480 && tick % 10 == 0) {

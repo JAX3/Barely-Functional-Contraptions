@@ -187,12 +187,9 @@ public final class ModBlocks {
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock::new,
                     p -> p.mapColor(MapColor.COLOR_PURPLE).strength(3.5F, 6.0F).sound(SoundType.IRON).noOcclusion().lightLevel(state -> 7));
 
-    /**
-     * Work in progress: the planned Echo Chamber, a model preview only. Registered in development builds alone
-     * ({@code runClient}), so released jars don't get a block that does nothing.
-     */
+    /** Late-game generator, 3x3x3: Warden sheep in front of its dish turn the vibrations they hear into power. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock> ECHO_CHAMBER =
-            net.neoforged.fml.loading.FMLEnvironment.isProduction() ? null : REGISTER.registerBlock("echo_chamber",
+            REGISTER.registerBlock("echo_chamber",
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock::new,
                     p -> p.mapColor(MapColor.COLOR_CYAN).strength(5.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion());
 

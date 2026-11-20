@@ -72,10 +72,8 @@ public final class ResourcefulSheepClient {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.CHILLER.get(), context -> new AreaOutlineRenderer<>());
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.THERMAL_REACTION_CHAMBER.get(), context -> new AreaOutlineRenderer<>());
-            if (com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.ECHO_CHAMBER != null) {
-                event.registerBlockEntityRenderer(
-                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.ECHO_CHAMBER.get(), context -> new AreaOutlineRenderer<>());
-            }
+            event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.ECHO_CHAMBER.get(), context -> new AreaOutlineRenderer<>());
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.POWERED_FURNACE.get(), context -> new AreaOutlineRenderer<>());
         });
@@ -108,7 +106,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.WOOL_BURNER.get(), WoolBurnerScreen::new);
         event.register(ModMenus.SHEEP_TREADMILL.get(), SheepTreadmillScreen::new);
         event.register(ModMenus.THERMAL_REACTION_CHAMBER.get(), ThermalReactionChamberScreen::new);
-        if (ModMenus.ECHO_CHAMBER != null) event.register(ModMenus.ECHO_CHAMBER.get(), EchoChamberScreen::new);
+        event.register(ModMenus.ECHO_CHAMBER.get(), EchoChamberScreen::new);
         event.register(ModMenus.WOOL_PACKER.get(), WoolPackerScreen::new);
         event.register(ModMenus.INFUSION_ALTAR.get(), InfusionAltarScreen::new);
     }
@@ -160,10 +158,9 @@ public final class ResourcefulSheepClient {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.hume_field_generator")
                     .withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE, net.minecraft.ChatFormatting.ITALIC));
         }
-        if (com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ECHO_CHAMBER != null
-                && event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ECHO_CHAMBER.get())) {
+        if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ECHO_CHAMBER.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.echo_chamber")
-                    .withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE, net.minecraft.ChatFormatting.ITALIC));
+                    .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
         if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ZERO_POINT_ENERGY_MODULE.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.zero_point_energy_module")

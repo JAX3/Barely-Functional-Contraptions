@@ -318,7 +318,7 @@ public final class ModConfigs {
                     .defineInRange("timingRevision", 0, 0, 100);
             b.pop();
 
-            b.comment("Sheep attraction: the Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller and Thermal Reaction Chamber call their sheep back into their working area when one wanders a little way out").push("sheep_attraction");
+            b.comment("Sheep attraction: the Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Thermal Reaction Chamber and Echo Chamber call their sheep back into their working area when one wanders a little way out").push("sheep_attraction");
             attractionEnabled = b.comment("Whether these machines call their sheep back.")
                     .define("enabled", true);
             attractionRange = b.comment("How far outside the working area, in blocks, a sheep is still called back. The area outline shows it faintly.")
@@ -530,7 +530,7 @@ public final class ModConfigs {
                     .defineListAllowEmpty("coldSources", List.of("barelyfunctionalcontraptions:snow"), () -> "barelyfunctionalcontraptions:snow", o -> o instanceof String);
             b.pop();
 
-            b.comment("Echo Chamber (work in progress, development builds only: Warden sheep in front of its dish turn the vibrations they hear into power)").push("echo_chamber");
+            b.comment("Echo Chamber (late-game generator, 3x3x3: Warden sheep in front of its dish turn the vibrations they hear into power)").push("echo_chamber");
             echoPowerPerSheep = b.comment("FE/t from the first Warden sheep, with the noise in the sweet spot and perfectly steady. Each sheep after it adds less, see falloff.")
                     .defineInRange("powerPerSheep", 8_000, 0, 1_000_000);
             echoFalloff = b.comment("How much less each extra sheep adds: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on. 0.25 with 4 sheep = 20,000 FE/t.")

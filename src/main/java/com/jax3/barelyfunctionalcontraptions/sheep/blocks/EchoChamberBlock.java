@@ -37,12 +37,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Work in progress: the Echo Chamber, a generator that turns the vibrations its Warden sheep hear into power (see
+ * The Echo Chamber, a late-game generator that turns the vibrations its Warden sheep hear into power (see
  * {@link EchoChamberBlockEntity}). A 3x3x3 machine in the blue-steel casing, lined
  * with sculk: a big resonator dish on the front whose rings pulse outward from a glowing heart, egg-crate
  * sound-dampening foam on the side walls with sculk creeping over it, a power port between louvred vents
  * at the back, and a sculk-covered roof with a catalyst dome in a crown of sculk fronds. The biggest two, the Warden
- * sheep's "ears", now and then give off a pop of sculk charge. It's registered in development builds only.
+ * sheep's "ears", now and then give off a pop of sculk charge.
  *
  * <ul>
  *     <li>right-click any block of it to open its window;</li>

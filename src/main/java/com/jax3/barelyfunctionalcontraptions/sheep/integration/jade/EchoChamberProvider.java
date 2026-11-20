@@ -24,7 +24,7 @@ import snownee.jade.api.StreamServerDataProvider;
 import snownee.jade.api.config.IPluginConfig;
 
 /**
- * Echo Chamber (development builds only): its status, output and herd, the noise level and how steady it is, how
+ * Echo Chamber: its status, output and herd, the noise level and how steady it is, how
  * drowsy its sheep are or how close it is to shrieking, and its stored energy. Whichever of its 27 blocks you look at,
  * Jade is pointed at the middle one, which holds the block entity ({@link #redirect}).
  */

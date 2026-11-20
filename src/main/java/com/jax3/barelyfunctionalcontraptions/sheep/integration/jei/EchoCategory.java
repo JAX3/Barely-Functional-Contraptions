@@ -24,7 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 /**
- * "Echo Chamber" (development builds only, like the machine): Warden sheep in front of the dish, the chamber, a note
+ * "Echo Chamber": Warden sheep in front of the dish, the chamber, a note
  * block for the noise, the sweet spot, and a table of the power for each number of sheep, with a steady noise and an
  * erratic one. Everything is read from the server's config, so it matches the machine.
  */

@@ -54,7 +54,7 @@ import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 /**
- * The Echo Chamber (work in progress, development builds only): Warden sheep in front of its dish turn the vibrations
+ * The Echo Chamber, a late-game generator: Warden sheep in front of its dish turn the vibrations
  * they hear into power. It lives in the middle block of the machine's bottom layer.
  *
  * <ul>

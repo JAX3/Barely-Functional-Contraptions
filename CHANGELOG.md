@@ -14,6 +14,27 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 
 ### New machines
 
+#### Echo Chamber (late-game generator)
+- A 3x3x3 machine that turns noise into power. Place it facing you: it fills the space behind and above, and
+  breaking any part takes it all down (it drops one, with a pickaxe).
+- **Herd:** grown Warden sheep in a 5x5 pen in front of its dish. One makes 8,000 FE/t, up to 20,000 FE/t from four.
+- **Hearing:** it hears vibrations like a sculk sensor, within 8 blocks of its dish. Wool blocks noise, Woollen Boots
+  make none, and its own Warden sheep don't count.
+- **Noise level and sweet spot:** vibrations per 5 seconds over the last 10 seconds (0-15). Levels 5-10 give full
+  power; quieter or louder gives less. A steady noise gets full power and an erratic one as little as half.
+- **Sleep and shriek:** too quiet for 30 seconds and its sheep fall asleep until the noise is back; too loud for 10
+  and the room shrieks, giving players nearby Darkness, and stops for a minute.
+- Power comes out of the port in the middle of its back (up to 40,000 FE/t). A comparator reads the noise level.
+- **Window:** energy gauge, the herd and output, a noise meter showing the sweet spot, steadiness, and the
+  drowsiness and shriek bars.
+- **Model:** blue-steel casing lined with sculk, a big resonator dish that pulses, foam walls, louvred vents, and
+  a crown of sculk fronds on its roof like the Warden sheep's ears.
+- **Recipe:** two Echo Shards either side of a Warden Wool Bale, over a Functional Machine Block.
+- **JEI:** an *Echo Chamber* page and an information page. **Jade:** status, output, herd, noise, steadiness and
+  energy, from any of its blocks.
+- New recipe ingredient `barelyfunctionalcontraptions:wool_bale` for data packs, like `resource_wool`.
+- New config section `[echo_chamber]`.
+
 #### Thermal Reaction Chamber (late-game generator)
 - Makes power from the difference between hot and cold. Blaze sheep stand in a 5x5 pen against its hot side (on the
   left as you face it), Snow sheep in a pen against its cold side, and water runs through the middle.
@@ -81,7 +102,7 @@ Older config files are updated once, the first time they load. Settings still at
 ones, and anything you changed is kept.
 
 #### Machines keep their sheep close
-- The Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller and Thermal Reaction Chamber call their sheep back when
+- The Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Thermal Reaction Chamber and Echo Chamber call their sheep back when
   one wanders up to 4 blocks out of the working area.
 - A machine only calls sheep while it has room for more.
 - The chamber only calls sheep in a way that keeps its herds even, so the attraction can never set off a meltdown or a

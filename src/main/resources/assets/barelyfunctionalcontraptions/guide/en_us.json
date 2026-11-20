@@ -190,6 +190,32 @@
       ]
     },
     {
+      "title": "Echo Chamber",
+      "icon": "barelyfunctionalcontraptions:echo_chamber",
+      "tab": "power",
+      "group": "Late Game",
+      "text": [
+        "A 3x3x3 generator. Warden sheep standing in front of its dish listen for vibrations, and it turns what they hear into power.",
+        "Place it facing you: the block you place is the middle of its front, and the rest fills the space behind and above (it won't place if anything's in the way). The listening pen is 5x5 and starts one block out from its dish. Sneak-right-click it to outline the pen, and right-click it for its window. Breaking any part takes it all down, and you need a pickaxe to keep it.",
+        "## Power",
+        "- One grown Warden sheep with its fleece on makes 8,000 FE/t, and each one after it a little less: 14,000 for two, 18,000 for three and 20,000 for four, the most it counts.",
+        "- That's with the noise steady and in its sweet spot. A noise that keeps changing gets as little as half.",
+        "- It stores 2,000,000 FE and pushes up to 40,000 FE/t out of its power port, the middle of its back on the bottom layer. Only that face connects.",
+        "## Noise",
+        "It hears vibrations the way a sculk sensor does, within 8 blocks of the middle of its dish: note blocks, pistons, doors, footsteps, items landing. Its own Warden sheep moving about don't count.",
+        "- The noise level is how many vibrations it heard in the last 10 seconds, per 5 seconds. A note block struck once a second is about 5.",
+        "- The sweet spot is 5-10. Quieter, it makes less, down to nothing in silence. Louder, it loses a fifth for each level over 10.",
+        "- Wool between the noise and its dish blocks it, so wool walls keep stray noise out. A player wearing Woollen Boots makes none.",
+        "- A comparator against any block of it reads the noise level (0-15), so a circuit can turn your noise up or down.",
+        "## Keep it steady",
+        "- Too quiet for 30 seconds and its Warden sheep fall asleep and it stops. Noise back in the sweet spot wakes them, and they take 5 seconds to settle.",
+        "- Too loud for 10 seconds and the room shrieks: players nearby get Darkness, and it stops for a minute.",
+        "- A note block on a steady redstone clock, shut in with the chamber behind wool walls, is the easy way.",
+        "## Making it",
+        "- Two Echo Shards either side of a Warden Wool Bale, over a Functional Machine Block."
+      ]
+    },
+    {
       "title": "Energy Storage",
       "icon": "barelyfunctionalcontraptions:hume_energy_cube",
       "tab": "power",
@@ -399,26 +425,6 @@
         "## Upkeep",
         "- Smooth it out with a bank of Hume Energy Cubes, or the swings are hard to use.",
         "- Re-infuse the sheep in its pen regularly, or its output averages down."
-      ]
-    },
-    {
-      "title": "Echo Chamber",
-      "icon": "barelyfunctionalcontraptions:echo_chamber",
-      "fallback_icon": "minecraft:sculk_shrieker",
-      "tab": "wip",
-      "text": [
-        "In development: its core works in development builds only, and the numbers may change.",
-        "A 3x3x3 machine. Warden sheep in the pen in front of its dish turn the vibrations they hear into energy.",
-        "## Power",
-        "- 8,000 FE/t from one Warden sheep, up to 20,000 FE/t from four, while the noise around it is steady and in its sweet spot (noise level 5-10).",
-        "- Wool blocks noise from reaching it. Its power comes out of the port in the middle of its back.",
-        "## Upkeep",
-        "- Keep the noise steady: a note block on a redstone clock works well.",
-        "- Too quiet for 30 seconds and the Warden sheep fall asleep and it stops, until the noise is back.",
-        "- Too loud for 10 seconds and the room shrieks: Darkness for players nearby, and it stops for a minute.",
-        "- Planned: sculk catalysts that wear out and need replacing.",
-        "## Making it",
-        "- Two Echo Shards either side of a Warden Wool Bale, over a Functional Machine Block. Right-click it for its window."
       ]
     },
     {

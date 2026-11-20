@@ -156,16 +156,14 @@ public final class ModGameTests {
         TESTS.put("wrench_dismantles_machines_into_the_inventory", ModGameTests::wrenchDismantles);
         TESTS.put("woollen_boots_muffle_the_wearer", ModGameTests::woollenBootsMuffle);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
-        if (ModBlocks.ECHO_CHAMBER != null) TESTS.put("echo_chamber_is_three_by_three", ModGameTests::echoChamber);
-        if (ModBlocks.ECHO_CHAMBER != null) {
-            ECHO_TESTS.put("echo_chamber_counts_its_warden_sheep", ModGameTests::echoCountsHerd);
-            ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
-            ECHO_TESTS.put("echo_chamber_hears_vibrations_but_not_through_wool", ModGameTests::echoHearing);
-            ECHO_TESTS.put("echo_chamber_pushes_power_out_of_its_port", ModGameTests::echoPort);
-            ECHO_TESTS.put("echo_chamber_falls_asleep_in_silence", ModGameTests::echoSleep);
-            ECHO_TESTS.put("echo_chamber_shrieks_when_too_loud", ModGameTests::echoShriek);
-            TESTS.put("echo_chamber_recipe_and_drop", ModGameTests::echoRecipeAndDrop);
-        }
+        TESTS.put("echo_chamber_is_three_by_three", ModGameTests::echoChamber);
+        ECHO_TESTS.put("echo_chamber_counts_its_warden_sheep", ModGameTests::echoCountsHerd);
+        ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
+        ECHO_TESTS.put("echo_chamber_hears_vibrations_but_not_through_wool", ModGameTests::echoHearing);
+        ECHO_TESTS.put("echo_chamber_pushes_power_out_of_its_port", ModGameTests::echoPort);
+        ECHO_TESTS.put("echo_chamber_falls_asleep_in_silence", ModGameTests::echoSleep);
+        ECHO_TESTS.put("echo_chamber_shrieks_when_too_loud", ModGameTests::echoShriek);
+        TESTS.put("echo_chamber_recipe_and_drop", ModGameTests::echoRecipeAndDrop);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
