@@ -194,6 +194,17 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue thermalOutput;
         public final ModConfigSpec.ConfigValue<List<? extends String>> thermalHotSources;
         public final ModConfigSpec.ConfigValue<List<? extends String>> thermalColdSources;
+        public final ModConfigSpec.IntValue echoPowerPerSheep;
+        public final ModConfigSpec.DoubleValue echoFalloff;
+        public final ModConfigSpec.IntValue echoMaxSheep;
+        public final ModConfigSpec.IntValue echoRadius;
+        public final ModConfigSpec.IntValue echoListenRadius;
+        public final ModConfigSpec.IntValue echoWindowTicks;
+        public final ModConfigSpec.IntValue echoQuietBelow;
+        public final ModConfigSpec.IntValue echoLoudAbove;
+        public final ModConfigSpec.IntValue echoCapacity;
+        public final ModConfigSpec.IntValue echoOutput;
+        public final ModConfigSpec.ConfigValue<List<? extends String>> echoSources;
         public final ModConfigSpec.IntValue chillerRadius;
         public final ModConfigSpec.IntValue chillerMaxSources;
         public final ModConfigSpec.DoubleValue chillerFalloff;
@@ -511,6 +522,31 @@ public final class ModConfigs {
                     .defineListAllowEmpty("hotSources", List.of("barelyfunctionalcontraptions:blaze"), () -> "barelyfunctionalcontraptions:blaze", o -> o instanceof String);
             thermalColdSources = b.comment("Sheep resources whose sheep chill its cold side (with their fleece on).")
                     .defineListAllowEmpty("coldSources", List.of("barelyfunctionalcontraptions:snow"), () -> "barelyfunctionalcontraptions:snow", o -> o instanceof String);
+            b.pop();
+
+            b.comment("Echo Chamber (work in progress, development builds only: Warden sheep in front of its dish turn the vibrations they hear into power)").push("echo_chamber");
+            echoPowerPerSheep = b.comment("FE/t from the first Warden sheep, with the noise in the sweet spot and perfectly steady. Each sheep after it adds less, see falloff.")
+                    .defineInRange("powerPerSheep", 8_000, 0, 1_000_000);
+            echoFalloff = b.comment("How much less each extra sheep adds: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on. 0.25 with 4 sheep = 20,000 FE/t.")
+                    .defineInRange("falloff", 0.25, 0.0, 1.0);
+            echoMaxSheep = b.comment("Most Warden sheep one chamber counts.")
+                    .defineInRange("maxSheep", 4, 1, 64);
+            echoRadius = b.comment("Size of the listening pen in front of its dish: 2 = 5x5 (default), 1 = 3x3. It covers the chamber's bottom level and the block above.")
+                    .defineInRange("radius", 2, 0, 8);
+            echoListenRadius = b.comment("How far it hears vibrations from, in blocks, measured from the middle of its dish (a sculk sensor hears 8).")
+                    .defineInRange("listenRadius", 8, 1, 32);
+            echoWindowTicks = b.comment("Ticks of noise the noise level averages over (200 = 10 seconds). The level is vibrations per 5 seconds; steadiness compares the five fifths of this window.")
+                    .defineInRange("windowTicks", 200, 20, 6_000);
+            echoQuietBelow = b.comment("Noise levels below this are too quiet: the output falls away towards nothing in silence.")
+                    .defineInRange("quietBelow", 5, 1, 15);
+            echoLoudAbove = b.comment("Noise levels above this are too loud: the output falls by a fifth for each level over, to nothing five levels above.")
+                    .defineInRange("loudAbove", 10, 1, 15);
+            echoCapacity = b.comment("FE it stores.")
+                    .defineInRange("capacity", 2_000_000, 1, Integer.MAX_VALUE);
+            echoOutput = b.comment("Most FE it pushes out of its power port (the middle of its back) per tick.")
+                    .defineInRange("output", 40_000, 0, Integer.MAX_VALUE);
+            echoSources = b.comment("Sheep resources whose sheep listen for it (with their fleece on).")
+                    .defineListAllowEmpty("sources", List.of("barelyfunctionalcontraptions:warden"), () -> "barelyfunctionalcontraptions:warden", o -> o instanceof String);
             b.pop();
 
             b.comment("Woollen Armour (crafted from wool, in the wool's colour)").push("woollen_armor");

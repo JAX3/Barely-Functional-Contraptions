@@ -73,7 +73,19 @@ Craft a **Contraptions Manual** (a book and a Functional Machine Block) and righ
 - **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Powered Furnace, the Snow Sheep Chiller, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, Woollen Armour and the Muffled effect, and data packs and commands.
 - **Recipes:** built from the game itself, so it matches any data-pack or modpack changes. *Machines* and *Parts, Tools and Armour* show every crafting recipe of the mod as a 3x3 grid; *Infusion* shows what each sheep is fed and the wool it grows; *Infusion Altar* shows the catalysts round the feeding item, with the tier and power; *Mechanical Separator* shows what every wool separates into, with the power and time; *Wool Bales* shows packing, unpacking and what every bale separates into. Ingredients that take any of several items cycle through them, and hovering over an item shows its tooltip.
-- **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned late-game generators that need upkeep: *Hume Field Generator*, *Echo Chamber* (a Warden sheep in a sculk room), *Lightning Array* and *Fleece Fusion*, and the *Quantum Sheep*, which blinks in and out of existence, changes its wool type and drops random resource wool. None of them is in the game yet. The Hume Field Generator has a first model, a 2x2 machine two and a half blocks tall: in development builds (`runClient`) it can be placed with `/give @s barelyfunctionalcontraptions:hume_field_generator` to look at. It fills the 2x2x3 space east, south and above where it's placed (and won't place if any of it is taken), breaking any part removes the whole machine, and it does nothing yet. The Echo Chamber has a first model too: a 3x3x3 machine in the machines' blue-steel casing, lined with sculk. It has a big resonator dish on the front whose rings pulse outward from a glowing heart, egg-crate sound-dampening foam on the side walls between baffle ribs, with sculk creeping over some of it, a power port between two louvred vents at the back, with a conduit and an exhaust grille above, and a roof covered in sculk, with a catalyst dome in a crown of sculk fronds: two big ones like the Warden sheep's ears, smaller ones leaning out over the front and back, and tufts in the corners. In development builds it can be placed with `/give @s barelyfunctionalcontraptions:echo_chamber`: the block you place is its front middle one, it faces you, it fills the 3x3x3 space behind and above (and won't place if any of it is taken), breaking any part removes the whole machine, and it does nothing yet. Released jars don't include either of them.
+- **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned late-game generators that need upkeep: *Hume Field Generator*, *Echo Chamber* (a Warden sheep in a sculk room), *Lightning Array* and *Fleece Fusion*, and the *Quantum Sheep*, which blinks in and out of existence, changes its wool type and drops random resource wool. None of them is in the game yet. The Hume Field Generator has a first model, a 2x2 machine two and a half blocks tall: in development builds (`runClient`) it can be placed with `/give @s barelyfunctionalcontraptions:hume_field_generator` to look at. It fills the 2x2x3 space east, south and above where it's placed (and won't place if any of it is taken), breaking any part removes the whole machine, and it does nothing yet. The Echo Chamber has a first model too: a 3x3x3 machine in the machines' blue-steel casing, lined with sculk. It has a big resonator dish on the front whose rings pulse outward from a glowing heart, egg-crate sound-dampening foam on the side walls between baffle ribs, with sculk creeping over some of it, a power port between two louvred vents at the back, with a conduit and an exhaust grille above, and a roof covered in sculk, with a catalyst dome in a crown of sculk fronds: two big ones like the Warden sheep's ears, smaller ones leaning out over the front and back, and tufts in the corners. In development builds it can be placed with `/give @s barelyfunctionalcontraptions:echo_chamber`: the block you place is its front middle one, it faces you, it fills the 3x3x3 space behind and above (and won't place if any of it is taken), breaking any part removes the whole machine. Released jars don't include either of them.
+
+  **Echo Chamber: how it works so far** (development builds only; the numbers may change). Its core loop is in: Warden sheep in front of its dish turn the vibrations they hear into power.
+  - **Herd:** grown Warden sheep with their fleece on, in the 5x5 *listening pen* that starts one block out from its dish. The first makes 8,000 FE/t and each one after it less, up to four: 8,000 / 14,000 / 18,000 / 20,000 FE/t. It calls back a Warden sheep that wanders just out of the pen.
+  - **Hearing:** it hears vibrations the way a sculk sensor does, within 8 blocks of the middle of its dish: note blocks, pistons, doors, footsteps, items landing and so on. Wool between the noise and the dish blocks it, a player wearing Woollen Boots makes none, and its own Warden sheep moving about don't count.
+  - **Noise level:** the vibrations it heard in the last 10 seconds, as vibrations per 5 seconds (0-15). A note block struck once a second is about 5.
+  - **Sweet spot:** levels 5-10 give full power. Quieter, the output falls away towards nothing in silence (level 3 gives three fifths); louder, it falls a fifth for each level over 10, to nothing at 15.
+  - **Steadiness:** it splits the 10 seconds into fifths. A noise that's the same in each gets full power; an erratic one as little as half.
+  - **Power:** it stores 2,000,000 FE and pushes up to 40,000 FE/t out of its **power port**, the middle of its back, on the bottom layer. Only that face connects.
+  - **Readouts:** right-click any block of it for a status line (state, herd, noise level, steadiness and output). Sneak-right-click shows or hides its listening pen. A comparator against any block of it reads the noise level, 0-15.
+  - Still to come: falling asleep in silence, shrieking when it's too loud, catalysts that wear out, Echo Shard boosts, fleece fatigue, a window, JEI and Jade pages, and a recipe. Config: `[echo_chamber]` (see below).
+
+  ![The Echo Chamber listening: three Warden sheep in its outlined pen, a note block beside it, and the status line reading Listening, Warden sheep 3/4, Noise 5, Steady 68%, 15,154 FE/t](screenshots/wip_echo_chamber_listening.png)
 
   | Hume Field Generator (WIP model) | Close up |
   |---|---|
@@ -1109,6 +1121,18 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `fatigueTicks` | 72000 | Ticks a sheep can react before its fleece is spent; 0 = never |
 | `capacity` / `output` | 2000000 / 40000 | Its buffer, and the most FE/t it pushes out |
 | `hotSources` / `coldSources` | blaze / snow | Sheep resources that count on each side |
+
+**`[echo_chamber]`** (work in progress, development builds only)
+
+| Key | Default | Meaning |
+|---|---|---|
+| `powerPerSheep` / `falloff` / `maxSheep` | 8000 / 0.25 / 4 | FE/t from the first Warden sheep (steady noise in the sweet spot), how much less each extra one adds, and the most counted |
+| `radius` | 2 | Size of the listening pen in front of its dish: 2 = 5x5 |
+| `listenRadius` | 8 | How far it hears vibrations from, in blocks, from the middle of its dish |
+| `windowTicks` | 200 | Ticks of noise the noise level averages over |
+| `quietBelow` / `loudAbove` | 5 / 10 | The sweet spot of noise levels |
+| `capacity` / `output` | 2000000 / 40000 | Its buffer, and the most FE/t it pushes out of its power port |
+| `sources` | warden | Sheep resources whose sheep listen for it |
 
 **`[sheep_attraction]`**
 

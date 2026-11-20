@@ -2398,6 +2398,16 @@ public final class DevScreenshotHarness {
                 level.setBlock(at.offset(-3, 0, -1), Blocks.SCULK_SENSOR.defaultBlockState(), 3);
                 level.setBlock(at.offset(3, 0, -2), Blocks.SCULK_SHRIEKER.defaultBlockState(), 3);
                 level.setBlock(at.offset(-3, 0, 1), Blocks.SCULK_CATALYST.defaultBlockState(), 3);
+                // The noise: a note block, struck by a redstone block beside it going on and off (see below).
+                level.setBlock(at.offset(-3, 0, 2), Blocks.NOTE_BLOCK.defaultBlockState(), 3);
+                // Two more Warden sheep, in the listening pen in front of the dish.
+                for (double[] p : new double[][]{{-1.0, 2.5}, {0.6, 3.6}}) {
+                    Sheep listener = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+                    listener.snapTo(at.getX() + 0.5 + p[0], at.getY(), at.getZ() + p[1], 180, 0);
+                    listener.setNoAi(true);
+                    SheepInfusionEvents.setInfusion(listener, new SheepInfusion(Optional.of(ResourcefulSheep.id("warden")), 9, 0));
+                    level.addFreshEntity(listener);
+                }
                 Sheep sheep = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
                 sheep.snapTo(at.getX() + 2.9, at.getY(), at.getZ() + 1.0, 150, 0);
                 sheep.setYHeadRot(150);
@@ -2415,9 +2425,41 @@ public final class DevScreenshotHarness {
             case 170 -> shot(mc, "wip_echo_chamber_back");
             case 172 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 0 5", origin.getX() + 0.5, origin.getY() - 0.2, origin.getZ() - 9.0));
             case 200 -> shot(mc, "wip_echo_chamber_back_close");
-            case 206 -> mc.stop();
+            // Then it runs: a note block beside the pen, struck once a second by a redstone block going on and off.
+            case 210 -> {
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 150 30", origin.getX() + 4.5, origin.getY() + 2.5, origin.getZ() + 3.5));
+                server.execute(() -> {
+                    var be = echoChamber(server);
+                    if (be != null) be.setShowsArea(true);
+                });
+            }
+            case 215 -> setHudHidden(mc, false);
+            // Nothing takes its power here, so its buffer is long full: empty it to see it listening.
+            case 460 -> server.execute(() -> {
+                var be = echoChamber(server);
+                if (be != null) be.emptyBuffer();
+            });
+            case 470 -> server.execute(() -> {
+                var be = echoChamber(server);
+                if (be != null) server.getPlayerList().getPlayers().getFirst().sendOverlayMessage(be.status());
+            });
+            case 480 -> shot(mc, "wip_echo_chamber_listening");
+            case 486 -> mc.stop();
             default -> {}
         }
+        if (tick >= 80 && tick < 480 && tick % 10 == 0) {
+            server.execute(() -> {
+                ServerLevel level = server.overworld();
+                BlockPos switchAt = origin.offset(-4, 0, -2);
+                boolean on = level.getBlockState(switchAt).is(Blocks.REDSTONE_BLOCK);
+                level.setBlockAndUpdate(switchAt, on ? Blocks.AIR.defaultBlockState() : Blocks.REDSTONE_BLOCK.defaultBlockState());
+            });
+        }
+    }
+
+    /** The Echo Chamber the scene built: its middle block is one behind the front, which faces south. */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.@org.jspecify.annotations.Nullable EchoChamberBlockEntity echoChamber(MinecraftServer server) {
+        return server.overworld().getBlockEntity(origin.offset(0, 0, -5)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity be ? be : null;
     }
 
     /**

@@ -72,6 +72,10 @@ public final class ResourcefulSheepClient {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.CHILLER.get(), context -> new AreaOutlineRenderer<>());
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.THERMAL_REACTION_CHAMBER.get(), context -> new AreaOutlineRenderer<>());
+            if (com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.ECHO_CHAMBER != null) {
+                event.registerBlockEntityRenderer(
+                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.ECHO_CHAMBER.get(), context -> new AreaOutlineRenderer<>());
+            }
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.POWERED_FURNACE.get(), context -> new AreaOutlineRenderer<>());
         });

@@ -1,10 +1,14 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.blocks;
 
+import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity;
+import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
 import com.jax3.barelyfunctionalcontraptions.util.PlacementFacing;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -15,40 +19,51 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Work in progress: the planned Echo Chamber, so far only its model. A 3x3x3 machine in the blue-steel casing, lined
+ * Work in progress: the Echo Chamber, a generator that turns the vibrations its Warden sheep hear into power (see
+ * {@link EchoChamberBlockEntity}). A 3x3x3 machine in the blue-steel casing, lined
  * with sculk: a big resonator dish on the front whose rings pulse outward from a glowing heart, egg-crate
  * sound-dampening foam on the side walls with sculk creeping over it, a power port between louvred vents
  * at the back, and a sculk-covered roof with a catalyst dome in a crown of sculk fronds. The biggest two, the Warden
- * sheep's "ears", now and then give off a pop of sculk charge. It does nothing yet; it's registered in development builds only.
+ * sheep's "ears", now and then give off a pop of sculk charge. It's registered in development builds only.
+ *
+ * <ul>
+ *     <li>right-click any block of it to see what it's doing: its state, herd, noise level, steadiness and output;</li>
+ *     <li>sneak-right-click with an empty hand to show or hide its listening pen.</li>
+ * </ul>
  *
  * <p>It's 27 blocks, as a bed is two. {@link #FACING} is the way its front faces; {@link #PART} says which column
  * (0-8: {@code across + 3 * depth}, across 0-2 from its left to its right as you face it, depth 0-2 from the front back)
  * and {@link #LAYER} how high (0-2). The block placed is the front middle one at the bottom (part 1, layer 0); the rest
  * fill the space behind and above it, and it won't place unless that space is free. Breaking any of them removes them
  * all. The middle column draws the whole model (see tools/sheep/generate_echo_chamber_model.py); the rest draw
- * nothing.</p>
+ * nothing. The middle block of the bottom layer holds the block entity.</p>
  */
-public class EchoChamberBlock extends Block {
+public class EchoChamberBlock extends Block implements EntityBlock {
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final IntegerProperty PART = IntegerProperty.create("part", 0, 8);
     public static final IntegerProperty LAYER = IntegerProperty.create("layer", 0, 2);
     public static final int SIZE = 3;
     /** The block that's placed: the front middle one, at the bottom. */
     public static final int FRONT_MIDDLE = 1;
-    private static final int MIDDLE = 4;
+    public static final int MIDDLE = 4;
 
     /** The roof is 12 pixels into the top layer; the dome in the middle reaches its top. */
     private static final VoxelShape ROOF = Block.box(0, 0, 0, 16, 12, 16);
@@ -72,6 +87,59 @@ public class EchoChamberBlock extends Block {
     public static BlockPos at(BlockPos origin, Direction facing, int part, int layer) {
         Direction right = facing.getCounterClockWise(); // the machine's right, as you face its front
         return origin.relative(right, part % SIZE - 1).relative(facing.getOpposite(), part / SIZE).above(layer);
+    }
+
+    /** The middle block of the bottom layer, which holds the block entity. */
+    public static BlockPos core(BlockPos pos, BlockState state) {
+        return at(origin(pos, state), state.getValue(FACING), MIDDLE, 0);
+    }
+
+    /** The machine's block entity, from any of its blocks. */
+    public static @Nullable EchoChamberBlockEntity entity(BlockGetter level, BlockPos pos, BlockState state) {
+        return state.getBlock() instanceof EchoChamberBlock && level.getBlockEntity(core(pos, state)) instanceof EchoChamberBlockEntity be ? be : null;
+    }
+
+    /** Whether {@code state} is the block that holds the block entity. */
+    public static boolean isCore(BlockState state) {
+        return state.getValue(PART) == MIDDLE && state.getValue(LAYER) == 0;
+    }
+
+    /** Whether {@code state} is its power port, the middle of its back on the bottom layer. */
+    public static boolean isPort(BlockState state) {
+        return state.getValue(PART) == MIDDLE + SIZE && state.getValue(LAYER) == 0;
+    }
+
+    @Override
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return isCore(state) ? new EchoChamberBlockEntity(pos, state) : null;
+    }
+
+    @Override
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        if (!(level instanceof ServerLevel serverLevel) || !isCore(state) || type != ModBlockEntities.ECHO_CHAMBER.get()) return null;
+        return (l, pos, s, be) -> EchoChamberBlockEntity.serverTick(serverLevel, pos, s, (EchoChamberBlockEntity) be);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
+        EchoChamberBlockEntity be = entity(level, pos, state);
+        if (be == null) return InteractionResult.PASS;
+        if (player.isSecondaryUseActive()) be.toggleArea(player);
+        else player.sendOverlayMessage(be.status());
+        return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    protected boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    /** The noise level it hears, 0-15, from any block of it. */
+    @Override
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+        EchoChamberBlockEntity be = entity(level, pos, state);
+        return be == null ? 0 : be.comparatorSignal();
     }
 
     /** The front middle bottom block, which the others are laid out from. */

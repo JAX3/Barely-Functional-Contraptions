@@ -74,6 +74,9 @@ public final class ModGameTests {
     private static final Map<String, Consumer<GameTestHelper>> TESTS = new java.util.LinkedHashMap<>();
     private static final java.util.Map<String, Consumer<GameTestHelper>> RELOAD_TESTS = new java.util.LinkedHashMap<>();
     private static final java.util.Map<String, Consumer<GameTestHelper>> SOLO_TESTS = new java.util.LinkedHashMap<>();
+    /** Echo Chamber tests: each in a batch of its own (so no other test's noise reaches it), on a bigger empty structure. */
+    private static final java.util.Map<String, Consumer<GameTestHelper>> ECHO_TESTS = new java.util.LinkedHashMap<>();
+    private static final Identifier BIG_STRUCTURE = ResourcefulSheep.id("tall_empty");
 
     /** The one test that needs more than 400 ticks: a whole bale takes 45 seconds. */
     private static final String LONG_BALE_TEST = "separator_separates_a_whole_bale";
@@ -154,6 +157,12 @@ public final class ModGameTests {
         TESTS.put("woollen_boots_muffle_the_wearer", ModGameTests::woollenBootsMuffle);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
         if (ModBlocks.ECHO_CHAMBER != null) TESTS.put("echo_chamber_is_three_by_three", ModGameTests::echoChamber);
+        if (ModBlocks.ECHO_CHAMBER != null) {
+            ECHO_TESTS.put("echo_chamber_counts_its_warden_sheep", ModGameTests::echoCountsHerd);
+            ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
+            ECHO_TESTS.put("echo_chamber_hears_vibrations_but_not_through_wool", ModGameTests::echoHearing);
+            ECHO_TESTS.put("echo_chamber_pushes_power_out_of_its_port", ModGameTests::echoPort);
+        }
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -206,6 +215,7 @@ public final class ModGameTests {
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         RELOAD_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
         SOLO_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
+        ECHO_TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
     }
 
     private ModGameTests() {}
@@ -229,6 +239,11 @@ public final class ModGameTests {
             Holder<TestEnvironmentDefinition<?>> soloEnv = event.registerEnvironment(ResourcefulSheep.id("solo_" + name), new TestEnvironmentDefinition.AllOf());
             ResourceKey<Consumer<GameTestHelper>> fn = ResourceKey.create(Registries.TEST_FUNCTION, ResourcefulSheep.id(name));
             event.registerTest(ResourcefulSheep.id(name), new FunctionGameTestInstance(fn, new TestData<>(soloEnv, STRUCTURE, 1200, 0, true)));
+        }
+        for (String name : ECHO_TESTS.keySet()) {
+            Holder<TestEnvironmentDefinition<?>> echoEnv = event.registerEnvironment(ResourcefulSheep.id("solo_" + name), new TestEnvironmentDefinition.AllOf());
+            ResourceKey<Consumer<GameTestHelper>> fn = ResourceKey.create(Registries.TEST_FUNCTION, ResourcefulSheep.id(name));
+            event.registerTest(ResourcefulSheep.id(name), new FunctionGameTestInstance(fn, new TestData<>(echoEnv, BIG_STRUCTURE, 400, 0, true)));
         }
     }
 
@@ -1114,6 +1129,123 @@ public final class ModGameTests {
             place.run();
             h.assertFalse(h.getLevel().getBlockState(origin).is(block), "it won't place where any of its space is taken");
             h.succeed();
+        });
+    }
+
+    // ------------------------------------------------------------------ Echo Chamber
+
+    /**
+     * Builds an Echo Chamber facing north in the middle of the big empty structure, on a stone floor, and returns its
+     * block entity. (Test structures can be turned, so this works in world positions: the pen runs north of the dish.)
+     */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity buildEchoChamber(GameTestHelper h) {
+        BlockPos front = h.absolutePos(new BlockPos(6, 1, 6));
+        for (BlockPos p : BlockPos.betweenClosed(front.offset(-5, -1, -5), front.offset(5, -1, 4))) h.getLevel().setBlockAndUpdate(p, Blocks.STONE.defaultBlockState());
+        com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.fill(h.getLevel(), front, ModBlocks.ECHO_CHAMBER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.FACING, Direction.NORTH));
+        return (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity) h.getLevel().getBlockEntity(front.south());
+    }
+
+    /** A sheep standing still at world position {@code at}, infused with {@code resource} (spawned in world positions too). */
+    private static Sheep echoSheep(GameTestHelper h, BlockPos at, String resource) {
+        Sheep sheep = Vanilla.SHEEP.create(h.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        sheep.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0, 0);
+        sheep.setNoAi(true);
+        Identifier id = ResourcefulSheep.id(resource);
+        int uses = SheepResourceRegistry.server().byId(id).orElseThrow().effectiveInfusionUses();
+        SheepInfusionEvents.setInfusion(sheep, SheepInfusion.NONE.withResource(id, uses).afterShearing(0, 0));
+        h.getLevel().addFreshEntity(sheep);
+        return sheep;
+    }
+
+    /** It counts the grown, fleeced Warden sheep in the pen in front of its dish, and no others. */
+    private static void echoCountsHerd(GameTestHelper h) {
+        var be = buildEchoChamber(h);
+        BlockPos front = be.getBlockPos().north();
+        echoSheep(h, front.north(2), "warden");
+        echoSheep(h, front.north(3).west(), "warden");
+        echoSheep(h, front.north(2).east(2), "iron");                // not a Warden sheep
+        echoSheep(h, front.north(4), "warden").setSheared(true);     // no fleece
+        echoSheep(h, front.north(3).west(4), "warden");              // outside the pen
+        echoSheep(h, front.north(4).east(), "warden").setAge(-24000); // a lamb
+        be.scan(h.getLevel(), be.getBlockPos(), Direction.NORTH);
+        h.assertTrue(be.herd() == 2, "two Warden sheep count, got " + be.herd());
+        h.succeed();
+    }
+
+    /** The output follows the herd, the noise level and how steady it is; a comparator reads the noise level. */
+    private static void echoPower(GameTestHelper h) {
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.power(1, 7, 1.0) == 8_000, "one sheep, steady, in the sweet spot: 8,000");
+        int[] herd = {8_000, 14_000, 18_000, 20_000};
+        for (int n = 1; n <= 4; n++) {
+            int got = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.power(n, 7, 1.0);
+            h.assertTrue(got == herd[n - 1], n + " sheep make " + herd[n - 1] + ", got " + got);
+        }
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.power(5, 7, 1.0) == 20_000, "a fifth sheep adds nothing");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.power(4, 0, 1.0) == 0, "silence makes nothing");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.power(4, 3, 1.0) == 12_000, "too quiet (3 of 5): three fifths");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.power(4, 12, 1.0) == 12_000, "too loud (2 over): two fifths less");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.power(4, 15, 1.0) == 0, "far too loud makes nothing");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.power(4, 7, 0.0) == 10_000, "an erratic noise gets half");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.steadiness(new int[]{2, 2, 2, 2, 2}) == 1.0, "the same every fifth is perfectly steady");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.steadiness(new int[]{0, 0, 10, 0, 0}) == 0.0, "one burst is not steady at all");
+        // In the world: two Warden sheep hearing a steady level 10 (four vibrations every two seconds).
+        var be = buildEchoChamber(h);
+        BlockPos front = be.getBlockPos().north();
+        echoSheep(h, front.north(2), "warden");
+        echoSheep(h, front.north(3), "warden");
+        be.hearSteadily(4);
+        h.runAfterDelay(2, () -> {
+            h.assertTrue(be.noise() == 10 && be.herd() == 2, "noise 10 and two sheep, got " + be.noise() + " and " + be.herd());
+            h.assertTrue(be.generating() == 14_000 && be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.State.LISTENING,
+                    "listening at 14,000 FE/t, got " + be.state() + " " + be.generating());
+            var state = h.getLevel().getBlockState(front);
+            h.assertTrue(state.getAnalogOutputSignal(h.getLevel(), front, Direction.NORTH) == 10, "a comparator reads the noise level, 10");
+            h.succeed();
+        });
+    }
+
+    /** It hears vibrations near its dish, but not its own Warden sheep moving, and not through a wall of wool. */
+    private static void echoHearing(GameTestHelper h) {
+        var be = buildEchoChamber(h);
+        BlockPos front = be.getBlockPos().north();
+        net.minecraft.server.level.ServerLevel level = h.getLevel();
+        Sheep listener = echoSheep(h, front.north(2), "warden");
+        be.scan(level, be.getBlockPos(), Direction.NORTH);
+        int before = be.hearingNow();
+        BlockPos noteAt = front.north(4).above();
+        level.gameEvent(net.minecraft.world.level.gameevent.GameEvent.NOTE_BLOCK_PLAY, noteAt, net.minecraft.world.level.gameevent.GameEvent.Context.of(Blocks.NOTE_BLOCK.defaultBlockState()));
+        h.assertTrue(be.hearingNow() == before + 1, "a note block 4 blocks out is heard");
+        level.gameEvent(net.minecraft.world.level.gameevent.GameEvent.STEP, listener.blockPosition(), net.minecraft.world.level.gameevent.GameEvent.Context.of(listener));
+        h.assertTrue(be.hearingNow() == before + 1, "its own Warden sheep's steps aren't counted");
+        Sheep stranger = echoSheep(h, front.north(3).west(2), "iron");
+        level.gameEvent(net.minecraft.world.level.gameevent.GameEvent.STEP, stranger.blockPosition(), net.minecraft.world.level.gameevent.GameEvent.Context.of(stranger));
+        h.assertTrue(be.hearingNow() == before + 2, "another sheep's steps are");
+        // A note block shut in a box of wool can't be heard.
+        BlockPos boxed = front.north(4).east(3).above();
+        var wool = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace("white_wool")).defaultBlockState();
+        for (BlockPos p : BlockPos.betweenClosed(boxed.offset(-1, -1, -1), boxed.offset(1, 1, 1))) {
+            if (!p.equals(boxed)) level.setBlockAndUpdate(p, wool);
+        }
+        level.gameEvent(net.minecraft.world.level.gameevent.GameEvent.NOTE_BLOCK_PLAY, boxed, net.minecraft.world.level.gameevent.GameEvent.Context.of(Blocks.NOTE_BLOCK.defaultBlockState()));
+        h.assertTrue(be.hearingNow() == before + 2, "nothing gets through the wool");
+        h.succeed();
+    }
+
+    /** It pushes its power out of the port in the middle of its back, and offers power on that face only. */
+    private static void echoPort(GameTestHelper h) {
+        var be = buildEchoChamber(h);
+        BlockPos core = be.getBlockPos(), port = core.south(), behind = port.south();
+        net.minecraft.server.level.ServerLevel level = h.getLevel();
+        h.assertTrue(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, port, Direction.SOUTH) != null, "the port offers power on its back face");
+        h.assertTrue(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, port, Direction.EAST) == null, "but not on its sides");
+        h.assertTrue(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, port.east(), Direction.SOUTH) == null, "and no other block of it does");
+        level.setBlockAndUpdate(behind, ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState());
+        echoSheep(h, core.north(3), "warden");
+        be.hearSteadily(3);
+        h.succeedWhen(() -> {
+            var cube = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, behind, Direction.NORTH);
+            h.assertTrue(cube != null && cube.getAmountAsLong() > 0, "the cube behind its port fills up");
         });
     }
 
