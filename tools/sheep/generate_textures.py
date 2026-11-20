@@ -4148,7 +4148,7 @@ def generate_thermal_reaction_chamber_gui():
             img.putpixel((x, 190), rnd.choice(FIRE[2:5] if x < 88 else ICE[2:5]))
     # ---- sprites ----
     img.paste(sep.crop((186, 194, 256, 202)), (186, 194))           # status lamps
-    img.paste(shears.crop((176, 64, 208, 80)), (176, 146))          # area button background
+    img.paste(shears.crop((176, 64, 208, 80)), (176, 162))          # area button background (below the thermometer fills)
     for u, top, bottom, shine in ((176, FIRE[4], FIRE[1], FIRE[5]), (206, hexc("#2f6fd0"), hexc("#163a8a"), hexc("#7fb8ff"))):
         for y in range(64):                                         # energy (amber) and water (blue) fills
             for x in range(30):

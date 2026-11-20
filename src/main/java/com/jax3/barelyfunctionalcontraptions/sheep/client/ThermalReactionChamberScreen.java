@@ -36,7 +36,7 @@ public class ThermalReactionChamberScreen extends AbstractContainerScreen<Therma
     private static final int TEXT_COLOR = 0xFFDFE4F5, TEXT_DIM = 0xFFAEB4C6, HOT_TEXT = 0xFFFFB46A, COLD_TEXT = 0xFFBFE8FF,
             ENERGY_TEXT = 0xFFFFD27F, WATER_TEXT = 0xFF7FB8FF;
     private static final int LAMP_X = 9, LAMP_Y = 87, LAMP_U = 186, LAMP_V = 194;
-    private static final int AREA_X = 154, AREA_Y = 4, BUTTON_SIZE = 16, BUTTON_U = 176, BUTTON_V = 146;
+    private static final int AREA_X = 154, AREA_Y = 4, BUTTON_SIZE = 16, BUTTON_U = 176, BUTTON_V = 162;
 
     public ThermalReactionChamberScreen(ThermalReactionChamberMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, 193);
