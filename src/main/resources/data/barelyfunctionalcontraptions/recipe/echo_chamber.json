@@ -3,6 +3,8 @@
   "category": "redstone",
   "key": {
     "E": "minecraft:echo_shard",
+    "B": "minecraft:blackstone",
+    "I": "minecraft:iron_block",
     "M": "barelyfunctionalcontraptions:functional_machine_block",
     "W": {
       "neoforge:ingredient_type": "barelyfunctionalcontraptions:wool_bale",
@@ -10,8 +12,9 @@
     }
   },
   "pattern": [
+    "IEI",
     "EWE",
-    " M "
+    "BMB"
   ],
   "result": {
     "id": "barelyfunctionalcontraptions:echo_chamber"
