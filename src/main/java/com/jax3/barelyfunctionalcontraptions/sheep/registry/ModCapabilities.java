@@ -60,6 +60,11 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.POWERED_FURNACE.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.POWERED_FURNACE.get(),
                 (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
+        // Grass Seeder: power and water in, and Bone Meal in for hoppers and pipes, on every face.
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.GRASS_SEEDER.get(), (be, side) -> be.getEnergyHandler());
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.GRASS_SEEDER.get(), (be, side) -> be.getTank());
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.GRASS_SEEDER.get(),
+                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Snow Sheep Chiller: water in on every face (buckets, pipes, a Fluid Reservoir), and its Ice out for hoppers and pipes.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.CHILLER.get(), (be, side) -> be.getTank());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.CHILLER.get(),

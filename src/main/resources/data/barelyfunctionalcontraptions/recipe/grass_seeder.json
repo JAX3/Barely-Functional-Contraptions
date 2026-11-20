@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "BMB",
+    "IHI"
+  ],
+  "key": {
+    "S": "minecraft:wheat_seeds",
+    "C": "minecraft:composter",
+    "B": "minecraft:bone_block",
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
+    "I": "minecraft:iron_ingot",
+    "H": "minecraft:hopper"
+  },
+  "result": {
+    "id": "barelyfunctionalcontraptions:grass_seeder",
+    "count": 1
+  }
+}

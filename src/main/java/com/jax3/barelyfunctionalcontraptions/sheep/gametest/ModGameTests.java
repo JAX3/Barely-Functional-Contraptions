@@ -171,6 +171,10 @@ public final class ModGameTests {
         ECHO_TESTS.put("static_generator_combs_oxidise_and_wax", ModGameTests::staticCombs);
         ECHO_TESTS.put("static_generator_arcs_into_its_buffer", ModGameTests::staticArcs);
         ECHO_TESTS.put("static_generator_shocks_knock_back_unless_insulated", ModGameTests::staticShocks);
+        ECHO_TESTS.put("grass_seeder_regrasses_eaten_dirt_with_bone_meal", ModGameTests::seederBoneMeal);
+        ECHO_TESTS.put("grass_seeder_runs_on_power_and_water_first", ModGameTests::seederPower);
+        ECHO_TESTS.put("grass_seeder_grows_short_grass_then_rests", ModGameTests::seederShortGrass);
+        ECHO_TESTS.put("grass_seeder_gets_sheared_sheep_grazing", ModGameTests::seederGrazing);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -1413,6 +1417,94 @@ public final class ModGameTests {
     }
 
     /** Its dome arcs the charge into its buffer, which goes out of its base into a Hume Energy Cube beside it. */
+    /** A Grass Seeder on a 7x7 grass floor; {@code dirt} of its ground blocks (by offset from it) eaten down to dirt. */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity buildSeeder(GameTestHelper h, int[]... dirt) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.GRASS_BLOCK);
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 1, 0), new BlockPos(6, 2, 6))) h.setBlock(p, Blocks.AIR);
+        BlockPos at = h.absolutePos(new BlockPos(3, 1, 3));
+        h.getLevel().setBlockAndUpdate(at, ModBlocks.GRASS_SEEDER.get().defaultBlockState());
+        for (int[] d : dirt) h.getLevel().setBlockAndUpdate(at.offset(d[0], -1, d[1]), Blocks.DIRT.defaultBlockState());
+        return (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity) h.getLevel().getBlockEntity(at);
+    }
+
+    /** With no fuel it leaves eaten dirt bare; a Bone Meal regrasses it, a block every turn, eight blocks to the Bone Meal. */
+    private static void seederBoneMeal(GameTestHelper h) {
+        var be = buildSeeder(h, new int[]{1, 0}, new int[]{-2, 2}, new int[]{0, -1});
+        BlockPos at = be.getBlockPos();
+        var level = h.getLevel();
+        be.work(level, at);
+        h.assertTrue(be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.Status.NO_FUEL && be.dirt() == 3,
+                "no fuel: the dirt stays, got " + be.status() + " with " + be.dirt() + " dirt");
+        h.assertTrue(be.insertBoneMeal(new ItemStack(Items.BONE_MEAL, 1)) == 1, "it takes Bone Meal");
+        for (int i = 0; i < 3; i++) be.work(level, at);
+        for (int[] d : new int[][]{{1, 0}, {-2, 2}, {0, -1}}) {
+            h.assertTrue(level.getBlockState(at.offset(d[0], -1, d[1])).is(Blocks.GRASS_BLOCK), "the dirt at " + d[0] + "," + d[1] + " is grass again");
+        }
+        h.assertTrue(be.boneMeal().isEmpty() && be.boneCharges() == 5, "one Bone Meal opened, 5 of its 8 blocks left, got " + be.boneMeal() + " and " + be.boneCharges());
+        h.assertTrue(be.tended() == 3 && be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.Status.TENDING,
+                "three blocks tended, got " + be.tended());
+        h.succeed();
+    }
+
+    /** With power and water it uses them (800 FE and 10 mB a block) and keeps its Bone Meal. */
+    private static void seederPower(GameTestHelper h) {
+        var be = buildSeeder(h, new int[]{2, 2});
+        BlockPos at = be.getBlockPos();
+        be.insertBoneMeal(new ItemStack(Items.BONE_MEAL, 4));
+        be.fillEnergy();
+        be.getTank().fill(1000);
+        int energy = be.getEnergyHandler().getAmountAsInt();
+        be.work(h.getLevel(), at);
+        h.assertTrue(h.getLevel().getBlockState(at.offset(2, -1, 2)).is(Blocks.GRASS_BLOCK), "the dirt is grass again");
+        h.assertTrue(energy - be.getEnergyHandler().getAmountAsInt() == 800 && be.getTank().getAmount() == 990,
+                "800 FE and 10 mB used, got " + (energy - be.getEnergyHandler().getAmountAsInt()) + " FE and " + be.getTank().getAmount() + " mB left");
+        h.assertTrue(be.boneMeal().getCount() == 4 && be.boneCharges() == 0, "its Bone Meal kept, got " + be.boneMeal());
+        h.succeed();
+    }
+
+    /** Once it's all grass it grows short grass on 40% of it (10 of 24), then rests without using fuel. */
+    private static void seederShortGrass(GameTestHelper h) {
+        var be = buildSeeder(h);
+        BlockPos at = be.getBlockPos();
+        be.insertBoneMeal(new ItemStack(Items.BONE_MEAL, 8));
+        for (int i = 0; i < 14; i++) be.work(h.getLevel(), at);
+        int planted = 0;
+        for (BlockPos p : com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.ground(at)) {
+            if (h.getLevel().getBlockState(p.above()).is(Blocks.SHORT_GRASS)) planted++;
+        }
+        h.assertTrue(planted == 10 && be.tended() == 10, "short grass on 10 of 24, got " + planted + " (" + be.tended() + " tended)");
+        h.assertTrue(be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.Status.ALL_GREEN, "then it rests, got " + be.status());
+        h.assertTrue(be.boneMeal().getCount() == 6 && be.boneCharges() == 6, "10 blocks of Bone Meal used, got " + be.boneMeal().getCount() + " + " + be.boneCharges());
+        h.succeed();
+    }
+
+    /**
+     * A sheared sheep in its area grazes (eating the grass under it to dirt) and regrows its wool much sooner than on its
+     * own; one with its fleece on is left alone.
+     */
+    private static void seederGrazing(GameTestHelper h) {
+        var be = buildSeeder(h);
+        BlockPos at = be.getBlockPos();
+        var level = h.getLevel();
+        be.insertBoneMeal(new ItemStack(Items.BONE_MEAL, 64));
+        Sheep sheared = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        sheared.snapTo(at.getX() + 2.5, at.getY(), at.getZ() + 0.5, 0, 0);
+        sheared.setNoAi(true); // so only the seeder makes it graze
+        sheared.setSheared(true);
+        level.addFreshEntity(sheared);
+        Sheep fleeced = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        fleeced.snapTo(at.getX() - 1.5, at.getY(), at.getZ() + 0.5, 0, 0);
+        fleeced.setNoAi(true);
+        level.addFreshEntity(fleeced);
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.grazeChance() > 0.1,
+                "a sheared sheep grazes about 1 in 9 turns, got " + com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.grazeChance());
+        // 200 turns: the chance it never grazes is about 4 in 100 billion.
+        for (int i = 0; i < 200 && sheared.isSheared(); i++) be.work(level, at);
+        h.assertTrue(!sheared.isSheared(), "the sheared sheep grazed and regrew its wool");
+        h.assertTrue(!fleeced.isSheared() && level.getBlockState(fleeced.blockPosition().below()).is(Blocks.GRASS_BLOCK), "the fleeced sheep was left alone");
+        h.succeed();
+    }
+
     private static void staticArcs(GameTestHelper h) {
         var be = buildStaticGenerator(h);
         BlockPos at = be.getBlockPos();

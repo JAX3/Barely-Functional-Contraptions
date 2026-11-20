@@ -31,6 +31,15 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
   from three Copper Ingots and a Brush.
 - New config section `[static_generator]`.
 
+#### Grass Seeder (production)
+- Keeps a sheep pen green: every 2 seconds it turns a block of eaten dirt in the 5x5 around it back to grass, then
+  grows short grass on up to 40% of it. While it has fuel, sheared sheep in its area graze four times as often, so
+  their wool grows back much sooner.
+- **Fuel:** Bone Meal (8 blocks each), or 800 FE and 10 mB of water a block, which it uses first.
+- Right-click it for a readout; sneak-right-click to outline its area; a comparator reads how green it is.
+- **Recipe:** Wheat Seeds, a Composter, two Bone Blocks, a Functional Machine Block, two Iron Ingots and a Hopper.
+- New config section `[grass_seeder]`, and a chapter in the Contraptions Manual (Production).
+
 #### Echo Chamber (late-game generator)
 - A 3x3x3 machine that turns noise into power. Place it facing you: it fills the space behind and above, and
   breaking any part takes it all down (it drops one, with a pickaxe).

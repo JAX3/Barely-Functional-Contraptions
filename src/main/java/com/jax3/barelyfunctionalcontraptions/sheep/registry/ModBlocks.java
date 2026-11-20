@@ -200,6 +200,12 @@ public final class ModBlocks {
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock::new,
                     p -> p.mapColor(MapColor.COLOR_ORANGE).strength(2.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion());
 
+    /** Keeps a pen green: turns eaten dirt back to grass, grows short grass, and gets sheared sheep grazing sooner. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.GrassSeederBlock> GRASS_SEEDER =
+            REGISTER.registerBlock("grass_seeder",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.GrassSeederBlock::new,
+                    p -> p.mapColor(MapColor.COLOR_GREEN).strength(3.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion());
+
     /** Late-game generator, 3x3x3: Warden sheep in front of its dish turn the vibrations they hear into power. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock> ECHO_CHAMBER =
             REGISTER.registerBlock("echo_chamber",

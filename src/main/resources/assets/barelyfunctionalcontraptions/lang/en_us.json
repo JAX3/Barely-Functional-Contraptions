@@ -1201,5 +1201,16 @@
   "jade.barelyfunctionalcontraptions.thermal_fatigue.spent": "Thermal fleece spent: infuse it again",
   "config.jade.plugin_barelyfunctionalcontraptions.thermal_reaction_chamber": "Thermal Reaction Chamber",
   "config.jade.plugin_barelyfunctionalcontraptions.thermal_fatigue": "Sheep thermal fleece wear",
-  "jei.barelyfunctionalcontraptions.thermal.balance_desc": "Each sheep without a partner on the other side, or a boost burning alone, costs a quarter of the power and tips the balance towards a meltdown or a freeze."
+  "jei.barelyfunctionalcontraptions.thermal.balance_desc": "Each sheep without a partner on the other side, or a boost burning alone, costs a quarter of the power and tips the balance towards a meltdown or a freeze.",
+  "block.barelyfunctionalcontraptions.grass_seeder": "Grass Seeder",
+  "tooltip.barelyfunctionalcontraptions.grass_seeder": "Keeps a sheep pen green, so sheared sheep regrow their wool sooner. Runs on Bone Meal, or FE and water.",
+  "message.barelyfunctionalcontraptions.grass_seeder.status.tending": "Tending",
+  "message.barelyfunctionalcontraptions.grass_seeder.status.all_green": "All green",
+  "message.barelyfunctionalcontraptions.grass_seeder.status.no_fuel": "No fuel: Bone Meal, or FE and water",
+  "message.barelyfunctionalcontraptions.grass_seeder.status.no_ground": "No grass or dirt around it",
+  "message.barelyfunctionalcontraptions.grass_seeder.grass": "%s / %s grass",
+  "message.barelyfunctionalcontraptions.grass_seeder.bone_meal": "Bone Meal: %s (+%s blocks)",
+  "message.barelyfunctionalcontraptions.grass_seeder.power": "%s FE, %s mB",
+  "message.barelyfunctionalcontraptions.grass_seeder.full": "It can't hold any more Bone Meal",
+  "message.barelyfunctionalcontraptions.grass_seeder.tank_full": "Its water tank is full"
 }

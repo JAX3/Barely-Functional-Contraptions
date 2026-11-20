@@ -78,6 +78,7 @@ public final class ContraptionsCreativeTab {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.INFUSION_ALTAR,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.POWERED_FURNACE,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CHILLER,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GRASS_SEEDER,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.AUTOMATIC_SHEARS,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_RESERVOIR)),

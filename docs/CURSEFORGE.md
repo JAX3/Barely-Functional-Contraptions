@@ -179,6 +179,12 @@ The Blaze Furnace's icy opposite: Snow sheep standing round it freeze water into
 
 ![A Snow Sheep Chiller on a snowy floor with three Snow sheep round it inside its blue area outline, snowflakes drifting in, and a hopper underneath](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/100_chiller.png)
 
+### Grass Seeder
+
+Keeps a sheep pen green. It turns the dirt your sheep have eaten bare back to grass and grows short grass for them, and sheared sheep in its area graze four times as often, so their wool grows back much sooner. It runs on Bone Meal, or on FE and water.
+
+![A pen of sheep round a Grass Seeder, all grass again with tufts of short grass](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/108_grass_seeder.png)
+
 ### Wool Machines
 
 The Mechanical Separator turns resource wool back into 2–4 of its resource, string and sometimes a bonus. Automatic Shears shear every sheep in front of them and keep the wool for hoppers and pipes.

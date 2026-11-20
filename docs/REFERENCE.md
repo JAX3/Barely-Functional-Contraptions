@@ -730,6 +730,28 @@ The Blaze Sheep Furnace's icy opposite: it **freezes water into Ice with the col
 - **Recipe:** iron ingots in the four corners, a Snow Block above a Functional Machine Block, Packed Ice either side of it, and a Cauldron below. Mine it with a pickaxe.
 - **Config:** `[chiller]` sets the radius, the most Snow sheep counted, the falloff, the time and water per Ice, the tank, and which sheep resources give cold (`coldSources`, the Snow sheep by default).
 
+### Grass Seeder
+Keeps a sheep pen **green**, so sheared sheep regrow their wool sooner. Sheep eat grass down to dirt, and a sheared sheep only grows its wool back when it eats, so a bare pen is a slow one. A squat machine on four legs with a window full of seeds, a seed hopper on top and a brass sprinkler that drips while it works.
+
+```
+S C S      S = Wheat Seeds, C = Composter
+B M B      B = Bone Block, M = Functional Machine Block
+I H I      I = Iron Ingot, H = Hopper
+```
+
+| A pen its sheep have eaten bare | Green again, with short grass growing |
+|---|---|
+| ![A Grass Seeder in a fenced pen of patchy dirt and grass, four sheared sheep round it, its area outlined in green](screenshots/108_grass_seeder_bare.png) | ![The same pen all grass with tufts of short grass, three of the sheep woolly again](screenshots/108_grass_seeder.png) |
+| ![Close up of the Grass Seeder: blue-steel casing on legs, a window of seeds with a sprout, a seed hopper and a brass sprinkler on top](screenshots/108_grass_seeder_close.png) | |
+
+- **Area:** the **5x5 ground around it** (`radius`), at its feet, and the sheep standing on it. Sneak-right-click it with an empty hand to outline it in green.
+- **Tending:** every **2 seconds** (`tickInterval`) it tends one block. **Bare dirt** goes back to grass first; once it's all grass, it grows **short grass** on up to **40%** of it (`shortGrass`), for the sheep to eat instead of the grass block. With nothing to tend it rests, and uses no fuel.
+- **Grazing:** while it has fuel, **sheared, grown sheep** in its area graze **four times as often** (`grazeMultiplier`) as they would on their own (a vanilla sheep: 1 in 1,000 a tick), so their wool comes back much sooner. Sheep with their fleece on, and lambs, are left alone. A sheep with a high **Growth** stat regrows anyway; the Seeder is the cheap fix for the rest.
+- **Fuel:** **Bone Meal** (one tends 8 blocks, `boneMealBlocks`), by right-click, hopper or pipe; or **FE and water**: **800 FE** (`energyPerTick` 20 x 2 s) and **10 mB** (`waterPerBlock`) a block, from cables, pipes or a Water Bucket. It holds 20,000 FE and 4 buckets. It uses power and water first and saves its Bone Meal.
+- **Readout:** right-click it with an empty hand: its status (*Tending*, *All green*, *No fuel*, *No grass or dirt around it*), how much of its ground is grass, its Bone Meal, FE and water.
+- **Comparator:** reads how green its area is, 0-15.
+- **Goes well with:** **Automatic Shears** on the same pen (the shears take the wool, the Seeder grows it back), and a **Static Generator**, whose sheep only count with their fleece on. Mine it with a pickaxe. **Config:** `[grass_seeder]` (see below).
+
 ### Sheep Treadmill
 A generator a sheep runs: a belt one block wide and two long in the machines' blue-steel casing, with a bundle of wheat hanging from a gantry at the front and the generator housing at the back. Crafted from two Iron Ingots, three wool (the belt), two Copper Ingots and a Functional Machine Block:
 
@@ -1215,6 +1237,18 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 |---|---|---|
 | `bootsMuffle` | true | Whether Woollen Boots give the Muffled effect while worn |
 | `muffleVibrations` | true | Whether Muffled also hides the wearer's vibrations from sculk and Wardens |
+
+**`[grass_seeder]`**
+
+| Key | Default | Meaning |
+|---|---|---|
+| `radius` | 2 | How far out it tends the ground: 2 = the 5x5 around it |
+| `tickInterval` | 40 | Ticks between the blocks it tends (2 seconds) |
+| `boneMealBlocks` | 8 | Blocks one Bone Meal tends |
+| `energyPerTick` / `waterPerBlock` | 20 / 10 | FE a tick while tending (800 FE a block) and mB of water a block, instead of Bone Meal |
+| `grazeMultiplier` | 4.0 | How much sooner sheared sheep in its area graze; 1 = no boost |
+| `shortGrass` | 0.4 | Share of its grass it keeps short grass growing on |
+| `capacity` / `maxInput` / `tankCapacity` | 20,000 / 200 / 4,000 | FE it stores, FE it takes in a tick, mB of water it holds |
 
 **`[chiller]`**
 

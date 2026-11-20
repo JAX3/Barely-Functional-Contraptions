@@ -4508,6 +4508,49 @@ def generate_static_generator():
     comb.save(out(base + "bristles.png"))
 
 
+def generate_grass_seeder():
+    """Grass Seeder: a squat machine casing on four legs, a window full of seeds on each side, a seed hopper on top and
+    a brass sprinkler standing on it."""
+    base = "block/grass_seeder/"
+    os.makedirs(out(base), exist_ok=True)
+    rnd = random.Random(11)
+    seeds = [hexc("#c9a64a"), hexc("#a8862e"), hexc("#e2c76c"), hexc("#7d6420")]
+    leaf = [hexc("#3f7a2a"), hexc("#5aa13a"), hexc("#7cc24e")]
+
+    side = grid(MACHINE_BLOCK, CARTOON)  # the casing; a window of seeds with a sprout in it
+    for y in range(4, 12):
+        for x in range(4, 12):
+            side.putpixel((x, y), CARTOON["k"] if x in (4, 11) or y in (4, 11) else seeds[rnd.randrange(4)])
+    for x, y, c in ((7, 6, 2), (8, 5, 2), (7, 7, 1), (8, 7, 0), (7, 8, 0), (8, 6, 1)):
+        side.putpixel((x, y), leaf[c])
+    side.save(out(base + "side.png"))
+
+    top = grid(MACHINE_BLOCK, CARTOON)  # a grated seed hopper
+    for y in range(3, 13):
+        for x in range(3, 13):
+            if x in (3, 12) or y in (3, 12):
+                top.putpixel((x, y), CARTOON["S"])
+            elif (x + y) % 3 == 0:
+                top.putpixel((x, y), CARTOON["M"])
+            else:
+                top.putpixel((x, y), seeds[rnd.randrange(4)])
+    top.save(out(base + "top.png"))
+
+    metal = Image.new("RGBA", (16, 16))  # the legs: plain steel, lit on the left
+    for y in range(16):
+        for x in range(16):
+            metal.putpixel((x, y), CARTOON["H"] if x % 4 == 0 else CARTOON["S"] if x % 4 == 3 else CARTOON["M"])
+    metal.save(out(base + "metal.png"))
+
+    brass = Image.new("RGBA", (16, 16))  # the sprinkler: brass, with a few water drops beaded on it
+    for y in range(16):
+        for x in range(16):
+            brass.putpixel((x, y), CARTOON["Y"] if (x + y) % 7 == 0 else CARTOON["c"] if y % 4 == 3 else CARTOON["C"])
+    for x, y in ((3, 5), (10, 2), (12, 9), (6, 12)):
+        brass.putpixel((x, y), hexc("#9fd8ff"))
+    brass.save(out(base + "brass.png"))
+
+
 def generate_static_generator_gui():
     """Static Generator window: energy gauge, then a panel with the herd and output, the dome's charge bar (the shock
     line marked) and four comb chips; the status lamp below."""
@@ -4590,6 +4633,7 @@ def main():
     generate_echo_chamber_gui()
     generate_static_generator()
     generate_static_generator_gui()
+    generate_grass_seeder()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

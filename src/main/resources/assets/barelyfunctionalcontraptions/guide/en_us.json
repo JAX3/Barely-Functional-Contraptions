@@ -409,6 +409,19 @@
       ]
     },
     {
+      "title": "Grass Seeder",
+      "icon": "barelyfunctionalcontraptions:grass_seeder",
+      "tab": "production",
+      "text": [
+        "Keeps a sheep pen green. Sheep eat grass down to dirt, and a sheared sheep only grows its wool back when it eats, so a bare pen is a slow pen. Place the Seeder in the middle of one.",
+        "- Every 2 seconds it tends one block of the 5x5 ground around it: dirt that's been eaten bare goes back to grass. Once it's all grass, it grows short grass on up to 40% of it, for the sheep to eat instead.",
+        "- While it has fuel, sheared sheep standing in its area graze four times as often, so their wool comes back much sooner. Sheep with their fleece on are left alone.",
+        "- Fuel: right-click it with Bone Meal (one tends 8 blocks), or feed it from a hopper or pipe. Or give it FE and water: 800 FE and 10 mB a block, from cables, pipes or a Water Bucket. It uses power and water first and saves its Bone Meal.",
+        "- A comparator reads how green its area is.",
+        "Right-click it with an empty hand to see how it's doing: its status, how much of its ground is grass, and its fuel. Sneak-right-click with an empty hand to outline its area. It pairs well with Automatic Shears on the same pen, and with a Static Generator, whose sheep only count with their fleece on."
+      ]
+    },
+    {
       "title": "Wool Machines",
       "icon": "barelyfunctionalcontraptions:mechanical_separator",
       "tab": "production",

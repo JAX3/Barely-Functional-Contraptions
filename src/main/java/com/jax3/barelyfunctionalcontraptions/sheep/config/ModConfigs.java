@@ -226,6 +226,16 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue staticWaxedEfficiency;
         public final ModConfigSpec.IntValue staticCapacity;
         public final ModConfigSpec.IntValue staticOutput;
+        public final ModConfigSpec.IntValue seederRadius;
+        public final ModConfigSpec.IntValue seederInterval;
+        public final ModConfigSpec.IntValue seederBoneMealBlocks;
+        public final ModConfigSpec.IntValue seederEnergyPerTick;
+        public final ModConfigSpec.IntValue seederWaterPerBlock;
+        public final ModConfigSpec.DoubleValue seederGrazeMultiplier;
+        public final ModConfigSpec.DoubleValue seederShortGrass;
+        public final ModConfigSpec.IntValue seederCapacity;
+        public final ModConfigSpec.IntValue seederMaxInput;
+        public final ModConfigSpec.IntValue seederTankCapacity;
         public final ModConfigSpec.IntValue chillerRadius;
         public final ModConfigSpec.IntValue chillerMaxSources;
         public final ModConfigSpec.DoubleValue chillerFalloff;
@@ -614,6 +624,29 @@ public final class ModConfigs {
                     .defineInRange("capacity", 500_000, 1, Integer.MAX_VALUE);
             staticOutput = b.comment("Most FE it pushes into the blocks around its base per tick, in total.")
                     .defineInRange("output", 2_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Grass Seeder (turns the dirt its sheep have eaten back to grass, grows short grass, and gets sheared sheep grazing sooner)").push("grass_seeder");
+            seederRadius = b.comment("How far out its area reaches: 2 = the 5x5 around it (default). It tends the ground it stands on.")
+                    .defineInRange("radius", 2, 1, 8);
+            seederInterval = b.comment("Ticks between the blocks it tends (40 = 2 seconds): one block each time.")
+                    .defineInRange("tickInterval", 40, 1, 72_000);
+            seederBoneMealBlocks = b.comment("Blocks one Bone Meal tends.")
+                    .defineInRange("boneMealBlocks", 8, 1, 64);
+            seederEnergyPerTick = b.comment("FE a tick while it tends, instead of Bone Meal (with water): taken for each block it tends, so 20 x 40 = 800 FE a block.")
+                    .defineInRange("energyPerTick", 20, 0, 1_000_000);
+            seederWaterPerBlock = b.comment("mB of water each block takes when it runs on FE.")
+                    .defineInRange("waterPerBlock", 10, 0, 1_000_000);
+            seederGrazeMultiplier = b.comment("How much sooner sheared sheep in its area graze (and so regrow their wool) than on plain grass: 4 = four times as often. 1 = no boost.")
+                    .defineInRange("grazeMultiplier", 4.0, 1.0, 100.0);
+            seederShortGrass = b.comment("Share of the grass in its area it keeps short grass growing on, for the sheep to eat (0.4 = 40%). 0 = none.")
+                    .defineInRange("shortGrass", 0.4, 0.0, 1.0);
+            seederCapacity = b.comment("FE it stores.")
+                    .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
+            seederMaxInput = b.comment("FE it takes in per tick.")
+                    .defineInRange("maxInput", 200, 1, Integer.MAX_VALUE);
+            seederTankCapacity = b.comment("mB of water it holds.")
+                    .defineInRange("tankCapacity", 4_000, 100, 1_000_000);
             b.pop();
 
             b.comment("Woollen Armour (crafted from wool, in the wool's colour)").push("woollen_armor");
