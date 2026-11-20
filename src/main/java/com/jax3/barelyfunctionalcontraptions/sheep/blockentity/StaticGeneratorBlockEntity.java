@@ -53,10 +53,10 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  *     <li><b>Pen and combs:</b> a 5x5 pen centred on it ({@code radius}), at its level and the one above. It uses the
  *     nearest {@code maxCombs} (4) Copper Combs in the pen.</li>
  *     <li><b>Herd:</b> every half second it counts the grown sheep with their fleece on standing within
- *     {@code combReach} (1.5 blocks) of a comb. Each gives {@code powerPerSheep} (75 FE/t), or what
- *     {@code sheepPower} lists for its resource (Copper 150, Redstone 125), times its comb's efficiency. The best
- *     counts in full and each one after it a little less ({@code falloff}), up to {@code maxSheep} (6): about
- *     400 FE/t from plain sheep, about 800 from Copper sheep.</li>
+ *     {@code combReach} (1.5 blocks) of a comb. Each gives {@code powerPerSheep} (100 FE/t), or what
+ *     {@code sheepPower} lists for its resource (Copper 150, Redstone 125), times its comb's efficiency, up to
+ *     {@code maxSheep} (6): 600 FE/t from plain sheep, 900 from Copper sheep. ({@code falloff}, 0 by default, can make
+ *     each one after the best add a little less.)</li>
  *     <li><b>Combs:</b> a comb gives 100% fresh, then 75, 50 and 25% as it oxidises; waxed, 85% of that. Each comb a
  *     sheep is rubbing against wears, and after {@code wearTicks} (20 minutes) of it oxidises a stage, unless it's
  *     waxed. An axe scrapes it back.</li>

@@ -45,6 +45,7 @@ z = -9.
 | Ore processing line: six Iron sheep in the Automatic Shears' pen, pipes over the top to a Mechanical Separator, a pipe trench under the row to three Powered Furnaces, a Wool Burner and a chest (filtered to ingots, nuggets and String), powered by a Mycelial Generator on a Fluid Reservoir | `/tp @s 405.5 40 -1 180 34` |
 | Thermal Reaction Chamber: three Blaze sheep in its hot pen and three Snow sheep in its cold pen (standing still, so it stays balanced), 16 Blaze Rods and Blue Ice to burn, pens outlined, six Fluid Reservoirs on a pool piping in its water, and an Energy Meter into a bank of eight Hume Energy Cubes | `/tp @s 422.5 41.5 -3.5 180 32` |
 | Echo Chamber on a sculk floor: four Warden sheep standing still in its fenced listening pen (outlined), a repeater clock beside it striking two note blocks for a steady noise in its sweet spot, and an Energy Meter behind its power port into a bank of eight Hume Energy Cubes | `/tp @s 442.5 40.5 0.5 180 28` |
+| Static Generator on grass: six sheep standing still at four fresh Copper Combs in its fenced pen (outlined, a gate at the front), making 600 FE/t through an Energy Meter into a bank of eight Hume Energy Cubes | `/tp @s 462.5 40 -2.5 180 32` |
 
 The scenes from the New blocks on were added to the existing world with
 `./gradlew runClient -PscreenshotHarness -PharnessScene=extend_world "-PharnessWorld=BFC Test World"` (unzip this
@@ -60,6 +61,12 @@ level 6, so after about 10 seconds it starts listening (about 18,000 FE/t, and p
 its buffer and cube bank fill in about half a minute, and then it waits as *Buffer full*. Walking around near it adds
 noise of your own, unless you're wearing Woollen Boots. To see it shriek, put another note block on the clock; to see
 its sheep fall asleep, break a repeater.
+
+The Static Generator is saved empty too, and runs while you're near it: 600 FE/t from its six sheep, in bursts as its
+dome arcs every 3 seconds. Its combs oxidise a stage for every 20 minutes they're worked, so scrape them with an axe or
+wax them with Honeycomb. After about 12 minutes its cube bank and buffer are full, its dome overcharges, and stepping
+through the gate into its pen in survival throws you back out (and gets you *Shocking!*). Take power out of the cubes
+to keep it charging safely.
 
 When you first open the world, Minecraft warns that it uses experimental settings, because it's a superflat test world.
 Choose **I Know What I'm Doing!**. The warning won't show again for this world.

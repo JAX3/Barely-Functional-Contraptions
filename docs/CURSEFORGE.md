@@ -79,7 +79,7 @@ Burns red or brown mushrooms and water for 200–250 FE/t. Generators that touch
 
 ### Static Generator
 
-Two blocks tall, like a Van de Graaff generator. Sheep rubbing against Copper Combs in its pen build up static, and its copper dome arcs it into power: 75 FE/t a sheep, 150 for Copper sheep, about 400–800 FE/t from six. The combs oxidise as they're worked, so scrape them with an axe or wax them. If nothing takes its power the dome overcharges and shocks anything in its pen, knocking it back; Woollen Armour insulates.
+Two blocks tall, like a Van de Graaff generator. Sheep rubbing against Copper Combs in its pen build up static, and its copper dome arcs it into power: 100 FE/t a sheep, 150 for Copper sheep: 600 FE/t from six plain sheep, 900 from six Copper sheep. The combs oxidise as they're worked, so scrape them with an axe or wax them. If nothing takes its power the dome overcharges and shocks anything in its pen, knocking it back; Woollen Armour insulates.
 
 ![A Static Generator with four Copper Combs and five sheep in its outlined pen](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/107_static_generator.png)
 

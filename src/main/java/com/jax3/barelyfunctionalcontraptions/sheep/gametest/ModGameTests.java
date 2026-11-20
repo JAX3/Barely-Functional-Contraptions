@@ -1361,14 +1361,13 @@ public final class ModGameTests {
         h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.State.NEEDS_COMBS
                 || be.combs().isEmpty(), "no combs yet");
         level.setBlockAndUpdate(comb, ModBlocks.COPPER_COMB.get().defaultBlockState());
-        echoSheep(h, comb.south(), "iron");            // next to the comb: 75
+        echoSheep(h, comb.south(), "iron");            // next to the comb: 100
         echoSheep(h, comb.north(), "copper");          // next to the comb: 150
         echoSheep(h, comb.west(), "iron").setSheared(true); // no fleece
         echoSheep(h, at.west(2).north(2), "iron");     // in the pen but nowhere near a comb
         be.scan(level, at);
         h.assertTrue(be.combs().size() == 1 && be.herd() == 2, "one comb and two sheep at it, got " + be.combs().size() + " and " + be.herd());
-        int expected = (int) Math.round(150 + 75 * 0.95);
-        h.assertTrue(be.generating() == expected, "Copper 150 and plain 75 (a little less as the second) make " + expected + ", got " + be.generating());
+        h.assertTrue(be.generating() == 250, "Copper 150 and plain 100 make 250, got " + be.generating());
         h.succeed();
     }
 

@@ -902,7 +902,7 @@
   "jei.barelyfunctionalcontraptions.static.shock": "Overcharged: shocks!",
   "jei.barelyfunctionalcontraptions.static.shock_desc": "With its buffer full, its dome keeps charging. Past %s%% it knocks back players and mobs in its pen. Woollen Armour insulates, a quarter per piece.",
   "jei.barelyfunctionalcontraptions.info.static_generator.1": "A generator two blocks tall. Sheep rubbing against Copper Combs in its 5x5 pen build up static, and its copper dome arcs it into power every 3 seconds.",
-  "jei.barelyfunctionalcontraptions.info.static_generator.2": "75 FE/t a sheep, Copper sheep 150 and Redstone sheep 125, up to six. The combs oxidise as they're worked: scrape them with an axe, or wax them with Honeycomb.",
+  "jei.barelyfunctionalcontraptions.info.static_generator.2": "100 FE/t a sheep, Copper sheep 150 and Redstone sheep 125, up to six. The combs oxidise as they're worked: scrape them with an axe, or wax them with Honeycomb.",
   "jei.barelyfunctionalcontraptions.info.static_generator.3": "Take its power, or its dome overcharges and knocks back anything in its pen. Woollen Armour insulates.",
   "jei.barelyfunctionalcontraptions.info.copper_comb": "Put up to 4 in a Static Generator's pen for its sheep to rub against. It oxidises as it's worked (100, 75, 50, 25%). Scrape it with an axe, or wax it with Honeycomb to stop it ageing (85%). It keeps its stage and wax when broken.",
   "jade.barelyfunctionalcontraptions.static_generator.output": "%s FE/t",

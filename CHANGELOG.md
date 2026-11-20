@@ -17,8 +17,8 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 #### Static Generator and Copper Comb (mid-game generator)
 - Two blocks tall, like a Van de Graaff generator. Sheep rubbing against Copper Combs in its 5x5 pen build up static,
   and its copper dome arcs the charge into its buffer every 3 seconds.
-- **Power:** a grown sheep with its fleece on gives 75 FE/t; Copper sheep 150, Redstone sheep 125. Up to six count,
-  each after the best a little less: about 400 FE/t from plain sheep, about 800 from Copper sheep.
+- **Power:** a grown sheep with its fleece on gives 100 FE/t; Copper sheep 150, Redstone sheep 125. Up to six count,
+  each in full: 600 FE/t from plain sheep, 900 from Copper sheep.
 - **Copper Combs:** up to 4 in its pen. They oxidise as they're worked (100, 75, 50, 25%), about every 20 minutes. An
   axe scrapes one back a stage; Honeycomb waxes it so it stops ageing, at 85%. A broken comb keeps its stage and wax.
 - **Shocks:** with its buffer full the dome keeps charging; past half full it shocks players and mobs in its pen,
@@ -27,6 +27,7 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 - **JEI:** a Static Generator page (the power for one to six plain or Copper sheep, the comb stages, the shock), and
   information pages for the generator and the comb. **Jade:** status, output, herd, dome charge, combs and energy.
 - **Advancement:** *Shocking!* (goal), for being knocked back by an overcharged Static Generator.
+- **Test world:** a Static Generator scene at x 462, six sheep making 600 FE/t into a bank of Hume Energy Cubes.
 - **Recipes:** a Lightning Rod, two Copper Blocks, Redstone, two wool and a Functional Machine Block; a Copper Comb
   from three Copper Ingots and a Brush.
 - New config section `[static_generator]`.

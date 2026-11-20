@@ -1640,8 +1640,8 @@ public final class DevScreenshotHarness {
             // Added before, and already in the world: new blocks (x 166), themed sheep (202), blaze furnace (234),
             // wool burner (262), wool packer (282), infusion altar (302), snow sheep chiller (322),
             // powered furnace (342), woollen armour (362), sheep treadmill (382), ore line (402),
-            // thermal reaction chamber (422).
-            {"echo chamber", 442},
+            // thermal reaction chamber (422), echo chamber (442).
+            {"static generator", 462},
     };
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
@@ -2095,6 +2095,54 @@ public final class DevScreenshotHarness {
                 .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN, Direction.EAST), 3);
         for (int z = -9; z <= -6; z++) for (int y = 0; y <= 1; y++) level.setBlock(o.offset(0, y, z), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
         label(server, o.offset(0, 5, -3), "Echo Chamber", "aqua");
+    }
+
+    /**
+     * The Static Generator for the test world: one facing south on grass, its 5x5 pen fenced (with a gate at the front)
+     * and outlined, four fresh Copper Combs in it, and six plain sheep standing still at them, which make 600 FE/t. Its
+     * power goes through an Energy Meter behind it into a bank of eight Hume Energy Cubes, so it runs for about 12
+     * minutes before its cubes fill and its dome overcharges.
+     */
+    private static void staticWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, 0, -12), o.offset(7, 6, 5))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, -1, -12), o.offset(7, -1, 5))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        BlockPos g = o.offset(0, 0, -3);
+        var gen = ModBlocks.STATIC_GENERATOR.get().defaultBlockState().setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.FACING, Direction.SOUTH);
+        level.setBlock(g, gen, 3);
+        level.setBlock(g.above(), gen.setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.HALF,
+                net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER), 3);
+        if (level.getBlockEntity(g) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity be) be.setShowsArea(true);
+        var comb = ModBlocks.COPPER_COMB.get().defaultBlockState();
+        for (int[] c : new int[][]{{-2, 1}, {2, 1}, {-2, -1}, {2, -1}}) level.setBlock(g.offset(c[0], 0, c[1]), comb, 3);
+        // The fence round the pen (x -2..2, z -2..2 from the generator), a gate in the front, a gap at the back for the cubes.
+        var fence = Blocks.SPRUCE_FENCE.defaultBlockState();
+        for (int d = -3; d <= 3; d++) {
+            level.setBlock(g.offset(-3, 0, d), fence, 3);
+            level.setBlock(g.offset(3, 0, d), fence, 3);
+            if (d != 0) level.setBlock(g.offset(d, 0, -3), fence, 3);
+            level.setBlock(g.offset(d, 0, 3), d == 0 ? Blocks.SPRUCE_FENCE_GATE.defaultBlockState() : fence, 3);
+        }
+        // Six plain sheep, each within reach of a comb, standing still.
+        for (double[] p : new double[][]{{-0.6, 2.3, 270}, {1.6, 2.3, 90}, {-0.6, -0.3, 270}, {1.6, -0.3, 90}, {-1.3, 2.7, 180}, {2.3, 2.7, 180}}) {
+            Sheep sheep = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            sheep.snapTo(g.getX() + p[0], g.getY(), g.getZ() + p[1], (float) p[2], 0);
+            sheep.setNoAi(true);
+            sheep.setPersistenceRequired();
+            level.addFreshEntity(sheep);
+        }
+        // Its power: an Energy Meter behind its base into a bank of eight Hume Energy Cubes.
+        level.setBlock(g.north(), ModBlocks.ENERGY_METER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.NORTH)
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN, Direction.EAST), 3);
+        for (int z = -5; z <= -2; z++) for (int y = 0; y <= 1; y++) level.setBlock(g.offset(0, y, z), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        label(server, g.above(3), "Static Generator", "gold");
     }
 
     /** Swaps the redstone block that started the Echo Chamber's clock back for stone, leaving the pulse going round. */
@@ -2712,8 +2760,8 @@ public final class DevScreenshotHarness {
 
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
-        // The latest scene: the Echo Chamber.
-        String[] tps = {"tp @a 442.5 40.5 0.5 180 28", "tp @a 449.5 39.5 -3.5 125 25"};
+        // The latest scene: the Static Generator.
+        String[] tps = {"tp @a 462.5 40 -2.5 180 32", "tp @a 467.5 38 -6.5 110 22"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -2729,11 +2777,11 @@ public final class DevScreenshotHarness {
         if (tick == report) {
             server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
-                if (level.getBlockEntity(new BlockPos(442, 35, -12)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity be) {
-                    ResourcefulSheep.LOGGER.warn("TOUR echo {} {} FE/t, {} sheep, noise {}, steady {}, energy {}", be.state(), be.generating(), be.herd(),
-                            be.noise(), be.steadiness(), be.getEnergyHandler().getAmountAsInt());
+                if (level.getBlockEntity(new BlockPos(462, 35, -12)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity be) {
+                    ResourcefulSheep.LOGGER.warn("TOUR static {} {} FE/t, {} sheep, {} combs, comb wear {}", be.state(), be.generating(), be.herd(),
+                            be.combs().size(), be.combs().isEmpty() ? 0 : be.wear(be.combs().getFirst()));
                 }
-                for (BlockPos p : new BlockPos[]{new BlockPos(442, 35, -14), new BlockPos(442, 35, -15)}) {
+                for (BlockPos p : new BlockPos[]{new BlockPos(462, 35, -13), new BlockPos(462, 35, -14)}) {
                     ResourcefulSheep.LOGGER.warn("TOUR at {}: {} / {}", p, level.getBlockState(p), level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity m
                             ? "meter rate " + m.rate() : String.valueOf(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.NORTH) instanceof net.neoforged.neoforge.transfer.energy.EnergyHandler h ? h.getAmountAsLong() : -1));
                 }
@@ -2774,12 +2822,11 @@ public final class DevScreenshotHarness {
                     player.teleportTo(x + 0.5, 35, -8.5); // exactly on the spot, in case it drifted
                     // Earlier runs built woolBurnerScene, woolPackerScene, altarScene (with bone blocks and a
                     // wither rose in its catalyst slots 2 and 3) and chillerScene here.
-                    // poweredFurnaceScene, woollenArmorScene, sheepTreadmillScene, oreLineScene and thermalWorldScene.
-                    echoWorldScene(server);
+                    // poweredFurnaceScene, woollenArmorScene, sheepTreadmillScene, oreLineScene, thermalWorldScene
+                    // and echoWorldScene (then echoWorldKick, two ticks later).
+                    staticWorldScene(server);
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
                 });
-            } else if (step == 42) {
-                server.execute(() -> echoWorldKick(server));
             }
         }
         if (tick == end + 20) {
@@ -2792,8 +2839,9 @@ public final class DevScreenshotHarness {
                 // Save the Thermal Reaction Chamber, the Echo Chamber and their cube banks empty, so they run for a while when
                 // someone visits.
                 ServerLevel level = player.level();
-                // The same for the Echo Chamber (its port, from the back) and its cube bank.
-                for (BlockPos p : new BlockPos[]{new BlockPos(442, 35, -13), new BlockPos(442, 35, -15)}) {
+                // The same for the Echo Chamber (its port, from the back) and its cube bank, and the Static Generator and its cubes.
+                for (BlockPos p : new BlockPos[]{new BlockPos(442, 35, -13), new BlockPos(442, 35, -15),
+                        new BlockPos(462, 35, -12), new BlockPos(462, 35, -14)}) {
                     var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.NORTH);
                     if (handler == null) continue;
                     for (int k = 0; k < 10_000 && handler.getAmountAsLong() > 0; k++) { // a cube bank only gives so much at a time

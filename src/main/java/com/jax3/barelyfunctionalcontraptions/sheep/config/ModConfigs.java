@@ -583,10 +583,10 @@ public final class ModConfigs {
             b.pop();
 
             b.comment("Static Generator (mid-game generator: sheep rubbing against Copper Combs in its pen build static, which its dome arcs into power)").push("static_generator");
-            staticPowerPerSheep = b.comment("FE/t of charge from a sheep against a fresh comb, unless sheepPower lists its resource. Each sheep after the best adds less, see falloff.")
-                    .defineInRange("powerPerSheep", 75, 0, 1_000_000);
-            staticFalloff = b.comment("How much less each extra sheep adds: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on.")
-                    .defineInRange("falloff", 0.05, 0.0, 1.0);
+            staticPowerPerSheep = b.comment("FE/t of charge from a sheep against a fresh comb, unless sheepPower lists its resource: six plain sheep make 600 FE/t.")
+                    .defineInRange("powerPerSheep", 100, 0, 1_000_000);
+            staticFalloff = b.comment("How much less each extra sheep adds: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on. 0 (default): every sheep counts in full.")
+                    .defineInRange("falloff", 0.0, 0.0, 1.0);
             staticMaxSheep = b.comment("Most sheep one generator counts.")
                     .defineInRange("maxSheep", 6, 1, 64);
             staticRadius = b.comment("Size of its pen, centred on it: 2 = 5x5 (default). Combs and sheep count anywhere in it, at its level and the one above.")
