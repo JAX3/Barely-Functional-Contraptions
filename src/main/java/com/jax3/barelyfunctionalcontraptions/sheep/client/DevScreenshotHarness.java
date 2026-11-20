@@ -2376,7 +2376,8 @@ public final class DevScreenshotHarness {
 
     /**
      * The work-in-progress 3x3x3 Echo Chamber model on a sculk floor with a Warden sheep beside it, from the front, from
-     * above at an angle, from the back and close up on the back: {@code -PharnessScene=echo_chamber}.
+     * above at an angle, from the back and close up on the back, then running, listening to a note block, and
+     * shrieking: {@code -PharnessScene=echo_chamber}.
      */
     private static void echoChamberTick(Minecraft mc, MinecraftServer server) {
         switch (tick) {
@@ -2444,7 +2445,24 @@ public final class DevScreenshotHarness {
                 if (be != null) server.getPlayerList().getPlayers().getFirst().sendOverlayMessage(be.status());
             });
             case 480 -> shot(mc, "wip_echo_chamber_listening");
-            case 486 -> mc.stop();
+            // Then far too loud for too long: it shrieks, and the player (in survival, so it counts) gets Darkness.
+            case 484 -> command(server, "gamemode survival @a");
+            case 488 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 155 12", origin.getX() + 3.5, origin.getY() + 0.0, origin.getZ() + 2.5));
+            case 490 -> server.execute(() -> {
+                var be = echoChamber(server);
+                if (be != null) {
+                    be.hearSteadily(7);
+                    be.setMeters(0, com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(
+                            com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.echoShriekTicks) - 2);
+                }
+            });
+            case 530 -> McClient.clearChat(mc);
+            case 536 -> server.execute(() -> {
+                var be = echoChamber(server);
+                if (be != null) server.getPlayerList().getPlayers().getFirst().sendOverlayMessage(be.status());
+            });
+            case 546 -> shot(mc, "wip_echo_chamber_shriek");
+            case 552 -> mc.stop();
             default -> {}
         }
         if (tick >= 80 && tick < 480 && tick % 10 == 0) {

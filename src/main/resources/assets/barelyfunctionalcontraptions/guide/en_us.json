@@ -413,7 +413,8 @@
         "- Wool blocks noise from reaching it. Its power comes out of the port in the middle of its back.",
         "## Upkeep",
         "- Keep the noise steady: note blocks, a redstone clock, or a Wool Burner's crackle.",
-        "- Too quiet and the Warden sheep falls asleep and it stops. Too loud and the room shrieks, then stops for a cooldown.",
+        "- Too quiet for 30 seconds and the Warden sheep fall asleep and it stops, until the noise is back.",
+        "- Too loud for 10 seconds and the room shrieks: Darkness for players nearby, and it stops for a minute.",
         "- The sculk catalysts in the room wear out and need replacing."
       ]
     },

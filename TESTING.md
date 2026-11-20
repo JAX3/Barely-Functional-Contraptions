@@ -8,13 +8,13 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 |---|---|---|
 | Build | `./gradlew build` | ✅ BUILD SUCCESSFUL, produces `build/libs/barelyfunctionalcontraptions-1.5.5-mc26.3.jar` |
 | Build for 26.2 | `./gradlew build -Pmc=26.2` | ✅ BUILD SUCCESSFUL (unit tests included), produces `build/mc26.2/libs/barelyfunctionalcontraptions-1.5.5-mc26.2.jar` |
-| GameTests on 26.2 | `./gradlew runGameTestServer -Pmc=26.2` | ✅ **All 163 required tests passed**, with no data files failing to load |
+| GameTests on 26.2 | `./gradlew runGameTestServer -Pmc=26.2` | ✅ **All 165 required tests passed**, with no data files failing to load |
 | Real client on 26.2 | `./gradlew runClient -Pmc=26.2 -PscreenshotHarness -PharnessScene=thermal_reaction_chamber` | ✅ Loads with JEI and Jade and no errors from the mod; the chamber, its window, the JEI page and Jade look the same as on 26.3 |
 | Build for 26.1 | `./gradlew build -Pmc=26.1` | ✅ BUILD SUCCESSFUL (unit tests included), produces `build/mc26.1/libs/barelyfunctionalcontraptions-1.5.5-mc26.1.jar` |
-| GameTests on 26.1 | `./gradlew runGameTestServer -Pmc=26.1` | ✅ **All 163 required tests passed**, with no data files failing to load and no warnings |
+| GameTests on 26.1 | `./gradlew runGameTestServer -Pmc=26.1` | ✅ **All 165 required tests passed**, with no data files failing to load and no warnings |
 | Real client on 26.1 | `./gradlew runClient -Pmc=26.1 -PscreenshotHarness -PharnessScene=thermal_reaction_chamber` and `-PharnessScene=creative_sections` | ✅ Loads with JEI and Jade and no errors from the mod; the chamber, its window, the JEI page, Jade and the folding creative-tab sections look the same as on 26.3 |
 | Unit tests | `./gradlew test` | ✅ 39/39 passed |
-| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 163 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 128 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
+| In-world GameTests | `./gradlew runGameTestServer` | ✅ **All 165 required tests passed** on a dedicated-server GameTest server: 15 Mycelial Power, 130 Resourceful Sheep, 19 integration, 1 NeoForge built-in |
 | Real client | `./gradlew runClient -PscreenshotHarness` | ✅ Loads with JEI and Jade, with no errors or warnings from the mod in the log. The 51 screenshots and 12 crafting-table recipe shots are in [`docs/screenshots/`](docs/screenshots) |
 
 ### Themed sheep (the ideas in `Custom block.txt`)
@@ -27,7 +27,9 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | GameTest `echo_chamber_power_follows_the_noise` (development builds) | ✅ 8,000 / 14,000 / 18,000 / 20,000 FE/t for one to four sheep, none in silence or far too loud, less too quiet or too loud, half for an erratic noise; two sheep hearing a steady level 10 make 14,000 FE/t, and a comparator reads 10 |
 | GameTest `echo_chamber_hears_vibrations_but_not_through_wool` (development builds) | ✅ It hears a note block 4 blocks out and another sheep's steps, but not its own Warden sheep's steps or a note block boxed in wool |
 | GameTest `echo_chamber_pushes_power_out_of_its_port` (development builds) | ✅ Only the back face of its power port offers power, and it fills a Hume Energy Cube placed behind it |
-| Echo Chamber in the real client | `./gradlew runClient -PscreenshotHarness -PharnessScene=echo_chamber` | ✅ With three Warden sheep and a note block struck once a second beside it, it hears noise level 5 and makes about 15,000 FE/t; its pen outline and status line show |
+| GameTest `echo_chamber_falls_asleep_in_silence` (development builds) | ✅ Silence sends its Warden sheep to sleep and it stops; noise back in the sweet spot wakes them, they settle making nothing, then it listens and makes power again |
+| GameTest `echo_chamber_shrieks_when_too_loud` (development builds) | ✅ Far too loud for long enough, it shrieks and stops with its shriek meter emptied, and stays stopped through its cooldown even once it's calm |
+| Echo Chamber in the real client | `./gradlew runClient -PscreenshotHarness -PharnessScene=echo_chamber` | ✅ With three Warden sheep and a note block struck once a second beside it, it hears noise level 5-6 and makes about 15,000 FE/t; its pen outline and status line show. Made far too loud, it shrieks: shriek rings rise off its roof, the survival player nearby gets Darkness, and its status reads *Shrieked · Back in 58s* |
 | GameTest `ghast_sheep_screams_like_a_ghast` | ✅ A Ghast sheep's bleat becomes the ghast's scream, and its hurt and death sounds the ghast's, even when sheared; a plain sheep still bleats; the `screaming` feature on its own gives the screaming goat's sounds |
 | GameTest `ghast_sheep_is_twice_the_size` | ✅ A Ghast sheep's `minecraft:scale` becomes 2 and its hitbox doubles; shearing doesn't change it, and once the infusion is gone it's back to 1 with the modifier removed |
 | GameTest `energy_meter_measures_what_passes_through` | ✅ Pushes from the back reach the block in front, pulls from the front draw from behind, nothing goes backwards, only the back and front connect, rolled-back transfers aren't counted, the reading matches the 10,000 FE/t the cube takes, and the comparator gives 10 |

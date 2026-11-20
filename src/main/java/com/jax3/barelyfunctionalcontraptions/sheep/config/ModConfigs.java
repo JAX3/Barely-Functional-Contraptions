@@ -202,6 +202,12 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue echoWindowTicks;
         public final ModConfigSpec.IntValue echoQuietBelow;
         public final ModConfigSpec.IntValue echoLoudAbove;
+        public final ModConfigSpec.IntValue echoSleepTicks;
+        public final ModConfigSpec.IntValue echoWakeTicks;
+        public final ModConfigSpec.IntValue echoShriekTicks;
+        public final ModConfigSpec.IntValue echoShriekCooldown;
+        public final ModConfigSpec.IntValue echoShriekRadius;
+        public final ModConfigSpec.IntValue echoDarknessTicks;
         public final ModConfigSpec.IntValue echoCapacity;
         public final ModConfigSpec.IntValue echoOutput;
         public final ModConfigSpec.ConfigValue<List<? extends String>> echoSources;
@@ -541,6 +547,18 @@ public final class ModConfigs {
                     .defineInRange("quietBelow", 5, 1, 15);
             echoLoudAbove = b.comment("Noise levels above this are too loud: the output falls by a fifth for each level over, to nothing five levels above.")
                     .defineInRange("loudAbove", 10, 1, 15);
+            echoSleepTicks = b.comment("Ticks of noise below the sweet spot before its Warden sheep fall asleep and it stops (600 = 30 seconds). Back in the sweet spot, the drowsiness wears off twice as fast.")
+                    .defineInRange("sleepTicks", 600, 20, 72_000);
+            echoWakeTicks = b.comment("Ticks the Warden sheep take to settle after the noise wakes them, making nothing (100 = 5 seconds).")
+                    .defineInRange("wakeTicks", 100, 0, 6_000);
+            echoShriekTicks = b.comment("Ticks of noise above the sweet spot before the room shrieks (200 = 10 seconds). Below it, the shriek meter drains again.")
+                    .defineInRange("shriekTicks", 200, 20, 72_000);
+            echoShriekCooldown = b.comment("Ticks it stops for after it shrieks (1200 = a minute).")
+                    .defineInRange("shriekCooldown", 1_200, 0, 72_000);
+            echoShriekRadius = b.comment("How far from its dish players get Darkness when it shrieks, in blocks. 0 = no Darkness.")
+                    .defineInRange("shriekRadius", 16, 0, 64);
+            echoDarknessTicks = b.comment("How long that Darkness lasts (200 = 10 seconds).")
+                    .defineInRange("darknessTicks", 200, 1, 6_000);
             echoCapacity = b.comment("FE it stores.")
                     .defineInRange("capacity", 2_000_000, 1, Integer.MAX_VALUE);
             echoOutput = b.comment("Most FE it pushes out of its power port (the middle of its back) per tick.")

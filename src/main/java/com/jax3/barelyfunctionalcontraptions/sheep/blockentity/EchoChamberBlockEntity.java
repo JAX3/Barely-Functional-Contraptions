@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ShriekParticleOption;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -19,8 +20,13 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectUtil;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.level.ClipBlockStateContext;
 import net.minecraft.world.level.Level;
@@ -61,6 +67,12 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  *     the output falls away towards nothing in silence; louder, it falls a fifth for each level over.</li>
  *     <li><b>Steadiness:</b> the window is split in five; a noise that's the same in each fifth is perfectly steady
  *     and gets full power, an erratic one as little as half.</li>
+ *     <li><b>Sleep:</b> too quiet for {@code sleepTicks} (30 seconds) and its Warden sheep fall asleep: it stops until
+ *     the noise is back up to the sweet spot, and they take {@code wakeTicks} (5 seconds) to settle. Back in the sweet
+ *     spot, drowsiness wears off twice as fast as it builds.</li>
+ *     <li><b>Shriek:</b> too loud for {@code shriekTicks} (10 seconds) and the room shrieks like a sculk shrieker:
+ *     players within {@code shriekRadius} of its dish get Darkness, and it stops for {@code shriekCooldown} (a minute).
+ *     Below the loud end, the shriek meter drains again.</li>
  * </ul>
  * It pushes its power out of its power port, the middle of its back, up to {@code output} FE/t. A comparator against
  * any block of it reads the noise level.
@@ -74,7 +86,7 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
     /** What the chamber is doing, for its status line. */
     public enum State {
         NEEDS_HERD(ChatFormatting.GRAY), TOO_QUIET(ChatFormatting.GOLD), LISTENING(ChatFormatting.GREEN), TOO_LOUD(ChatFormatting.RED),
-        FULL(ChatFormatting.GOLD);
+        FULL(ChatFormatting.GOLD), ASLEEP(ChatFormatting.DARK_AQUA), WAKING(ChatFormatting.AQUA), SHRIEKED(ChatFormatting.DARK_RED);
 
         public final ChatFormatting color;
 
@@ -99,6 +111,11 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
     /** Ids of the Warden sheep it counts: their own vibrations don't count. */
     private int[] sheepIds = new int[0];
     private int noise, generating, scanCooldown;
+    /** Ticks it has been too quiet (towards sleepTicks) and too loud (towards shriekTicks). */
+    private int drowsiness, shriekMeter;
+    /** Whether its Warden sheep are asleep; ticks left settling after they woke; ticks left of the cooldown after a shriek. */
+    private boolean asleep;
+    private int waking, cooldown;
     private double steadiness;
     private boolean showArea;
     private State state = State.NEEDS_HERD;
@@ -272,14 +289,32 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
 
         State previous = state;
         generating = 0;
-        if (sheepIds.length == 0) {
+        if (cooldown > 0) {
+            // Recovering from a shriek.
+            cooldown--;
+            state = State.SHRIEKED;
+        } else if (sheepIds.length == 0) {
             state = State.NEEDS_HERD;
-        } else if (energy.getAmountAsInt() >= energy.getCapacityAsInt()) {
-            state = State.FULL;
+            drowsiness = 0;
+            shriekMeter = Math.max(0, shriekMeter - 1);
+            asleep = false;
+            waking = 0;
         } else {
-            generating = power(sheepIds.length, noise, steadiness);
-            energy.generate(generating);
-            state = noise < quietBelow() ? State.TOO_QUIET : noise > loudAbove() ? State.TOO_LOUD : State.LISTENING;
+            listen(level, pos, facing);
+            if (cooldown > 0) {
+                state = State.SHRIEKED; // it just shrieked
+            } else if (asleep) {
+                state = State.ASLEEP;
+            } else if (waking > 0) {
+                waking--;
+                state = State.WAKING;
+            } else if (energy.getAmountAsInt() >= energy.getCapacityAsInt()) {
+                state = State.FULL;
+            } else {
+                generating = power(sheepIds.length, noise, steadiness);
+                energy.generate(generating);
+                state = noise < quietBelow() ? State.TOO_QUIET : noise > loudAbove() ? State.TOO_LOUD : State.LISTENING;
+            }
         }
         push(level, pos, facing);
 
@@ -290,7 +325,63 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
                 level.updateNeighbourForOutputSignal(EchoChamberBlock.at(front(pos, facing), facing, part, 0), blockState.getBlock());
             }
         }
-        if (state != previous) setChanged();
+        if (state != previous) {
+            setChanged();
+            level.sendBlockUpdated(pos, blockState, blockState, Block.UPDATE_CLIENTS); // the ears stop popping while it sleeps or recovers
+        }
+    }
+
+    /**
+     * Too quiet for {@code sleepTicks} and its Warden sheep fall asleep, until the noise is back up to the sweet spot
+     * (then they take {@code wakeTicks} to settle). Too loud for {@code shriekTicks} and the room shrieks.
+     */
+    private void listen(ServerLevel level, BlockPos pos, Direction facing) {
+        int quiet = quietBelow(), loud = loudAbove();
+        if (asleep) {
+            if (noise >= quiet) {
+                asleep = false;
+                drowsiness = 0;
+                waking = ModConfigs.getInt(ModConfigs.SERVER.echoWakeTicks);
+                level.playSound(null, pos, SoundEvents.SCULK_CLICKING, SoundSource.BLOCKS, 1.0F, 1.2F);
+            }
+        } else if (noise < quiet) {
+            if (++drowsiness >= ModConfigs.getInt(ModConfigs.SERVER.echoSleepTicks)) {
+                asleep = true;
+                waking = 0;
+                level.playSound(null, pos, SoundEvents.SCULK_CLICKING_STOP, SoundSource.BLOCKS, 1.0F, 0.6F);
+            }
+        } else {
+            drowsiness = Math.max(0, drowsiness - 2);
+        }
+        if (noise > loud) {
+            if (++shriekMeter >= ModConfigs.getInt(ModConfigs.SERVER.echoShriekTicks)) shriek(level, pos, facing);
+        } else {
+            shriekMeter = Math.max(0, shriekMeter - 1);
+        }
+    }
+
+    /**
+     * Too loud for too long: the room shrieks like a sculk shrieker. Players near its dish get Darkness, it wakes any
+     * sleeping sheep, and it makes nothing for {@code shriekCooldown}.
+     */
+    private void shriek(ServerLevel level, BlockPos pos, Direction facing) {
+        shriekMeter = 0;
+        drowsiness = 0;
+        asleep = false;
+        waking = 0;
+        generating = 0;
+        cooldown = Math.max(1, ModConfigs.getInt(ModConfigs.SERVER.echoShriekCooldown));
+        Vec3 dish = dish(pos, facing);
+        level.playSound(null, dish.x, dish.y, dish.z, SoundEvents.SCULK_SHRIEKER_SHRIEK, SoundSource.BLOCKS, 2.0F, 0.8F);
+        Vec3 dome = Vec3.atBottomCenterOf(pos.above(3));
+        for (int i = 0; i < 10; i++) {
+            level.sendParticles(new ShriekParticleOption(i * 5), dome.x, dome.y, dome.z, 1, 0, 0, 0, 0);
+        }
+        int radius = ModConfigs.getInt(ModConfigs.SERVER.echoShriekRadius);
+        if (radius > 0) {
+            MobEffectUtil.addEffectToPlayersAround(level, null, dish, radius,
+                    new MobEffectInstance(MobEffects.DARKNESS, ModConfigs.getInt(ModConfigs.SERVER.echoDarknessTicks), 0, false, false), 200);
+        }
     }
 
     /** Counts the Warden sheep in the pen, and calls back one that wandered out while there's room for more. */
@@ -346,6 +437,31 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
         return sheepIds.length;
     }
 
+    public boolean asleep() {
+        return asleep;
+    }
+
+    /** Ticks it has been too quiet, towards falling asleep. */
+    public int drowsiness() {
+        return drowsiness;
+    }
+
+    /** Ticks it has been too loud, towards shrieking. */
+    public int shriekMeter() {
+        return shriekMeter;
+    }
+
+    /** Ticks left of its cooldown after a shriek. */
+    public int cooldown() {
+        return cooldown;
+    }
+
+    /** Sets how drowsy it is and how full its shriek meter is, in ticks (tests). */
+    public void setMeters(int drowsiness, int shriekMeter) {
+        this.drowsiness = drowsiness;
+        this.shriekMeter = shriekMeter;
+    }
+
     /** The noise level, 0-15. */
     public int comparatorSignal() {
         return noise;
@@ -369,11 +485,23 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
         return hearing;
     }
 
-    /** One line on what it's doing, for a right-click: state, herd, noise, steadiness and output. */
+    /** One line on what it's doing, for a right-click: state, herd, noise level, steadiness and output, then how close it is to sleeping or shrieking. */
     public Component status() {
-        return Component.translatable("message.barelyfunctionalcontraptions.echo_chamber.status",
-                Component.translatable(state.key()).withStyle(state.color), sheepIds.length, maxSheep(), noise, quietBelow(), loudAbove(),
+        net.minecraft.network.chat.MutableComponent line = Component.translatable("message.barelyfunctionalcontraptions.echo_chamber.status",
+                Component.translatable(state.key()).withStyle(state.color), sheepIds.length, maxSheep(), noise,
                 Math.round(steadiness * 100), String.format(java.util.Locale.ROOT, "%,d", generating));
+        // How close it is to falling asleep or shrieking, or how long it has left to recover.
+        if (cooldown > 0) {
+            line.append(Component.translatable("message.barelyfunctionalcontraptions.echo_chamber.cooldown", (cooldown + 19) / 20).withStyle(ChatFormatting.DARK_RED));
+        } else if (!asleep && drowsiness > 0) {
+            line.append(Component.translatable("message.barelyfunctionalcontraptions.echo_chamber.drowsy",
+                    drowsiness * 100 / ModConfigs.getInt(ModConfigs.SERVER.echoSleepTicks)).withStyle(ChatFormatting.DARK_AQUA));
+        }
+        if (cooldown == 0 && shriekMeter > 0) {
+            line.append(Component.translatable("message.barelyfunctionalcontraptions.echo_chamber.shriek",
+                    shriekMeter * 100 / ModConfigs.getInt(ModConfigs.SERVER.echoShriekTicks)).withStyle(ChatFormatting.RED));
+        }
+        return line;
     }
 
     private Direction facing() {
@@ -422,6 +550,11 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
         steadiness = steadiness(buckets);
         showArea = input.getBooleanOr("show_area", false);
         state = State.byId(input.getIntOr("state", 0));
+        drowsiness = input.getIntOr("drowsiness", 0);
+        shriekMeter = input.getIntOr("shriek_meter", 0);
+        asleep = input.getBooleanOr("asleep", false);
+        waking = input.getIntOr("waking", 0);
+        cooldown = input.getIntOr("cooldown", 0);
     }
 
     @Override
@@ -432,6 +565,11 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
         output.putInt("noise", noise);
         output.putBoolean("show_area", showArea);
         output.putInt("state", state.ordinal());
+        output.putInt("drowsiness", drowsiness);
+        output.putInt("shriek_meter", shriekMeter);
+        output.putBoolean("asleep", asleep);
+        output.putInt("waking", waking);
+        output.putInt("cooldown", cooldown);
     }
 
     @Override
@@ -439,11 +577,12 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    /** Clients only need the area setting, for its outline. */
+    /** Clients get the area setting, for its outline, and the state, so its ears stop popping while it sleeps or recovers. */
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("show_area", showArea);
+        tag.putInt("state", state.ordinal());
         return tag;
     }
 

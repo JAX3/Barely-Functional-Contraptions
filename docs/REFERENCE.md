@@ -82,10 +82,14 @@ Craft a **Contraptions Manual** (a book and a Functional Machine Block) and righ
   - **Sweet spot:** levels 5-10 give full power. Quieter, the output falls away towards nothing in silence (level 3 gives three fifths); louder, it falls a fifth for each level over 10, to nothing at 15.
   - **Steadiness:** it splits the 10 seconds into fifths. A noise that's the same in each gets full power; an erratic one as little as half.
   - **Power:** it stores 2,000,000 FE and pushes up to 40,000 FE/t out of its **power port**, the middle of its back, on the bottom layer. Only that face connects.
-  - **Readouts:** right-click any block of it for a status line (state, herd, noise level, steadiness and output). Sneak-right-click shows or hides its listening pen. A comparator against any block of it reads the noise level, 0-15.
-  - Still to come: falling asleep in silence, shrieking when it's too loud, catalysts that wear out, Echo Shard boosts, fleece fatigue, a window, JEI and Jade pages, and a recipe. Config: `[echo_chamber]` (see below).
+  - **Sleep:** too quiet for 30 seconds and its Warden sheep fall asleep (the sculk clicks stop, and so do the pops off its ears). It makes nothing until the noise is back up to the sweet spot, then they take 5 seconds to settle before it starts again. Back in the sweet spot, drowsiness wears off twice as fast as it builds.
+  - **Shriek:** too loud for 10 seconds and the room shrieks like a sculk shrieker: shriek rings rise off its roof, players in survival within 16 blocks of its dish get Darkness for 10 seconds, and it stops for a minute. Out of the loud end, the shriek meter drains again.
+  - **Readouts:** right-click any block of it for a status line: its state, herd, noise level, steadiness and output, then how drowsy it is, how close it is to shrieking, or how long until it's back. Sneak-right-click shows or hides its listening pen. A comparator against any block of it reads the noise level, 0-15, for circuits that turn the noise up or down.
+  - Still to come: catalysts that wear out, Echo Shard boosts, fleece fatigue, a window, JEI and Jade pages, and a recipe. Config: `[echo_chamber]` (see below).
 
-  ![The Echo Chamber listening: three Warden sheep in its outlined pen, a note block beside it, and the status line reading Listening, Warden sheep 3/4, Noise 5, Steady 68%, 15,154 FE/t](screenshots/wip_echo_chamber_listening.png)
+  | Listening | Shrieked |
+  |---|---|
+  | ![The Echo Chamber listening: three Warden sheep in its outlined pen, a note block beside it, and the status line reading Listening, about 15,000 FE/t](screenshots/wip_echo_chamber_listening.png) | ![The Echo Chamber after a shriek: the sky gone dark with Darkness, shriek rings rising off its roof, and the status line reading Shrieked, Noise 15, 0 FE/t, Back in 58s](screenshots/wip_echo_chamber_shriek.png) |
 
   | Hume Field Generator (WIP model) | Close up |
   |---|---|
@@ -1131,6 +1135,9 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `listenRadius` | 8 | How far it hears vibrations from, in blocks, from the middle of its dish |
 | `windowTicks` | 200 | Ticks of noise the noise level averages over |
 | `quietBelow` / `loudAbove` | 5 / 10 | The sweet spot of noise levels |
+| `sleepTicks` / `wakeTicks` | 600 / 100 | How long it can be too quiet before its sheep fall asleep, and how long they take to settle once woken |
+| `shriekTicks` / `shriekCooldown` | 200 / 1200 | How long it can be too loud before it shrieks, and how long it stops for after |
+| `shriekRadius` / `darknessTicks` | 16 / 200 | How far from its dish survival players get Darkness when it shrieks (0 = none), and for how long |
 | `capacity` / `output` | 2000000 / 40000 | Its buffer, and the most FE/t it pushes out of its power port |
 | `sources` | warden | Sheep resources whose sheep listen for it |
 

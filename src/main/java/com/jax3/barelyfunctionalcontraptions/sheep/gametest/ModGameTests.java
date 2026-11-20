@@ -162,6 +162,8 @@ public final class ModGameTests {
             ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
             ECHO_TESTS.put("echo_chamber_hears_vibrations_but_not_through_wool", ModGameTests::echoHearing);
             ECHO_TESTS.put("echo_chamber_pushes_power_out_of_its_port", ModGameTests::echoPort);
+            ECHO_TESTS.put("echo_chamber_falls_asleep_in_silence", ModGameTests::echoSleep);
+            ECHO_TESTS.put("echo_chamber_shrieks_when_too_loud", ModGameTests::echoShriek);
         }
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
@@ -1230,6 +1232,58 @@ public final class ModGameTests {
         level.gameEvent(net.minecraft.world.level.gameevent.GameEvent.NOTE_BLOCK_PLAY, boxed, net.minecraft.world.level.gameevent.GameEvent.Context.of(Blocks.NOTE_BLOCK.defaultBlockState()));
         h.assertTrue(be.hearingNow() == before + 2, "nothing gets through the wool");
         h.succeed();
+    }
+
+    /**
+     * Too quiet for long enough and its Warden sheep fall asleep and it stops; noise back in the sweet spot wakes them,
+     * they take a moment to settle, and then it makes power again.
+     */
+    private static void echoSleep(GameTestHelper h) {
+        var be = buildEchoChamber(h);
+        echoSheep(h, be.getBlockPos().north(3), "warden");
+        int sleepTicks = ModConfigs.getInt(ModConfigs.SERVER.echoSleepTicks), wakeTicks = ModConfigs.getInt(ModConfigs.SERVER.echoWakeTicks);
+        be.hearSteadily(0);
+        be.setMeters(sleepTicks - 3, 0); // nearly asleep already
+        h.runAfterDelay(5, () -> {
+            h.assertTrue(be.asleep() && be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.State.ASLEEP
+                    && be.generating() == 0, "silence sends its sheep to sleep, got " + be.state());
+            be.hearSteadily(3); // noise level 7: back in the sweet spot
+            h.runAfterDelay(2, () -> {
+                h.assertTrue(!be.asleep() && be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.State.WAKING
+                        && be.generating() == 0, "the noise wakes them, and they settle first, got " + be.state());
+                h.runAfterDelay(wakeTicks, () -> {
+                    be.hearSteadily(3);
+                    h.runAfterDelay(1, () -> {
+                        h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.State.LISTENING
+                                && be.generating() > 0, "then it listens again, got " + be.state() + " at " + be.generating() + " FE/t");
+                        h.succeed();
+                    });
+                });
+            });
+        });
+    }
+
+    /**
+     * Too loud for long enough and the room shrieks: it stops for its cooldown, and its shriek meter empties. (The
+     * Darkness it gives nearby players is vanilla's own Warden helper; the screenshot harness shows it on a real player.)
+     */
+    private static void echoShriek(GameTestHelper h) {
+        var be = buildEchoChamber(h);
+        echoSheep(h, be.getBlockPos().north(3), "warden");
+        int shriekTicks = ModConfigs.getInt(ModConfigs.SERVER.echoShriekTicks), cooldown = ModConfigs.getInt(ModConfigs.SERVER.echoShriekCooldown);
+        be.hearSteadily(7); // noise level 15: far too loud
+        be.setMeters(0, shriekTicks - 3);
+        h.runAfterDelay(5, () -> {
+            h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.State.SHRIEKED
+                    && be.generating() == 0, "it shrieks and stops, got " + be.state());
+            h.assertTrue(be.cooldown() > cooldown - 10 && be.shriekMeter() == 0, "for its cooldown, with the meter emptied, got " + be.cooldown() + " / " + be.shriekMeter());
+            be.hearSteadily(3); // calm again: it still waits out the cooldown
+            h.runAfterDelay(20, () -> {
+                h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.State.SHRIEKED && be.generating() == 0,
+                        "it stays stopped until the cooldown is over, got " + be.state());
+                h.succeed();
+            });
+        });
     }
 
     /** It pushes its power out of the port in the middle of its back, and offers power on that face only. */

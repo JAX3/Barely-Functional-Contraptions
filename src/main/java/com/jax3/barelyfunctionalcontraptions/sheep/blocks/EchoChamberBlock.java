@@ -230,6 +230,9 @@ public class EchoChamberBlock extends Block implements EntityBlock {
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (state.getValue(PART) != MIDDLE || state.getValue(LAYER) != SIZE - 1 || random.nextInt(3) != 0) return;
+        // Quiet while its Warden sheep sleep, or while it recovers from a shriek.
+        EchoChamberBlockEntity be = entity(level, pos, state);
+        if (be != null && (be.state() == EchoChamberBlockEntity.State.ASLEEP || be.state() == EchoChamberBlockEntity.State.SHRIEKED)) return;
         // The ears stand 15 pixels either side of the middle and lean outwards; their tips are about 1.1 blocks up.
         Direction right = state.getValue(FACING).getCounterClockWise();
         double side = (random.nextBoolean() ? 1 : -1) * 1.35;
