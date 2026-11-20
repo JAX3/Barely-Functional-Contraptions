@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:static_generator"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.static_shock.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.static_shock.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

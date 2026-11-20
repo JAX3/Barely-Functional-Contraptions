@@ -25,7 +25,7 @@ Next goal
 From the manual's WIP tab:
 19. Hume Field Generator: a 2x2 machine whose power jumps around, smoothed by Hume Energy Cubes. (Model done, development builds only.)
 20. [DONE] Echo Chamber: Warden sheep in front of its dish turn steady noise into power; sleep in silence, shriek when too loud; window, JEI, Jade, recipe, the Good Vibrations advancement and a test-world scene. (Moved out of WIP into the Power tab.) Still to do: catalysts, Echo Shard boost, fatigue.
-25. [STARTED] Static Generator (mid-game): sheep rubbing against Copper Combs build static, its dome arcs it into power; combs oxidise (axe, honeycomb); overcharged it knocks things back (Woollen Armour insulates). Window, recipes, guide chapter done. Still to do: JEI and Jade, an advancement, a test-world scene.
+25. [STARTED] Static Generator (mid-game): sheep rubbing against Copper Combs build static, its dome arcs it into power; combs oxidise (axe, honeycomb); overcharged it knocks things back (Woollen Armour insulates). Window, recipes, guide chapter, JEI, Jade and the Shocking! advancement done. Still to do: a test-world scene.
 21. Lightning Array: a copper mast that catches lightning into Hume Energy Cubes; scrape or wax it as it oxidises.
 22. Fleece Fusion: fuses two resource wools into power; clear the lint with shears.
 23. Quantum Sheep: blinks in and out of existence, changes its wool type and drops random resource wool.

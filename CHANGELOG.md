@@ -24,6 +24,9 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 - **Shocks:** with its buffer full the dome keeps charging; past half full it shocks players and mobs in its pen,
   knocking them back. Woollen Armour insulates, a quarter per piece. A comparator reads the dome's charge.
 - **Window:** energy, herd and output, the dome's charge with the shock line, and a chip for each comb.
+- **JEI:** a Static Generator page (the power for one to six plain or Copper sheep, the comb stages, the shock), and
+  information pages for the generator and the comb. **Jade:** status, output, herd, dome charge, combs and energy.
+- **Advancement:** *Shocking!* (goal), for being knocked back by an overcharged Static Generator.
 - **Recipes:** a Lightning Rod, two Copper Blocks, Redstone, two wool and a Functional Machine Block; a Copper Comb
   from three Copper Ingots and a Brush.
 - New config section `[static_generator]`.

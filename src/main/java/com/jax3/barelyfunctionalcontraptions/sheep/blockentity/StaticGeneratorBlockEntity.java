@@ -165,7 +165,11 @@ public class StaticGeneratorBlockEntity extends BlockEntity implements AreaDispl
 
     /** FE/t of charge from {@code sheep} against a fresh comb: its resource's entry in sheepPower, or powerPerSheep. */
     public static int sheepPower(Sheep sheep) {
-        String id = SheepInfusionEvents.getInfusion(sheep).resource().map(Identifier::toString).orElse(null);
+        return sheepPower(SheepInfusionEvents.getInfusion(sheep).resource().map(Identifier::toString).orElse(null));
+    }
+
+    /** FE/t of charge from a sheep of resource {@code id} (null for a plain sheep) against a fresh comb. */
+    public static int sheepPower(@org.jspecify.annotations.Nullable String id) {
         if (id != null) {
             for (String entry : ModConfigs.SERVER.staticSheepPower.get()) {
                 int eq = entry.indexOf('=');
@@ -345,6 +349,10 @@ public class StaticGeneratorBlockEntity extends BlockEntity implements AreaDispl
             if (push <= 0) continue;
             entity.push(away.x * push, 0.35 * push, away.z * push);
             com.jax3.barelyfunctionalcontraptions.compat.Mc.syncMotion(entity);
+            if (entity instanceof net.minecraft.server.level.ServerPlayer player) {
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.award(player,
+                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.STATIC_SHOCK);
+            }
             charge = Math.max(0, charge - domeCapacity() / 20); // each shock bleeds a little charge off
         }
     }

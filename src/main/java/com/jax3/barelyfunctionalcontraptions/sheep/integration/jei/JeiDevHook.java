@@ -95,6 +95,14 @@ public final class JeiDevHook {
         return true;
     }
 
+    /** Opens the Static Generator page. */
+    public static boolean showStatic() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        rt.getRecipesGui().showTypes(java.util.List.of(StaticCategory.TYPE));
+        return true;
+    }
+
     /** Opens the Echo Chamber page. */
     public static boolean showEcho() {
         IJeiRuntime rt = runtime;

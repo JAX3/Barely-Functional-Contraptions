@@ -133,6 +133,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | ⭐ **Sheepish Combustion** (goal) | Be within 16 blocks of a Blaze Sheep Furnace when it starts making power from a Blaze sheep |
 | ⭐ **Running Ewe Ragged** (goal) | Be within 16 blocks of a Sheep Treadmill when a sheep starts walking it |
 | ⭐ **Thermal Shock** (challenge) | Be within 16 blocks of a Thermal Reaction Chamber when it starts reacting |
+| ⭐ **Shocking!** (goal) | Get knocked back by an overcharged Static Generator |
 | ⭐ **Good Vibrations** (challenge) | Be within 16 blocks of an Echo Chamber when it starts listening with its noise in the sweet spot (comes after the Warden sheep) |
 | Wool You Look at That | Infuse a sheep with any resource |
 | Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
@@ -530,12 +531,16 @@ I I I      Copper Comb: I = Copper Ingot
 - **Shocks:** with nothing taking its power, its buffer fills and the dome keeps charging (up to 100,000 FE, `domeCapacity`). Past half full (`shockAt`) it's *Overcharged*: it shocks every player and mob in its pen (not sheep, not creative players), knocking them back away from the dome (`shockStrength`). Each piece of **Woollen Armour** takes a quarter off a shock, and a full set stops it. Each shock bleeds a little charge off.
 - **Window:** the energy gauge, the herd and output, the dome's charge bar with the shock line marked in red, a chip for each comb (coloured by its stage, with a sheen when waxed), and the status. Every part has a tooltip.
 - **Comparator:** reads how charged its dome is, 0-15, for a circuit that keeps people out or switches on a load.
+- **JEI:** a *Static Generator* page (the sheep, the combs, the generator, an axe and Honeycomb, the power for one to six plain or Copper sheep, what each comb stage passes on, and the shock warning), information pages for the generator and the Copper Comb, and its recipes. **Jade:** its status, output, herd, dome charge, its combs (how many, the most worn, how many waxed) and its stored energy, on either half.
+- **Advancement:** ⭐ *Shocking!* (goal), for being knocked back by an overcharged one.
 - Mine it with a pickaxe; breaking either half removes both. **Config:** `[static_generator]` (see below).
 
 | In its pen: four combs at different stages, five sheep | Its window |
 |---|---|
 | ![A Static Generator on grass with its pen outlined, four Copper Combs round it at different stages of oxidation, and Copper, Redstone and plain sheep at them](screenshots/107_static_generator.png) | ![Its window: 5 / 6 sheep rubbing, 389 FE/t, the dome's charge bar, and four comb chips coloured by stage, one waxed](screenshots/107_static_generator_gui.png) |
 | ![Close up of the Static Generator: the belt column and the copper dome above its base](screenshots/107_static_generator_close.png) | ![Its window overcharged: the dome's charge bar past the red shock line, and Overcharged: keep clear!](screenshots/107_static_generator_gui_overcharged.png) |
+| ![Jade on the Static Generator: Overcharged: keep clear!, 389 FE/t, 5 / 6 sheep rubbing, dome charge, four combs with the worst oxidised and one waxed, and its energy](screenshots/107_static_generator_jade.png) | ![JEI's Static Generator page: the sheep, combs, generator, an axe and Honeycomb, and the power for one to six plain or Copper sheep](screenshots/107_static_generator_jei.png) |
+| ![Its crafting recipe in JEI: a Lightning Rod, two Copper Blocks, Redstone, two wool and a Functional Machine Block](screenshots/107_static_generator_jei_recipe.png) | ![Thrown back out of an overcharged pen in survival: Shocking!](screenshots/107_static_generator_shock.png) |
 
 ### Thermal Reaction Chamber
 A late-game generator that makes power from the **difference between hot and cold**. Blaze sheep stand in a pen against its hot side, Snow sheep in a pen against its cold side, and water runs through the middle. It is the machines' blue-steel casing split down the middle: red-hot vent slats and fins on the hot side, frosted ones on the cold side, a gauge panel at the front (two thermometers and a balance dial), water and power ports at the back, and a window on top where flame and snow chase each other while it reacts. Crafted from a Magma Block, a Nether Star, Blue Ice, a Blaze Sheep Furnace, a Hume Energy Cube, a Snow Sheep Chiller, two Copper Blocks and a Fluid Tank, hot things on the left and cold on the right:

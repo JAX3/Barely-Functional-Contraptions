@@ -40,8 +40,8 @@ public final class Mc {
         return RegistryCodecs.holderSet(Registries.ENTITY_TYPE);
     }
 
-    /** Sends {@code entity}'s new motion to the client this tick, as being hit does (26.3 calls the flag needsSync). */
+    /** Sends {@code entity}'s new motion to the client this tick, as being hit does (26.3 calls the flag syncVelocity). */
     public static void syncMotion(net.minecraft.world.entity.Entity entity) {
-        entity.needsSync = true;
+        entity.syncVelocity = true;
     }
 }

@@ -2646,7 +2646,31 @@ public final class DevScreenshotHarness {
             case 254 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Static Generator"); }
             case 258 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
             case 266 -> shot(mc, "107_guide_static_generator");
-            case 272 -> mc.stop();
+            // Jade on its dome from just outside the pen, its JEI page and recipe, then a shock for the advancement.
+            case 268 -> { McClient.setScreen(mc, null); setHudHidden(mc, false); }
+            case 270 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 8", origin.getX() + 0.5, origin.getY() + 0.0, origin.getZ() - 0.4));
+            case 290 -> shot(mc, "107_static_generator_jade");
+            case 292 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showStatic();
+            }
+            case 300 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 312 -> shot(mc, "107_static_generator_jei");
+            case 314 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
+                    com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.show(new ItemStack(ModItems.STATIC_GENERATOR.get()), true);
+                }
+            }
+            case 322 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 332 -> shot(mc, "107_static_generator_jei_recipe");
+            case 334 -> McClient.setScreen(mc, null);
+            case 336 -> command(server, "gamemode survival @a");
+            // Into the overcharged pen: the next arc throws the player back out, which earns "Shocking!".
+            case 340 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 0", origin.getX() + 0.5, origin.getY() + 0.0, origin.getZ() - 2.5));
+            case 410 -> shot(mc, "107_static_generator_shock");
+            case 412 -> server.execute(() -> ResourcefulSheep.LOGGER.warn("SHOCK player at {}, Shocking! {}", server.getPlayerList().getPlayers().getFirst().position(),
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(server.getPlayerList().getPlayers().getFirst(),
+                            com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.STATIC_SHOCK)));
+            case 418 -> mc.stop();
             default -> {}
         }
     }
