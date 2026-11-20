@@ -644,7 +644,7 @@ public final class ModConfigs {
             statusPanelRows = b.comment("Machines one panel shows.")
                     .defineInRange("rowsPerPanel", 4, 1, 4);
             statusPanelRange = b.comment("How far from the panel a machine can be, in blocks.")
-                    .defineInRange("range", 128, 1, 256);
+                    .defineInRange("range", 200, 1, 356);
             statusPanelRefresh = b.comment("Ticks between reads of its machines (20 = every second).")
                     .defineInRange("refreshTicks", 20, 1, 1_200);
             statusPanelMaxWidth = b.comment("Most panels across that join into one screen.")
