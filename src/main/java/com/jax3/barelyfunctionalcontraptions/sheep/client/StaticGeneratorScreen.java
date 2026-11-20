@@ -66,13 +66,16 @@ public class StaticGeneratorScreen extends AbstractContainerScreen<StaticGenerat
             }
         }
 
-        // The dome's charge, flickering past the shock line.
+        // The dome's charge, steady; overcharged, the part past the shock line is tinted red.
         int width = Math.round(CHARGE_W * Math.min(1F, menu.getCharge() / (float) menu.getDomeCapacity()));
         boolean danger = menu.getState() == State.OVERCHARGED;
-        if (width > 0 && !(danger && time % 6 < 2)) {
+        if (width > 0) {
             graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + CHARGE_X, y + CHARGE_Y, 0, CHARGE_V, width, CHARGE_H, TEX, TEX);
         }
         int line = x + CHARGE_X + Math.round(CHARGE_W * menu.getShockAt() / 1000F);
+        if (danger && x + CHARGE_X + width > line + 1) {
+            graphics.fill(line + 1, y + CHARGE_Y, x + CHARGE_X + width, y + CHARGE_Y + CHARGE_H, 0x60E35D5D);
+        }
         graphics.fill(line, y + CHARGE_Y - 1, line + 1, y + CHARGE_Y + CHARGE_H + 1, 0xFFE35D5D);
 
         // A chip for each comb: its copper colour, a sheen when waxed.
