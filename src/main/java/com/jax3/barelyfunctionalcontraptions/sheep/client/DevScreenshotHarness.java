@@ -3157,9 +3157,12 @@ public final class DevScreenshotHarness {
                 for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, 0, -9), o.offset(7, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
                 for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, -1, -9), o.offset(7, -1, 3))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
                 for (BlockPos p : BlockPos.betweenClosed(o.offset(-2, 0, -6), o.offset(2, 3, -6))) level.setBlock(p, Blocks.STONE_BRICKS.defaultBlockState(), 2);
-                BlockPos panel = o.offset(0, 0, -5);
-                level.setBlock(panel, ModBlocks.STATUS_PANEL.get().defaultBlockState()
-                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.FACING, Direction.SOUTH), 3);
+                // A 3x3 screen of nine panels; the top-left one (as you look at it: west, top) holds the links.
+                for (int x = -1; x <= 1; x++) for (int y = 0; y <= 2; y++) {
+                    level.setBlock(o.offset(x, y, -5), ModBlocks.STATUS_PANEL.get().defaultBlockState()
+                            .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.FACING, Direction.SOUTH), 3);
+                }
+                BlockPos panel = o.offset(0, 0, -5), topLeft = o.offset(-1, 2, -5);
                 // Its alarm: a comparator reading it, to a lamp that's lit while anything has a problem.
                 level.setBlock(panel.south(), Blocks.COMPARATOR.defaultBlockState()
                         .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.NORTH), 3);
@@ -3189,10 +3192,20 @@ public final class DevScreenshotHarness {
                     sheep.setNoAi(true);
                     level.addFreshEntity(sheep);
                 }
-                if (level.getBlockEntity(panel) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity be) {
+                // More machines: a second furnace and Automatic Shears with no power, a Mechanical Separator, a Wool Burner,
+                // more cubes and an Energy Meter.
+                BlockPos[] more = {o.offset(-6, 0, -1), o.offset(-6, 0, 1), o.offset(6, 0, -1), o.offset(6, 0, 1), o.offset(-3, 0, 2), o.offset(3, 0, 2)};
+                level.setBlock(more[0], ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+                level.setBlock(more[1], ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState(), 3);
+                level.setBlock(more[2], ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState(), 3);
+                level.setBlock(more[3], ModBlocks.WOOL_BURNER.get().defaultBlockState(), 3);
+                level.setBlock(more[4], ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+                level.setBlock(more[5], ModBlocks.ENERGY_METER.get().defaultBlockState(), 3);
+                if (level.getBlockEntity(topLeft) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity be) {
                     be.toggleLink(level, furnace);
                     be.toggleLink(level, seeder);
                     be.toggleLink(level, cube);
+                    for (BlockPos m : more) be.toggleLink(level, m);
                 }
                 // The last one through the wrench, as a player does it: the panel, the machine, the panel.
                 ItemStack wrench = new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get());
@@ -3205,13 +3218,13 @@ public final class DevScreenshotHarness {
                 player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
             });
             case 70 -> setHudHidden(mc, true);
-            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 25", origin.getX() + 0.5, origin.getY() + 2.0, origin.getZ() + 2.5));
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 15", origin.getX() + 0.5, origin.getY() + 2.0, origin.getZ() + 3.5));
             case 140 -> shot(mc, "110_status_panel");
-            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 12", at.getX() + 0.5, at.getY() - 0.9, at.getZ() + 1.9));
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 0", at.getX() + 0.5, at.getY() - 0.1, at.getZ() + 3.2));
             case 170 -> shot(mc, "110_status_panel_close");
             case 172 -> server.execute(() -> {
                 ServerLevel level = server.overworld();
-                if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity be) {
+                if (level.getBlockEntity(at.offset(-1, 2, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity be) {
                     for (var row : be.rows()) ResourcefulSheep.LOGGER.warn("PANEL row {} {} {} {}", row.name(), row.report().status(), row.report().level(), row.report().number());
                     ResourcefulSheep.LOGGER.warn("PANEL signal {} lamp {}", be.comparatorSignal(), level.getBlockState(at.south(2)));
                 }

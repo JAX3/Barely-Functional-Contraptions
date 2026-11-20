@@ -36,6 +36,8 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
   red a problem, grey idle) and one key number each. Link them with the Barely Functional Wrench (click the panel,
   then each machine, then the panel). A broken machine reads Missing. No power.
 - A comparator reads how many of its machines have a problem, for an alarm.
+- **Bigger screens:** panels in a rectangle up to 3x3 join into one seamless screen showing 4 machines a panel (36 on a
+  3x3), its rows sized to fill it. Config `maxWidth`, `maxHeight`.
 - **Recipe:** four Glass Panes, two Redstone, a Functional Machine Block, a Comparator and an Iron Ingot.
 - New config section `[status_panel]`, and a chapter in the Contraptions Manual (Utility).
 

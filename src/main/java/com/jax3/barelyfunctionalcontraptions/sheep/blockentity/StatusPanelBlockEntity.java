@@ -7,6 +7,7 @@ import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -25,6 +26,9 @@ import net.minecraft.world.level.storage.ValueOutput;
  * {@code refreshTicks} (a second) it reads each one's line from {@link MachineReports}: its name, its status (running,
  * waiting, a problem or idle) and its key number. A machine that's been broken reads <i>Missing</i>; one in an
  * unloaded chunk <i>Out of range</i>. Its comparator reads how many have a problem, up to 15. It needs no power.
+ * <p>
+ * Joined into a bigger screen, the top-left panel holds every link (taking over any the others had) and reads them all;
+ * the others show nothing of their own.
  */
 public class StatusPanelBlockEntity extends BlockEntity {
     /** One machine's line on the screen: where it is, its block's name (a translation key), and its report. */
@@ -57,8 +61,44 @@ public class StatusPanelBlockEntity extends BlockEntity {
         be.refresh(level, pos, state);
     }
 
+    /** Whether it's the top-left panel of its screen (or on its own): the one that holds the links and draws the rows. */
+    public boolean isMaster() {
+        return level == null || com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.master(level, worldPosition).equals(worldPosition);
+    }
+
+    /** Machines its screen shows: 4 for each panel in it. */
+    public int capacity() {
+        if (level == null) return maxLinks();
+        BlockPos master = com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.master(level, worldPosition);
+        return maxLinks() * com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.members(level, master).size();
+    }
+
+    /** Takes over links from a panel that's gone (the ones it doesn't have already). */
+    public void adopt(List<BlockPos> more) {
+        for (BlockPos p : more) if (!links.contains(p)) links.add(p.immutable());
+        cooldown = 0;
+        setChanged();
+    }
+
     /** Reads every linked machine's line, then updates its screen and its comparator. */
     public void refresh(ServerLevel level, BlockPos pos, BlockState state) {
+        if (!isMaster()) {
+            // Part of a bigger screen: its top-left panel shows everything (and takes its links).
+            if (!rows.isEmpty()) {
+                rows = List.of();
+                syncedHash = 0;
+                level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
+            }
+            return;
+        }
+        for (BlockPos member : com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.members(level, pos)) {
+            if (!member.equals(pos) && level.getBlockEntity(member) instanceof StatusPanelBlockEntity other && !other.links.isEmpty()) {
+                adopt(other.links);
+                other.links.clear();
+                other.setChanged();
+            }
+        }
+        while (links.size() > capacity()) links.removeLast(); // a smaller screen than before: the last ones drop off
         List<Row> fresh = new ArrayList<>();
         for (BlockPos link : links) {
             String name = level.getBlockState(link).getBlock().getDescriptionId();
@@ -81,7 +121,26 @@ public class StatusPanelBlockEntity extends BlockEntity {
         int signal = comparatorSignal();
         if (signal != lastSignal) {
             lastSignal = signal;
-            level.updateNeighbourForOutputSignal(pos, state.getBlock());
+            for (BlockPos member : com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.members(level, pos)) {
+                level.updateNeighbourForOutputSignal(member, state.getBlock());
+            }
+        }
+    }
+
+    /** Broken: its links go to a panel next to it on the wall, so its screen keeps them. */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (level == null || links.isEmpty() || !(state.getBlock() instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock)) return;
+        Direction facing = state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.FACING);
+        for (Direction d : new Direction[]{com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.right(facing), Direction.DOWN,
+                com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.left(facing), Direction.UP}) {
+            if (level.getBlockEntity(pos.relative(d)) instanceof StatusPanelBlockEntity other
+                    && other.getBlockState().getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.FACING) == facing) {
+                other.adopt(links);
+                links.clear();
+                return;
+            }
         }
     }
 
@@ -93,7 +152,7 @@ public class StatusPanelBlockEntity extends BlockEntity {
         }
         if (!MachineReports.supports(level.getBlockEntity(machine))) return LinkResult.NOT_A_MACHINE;
         if (!machine.closerThan(worldPosition, range())) return LinkResult.TOO_FAR;
-        if (links.size() >= maxLinks()) return LinkResult.FULL;
+        if (links.size() >= capacity()) return LinkResult.FULL;
         links.add(machine.immutable());
         changed(level);
         return LinkResult.LINKED;

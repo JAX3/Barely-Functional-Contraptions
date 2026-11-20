@@ -1,0 +1,32 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "frame": "barelyfunctionalcontraptions:block/status_panel/frame_right",
+    "particle": "barelyfunctionalcontraptions:block/status_panel/back"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        13.97
+      ],
+      "to": [
+        2,
+        16,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#frame",
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

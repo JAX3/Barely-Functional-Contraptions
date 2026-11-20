@@ -2,7 +2,8 @@
   "parent": "minecraft:block/block",
   "ambientocclusion": false,
   "textures": {
-    "front": "barelyfunctionalcontraptions:block/status_panel/front",
+    "glass": "barelyfunctionalcontraptions:block/status_panel/glass",
+    "frame": "barelyfunctionalcontraptions:block/status_panel/frame",
     "back": "barelyfunctionalcontraptions:block/status_panel/back",
     "particle": "barelyfunctionalcontraptions:block/status_panel/back"
   },
@@ -20,7 +21,7 @@
       ],
       "faces": {
         "north": {
-          "texture": "#front"
+          "texture": "#glass"
         },
         "south": {
           "texture": "#back"
@@ -62,6 +63,98 @@
           ]
         }
       }
+    },
+    {
+      "from": [
+        0,
+        14,
+        13.98
+      ],
+      "to": [
+        16,
+        16,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#frame",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        13.98
+      ],
+      "to": [
+        16,
+        2,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#frame",
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        14,
+        0,
+        13.98
+      ],
+      "to": [
+        16,
+        16,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#frame",
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        13.98
+      ],
+      "to": [
+        2,
+        16,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#frame",
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ]
+        }
+      }
     }
   ],
   "display": {
@@ -69,11 +162,6 @@
       "rotation": [
         30,
         225,
-        0
-      ],
-      "translation": [
-        0,
-        0,
         0
       ],
       "scale": [

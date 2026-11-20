@@ -95,7 +95,10 @@ public class MyceliumWrenchItem extends Item {
         if (level.isClientSide() || !(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
         GlobalPos clicked = GlobalPos.of(level.dimension(), pos);
         if (onPanel) {
-            if (clicked.equals(linking)) {
+            boolean sameScreen = linking != null && linking.dimension().equals(level.dimension())
+                    && com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.master(level, linking.pos())
+                    .equals(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.master(level, pos));
+            if (sameScreen) {
                 stack.remove(ModDataComponents.LINKING_PANEL.get());
                 ok(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.done"));
             } else {
@@ -106,7 +109,8 @@ public class MyceliumWrenchItem extends Item {
             return InteractionResult.SUCCESS;
         }
         if (!linking.dimension().equals(level.dimension())
-                || !(level.getBlockEntity(linking.pos()) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel)) {
+                || !(level.getBlockEntity(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.master(level, linking.pos()))
+                instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel)) {
             stack.remove(ModDataComponents.LINKING_PANEL.get());
             fail(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.gone"));
             return InteractionResult.SUCCESS;
@@ -115,16 +119,14 @@ public class MyceliumWrenchItem extends Item {
         Component name = level.getBlockState(pos).getBlock().getName();
         switch (result) {
             case LINKED -> {
-                ok(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.linked", name, panel.links().size(),
-                        com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.maxLinks()));
+                ok(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.linked", name, panel.links().size(), panel.capacity()));
                 level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 0.8F, 1.8F);
             }
             case UNLINKED -> {
                 ok(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.unlinked", name));
                 level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.BLOCKS, 0.8F, 0.9F);
             }
-            case FULL -> fail(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.full",
-                    com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.maxLinks()));
+            case FULL -> fail(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.full", panel.capacity()));
             case TOO_FAR -> fail(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.too_far",
                     com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.range()));
             case NOT_A_MACHINE -> fail(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.not_a_machine", name));

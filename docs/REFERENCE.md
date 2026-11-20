@@ -1016,16 +1016,17 @@ R M R      R = Redstone, M = Functional Machine Block
 G C I      C = Comparator, I = Iron Ingot
 ```
 
-| A panel on a wall, its alarm lamp lit | Its screen |
+| A 3x3 screen on a wall, its alarm lamp lit | Its screen |
 |---|---|
-| ![A Machine Status Panel on a stone-brick wall, a comparator and lit redstone lamp in front of it, and the machines it shows round it: Hume Energy Cubes, a Grass Seeder on dirt, a Powered Furnace](screenshots/110_status_panel.png) | ![Its screen: Powered Furnace Working 100%, Grass Seeder No fuel 0/8 in red, Hume Energy Cube Stored 50%, Herd Counter Counting 3](screenshots/110_status_panel_close.png) |
+| ![Nine Machine Status Panels joined into one 3x3 screen on a stone-brick wall, a lit redstone lamp in front of it, and the machines it shows round it](screenshots/110_status_panel.png) | ![The 3x3 screen: ten machines in two columns, a Powered Furnace Working 100%, a Grass Seeder No fuel and Automatic Shears No power in red, cubes, a separator, a burner, a meter and a Herd Counter Counting 3](screenshots/110_status_panel_close.png) |
 
 - **Placing it:** on a wall it faces out from the wall; on the ground it faces you.
-- **Linking:** with the **Barely Functional Wrench**: click the panel (the wrench glows), then each machine within **64 blocks** (`range`), again to unlink one, then the panel again to finish. A panel shows **4 machines** (`rowsPerPanel`). It refuses blocks that aren't machines, and says when it's full or a machine is too far.
+- **Bigger screens:** panels facing the same way that fill a **rectangle up to 3x3** (`maxWidth`, `maxHeight`) join into **one screen**: the bezels between them go, and it shows **4 machines for each panel** (36 on a 3x3). Its top-left panel, as you look at it, holds the links, taking over any the others had; click any panel of the screen with the wrench to link. The rows fill the screen in as many columns, at as big a size, as fits best. Break a panel and the rest regroup (its links go to a panel next to it); an L, a gap or anything bigger than 3x3 stays separate panels. Every panel of a screen gives its comparator reading.
+- **Linking:** with the **Barely Functional Wrench**: click the panel (the wrench glows), then each machine within **64 blocks** (`range`), again to unlink one, then the panel again to finish. A panel shows **4 machines** (`rowsPerPanel`), a joined screen 4 for each of its panels. It refuses blocks that aren't machines, and says when it's full or a machine is too far.
 - **Its screen:** two lines for each machine: its name with a status lamp, then its **status** in colour and **one key number** that suits it (FE/t for generators; progress, stored energy, Ice made, wool held or grass for the rest). **Green** working, **amber** waiting (full, asleep, all green), **red** a problem (no power, no fuel, no water, output full, overcharged, overgrown...), **grey** idle. A broken machine reads *Missing*; one in an unloaded chunk *Out of range*. It reads its machines every second (`refreshTicks`).
 - **Comparator:** reads how many of its machines have a **problem**, up to 15, for an alarm lamp or bell.
 - **Machines it shows:** every generator (Blaze Sheep Furnace, Wool Burner, Thermal Reaction Chamber, Echo Chamber, Static Generator, Sheep Treadmill, Glow Panel, Mycelial Generator), the Powered Furnace, Snow Sheep Chiller, Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Herd Counter, Hume Energy Cubes, Energy Meter and Zero Point Energy Module.
-- Mine it with a pickaxe. **Config:** `[status_panel]`: `rowsPerPanel` (4), `range` (64), `refreshTicks` (20).
+- Mine it with a pickaxe. **Config:** `[status_panel]`: `rowsPerPanel` (4), `range` (64), `refreshTicks` (20), `maxWidth` and `maxHeight` (3).
 
 ### Woollen Armour and Muffled
 A full armour set knitted from wool: the **Woollen Beanie** (helmet), **Woollen Jumper** (chestplate), **Woollen Leggings** and **Woollen Boots**.

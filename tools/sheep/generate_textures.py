@@ -4673,6 +4673,35 @@ def generate_status_panel():
     for x, y in ((1, 1), (14, 1), (1, 14), (14, 14)):
         front.putpixel((x, y), CARTOON["b"])
     front.save(out(base + "front.png"))
+    glass = Image.new("RGBA", (16, 16))                     # the glass alone, for joined screens (the bezel is separate)
+    for y in range(16):
+        for x in range(16):
+            glass.putpixel((x, y), hexc("#0d1118") if (x + y) % 6 else hexc("#121823"))
+    glass.save(out(base + "glass.png"))
+    frame = Image.new("RGBA", (16, 16), CLEAR)             # the bezel round the outside edge of a screen
+    for y in range(16):
+        for x in range(16):
+            if x in (0, 15) or y in (0, 15):
+                frame.putpixel((x, y), CARTOON["O"])
+            elif x == 1 or y == 1:
+                frame.putpixel((x, y), CARTOON["H"])
+            elif x == 14 or y == 14:
+                frame.putpixel((x, y), CARTOON["S"])
+    frame.save(out(base + "frame.png"))
+    # The bezel as four strips, each the same all along its length, so joined screens show no seams between panels.
+    for side in ("top", "bottom", "left", "right"):
+        strip = Image.new("RGBA", (16, 16), CLEAR)
+        for a in range(16):
+            for b, c in enumerate((CARTOON["O"], CARTOON["H"])):
+                if side == "top":
+                    strip.putpixel((a, b), c)
+                elif side == "bottom":
+                    strip.putpixel((a, 15 - b), c if b == 0 else CARTOON["S"])
+                elif side == "left":
+                    strip.putpixel((b, a), c)
+                else:
+                    strip.putpixel((15 - b, a), c if b == 0 else CARTOON["S"])
+        strip.save(out(base + "frame_" + side + ".png"))
     back = Image.new("RGBA", (16, 16))
     for y in range(16):
         for x in range(16):

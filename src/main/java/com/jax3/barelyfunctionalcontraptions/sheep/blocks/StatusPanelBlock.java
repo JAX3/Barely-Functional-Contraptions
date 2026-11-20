@@ -33,6 +33,11 @@ import org.jspecify.annotations.Nullable;
  * The Machine Status Panel block: a thin screen that mounts on a wall, showing how the machines linked to it are doing
  * ({@link StatusPanelBlockEntity}). Link machines with the Barely Functional Wrench: click the panel with it, then each
  * machine (again to unlink), then the panel again to finish.
+ * <p>
+ * Panels facing the same way that fill a rectangle up to {@code maxWidth} x {@code maxHeight} (3 x 3) join into one
+ * screen: the bezels between them go ({@link #JOINED_UP} and the rest say which sides join), its top-left panel (as you
+ * look at it) holds the links for all of them, and it shows 4 machines for each panel. Anything else (an L, a gap, too
+ * big) stays separate panels.
  */
 public class StatusPanelBlock extends BaseEntityBlock {
     /**
@@ -45,18 +50,140 @@ public class StatusPanelBlock extends BaseEntityBlock {
 
     /** The way its screen faces (it hangs on the block behind it). */
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
+    /** Which sides (as you look at its screen) join to the next panel of the same screen. */
+    public static final net.minecraft.world.level.block.state.properties.BooleanProperty JOINED_UP =
+            net.minecraft.world.level.block.state.properties.BooleanProperty.create("joined_up");
+    public static final net.minecraft.world.level.block.state.properties.BooleanProperty JOINED_DOWN =
+            net.minecraft.world.level.block.state.properties.BooleanProperty.create("joined_down");
+    public static final net.minecraft.world.level.block.state.properties.BooleanProperty JOINED_LEFT =
+            net.minecraft.world.level.block.state.properties.BooleanProperty.create("joined_left");
+    public static final net.minecraft.world.level.block.state.properties.BooleanProperty JOINED_RIGHT =
+            net.minecraft.world.level.block.state.properties.BooleanProperty.create("joined_right");
 
     private static final VoxelShape NORTH = Block.box(0, 0, 14, 16, 16, 16), SOUTH = Block.box(0, 0, 0, 16, 16, 2),
             EAST = Block.box(0, 0, 0, 2, 16, 16), WEST = Block.box(14, 0, 0, 16, 16, 16);
 
     public StatusPanelBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(JOINED_UP, false).setValue(JOINED_DOWN, false)
+                .setValue(JOINED_LEFT, false).setValue(JOINED_RIGHT, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, JOINED_UP, JOINED_DOWN, JOINED_LEFT, JOINED_RIGHT);
+    }
+
+    /** The way that's left, as you look at a screen facing {@code facing}. */
+    public static Direction left(Direction facing) {
+        return facing.getClockWise();
+    }
+
+    public static Direction right(Direction facing) {
+        return facing.getCounterClockWise();
+    }
+
+    public static int maxWidth() {
+        return com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.statusPanelMaxWidth);
+    }
+
+    public static int maxHeight() {
+        return com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.statusPanelMaxHeight);
+    }
+
+    /** The top-left panel of the screen {@code pos} is part of (itself, if it's on its own): the one that holds the links. */
+    public static BlockPos master(BlockGetter level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof StatusPanelBlock)) return pos;
+        Direction left = left(state.getValue(FACING));
+        BlockPos at = pos;
+        for (int i = 0; i < 8 && level.getBlockState(at).getBlock() instanceof StatusPanelBlock && level.getBlockState(at).getValue(JOINED_LEFT); i++) at = at.relative(left);
+        for (int i = 0; i < 8 && level.getBlockState(at).getBlock() instanceof StatusPanelBlock && level.getBlockState(at).getValue(JOINED_UP); i++) at = at.above();
+        return at;
+    }
+
+    /** How many panels across and down the screen whose top-left panel is {@code master} is. */
+    public static int[] size(BlockGetter level, BlockPos master) {
+        BlockState state = level.getBlockState(master);
+        if (!(state.getBlock() instanceof StatusPanelBlock)) return new int[]{1, 1};
+        Direction right = right(state.getValue(FACING));
+        int w = 1, h = 1;
+        BlockPos at = master;
+        while (w < 8 && level.getBlockState(at).getBlock() instanceof StatusPanelBlock && level.getBlockState(at).getValue(JOINED_RIGHT)) {
+            at = at.relative(right);
+            w++;
+        }
+        at = master;
+        while (h < 8 && level.getBlockState(at).getBlock() instanceof StatusPanelBlock && level.getBlockState(at).getValue(JOINED_DOWN)) {
+            at = at.below();
+            h++;
+        }
+        return new int[]{w, h};
+    }
+
+    /** Every panel of the screen whose top-left panel is {@code master}, row by row. */
+    public static java.util.List<BlockPos> members(BlockGetter level, BlockPos master) {
+        int[] size = size(level, master);
+        Direction right = right(level.getBlockState(master).getValue(FACING));
+        java.util.List<BlockPos> list = new java.util.ArrayList<>();
+        for (int row = 0; row < size[1]; row++) for (int col = 0; col < size[0]; col++) list.add(master.relative(right, col).below(row));
+        return list;
+    }
+
+    /**
+     * Works out again which panels around {@code start} (facing the same way, touching edge to edge on the wall) make
+     * one screen: if they fill a rectangle no bigger than {@code maxWidth} x {@code maxHeight}, they join; otherwise
+     * each is on its own. Then sets every one's joined sides to match.
+     */
+    public static void reform(Level level, BlockPos start) {
+        BlockState first = level.getBlockState(start);
+        if (!(first.getBlock() instanceof StatusPanelBlock)) return;
+        Direction facing = first.getValue(FACING);
+        Direction left = left(facing), right = right(facing);
+        java.util.Set<BlockPos> group = new java.util.LinkedHashSet<>();
+        java.util.ArrayDeque<BlockPos> queue = new java.util.ArrayDeque<>();
+        group.add(start);
+        queue.add(start);
+        while (!queue.isEmpty() && group.size() < 32) {
+            BlockPos at = queue.poll();
+            for (Direction d : new Direction[]{Direction.UP, Direction.DOWN, left, right}) {
+                BlockPos next = at.relative(d);
+                BlockState state = level.getBlockState(next);
+                if (state.getBlock() instanceof StatusPanelBlock && state.getValue(FACING) == facing && group.add(next.immutable())) queue.add(next.immutable());
+            }
+        }
+        int minCol = Integer.MAX_VALUE, maxCol = Integer.MIN_VALUE, minRow = Integer.MAX_VALUE, maxRow = Integer.MIN_VALUE;
+        for (BlockPos p : group) {
+            int col = (p.getX() - start.getX()) * right.getStepX() + (p.getZ() - start.getZ()) * right.getStepZ();
+            int row = start.getY() - p.getY();
+            minCol = Math.min(minCol, col);
+            maxCol = Math.max(maxCol, col);
+            minRow = Math.min(minRow, row);
+            maxRow = Math.max(maxRow, row);
+        }
+        int w = maxCol - minCol + 1, h = maxRow - minRow + 1;
+        boolean joined = group.size() > 1 && group.size() == w * h && w <= maxWidth() && h <= maxHeight();
+        for (BlockPos p : group) {
+            BlockState state = level.getBlockState(p);
+            BlockState next = state.setValue(JOINED_UP, joined && group.contains(p.above())).setValue(JOINED_DOWN, joined && group.contains(p.below()))
+                    .setValue(JOINED_LEFT, joined && group.contains(p.relative(left))).setValue(JOINED_RIGHT, joined && group.contains(p.relative(right)));
+            if (next != state) level.setBlock(p, next, Block.UPDATE_CLIENTS);
+        }
+    }
+
+    @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        super.onPlace(state, level, pos, oldState, movedByPiston);
+        if (!level.isClientSide() && !oldState.is(this)) reform(level, pos);
+    }
+
+    /** Its neighbours on the wall regroup without it. */
+    @Override
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
+        if (level.getBlockState(pos).is(this)) return;
+        Direction facing = state.getValue(FACING);
+        for (Direction d : new Direction[]{Direction.UP, Direction.DOWN, left(facing), right(facing)}) reform(level, pos.relative(d));
     }
 
     /** Placed on a wall, it faces out from it; otherwise towards whoever places it. */
@@ -101,9 +228,9 @@ public class StatusPanelBlock extends BaseEntityBlock {
     /** With an empty hand: how many machines are linked, and how to link more. */
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof StatusPanelBlockEntity be) {
+        if (!level.isClientSide() && level.getBlockEntity(master(level, pos)) instanceof StatusPanelBlockEntity be) {
             player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.status_panel.info",
-                    be.links().size(), StatusPanelBlockEntity.maxLinks()).withStyle(ChatFormatting.GRAY));
+                    be.links().size(), be.capacity()).withStyle(ChatFormatting.GRAY));
         }
         return InteractionResult.SUCCESS;
     }
@@ -116,6 +243,6 @@ public class StatusPanelBlock extends BaseEntityBlock {
     /** How many linked machines have a problem, up to 15. */
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
-        return level.getBlockEntity(pos) instanceof StatusPanelBlockEntity be ? be.comparatorSignal() : 0;
+        return level.getBlockEntity(master(level, pos)) instanceof StatusPanelBlockEntity be ? be.comparatorSignal() : 0;
     }
 }

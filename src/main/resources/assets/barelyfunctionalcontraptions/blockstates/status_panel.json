@@ -1,19 +1,200 @@
 {
-  "variants": {
-    "facing=north": {
-      "model": "barelyfunctionalcontraptions:block/status_panel"
+  "multipart": [
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_base",
+        "y": 0
+      }
     },
-    "facing=east": {
-      "model": "barelyfunctionalcontraptions:block/status_panel",
-      "y": 90
+    {
+      "when": {
+        "facing": "north",
+        "joined_up": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_up",
+        "y": 0
+      }
     },
-    "facing=south": {
-      "model": "barelyfunctionalcontraptions:block/status_panel",
-      "y": 180
+    {
+      "when": {
+        "facing": "north",
+        "joined_down": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_down",
+        "y": 0
+      }
     },
-    "facing=west": {
-      "model": "barelyfunctionalcontraptions:block/status_panel",
-      "y": 270
+    {
+      "when": {
+        "facing": "north",
+        "joined_left": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_left",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "joined_right": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_right",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_base",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "joined_up": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_up",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "joined_down": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_down",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "joined_left": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_left",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "joined_right": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_right",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_base",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "joined_up": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_up",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "joined_down": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_down",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "joined_left": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_left",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "joined_right": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_right",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_base",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "joined_up": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_up",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "joined_down": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_down",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "joined_left": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_left",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "joined_right": "false"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/status_panel_edge_right",
+        "y": 270
+      }
     }
-  }
+  ]
 }

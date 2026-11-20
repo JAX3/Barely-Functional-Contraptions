@@ -181,6 +181,7 @@ public final class ModGameTests {
         ECHO_TESTS.put("herd_counter_full_mode_waits_for_its_target", ModGameTests::herdCounterFull);
         ECHO_TESTS.put("herd_counter_double_counts_dashing_sheep_unless_steady", ModGameTests::herdCounterSteady);
         ECHO_TESTS.put("status_panel_shows_its_linked_machines", ModGameTests::statusPanel);
+        ECHO_TESTS.put("status_panels_join_into_one_screen_up_to_3x3", ModGameTests::statusPanelJoin);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -1685,6 +1686,56 @@ public final class ModGameTests {
         panel.toggleLink(level, more[1]);
         h.assertTrue(panel.toggleLink(level, more[2]) == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.LinkResult.FULL,
                 "a panel holds 4");
+        h.succeed();
+    }
+
+    /**
+     * Nine panels facing the same way in a 3x3 join into one screen: its top-left panel (as you look at it) holds the
+     * links (taking over any another panel had) and shows 36; the comparator reads the same on every panel. Broken, the
+     * top-left panel's links go to its neighbour and the rest stop joining (not a rectangle); four across don't join.
+     */
+    private static void statusPanelJoin(GameTestHelper h) {
+        var level = h.getLevel();
+        BlockPos base = h.absolutePos(new BlockPos(1, 1, 1));
+        var panelState = ModBlocks.STATUS_PANEL.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.FACING, Direction.SOUTH);
+        for (int x = 0; x < 3; x++) for (int y = 0; y < 3; y++) level.setBlockAndUpdate(base.offset(x, y, 0), panelState);
+        // Facing south, you look north at it: its left is west, so its top-left panel is the west end of the top row.
+        BlockPos topLeft = base.offset(0, 2, 0), middle = base.offset(1, 1, 0);
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.master(level, middle).equals(topLeft), "the top-left panel holds the screen");
+        var mid = level.getBlockState(middle);
+        h.assertTrue(mid.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.JOINED_UP)
+                && mid.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.JOINED_DOWN)
+                && mid.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.JOINED_LEFT)
+                && mid.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.JOINED_RIGHT), "the middle panel joins on every side");
+        var master = (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity) level.getBlockEntity(topLeft);
+        var other = (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity) level.getBlockEntity(middle);
+        h.assertTrue(master.capacity() == 36 && other.capacity() == 36, "a 3x3 screen shows 36, got " + master.capacity());
+        java.util.List<BlockPos> cubes = new java.util.ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            BlockPos c = base.offset(i, -1, 3);
+            level.setBlockAndUpdate(c, ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState());
+            cubes.add(c);
+        }
+        for (int i = 0; i < 5; i++) master.toggleLink(level, cubes.get(i));
+        other.adopt(java.util.List.of(cubes.get(5))); // a link another panel had before it joined
+        master.refresh(level, topLeft, level.getBlockState(topLeft));
+        h.assertTrue(master.links().size() == 6 && other.links().isEmpty() && master.rows().size() == 6, "the top-left panel takes every link: got " + master.links().size());
+        other.refresh(level, middle, mid);
+        h.assertTrue(other.rows().isEmpty(), "the other panels draw nothing of their own");
+        h.assertTrue(level.getBlockState(middle).getAnalogOutputSignal(level, middle, Direction.NORTH) == master.comparatorSignal(), "every panel reads the screen's signal");
+        // Break the top-left panel: its links go next door, and what's left (an L) stops joining.
+        level.setBlockAndUpdate(topLeft, Blocks.AIR.defaultBlockState());
+        var neighbour = (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity) level.getBlockEntity(base.offset(1, 2, 0));
+        h.assertTrue(neighbour.links().size() == 6, "its links went to its neighbour: got " + neighbour.links().size());
+        h.assertTrue(!level.getBlockState(middle).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.JOINED_UP),
+                "eight panels in an L don't join");
+        // Four across don't join either.
+        level.setBlockAndUpdate(topLeft, panelState);
+        h.assertTrue(level.getBlockState(middle).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.JOINED_UP), "3x3 again: joined");
+        for (int y = 0; y < 3; y++) level.setBlockAndUpdate(base.offset(3, y, 0), panelState);
+        h.assertTrue(!level.getBlockState(middle).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.JOINED_UP),
+                "4 across is too wide: they stay separate");
         h.succeed();
     }
 

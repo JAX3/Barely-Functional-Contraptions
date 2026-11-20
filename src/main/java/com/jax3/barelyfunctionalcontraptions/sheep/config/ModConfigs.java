@@ -229,6 +229,8 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue statusPanelRows;
         public final ModConfigSpec.IntValue statusPanelRange;
         public final ModConfigSpec.IntValue statusPanelRefresh;
+        public final ModConfigSpec.IntValue statusPanelMaxWidth;
+        public final ModConfigSpec.IntValue statusPanelMaxHeight;
         public final ModConfigSpec.IntValue herdRadius;
         public final ModConfigSpec.IntValue herdInterval;
         public final ModConfigSpec.IntValue herdSignalPerSheep;
@@ -645,6 +647,10 @@ public final class ModConfigs {
                     .defineInRange("range", 64, 1, 256);
             statusPanelRefresh = b.comment("Ticks between reads of its machines (20 = every second).")
                     .defineInRange("refreshTicks", 20, 1, 1_200);
+            statusPanelMaxWidth = b.comment("Most panels across that join into one screen.")
+                    .defineInRange("maxWidth", 3, 1, 3);
+            statusPanelMaxHeight = b.comment("Most panels high that join into one screen.")
+                    .defineInRange("maxHeight", 3, 1, 3);
             b.pop();
 
             b.comment("Herd Counter (counts the sheep in a pen in front of its screen, and puts any count on a comparator; needs no power)").push("herd_counter");
