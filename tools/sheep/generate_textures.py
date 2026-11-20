@@ -4632,6 +4632,28 @@ def generate_herd_counter():
     wheel.save(out(base + "wheel.png"))
 
 
+def generate_herd_counter_gui():
+    """Herd Counter window: a screen-like readout with a strip of signal pips under it, room for the mode buttons, a
+    herd list, the ghost filter slot and the Full target, and the player inventory."""
+    shears = Image.open(out("gui/automatic_shears.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 7, 16, 67, 58, hexc("#0c1a10"))         # the readout screen, 58x40 at (8, 17)
+    for y in range(17, 57, 2):                            # scan lines
+        for x in range(8, 66):
+            img.putpixel((x, y), hexc("#10241a"))
+    inset(img, 7, 60, 67, 66, GUI["gauge"])            # signal pips, 58x4 at (8, 61)
+    inset(img, 70, 16, 170, 77, GUI["panel"])          # herd list
+    slot(img, 77, 80)                                  # filter (a ghost slot)
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    img.paste(shears.crop((176, 64, 208, 80)), (176, 146))          # area button background, normal and hovered
+    img.save(out("gui/herd_counter.png"))
+
+
 def generate_static_generator_gui():
     """Static Generator window: energy gauge, then a panel with the herd and output, the dome's charge bar (the shock
     line marked) and four comb chips; the status lamp below."""
@@ -4717,6 +4739,7 @@ def main():
     generate_grass_seeder()
     generate_grass_seeder_gui()
     generate_herd_counter()
+    generate_herd_counter_gui()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

@@ -103,6 +103,14 @@ public final class JeiDevHook {
         return true;
     }
 
+    /** Opens the Herd Counter page. */
+    public static boolean showHerdCounter() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        rt.getRecipesGui().showTypes(java.util.List.of(HerdCounterCategory.TYPE));
+        return true;
+    }
+
     /** Opens the Grass Seeder page. */
     public static boolean showGrassSeeder() {
         IJeiRuntime rt = runtime;

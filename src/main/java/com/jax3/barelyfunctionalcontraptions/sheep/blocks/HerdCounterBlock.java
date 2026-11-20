@@ -38,7 +38,7 @@ import org.jspecify.annotations.Nullable;
  * wheel on its side. It counts the sheep in the pen in front of its screen ({@link HerdCounterBlockEntity}).
  *
  * <ul>
- *     <li>right-click with an empty hand to change what it counts (its mode);</li>
+ *     <li>right-click with an empty hand to open its window (what it counts, its filter, its Full target);</li>
  *     <li>right-click with a resource wool or spawn egg (or plain wool, or a sheep's egg) to count only that resource;
  *     again with the same one to count every sheep;</li>
  *     <li>sneak-right-click with an empty hand to show or hide its area.</li>
@@ -122,7 +122,7 @@ public class HerdCounterBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
-    /** Changes what it counts; a sneak-right-click shows or hides its area. */
+    /** Opens its window; a sneak-right-click shows or hides its area. */
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof HerdCounterBlockEntity be)) return InteractionResult.SUCCESS;
@@ -130,12 +130,7 @@ public class HerdCounterBlock extends BaseEntityBlock {
             be.toggleArea(player);
             return InteractionResult.SUCCESS;
         }
-        be.setMode(be.mode().next());
-        level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 0.4F, 1.2F);
-        if (level instanceof ServerLevel server) be.count(server, pos, state);
-        player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.herd_counter.mode",
-                Component.translatable("message.barelyfunctionalcontraptions.herd_counter.mode." + be.mode().key()), be.value(), be.comparatorSignal())
-                .withColor(0x6FE3FF));
+        player.openMenu(be, pos);
         return InteractionResult.SUCCESS;
     }
 

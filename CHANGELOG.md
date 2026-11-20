@@ -34,8 +34,11 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 #### Herd Counter (utility)
 - A little screen that counts the sheep in the 7x7 pen in front of it every second, and puts the count on a comparator
   (1 a sheep, up to 15). It needs no power.
-- **Modes** (right-click to change): every sheep, ready to shear, sheared, lambs, low on infusion, or Full (15 once
-  there are 6). **Filter:** right-click with a resource wool or spawn egg to count only that resource.
+- **Window:** its screen and signal, a button for each mode, the herd (a row for each resource with how many are ready),
+  a ghost filter slot and the Full target (− and +). **JEI:** a Herd Counter page and an information page. **Jade:**
+  what it's counting, its signal and filter, the herd and its biggest resources.
+- **Modes:** every sheep, ready to shear, sheared, lambs, low on infusion, or Full (15 once there are as many as its
+  target). **Filter:** a resource wool or spawn egg in its filter slot counts only that resource.
 - **Advancement:** *Count Your Sheep* (goal), for being near one counting 20 sheep.
 - **Recipe:** two Iron Ingots, a Glass Pane, an Observer, a Functional Machine Block and a Comparator.
 - New config section `[herd_counter]`, and a chapter in the Contraptions Manual (Utility).

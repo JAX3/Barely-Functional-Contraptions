@@ -3039,7 +3039,32 @@ public final class DevScreenshotHarness {
                             level.getBlockState(at.west(2)).getValue(net.minecraft.world.level.block.RedstoneLampBlock.LIT));
                 }
             });
-            case 226 -> mc.stop();
+            // Its window (Ready, filtered to Iron), then Jade on it, then its JEI page.
+            case 224 -> {
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 90 28", at.getX() + 2.5, at.getY() + 0.0, at.getZ() + 0.5));
+                server.execute(() -> {
+                    if (server.overworld().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity be) {
+                        be.setMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.Mode.READY);
+                        be.setFilter(com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("iron"), 1));
+                    }
+                });
+            }
+            case 232 -> server.execute(() -> {
+                if (server.overworld().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity be) {
+                    server.getPlayerList().getPlayers().getFirst().openMenu(be, at);
+                }
+            });
+            case 238 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 246 -> shot(mc, "109_herd_counter_gui");
+            case 248 -> { McClient.setScreen(mc, null); setHudHidden(mc, false); McClient.clearChat(mc); }
+            case 264 -> shot(mc, "109_herd_counter_jade");
+            case 266 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showHerdCounter();
+            }
+            case 274 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 284 -> shot(mc, "109_herd_counter_jei");
+            case 290 -> mc.stop();
             default -> {}
         }
     }

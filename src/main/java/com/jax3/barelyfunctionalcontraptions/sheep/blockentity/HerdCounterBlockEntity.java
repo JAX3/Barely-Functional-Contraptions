@@ -53,12 +53,32 @@ import org.jspecify.annotations.Nullable;
  *     sheep of that resource.</li>
  * </ul>
  */
-public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay {
+public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay, net.minecraft.world.MenuProvider {
     public static final int AREA_COLOR = 0xFFE8ECF5;
     /** The filter key for sheep with no infusion. */
     public static final String PLAIN = "plain";
     /** Sheep it must count at once for the players near it to earn Count Your Sheep. */
     public static final int ADVANCEMENT_SHEEP = 20;
+
+    /**
+     * One resource in its pen: how many sheep, how many of those are ready to shear, and their average stats. {@link #key}
+     * is the resource's id, or {@link #PLAIN}.
+     */
+    public record Row(String key, int count, int ready, float yield, float growth, float endurance) {
+        void write(CompoundTag tag) {
+            tag.putString("key", key);
+            tag.putInt("count", count);
+            tag.putInt("ready", ready);
+            tag.putFloat("yield", yield);
+            tag.putFloat("growth", growth);
+            tag.putFloat("endurance", endurance);
+        }
+
+        static Row read(CompoundTag tag) {
+            return new Row(tag.getStringOr("key", PLAIN), tag.getIntOr("count", 0), tag.getIntOr("ready", 0),
+                    tag.getFloatOr("yield", 1), tag.getFloatOr("growth", 1), tag.getFloatOr("endurance", 1));
+        }
+    }
 
     /** What its screen shows and its comparator reads. */
     public enum Mode {
@@ -101,6 +121,10 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay {
     private final Map<String, Integer> byResource = new LinkedHashMap<>();
     private float averageYield, averageGrowth, averageEndurance;
     private SheepStats best = SheepStats.WILD;
+    /** Each resource in its pen, most first (synced to clients for its window). */
+    private List<Row> rows = List.of();
+    /** What clients last heard, so it only sends when something changed. */
+    private int syncedHash;
 
     public HerdCounterBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.HERD_COUNTER.get(), pos, state);
@@ -164,6 +188,7 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay {
         int bestYield = 1, bestGrowth = 1, bestEndurance = 1;
         List<Map.Entry<String, Integer>> sorted = new ArrayList<>();
         Map<String, Integer> counts = new LinkedHashMap<>();
+        Map<String, float[]> sums = new LinkedHashMap<>(); // ready, yield, growth, endurance
         String key = filterKey(filter);
         int matched = 0;
         for (Sheep s : sheep) {
@@ -173,6 +198,11 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay {
             if (lowOnInfusion(s)) low++;
             counts.merge(resourceKey(s), 1, Integer::sum);
             SheepStats stats = SheepInfusionEvents.getStats(s);
+            float[] sum = sums.computeIfAbsent(resourceKey(s), k -> new float[4]);
+            if (!s.isBaby() && !s.isSheared()) sum[0]++;
+            sum[1] += stats.yield();
+            sum[2] += stats.growth();
+            sum[3] += stats.endurance();
             yield += stats.yield();
             growth += stats.growth();
             endurance += stats.endurance();
@@ -183,7 +213,14 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay {
         }
         sorted.addAll(counts.entrySet());
         sorted.sort(Map.Entry.<String, Integer>comparingByValue().reversed());
-        for (var e : sorted) byResource.put(e.getKey(), e.getValue());
+        List<Row> newRows = new ArrayList<>();
+        for (var e : sorted) {
+            byResource.put(e.getKey(), e.getValue());
+            float[] sum = sums.get(e.getKey());
+            int n = e.getValue();
+            newRows.add(new Row(e.getKey(), n, (int) sum[0], sum[1] / n, sum[2] / n, sum[3] / n));
+        }
+        rows = List.copyOf(newRows);
         averageYield = total == 0 ? 0 : yield / (float) total;
         averageGrowth = total == 0 ? 0 : growth / (float) total;
         averageEndurance = total == 0 ? 0 : endurance / (float) total;
@@ -191,6 +228,10 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay {
         if (matched != value) {
             value = matched;
             setChanged();
+        }
+        int hash = java.util.Objects.hash(value, total, lambs, ready, sheared, low, rows, averageYield, averageGrowth, averageEndurance, best);
+        if (hash != syncedHash) {
+            syncedHash = hash;
             level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
         }
         int signal = comparatorSignal();
@@ -265,6 +306,22 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay {
 
     public int lowInfusion() {
         return low;
+    }
+
+    /** Each resource in its pen, most first, with its ready sheep and average stats (both sides). */
+    public List<Row> rows() {
+        return rows;
+    }
+
+    @Override
+    public net.minecraft.network.chat.Component getDisplayName() {
+        return net.minecraft.network.chat.Component.translatable("block.barelyfunctionalcontraptions.herd_counter");
+    }
+
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int containerId, net.minecraft.world.entity.player.Inventory inventory,
+                                                                          net.minecraft.world.entity.player.Player player) {
+        return new com.jax3.barelyfunctionalcontraptions.sheep.menu.HerdCounterMenu(containerId, inventory, this);
     }
 
     /** Sheep of each resource ({@link #PLAIN} for none), most first. */
@@ -352,6 +409,17 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay {
         tag.putBoolean("show_area", showArea);
         String key = filterKey(filter);
         if (key != null) tag.putString("filter_key", key);
+        tag.putIntArray("summary", new int[]{total, lambs, ready, sheared, low, best.yield(), best.growth(), best.endurance()});
+        tag.putFloat("avg_yield", averageYield);
+        tag.putFloat("avg_growth", averageGrowth);
+        tag.putFloat("avg_endurance", averageEndurance);
+        net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
+        for (Row row : rows) {
+            CompoundTag r = new CompoundTag();
+            row.write(r);
+            list.add(r);
+        }
+        tag.put("rows", list);
         return tag;
     }
 
@@ -365,6 +433,21 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay {
         target = input.getIntOr("target", -1);
         showArea = input.getBooleanOr("show_area", false);
         clientFilter = input.getString("filter_key").orElse(null);
+        int[] summary = input.getIntArray("summary").orElse(new int[8]);
+        if (summary.length >= 8) {
+            total = summary[0];
+            lambs = summary[1];
+            ready = summary[2];
+            sheared = summary[3];
+            low = summary[4];
+            best = new SheepStats(summary[5], summary[6], summary[7]);
+        }
+        averageYield = input.getFloatOr("avg_yield", 0);
+        averageGrowth = input.getFloatOr("avg_growth", 0);
+        averageEndurance = input.getFloatOr("avg_endurance", 0);
+        List<Row> list = new ArrayList<>();
+        for (CompoundTag r : input.read("rows", CompoundTag.CODEC.listOf()).orElse(List.of())) list.add(Row.read(r));
+        rows = List.copyOf(list);
     }
 
     @Override

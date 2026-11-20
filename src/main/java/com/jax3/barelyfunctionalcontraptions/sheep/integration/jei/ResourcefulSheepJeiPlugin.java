@@ -50,7 +50,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration registration) {
         var gui = registration.getJeiHelpers().getGuiHelper();
         registration.addRecipeCategories(new InfusionCategory(gui), new AltarCategory(gui), new SeparationCategory(gui), new ThermalCategory(gui));
-        registration.addRecipeCategories(new EchoCategory(gui), new StaticCategory(gui), new GrassSeederCategory(gui));
+        registration.addRecipeCategories(new EchoCategory(gui), new StaticCategory(gui), new GrassSeederCategory(gui), new HerdCounterCategory(gui));
     }
 
     @Override
@@ -87,6 +87,10 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
                 Component.translatable("jei.barelyfunctionalcontraptions.info.static_generator.3"));
         registration.addItemStackInfo(new ItemStack(ModItems.COPPER_COMB.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.copper_comb"));
         registration.addRecipes(GrassSeederCategory.TYPE, List.of(new GrassSeederDisplay()));
+        registration.addRecipes(HerdCounterCategory.TYPE, List.of(new HerdCounterDisplay()));
+        registration.addItemStackInfo(new ItemStack(ModItems.HERD_COUNTER.get()),
+                Component.translatable("jei.barelyfunctionalcontraptions.info.herd_counter.1"),
+                Component.translatable("jei.barelyfunctionalcontraptions.info.herd_counter.2"));
         registration.addItemStackInfo(new ItemStack(ModItems.GRASS_SEEDER.get()),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.grass_seeder.1"),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.grass_seeder.2"));
@@ -193,6 +197,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addCraftingStation(EchoCategory.TYPE, ModItems.ECHO_CHAMBER.get());
         registration.addCraftingStation(StaticCategory.TYPE, ModItems.STATIC_GENERATOR.get());
         registration.addCraftingStation(GrassSeederCategory.TYPE, ModItems.GRASS_SEEDER.get());
+        registration.addCraftingStation(HerdCounterCategory.TYPE, ModItems.HERD_COUNTER.get());
         // The Powered Furnace smelts everything a Furnace does.
         registration.addCraftingStation(mezz.jei.api.constants.RecipeTypes.SMELTING, ModItems.POWERED_FURNACE.get());
     }
