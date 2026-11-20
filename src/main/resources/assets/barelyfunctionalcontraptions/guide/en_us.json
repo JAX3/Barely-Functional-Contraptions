@@ -432,6 +432,7 @@
         "- FULL reads 0 until the pen has as many sheep as its target (set with - and + in its window), then 15: handy for stopping a breeder.",
         "- Click its filter slot with a resource wool or spawn egg to count only that resource (the label turns gold), or with an empty hand to count them all. It keeps a copy, not your item. Plain wool or a sheep's egg counts the plain sheep.",
         "- Its window also lists the sheep of each resource in its pen, with how many are ready to shear.",
+        "- It's barely functional: a sheep dashing past its screen is now and then counted twice, making its count jump. Switch Steady on (the clock button) and it averages over 5 seconds instead.",
         "Sneak-right-click with an empty hand to outline its area. Use it to run Automatic Shears only when enough sheep are ready, or a Grass Seeder only while sheep are shorn."
       ]
     },

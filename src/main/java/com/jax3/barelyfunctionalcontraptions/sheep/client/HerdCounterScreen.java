@@ -44,6 +44,7 @@ public class HerdCounterScreen extends AbstractContainerScreen<HerdCounterMenu> 
     private static final int MODE_X = 8, MODE_Y = 69, MODE_W = 18, MODE_H = 12, MODE_STEP_X = 20, MODE_STEP_Y = 14;
     private static final int LIST_X = 71, LIST_Y = 17, LIST_W = 98, ROW_Y = 28, ROW_H = 15, ROWS = 3;
     private static final int TARGET_DOWN_X = 138, TARGET_UP_X = 160, TARGET_Y = 79, TARGET_W = 10;
+    private static final int STEADY_X = 135;
     private static final int AREA_X = 154, AREA_Y = 2, BUTTON_SIZE = 16, BUTTON_U = 176, BUTTON_V = 146;
     private static final int TEXT_COLOR = 0xFFDFE4F5, TEXT_DIM = 0xFFAEB4C6, LIT = 0xFF7CFF8A, UNLIT = 0xFF2F6A3A, FILTERED = 0xFFFFD27F,
             BUTTON = 0xFF3A3F4E, BUTTON_HOVER = 0xFF4A5064, BUTTON_ON = 0xFF2F6A3A, READY = 0xFF8FE07A;
@@ -63,6 +64,9 @@ public class HerdCounterScreen extends AbstractContainerScreen<HerdCounterMenu> 
         this.titleLabelX = 8;
         addRenderableWidget(new AreaToggleButton(leftPos + AREA_X, topPos + AREA_Y, TEXTURE, BUTTON_U, BUTTON_V,
                 () -> be() != null && be().showsArea(), HerdCounterBlockEntity.AREA_COLOR, menu.containerId, HerdCounterMenu.BUTTON_AREA));
+        addRenderableWidget(new AreaToggleButton(leftPos + STEADY_X, topPos + AREA_Y, TEXTURE, BUTTON_U, BUTTON_V,
+                () -> be() != null && be().steady(), HerdCounterBlockEntity.AREA_COLOR, menu.containerId, HerdCounterMenu.BUTTON_STEADY,
+                new ItemStack(net.minecraft.world.item.Items.CLOCK), Component.translatable("gui.barelyfunctionalcontraptions.herd_counter.steady.button")));
         for (Mode mode : Mode.values()) {
             int i = mode.ordinal();
             addRenderableWidget(new SmallButton(leftPos + MODE_X + i % 3 * MODE_STEP_X, topPos + MODE_Y + i / 3 * MODE_STEP_Y, MODE_W, MODE_H,
@@ -211,6 +215,11 @@ public class HerdCounterScreen extends AbstractContainerScreen<HerdCounterMenu> 
         } else if (isHovering(96, TARGET_Y - 1, 74, 14, mouseX, mouseY)) {
             lines.add(Component.translatable(key + "target.title", be.target()));
             lines.add(Component.translatable(key + "target.desc").withStyle(ChatFormatting.GRAY));
+        } else if (isHovering(STEADY_X, AREA_Y, BUTTON_SIZE, BUTTON_SIZE, mouseX, mouseY)) {
+            lines.add(Component.translatable(be.steady() ? key + "steady.on" : key + "steady.off"));
+            lines.add(Component.translatable(key + "steady.desc", com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(
+                    com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.herdSteadySeconds)).withStyle(ChatFormatting.GRAY));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.grass_seeder.trim.click").withStyle(ChatFormatting.DARK_GRAY));
         } else if (isHovering(AREA_X, AREA_Y, BUTTON_SIZE, BUTTON_SIZE, mouseX, mouseY)) {
             lines.add(Component.translatable(be.showsArea() ? "gui.barelyfunctionalcontraptions.area.shown" : "gui.barelyfunctionalcontraptions.area.hidden"));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.area.click").withStyle(ChatFormatting.DARK_GRAY));

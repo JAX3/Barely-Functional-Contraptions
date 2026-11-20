@@ -109,7 +109,15 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay, 
         }
     }
 
+    /** Horizontal speed (blocks a tick) above which a sheep may be counted twice. */
+    public static final double DASH_SPEED = 0.2;
+
     private Mode mode = Mode.COUNT;
+    /** Whether it averages its counts over {@code steadySeconds}, smoothing out double counts. */
+    private boolean steady;
+    private final java.util.ArrayDeque<Integer> history = new java.util.ArrayDeque<>();
+    /** Whether its last count had a sheep counted twice. */
+    private boolean doubled;
     private ItemStack filter = ItemStack.EMPTY;
     private int target = -1;
     private boolean showArea;
@@ -191,6 +199,8 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay, 
         Map<String, float[]> sums = new LinkedHashMap<>(); // ready, yield, growth, endurance
         String key = filterKey(filter);
         int matched = 0;
+        boolean glitch = ModConfigs.SERVER.herdDoubleCount.get();
+        doubled = false;
         for (Sheep s : sheep) {
             if (s.isBaby()) lambs++;
             else if (s.isSheared()) sheared++;
@@ -209,7 +219,14 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay, 
             bestYield = Math.max(bestYield, stats.yield());
             bestGrowth = Math.max(bestGrowth, stats.growth());
             bestEndurance = Math.max(bestEndurance, stats.endurance());
-            if ((key == null || key.equals(resourceKey(s))) && mode.counts.test(s)) matched++;
+            if ((key == null || key.equals(resourceKey(s))) && mode.counts.test(s)) {
+                matched++;
+                // Barely functional: a sheep dashing past its screen is sometimes counted twice.
+                if (glitch && s.getDeltaMovement().horizontalDistance() > DASH_SPEED && level.getRandom().nextBoolean()) {
+                    matched++;
+                    doubled = true;
+                }
+            }
         }
         sorted.addAll(counts.entrySet());
         sorted.sort(Map.Entry.<String, Integer>comparingByValue().reversed());
@@ -225,11 +242,21 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay, 
         averageGrowth = total == 0 ? 0 : growth / (float) total;
         averageEndurance = total == 0 ? 0 : endurance / (float) total;
         best = new SheepStats(bestYield, bestGrowth, bestEndurance);
+        if (steady) {
+            history.addLast(matched);
+            int samples = Math.max(1, ModConfigs.getInt(ModConfigs.SERVER.herdSteadySeconds) * 20 / ModConfigs.getInt(ModConfigs.SERVER.herdInterval));
+            while (history.size() > samples) history.removeFirst();
+            double sum = 0;
+            for (int n : history) sum += n;
+            matched = (int) Math.round(sum / history.size());
+        } else {
+            history.clear();
+        }
         if (matched != value) {
             value = matched;
             setChanged();
         }
-        int hash = java.util.Objects.hash(value, total, lambs, ready, sheared, low, rows, averageYield, averageGrowth, averageEndurance, best);
+        int hash = java.util.Objects.hash(value, total, lambs, ready, sheared, low, rows, averageYield, averageGrowth, averageEndurance, best, steady);
         if (hash != syncedHash) {
             syncedHash = hash;
             level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
@@ -256,6 +283,22 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay, 
 
     public ItemStack filter() {
         return filter;
+    }
+
+    public boolean steady() {
+        return steady;
+    }
+
+    public void setSteady(boolean on) {
+        steady = on;
+        history.clear();
+        cooldown = 0;
+        sync();
+    }
+
+    /** Whether its last count had a sheep counted twice. */
+    public boolean doubled() {
+        return doubled;
     }
 
     /** Filters to {@code stack}'s resource (a copy of one is kept), or clears the filter with an empty stack. */
@@ -382,6 +425,7 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay, 
         target = in.getIntOr("target", -1);
         showArea = in.getBooleanOr("show_area", false);
         value = in.getIntOr("value", 0);
+        steady = in.getBooleanOr("steady", false);
     }
 
     @Override
@@ -392,6 +436,7 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay, 
         out.putInt("target", target);
         out.putBoolean("show_area", showArea);
         out.putInt("value", value);
+        out.putBoolean("steady", steady);
     }
 
     @Override
@@ -407,6 +452,7 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay, 
         tag.putInt("value", value);
         tag.putInt("target", target());
         tag.putBoolean("show_area", showArea);
+        tag.putBoolean("steady", steady);
         String key = filterKey(filter);
         if (key != null) tag.putString("filter_key", key);
         tag.putIntArray("summary", new int[]{total, lambs, ready, sheared, low, best.yield(), best.growth(), best.endurance()});
@@ -432,6 +478,7 @@ public class HerdCounterBlockEntity extends BlockEntity implements AreaDisplay, 
         value = input.getIntOr("value", 0);
         target = input.getIntOr("target", -1);
         showArea = input.getBooleanOr("show_area", false);
+        steady = input.getBooleanOr("steady", false);
         clientFilter = input.getString("filter_key").orElse(null);
         int[] summary = input.getIntArray("summary").orElse(new int[8]);
         if (summary.length >= 8) {

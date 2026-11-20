@@ -26,7 +26,7 @@ public class HerdCounterMenu extends AbstractContainerMenu {
     public static final int FILTER_X = 77, FILTER_Y = 80;
     public static final int INVENTORY_Y = 111;
     /** Buttons: 0-5 pick a mode; then the area, and the target down/up by one and by five. */
-    public static final int BUTTON_AREA = 6, BUTTON_TARGET_DOWN = 7, BUTTON_TARGET_UP = 8, BUTTON_TARGET_DOWN_5 = 9, BUTTON_TARGET_UP_5 = 10;
+    public static final int BUTTON_AREA = 6, BUTTON_TARGET_DOWN = 7, BUTTON_TARGET_UP = 8, BUTTON_TARGET_DOWN_5 = 9, BUTTON_TARGET_UP_5 = 10, BUTTON_STEADY = 11;
 
     private final ContainerLevelAccess access;
     private final BlockPos pos;
@@ -99,6 +99,8 @@ public class HerdCounterMenu extends AbstractContainerMenu {
             blockEntity.setMode(Mode.byId(id));
         } else if (id == BUTTON_AREA) {
             blockEntity.toggleArea(player);
+        } else if (id == BUTTON_STEADY) {
+            blockEntity.setSteady(!blockEntity.steady());
         } else if (id >= BUTTON_TARGET_DOWN && id <= BUTTON_TARGET_UP_5) {
             int step = switch (id) {
                 case BUTTON_TARGET_DOWN -> -1;

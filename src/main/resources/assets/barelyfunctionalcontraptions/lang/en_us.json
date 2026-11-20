@@ -1335,5 +1335,10 @@
   "jade.barelyfunctionalcontraptions.herd_counter.counting": "Counting %s: %s (signal %s)",
   "jade.barelyfunctionalcontraptions.herd_counter.filter": "Only: %s",
   "jade.barelyfunctionalcontraptions.herd_counter.herd": "%s sheep: %s ready, %s sheared, %s lambs",
-  "config.jade.plugin_barelyfunctionalcontraptions.herd_counter": "Herd Counter"
+  "config.jade.plugin_barelyfunctionalcontraptions.herd_counter": "Herd Counter",
+  "gui.barelyfunctionalcontraptions.herd_counter.steady.button": "Steady",
+  "gui.barelyfunctionalcontraptions.herd_counter.steady.on": "Steady: on",
+  "gui.barelyfunctionalcontraptions.herd_counter.steady.off": "Steady: off",
+  "gui.barelyfunctionalcontraptions.herd_counter.steady.desc": "A sheep dashing past its screen is now and then counted twice for a moment, making its count and signal jump. On, it averages its counts over %s seconds: no jumps, but slower to follow the pen.",
+  "jade.barelyfunctionalcontraptions.herd_counter.steady": "Steady"
 }

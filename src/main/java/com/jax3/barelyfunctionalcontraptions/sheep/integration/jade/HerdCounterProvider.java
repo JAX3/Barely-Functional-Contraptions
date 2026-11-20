@@ -31,7 +31,7 @@ public final class HerdCounterProvider {
     private HerdCounterProvider() {}
 
     public record Data(int mode, int value, int target, int signal, int total, int ready, int sheared, int lambs, String filter,
-                       List<String> keys, List<Integer> counts, boolean area) {
+                       List<String> keys, List<Integer> counts, boolean area, boolean steady) {
         static final StreamCodec<RegistryFriendlyByteBuf, Data> CODEC = StreamCodec.of(
                 (buf, d) -> {
                     for (int v : new int[]{d.mode, d.value, d.target, d.signal, d.total, d.ready, d.sheared, d.lambs}) ByteBufCodecs.VAR_INT.encode(buf, v);
@@ -42,6 +42,7 @@ public final class HerdCounterProvider {
                         ByteBufCodecs.VAR_INT.encode(buf, d.counts.get(i));
                     }
                     ByteBufCodecs.BOOL.encode(buf, d.area);
+                    ByteBufCodecs.BOOL.encode(buf, d.steady);
                 },
                 buf -> {
                     int[] v = new int[8];
@@ -54,7 +55,8 @@ public final class HerdCounterProvider {
                         keys.add(ByteBufCodecs.STRING_UTF8.decode(buf));
                         counts.add(ByteBufCodecs.VAR_INT.decode(buf));
                     }
-                    return new Data(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], filter, keys, counts, ByteBufCodecs.BOOL.decode(buf));
+                    boolean area = ByteBufCodecs.BOOL.decode(buf);
+                    return new Data(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], filter, keys, counts, area, ByteBufCodecs.BOOL.decode(buf));
                 });
     }
 
@@ -78,7 +80,7 @@ public final class HerdCounterProvider {
             }
             String filter = be.filterResource();
             return new Data(be.mode().ordinal(), be.value(), be.target(), be.comparatorSignal(), be.total(), be.ready(), be.sheared(), be.lambs(),
-                    filter == null ? "" : filter, keys, counts, be.showsArea());
+                    filter == null ? "" : filter, keys, counts, be.showsArea(), be.steady());
         }
 
         @Override
@@ -105,6 +107,7 @@ public final class HerdCounterProvider {
                     Component.translatable("message.barelyfunctionalcontraptions.herd_counter.mode." + mode.key()),
                     mode == Mode.FULL ? d.value() + "/" + d.target() : Integer.toString(d.value()), d.signal());
             tooltip.add(counting.withColor(LIT));
+            if (d.steady()) tooltip.add(Component.translatable(key + "steady").withColor(GREY));
             if (!d.filter().isEmpty()) tooltip.add(Component.translatable(key + "filter", resourceName(d.filter())).withColor(0xFFD27F));
             tooltip.add(Component.translatable(key + "herd", d.total(), d.ready(), d.sheared(), d.lambs()).withColor(0xDFE4F5));
             for (int i = 0; i < d.keys().size(); i++) {

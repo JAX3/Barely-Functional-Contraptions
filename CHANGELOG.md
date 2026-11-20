@@ -39,7 +39,11 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
   what it's counting, its signal and filter, the herd and its biggest resources.
 - **Modes:** every sheep, ready to shear, sheared, lambs, low on infusion, or Full (15 once there are as many as its
   target). **Filter:** a resource wool or spawn egg in its filter slot counts only that resource.
+- **Recount glitch and Steady:** a sheep dashing past its screen is now and then counted twice for a moment; Steady
+  (a clock button in its window) averages its counts over 5 seconds to smooth that out. Config `doubleCount`,
+  `steadySeconds`.
 - **Advancement:** *Count Your Sheep* (goal), for being near one counting 20 sheep.
+- **Test world:** a Herd Counter pen with two counters, one in Full lighting a lamp, one counting ready Iron sheep.
 - **Recipe:** two Iron Ingots, a Glass Pane, an Observer, a Functional Machine Block and a Comparator.
 - New config section `[herd_counter]`, and a chapter in the Contraptions Manual (Utility).
 

@@ -1671,8 +1671,9 @@ public final class DevScreenshotHarness {
      * saves: {@code -PharnessScene=extend_world -PharnessWorld="BFC Test World"}. With no scenes listed it only drains.
      */
     private static final Object[][] EXTRA_SCENES = {
-            // Every cell up to (1, 5) is taken, and (2, 5) by the Grass Seeder; (3, 5) and (4, 5) are free.
-            {"grass seeder", 2, 5},
+            // Every cell up to (1, 5) is taken, (2, 5) by the Grass Seeder (added before) and (3, 5) by the Herd Counter;
+            // (4, 5) is free.
+            {"herd counter", 3, 5},
     };
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
@@ -2223,6 +2224,70 @@ public final class DevScreenshotHarness {
             level.addFreshEntity(sheep);
         }
         label(server, g.above(3), "Grass Seeder", "green");
+    }
+
+    /**
+     * The Herd Counter for the test world: a fenced 5x5 pen (a gate at the front) of eight sheep free to wander, Iron,
+     * Gold, Copper and plain, one a lamb, watched by two counters. The one on the west counts every sheep in Full mode at
+     * 8, wired through a comparator to a lamp that's lit while the whole herd is in; the one on the north counts the Iron
+     * sheep ready to shear, Steady, through a comparator to a lamp of its own. Both areas are outlined.
+     */
+    private static void herdWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin, g = o.offset(0, 0, -3);
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(8, 6, 8),
+                e -> e instanceof Sheep || e instanceof net.minecraft.world.entity.Display.TextDisplay)) e.discard();
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-7, 0, -7), g.offset(6, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-7, -1, -7), g.offset(6, -1, 6))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        var fence = Blocks.OAK_FENCE.defaultBlockState();
+        for (int d = -3; d <= 3; d++) {
+            level.setBlock(g.offset(-3, 0, d), fence, 3);
+            level.setBlock(g.offset(3, 0, d), fence, 3);
+            level.setBlock(g.offset(d, 0, -3), fence, 3);
+            level.setBlock(g.offset(d, 0, 3), d == 0 ? Blocks.OAK_FENCE_GATE.defaultBlockState() : fence, 3);
+        }
+        var facing = com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock.FACING;
+        var diode = net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING;
+        // West: every sheep, Full at 8.
+        BlockPos west = g.offset(-4, 0, 0);
+        level.setBlock(west, ModBlocks.HERD_COUNTER.get().defaultBlockState().setValue(facing, Direction.EAST), 3);
+        level.setBlock(west.west(), Blocks.COMPARATOR.defaultBlockState().setValue(diode, Direction.EAST), 3);
+        level.setBlock(west.west(2), Blocks.REDSTONE_LAMP.defaultBlockState(), 3);
+        if (level.getBlockEntity(west) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity be) {
+            be.setMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.Mode.FULL);
+            be.setTarget(8);
+            be.setShowsArea(true);
+        }
+        // North: the Iron sheep ready to shear, Steady.
+        BlockPos north = g.offset(0, 0, -4);
+        level.setBlock(north, ModBlocks.HERD_COUNTER.get().defaultBlockState().setValue(facing, Direction.SOUTH), 3);
+        level.setBlock(north.north(), Blocks.COMPARATOR.defaultBlockState().setValue(diode, Direction.SOUTH), 3);
+        level.setBlock(north.north(2), Blocks.REDSTONE_LAMP.defaultBlockState(), 3);
+        if (level.getBlockEntity(north) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity be) {
+            be.setMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.Mode.READY);
+            be.setFilter(com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("iron"), 1));
+            be.setSteady(true);
+        }
+        String[] kinds = {"iron", "iron", "iron", "gold", "gold", "copper", "", ""};
+        double[][] spots = {{-1.5, -1.5}, {0.5, -1.8}, {1.6, 0.2}, {-1.7, 0.6}, {-0.2, 1.6}, {1.5, 1.7}, {0.2, -0.1}, {-1.4, 2.2}};
+        for (int i = 0; i < kinds.length; i++) {
+            Sheep sheep = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            sheep.snapTo(g.getX() + 0.5 + spots[i][0], g.getY(), g.getZ() + 0.5 + spots[i][1], i * 45, 0);
+            sheep.setPersistenceRequired();
+            if (!kinds[i].isEmpty()) {
+                var resource = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(ResourcefulSheep.id(kinds[i])).orElseThrow();
+                SheepInfusionEvents.setInfusion(sheep, SheepInfusion.NONE.withResource(resource.id(), resource.effectiveInfusionUses()));
+            }
+            if (i == 4) sheep.setSheared(true);
+            if (i == 7) sheep.setAge(-24000);
+            level.addFreshEntity(sheep);
+        }
+        label(server, g.above(3), "Herd Counter", "aqua");
     }
 
     /** Swaps the redstone block that started the Echo Chamber's clock back for stone, leaving the pulse going round. */
@@ -3115,7 +3180,7 @@ public final class DevScreenshotHarness {
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
         // The whole square platform from above its south edge and from straight overhead, then the latest scene.
-        String[] tps = {"tp @a 73.5 95 205.5 180 40", "tp @a 73.5 175 97 180 90", "tp @a 73.5 41 163.5 180 38", "tp @a 80.5 39 160.5 125 28"};
+        String[] tps = {"tp @a 73.5 95 205.5 180 40", "tp @a 73.5 175 97 180 90", "tp @a 101.5 41 163.5 180 38", "tp @a 93.5 38 160.5 215 25"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -3131,6 +3196,13 @@ public final class DevScreenshotHarness {
         if (tick == report) {
             server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                for (BlockPos p : new BlockPos[]{new BlockPos(97, 35, 154), new BlockPos(101, 35, 150)}) {
+                    if (level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity hc) {
+                        ResourcefulSheep.LOGGER.warn("TOUR herd counter at {}: {} {} (target {}), total {}, signal {}, steady {}, lamp {}", p, hc.mode(), hc.value(), hc.target(),
+                                hc.total(), hc.comparatorSignal(), hc.steady(), level.getBlockState(p.relative(level.getBlockState(p)
+                                        .getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock.FACING).getOpposite(), 2)));
+                    }
+                }
                 if (level.getBlockEntity(new BlockPos(73, 35, 154)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity seeder) {
                     ResourcefulSheep.LOGGER.warn("TOUR seeder {} grass {}/{} short {} tended {} grazing {} bone {}+{}", seeder.status(), seeder.grass(),
                             seeder.grass() + seeder.dirt(), seeder.shortGrass(), seeder.tended(), seeder.grazing(), seeder.boneMeal().getCount(), seeder.boneCharges());
@@ -3398,8 +3470,12 @@ public final class DevScreenshotHarness {
                     // wither rose in its catalyst slots 2 and 3) and chillerScene here.
                     // poweredFurnaceScene, woollenArmorScene, sheepTreadmillScene, oreLineScene, thermalWorldScene,
                     // echoWorldScene (then echoWorldKick, two ticks later) and staticWorldScene, all since moved onto
-                    // the square platform by squareWorld.
-                    seederWorldScene(server);
+                    // the square platform by squareWorld, and seederWorldScene.
+                    switch ((String) EXTRA_SCENES[i][0]) {
+                        case "grass seeder" -> seederWorldScene(server);
+                        case "herd counter" -> herdWorldScene(server);
+                        default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
+                    }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
                 });
             }

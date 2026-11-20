@@ -231,6 +231,8 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue herdSignalPerSheep;
         public final ModConfigSpec.DoubleValue herdLowInfusion;
         public final ModConfigSpec.IntValue herdFullTarget;
+        public final ModConfigSpec.BooleanValue herdDoubleCount;
+        public final ModConfigSpec.IntValue herdSteadySeconds;
         public final ModConfigSpec.IntValue seederRadius;
         public final ModConfigSpec.IntValue seederInterval;
         public final ModConfigSpec.IntValue seederBoneMealBlocks;
@@ -644,6 +646,10 @@ public final class ModConfigs {
                     .defineInRange("lowInfusion", 0.25, 0.0, 1.0);
             herdFullTarget = b.comment("How many sheep a new Herd Counter's Full mode waits for.")
                     .defineInRange("fullTarget", 6, 1, 64);
+            herdDoubleCount = b.comment("Whether it's barely functional: a sheep dashing past its screen (running, or knocked back) is now and then counted twice for a moment. Steady, in its window, smooths it out.")
+                    .define("doubleCount", true);
+            herdSteadySeconds = b.comment("With Steady on, how many seconds of counts it averages: steadier, but slower to follow the pen.")
+                    .defineInRange("steadySeconds", 5, 1, 60);
             b.pop();
 
             b.comment("Grass Seeder (turns the dirt its sheep have eaten back to grass, grows short grass, and gets sheared sheep grazing sooner)").push("grass_seeder");

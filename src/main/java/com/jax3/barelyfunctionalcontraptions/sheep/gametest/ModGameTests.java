@@ -179,6 +179,7 @@ public final class ModGameTests {
         ECHO_TESTS.put("automatic_shears_cant_see_sheep_in_tall_grass", ModGameTests::shearsTallGrass);
         ECHO_TESTS.put("herd_counter_counts_its_pen", ModGameTests::herdCounterCounts);
         ECHO_TESTS.put("herd_counter_full_mode_waits_for_its_target", ModGameTests::herdCounterFull);
+        ECHO_TESTS.put("herd_counter_double_counts_dashing_sheep_unless_steady", ModGameTests::herdCounterSteady);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -1602,6 +1603,41 @@ public final class ModGameTests {
         be.setMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.Mode.LOW_INFUSION);
         be.count(level, at, state);
         h.assertTrue(be.value() == 1 && be.comparatorSignal() == 1, "Low on infusion: 1, got " + be.value());
+        h.succeed();
+    }
+
+    /**
+     * A sheep dashing past is now and then counted twice (and otherwise once); with Steady on, the count is averaged, and
+     * settles back to exactly 1 once the sheep stops.
+     */
+    private static void herdCounterSteady(GameTestHelper h) {
+        var be = buildHerdCounter(h);
+        BlockPos at = be.getBlockPos();
+        var level = h.getLevel();
+        var state = level.getBlockState(at);
+        Sheep sheep = plainSheep(h, at.offset(0, 0, 2));
+        int min = Integer.MAX_VALUE, max = 0;
+        for (int i = 0; i < 60; i++) {
+            sheep.setDeltaMovement(0.5, 0, 0);
+            be.count(level, at, state);
+            min = Math.min(min, be.value());
+            max = Math.max(max, be.value());
+        }
+        h.assertTrue(min == 1 && max == 2, "a dashing sheep is counted once, and now and then twice: got " + min + " to " + max);
+        sheep.setDeltaMovement(0, 0, 0);
+        be.count(level, at, state);
+        h.assertTrue(be.value() == 1 && !be.doubled(), "standing still, once: got " + be.value());
+        be.setSteady(true);
+        for (int i = 0; i < 5; i++) {
+            sheep.setDeltaMovement(0.5, 0, 0);
+            be.count(level, at, state);
+        }
+        h.assertTrue(be.value() >= 1 && be.value() <= 2, "steady while it dashes: between 1 and 2, got " + be.value());
+        for (int i = 0; i < 5; i++) {
+            sheep.setDeltaMovement(0, 0, 0);
+            be.count(level, at, state);
+        }
+        h.assertTrue(be.value() == 1, "steady once it stops: 1, got " + be.value());
         h.succeed();
     }
 
