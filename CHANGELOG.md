@@ -27,7 +27,6 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 - **JEI:** a Static Generator page (the power for one to six plain or Copper sheep, the comb stages, the shock), and
   information pages for the generator and the comb. **Jade:** status, output, herd, dome charge, combs and energy.
 - **Advancement:** *Shocking!* (goal), for being knocked back by an overcharged Static Generator.
-- **Test world:** a Static Generator scene at x 462, six sheep making 600 FE/t into a bank of Hume Energy Cubes.
 - **Recipes:** a Lightning Rod, two Copper Blocks, Redstone, two wool and a Functional Machine Block; a Copper Comb
   from three Copper Ingots and a Brush.
 - New config section `[static_generator]`.
@@ -163,7 +162,9 @@ While a pair is linked, each module's emitter slowly turns the opposite way to t
 - **Contraptions Manual:** new chapters for the Sheep Treadmill (Power → Early Game), the Thermal Reaction Chamber
   (Power → Late Game) and Woollen Armour (Utility), and updated times and notes throughout.
 - **Test world:** new scenes for the Powered Furnace, Woollen Armour, the Sheep Treadmill, an ore processing line, the
-  Thermal Reaction Chamber and the Echo Chamber. Teleports are in `test-world/README.md`.
+  Thermal Reaction Chamber, the Echo Chamber and the Static Generator. Teleports are in `test-world/README.md`.
+- **Test world on one square platform:** every scene now stands on a single 146x146 platform in a grid of cells,
+  instead of a long row of separate platforms, and you start at its south edge. Hostile mobs no longer spawn there.
 - **Smaller jar:** the GameTests and the screenshot tools are no longer shipped in the released jar.
 - **Docs:** the README, the CurseForge page and the reference doc cover all of the above. There's a new *Sheep
   attraction* section, and config tables for `[thermal_reaction_chamber]`, `[sheep_treadmill]`, `[woollen_armor]` and

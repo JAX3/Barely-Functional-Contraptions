@@ -541,7 +541,7 @@ I I I      Copper Comb: I = Copper Ingot
 | ![Close up of the Static Generator: the belt column and the copper dome above its base](screenshots/107_static_generator_close.png) | ![Its window overcharged: the dome's charge bar past the red shock line, and Overcharged: keep clear!](screenshots/107_static_generator_gui_overcharged.png) |
 | ![Jade on the Static Generator: Overcharged: keep clear!, 439 FE/t, 5 / 6 sheep rubbing, dome charge, four combs with the worst oxidised and one waxed, and its energy](screenshots/107_static_generator_jade.png) | ![JEI's Static Generator page: the sheep, combs, generator, an axe and Honeycomb, and the power for one to six plain or Copper sheep](screenshots/107_static_generator_jei.png) |
 | ![Its crafting recipe in JEI: a Lightning Rod, two Copper Blocks, Redstone, two wool and a Functional Machine Block](screenshots/107_static_generator_jei_recipe.png) | ![Thrown back out of an overcharged pen in survival: Shocking!](screenshots/107_static_generator_shock.png) |
-| ![The test world's Static Generator: six sheep at four fresh combs in a fenced pen, an Energy Meter and a bank of Hume Energy Cubes behind it, the Echo Chamber beyond](screenshots/107_static_generator_world.png) | |
+| ![The test world's Static Generator: six sheep at four fresh combs in a fenced pen, an Energy Meter and a bank of Hume Energy Cubes behind it, with a row of machines in the next cell and the rest of the platform beyond](screenshots/107_static_generator_world.png) | |
 
 ### Thermal Reaction Chamber
 A late-game generator that makes power from the **difference between hot and cold**. Blaze sheep stand in a pen against its hot side, Snow sheep in a pen against its cold side, and water runs through the middle. It is the machines' blue-steel casing split down the middle: red-hot vent slats and fins on the hot side, frosted ones on the cold side, a gauge panel at the front (two thermometers and a balance dial), water and power ports at the back, and a window on top where flame and snow chase each other while it reacts. Crafted from a Magma Block, a Nether Star, Blue Ice, a Blaze Sheep Furnace, a Hume Energy Cube, a Snow Sheep Chiller, two Copper Blocks and a Fluid Tank, hot things on the left and cold on the right:
@@ -1503,7 +1503,12 @@ To give a data-pack resource its own icon, ship a resource pack that overrides `
 
 [`test-world/BFC-Test-World.zip`](../test-world/BFC-Test-World.zip) is a creative world with every contraption set up
 and running: sheep and separators, generators, cubes, Zero Point pairs, cables, pipes and Fluid Tanks. Unzip it into
-your `saves` folder. [`test-world/README.md`](../test-world/README.md) lists a teleport command for each scene.
+your `saves` folder. Every scene stands on one square platform, in a grid of cells, and you start at its south edge.
+[`test-world/README.md`](../test-world/README.md) lists a teleport command for each scene.
+
+| The platform from its south edge | From above |
+|---|---|
+| ![The test world: one square stone platform split into a grid of cells, each with a scene on it](screenshots/test_world_square.png) | ![The test world's platform from straight above: five cells across, six deep, the last three empty](screenshots/test_world_square_top.png) |
 
 ## Configuration files
 

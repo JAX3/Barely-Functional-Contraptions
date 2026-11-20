@@ -19,6 +19,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -237,6 +238,31 @@ public final class DevScreenshotHarness {
         }
         if ("list_command".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             listCommandTick(mc);
+            return;
+        }
+        if ("square_world".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            squareWorldTick(mc, server);
+            return;
+        }
+        if ("survey_world".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            if (tick == 40) {
+                command(server, "forceload add -96 -96 200 64");
+                command(server, "forceload add 201 -96 520 64");
+            }
+            if (tick == 300) server.execute(() -> surveyWorld(server));
+            if (tick == 302) server.execute(() -> {
+                ServerLevel level = server.overworld();
+                StringBuilder col = new StringBuilder();
+                for (int y = -64; y < 40; y++) {
+                    var st = level.getBlockState(new BlockPos(-10, y, 0));
+                    if (!st.isAir()) col.append(y).append('=').append(st.getBlock().getDescriptionId()).append(' ');
+                }
+                ResourcefulSheep.LOGGER.warn("SURVEY column -10,0: {}", col);
+                for (var e : level.getAllEntities()) {
+                    if (!(e instanceof ServerPlayer)) ResourcefulSheep.LOGGER.warn("SURVEY entity {} at {}", net.minecraft.world.entity.EntityType.getKey(e.getType()).getPath(), e.blockPosition());
+                }
+            });
+            if (tick == 320) mc.stop();
             return;
         }
         if ("extend_world".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
@@ -1632,16 +1658,13 @@ public final class DevScreenshotHarness {
     }
 
     /**
-     * Adds the newer scenes to the test world, each on its own platform at y = 34 further east along the row of
-     * scenes, then puts the player back where they were and saves: {@code -PharnessScene=extend_world
-     * -PharnessWorld="BFC Test World"}.
+     * Adds new scenes to the test world, each in a free cell of its square platform (see {@link #SQUARE_SCENES}; name,
+     * column, row), then puts the player back where they were, drains the generators that should be saved empty, and
+     * saves: {@code -PharnessScene=extend_world -PharnessWorld="BFC Test World"}. With no scenes listed it only drains.
      */
     private static final Object[][] EXTRA_SCENES = {
-            // Added before, and already in the world: new blocks (x 166), themed sheep (202), blaze furnace (234),
-            // wool burner (262), wool packer (282), infusion altar (302), snow sheep chiller (322),
-            // powered furnace (342), woollen armour (362), sheep treadmill (382), ore line (402),
-            // thermal reaction chamber (422), echo chamber (442).
-            {"static generator", 462},
+            // Every cell up to (1, 5) is taken; (2, 5), (3, 5) and (4, 5) are free. For example:
+            // {"next contraption", 2, 5},
     };
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
@@ -2760,8 +2783,8 @@ public final class DevScreenshotHarness {
 
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
-        // The latest scene: the Static Generator.
-        String[] tps = {"tp @a 462.5 40 -2.5 180 32", "tp @a 467.5 38 -6.5 110 22"};
+        // The whole square platform from above its south edge and from straight overhead, then the latest scene.
+        String[] tps = {"tp @a 73.5 95 205.5 180 40", "tp @a 73.5 175 97 180 90", "tp @a 45.5 46 66 180 35", "tp @a 31.5 44 176 180 30"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -2777,11 +2800,14 @@ public final class DevScreenshotHarness {
         if (tick == report) {
             server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
-                if (level.getBlockEntity(new BlockPos(462, 35, -12)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity be) {
+                if (level.getBlockEntity(new BlockPos(17, 35, 154)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity be) {
                     ResourcefulSheep.LOGGER.warn("TOUR static {} {} FE/t, {} sheep, {} combs, comb wear {}", be.state(), be.generating(), be.herd(),
                             be.combs().size(), be.combs().isEmpty() ? 0 : be.wear(be.combs().getFirst()));
                 }
-                for (BlockPos p : new BlockPos[]{new BlockPos(462, 35, -13), new BlockPos(462, 35, -14)}) {
+                if (level.getBlockEntity(new BlockPos(129, 35, 131)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity echo) {
+                    ResourcefulSheep.LOGGER.warn("TOUR echo {} {} FE/t, {} sheep, noise {}", echo.state(), echo.generating(), echo.herd(), echo.noise());
+                }
+                for (BlockPos p : new BlockPos[]{new BlockPos(17, 35, 153), new BlockPos(17, 35, 152)}) {
                     ResourcefulSheep.LOGGER.warn("TOUR at {}: {} / {}", p, level.getBlockState(p), level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity m
                             ? "meter rate " + m.rate() : String.valueOf(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.NORTH) instanceof net.neoforged.neoforge.transfer.energy.EnergyHandler h ? h.getAmountAsLong() : -1));
                 }
@@ -2789,6 +2815,212 @@ public final class DevScreenshotHarness {
         }
         if (tick == report + 10) shot(mc, "tour_last");
         if (tick == report + 20) mc.stop();
+    }
+
+    /**
+     * The test world's scenes, as they stood in a row of separate platforms: name, the blocks' bounds (x0, x1, z0, z1,
+     * y0, y1), how far up to lift them (so every scene's floor ends up at y = 34), and the grid cell (column, row; the
+     * Themed sheep take two cells). {@link #squareWorldTick} moves them all onto one square platform.
+     */
+    private static final Object[][] SQUARE_SCENES = {
+            {"Infused sheep, Mechanical Separators and Automatic Shears", new int[]{-14, -4, -13, -4, 4, 4}, 31, 0, 0},
+            {"Hume Energy Cubes", new int[]{-25, -10, -10, 3, 33, 38}, 1, 1, 0},
+            {"Fluid Reservoir", new int[]{-12, -7, -12, -8, 24, 26}, 9, 2, 0},
+            {"Wireless power and Creative Generator", new int[]{1, 22, -10, -8, 33, 36}, 1, 3, 0},
+            {"Zero Point Energy Modules", new int[]{35, 41, -11, -7, 33, 41}, 1, 4, 0},
+            {"Energy Cables", new int[]{52, 61, -12, -5, 33, 37}, 1, 0, 1},
+            {"Fluid Pipes", new int[]{67, 77, -12, -4, 32, 36}, 1, 1, 1},
+            {"Item Pipes", new int[]{83, 93, -12, -4, 33, 35}, 1, 2, 1},
+            {"Zero Point modules on walls", new int[]{100, 110, -13, -5, 33, 38}, 1, 3, 1},
+            {"Bred lambs", new int[]{116, 126, -12, -6, 33, 33}, 1, 4, 1},
+            {"Fluid Tanks", new int[]{131, 144, -13, -5, 33, 36}, 1, 0, 2},
+            {"New blocks", new int[]{154, 178, -19, -3, 34, 36}, 0, 1, 2},
+            {"Themed sheep", new int[]{186, 218, -19, -2, 34, 35}, 0, 2, 2},
+            {"Blaze Sheep Furnace", new int[]{226, 244, -19, -1, 34, 35}, 0, 4, 2},
+            {"Wool Burners", new int[]{254, 270, -19, -3, 34, 37}, 0, 0, 3},
+            {"Wool Packers", new int[]{274, 290, -19, -3, 34, 37}, 0, 1, 3},
+            {"Infusion Altar", new int[]{294, 312, -19, -3, 34, 35}, 0, 2, 3},
+            {"Snow Sheep Chiller", new int[]{316, 328, -19, -7, 34, 35}, 0, 3, 3},
+            {"Powered Furnaces", new int[]{334, 350, -19, -5, 34, 37}, 0, 4, 3},
+            {"Woollen Armour", new int[]{354, 370, -19, -5, 34, 34}, 0, 0, 4},
+            {"Sheep Treadmills", new int[]{376, 388, -17, -6, 34, 35}, 0, 1, 4},
+            {"Ore processing line", new int[]{398, 412, -15, -5, 33, 36}, 0, 2, 4},
+            {"Thermal Reaction Chamber", new int[]{415, 429, -21, -6, 33, 36}, 0, 3, 4},
+            {"Echo Chamber", new int[]{435, 449, -21, -4, 34, 37}, 0, 4, 4},
+            {"Static Generator", new int[]{455, 469, -21, -4, 34, 36}, 0, 0, 5},
+            {"Mycelial Generators, Mechanical Separators and Automatic Shears", new int[]{-15, -6, -11, -10, 16, 16}, 19, 1, 5},
+    };
+    /** The square platform: its north-west corner, its side, and the grid of cells on it. */
+    private static final int SQUARE_X = 0, SQUARE_Z = 24, SQUARE_SIDE = 146, CELL_W = 28, CELL_D = 23, GRID_X = 3, GRID_Z = 4;
+
+    /** Where a cell's middle is (x, z), for a scene {@code span} cells wide. */
+    private static int[] cellCentre(int column, int row, int span) {
+        return new int[]{SQUARE_X + GRID_X + column * CELL_W + span * CELL_W / 2, SQUARE_Z + GRID_Z + row * CELL_D + CELL_D / 2};
+    }
+
+    /**
+     * Moves every scene of the test world off its own platform onto one square platform at y = 34, in a grid, with its
+     * sheep, labels and armour stands, and re-points the Barely Functional Wrench's wireless links; then sets the
+     * spawn at the platform's south edge: {@code -PharnessScene=square_world -PharnessWorld="BFC Test World"}.
+     */
+    private static void squareWorldTick(Minecraft mc, MinecraftServer server) {
+        if (tick == 40) {
+            command(server, "forceload add -96 -96 200 64");
+            command(server, "forceload add 201 -96 520 64");
+            command(server, String.format(java.util.Locale.ROOT, "forceload add %d %d %d %d", SQUARE_X, SQUARE_Z, SQUARE_X + SQUARE_SIDE, SQUARE_Z + SQUARE_SIDE));
+        }
+        if (tick == 300) server.execute(() -> squareWorld(server));
+        if (tick == 340) server.execute(() -> {
+            command(server, "forceload remove all");
+            command(server, "gamerule send_command_feedback true");
+        });
+        if (tick == 360) mc.stop();
+    }
+
+    private static void squareWorld(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        var cmds = server.getCommands();
+        java.util.function.Consumer<String> run = c -> cmds.performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(), c);
+        run.accept("gamerule send_command_feedback false");
+        // Each scene's offset, worked out from its cell.
+        int n = SQUARE_SCENES.length;
+        int[][] offsets = new int[n][];
+        for (int i = 0; i < n; i++) {
+            int[] b = (int[]) SQUARE_SCENES[i][1];
+            int span = "Themed sheep".equals(SQUARE_SCENES[i][0]) ? 2 : 1;
+            int[] centre = cellCentre((Integer) SQUARE_SCENES[i][3], (Integer) SQUARE_SCENES[i][4], span);
+            offsets[i] = new int[]{centre[0] - (b[0] + b[1] + 1) / 2, (Integer) SQUARE_SCENES[i][2], centre[1] - (b[2] + b[3] + 1) / 2};
+        }
+        java.util.function.Function<BlockPos, BlockPos> moved = pos -> {
+            for (int i = 0; i < n; i++) {
+                int[] b = (int[]) SQUARE_SCENES[i][1];
+                if (pos.getX() >= b[0] - 1 && pos.getX() <= b[1] + 1 && pos.getZ() >= b[2] - 1 && pos.getZ() <= b[3] + 1 && pos.getY() >= b[4] && pos.getY() <= b[5] + 6) {
+                    return pos.offset(offsets[i][0], offsets[i][1], offsets[i][2]);
+                }
+            }
+            return null;
+        };
+        // The wireless links (generator to machine, and generator to generator) whose ends both move, before moving.
+        var powerLinks = com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinkData.get(server);
+        var manualLinks = com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData.get(server);
+        java.util.List<GlobalPos[]> power = new java.util.ArrayList<>(), manual = new java.util.ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            int[] b = (int[]) SQUARE_SCENES[i][1];
+            for (BlockPos p : BlockPos.betweenClosed(b[0] - 1, b[4], b[2] - 1, b[1] + 1, b[5] + 6, b[3] + 1)) {
+                GlobalPos gp = GlobalPos.of(level.dimension(), p.immutable());
+                for (GlobalPos m : powerLinks.machinesOf(gp)) power.add(new GlobalPos[]{gp, m});
+                for (GlobalPos m : manualLinks.linksOf(gp)) if (gp.pos().asLong() < m.pos().asLong()) manual.add(new GlobalPos[]{gp, m});
+            }
+        }
+        // The entities of each scene, before moving (the clone would leave them floating).
+        java.util.List<java.util.List<net.minecraft.world.entity.Entity>> entities = new java.util.ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            int[] b = (int[]) SQUARE_SCENES[i][1];
+            var box = new net.minecraft.world.phys.AABB(b[0] - 1, b[4], b[2] - 1, b[1] + 2, b[5] + 10, b[3] + 2);
+            entities.add(level.getEntities((net.minecraft.world.entity.Entity) null, box,
+                    e -> !(e instanceof ServerPlayer) && !(e instanceof net.minecraft.world.entity.monster.Enemy)
+                            && !(e instanceof net.minecraft.world.entity.ExperienceOrb) && !(e instanceof net.minecraft.world.entity.item.ItemEntity)));
+        }
+        // The platform: smooth stone, a stone-brick line between the cells, a polished-deepslate rim.
+        for (int x = SQUARE_X; x < SQUARE_X + SQUARE_SIDE; x++) {
+            for (int z = SQUARE_Z; z < SQUARE_Z + SQUARE_SIDE; z++) {
+                boolean rim = x == SQUARE_X || z == SQUARE_Z || x == SQUARE_X + SQUARE_SIDE - 1 || z == SQUARE_Z + SQUARE_SIDE - 1;
+                int gx = x - SQUARE_X - GRID_X, gz = z - SQUARE_Z - GRID_Z;
+                boolean line = (gx >= 0 && gx <= 5 * CELL_W && gx % CELL_W == 0 && gz >= 0 && gz <= 6 * CELL_D)
+                        || (gz >= 0 && gz <= 6 * CELL_D && gz % CELL_D == 0 && gx >= 0 && gx <= 5 * CELL_W);
+                level.setBlock(new BlockPos(x, 34, z), (rim ? Blocks.POLISHED_DEEPSLATE : line ? Blocks.STONE_BRICKS : Blocks.SMOOTH_STONE).defaultBlockState(), 2);
+            }
+        }
+        // Move each scene's blocks (only its blocks, so the platform stays round them), then its entities.
+        for (int i = 0; i < n; i++) {
+            int[] b = (int[]) SQUARE_SCENES[i][1], o = offsets[i];
+            {
+                int y0 = b[4], y1 = b[5] + 6;
+                run.accept(String.format(java.util.Locale.ROOT, "clone %d %d %d %d %d %d %d %d %d masked move",
+                        b[0] - 1, y0, b[2] - 1, b[1] + 1, y1, b[3] + 1, b[0] - 1 + o[0], y0 + o[1], b[2] - 1 + o[2]));
+            }
+            for (var e : entities.get(i)) e.teleportTo(e.getX() + o[0], e.getY() + o[1], e.getZ() + o[2]);
+            boolean labelled = entities.get(i).stream().anyMatch(e -> e instanceof net.minecraft.world.entity.Display.TextDisplay);
+            int[] centre = new int[]{(b[0] + b[1] + 1) / 2 + o[0], (b[2] + b[3] + 1) / 2 + o[2]};
+            if (!labelled) label(server, new BlockPos(centre[0], 41, (b[2] + o[2]) - 1), (String) SQUARE_SCENES[i][0], "white");
+            ResourcefulSheep.LOGGER.warn("SQUARE '{}' moved by {} {} {} ({} entities), centre now {} {}", SQUARE_SCENES[i][0], o[0], o[1], o[2],
+                    entities.get(i).size(), centre[0], centre[1]);
+        }
+        // Re-point the links that moved.
+        for (GlobalPos[] link : power) {
+            BlockPos a = moved.apply(link[0].pos()), c = moved.apply(link[1].pos());
+            if (a == null || c == null) continue;
+            powerLinks.remove(link[0], link[1]);
+            powerLinks.add(GlobalPos.of(level.dimension(), a), GlobalPos.of(level.dimension(), c));
+        }
+        for (GlobalPos[] link : manual) {
+            BlockPos a = moved.apply(link[0].pos()), c = moved.apply(link[1].pos());
+            if (a == null || c == null) continue;
+            manualLinks.remove(link[0], link[1]);
+            manualLinks.add(GlobalPos.of(level.dimension(), a), GlobalPos.of(level.dimension(), c));
+        }
+        ResourcefulSheep.LOGGER.warn("SQUARE links moved: {} power, {} manual", power.size(), manual.size());
+        // A crafting table left over from an old screenshot.
+        level.setBlock(new BlockPos(-17, 39, 8), Blocks.AIR.defaultBlockState(), 3);
+        // Clear out wild mobs and leftovers, and stop them spawning in the platform's shadow on the sand below.
+        run.accept("gamerule spawn_mobs false");
+        // (Discarded, not killed: a killed slime splits into smaller ones.)
+        for (var e : java.util.List.copyOf((java.util.Collection<net.minecraft.world.entity.Entity>) com.google.common.collect.Lists.newArrayList(level.getAllEntities()))) {
+            if (e instanceof net.minecraft.world.entity.monster.Enemy || e instanceof net.minecraft.world.entity.item.ItemEntity
+                    || e instanceof net.minecraft.world.entity.ExperienceOrb) e.discard();
+        }
+        int sx = SQUARE_X + SQUARE_SIDE / 2;
+        run.accept(String.format(java.util.Locale.ROOT, "setworldspawn %d 35 %d", sx, SQUARE_Z + SQUARE_SIDE - 3));
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        player.teleportTo(level, sx + 0.5, 35, SQUARE_Z + SQUARE_SIDE - 2.5, java.util.Set.of(), 180, 10, true);
+        ResourcefulSheep.LOGGER.warn("SQUARE done; spawn {} 35 {}", sx, SQUARE_Z + SQUARE_SIDE - 3);
+    }
+
+    /** Logs each separate group of blocks above the superflat ground (the scenes), with its bounds and entities. */
+    private static void surveyWorld(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        int x0 = -96, x1 = 520, z0 = -96, z1 = 200, y0 = 4, y1 = 90;
+        int w = x1 - x0 + 1, d = z1 - z0 + 1, hgt = y1 - y0 + 1;
+        boolean[] solid = new boolean[w * d * hgt];
+        for (int cx = x0 >> 4; cx <= x1 >> 4; cx++) for (int cz = z0 >> 4; cz <= z1 >> 4; cz++) level.getChunk(cx, cz);
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        for (int x = x0; x <= x1; x++) for (int z = z0; z <= z1; z++) for (int y = y0; y <= y1; y++) {
+            if (!level.getBlockState(m.set(x, y, z)).isAir()) solid[((x - x0) * d + (z - z0)) * hgt + (y - y0)] = true;
+        }
+        boolean[] seen = new boolean[solid.length];
+        java.util.ArrayDeque<Integer> queue = new java.util.ArrayDeque<>();
+        for (int i = 0; i < solid.length; i++) {
+            if (!solid[i] || seen[i]) continue;
+            int minX = Integer.MAX_VALUE, minY = minX, minZ = minX, maxX = Integer.MIN_VALUE, maxY = maxX, maxZ = maxX, count = 0;
+            seen[i] = true; queue.add(i);
+            while (!queue.isEmpty()) {
+                int k = queue.poll(); count++;
+                int y = k % hgt, z = (k / hgt) % d, x = k / hgt / d;
+                minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y); minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
+                for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) for (int dy = -1; dy <= 1; dy++) {
+                    int nx = x + dx, ny = y + dy, nz = z + dz;
+                    if (nx < 0 || ny < 0 || nz < 0 || nx >= w || ny >= hgt || nz >= d) continue;
+                    int n = (nx * d + nz) * hgt + ny;
+                    if (solid[n] && !seen[n]) { seen[n] = true; queue.add(n); }
+                }
+            }
+            if (count < 1 || minZ + z0 > 23 && count > 100) continue;
+            if (minZ + z0 <= 23 || count < 40) {
+                StringBuilder what = new StringBuilder();
+                java.util.Set<String> names = new java.util.TreeSet<>();
+                for (int xx = minX + x0; xx <= maxX + x0; xx++) for (int zz = minZ + z0; zz <= maxZ + z0; zz++) for (int yy = minY + y0; yy <= maxY + y0; yy++) {
+                    var st = level.getBlockState(new BlockPos(xx, yy, zz));
+                    if (!st.isAir()) names.add(st.getBlock().getDescriptionId().replace("block.minecraft.", "").replace("block.barelyfunctionalcontraptions.", "bfc:"));
+                }
+                ResourcefulSheep.LOGGER.warn("SURVEY blocks {}", names);
+            }
+            var box = new net.minecraft.world.phys.AABB(minX + x0, minY + y0, minZ + z0, maxX + x0 + 1, maxY + y0 + 1, maxZ + z0 + 1).inflate(1, 4, 1);
+            var ents = level.getEntities((net.minecraft.world.entity.Entity) null, box, e -> !(e instanceof ServerPlayer));
+            java.util.Map<String, Integer> kinds = new java.util.TreeMap<>();
+            for (var e : ents) kinds.merge(net.minecraft.world.entity.EntityType.getKey(e.getType()).getPath(), 1, Integer::sum);
+            ResourcefulSheep.LOGGER.warn("SURVEY x {}..{} y {}..{} z {}..{} blocks {} entities {}", minX + x0, maxX + x0, minY + y0, maxY + y0, minZ + z0, maxZ + z0, count, kinds);
+        }
+        ResourcefulSheep.LOGGER.warn("SURVEY links {}", com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinkData.get(server));
     }
 
     private static net.minecraft.world.phys.Vec3 extendReturn = net.minecraft.world.phys.Vec3.ZERO;
@@ -2808,23 +3040,25 @@ public final class DevScreenshotHarness {
         }
         if (tick >= start && tick < end) {
             int i = (tick - start) / per, step = (tick - start) % per;
-            int x = (Integer) EXTRA_SCENES[i][1];
+            int[] cell = cellCentre((Integer) EXTRA_SCENES[i][1], (Integer) EXTRA_SCENES[i][2], 1);
+            // The scenes build round the player, from 12 blocks north of them to 5 south: stand so that's the cell's middle.
+            int x = cell[0], z = cell[1] + 3;
             if (step == 0) {
                 server.execute(() -> {
                     ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                     player.getAbilities().flying = true;
                     player.onUpdateAbilities();
-                    player.teleportTo(x + 0.5, 35, -8.5);
+                    player.teleportTo(x + 0.5, 35, z + 0.5);
                 });
             } else if (step == 40) {
                 server.execute(() -> {
                     ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
-                    player.teleportTo(x + 0.5, 35, -8.5); // exactly on the spot, in case it drifted
+                    player.teleportTo(x + 0.5, 35, z + 0.5); // exactly on the spot, in case it drifted
                     // Earlier runs built woolBurnerScene, woolPackerScene, altarScene (with bone blocks and a
                     // wither rose in its catalyst slots 2 and 3) and chillerScene here.
-                    // poweredFurnaceScene, woollenArmorScene, sheepTreadmillScene, oreLineScene, thermalWorldScene
-                    // and echoWorldScene (then echoWorldKick, two ticks later).
-                    staticWorldScene(server);
+                    // poweredFurnaceScene, woollenArmorScene, sheepTreadmillScene, oreLineScene, thermalWorldScene,
+                    // echoWorldScene (then echoWorldKick, two ticks later) and staticWorldScene, all since moved onto
+                    // the square platform by squareWorld. The next new scene's builder goes here.
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
                 });
             }
@@ -2836,12 +3070,12 @@ public final class DevScreenshotHarness {
                 // The scenes turn command feedback off for clean shots; the shared world must keep it on, or commands
                 // such as /barelyfunctionalcontraptions list show nothing.
                 server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamerule send_command_feedback true");
-                // Save the Thermal Reaction Chamber, the Echo Chamber and their cube banks empty, so they run for a while when
-                // someone visits.
+                // Save the Thermal Reaction Chamber, the Echo Chamber, the Static Generator and their cube banks empty, so they
+                // run for a while when someone visits.
                 ServerLevel level = player.level();
-                // The same for the Echo Chamber (its port, from the back) and its cube bank, and the Static Generator and its cubes.
-                for (BlockPos p : new BlockPos[]{new BlockPos(442, 35, -13), new BlockPos(442, 35, -15),
-                        new BlockPos(462, 35, -12), new BlockPos(462, 35, -14)}) {
+                // The Echo Chamber (its port, from the back) and its cube bank, and the Static Generator and its cubes.
+                for (BlockPos p : new BlockPos[]{new BlockPos(129, 35, 130), new BlockPos(129, 35, 128),
+                        new BlockPos(17, 35, 154), new BlockPos(17, 35, 152)}) {
                     var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.NORTH);
                     if (handler == null) continue;
                     for (int k = 0; k < 10_000 && handler.getAmountAsLong() > 0; k++) { // a cube bank only gives so much at a time
@@ -2852,7 +3086,7 @@ public final class DevScreenshotHarness {
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND drained {} to {}", p, handler.getAmountAsLong());
                 }
-                for (BlockPos p : new BlockPos[]{new BlockPos(422, 35, -13), new BlockPos(422, 35, -11)}) {
+                for (BlockPos p : new BlockPos[]{new BlockPos(101, 35, 131), new BlockPos(101, 35, 133)}) {
                     var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.UP);
                     if (handler == null) continue;
                     for (int k = 0; k < 10_000 && handler.getAmountAsLong() > 0; k++) { // a cube bank only gives so much at a time
