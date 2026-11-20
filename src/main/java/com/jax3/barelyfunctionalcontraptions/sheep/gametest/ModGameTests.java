@@ -1286,8 +1286,8 @@ public final class ModGameTests {
     }
 
     /**
-     * Two Echo Shards, a Warden Wool Bale and a Functional Machine Block make an Echo Chamber (another resource's bale
-     * won't do); breaking any block of a placed one drops one Echo Chamber, not one for each of its 27 blocks, and a
+     * Its recipe (Iron Blocks and an Echo Shard; Echo Shards round a Warden Wool Bale; Blackstone round a Functional
+     * Machine Block) makes an Echo Chamber (another resource's bale won't do); breaking any block of a placed one drops one Echo Chamber, not one for each of its 27 blocks, and a
      * player needs a pickaxe for it.
      */
     private static void echoRecipeAndDrop(GameTestHelper h) {
@@ -1295,9 +1295,10 @@ public final class ModGameTests {
         ItemStack machine = new ItemStack(ModItems.FUNCTIONAL_MACHINE_BLOCK.get());
         ItemStack warden = com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("warden"), 1);
         ItemStack iron = com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("iron"), 1);
-        ItemStack made = craft(h, 3, 2, List.of(shard, warden, shard, e, machine, e));
+        ItemStack ironBlock = new ItemStack(Items.IRON_BLOCK), blackstone = new ItemStack(Items.BLACKSTONE);
+        ItemStack made = craft(h, 3, 3, List.of(ironBlock, shard, ironBlock, shard, warden, shard, blackstone, machine, blackstone));
         h.assertTrue(made.is(ModItems.ECHO_CHAMBER.get()), "the recipe makes an Echo Chamber, got " + made);
-        h.assertTrue(craft(h, 3, 2, List.of(shard, iron, shard, e, machine, e)).isEmpty(), "an Iron Wool Bale won't do");
+        h.assertTrue(craft(h, 3, 3, List.of(ironBlock, shard, ironBlock, shard, iron, shard, blackstone, machine, blackstone)).isEmpty(), "an Iron Wool Bale won't do");
         // Placed on the platform, then broken from its top corner.
         for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.STONE);
         BlockPos front = h.absolutePos(new BlockPos(3, 1, 1));

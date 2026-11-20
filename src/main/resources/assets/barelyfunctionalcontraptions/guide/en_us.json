@@ -212,7 +212,7 @@
         "- Too loud for 10 seconds and the room shrieks: players nearby get Darkness, and it stops for a minute.",
         "- A note block on a steady redstone clock, shut in with the chamber behind wool walls, is the easy way.",
         "## Making it",
-        "- Two Echo Shards either side of a Warden Wool Bale, over a Functional Machine Block."
+        "- Iron Block, Echo Shard, Iron Block on top; Echo Shard, Warden Wool Bale, Echo Shard in the middle; Blackstone, Functional Machine Block, Blackstone at the bottom."
       ]
     },
     {

@@ -29,7 +29,8 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
   drowsiness and shriek bars.
 - **Model:** blue-steel casing lined with sculk, a big resonator dish that pulses, foam walls, louvred vents, and
   a crown of sculk fronds on its roof like the Warden sheep's ears.
-- **Recipe:** two Echo Shards either side of a Warden Wool Bale, over a Functional Machine Block.
+- **Recipe:** Iron Block, Echo Shard and Iron Block on top; Echo Shards either side of a Warden Wool Bale in the
+  middle; Blackstone, a Functional Machine Block and Blackstone on the bottom.
 - **JEI:** an *Echo Chamber* page and an information page. **Jade:** status, output, herd, noise, steadiness and
   energy, from any of its blocks.
 - New recipe ingredient `barelyfunctionalcontraptions:wool_bale` for data packs, like `resource_wool`.
