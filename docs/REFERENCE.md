@@ -133,6 +133,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | ⭐ **Sheepish Combustion** (goal) | Be within 16 blocks of a Blaze Sheep Furnace when it starts making power from a Blaze sheep |
 | ⭐ **Running Ewe Ragged** (goal) | Be within 16 blocks of a Sheep Treadmill when a sheep starts walking it |
 | ⭐ **Thermal Shock** (challenge) | Be within 16 blocks of a Thermal Reaction Chamber when it starts reacting |
+| ⭐ **Keep Off the Grass** (goal) | Be near a Grass Seeder that has tended 100 blocks of its pen |
 | ⭐ **Shocking!** (goal) | Get knocked back by an overcharged Static Generator |
 | ⭐ **Good Vibrations** (challenge) | Be within 16 blocks of an Echo Chamber when it starts listening with its noise in the sweet spot (comes after the Warden sheep) |
 | Wool You Look at That | Infuse a sheep with any resource |
@@ -744,6 +745,7 @@ I H I      I = Iron Ingot, H = Hopper
 | ![A Grass Seeder in a fenced pen of patchy dirt and grass, four sheared sheep round it, its area outlined in green](screenshots/108_grass_seeder_bare.png) | ![The same pen all grass with tufts of short grass, three of the sheep woolly again](screenshots/108_grass_seeder.png) |
 | ![Close up of the Grass Seeder: blue-steel casing on legs, a window of seeds with a sprout, a seed hopper and a brass sprinkler on top](screenshots/108_grass_seeder_close.png) | ![Jade on it: All green, Grass 24 / 24 (10 short), the Bone Meal it has open, its Bone Meal, water and FE](screenshots/108_grass_seeder_jade.png) |
 | ![Its window on the bare pen: energy and water gauges, a map of its ground in grass and dirt, 11/24 grass, 4 grazing, status Tending](screenshots/108_grass_seeder_gui_bare.png) | ![Its window once it's green: the map all grass with tufts of short grass, 24/24 grass, 10 tufts, status All green](screenshots/108_grass_seeder_gui.png) |
+| ![Its window overgrown: the map all tall grass, 24 tall grass, status Overgrown, the Trim button beside the area button](screenshots/108_grass_seeder_gui_overgrown.png) | ![The pen overgrown with tall grass, its sheep hidden in it](screenshots/108_grass_seeder_overgrown.png) |
 | ![JEI's Grass Seeder page: Bone Meal, a Water Bucket and dirt into the seeder, grass and short grass out; a sheep grazing 4x as often into wool](screenshots/108_grass_seeder_jei.png) | ![The test world's Grass Seeder: a fenced pen with four sheep, Automatic Shears in the back fence powered by a Creative Generator](screenshots/108_grass_seeder_world.png) |
 
 - **Area:** the **5x5 ground around it** (`radius`), at its feet, and the sheep standing on it. Sneak-right-click it with an empty hand to outline it in green.
@@ -752,7 +754,9 @@ I H I      I = Iron Ingot, H = Hopper
 - **Fuel:** **Bone Meal** (one tends 8 blocks, `boneMealBlocks`), by right-click, hopper or pipe; or **FE and water**: **800 FE** (`energyPerTick` 20 x 2 s) and **10 mB** (`waterPerBlock`) a block, from cables, pipes or a Water Bucket. It holds 20,000 FE and 4 buckets. It uses power and water first and saves its Bone Meal.
 - **Window:** right-click it with an empty hand. The energy and water gauges; a **map of its ground**, a tile for each block (grass, grass with a tuft of short grass, bare dirt, the seeder in the middle; areas up to 7x7); a bar of how green it is; the Bone Meal slot and how many blocks the Bone Meal it has open will still tend; how much of its ground is grass and short grass; how many sheared sheep are grazing; and the status lamp (*Tending*, *All green*, *No fuel*, *No grass or dirt around it*). Every part has a tooltip, and its spyglass button outlines its area.
 - **JEI:** a *Grass Seeder* page (Bone Meal, water and dirt into the seeder, grass and short grass out; sheared sheep grazing 4x as often into wool; its area, timing and fuel) and an information page. **Jade:** its status, how much of its ground is grass and short grass, the sheep grazing, and the Bone Meal it has open, with Jade's own lines for its Bone Meal, water and FE.
+- **Overgrowth:** left with nothing to tend and **Trim** off, it doesn't stop: now and then (a 1 in 4 chance a turn, `overgrowthChance`) a tuft of short grass shoots up into **tall grass**, and it plants more short grass to replace it, until the whole pen is overgrown. Sheep can't eat tall grass, and **Automatic Shears can't see a sheep standing in it**, so an overgrown pen stops being sheared. Its status reads *Overgrown* (amber). Switch **Trim** on (the shears button in its window) and it cuts the tall grass back to short grass, a block a turn, and never lets it overgrow; each cut takes fuel like any other block. You can also cut tall grass by hand. `overgrowth = false` turns it off.
 - **Comparator:** reads how green its area is, 0-15.
+- **Advancement:** ⭐ *Keep Off the Grass* (goal), for being near a Grass Seeder that has tended 100 blocks.
 - **Goes well with:** **Automatic Shears** on the same pen (the shears take the wool, the Seeder grows it back), and a **Static Generator**, whose sheep only count with their fleece on. Mine it with a pickaxe. **Config:** `[grass_seeder]` (see below).
 
 ### Sheep Treadmill
@@ -1251,6 +1255,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `energyPerTick` / `waterPerBlock` | 20 / 10 | FE a tick while tending (800 FE a block) and mB of water a block, instead of Bone Meal |
 | `grazeMultiplier` | 4.0 | How much sooner sheared sheep in its area graze; 1 = no boost |
 | `shortGrass` | 0.4 | Share of its grass it keeps short grass growing on |
+| `overgrowth` / `overgrowthChance` | true / 0.25 | Whether it overgrows with tall grass when it has nothing to do and Trim is off, and the chance a turn |
 | `capacity` / `maxInput` / `tankCapacity` | 20,000 / 200 / 4,000 | FE it stores, FE it takes in a tick, mB of water it holds |
 
 **`[chiller]`**

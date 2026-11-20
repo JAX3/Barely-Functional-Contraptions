@@ -56,12 +56,16 @@ import org.jspecify.annotations.Nullable;
  */
 public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
     public static final int AREA_COLOR = 0xFF6FCF4A;
-    /** The ground map in its window covers areas up to 7x7 (radius 3), two bits a block, seven blocks to a value. */
-    public static final int MAP_MAX = 7, MAP_VALUES = 7, MAP_PER_VALUE = 7;
+    /** The ground map in its window covers areas up to 7x7 (radius 3), three bits a block, five blocks to a value. */
+    public static final int MAP_MAX = 7, MAP_VALUES = 10, MAP_PER_VALUE = 5, MAP_BITS = 3;
     /** What a block on the ground map is. */
-    public static final int TILE_OTHER = 0, TILE_DIRT = 1, TILE_GRASS = 2, TILE_SHORT = 3;
+    public static final int TILE_OTHER = 0, TILE_DIRT = 1, TILE_GRASS = 2, TILE_SHORT = 3, TILE_TALL = 4;
+    /** Where the ground map starts in its synced values. */
+    public static final int MAP_DATA = 20;
     /** Values synced to the window ({@link com.jax3.barelyfunctionalcontraptions.sheep.menu.GrassSeederMenu}). */
-    public static final int DATA_COUNT = 18 + MAP_VALUES;
+    public static final int DATA_COUNT = MAP_DATA + MAP_VALUES;
+    /** Blocks it must tend for the players near it to earn Keep Off the Grass. */
+    public static final int ADVANCEMENT_BLOCKS = 100;
     private static final int[] SLOTS = {0};
     public static final FluidResource WATER = FluidResource.of(Fluids.WATER);
 
@@ -73,6 +77,8 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
         ALL_GREEN(0xFF8FE07A),
         /** It has something to tend but no Bone Meal, and not enough power and water. */
         NO_FUEL(0xFFE35D5D),
+        /** Its ground is green and it has nothing to do, so it's growing tall grass: Trim keeps it short. */
+        OVERGROWN(0xFFE0B04A),
         /** No grass or dirt in its area to tend. */
         NO_GROUND(0xFFAEB4C6);
 
@@ -96,7 +102,9 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
     private int cooldown;
     private boolean showArea;
     private Status status = Status.NO_GROUND;
-    private int grass, dirt, shortGrass;
+    private int grass, dirt, shortGrass, tallGrass;
+    /** Whether it cuts tall grass back to short grass, instead of letting it grow. */
+    private boolean trim;
     /** Blocks it has tended in all. */
     private long tended;
     private int lastSignal;
@@ -107,7 +115,7 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
     private final net.minecraft.world.inventory.ContainerData data = new net.minecraft.world.inventory.ContainerData() {
         @Override
         public int get(int index) {
-            if (index >= 18) return map[index - 18];
+            if (index >= MAP_DATA) return map[index - MAP_DATA];
             long tendedCapped = Math.min(Integer.MAX_VALUE, tended);
             return switch (index) {
                 case 0 -> energy.getAmountAsInt() & 0xFFFF;
@@ -128,6 +136,8 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
                 case 15 -> grazing;
                 case 16 -> (int) (tendedCapped & 0xFFFF);
                 case 17 -> (int) (tendedCapped >>> 16);
+                case 18 -> tallGrass;
+                case 19 -> trim ? 1 : 0;
                 default -> 0;
             };
         }
@@ -209,48 +219,95 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
         if (state.getValue(GrassSeederBlock.ACTIVE) != active) level.setBlock(pos, state.setValue(GrassSeederBlock.ACTIVE, active), Block.UPDATE_ALL);
     }
 
-    /** Tends one block (if anything needs it and it has the fuel), then lets the sheared sheep graze. */
+    /** What it does to a block on a turn. */
+    private enum Job { REGRASS, TRIM, PLANT, OVERGROW }
+
+    /**
+     * Tends one block (if anything needs it and it has the fuel), then lets the sheared sheep graze. In order: bare
+     * dirt goes back to grass; with Trim on, tall grass is cut back to short grass; short grass is grown up to its share
+     * of the grass; and, with nothing else to do and Trim off, it overgrows: now and then a tuft of short grass shoots up
+     * into tall grass, which the sheep can't eat and Automatic Shears can't see them in.
+     */
     public void work(ServerLevel level, BlockPos pos) {
-        List<BlockPos> bare = new ArrayList<>(), plantable = new ArrayList<>();
-        grass = dirt = shortGrass = 0;
+        List<BlockPos> bare = new ArrayList<>(), plantable = new ArrayList<>(), tall = new ArrayList<>(), tufts = new ArrayList<>();
+        grass = dirt = shortGrass = tallGrass = 0;
         for (BlockPos p : ground(pos)) {
             BlockState state = level.getBlockState(p), above = level.getBlockState(p.above());
-            if (state.is(Blocks.DIRT)) {
-                dirt++;
+            boolean isDirt = state.is(Blocks.DIRT), isGrass = state.is(Blocks.GRASS_BLOCK);
+            if (!isDirt && !isGrass) continue;
+            if (isDirt) dirt++;
+            else grass++;
+            if (above.is(Blocks.TALL_GRASS)) {
+                tallGrass++;
+                tall.add(p);
+            } else if (isDirt) {
                 if (above.isAir()) bare.add(p);
-            } else if (state.is(Blocks.GRASS_BLOCK)) {
-                grass++;
-                if (above.is(Blocks.SHORT_GRASS)) shortGrass++;
-                else if (above.isAir()) plantable.add(p);
+            } else if (above.is(Blocks.SHORT_GRASS)) {
+                shortGrass++;
+                if (level.getBlockState(p.above(2)).isAir()) tufts.add(p);
+            } else if (above.isAir()) {
+                plantable.add(p);
             }
         }
         grazing = level.getEntitiesOfClass(Sheep.class, area(pos), s -> s.isAlive() && s.isSheared() && !s.isBaby()).size();
-        BlockPos target = null;
-        boolean regrass = false;
+        Job job = null;
+        List<BlockPos> targets = List.of();
         if (!bare.isEmpty()) {
-            target = bare.get(level.getRandom().nextInt(bare.size()));
-            regrass = true;
+            job = Job.REGRASS;
+            targets = bare;
+        } else if (trim && !tall.isEmpty()) {
+            job = Job.TRIM;
+            targets = tall;
         } else if (shortGrass < Math.round(ModConfigs.getDouble(ModConfigs.SERVER.seederShortGrass) * grass) && !plantable.isEmpty()) {
-            target = plantable.get(level.getRandom().nextInt(plantable.size()));
+            job = Job.PLANT;
+            targets = plantable;
+        } else if (!trim && ModConfigs.SERVER.seederOvergrowth.get() && !tufts.isEmpty()
+                && level.getRandom().nextDouble() < ModConfigs.getDouble(ModConfigs.SERVER.seederOvergrowthChance)) {
+            job = Job.OVERGROW;
+            targets = tufts;
         }
-        if (target == null) {
-            status = grass + dirt == 0 ? Status.NO_GROUND : Status.ALL_GREEN;
+        if (job == null) {
+            status = grass + dirt == 0 ? Status.NO_GROUND : tallGrass > 0 && !trim ? Status.OVERGROWN : Status.ALL_GREEN;
         } else if (!useFuel()) {
             status = Status.NO_FUEL;
         } else {
+            BlockPos target = targets.get(level.getRandom().nextInt(targets.size()));
             status = Status.TENDING;
-            if (regrass) {
-                level.setBlock(target, Blocks.GRASS_BLOCK.defaultBlockState(), Block.UPDATE_ALL);
-                level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target.above(), 0);
-                grass++;
-                dirt--;
-            } else {
-                level.setBlock(target.above(), Blocks.SHORT_GRASS.defaultBlockState(), Block.UPDATE_ALL);
-                level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target.above(), 0);
-                shortGrass++;
+            switch (job) {
+                case REGRASS -> {
+                    level.setBlock(target, Blocks.GRASS_BLOCK.defaultBlockState(), Block.UPDATE_ALL);
+                    level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target.above(), 0);
+                    grass++;
+                    dirt--;
+                }
+                case TRIM -> {
+                    // Upper half first, so the lower one doesn't pop off as an item.
+                    level.setBlock(target.above(2), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+                    level.setBlock(target.above(), Blocks.SHORT_GRASS.defaultBlockState(), Block.UPDATE_ALL);
+                    level.playSound(null, target.above(), net.minecraft.sounds.SoundEvents.GROWING_PLANT_CROP, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                    tallGrass--;
+                    shortGrass++;
+                }
+                case PLANT -> {
+                    level.setBlock(target.above(), Blocks.SHORT_GRASS.defaultBlockState(), Block.UPDATE_ALL);
+                    level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target.above(), 0);
+                    shortGrass++;
+                }
+                case OVERGROW -> {
+                    net.minecraft.world.level.block.DoublePlantBlock.placeAt(level, Blocks.TALL_GRASS.defaultBlockState(), target.above(), Block.UPDATE_ALL);
+                    level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target.above(), 0);
+                    shortGrass--;
+                    tallGrass++;
+                    status = Status.OVERGROWN;
+                }
             }
             tended++;
             setChanged();
+            if (tended >= ADVANCEMENT_BLOCKS) {
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.awardNearby(level, pos,
+                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.AUTO_SHEAR_RADIUS,
+                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.KEEP_OFF_THE_GRASS);
+            }
         }
         if (status != Status.NO_FUEL && hasFuel()) graze(level, pos);
         updateMap(level, pos);
@@ -267,16 +324,18 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
                 if (dx == 0 && dz == 0) continue;
                 BlockPos p = pos.offset(dx, -1, dz);
                 BlockState state = level.getBlockState(p);
-                int tile = state.is(Blocks.DIRT) ? TILE_DIRT
-                        : state.is(Blocks.GRASS_BLOCK) ? (level.getBlockState(p.above()).is(Blocks.SHORT_GRASS) ? TILE_SHORT : TILE_GRASS) : TILE_OTHER;
-                map[i / MAP_PER_VALUE] |= tile << ((i % MAP_PER_VALUE) * 2);
+                BlockState above = level.getBlockState(p.above());
+                boolean ground = state.is(Blocks.DIRT) || state.is(Blocks.GRASS_BLOCK);
+                int tile = !ground ? TILE_OTHER : above.is(Blocks.TALL_GRASS) ? TILE_TALL : state.is(Blocks.DIRT) ? TILE_DIRT
+                        : above.is(Blocks.SHORT_GRASS) ? TILE_SHORT : TILE_GRASS;
+                map[i / MAP_PER_VALUE] |= tile << ((i % MAP_PER_VALUE) * MAP_BITS);
             }
         }
     }
 
     /** The tile at {@code index} (row by row from the north-west) of a packed ground map. */
     public static int tile(int[] packed, int index) {
-        return (packed[index / MAP_PER_VALUE] >> ((index % MAP_PER_VALUE) * 2)) & 3;
+        return (packed[index / MAP_PER_VALUE] >> ((index % MAP_PER_VALUE) * MAP_BITS)) & 7;
     }
 
     /** Sheared, grown sheep in its area graze sooner: they eat the short grass or the grass under them, and regrow. */
@@ -349,6 +408,20 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
 
     public int shortGrass() {
         return shortGrass;
+    }
+
+    public int tallGrass() {
+        return tallGrass;
+    }
+
+    public boolean trims() {
+        return trim;
+    }
+
+    /** Switches Trim (cutting tall grass back) on or off. */
+    public void setTrim(boolean on) {
+        trim = on;
+        setChanged();
     }
 
     public long tended() {
@@ -604,6 +677,7 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
         boneMeal = in.read("bone_meal", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         boneCharges = in.getIntOr("bone_charges", 0);
         tended = in.getLongOr("tended", 0L);
+        trim = in.getBooleanOr("trim", false);
         showArea = in.getBooleanOr("show_area", false);
     }
 
@@ -615,6 +689,7 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
         if (!boneMeal.isEmpty()) out.store("bone_meal", ItemStack.OPTIONAL_CODEC, boneMeal);
         out.putInt("bone_charges", boneCharges);
         out.putLong("tended", tended);
+        out.putBoolean("trim", trim);
         out.putBoolean("show_area", showArea);
     }
 

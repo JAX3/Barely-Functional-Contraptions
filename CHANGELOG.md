@@ -39,7 +39,10 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 - **Window:** energy and water gauges, a map of its ground, how green it is, its Bone Meal and the sheep grazing.
   **JEI:** a Grass Seeder page and an information page. **Jade:** its status, grass, sheep grazing and open Bone Meal.
 - Sneak-right-click to outline its area; a comparator reads how green it is.
-- **Test world:** a Grass Seeder pen with Automatic Shears, which runs itself.
+- **Overgrowth:** with nothing to tend and Trim off, its short grass shoots up into tall grass, which sheep can't eat and
+  Automatic Shears can't see them in. **Trim** (a button in its window) cuts it back. Config `overgrowth`.
+- **Advancement:** *Keep Off the Grass* (goal), for being near a Grass Seeder that has tended 100 blocks.
+- **Test world:** a Grass Seeder pen (Trim on) with Automatic Shears, which runs itself.
 - **Recipe:** Wheat Seeds, a Composter, two Bone Blocks, a Functional Machine Block, two Iron Ingots and a Hopper.
 - New config section `[grass_seeder]`, and a chapter in the Contraptions Manual (Production).
 

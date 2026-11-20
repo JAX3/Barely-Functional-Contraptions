@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/auto_shear",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:grass_seeder"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.keep_off_the_grass.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.keep_off_the_grass.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

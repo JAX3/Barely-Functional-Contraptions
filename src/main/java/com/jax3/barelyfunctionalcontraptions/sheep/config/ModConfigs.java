@@ -233,6 +233,8 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue seederWaterPerBlock;
         public final ModConfigSpec.DoubleValue seederGrazeMultiplier;
         public final ModConfigSpec.DoubleValue seederShortGrass;
+        public final ModConfigSpec.BooleanValue seederOvergrowth;
+        public final ModConfigSpec.DoubleValue seederOvergrowthChance;
         public final ModConfigSpec.IntValue seederCapacity;
         public final ModConfigSpec.IntValue seederMaxInput;
         public final ModConfigSpec.IntValue seederTankCapacity;
@@ -641,6 +643,10 @@ public final class ModConfigs {
                     .defineInRange("grazeMultiplier", 4.0, 1.0, 100.0);
             seederShortGrass = b.comment("Share of the grass in its area it keeps short grass growing on, for the sheep to eat (0.4 = 40%). 0 = none.")
                     .defineInRange("shortGrass", 0.4, 0.0, 1.0);
+            seederOvergrowth = b.comment("Whether it overgrows: with nothing to tend and Trim off, its short grass shoots up into tall grass, which sheep can't eat and Automatic Shears can't see them in. Trim, in its window, keeps it short.")
+                    .define("overgrowth", true);
+            seederOvergrowthChance = b.comment("Chance on each turn with nothing else to do that a tuft of short grass grows tall (0.25 = about every 8 seconds).")
+                    .defineInRange("overgrowthChance", 0.25, 0.0, 1.0);
             seederCapacity = b.comment("FE it stores.")
                     .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
             seederMaxInput = b.comment("FE it takes in per tick.")

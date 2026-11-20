@@ -2174,7 +2174,7 @@ public final class DevScreenshotHarness {
 
     /**
      * The Grass Seeder for the test world: one in the middle of a fenced 5x5 pen of grass eaten into patches of dirt,
-     * with a gate at the front, 64 Bone Meal, its area outlined, and four plain sheep free to wander and graze. Automatic
+     * with a gate at the front, 64 Bone Meal, Trim on, its area outlined, and four plain sheep free to wander and graze. Automatic
      * Shears in the back fence (powered by a Creative Generator behind them) shear the sheep that wander in front of
      * them, and the Seeder gets them grazing and regrowing their wool: the pen runs itself.
      */
@@ -2186,6 +2186,9 @@ public final class DevScreenshotHarness {
             server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
         }
         BlockPos o = origin, g = o.offset(0, 0, -3);
+        // (Built again over an earlier copy: its sheep and label go first.)
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(7, 6, 7),
+                e -> e instanceof Sheep || e instanceof net.minecraft.world.entity.Display.TextDisplay)) e.discard();
         for (BlockPos p : BlockPos.betweenClosed(g.offset(-6, 0, -6), g.offset(6, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
         var rnd = new java.util.Random(8);
         for (BlockPos p : BlockPos.betweenClosed(g.offset(-6, -1, -6), g.offset(6, -1, 6))) {
@@ -2195,6 +2198,7 @@ public final class DevScreenshotHarness {
         level.setBlock(g, ModBlocks.GRASS_SEEDER.get().defaultBlockState(), 3);
         if (level.getBlockEntity(g) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity be) {
             be.setShowsArea(true);
+            be.setTrim(true); // so it never overgrows and hides its sheep from the shears
             be.insertBoneMeal(new ItemStack(Items.BONE_MEAL, 64));
         }
         // The fence round the pen, a gate at the front, and the shears in the middle of the back.
@@ -2899,7 +2903,57 @@ public final class DevScreenshotHarness {
             }
             case 240 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
             case 250 -> shot(mc, "108_grass_seeder_jei_recipe");
-            case 256 -> mc.stop();
+            // Left with nothing to do and Trim off, it overgrows; past 100 blocks tended, the player nearby earns Keep Off the Grass.
+            case 252 -> {
+                McClient.setScreen(mc, null);
+                server.execute(() -> {
+                    ServerLevel level = server.overworld();
+                    if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity be) {
+                        for (int i = 0; i < 160; i++) be.work(level, at);
+                        ResourcefulSheep.LOGGER.warn("SEEDER overgrown: {} tall {} short {} tended {}", be.status(), be.tallGrass(), be.shortGrass(), be.tended());
+                    }
+                });
+            }
+            case 262 -> openSeederWindow(server, at);
+            case 268 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 276 -> shot(mc, "108_grass_seeder_gui_overgrown");
+            case 278 -> McClient.setScreen(mc, null);
+            case 280 -> {
+                setHudHidden(mc, true);
+                command(server, "gamemode spectator @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 160 40", origin.getX() + 2.5, origin.getY() + 3.5, origin.getZ() + 1.5));
+            }
+            case 300 -> shot(mc, "108_grass_seeder_overgrown");
+            // Trim on, and some ground eaten bare again: it cuts the tall grass back and regrasses, past 100 blocks.
+            case 302 -> {
+                command(server, "gamemode creative @a");
+                server.execute(() -> {
+                    ServerLevel level = server.overworld();
+                    if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity be) {
+                        be.setTrim(true);
+                        int k = 0;
+                        for (BlockPos p : com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.ground(at)) {
+                            if (k++ % 6 == 0) continue; // a few left overgrown, for Trim to cut back
+                            level.setBlock(p.above(2), Blocks.AIR.defaultBlockState(), 2);
+                            level.setBlock(p.above(), Blocks.AIR.defaultBlockState(), 2);
+                            level.setBlock(p, Blocks.DIRT.defaultBlockState(), 2);
+                        }
+                        for (int i = 0; i < 60; i++) be.work(level, at);
+                        // And a second time the sheep eat it bare.
+                        for (BlockPos p : com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.ground(at)) {
+                            if (level.getBlockState(p.above()).is(Blocks.SHORT_GRASS)) level.setBlock(p.above(), Blocks.AIR.defaultBlockState(), 2);
+                            level.setBlock(p, Blocks.DIRT.defaultBlockState(), 2);
+                        }
+                        for (int i = 0; i < 40; i++) be.work(level, at);
+                        ResourcefulSheep.LOGGER.warn("SEEDER trimmed: {} tall {} short {} tended {}", be.status(), be.tallGrass(), be.shortGrass(), be.tended());
+                    }
+                });
+            }
+            case 320 -> shot(mc, "108_grass_seeder_trimmed");
+            case 322 -> server.execute(() -> ResourcefulSheep.LOGGER.warn("SEEDER Keep Off the Grass: {}",
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(server.getPlayerList().getPlayers().getFirst(),
+                            com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.KEEP_OFF_THE_GRASS)));
+            case 326 -> mc.stop();
             default -> {}
         }
     }

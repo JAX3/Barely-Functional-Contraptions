@@ -175,6 +175,8 @@ public final class ModGameTests {
         ECHO_TESTS.put("grass_seeder_runs_on_power_and_water_first", ModGameTests::seederPower);
         ECHO_TESTS.put("grass_seeder_grows_short_grass_then_rests", ModGameTests::seederShortGrass);
         ECHO_TESTS.put("grass_seeder_gets_sheared_sheep_grazing", ModGameTests::seederGrazing);
+        ECHO_TESTS.put("grass_seeder_overgrows_unless_trimmed", ModGameTests::seederOvergrowth);
+        ECHO_TESTS.put("automatic_shears_cant_see_sheep_in_tall_grass", ModGameTests::shearsTallGrass);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -1466,6 +1468,7 @@ public final class ModGameTests {
     private static void seederShortGrass(GameTestHelper h) {
         var be = buildSeeder(h);
         BlockPos at = be.getBlockPos();
+        be.setTrim(true); // so it doesn't start overgrowing once it's green
         be.insertBoneMeal(new ItemStack(Items.BONE_MEAL, 8));
         for (int i = 0; i < 14; i++) be.work(h.getLevel(), at);
         int planted = 0;
@@ -1502,6 +1505,59 @@ public final class ModGameTests {
         for (int i = 0; i < 200 && sheared.isSheared(); i++) be.work(level, at);
         h.assertTrue(!sheared.isSheared(), "the sheared sheep grazed and regrew its wool");
         h.assertTrue(!fleeced.isSheared() && level.getBlockState(fleeced.blockPosition().below()).is(Blocks.GRASS_BLOCK), "the fleeced sheep was left alone");
+        h.succeed();
+    }
+
+    /**
+     * Left green with nothing to do and Trim off, its short grass shoots up into tall grass; with Trim on, it cuts it all
+     * back to short grass and stays green.
+     */
+    private static void seederOvergrowth(GameTestHelper h) {
+        var be = buildSeeder(h);
+        BlockPos at = be.getBlockPos();
+        var level = h.getLevel();
+        be.insertBoneMeal(new ItemStack(Items.BONE_MEAL, 64));
+        boolean overgrown = false;
+        for (int i = 0; i < 300; i++) {
+            be.work(level, at);
+            overgrown |= be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.Status.OVERGROWN;
+        }
+        h.assertTrue(overgrown && be.tallGrass() > 10, "it overgrew, got " + be.tallGrass() + " tall grass");
+        int tall = 0;
+        for (BlockPos p : com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.ground(at)) {
+            if (level.getBlockState(p.above()).is(Blocks.TALL_GRASS) && level.getBlockState(p.above(2)).is(Blocks.TALL_GRASS)) tall++;
+        }
+        h.assertTrue(tall == be.tallGrass(), "the tall grass is in the world, both halves: " + tall);
+        be.setTrim(true);
+        for (int i = 0; i < 60; i++) be.work(level, at);
+        h.assertTrue(be.tallGrass() == 0 && be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.Status.ALL_GREEN,
+                "trimmed back, got " + be.tallGrass() + " tall grass and " + be.status());
+        for (BlockPos p : com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.ground(at)) {
+            h.assertTrue(!level.getBlockState(p.above(2)).is(Blocks.TALL_GRASS), "no tall grass left at " + p);
+        }
+        h.succeed();
+    }
+
+    /** Automatic Shears can't see a sheep standing in tall grass; once it's cut, they shear it. */
+    private static void shearsTallGrass(GameTestHelper h) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.GRASS_BLOCK);
+        BlockPos shearsPos = new BlockPos(3, 1, 1);
+        h.setBlock(shearsPos, ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.SOUTH));
+        var shears = h.getBlockEntity(shearsPos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.class);
+        shears.getEnergy().set(50_000);
+        BlockPos grass = h.absolutePos(new BlockPos(3, 1, 3));
+        var level = h.getLevel();
+        net.minecraft.world.level.block.DoublePlantBlock.placeAt(level, Blocks.TALL_GRASS.defaultBlockState(), grass, 3);
+        Sheep sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        sheep.snapTo(grass.getX() + 0.5, grass.getY(), grass.getZ() + 0.5, 0, 0);
+        sheep.setNoAi(true);
+        level.addFreshEntity(sheep);
+        BlockPos abs = h.absolutePos(shearsPos);
+        h.assertTrue(shears.shearArea(level, abs, Direction.SOUTH) == 0 && !sheep.isSheared(), "hidden in tall grass: not sheared");
+        level.setBlock(grass.above(), Blocks.AIR.defaultBlockState(), 3);
+        level.setBlock(grass, Blocks.AIR.defaultBlockState(), 3);
+        h.assertTrue(shears.shearArea(level, abs, Direction.SOUTH) == 1 && sheep.isSheared(), "cut down: sheared");
         h.succeed();
     }
 

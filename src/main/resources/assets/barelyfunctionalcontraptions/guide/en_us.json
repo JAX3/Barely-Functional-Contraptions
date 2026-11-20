@@ -417,6 +417,7 @@
         "- Every 2 seconds it tends one block of the 5x5 ground around it: dirt that's been eaten bare goes back to grass. Once it's all grass, it grows short grass on up to 40% of it, for the sheep to eat instead.",
         "- While it has fuel, sheared sheep standing in its area graze four times as often, so their wool comes back much sooner. Sheep with their fleece on are left alone.",
         "- Fuel: right-click it with Bone Meal (one tends 8 blocks), or feed it from a hopper or pipe. Or give it FE and water: 800 FE and 10 mB a block, from cables, pipes or a Water Bucket. It uses power and water first and saves its Bone Meal.",
+        "- With nothing to tend, it overgrows: its short grass shoots up into tall grass, which sheep can't eat and Automatic Shears can't see them in. Switch Trim on in its window (the shears button) and it cuts the tall grass back instead.",
         "- A comparator reads how green its area is.",
         "Right-click it with an empty hand to open its window: power and water, a map of its ground (grass, short grass, bare dirt), how green it is, its Bone Meal, and how many sheep are grazing. Its spyglass button, or a sneak-right-click with an empty hand, outlines its area. It pairs well with Automatic Shears on the same pen, and with a Static Generator, whose sheep only count with their fleece on."
       ]

@@ -31,10 +31,10 @@ public class GrassSeederScreen extends AbstractContainerScreen<GrassSeederMenu> 
     private static final int BAR_X = 47, BAR_Y = 75, BAR_W = 51, BAR_H = 8;
     private static final int INFO_CENTRE = 136;
     private static final int LAMP_X = 9, LAMP_Y = 87, LAMP_U = 186, LAMP_V = 194;
-    private static final int AREA_X = 154, AREA_Y = 4, BUTTON_SIZE = 16, BUTTON_U = 176, BUTTON_V = 146;
+    private static final int AREA_X = 154, AREA_Y = 4, TRIM_X = 135, BUTTON_SIZE = 16, BUTTON_U = 176, BUTTON_V = 146;
     private static final int TEXT_COLOR = 0xFFDFE4F5, TEXT_DIM = 0xFFAEB4C6, ENERGY_TEXT = 0xFFFFD27F, WATER_TEXT = 0xFF7FB8FF;
     private static final int GRASS = 0xFF5AA13A, GRASS_LIGHT = 0xFF7CC24E, TUFT = 0xFF9BD86A, DIRT = 0xFF79553A, DIRT_DARK = 0xFF5E4029,
-            OTHER = 0xFF2A2C34, GREEN_TEXT = 0xFF8FE07A;
+            OTHER = 0xFF2A2C34, GREEN_TEXT = 0xFF8FE07A, TALL = 0xFF3F7A2A, TALL_BLADE = 0xFF6FB043, OVERGROWN_TEXT = 0xFFE0B04A;
 
     public GrassSeederScreen(GrassSeederMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, 193);
@@ -47,6 +47,9 @@ public class GrassSeederScreen extends AbstractContainerScreen<GrassSeederMenu> 
         this.titleLabelX = 8;
         addRenderableWidget(new AreaToggleButton(leftPos + AREA_X, topPos + AREA_Y, TEXTURE, BUTTON_U, BUTTON_V,
                 menu::isShowingArea, GrassSeederBlockEntity.AREA_COLOR, menu.containerId, GrassSeederMenu.BUTTON_AREA));
+        addRenderableWidget(new AreaToggleButton(leftPos + TRIM_X, topPos + AREA_Y, TEXTURE, BUTTON_U, BUTTON_V,
+                menu::isTrimming, GrassSeederBlockEntity.AREA_COLOR, menu.containerId, GrassSeederMenu.BUTTON_TRIM,
+                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SHEARS), Component.translatable("gui.barelyfunctionalcontraptions.grass_seeder.trim.button")));
     }
 
     @Override
@@ -117,6 +120,11 @@ public class GrassSeederScreen extends AbstractContainerScreen<GrassSeederMenu> 
                     graphics.fill(cx + 2, cy - 1, cx + 3, cy + 3, TUFT);
                 }
             }
+            case GrassSeederBlockEntity.TILE_TALL -> {
+                // Overgrown: dark grass, crowded with tall blades.
+                graphics.fill(tx, ty, tx + inner, ty + inner, TALL);
+                for (int k = 1; k < inner - 1; k += 2) graphics.fill(tx + k, ty + 1 + (k + seed) % 3, tx + k + 1, ty + inner - 1, TALL_BLADE);
+            }
             default -> graphics.fill(tx, ty, tx + inner, ty + inner, OTHER);
         }
     }
@@ -136,7 +144,8 @@ public class GrassSeederScreen extends AbstractContainerScreen<GrassSeederMenu> 
         return switch (status) {
             case NO_GROUND -> 0;
             case TENDING -> 1;
-            case ALL_GREEN -> 2;
+            case ALL_GREEN -> 1;
+            case OVERGROWN -> 2;
             case NO_FUEL -> 3;
         };
     }
@@ -153,7 +162,8 @@ public class GrassSeederScreen extends AbstractContainerScreen<GrassSeederMenu> 
         centred(graphics, Component.translatable(key + "charges", menu.getBoneCharges()), 43, menu.getBoneCharges() > 0 ? TEXT_COLOR : TEXT_DIM);
         centred(graphics, Component.translatable(key + "grass", menu.getGrass(), menu.getGrass() + menu.getDirt()), 54,
                 menu.getDirt() == 0 && menu.getGrass() > 0 ? GREEN_TEXT : TEXT_COLOR);
-        centred(graphics, Component.translatable(key + "tufts", menu.getShortGrass()), 64, TEXT_DIM);
+        if (menu.getTallGrass() > 0) centred(graphics, Component.translatable(key + "tall", menu.getTallGrass()), 64, OVERGROWN_TEXT);
+        else centred(graphics, Component.translatable(key + "tufts", menu.getShortGrass()), 64, TEXT_DIM);
         centred(graphics, Component.translatable(key + "grazing", menu.getGrazing()), 74, menu.getGrazing() > 0 ? TEXT_COLOR : TEXT_DIM);
         graphics.text(font, statusText(), LAMP_X + 13, LAMP_Y + 1, menu.getStatus().color, false);
     }
@@ -191,6 +201,7 @@ public class GrassSeederScreen extends AbstractContainerScreen<GrassSeederMenu> 
                         case GrassSeederBlockEntity.TILE_DIRT -> "dirt";
                         case GrassSeederBlockEntity.TILE_GRASS -> "grass";
                         case GrassSeederBlockEntity.TILE_SHORT -> "short";
+                        case GrassSeederBlockEntity.TILE_TALL -> "tall";
                         default -> "other";
                     };
                     lines.add(Component.translatable(key + "tile." + kind));
@@ -199,6 +210,7 @@ public class GrassSeederScreen extends AbstractContainerScreen<GrassSeederMenu> 
             lines.add(Component.translatable(key + "map.desc", size, size).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(BAR_X - 1, BAR_Y - 1, BAR_W + 2, BAR_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable(key + "bar", menu.getGrass(), menu.getGrass() + menu.getDirt(), menu.getShortGrass()).withColor(GREEN_TEXT));
+            if (menu.getTallGrass() > 0) lines.add(Component.translatable(key + "bar.tall", menu.getTallGrass()).withColor(OVERGROWN_TEXT));
             lines.add(Component.translatable(key + "bar.desc", fmt(menu.getTended())).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(104, 72, 64, 11, mouseX, mouseY)) {
             lines.add(Component.translatable(key + "grazing.title", menu.getGrazing()));
@@ -206,6 +218,10 @@ public class GrassSeederScreen extends AbstractContainerScreen<GrassSeederMenu> 
         } else if (isHovering(LAMP_X, LAMP_Y - 1, 150, 10, mouseX, mouseY)) {
             lines.add(statusText().copy().withColor(menu.getStatus().color));
             lines.add(Component.translatable(key + "status." + menu.getStatus().name().toLowerCase(Locale.ROOT) + ".desc").withStyle(ChatFormatting.GRAY));
+        } else if (isHovering(TRIM_X, AREA_Y, BUTTON_SIZE, BUTTON_SIZE, mouseX, mouseY)) {
+            lines.add(Component.translatable(menu.isTrimming() ? key + "trim.on" : key + "trim.off"));
+            lines.add(Component.translatable(key + "trim.desc").withStyle(ChatFormatting.GRAY));
+            lines.add(Component.translatable(key + "trim.click").withStyle(ChatFormatting.DARK_GRAY));
         } else if (isHovering(AREA_X, AREA_Y, BUTTON_SIZE, BUTTON_SIZE, mouseX, mouseY)) {
             lines.add(Component.translatable(menu.isShowingArea() ? "gui.barelyfunctionalcontraptions.area.shown" : "gui.barelyfunctionalcontraptions.area.hidden"));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.area.click").withStyle(ChatFormatting.DARK_GRAY));

@@ -27,7 +27,7 @@ import org.jspecify.annotations.Nullable;
 public class GrassSeederMenu extends AbstractContainerMenu {
     public static final int BONE_X = 128, BONE_Y = 22;
     public static final int INVENTORY_Y = 111;
-    public static final int BUTTON_AREA = 0;
+    public static final int BUTTON_AREA = 0, BUTTON_TRIM = 1;
 
     private static final int PLAYER_START = 1;
     private static final int PLAYER_END = PLAYER_START + 36;
@@ -89,6 +89,10 @@ public class GrassSeederMenu extends AbstractContainerMenu {
             blockEntity.toggleArea(player);
             return true;
         }
+        if (id == BUTTON_TRIM && blockEntity != null) {
+            blockEntity.setTrim(!blockEntity.trims());
+            return true;
+        }
         return false;
     }
 
@@ -115,11 +119,13 @@ public class GrassSeederMenu extends AbstractContainerMenu {
     /** Sheared, grown sheep in its area. */
     public int getGrazing() { return data.get(15); }
     public int getTended() { return wide(16); }
+    public int getTallGrass() { return data.get(18); }
+    public boolean isTrimming() { return data.get(19) != 0; }
 
     /** The ground map, packed two bits a block (see {@link GrassSeederBlockEntity#tile}). */
     public int[] getMap() {
         int[] map = new int[GrassSeederBlockEntity.MAP_VALUES];
-        for (int i = 0; i < map.length; i++) map[i] = data.get(18 + i) & 0xFFFF;
+        for (int i = 0; i < map.length; i++) map[i] = data.get(GrassSeederBlockEntity.MAP_DATA + i) & 0xFFFF;
         return map;
     }
 }

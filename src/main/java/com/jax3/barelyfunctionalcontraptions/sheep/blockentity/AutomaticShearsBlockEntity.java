@@ -162,6 +162,8 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
             if (!(mob instanceof IShearable shearable)) continue;
             ItemStack shears = new ItemStack(Items.SHEARS); // a fresh pair each time: the machine never wears out
             BlockPos at = mob.blockPosition();
+            // A sheep hidden in tall grass (an overgrown Grass Seeder's pen) is out of the blades' sight.
+            if (level.getBlockState(at).is(net.minecraft.world.level.block.Blocks.TALL_GRASS)) continue;
             if (!shearable.isShearable(null, shears, level, at)) continue;
             if (!energy.consume(cost)) break; // out of power: the rest wait for the next sweep
             for (ItemStack drop : shearable.onSheared(null, shears, level, at)) {
