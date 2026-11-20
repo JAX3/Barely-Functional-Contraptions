@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "value": "barelyfunctionalcontraptions:echo_chamber"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "E": "minecraft:echo_shard",
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
+    "W": {
+      "neoforge:ingredient_type": "barelyfunctionalcontraptions:wool_bale",
+      "resource": "barelyfunctionalcontraptions:warden"
+    }
+  },
+  "pattern": [
+    "EWE",
+    " M "
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:echo_chamber"
+  }
+}

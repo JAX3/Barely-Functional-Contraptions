@@ -4363,6 +4363,59 @@ def generate_echo_chamber():
         return img
     _echo_animated(base, "ear", 8, 4, ear)
 
+def generate_echo_chamber_gui():
+    """Echo Chamber window: energy gauge, then a panel with the herd and output, the 16-step noise meter (too quiet,
+    the sweet spot, too loud), the steadiness bar, and the drowsiness and shriek bars; the status lamp below."""
+    trc = Image.open(out("gui/thermal_reaction_chamber.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 108)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # energy gauge, fill 30x64 at (11, 19)
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 48, 16, 166, 84, GUI["panel"])         # the listening panel
+    inset(img, 50, 41, 164, 51, GUI["gauge"])         # noise meter: 16 segments of 6 (+1 gap) at (51 + 7k, 42), 8 tall
+    for k in range(16):
+        zone = hexc("#5a3a14") if k < 5 else hexc("#1f5a2e") if k <= 10 else hexc("#5a1f24")
+        for y in range(42, 50):
+            for x in range(51 + 7 * k, 57 + 7 * k):
+                img.putpixel((x, y), mix(GUI["gauge"], zone, 0.55))
+    for x in (51 + 7 * 5, 56 + 7 * 10):              # the sweet spot's ends, marked under the meter
+        for y in range(52, 55):
+            img.putpixel((x, y), hexc("#55d66b"))
+    for x in range(51 + 7 * 5, 57 + 7 * 10):
+        img.putpixel((x, 54), hexc("#55d66b"))
+    inset(img, 50, 59, 164, 64, GUI["gauge"])         # steadiness, fill 113x3 at (51, 60)
+    inset(img, 50, 70, 105, 75, GUI["gauge"])         # drowsiness, fill 54x3 at (51, 71)
+    inset(img, 109, 70, 164, 75, GUI["gauge"])        # shriek, fill 54x3 at (110, 71)
+    # Tiny marks over the two meters: "z" for drowsy, "!" for shriek.
+    for x, y in ((51, 66), (52, 66), (53, 66), (52, 67), (51, 68), (52, 68), (53, 68)):  # a little "z"
+        img.putpixel((x, y), SCULK[4])
+    for y in (65, 66, 67):
+        img.putpixel((110, y), hexc("#e35d5d"))
+    img.putpixel((110, 69), hexc("#e35d5d"))
+    inset(img, 8, 89, 18, 99, GUI["gauge"])           # status lamp housing, lamp at (9, 90)
+    rnd = random.Random(41)
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 105), rnd.choice(SCULK[2:5]))
+    # ---- sprites ----
+    img.paste(trc.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    shears = Image.open(out("gui/automatic_shears.png")).convert("RGBA")
+    img.paste(shears.crop((176, 64, 208, 80)), (176, 146))          # area button background
+    img.paste(trc.crop((176, 0, 206, 74)), (176, 0))                # energy fill (amber) and its shimmer
+    for k in range(16):                                             # lit noise segments, 6x8 at (7k, 200)
+        zone = (FIRE[4], FIRE[2]) if k < 5 else (hexc("#8cf08c"), hexc("#2f9a45")) if k <= 10 else (hexc("#ff8a8a"), hexc("#b8262f"))
+        for y in range(8):
+            for x in range(6):
+                c = mix(zone[0], zone[1], y / 7.0)
+                if y == 0:
+                    c = mix(c, hexc("#ffffff"), 0.4)
+                img.putpixel((7 * k + x, 200 + y), c)
+    img.save(out("gui/echo_chamber.png"))
+
+
 def main():
     generate_wool_items()
     generate_sheep_fur()
@@ -4406,6 +4459,7 @@ def main():
     generate_thermal_reaction_chamber()
     generate_thermal_reaction_chamber_gui()
     generate_echo_chamber()
+    generate_echo_chamber_gui()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

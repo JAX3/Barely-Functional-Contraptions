@@ -12,11 +12,13 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public final class ModRecipes {
     public static final DeferredRegister<RecipeType<?>> TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, ResourcefulSheep.MOD_ID);
     public static final DeferredRegister<RecipeSerializer<?>> SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, ResourcefulSheep.MOD_ID);
-    /** Custom ingredient types: {@code barelyfunctionalcontraptions:resource_wool}. */
+    /** Custom ingredient types: {@code barelyfunctionalcontraptions:resource_wool} and {@code barelyfunctionalcontraptions:wool_bale}. */
     public static final DeferredRegister<net.neoforged.neoforge.common.crafting.IngredientType<?>> INGREDIENT_TYPES =
             DeferredRegister.create(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.INGREDIENT_TYPES, ResourcefulSheep.MOD_ID);
     public static final java.util.function.Supplier<net.neoforged.neoforge.common.crafting.IngredientType<com.jax3.barelyfunctionalcontraptions.sheep.recipe.ResourceWoolIngredient>> RESOURCE_WOOL_INGREDIENT =
             INGREDIENT_TYPES.register("resource_wool", () -> com.jax3.barelyfunctionalcontraptions.sheep.recipe.ResourceWoolIngredient.TYPE);
+    public static final java.util.function.Supplier<net.neoforged.neoforge.common.crafting.IngredientType<com.jax3.barelyfunctionalcontraptions.sheep.recipe.WoolBaleIngredient>> WOOL_BALE_INGREDIENT =
+            INGREDIENT_TYPES.register("wool_bale", () -> com.jax3.barelyfunctionalcontraptions.sheep.recipe.WoolBaleIngredient.TYPE);
 
     public static final DeferredRegister<RecipeBookCategory> BOOK_CATEGORIES = DeferredRegister.create(Registries.RECIPE_BOOK_CATEGORY, ResourcefulSheep.MOD_ID);
 

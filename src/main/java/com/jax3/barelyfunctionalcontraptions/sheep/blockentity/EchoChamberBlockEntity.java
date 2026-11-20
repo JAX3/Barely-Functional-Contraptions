@@ -3,11 +3,11 @@ package com.jax3.barelyfunctionalcontraptions.sheep.blockentity;
 import com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock;
 import com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs;
 import com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents;
+import com.jax3.barelyfunctionalcontraptions.sheep.menu.EchoChamberMenu;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -27,7 +27,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.animal.sheep.Sheep;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.ClipBlockStateContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -75,31 +80,29 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  *     Below the loud end, the shriek meter drains again.</li>
  * </ul>
  * It pushes its power out of its power port, the middle of its back, up to {@code output} FE/t. A comparator against
- * any block of it reads the noise level.
+ * any block of it reads the noise level. Right-clicking any block of it opens its window ({@link EchoChamberMenu}).
  */
-public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, GameEventListener.Provider<EchoChamberBlockEntity.Ears> {
+public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, MenuProvider, GameEventListener.Provider<EchoChamberBlockEntity.Ears> {
     public static final int SCAN_INTERVAL = 10;
     public static final int BUCKETS = 5;
     public static final int MAX_LEVEL = 15;
     public static final int AREA_COLOR = 0xFF29DFEB;
+    public static final int DATA_COUNT = 16;
 
-    /** What the chamber is doing, for its status line. */
+    /** What the chamber is doing, for its window's status line and lamp. */
     public enum State {
-        NEEDS_HERD(ChatFormatting.GRAY), TOO_QUIET(ChatFormatting.GOLD), LISTENING(ChatFormatting.GREEN), TOO_LOUD(ChatFormatting.RED),
-        FULL(ChatFormatting.GOLD), ASLEEP(ChatFormatting.DARK_AQUA), WAKING(ChatFormatting.AQUA), SHRIEKED(ChatFormatting.DARK_RED);
+        NEEDS_HERD(0xFF9AA0A6), TOO_QUIET(0xFFE8B23A), LISTENING(0xFF55D66B), TOO_LOUD(0xFFE35D5D),
+        FULL(0xFFE8B23A), ASLEEP(0xFF3FA9B5), WAKING(0xFF7FE6EE), SHRIEKED(0xFFC0392B);
 
-        public final ChatFormatting color;
+        /** ARGB, for its window's status line. */
+        public final int color;
 
-        State(ChatFormatting color) {
+        State(int color) {
             this.color = color;
         }
 
         public static State byId(int id) {
             return id >= 0 && id < values().length ? values()[id] : NEEDS_HERD;
-        }
-
-        public String key() {
-            return "message.barelyfunctionalcontraptions.echo_chamber.state." + name().toLowerCase(java.util.Locale.ROOT);
         }
     }
 
@@ -120,6 +123,41 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
     private boolean showArea;
     private State state = State.NEEDS_HERD;
     private int lastSignal;
+
+    /** What its window shows, synced while it's open. Big numbers are split into two 16-bit halves. */
+    private final ContainerData data = new ContainerData() {
+        @Override
+        public int get(int index) {
+            return switch (index) {
+                case 0 -> energy.getAmountAsInt() & 0xFFFF;
+                case 1 -> energy.getAmountAsInt() >>> 16;
+                case 2 -> energy.getCapacityAsInt() & 0xFFFF;
+                case 3 -> energy.getCapacityAsInt() >>> 16;
+                case 4 -> generating & 0xFFFF;
+                case 5 -> generating >>> 16;
+                case 6 -> sheepIds.length;
+                case 7 -> maxSheep();
+                case 8 -> noise;
+                case 9 -> quietBelow();
+                case 10 -> loudAbove();
+                case 11 -> (int) Math.round(steadiness * 100);
+                case 12 -> asleep ? 1000 : drowsiness * 1000 / Math.max(1, ModConfigs.getInt(ModConfigs.SERVER.echoSleepTicks));
+                case 13 -> cooldown > 0 ? cooldown * 1000 / Math.max(1, ModConfigs.getInt(ModConfigs.SERVER.echoShriekCooldown))
+                        : shriekMeter * 1000 / Math.max(1, ModConfigs.getInt(ModConfigs.SERVER.echoShriekTicks));
+                case 14 -> state.ordinal() | (cooldown + 19) / 20 << 4;
+                case 15 -> showArea ? 1 : 0;
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int index, int value) {}
+
+        @Override
+        public int getCount() {
+            return DATA_COUNT;
+        }
+    };
 
     public EchoChamberBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ECHO_CHAMBER.get(), pos, state);
@@ -485,28 +523,21 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
         return hearing;
     }
 
-    /** One line on what it's doing, for a right-click: state, herd, noise level, steadiness and output, then how close it is to sleeping or shrieking. */
-    public Component status() {
-        net.minecraft.network.chat.MutableComponent line = Component.translatable("message.barelyfunctionalcontraptions.echo_chamber.status",
-                Component.translatable(state.key()).withStyle(state.color), sheepIds.length, maxSheep(), noise,
-                Math.round(steadiness * 100), String.format(java.util.Locale.ROOT, "%,d", generating));
-        // How close it is to falling asleep or shrieking, or how long it has left to recover.
-        if (cooldown > 0) {
-            line.append(Component.translatable("message.barelyfunctionalcontraptions.echo_chamber.cooldown", (cooldown + 19) / 20).withStyle(ChatFormatting.DARK_RED));
-        } else if (!asleep && drowsiness > 0) {
-            line.append(Component.translatable("message.barelyfunctionalcontraptions.echo_chamber.drowsy",
-                    drowsiness * 100 / ModConfigs.getInt(ModConfigs.SERVER.echoSleepTicks)).withStyle(ChatFormatting.DARK_AQUA));
-        }
-        if (cooldown == 0 && shriekMeter > 0) {
-            line.append(Component.translatable("message.barelyfunctionalcontraptions.echo_chamber.shriek",
-                    shriekMeter * 100 / ModConfigs.getInt(ModConfigs.SERVER.echoShriekTicks)).withStyle(ChatFormatting.RED));
-        }
-        return line;
-    }
-
     private Direction facing() {
         BlockState blockState = getBlockState();
         return blockState.hasProperty(EchoChamberBlock.FACING) ? blockState.getValue(EchoChamberBlock.FACING) : Direction.NORTH;
+    }
+
+    // ------------------------------------------------------------------ window
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("block.barelyfunctionalcontraptions.echo_chamber");
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
+        return new EchoChamberMenu(containerId, inventory, this, data);
     }
 
     // ------------------------------------------------------------------ area

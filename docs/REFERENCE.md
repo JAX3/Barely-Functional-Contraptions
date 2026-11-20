@@ -84,12 +84,19 @@ Craft a **Contraptions Manual** (a book and a Functional Machine Block) and righ
   - **Power:** it stores 2,000,000 FE and pushes up to 40,000 FE/t out of its **power port**, the middle of its back, on the bottom layer. Only that face connects.
   - **Sleep:** too quiet for 30 seconds and its Warden sheep fall asleep (the sculk clicks stop, and so do the pops off its ears). It makes nothing until the noise is back up to the sweet spot, then they take 5 seconds to settle before it starts again. Back in the sweet spot, drowsiness wears off twice as fast as it builds.
   - **Shriek:** too loud for 10 seconds and the room shrieks like a sculk shrieker: shriek rings rise off its roof, players in survival within 16 blocks of its dish get Darkness for 10 seconds, and it stops for a minute. Out of the loud end, the shriek meter drains again.
-  - **Readouts:** right-click any block of it for a status line: its state, herd, noise level, steadiness and output, then how drowsy it is, how close it is to shrieking, or how long until it's back. Sneak-right-click shows or hides its listening pen. A comparator against any block of it reads the noise level, 0-15, for circuits that turn the noise up or down.
-  - Still to come: catalysts that wear out, Echo Shard boosts, fleece fatigue, a window, JEI and Jade pages, and a recipe. Config: `[echo_chamber]` (see below).
+  - **Window:** right-click any block of it. Left, its energy gauge. In the panel: the herd and output, the **noise meter** (16 segments from silence to 15: amber is too quiet, green the sweet spot, red too loud, lit up to the noise level now), the steadiness bar, and two small bars under it: drowsiness (towards its sheep falling asleep) and the shriek meter (towards a shriek; after one, the cooldown draining). Bottom: a status lamp and line. Every part has a tooltip, and the button top right shows or hides its listening pen (so does sneak-right-click).
+  - **Comparator:** against any block of it, reads the noise level, 0-15, for circuits that turn the noise up or down.
+  - **Recipe:** two Echo Shards either side of a Warden Wool Bale, over a Functional Machine Block. It needs a pickaxe; breaking any block of it drops the one machine.
+  - **JEI:** an *Echo Chamber* page (the Warden sheep, a note block for the noise, the sweet spot, and the power for one to four sheep with a steady noise and an erratic one) and an information page. **Jade:** its status, output, herd, noise level and steadiness, how drowsy or close to shrieking it is, and its stored energy, whichever of its blocks you look at.
+  - The recipe, its unlock and its drop only load while the block exists (`neoforge:registered` conditions), so released jars, which don't have it yet, skip them quietly.
+  - Still to come: catalysts that wear out, Echo Shard boosts and fleece fatigue. Config: `[echo_chamber]` (see below).
 
   | Listening | Shrieked |
   |---|---|
-  | ![The Echo Chamber listening: three Warden sheep in its outlined pen, a note block beside it, and the status line reading Listening, about 15,000 FE/t](screenshots/wip_echo_chamber_listening.png) | ![The Echo Chamber after a shriek: the sky gone dark with Darkness, shriek rings rising off its roof, and the status line reading Shrieked, Noise 15, 0 FE/t, Back in 58s](screenshots/wip_echo_chamber_shriek.png) |
+  | ![The Echo Chamber listening: three Warden sheep in its outlined pen and a note block beside it](screenshots/wip_echo_chamber_listening.png) | ![The Echo Chamber after a shriek: the sky gone dark with Darkness and shriek rings rising off its roof](screenshots/wip_echo_chamber_shriek.png) |
+  | ![Its window while listening: 3 / 4 Warden sheep, 18,000 FE/t, the noise meter lit to 5 at the start of the green sweet spot, fully steady](screenshots/wip_echo_chamber_gui.png) | ![Its window after a shriek: 0 FE/t, the noise meter lit into the red, the cooldown bar full, and Shrieked: back in 57s](screenshots/wip_echo_chamber_gui_shriek.png) |
+  | ![Jade on its dish: Echo Chamber, its status, herd, noise level and steadiness, and energy](screenshots/wip_echo_chamber_jade.png) | ![JEI's Echo Chamber page: Warden sheep, the chamber and a note block, the sweet spot 5-10, and the power for one to four sheep](screenshots/wip_echo_chamber_jei.png) |
+  | ![JEI showing its recipe: two Echo Shards either side of a Warden Wool Bale, over a Functional Machine Block](screenshots/wip_echo_chamber_jei_recipe.png) | |
 
   | Hume Field Generator (WIP model) | Close up |
   |---|---|
@@ -1396,13 +1403,18 @@ Use the recipe type `barelyfunctionalcontraptions:separating` to process any ite
 An explicit recipe always takes priority over a resource definition. JEI shows only the recipe that actually applies.
 
 #### Recipe support for other mods (KubeJS, Create, data packs)
-Two building blocks make the mod easy to drive from other mods' recipes and from KubeJS:
+Three building blocks make the mod easy to drive from other mods' recipes and from KubeJS:
 
 - **`barelyfunctionalcontraptions:resource_wool` ingredient.** Asks for resource wool in any recipe (crafting, the separator, another mod's machine) without spelling out its data component:
   ```jsonc
   { "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool", "resource": "barelyfunctionalcontraptions:iron" } // Iron Wool
   { "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool", "category": "gem" }  // any gem resource's wool
   { "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool" }                     // any resource wool
+  ```
+- **`barelyfunctionalcontraptions:wool_bale` ingredient.** The same for Wool Bales:
+  ```jsonc
+  { "neoforge:ingredient_type": "barelyfunctionalcontraptions:wool_bale", "resource": "barelyfunctionalcontraptions:warden" } // Warden Wool Bale
+  { "neoforge:ingredient_type": "barelyfunctionalcontraptions:wool_bale" }                                                    // any Wool Bale
   ```
 - **`barelyfunctionalcontraptions:mycelial_fuel` data map.** Adds Mycelial Generator fuels from a data pack (`data/<namespace>/data_maps/item/mycelial_fuel.json`) instead of the config:
   ```json

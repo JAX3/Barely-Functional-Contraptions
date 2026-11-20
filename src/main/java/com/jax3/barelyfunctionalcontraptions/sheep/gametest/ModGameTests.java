@@ -164,6 +164,7 @@ public final class ModGameTests {
             ECHO_TESTS.put("echo_chamber_pushes_power_out_of_its_port", ModGameTests::echoPort);
             ECHO_TESTS.put("echo_chamber_falls_asleep_in_silence", ModGameTests::echoSleep);
             ECHO_TESTS.put("echo_chamber_shrieks_when_too_loud", ModGameTests::echoShriek);
+            TESTS.put("echo_chamber_recipe_and_drop", ModGameTests::echoRecipeAndDrop);
         }
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
@@ -1281,6 +1282,52 @@ public final class ModGameTests {
             h.runAfterDelay(20, () -> {
                 h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.State.SHRIEKED && be.generating() == 0,
                         "it stays stopped until the cooldown is over, got " + be.state());
+                h.succeed();
+            });
+        });
+    }
+
+    /**
+     * Two Echo Shards, a Warden Wool Bale and a Functional Machine Block make an Echo Chamber (another resource's bale
+     * won't do); breaking any block of a placed one drops one Echo Chamber, not one for each of its 27 blocks, and a
+     * player needs a pickaxe for it.
+     */
+    private static void echoRecipeAndDrop(GameTestHelper h) {
+        ItemStack shard = new ItemStack(Items.ECHO_SHARD), e = ItemStack.EMPTY;
+        ItemStack machine = new ItemStack(ModItems.FUNCTIONAL_MACHINE_BLOCK.get());
+        ItemStack warden = com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("warden"), 1);
+        ItemStack iron = com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("iron"), 1);
+        ItemStack made = craft(h, 3, 2, List.of(shard, warden, shard, e, machine, e));
+        h.assertTrue(made.is(ModItems.ECHO_CHAMBER.get()), "the recipe makes an Echo Chamber, got " + made);
+        h.assertTrue(craft(h, 3, 2, List.of(shard, iron, shard, e, machine, e)).isEmpty(), "an Iron Wool Bale won't do");
+        // Placed on the platform, then broken from its top corner.
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.STONE);
+        BlockPos front = h.absolutePos(new BlockPos(3, 1, 1));
+        com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.fill(h.getLevel(), front, ModBlocks.ECHO_CHAMBER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.FACING, Direction.NORTH));
+        BlockPos corner = com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.at(front, Direction.NORTH, 8, 2);
+        h.getLevel().destroyBlock(corner, true);
+        h.runAfterDelay(3, () -> {
+            var area = new net.minecraft.world.phys.AABB(front).inflate(6);
+            int dropped = h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, area,
+                    i -> i.getItem().is(ModItems.ECHO_CHAMBER.get())).stream().mapToInt(i -> i.getItem().getCount()).sum();
+            h.assertTrue(dropped == 1, "one Echo Chamber drops, got " + dropped);
+            h.assertTrue(h.getLevel().getBlockState(front).isAir(), "and the whole machine is gone");
+            for (var item : h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, area)) item.discard();
+            // A player in survival mining its front corner with a pickaxe gets one too; with a bare hand, none.
+            var state = ModBlocks.ECHO_CHAMBER.get().defaultBlockState().setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.FACING, Direction.NORTH);
+            var miner = McTest.mockServerPlayer(h, GameType.SURVIVAL);
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.fill(h.getLevel(), front, state);
+            miner.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_PICKAXE));
+            h.assertTrue(miner.gameMode.destroyBlock(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.at(front, Direction.NORTH, 0, 0)), "it breaks");
+            com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.fill(h.getLevel(), front, state);
+            miner.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            h.assertTrue(miner.gameMode.destroyBlock(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.at(front, Direction.NORTH, 2, 1)), "it breaks by hand too");
+            h.runAfterDelay(3, () -> {
+                int mined = h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, area,
+                        i -> i.getItem().is(ModItems.ECHO_CHAMBER.get())).stream().mapToInt(i -> i.getItem().getCount()).sum();
+                h.assertTrue(mined == 1, "one from the pickaxe and none by hand, got " + mined);
+                h.assertTrue(h.getLevel().getBlockState(front.south()).isAir(), "and it's all gone");
                 h.succeed();
             });
         });

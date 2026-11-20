@@ -108,6 +108,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.WOOL_BURNER.get(), WoolBurnerScreen::new);
         event.register(ModMenus.SHEEP_TREADMILL.get(), SheepTreadmillScreen::new);
         event.register(ModMenus.THERMAL_REACTION_CHAMBER.get(), ThermalReactionChamberScreen::new);
+        if (ModMenus.ECHO_CHAMBER != null) event.register(ModMenus.ECHO_CHAMBER.get(), EchoChamberScreen::new);
         event.register(ModMenus.WOOL_PACKER.get(), WoolPackerScreen::new);
         event.register(ModMenus.INFUSION_ALTAR.get(), InfusionAltarScreen::new);
     }

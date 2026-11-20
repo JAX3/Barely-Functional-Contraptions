@@ -33,6 +33,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(WoolPackerProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.class);
         registration.registerBlockDataProvider(EnergyMeterProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity.class);
         registration.registerBlockDataProvider(ThermalReactionChamberProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.class);
+        registration.registerBlockDataProvider(EchoChamberProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.class);
         registration.registerEntityDataProvider(ThermalFatigueProvider.Server.INSTANCE, net.minecraft.world.entity.animal.sheep.Sheep.class);
     }
 
@@ -52,6 +53,8 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(WoolPackerProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.class);
         registration.registerBlockComponent(EnergyMeterProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.class);
         registration.registerBlockComponent(ThermalReactionChamberProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock.class);
+        registration.registerBlockComponent(EchoChamberProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.class);
+        EchoChamberProvider.redirect(registration);
         registration.registerEntityComponent(ThermalFatigueProvider.Client.INSTANCE, net.minecraft.world.entity.animal.sheep.Sheep.class);
     }
 }

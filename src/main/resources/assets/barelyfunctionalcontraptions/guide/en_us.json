@@ -403,7 +403,8 @@
     },
     {
       "title": "Echo Chamber",
-      "icon": "minecraft:sculk_shrieker",
+      "icon": "barelyfunctionalcontraptions:echo_chamber",
+      "fallback_icon": "minecraft:sculk_shrieker",
       "tab": "wip",
       "text": [
         "In development: its core works in development builds only, and the numbers may change.",
@@ -412,10 +413,12 @@
         "- 8,000 FE/t from one Warden sheep, up to 20,000 FE/t from four, while the noise around it is steady and in its sweet spot (noise level 5-10).",
         "- Wool blocks noise from reaching it. Its power comes out of the port in the middle of its back.",
         "## Upkeep",
-        "- Keep the noise steady: note blocks, a redstone clock, or a Wool Burner's crackle.",
+        "- Keep the noise steady: a note block on a redstone clock works well.",
         "- Too quiet for 30 seconds and the Warden sheep fall asleep and it stops, until the noise is back.",
         "- Too loud for 10 seconds and the room shrieks: Darkness for players nearby, and it stops for a minute.",
-        "- The sculk catalysts in the room wear out and need replacing."
+        "- Planned: sculk catalysts that wear out and need replacing.",
+        "## Making it",
+        "- Two Echo Shards either side of a Warden Wool Bale, over a Functional Machine Block. Right-click it for its window."
       ]
     },
     {

@@ -95,6 +95,14 @@ public final class JeiDevHook {
         return true;
     }
 
+    /** Opens the Echo Chamber page. */
+    public static boolean showEcho() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        rt.getRecipesGui().showTypes(java.util.List.of(EchoCategory.TYPE));
+        return true;
+    }
+
     /** Opens the Thermal Reaction Chamber's information page. */
     public static boolean showThermalInfo() {
         IJeiRuntime rt = runtime;

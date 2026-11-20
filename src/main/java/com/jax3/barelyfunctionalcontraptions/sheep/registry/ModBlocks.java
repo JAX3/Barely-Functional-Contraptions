@@ -194,7 +194,7 @@ public final class ModBlocks {
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock> ECHO_CHAMBER =
             net.neoforged.fml.loading.FMLEnvironment.isProduction() ? null : REGISTER.registerBlock("echo_chamber",
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock::new,
-                    p -> p.mapColor(MapColor.COLOR_CYAN).strength(5.0F, 6.0F).sound(SoundType.IRON).noOcclusion());
+                    p -> p.mapColor(MapColor.COLOR_CYAN).strength(5.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion());
 
     /** Late-game generator: power from Blaze sheep on its hot side against Snow sheep on its cold side. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock> THERMAL_REACTION_CHAMBER =

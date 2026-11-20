@@ -2440,11 +2440,12 @@ public final class DevScreenshotHarness {
                 var be = echoChamber(server);
                 if (be != null) be.emptyBuffer();
             });
-            case 470 -> server.execute(() -> {
-                var be = echoChamber(server);
-                if (be != null) server.getPlayerList().getPlayers().getFirst().sendOverlayMessage(be.status());
-            });
-            case 480 -> shot(mc, "wip_echo_chamber_listening");
+            case 450 -> command(server, "gamemode creative @a"); // spectators can't open machine windows
+            case 464 -> shot(mc, "wip_echo_chamber_listening");
+            case 466 -> openEchoWindow(server);
+            case 474 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); // park the cursor in a corner
+            case 478 -> shot(mc, "wip_echo_chamber_gui");
+            case 481 -> McClient.setScreen(mc, null);
             // Then far too loud for too long: it shrieks, and the player (in survival, so it counts) gets Darkness.
             case 484 -> command(server, "gamemode survival @a");
             case 488 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 155 12", origin.getX() + 3.5, origin.getY() + 0.0, origin.getZ() + 2.5));
@@ -2457,12 +2458,28 @@ public final class DevScreenshotHarness {
                 }
             });
             case 530 -> McClient.clearChat(mc);
-            case 536 -> server.execute(() -> {
-                var be = echoChamber(server);
-                if (be != null) server.getPlayerList().getPlayers().getFirst().sendOverlayMessage(be.status());
-            });
             case 546 -> shot(mc, "wip_echo_chamber_shriek");
-            case 552 -> mc.stop();
+            case 548 -> openEchoWindow(server);
+            case 554 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 560 -> shot(mc, "wip_echo_chamber_gui_shriek");
+            // Jade on its dish once the Darkness has worn off, then its JEI page and its recipe.
+            case 562 -> McClient.setScreen(mc, null);
+            case 570 -> command(server, "gamemode creative @a");
+            case 575 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 -4", origin.getX() + 0.5, origin.getY() + 0.0, origin.getZ() - 1.0));
+            case 720 -> shot(mc, "wip_echo_chamber_jade");
+            case 722 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showEcho();
+            }
+            case 730 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 745 -> shot(mc, "wip_echo_chamber_jei");
+            case 747 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
+                    com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.show(new ItemStack(ModItems.ECHO_CHAMBER.get()), true);
+                }
+            }
+            case 755 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 770 -> shot(mc, "wip_echo_chamber_jei_recipe");
+            case 776 -> mc.stop();
             default -> {}
         }
         if (tick >= 80 && tick < 480 && tick % 10 == 0) {
@@ -2473,6 +2490,14 @@ public final class DevScreenshotHarness {
                 level.setBlockAndUpdate(switchAt, on ? Blocks.AIR.defaultBlockState() : Blocks.REDSTONE_BLOCK.defaultBlockState());
             });
         }
+    }
+
+    /** Opens the scene's Echo Chamber's window for the player, as a right-click does. */
+    private static void openEchoWindow(MinecraftServer server) {
+        server.execute(() -> {
+            var be = echoChamber(server);
+            if (be != null) server.getPlayerList().getPlayers().getFirst().openMenu(be, be.getBlockPos());
+        });
     }
 
     /** The Echo Chamber the scene built: its middle block is one behind the front, which faces south. */

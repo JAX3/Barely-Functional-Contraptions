@@ -45,7 +45,7 @@ import org.jspecify.annotations.Nullable;
  * sheep's "ears", now and then give off a pop of sculk charge. It's registered in development builds only.
  *
  * <ul>
- *     <li>right-click any block of it to see what it's doing: its state, herd, noise level, steadiness and output;</li>
+ *     <li>right-click any block of it to open its window;</li>
  *     <li>sneak-right-click with an empty hand to show or hide its listening pen.</li>
  * </ul>
  *
@@ -126,7 +126,7 @@ public class EchoChamberBlock extends Block implements EntityBlock {
         EchoChamberBlockEntity be = entity(level, pos, state);
         if (be == null) return InteractionResult.PASS;
         if (player.isSecondaryUseActive()) be.toggleArea(player);
-        else player.sendOverlayMessage(be.status());
+        else player.openMenu(be, be.getBlockPos());
         return InteractionResult.SUCCESS;
     }
 
@@ -201,11 +201,24 @@ public class EchoChamberBlock extends Block implements EntityBlock {
         return super.updateShape(state, level, ticks, pos, direction, neighbourPos, neighbourState, random);
     }
 
+    /**
+     * Breaking any block of it removes the rest. Only the middle bottom block drops the machine (its loot table), so a
+     * player breaking another block of it breaks that one too, with their tool: a pickaxe gets the drop, a bare hand or
+     * creative doesn't, as for any machine.
+     */
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide()) {
             BlockPos origin = origin(pos, state);
             Direction facing = state.getValue(FACING);
+            BlockPos core = at(origin, facing, MIDDLE, 0);
+            // The middle block first, quietly (no drops, no knock-on updates), so the others going can't drop it too.
+            BlockState coreState = level.getBlockState(core);
+            if (!core.equals(pos) && coreState.is(this)) {
+                boolean drops = !player.getAbilities().instabuild && player.hasCorrectToolForDrops(coreState);
+                if (drops) dropResources(coreState, level, core, level.getBlockEntity(core), player, player.getMainHandItem());
+                level.setBlock(core, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS);
+            }
             for (int part = 0; part < SIZE * SIZE; part++) {
                 for (int layer = 0; layer < SIZE; layer++) {
                     BlockPos other = at(origin, facing, part, layer);
