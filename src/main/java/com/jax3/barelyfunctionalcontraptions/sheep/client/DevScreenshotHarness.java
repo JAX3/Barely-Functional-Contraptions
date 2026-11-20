@@ -3229,7 +3229,37 @@ public final class DevScreenshotHarness {
                     ResourcefulSheep.LOGGER.warn("PANEL signal {} lamp {}", be.comparatorSignal(), level.getBlockState(at.south(2)));
                 }
             });
-            case 176 -> mc.stop();
+            // Its window, with a machine named and the green theme; then the screen in green, Jade, and its JEI page.
+            case 174 -> {
+                command(server, "gamemode creative @a");
+                server.execute(() -> {
+                    ServerLevel level = server.overworld();
+                    if (level.getBlockEntity(at.offset(-1, 2, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity be) {
+                        be.rename(level, 0, "Iron line furnace");
+                        be.rename(level, 1, "Pen seeder");
+                        be.cycleTheme(level);
+                        server.getPlayerList().getPlayers().getFirst().openMenu(be, at.offset(-1, 2, 0));
+                    }
+                });
+            }
+            case 182 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 192 -> shot(mc, "110_status_panel_gui");
+            case 194 -> McClient.setScreen(mc, null);
+            case 196 -> command(server, "gamemode spectator @a");
+            case 198 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 0", at.getX() + 0.5, at.getY() - 0.1, at.getZ() + 3.2));
+            case 214 -> shot(mc, "110_status_panel_green");
+            case 216 -> {
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 8", at.getX() + 0.5, at.getY() + 0.0, at.getZ() + 2.5));
+            }
+            case 220 -> { setHudHidden(mc, false); McClient.clearChat(mc); }
+            case 236 -> shot(mc, "110_status_panel_jade");
+            case 238 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showStatusPanel();
+            }
+            case 246 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 256 -> shot(mc, "110_status_panel_jei");
+            case 262 -> mc.stop();
             default -> {}
         }
     }

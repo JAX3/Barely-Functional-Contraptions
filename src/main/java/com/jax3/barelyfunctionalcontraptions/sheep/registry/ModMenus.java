@@ -42,6 +42,9 @@ public final class ModMenus {
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.ChillerMenu>> CHILLER = REGISTER.register("chiller",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.ChillerMenu::new));
 
+    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.StatusPanelMenu>> STATUS_PANEL = REGISTER.register("status_panel",
+            () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.StatusPanelMenu::new));
+
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.HerdCounterMenu>> HERD_COUNTER = REGISTER.register("herd_counter",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.HerdCounterMenu::new));
 

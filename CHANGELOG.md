@@ -38,6 +38,11 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 - A comparator reads how many of its machines have a problem, for an alarm.
 - **Bigger screens:** panels in a rectangle up to 3x3 join into one seamless screen showing 4 machines a panel (36 on a
   3x3), its rows sized to fill it. Config `maxWidth`, `maxHeight`.
+- **Window:** name machines, move them up and down, unlink them, switch each one's alert (whether its problems count
+  for the comparator), sort the screen (your order, problems first, by machine), pick its colours (classic, green,
+  amber), and set its comparator to count problems or working machines.
+- **JEI:** a Machine Status Panel page and an information page. **Jade:** machines linked, screen size, problems and the
+  first two, and its signal.
 - **Recipe:** four Glass Panes, two Redstone, a Functional Machine Block, a Comparator and an Iron Ingot.
 - New config section `[status_panel]`, and a chapter in the Contraptions Manual (Utility).
 

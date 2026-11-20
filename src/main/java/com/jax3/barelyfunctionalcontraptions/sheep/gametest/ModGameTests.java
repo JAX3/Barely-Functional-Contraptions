@@ -182,6 +182,7 @@ public final class ModGameTests {
         ECHO_TESTS.put("herd_counter_double_counts_dashing_sheep_unless_steady", ModGameTests::herdCounterSteady);
         ECHO_TESTS.put("status_panel_shows_its_linked_machines", ModGameTests::statusPanel);
         ECHO_TESTS.put("status_panels_join_into_one_screen_up_to_3x3", ModGameTests::statusPanelJoin);
+        ECHO_TESTS.put("status_panel_window_names_orders_and_alerts", ModGameTests::statusPanelWindow);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -1737,6 +1738,53 @@ public final class ModGameTests {
         h.assertTrue(!level.getBlockState(middle).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.JOINED_UP),
                 "4 across is too wide: they stay separate");
         h.succeed();
+    }
+
+    /**
+     * Its window's settings: moving a machine changes its order, a name shows instead of the block's (and an empty one
+     * goes back), an alert switched off takes that machine's problem off the comparator, Problems first puts problems
+     * at the top, and Working counts working machines instead. The names, order and settings survive a save and load.
+     */
+    private static void statusPanelWindow(GameTestHelper h) {
+        var level = h.getLevel();
+        BlockPos base = h.absolutePos(new BlockPos(1, 1, 1));
+        for (BlockPos p : BlockPos.betweenClosed(base.offset(0, -1, 0), base.offset(5, -1, 5))) level.setBlockAndUpdate(p, Blocks.DIRT.defaultBlockState());
+        BlockPos panelPos = base.offset(0, 1, 0);
+        level.setBlockAndUpdate(panelPos, ModBlocks.STATUS_PANEL.get().defaultBlockState());
+        var panel = (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity) level.getBlockEntity(panelPos);
+        BlockPos cube = base.offset(2, 0, 0), seeder = base.offset(4, 0, 3), furnace = base.offset(2, 0, 3);
+        level.setBlockAndUpdate(cube, ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState());
+        level.setBlockAndUpdate(seeder, ModBlocks.GRASS_SEEDER.get().defaultBlockState());
+        level.setBlockAndUpdate(furnace, ModBlocks.POWERED_FURNACE.get().defaultBlockState());
+        level.setBlockAndUpdate(furnace.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState());
+        ((com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity) level.getBlockEntity(furnace)).setItem(0, new ItemStack(Items.RAW_IRON, 64));
+        ((com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity) level.getBlockEntity(seeder)).work(level, seeder); // no fuel: a problem
+        panel.toggleLink(level, cube);
+        panel.toggleLink(level, seeder);
+        panel.toggleLink(level, furnace);
+        h.runAfterDelay(20, () -> {
+            panel.refresh(level, panelPos, level.getBlockState(panelPos));
+            h.assertTrue(panel.comparatorSignal() == 1, "one problem, got " + panel.comparatorSignal());
+            panel.move(level, 2, -1);
+            h.assertTrue(panel.links().get(1).equals(furnace) && panel.links().get(2).equals(seeder), "the furnace moved up: " + panel.links());
+            panel.rename(level, 0, "  Main bank  ");
+            h.assertTrue(panel.rows().get(0).custom().equals("Main bank") && panel.rows().get(0).displayName().getString().equals("Main bank"), "renamed");
+            panel.toggleAlert(level, 2);
+            h.assertTrue(!panel.rows().get(2).alert() && panel.comparatorSignal() == 0, "the seeder's alert off: its problem doesn't count");
+            panel.toggleAlert(level, 2);
+            panel.cycleSort(level); // problems first
+            h.assertTrue(panel.rows().get(0).pos().equals(seeder) && panel.rows().get(0).link() == 2, "problems first: the seeder on top, still link 2");
+            panel.toggleSignal(level); // working
+            h.assertTrue(panel.comparatorSignal() == 1, "Working: the furnace, got " + panel.comparatorSignal());
+            // Saved and loaded again.
+            var saved = panel.saveWithFullMetadata(level.registryAccess());
+            var copy = (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity)
+                    net.minecraft.world.level.block.entity.BlockEntity.loadStatic(panelPos, level.getBlockState(panelPos), saved, level.registryAccess());
+            h.assertTrue(copy != null && copy.links().equals(panel.links()) && copy.sort() == panel.sort() && copy.signal() == panel.signal(), "saved and loaded");
+            panel.rename(level, 0, "");
+            h.assertTrue(panel.rows().stream().noneMatch(r -> r.link() == 0 && !r.custom().isEmpty()), "an empty name: its own name again");
+            h.succeed();
+        });
     }
 
     /** Full mode reads 0 until it counts its target, then 15. */

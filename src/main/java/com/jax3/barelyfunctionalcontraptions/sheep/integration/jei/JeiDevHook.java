@@ -103,6 +103,14 @@ public final class JeiDevHook {
         return true;
     }
 
+    /** Opens the Machine Status Panel page. */
+    public static boolean showStatusPanel() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        rt.getRecipesGui().showTypes(java.util.List.of(StatusPanelCategory.TYPE));
+        return true;
+    }
+
     /** Opens the Herd Counter page. */
     public static boolean showHerdCounter() {
         IJeiRuntime rt = runtime;

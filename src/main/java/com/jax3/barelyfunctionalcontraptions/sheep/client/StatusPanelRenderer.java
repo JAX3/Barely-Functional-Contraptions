@@ -35,6 +35,7 @@ public class StatusPanelRenderer implements BlockEntityRenderer<StatusPanelBlock
         Direction facing = Direction.NORTH;
         /** Whether this panel draws (the top-left one of its screen), and the screen's size in panels. */
         boolean master = true;
+        StatusPanelBlockEntity.Theme theme = StatusPanelBlockEntity.Theme.CLASSIC;
         int width = 1, height = 1;
     }
 
@@ -49,6 +50,7 @@ public class StatusPanelRenderer implements BlockEntityRenderer<StatusPanelBlock
         BlockEntityRenderer.super.extractRenderState(be, state, partialTicks, cameraPosition, breakProgress);
         state.rows = be.rows();
         state.facing = be.getBlockState().getValue(StatusPanelBlock.FACING);
+        state.theme = be.theme();
         var level = be.getLevel();
         state.master = level == null || StatusPanelBlock.master(level, be.getBlockPos()).equals(be.getBlockPos());
         int[] size = level == null ? new int[]{1, 1} : StatusPanelBlock.size(level, be.getBlockPos());
@@ -100,13 +102,13 @@ public class StatusPanelRenderer implements BlockEntityRenderer<StatusPanelBlock
             int x = (i / perColumn) * (columnW + 4) + (i / perColumn > 0 ? 2 : 0), y = 1 + (i % perColumn) * 21;
             int colour = row.report().level().color;
             text(collector, poseStack, font, Component.literal("\u25a0").getVisualOrderText(), x, y, colour);
-            String name = font.plainSubstrByWidth(Component.translatable(row.name()).getString(), columnW - 9);
-            text(collector, poseStack, font, Component.literal(name).getVisualOrderText(), x + 8, y, NAME);
+            String name = font.plainSubstrByWidth(row.displayName().getString(), columnW - 9);
+            text(collector, poseStack, font, Component.literal(name).getVisualOrderText(), x + 8, y, state.theme.name);
             String number = row.report().number();
             int numberWidth = font.width(number);
             String status = font.plainSubstrByWidth(row.report().statusText().getString(), columnW - numberWidth - 4);
             text(collector, poseStack, font, Component.literal(status).getVisualOrderText(), x, y + 9, colour);
-            text(collector, poseStack, font, Component.literal(number).getVisualOrderText(), x + columnW - numberWidth, y + 9, NUMBER);
+            text(collector, poseStack, font, Component.literal(number).getVisualOrderText(), x + columnW - numberWidth, y + 9, state.theme.number);
         }
         poseStack.popPose();
     }

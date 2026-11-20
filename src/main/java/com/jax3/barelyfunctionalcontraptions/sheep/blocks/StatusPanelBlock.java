@@ -225,13 +225,11 @@ public class StatusPanelBlock extends BaseEntityBlock {
                 (l, pos, s, be) -> StatusPanelBlockEntity.serverTick(serverLevel, pos, s, be));
     }
 
-    /** With an empty hand: how many machines are linked, and how to link more. */
+    /** With an empty hand: its screen's window (any of its panels opens the top-left one's). */
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide() && level.getBlockEntity(master(level, pos)) instanceof StatusPanelBlockEntity be) {
-            player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.status_panel.info",
-                    be.links().size(), be.capacity()).withStyle(ChatFormatting.GRAY));
-        }
+        BlockPos master = master(level, pos);
+        if (!level.isClientSide() && level.getBlockEntity(master) instanceof StatusPanelBlockEntity be) player.openMenu(be, master);
         return InteractionResult.SUCCESS;
     }
 
