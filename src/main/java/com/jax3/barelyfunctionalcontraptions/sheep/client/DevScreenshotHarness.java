@@ -1635,8 +1635,9 @@ public final class DevScreenshotHarness {
     private static final Object[][] EXTRA_SCENES = {
             // Added before, and already in the world: new blocks (x 166), themed sheep (202), blaze furnace (234),
             // wool burner (262), wool packer (282), infusion altar (302), snow sheep chiller (322),
-            // powered furnace (342), woollen armour (362), sheep treadmill (382), ore line (402).
-            {"thermal reaction chamber", 422},
+            // powered furnace (342), woollen armour (362), sheep treadmill (382), ore line (402),
+            // thermal reaction chamber (422).
+            {"echo chamber", 442},
     };
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
@@ -2024,6 +2025,79 @@ public final class DevScreenshotHarness {
                 .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN, Direction.EAST), 3);
         for (int z = -2; z <= 1; z++) for (int y = 0; y <= 1; y++) level.setBlock(o.offset(0, y, z), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
         label(server, at.above(2), "Thermal Reaction Chamber", "gold");
+    }
+
+    /** Where {@link #echoWorldScene} put the redstone block that starts its clock, to be swapped back for stone a tick later. */
+    private static @org.jspecify.annotations.Nullable BlockPos echoKick;
+
+    /**
+     * The Echo Chamber for the test world, built to run for as long as the world is open: one chamber facing south on a
+     * sculk floor, four Warden sheep standing still in its fenced listening pen, its pen outlined, and a repeater clock
+     * beside it striking two note blocks about 1.25 times a second (noise level 6, in the sweet spot). Its power goes
+     * through an Energy Meter behind its power port into a bank of eight Hume Energy Cubes. No sculk sensors: they'd
+     * click back at the note blocks and make the noise less steady. Call {@link #echoWorldKick} a tick later.
+     */
+    private static void echoWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin;
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, 0, -12), o.offset(7, 6, 5))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, -1, -12), o.offset(7, -1, 5))) {
+            level.setBlock(p, Math.floorMod(p.getX() + p.getZ(), 3) == 0 ? Blocks.DEEPSLATE_TILES.defaultBlockState() : Blocks.SCULK.defaultBlockState(), 2);
+        }
+        // The chamber: its front middle block here, facing south; it fills the 3x3x3 space north of and above it.
+        BlockPos front = o.offset(0, 0, -2);
+        com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.fill(level, front, ModBlocks.ECHO_CHAMBER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.FACING, Direction.SOUTH));
+        if (level.getBlockEntity(front.north()) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity be) be.setShowsArea(true);
+        // The pen (x -2..2, z -1..3 from here) fenced round its sides and front, and four Warden sheep in it facing the dish.
+        var fence = Blocks.DARK_OAK_FENCE.defaultBlockState();
+        for (int z = -1; z <= 4; z++) {
+            level.setBlock(o.offset(-3, 0, z), fence, 3);
+            level.setBlock(o.offset(3, 0, z), fence, 3);
+        }
+        for (int x = -2; x <= 2; x++) level.setBlock(o.offset(x, 0, 4), fence, 3);
+        for (double[] p : new double[][]{{-1.2, 0.5}, {1.2, 0.5}, {-0.8, 2.4}, {1.0, 2.6}}) {
+            Sheep sheep = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            sheep.snapTo(o.getX() + 0.5 + p[0], o.getY(), o.getZ() + 0.5 + p[1], 180, 0);
+            sheep.setNoAi(true);
+            sheep.setPersistenceRequired();
+            SheepInfusionEvents.setInfusion(sheep, new SheepInfusion(Optional.of(ResourcefulSheep.id("warden")), 100, 0));
+            level.addFreshEntity(sheep);
+        }
+        // The noise: a 3x3 ring east of the chamber (x 4..6, z -4..-2). Repeaters on its edges, at their longest delay, carry
+        // one pulse round it every 1.6 seconds; its corners are two note blocks (struck as the pulse passes) and two stone.
+        BlockPos c = o.offset(4, 0, -4);
+        var stone = Blocks.STONE.defaultBlockState();
+        level.setBlock(c, stone, 3);
+        level.setBlock(c.offset(2, 0, 2), stone, 3);
+        level.setBlock(c.offset(2, 0, 0), Blocks.NOTE_BLOCK.defaultBlockState(), 3);
+        level.setBlock(c.offset(0, 0, 2), Blocks.NOTE_BLOCK.defaultBlockState(), 3);
+        var repeater = Blocks.REPEATER.defaultBlockState().setValue(net.minecraft.world.level.block.RepeaterBlock.DELAY, 4);
+        var facing = net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING; // a repeater takes its input from the way it faces
+        level.setBlock(c.offset(1, 0, 0), repeater.setValue(facing, Direction.WEST), 3);
+        level.setBlock(c.offset(2, 0, 1), repeater.setValue(facing, Direction.NORTH), 3);
+        level.setBlock(c.offset(1, 0, 2), repeater.setValue(facing, Direction.EAST), 3);
+        level.setBlock(c.offset(0, 0, 1), repeater.setValue(facing, Direction.SOUTH), 3);
+        level.setBlock(c, Blocks.REDSTONE_BLOCK.defaultBlockState(), 3); // the kick that starts the pulse
+        echoKick = c;
+        // Its power: an Energy Meter behind its power port (the middle of its back) into a bank of eight Hume Energy Cubes.
+        level.setBlock(o.offset(0, 0, -5), ModBlocks.ENERGY_METER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.FACING, Direction.NORTH)
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.SCREEN, Direction.EAST), 3);
+        for (int z = -9; z <= -6; z++) for (int y = 0; y <= 1; y++) level.setBlock(o.offset(0, y, z), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        label(server, o.offset(0, 5, -3), "Echo Chamber", "aqua");
+    }
+
+    /** Swaps the redstone block that started the Echo Chamber's clock back for stone, leaving the pulse going round. */
+    private static void echoWorldKick(MinecraftServer server) {
+        if (echoKick == null) return;
+        server.getPlayerList().getPlayers().getFirst().level().setBlock(echoKick, Blocks.STONE.defaultBlockState(), 3);
+        echoKick = null;
     }
 
     /**
@@ -2528,8 +2602,8 @@ public final class DevScreenshotHarness {
 
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
-        // The latest scene: the Thermal Reaction Chamber.
-        String[] tps = {"tp @a 422.5 41.5 -3.5 180 32", "tp @a 425.5 37.5 -7.5 145 25"};
+        // The latest scene: the Echo Chamber.
+        String[] tps = {"tp @a 442.5 40.5 0.5 180 28", "tp @a 449.5 39.5 -3.5 125 25"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -2538,16 +2612,18 @@ public final class DevScreenshotHarness {
             if (tick == 40 + i * 60) command(server, tps[i]);
             if (tick == 90 + i * 60) shot(mc, "tour_" + i);
         }
+        // After the shots, out of spectator, so the scene's advancement (players nearby, not spectating) can be checked.
+        if (tick == 40 + tps.length * 60 + 5) command(server, "gamemode creative @a");
         // Let the latest scene run a while (it stays loaded round the player), then report how it is doing.
         int report = 40 + tps.length * 60 + 600;
         if (tick == report) {
             server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
-                if (level.getBlockEntity(new BlockPos(422, 35, -13)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity be) {
-                    ResourcefulSheep.LOGGER.warn("TOUR chamber {} {} FE/t, {} pairs, balance {}, water {} mB, energy {}", be.state(), be.generating(), be.pairs(),
-                            be.balance(), be.getTank().getAmount(), be.getEnergyHandler().getAmountAsInt());
+                if (level.getBlockEntity(new BlockPos(442, 35, -12)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity be) {
+                    ResourcefulSheep.LOGGER.warn("TOUR echo {} {} FE/t, {} sheep, noise {}, steady {}, energy {}", be.state(), be.generating(), be.herd(),
+                            be.noise(), be.steadiness(), be.getEnergyHandler().getAmountAsInt());
                 }
-                for (BlockPos p : new BlockPos[]{new BlockPos(422, 35, -12), new BlockPos(422, 35, -11)}) {
+                for (BlockPos p : new BlockPos[]{new BlockPos(442, 35, -14), new BlockPos(442, 35, -15)}) {
                     ResourcefulSheep.LOGGER.warn("TOUR at {}: {} / {}", p, level.getBlockState(p), level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity m
                             ? "meter rate " + m.rate() : String.valueOf(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.NORTH) instanceof net.neoforged.neoforge.transfer.energy.EnergyHandler h ? h.getAmountAsLong() : -1));
                 }
@@ -2588,10 +2664,12 @@ public final class DevScreenshotHarness {
                     player.teleportTo(x + 0.5, 35, -8.5); // exactly on the spot, in case it drifted
                     // Earlier runs built woolBurnerScene, woolPackerScene, altarScene (with bone blocks and a
                     // wither rose in its catalyst slots 2 and 3) and chillerScene here.
-                    // poweredFurnaceScene, woollenArmorScene, sheepTreadmillScene and oreLineScene.
-                    thermalWorldScene(server);
+                    // poweredFurnaceScene, woollenArmorScene, sheepTreadmillScene, oreLineScene and thermalWorldScene.
+                    echoWorldScene(server);
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
                 });
+            } else if (step == 42) {
+                server.execute(() -> echoWorldKick(server));
             }
         }
         if (tick == end + 20) {
@@ -2601,14 +2679,29 @@ public final class DevScreenshotHarness {
                 // The scenes turn command feedback off for clean shots; the shared world must keep it on, or commands
                 // such as /barelyfunctionalcontraptions list show nothing.
                 server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamerule send_command_feedback true");
-                // Save the Thermal Reaction Chamber and its cube bank empty, so it reacts for a while when someone visits.
+                // Save the Thermal Reaction Chamber, the Echo Chamber and their cube banks empty, so they run for a while when
+                // someone visits.
                 ServerLevel level = player.level();
+                // The same for the Echo Chamber (its port, from the back) and its cube bank.
+                for (BlockPos p : new BlockPos[]{new BlockPos(442, 35, -13), new BlockPos(442, 35, -15)}) {
+                    var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.NORTH);
+                    if (handler == null) continue;
+                    for (int k = 0; k < 10_000 && handler.getAmountAsLong() > 0; k++) { // a cube bank only gives so much at a time
+                        try (Transaction tx = Transaction.openRoot()) {
+                            handler.extract(Integer.MAX_VALUE, tx);
+                            tx.commit();
+                        }
+                    }
+                    ResourcefulSheep.LOGGER.info("EXTEND drained {} to {}", p, handler.getAmountAsLong());
+                }
                 for (BlockPos p : new BlockPos[]{new BlockPos(422, 35, -13), new BlockPos(422, 35, -11)}) {
                     var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.UP);
                     if (handler == null) continue;
-                    try (Transaction tx = Transaction.openRoot()) {
-                        handler.extract(Integer.MAX_VALUE, tx);
-                        tx.commit();
+                    for (int k = 0; k < 10_000 && handler.getAmountAsLong() > 0; k++) { // a cube bank only gives so much at a time
+                        try (Transaction tx = Transaction.openRoot()) {
+                            handler.extract(Integer.MAX_VALUE, tx);
+                            tx.commit();
+                        }
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND drained {} to {}", p, handler.getAmountAsLong());
                 }

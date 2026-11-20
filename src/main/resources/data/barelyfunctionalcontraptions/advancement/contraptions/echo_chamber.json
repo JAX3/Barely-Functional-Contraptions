@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/sheep/warden",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:echo_chamber"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.echo_chamber.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.echo_chamber.description"
+    },
+    "frame": "challenge"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -133,6 +133,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | ⭐ **Sheepish Combustion** (goal) | Be within 16 blocks of a Blaze Sheep Furnace when it starts making power from a Blaze sheep |
 | ⭐ **Running Ewe Ragged** (goal) | Be within 16 blocks of a Sheep Treadmill when a sheep starts walking it |
 | ⭐ **Thermal Shock** (challenge) | Be within 16 blocks of a Thermal Reaction Chamber when it starts reacting |
+| ⭐ **Good Vibrations** (challenge) | Be within 16 blocks of an Echo Chamber when it starts listening with its noise in the sweet spot (comes after the Warden sheep) |
 | Wool You Look at That | Infuse a sheep with any resource |
 | Hay There, Night Light, Bare Bones, Charred to the Bone, Eight Legs, Four Hooves, Too Hot to Shear, Scream and Shout | Infuse a sheep with a Hay Bale, Glow Ink Sac, Bone Block, Wither Rose, Spider Eye, Blaze Rod or Ghast Tear |
 | ⭐ **Three Heads Are Better Than One**, **Here Be Dragons**, **Shh... It's Sculking** (goals) | Infuse a sheep with a Nether Star, Dragon's Breath or Echo Shard |
@@ -572,6 +573,7 @@ B M B      B = Blackstone, M = Functional Machine Block
 - **Comparator:** against any block of it, reads the noise level, 0-15, for circuits that turn the noise up or down.
 - **Recipe:** see above: three Echo Shards, two Iron Blocks, a Warden Wool Bale, two Blackstone and a Functional Machine Block. It needs a pickaxe; breaking any block of it drops the one machine.
 - **JEI:** an *Echo Chamber* page (the Warden sheep, a note block for the noise, the sweet spot, and the power for one to four sheep with a steady noise and an erratic one) and an information page. **Jade:** its status, output, herd, noise level and steadiness, how drowsy or close to shrieking it is, and its stored energy, whichever of its blocks you look at.
+- **Advancement:** ⭐ **Good Vibrations** (challenge), for being within 16 blocks when one starts listening with its noise in the sweet spot.
 - Still to come: sculk catalysts that wear out, Echo Shard boosts and fleece fatigue.
 - **Config:** `[echo_chamber]` (see below).
 

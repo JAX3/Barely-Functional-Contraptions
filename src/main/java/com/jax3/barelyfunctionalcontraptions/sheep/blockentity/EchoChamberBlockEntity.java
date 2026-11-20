@@ -366,6 +366,11 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
         if (state != previous) {
             setChanged();
             level.sendBlockUpdated(pos, blockState, blockState, Block.UPDATE_CLIENTS); // the ears stop popping while it sleeps or recovers
+            if (state == State.LISTENING) {
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.awardNearby(level, pos,
+                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.AUTO_SHEAR_RADIUS,
+                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.ECHO_CHAMBER);
+            }
         }
     }
 

@@ -34,6 +34,7 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 - **JEI:** an *Echo Chamber* page and an information page. **Jade:** status, output, herd, noise, steadiness and
   energy, from any of its blocks.
 - New recipe ingredient `barelyfunctionalcontraptions:wool_bale` for data packs, like `resource_wool`.
+- **Advancement:** ⭐ *Good Vibrations* (challenge), for being nearby when one starts listening.
 - New config section `[echo_chamber]`.
 
 #### Thermal Reaction Chamber (late-game generator)
@@ -143,8 +144,8 @@ While a pair is linked, each module's emitter slowly turns the opposite way to t
 ### Manual, docs and test world
 - **Contraptions Manual:** new chapters for the Sheep Treadmill (Power → Early Game), the Thermal Reaction Chamber
   (Power → Late Game) and Woollen Armour (Utility), and updated times and notes throughout.
-- **Test world:** new scenes for the Powered Furnace, Woollen Armour, the Sheep Treadmill, an ore processing line, and
-  the Thermal Reaction Chamber. Teleports are in `test-world/README.md`.
+- **Test world:** new scenes for the Powered Furnace, Woollen Armour, the Sheep Treadmill, an ore processing line, the
+  Thermal Reaction Chamber and the Echo Chamber. Teleports are in `test-world/README.md`.
 - **Smaller jar:** the GameTests and the screenshot tools are no longer shipped in the released jar.
 - **Docs:** the README, the CurseForge page and the reference doc cover all of the above. There's a new *Sheep
   attraction* section, and config tables for `[thermal_reaction_chamber]`, `[sheep_treadmill]`, `[woollen_armor]` and

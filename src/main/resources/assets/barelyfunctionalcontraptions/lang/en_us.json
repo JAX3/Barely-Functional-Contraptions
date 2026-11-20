@@ -1113,6 +1113,8 @@
   "gui.barelyfunctionalcontraptions.thermal_reaction_chamber.status.frozen.desc": "Mine away the Packed Ice around it to thaw it out.",
   "advancements.barelyfunctionalcontraptions.thermal_reaction_chamber.title": "Thermal Shock",
   "advancements.barelyfunctionalcontraptions.thermal_reaction_chamber.description": "Start a Thermal Reaction Chamber reacting with Blaze sheep and Snow sheep",
+  "advancements.barelyfunctionalcontraptions.echo_chamber.title": "Good Vibrations",
+  "advancements.barelyfunctionalcontraptions.echo_chamber.description": "Get an Echo Chamber listening, with Warden sheep and a steady noise in its sweet spot",
   "jei.barelyfunctionalcontraptions.thermal_reaction": "Thermal Reaction",
   "jei.barelyfunctionalcontraptions.thermal.hot_herd": "Hot side: up to %s Blaze sheep in the %s pen on the chamber's left",
   "jei.barelyfunctionalcontraptions.thermal.cold_herd": "Cold side: up to %s Snow sheep in the %s pen on the chamber's right",

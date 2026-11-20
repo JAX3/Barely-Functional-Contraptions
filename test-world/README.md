@@ -44,6 +44,7 @@ z = -9.
 | Sheep Treadmills in a fenced pen: a sheep walking one, a sheared sheep another, one empty and one turned east, all fed Hay Bales | `/tp @s 380.5 36.2 -7.5 205 28` |
 | Ore processing line: six Iron sheep in the Automatic Shears' pen, pipes over the top to a Mechanical Separator, a pipe trench under the row to three Powered Furnaces, a Wool Burner and a chest (filtered to ingots, nuggets and String), powered by a Mycelial Generator on a Fluid Reservoir | `/tp @s 405.5 40 -1 180 34` |
 | Thermal Reaction Chamber: three Blaze sheep in its hot pen and three Snow sheep in its cold pen (standing still, so it stays balanced), 16 Blaze Rods and Blue Ice to burn, pens outlined, six Fluid Reservoirs on a pool piping in its water, and an Energy Meter into a bank of eight Hume Energy Cubes | `/tp @s 422.5 41.5 -3.5 180 32` |
+| Echo Chamber on a sculk floor: four Warden sheep standing still in its fenced listening pen (outlined), a repeater clock beside it striking two note blocks for a steady noise in its sweet spot, and an Energy Meter behind its power port into a bank of eight Hume Energy Cubes | `/tp @s 442.5 40.5 0.5 180 28` |
 
 The scenes from the New blocks on were added to the existing world with
 `./gradlew runClient -PscreenshotHarness -PharnessScene=extend_world "-PharnessWorld=BFC Test World"` (unzip this
@@ -53,6 +54,12 @@ The Thermal Reaction Chamber is saved with its buffer and cube bank empty, and i
 it reacts for about 45 seconds after you arrive (the meter shows about 13,000 FE/t) and then waits as *Buffer full*.
 Take power out of the cubes, with cables to machines, to keep it making power. Even while it's full, its needle and danger bar keep following the herds, so adding or removing a sheep still runs it hot or cold. Its sheep can't wander, so it never runs hot or
 cold on its own; to see a meltdown or a freeze, add or remove a sheep yourself (back up the world first).
+
+The Echo Chamber is saved the same way, empty, and only runs while you're near it. Its clock keeps the noise at about
+level 6, so after about 10 seconds it starts listening (about 18,000 FE/t, and players nearby get *Good Vibrations*);
+its buffer and cube bank fill in about half a minute, and then it waits as *Buffer full*. Walking around near it adds
+noise of your own, unless you're wearing Woollen Boots. To see it shriek, put another note block on the clock; to see
+its sheep fall asleep, break a repeater.
 
 When you first open the world, Minecraft warns that it uses experimental settings, because it's a superflat test world.
 Choose **I Know What I'm Doing!**. The warning won't show again for this world.
