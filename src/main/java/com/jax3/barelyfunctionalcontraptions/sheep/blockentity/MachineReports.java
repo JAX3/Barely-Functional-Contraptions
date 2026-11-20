@@ -97,7 +97,10 @@ public final class MachineReports {
         }
         // Machines: their status, and their progress or stored energy.
         if (be instanceof PoweredFurnaceBlockEntity b) return of(b.status(), stored(b.getEnergyHandler()));
-        if (be instanceof ChillerBlockEntity b) return of(b.status(), b.output().getCount() + " Ice");
+        if (be instanceof ChillerBlockEntity b) {
+            // (The chiller has no power: its "no energy" means it's out of water.)
+            return of(b.status() == MachineStatus.NO_ENERGY ? "no_water" : b.status().name().toLowerCase(Locale.ROOT), b.output().getCount() + " Ice");
+        }
         if (be instanceof MechanicalSeparatorBlockEntity b) return of(b.getStatus(), percent(b.getEnergy().getEnergy(), b.getEnergy().getCapacityAsInt()));
         if (be instanceof AutomaticShearsBlockEntity b) {
             int wool = 0;

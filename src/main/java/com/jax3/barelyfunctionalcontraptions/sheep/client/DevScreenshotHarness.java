@@ -1675,9 +1675,9 @@ public final class DevScreenshotHarness {
      * saves: {@code -PharnessScene=extend_world -PharnessWorld="BFC Test World"}. With no scenes listed it only drains.
      */
     private static final Object[][] EXTRA_SCENES = {
-            // Every cell up to (1, 5) is taken, (2, 5) by the Grass Seeder (added before) and (3, 5) by the Herd Counter;
-            // (4, 5) is free.
-            {"herd counter", 3, 5},
+            // Every cell is taken: up to (1, 5) by the moved scenes, (2, 5) by the Grass Seeder, (3, 5) by the Herd Counter
+            // and (4, 5) by the Machine Status Panel. A new scene needs a new row of cells.
+            {"status panel", 4, 5},
     };
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
@@ -2292,6 +2292,55 @@ public final class DevScreenshotHarness {
             level.addFreshEntity(sheep);
         }
         label(server, g.above(3), "Herd Counter", "aqua");
+    }
+
+    /**
+     * The Machine Status Panel for the test world: nine panels joined into a 3x3 screen on a stone-brick wall, linked to
+     * the real machines of the scenes round it on the platform (the nearest of each kind within its range: the Echo
+     * Chamber, the Thermal Reaction Chamber, the Grass Seeder, the Herd Counters, the Powered Furnaces and so on), with a
+     * comparator in front of it lighting a lamp while any of them has a problem.
+     */
+    private static void panelWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin, g = o.offset(0, 0, -3);
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(8, 6, 8),
+                e -> e instanceof net.minecraft.world.entity.Display.TextDisplay)) e.discard();
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-7, 0, -7), g.offset(6, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-4, -1, -5), g.offset(4, -1, 3))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-2, 0, -3), g.offset(2, 3, -3))) level.setBlock(p, Blocks.STONE_BRICKS.defaultBlockState(), 2);
+        var panelState = ModBlocks.STATUS_PANEL.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.FACING, Direction.SOUTH);
+        for (int x = -1; x <= 1; x++) for (int y = 0; y <= 2; y++) level.setBlock(g.offset(x, y, -2), panelState, 3);
+        BlockPos topLeft = g.offset(-1, 2, -2);
+        level.setBlock(g.offset(0, 0, -1), Blocks.COMPARATOR.defaultBlockState()
+                .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.NORTH), 3);
+        level.setBlock(g, Blocks.REDSTONE_LAMP.defaultBlockState(), 3);
+        if (!(level.getBlockEntity(topLeft) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel)) return;
+        // The nearest machine of each kind within its range, nearest kinds first.
+        int range = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.range() - 2;
+        java.util.Map<net.minecraft.world.level.block.Block, BlockPos> nearest = new java.util.HashMap<>();
+        for (int cx = (topLeft.getX() - range) >> 4; cx <= (topLeft.getX() + range) >> 4; cx++) {
+            for (int cz = (topLeft.getZ() - range) >> 4; cz <= (topLeft.getZ() + range) >> 4; cz++) {
+                for (var be : level.getChunk(cx, cz).getBlockEntities().values()) {
+                    BlockPos p = be.getBlockPos();
+                    if (be instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity
+                            || !p.closerThan(topLeft, range) || !com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.supports(be)) continue;
+                    var block = be.getBlockState().getBlock();
+                    BlockPos best = nearest.get(block);
+                    if (best == null || p.distSqr(topLeft) < best.distSqr(topLeft)) nearest.put(block, p.immutable());
+                }
+            }
+        }
+        nearest.values().stream().sorted(java.util.Comparator.comparingDouble(p -> p.distSqr(topLeft))).limit(14)
+                .forEach(p -> panel.toggleLink(level, p));
+        label(server, g.above(4).relative(Direction.NORTH, 2), "Machine Status Panel", "aqua");
+        ResourcefulSheep.LOGGER.info("EXTEND status panel linked {} machines: {}", panel.links().size(), panel.rows().stream()
+                .map(r -> r.name().replace("block.barelyfunctionalcontraptions.", "")).toList());
     }
 
     /** Swaps the redstone block that started the Echo Chamber's clock back for stone, leaving the pulse going round. */
@@ -3227,6 +3276,8 @@ public final class DevScreenshotHarness {
                 if (level.getBlockEntity(at.offset(-1, 2, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity be) {
                     for (var row : be.rows()) ResourcefulSheep.LOGGER.warn("PANEL row {} {} {} {}", row.name(), row.report().status(), row.report().level(), row.report().number());
                     ResourcefulSheep.LOGGER.warn("PANEL signal {} lamp {}", be.comparatorSignal(), level.getBlockState(at.south(2)));
+                    ResourcefulSheep.LOGGER.warn("PANEL Mission Control: {}", com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(
+                            server.getPlayerList().getPlayers().getFirst(), com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.MISSION_CONTROL));
                 }
             });
             // Its window, with a machine named and the green theme; then the screen in green, Jade, and its JEI page.
@@ -3310,7 +3361,7 @@ public final class DevScreenshotHarness {
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
         // The whole square platform from above its south edge and from straight overhead, then the latest scene.
-        String[] tps = {"tp @a 73.5 95 205.5 180 40", "tp @a 73.5 175 97 180 90", "tp @a 101.5 41 163.5 180 38", "tp @a 93.5 38 160.5 215 25"};
+        String[] tps = {"tp @a 73.5 95 205.5 180 40", "tp @a 73.5 175 97 180 90", "tp @a 129.5 38 162.5 180 12", "tp @a 129.5 35.4 156.8 180 4"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -3326,6 +3377,12 @@ public final class DevScreenshotHarness {
         if (tick == report) {
             server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                if (level.getBlockEntity(new BlockPos(128, 37, 152)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel) {
+                    ResourcefulSheep.LOGGER.warn("TOUR status panel: {} machines, signal {}, lamp {}", panel.rows().size(), panel.comparatorSignal(),
+                            level.getBlockState(new BlockPos(129, 35, 154)));
+                    for (var row : panel.rows()) ResourcefulSheep.LOGGER.warn("TOUR   {} {} {} at {}", row.name().replace("block.barelyfunctionalcontraptions.", ""),
+                            row.report().status(), row.report().number(), row.pos());
+                }
                 for (BlockPos p : new BlockPos[]{new BlockPos(97, 35, 154), new BlockPos(101, 35, 150)}) {
                     if (level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity hc) {
                         ResourcefulSheep.LOGGER.warn("TOUR herd counter at {}: {} {} (target {}), total {}, signal {}, steady {}, lamp {}", p, hc.mode(), hc.value(), hc.target(),
@@ -3604,6 +3661,7 @@ public final class DevScreenshotHarness {
                     switch ((String) EXTRA_SCENES[i][0]) {
                         case "grass seeder" -> seederWorldScene(server);
                         case "herd counter" -> herdWorldScene(server);
+                        case "status panel" -> panelWorldScene(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);

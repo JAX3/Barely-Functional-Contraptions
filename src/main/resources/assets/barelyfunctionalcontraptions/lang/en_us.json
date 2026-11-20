@@ -1443,5 +1443,7 @@
   "jade.barelyfunctionalcontraptions.status_panel.fine": "All fine",
   "jade.barelyfunctionalcontraptions.status_panel.problems": "%s with a problem",
   "jade.barelyfunctionalcontraptions.status_panel.signal": "Signal: %s",
-  "config.jade.plugin_barelyfunctionalcontraptions.status_panel": "Machine Status Panel"
+  "config.jade.plugin_barelyfunctionalcontraptions.status_panel": "Machine Status Panel",
+  "advancements.barelyfunctionalcontraptions.mission_control.title": "Mission Control",
+  "advancements.barelyfunctionalcontraptions.mission_control.description": "Link 8 machines to one Machine Status Panel screen"
 }

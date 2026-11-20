@@ -19,7 +19,7 @@ facing it.
 Every scene stands on one square platform of smooth stone, 146 blocks a side, floating at y = 34 above the sand. It's
 split into a grid of cells by stone-brick lines, five across and six deep, and the scenes fill it in the order below,
 from the north-west corner: west to east, then the next row south. The Themed sheep take two cells; the last three
-cells were left free for new contraptions (the Grass Seeder and the Herd Counter now have two of them). Each scene keeps its own floor (grass, sculk, andesite and so on), and the ones
+cells were left free for new contraptions; the Grass Seeder, the Herd Counter and the Machine Status Panel have them now. Each scene keeps its own floor (grass, sculk, andesite and so on), and the ones
 without a label of their own have their name floating over their north edge. Hostile mobs don't spawn (the
 `spawn_mobs` game rule is off), so nothing gathers in the platform's shadow.
 
@@ -53,6 +53,7 @@ without a label of their own have their name floating over their north edge. Hos
 | Static Generator on grass: six sheep standing still at four fresh Copper Combs in its fenced pen (outlined, a gate at the front), making 600 FE/t through an Energy Meter into a bank of eight Hume Energy Cubes | `/tp @s 17.5 40 163.5 180 32` |
 | Grass Seeder in a fenced pen of grass eaten into patches of dirt (outlined, a gate at the front), with 64 Bone Meal and Trim on (so it never overgrows); four sheep free to graze, and Automatic Shears in the back fence (powered by a Creative Generator) shearing the ones that wander in front of them: the pen runs itself | `/tp @s 73.5 41 163.5 180 38` |
 | Herd Counter: a fenced pen of eight sheep free to wander (Iron, Gold, Copper and plain, one sheared, one a lamb); a counter on the west side in Full at 8, lighting a lamp through a comparator while the whole herd is in, and one on the north side counting the Iron sheep ready to shear, with Steady on | `/tp @s 101.5 41 163.5 180 38` |
+| Machine Status Panel: nine panels joined into a 3x3 screen on a stone-brick wall, showing 13 of the machines round it on the platform (the nearest of each kind: the Echo Chamber and its cubes and meter, the Thermal Reaction Chamber, a Herd Counter, the Grass Seeder, the Powered Furnaces, the Chiller, a Mycelial Generator and more), with a comparator lighting a lamp while any has a problem | `/tp @s 129.5 38 162.5 180 12` |
 | A row of running machines: two Mycelial Generators (one fuelled and watered), two Mechanical Separators (one fed wool and powered by a Creative Generator) and two Automatic Shears (one charged) | `/tp @s 45.5 38 161 180 25` |
 
 The scenes used to stand in a long row of separate platforms; `-PharnessScene=square_world` moved them all onto the

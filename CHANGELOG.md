@@ -43,6 +43,8 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
   amber), and set its comparator to count problems or working machines.
 - **JEI:** a Machine Status Panel page and an information page. **Jade:** machines linked, screen size, problems and the
   first two, and its signal.
+- **Advancement:** *Mission Control* (goal), for linking 8 machines to one screen.
+- **Test world:** a 3x3 screen in the last cell, showing 13 of the machines round it on the platform.
 - **Recipe:** four Glass Panes, two Redstone, a Functional Machine Block, a Comparator and an Iron Ingot.
 - New config section `[status_panel]`, and a chapter in the Contraptions Manual (Utility).
 

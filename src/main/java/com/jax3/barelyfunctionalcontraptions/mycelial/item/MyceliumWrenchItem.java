@@ -120,6 +120,11 @@ public class MyceliumWrenchItem extends Item {
         switch (result) {
             case LINKED -> {
                 ok(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.linked", name, panel.links().size(), panel.capacity()));
+                if (panel.links().size() >= com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.MISSION_CONTROL_MACHINES
+                        && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.award(serverPlayer,
+                            com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.MISSION_CONTROL);
+                }
                 level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 0.8F, 1.8F);
             }
             case UNLINKED -> {
