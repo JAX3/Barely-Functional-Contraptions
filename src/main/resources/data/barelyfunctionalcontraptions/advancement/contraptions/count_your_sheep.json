@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:herd_counter"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.count_your_sheep.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.count_your_sheep.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

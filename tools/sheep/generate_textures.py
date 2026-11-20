@@ -4594,6 +4594,44 @@ def generate_grass_seeder_gui():
     img.save(out("gui/grass_seeder.png"))
 
 
+def generate_herd_counter():
+    """Herd Counter: a slim blue-steel panel with a green-on-black screen on its front (the count is drawn over it) and a
+    tally wheel on its side."""
+    base = "block/herd_counter/"
+    os.makedirs(out(base), exist_ok=True)
+    front = grid(MACHINE_BLOCK, CARTOON)
+    for y in range(3, 11):
+        for x in range(3, 13):
+            edge = x in (3, 12) or y in (3, 10)
+            front.putpixel((x, y), CARTOON["O"] if edge else (hexc("#0c1a10") if (x + y) % 5 else hexc("#10241a")))
+    for x in range(4, 12):
+        front.putpixel((x, 11), CARTOON["H"])                         # a lip under the screen
+    for x, c in ((5, CARTOON["R"]), (7, hexc("#7cff8a")), (9, CARTOON["E"])):   # three little lamps under it
+        front.putpixel((x, 13), c)
+    front.save(out(base + "front.png"))
+
+    side = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            c = CARTOON["M"]
+            if x in (0, 15) or y in (0, 15):
+                c = CARTOON["O"]
+            elif x == 1 or y == 1:
+                c = CARTOON["H"]
+            elif x == 14 or y == 14:
+                c = CARTOON["S"]
+            side.putpixel((x, y), c)
+    for x, y in ((3, 3), (12, 3), (3, 12), (12, 12)):
+        side.putpixel((x, y), CARTOON["b"])
+    side.save(out(base + "side.png"))
+
+    wheel = Image.new("RGBA", (16, 16))                               # the tally wheel: brass, notched
+    for y in range(16):
+        for x in range(16):
+            wheel.putpixel((x, y), CARTOON["c"] if y % 3 == 0 else CARTOON["Y"] if x % 5 == 0 else CARTOON["C"])
+    wheel.save(out(base + "wheel.png"))
+
+
 def generate_static_generator_gui():
     """Static Generator window: energy gauge, then a panel with the herd and output, the dome's charge bar (the shock
     line marked) and four comb chips; the status lamp below."""
@@ -4678,6 +4716,7 @@ def main():
     generate_static_generator_gui()
     generate_grass_seeder()
     generate_grass_seeder_gui()
+    generate_herd_counter()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

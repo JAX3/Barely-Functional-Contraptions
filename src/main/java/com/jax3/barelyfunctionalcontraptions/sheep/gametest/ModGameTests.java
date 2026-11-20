@@ -177,6 +177,8 @@ public final class ModGameTests {
         ECHO_TESTS.put("grass_seeder_gets_sheared_sheep_grazing", ModGameTests::seederGrazing);
         ECHO_TESTS.put("grass_seeder_overgrows_unless_trimmed", ModGameTests::seederOvergrowth);
         ECHO_TESTS.put("automatic_shears_cant_see_sheep_in_tall_grass", ModGameTests::shearsTallGrass);
+        ECHO_TESTS.put("herd_counter_counts_its_pen", ModGameTests::herdCounterCounts);
+        ECHO_TESTS.put("herd_counter_full_mode_waits_for_its_target", ModGameTests::herdCounterFull);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -1535,6 +1537,89 @@ public final class ModGameTests {
         for (BlockPos p : com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.ground(at)) {
             h.assertTrue(!level.getBlockState(p.above(2)).is(Blocks.TALL_GRASS), "no tall grass left at " + p);
         }
+        h.succeed();
+    }
+
+    /** A Herd Counter facing south in the middle of a grass floor (world positions: the pen is south of it). */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity buildHerdCounter(GameTestHelper h) {
+        BlockPos at = h.absolutePos(new BlockPos(3, 1, 1));
+        var level = h.getLevel();
+        for (BlockPos p : BlockPos.betweenClosed(at.offset(-3, -1, -2), at.offset(3, -1, 5))) level.setBlockAndUpdate(p, Blocks.GRASS_BLOCK.defaultBlockState());
+        for (BlockPos p : BlockPos.betweenClosed(at.offset(-3, 0, -2), at.offset(3, 3, 5))) level.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState());
+        level.setBlockAndUpdate(at, ModBlocks.HERD_COUNTER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock.FACING, Direction.SOUTH));
+        return (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity) level.getBlockEntity(at);
+    }
+
+    private static Sheep plainSheep(GameTestHelper h, BlockPos at) {
+        Sheep sheep = Vanilla.SHEEP.create(h.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        sheep.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0, 0);
+        sheep.setNoAi(true);
+        h.getLevel().addFreshEntity(sheep);
+        return sheep;
+    }
+
+    /**
+     * It counts the sheep in front of its screen, not the one behind it: every sheep, ready and sheared ones, lambs,
+     * ones low on infusion, and how many of each resource; a filter narrows each mode to one resource.
+     */
+    private static void herdCounterCounts(GameTestHelper h) {
+        var be = buildHerdCounter(h);
+        BlockPos at = be.getBlockPos();
+        var level = h.getLevel();
+        echoSheep(h, at.offset(-1, 0, 2), "iron");
+        echoSheep(h, at.offset(1, 0, 2), "iron");
+        echoSheep(h, at.offset(0, 0, 3), "iron").setSheared(true);
+        plainSheep(h, at.offset(-2, 0, 3)).setAge(-24000);
+        Sheep gold = echoSheep(h, at.offset(2, 0, 3), "gold");
+        SheepInfusionEvents.setInfusion(gold, new SheepInfusion(Optional.of(ResourcefulSheep.id("gold")), 1, 0)); // one shearing left
+        plainSheep(h, at.offset(0, 0, -2)); // behind its screen: not in its pen
+        var state = level.getBlockState(at);
+        be.count(level, at, state);
+        h.assertTrue(be.total() == 5 && be.lambs() == 1 && be.sheared() == 1 && be.ready() == 3 && be.lowInfusion() == 1,
+                "5 sheep: 1 lamb, 1 sheared, 3 ready, 1 low on infusion; got " + be.total() + ", " + be.lambs() + ", " + be.sheared() + ", " + be.ready() + ", " + be.lowInfusion());
+        h.assertTrue(be.byResource().getOrDefault(ResourcefulSheep.id("iron").toString(), 0) == 3
+                        && be.byResource().keySet().iterator().next().equals(ResourcefulSheep.id("iron").toString()),
+                "3 iron sheep, the most, got " + be.byResource());
+        h.assertTrue(be.value() == 5 && be.comparatorSignal() == 5, "Count: 5, signal 5, got " + be.value() + " / " + be.comparatorSignal());
+        be.setFilter(ResourceWoolItem.create(ResourcefulSheep.id("iron"), 1));
+        be.count(level, at, state);
+        h.assertTrue(be.value() == 3, "Count, iron only: 3, got " + be.value());
+        be.setMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.Mode.READY);
+        be.count(level, at, state);
+        h.assertTrue(be.value() == 2, "Ready, iron only: 2, got " + be.value());
+        be.setMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.Mode.SHEARED);
+        be.count(level, at, state);
+        h.assertTrue(be.value() == 1, "Sheared, iron only: 1, got " + be.value());
+        be.setFilter(ItemStack.EMPTY);
+        be.setMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.Mode.LAMBS);
+        be.count(level, at, state);
+        h.assertTrue(be.value() == 1, "Lambs: 1, got " + be.value());
+        be.setFilter(new ItemStack(Items.SHEEP_SPAWN_EGG));
+        be.count(level, at, state);
+        h.assertTrue(be.value() == 1, "Lambs, plain only (a sheep's egg): 1, got " + be.value());
+        be.setFilter(ItemStack.EMPTY);
+        be.setMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.Mode.LOW_INFUSION);
+        be.count(level, at, state);
+        h.assertTrue(be.value() == 1 && be.comparatorSignal() == 1, "Low on infusion: 1, got " + be.value());
+        h.succeed();
+    }
+
+    /** Full mode reads 0 until it counts its target, then 15. */
+    private static void herdCounterFull(GameTestHelper h) {
+        var be = buildHerdCounter(h);
+        BlockPos at = be.getBlockPos();
+        var level = h.getLevel();
+        be.setMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.Mode.FULL);
+        be.setTarget(3);
+        plainSheep(h, at.offset(-1, 0, 2));
+        plainSheep(h, at.offset(1, 0, 2));
+        be.count(level, at, level.getBlockState(at));
+        h.assertTrue(be.value() == 2 && be.comparatorSignal() == 0, "2 of 3: signal 0, got " + be.comparatorSignal());
+        plainSheep(h, at.offset(0, 0, 4));
+        be.count(level, at, level.getBlockState(at));
+        h.assertTrue(be.value() == 3 && be.comparatorSignal() == 15, "3 of 3: signal 15, got " + be.comparatorSignal());
+        h.assertTrue(level.getBlockState(at).getAnalogOutputSignal(level, at, Direction.NORTH) == 15, "the comparator reads it");
         h.succeed();
     }
 

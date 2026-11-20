@@ -79,6 +79,8 @@ public final class ResourcefulSheepClient {
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.GRASS_SEEDER.get(), context -> new AreaOutlineRenderer<>());
             event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.HERD_COUNTER.get(), context -> new HerdCounterRenderer());
+            event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.POWERED_FURNACE.get(), context -> new AreaOutlineRenderer<>());
         });
 
@@ -166,7 +168,8 @@ public final class ResourcefulSheepClient {
         }
         for (var tipped : java.util.List.of(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATIC_GENERATOR,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.COPPER_COMB,
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GRASS_SEEDER)) {
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GRASS_SEEDER,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HERD_COUNTER)) {
             if (event.getItemStack().is(tipped.get())) {
                 event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions." + tipped.getId().getPath())
                         .withStyle(net.minecraft.ChatFormatting.GRAY));

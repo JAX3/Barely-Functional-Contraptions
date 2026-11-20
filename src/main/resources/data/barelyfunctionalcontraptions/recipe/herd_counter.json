@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IGI",
+    "OMC"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "G": "minecraft:glass_pane",
+    "O": "minecraft:observer",
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
+    "C": "minecraft:comparator"
+  },
+  "result": {
+    "id": "barelyfunctionalcontraptions:herd_counter",
+    "count": 1
+  }
+}

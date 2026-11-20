@@ -24,6 +24,7 @@
     "barelyfunctionalcontraptions:echo_chamber",
     "barelyfunctionalcontraptions:static_generator",
     "barelyfunctionalcontraptions:copper_comb",
-    "barelyfunctionalcontraptions:grass_seeder"
+    "barelyfunctionalcontraptions:grass_seeder",
+    "barelyfunctionalcontraptions:herd_counter"
   ]
 }

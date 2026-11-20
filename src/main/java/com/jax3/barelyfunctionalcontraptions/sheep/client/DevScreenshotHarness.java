@@ -232,6 +232,10 @@ public final class DevScreenshotHarness {
             echoChamberTick(mc, server);
             return;
         }
+        if ("herd_counter".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            herdCounterTick(mc, server);
+            return;
+        }
         if ("grass_seeder".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             grassSeederTick(mc, server);
             return;
@@ -2954,6 +2958,88 @@ public final class DevScreenshotHarness {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(server.getPlayerList().getPlayers().getFirst(),
                             com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.KEEP_OFF_THE_GRASS)));
             case 326 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    /**
+     * A Herd Counter on the west side of a fenced pen of mixed sheep, its screen facing them, wired through a comparator
+     * to a lamp: the pen, its screen close up, then Ready and Full modes (the lamp lighting): {@code -PharnessScene=herd_counter}.
+     */
+    private static void herdCounterTick(Minecraft mc, MinecraftServer server) {
+        BlockPos at = origin == null ? null : origin.offset(-4, 0, -5);
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                BlockPos c = origin.offset(-4, 0, -5);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, 0, -11), origin.offset(6, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, -1, -11), origin.offset(6, -1, 3))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                level.setBlock(c, ModBlocks.HERD_COUNTER.get().defaultBlockState()
+                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock.FACING, Direction.EAST), 3);
+                level.setBlock(c.west(), Blocks.COMPARATOR.defaultBlockState().setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.EAST), 3);
+                level.setBlock(c.west(2), Blocks.REDSTONE_LAMP.defaultBlockState(), 3);
+                var fence = Blocks.OAK_FENCE.defaultBlockState();
+                BlockPos pen = c.east(4);
+                for (int d = -3; d <= 3; d++) {
+                    level.setBlock(pen.offset(3, 0, d), fence, 3);
+                    level.setBlock(pen.offset(d, 0, -3), fence, 3);
+                    level.setBlock(pen.offset(d, 0, 3), fence, 3);
+                    if (d != 0) level.setBlock(pen.offset(-3, 0, d), fence, 3);
+                }
+                String[] kinds = {"iron", "iron", "iron", "gold", "gold", "copper", "", ""};
+                double[][] spots = {{-1.5, -1.5}, {0.5, -1.8}, {1.6, 0.2}, {-1.7, 0.6}, {-0.2, 1.6}, {1.5, 1.7}, {0.2, -0.1}, {-1.4, 2.2}};
+                for (int i = 0; i < kinds.length; i++) {
+                    Sheep sheep = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+                    sheep.snapTo(pen.getX() + 0.5 + spots[i][0], pen.getY(), pen.getZ() + 0.5 + spots[i][1], i * 45, 0);
+                    sheep.setNoAi(true);
+                    if (!kinds[i].isEmpty()) {
+                        var resource = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(ResourcefulSheep.id(kinds[i])).orElseThrow();
+                        SheepInfusionEvents.setInfusion(sheep, SheepInfusion.NONE.withResource(resource.id(), resource.effectiveInfusionUses()));
+                    }
+                    if (i == 4) sheep.setSheared(true);
+                    if (i == 7) sheep.setAge(-24000);
+                    level.addFreshEntity(sheep);
+                }
+                if (level.getBlockEntity(c) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity be) be.setShowsArea(true);
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 135 32", origin.getX() + 4.5, origin.getY() + 4.0, origin.getZ() + 2.5));
+            case 140 -> shot(mc, "109_herd_counter");
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 90 12", at.getX() + 2.1, at.getY() - 0.9, at.getZ() + 0.5));
+            case 170 -> shot(mc, "109_herd_counter_close");
+            case 172 -> server.execute(() -> {
+                if (server.overworld().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity be) {
+                    be.setMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.Mode.READY);
+                    be.setFilter(com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("iron"), 1));
+                }
+            });
+            case 190 -> shot(mc, "109_herd_counter_ready");
+            // Full at 7: the lamp behind it lights.
+            case 192 -> {
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 150 22", at.getX() + 2.0, at.getY() + 0.6, at.getZ() + 3.0));
+                server.execute(() -> {
+                    if (server.overworld().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity be) {
+                        be.setFilter(ItemStack.EMPTY);
+                        be.setMode(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.Mode.FULL);
+                        be.setTarget(7);
+                    }
+                });
+            }
+            case 220 -> shot(mc, "109_herd_counter_full");
+            case 222 -> server.execute(() -> {
+                ServerLevel level = server.overworld();
+                if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity be) {
+                    ResourcefulSheep.LOGGER.warn("HERD total {} lambs {} ready {} sheared {} low {} by {} value {} signal {} lamp {}", be.total(), be.lambs(), be.ready(),
+                            be.sheared(), be.lowInfusion(), be.byResource(), be.value(), be.comparatorSignal(),
+                            level.getBlockState(at.west(2)).getValue(net.minecraft.world.level.block.RedstoneLampBlock.LIT));
+                }
+            });
+            case 226 -> mc.stop();
             default -> {}
         }
     }

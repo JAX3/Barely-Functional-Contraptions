@@ -226,6 +226,11 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue staticWaxedEfficiency;
         public final ModConfigSpec.IntValue staticCapacity;
         public final ModConfigSpec.IntValue staticOutput;
+        public final ModConfigSpec.IntValue herdRadius;
+        public final ModConfigSpec.IntValue herdInterval;
+        public final ModConfigSpec.IntValue herdSignalPerSheep;
+        public final ModConfigSpec.DoubleValue herdLowInfusion;
+        public final ModConfigSpec.IntValue herdFullTarget;
         public final ModConfigSpec.IntValue seederRadius;
         public final ModConfigSpec.IntValue seederInterval;
         public final ModConfigSpec.IntValue seederBoneMealBlocks;
@@ -626,6 +631,19 @@ public final class ModConfigs {
                     .defineInRange("capacity", 500_000, 1, Integer.MAX_VALUE);
             staticOutput = b.comment("Most FE it pushes into the blocks around its base per tick, in total.")
                     .defineInRange("output", 2_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Herd Counter (counts the sheep in a pen in front of its screen, and puts any count on a comparator; needs no power)").push("herd_counter");
+            herdRadius = b.comment("How far its area reaches: 3 = the 7x7 in front of its screen (default).")
+                    .defineInRange("radius", 3, 1, 8);
+            herdInterval = b.comment("Ticks between counts (20 = every second).")
+                    .defineInRange("interval", 20, 1, 1_200);
+            herdSignalPerSheep = b.comment("Comparator strength each sheep counted adds (up to 15), in every mode but Full.")
+                    .defineInRange("signalPerSheep", 1, 1, 15);
+            herdLowInfusion = b.comment("A sheep counts as low on infusion below this share of its infusion's uses (0.25 = a quarter).")
+                    .defineInRange("lowInfusion", 0.25, 0.0, 1.0);
+            herdFullTarget = b.comment("How many sheep a new Herd Counter's Full mode waits for.")
+                    .defineInRange("fullTarget", 6, 1, 64);
             b.pop();
 
             b.comment("Grass Seeder (turns the dirt its sheep have eaten back to grass, grows short grass, and gets sheared sheep grazing sooner)").push("grass_seeder");

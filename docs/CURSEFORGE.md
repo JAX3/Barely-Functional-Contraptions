@@ -185,6 +185,12 @@ Keeps a sheep pen green. It turns the dirt your sheep have eaten bare back to gr
 
 ![A pen of sheep round a Grass Seeder, all grass again with tufts of short grass](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/108_grass_seeder.png)
 
+### Herd Counter
+
+A little screen that counts the sheep in the pen in front of it (all of them, the ones ready to shear, the sheared ones, lambs, or ones low on infusion, of every resource or just one) and puts the count on a comparator. Use it to run shears, seeders or breeders only when they're needed.
+
+![A Herd Counter beside a pen of mixed sheep, its area outlined, a comparator and redstone lamp behind it](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/109_herd_counter.png)
+
 ### Wool Machines
 
 The Mechanical Separator turns resource wool back into 2–4 of its resource, string and sometimes a bonus. Automatic Shears shear every sheep in front of them and keep the wool for hoppers and pipes.

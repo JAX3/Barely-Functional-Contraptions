@@ -39,6 +39,8 @@ public final class ModAdvancements {
     public static final String STATIC_SHOCK = "contraptions/static_shock";
     /** Being within {@link #AUTO_SHEAR_RADIUS} blocks of a Grass Seeder that has tended 100 blocks. */
     public static final String KEEP_OFF_THE_GRASS = "contraptions/keep_off_the_grass";
+    /** Being within {@link #AUTO_SHEAR_RADIUS} blocks of a Herd Counter counting 20 sheep at once. */
+    public static final String COUNT_YOUR_SHEEP = "contraptions/count_your_sheep";
     public static final String INFUSE_SHEEP = "contraptions/infuse_sheep";
     /** Players this close to Automatic Shears when they shear a sheep get {@link #AUTO_SHEAR}. */
     public static final double AUTO_SHEAR_RADIUS = 16;

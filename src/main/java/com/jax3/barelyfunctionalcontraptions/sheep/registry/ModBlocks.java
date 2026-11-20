@@ -200,6 +200,12 @@ public final class ModBlocks {
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock::new,
                     p -> p.mapColor(MapColor.COLOR_ORANGE).strength(2.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion());
 
+    /** Counts the sheep in the pen in front of its screen, and puts any count on a comparator. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock> HERD_COUNTER =
+            REGISTER.registerBlock("herd_counter",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock::new,
+                    p -> p.mapColor(MapColor.COLOR_BLUE).strength(2.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion());
+
     /** Keeps a pen green: turns eaten dirt back to grass, grows short grass, and gets sheared sheep grazing sooner. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.GrassSeederBlock> GRASS_SEEDER =
             REGISTER.registerBlock("grass_seeder",

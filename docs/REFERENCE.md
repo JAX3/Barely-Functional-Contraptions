@@ -133,6 +133,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | ⭐ **Sheepish Combustion** (goal) | Be within 16 blocks of a Blaze Sheep Furnace when it starts making power from a Blaze sheep |
 | ⭐ **Running Ewe Ragged** (goal) | Be within 16 blocks of a Sheep Treadmill when a sheep starts walking it |
 | ⭐ **Thermal Shock** (challenge) | Be within 16 blocks of a Thermal Reaction Chamber when it starts reacting |
+| ⭐ **Count Your Sheep** (goal) | Be near a Herd Counter counting 20 sheep at once |
 | ⭐ **Keep Off the Grass** (goal) | Be near a Grass Seeder that has tended 100 blocks of its pen |
 | ⭐ **Shocking!** (goal) | Get knocked back by an overcharged Static Generator |
 | ⭐ **Good Vibrations** (challenge) | Be within 16 blocks of an Echo Chamber when it starts listening with its noise in the sweet spot (comes after the Warden sheep) |
@@ -972,6 +973,34 @@ Each side where a Fluid or Item Pipe meets a block can be set up on its own, wit
 - Without the wrench, clicking a pipe does nothing special, so items and blocks in your hand are used or placed as normal.
 - **Jade** lists every side that isn't plain Normal, with its filter. The settings are saved with the pipe.
 - Energy Cables have no modes or filters.
+
+### Herd Counter
+A little screen that **counts the sheep in a pen** and puts the count on a **comparator**. It needs no power. A slim blue-steel panel with a green-on-black screen and a tally wheel on its side; its screen faces whoever places it, and it counts the pen on that side.
+
+```
+I G I      I = Iron Ingot, G = Glass Pane
+O M C      O = Observer, M = Functional Machine Block, C = Comparator
+```
+
+| Its pen of mixed sheep, outlined | Its screen | Full: the lamp behind it lit |
+|---|---|---|
+| ![A Herd Counter at the side of a fenced pen of Iron, Gold, Copper and plain sheep and a lamb, its 7x7 area outlined in white, a comparator and a redstone lamp behind it](screenshots/109_herd_counter.png) | ![Its screen up close: 8 SHEEP in green on black](screenshots/109_herd_counter_close.png) | ![In Full mode: 8/7 FULL on its screen, the comparator behind it on and the redstone lamp lit](screenshots/109_herd_counter_full.png) |
+
+- **Area:** the **7x7 in front of its screen** (`radius` 3), from a block below it to three above. It counts the sheep in it **every second** (`interval`). Sneak-right-click it with an empty hand to outline it.
+- **Modes:** right-click it with an empty hand to change what it counts. Its screen shows the number and the mode, and a comparator reads **1 a sheep, up to 15** (`signalPerSheep`):
+
+  | Screen | Counts |
+  |---|---|
+  | SHEEP | Every sheep |
+  | READY | Grown sheep with their fleece on, ready to shear |
+  | SHORN | Grown sheep that have been sheared |
+  | LAMBS | Lambs |
+  | LOW | Sheep with less than a quarter of their infusion's uses left (`lowInfusion`) |
+  | FULL | Every sheep, but the comparator reads 0 until there are 6 (`fullTarget`), then 15 |
+- **Filter:** right-click it with a **resource wool or spawn egg** to count only sheep of that resource (its label turns gold); again with the same one to count them all. Plain wool or a sheep's spawn egg counts the plain sheep.
+- **Uses:** run Automatic Shears only when enough sheep are READY, a Grass Seeder only while some are SHORN, or stop a breeder when the pen is FULL.
+- **Advancement:** ⭐ *Count Your Sheep* (goal), for being near a Herd Counter counting 20 sheep at once.
+- Mine it with a pickaxe. **Config:** `[herd_counter]`: `radius` (3), `interval` (20 ticks), `signalPerSheep` (1), `lowInfusion` (0.25), `fullTarget` (6).
 
 ### Woollen Armour and Muffled
 A full armour set knitted from wool: the **Woollen Beanie** (helmet), **Woollen Jumper** (chestplate), **Woollen Leggings** and **Woollen Boots**.

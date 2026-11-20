@@ -31,6 +31,15 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
   from three Copper Ingots and a Brush.
 - New config section `[static_generator]`.
 
+#### Herd Counter (utility)
+- A little screen that counts the sheep in the 7x7 pen in front of it every second, and puts the count on a comparator
+  (1 a sheep, up to 15). It needs no power.
+- **Modes** (right-click to change): every sheep, ready to shear, sheared, lambs, low on infusion, or Full (15 once
+  there are 6). **Filter:** right-click with a resource wool or spawn egg to count only that resource.
+- **Advancement:** *Count Your Sheep* (goal), for being near one counting 20 sheep.
+- **Recipe:** two Iron Ingots, a Glass Pane, an Observer, a Functional Machine Block and a Comparator.
+- New config section `[herd_counter]`, and a chapter in the Contraptions Manual (Utility).
+
 #### Grass Seeder (production)
 - Keeps a sheep pen green: every 2 seconds it turns a block of eaten dirt in the 5x5 around it back to grass, then
   grows short grass on up to 40% of it. While it has fuel, sheared sheep in its area graze four times as often, so
