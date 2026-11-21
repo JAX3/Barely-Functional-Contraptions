@@ -1,7 +1,7 @@
 
 Logistics
 2. Pipe tiers: copper, then iron, then netherite pipes that move more per tick, made with upgrade items or by crafting.
-3. Wool Barrel or drawer: a block that stores large amounts of one item, for resource wool, which builds up fast.
+3.[Done] Wool Barrel or drawer: a block that stores large amounts of one item, for resource wool, which builds up fast.
 4. Sheep transport: a Sheep Crate or catching net that picks up an infused sheep and keeps its infusion, skin and stats until you place it again.
 Power
 5. [DONE] The rest of the themed generators:
@@ -19,7 +19,7 @@ Resource generation
 
 Next goal
 15. Explosive Sheep Implosion Chamber.
-16. [STARTED] Thermal Reaction Chamber: late-game power from Blaze sheep and Snow sheep together. Built and working (pairs, water, boosts, balance with meltdown and freezing, fleece fatigue, window, model, manual chapter). Jade info and a JEI page done. Still to do: a test-world scene.
+16. [Done] Thermal Reaction Chamber: late-game power from Blaze sheep and Snow sheep together. Built and working (pairs, water, boosts, balance with meltdown and freezing, fleece fatigue, window, model, manual chapter). Jade info and a JEI page done. Still to do: a test-world scene.
 17. Explosive Rock Cracker: cobblestone to gravel to sand.
 18. Fluid sheep: lava, water and honey (maybe).
 From the manual's WIP tab:
