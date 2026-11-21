@@ -186,6 +186,7 @@ public final class ModGameTests {
         ECHO_TESTS.put("status_panel_links_big_machines_from_any_of_their_blocks", ModGameTests::statusPanelBigMachines);
         ECHO_TESTS.put("crate_holds_one_kind_of_item_and_locks_to_it", ModGameTests::crateStores);
         ECHO_TESTS.put("crate_bales_make_it_bigger_and_crates_stay_out", ModGameTests::crateBales);
+        ECHO_TESTS.put("crate_lining_matches_its_item_unless_dyed", ModGameTests::crateLining);
         ECHO_TESTS.put("crate_fills_from_hoppers_and_pipes_and_reads_on_a_comparator", ModGameTests::crateAutomation);
         ECHO_TESTS.put("crate_bulges_then_bursts_unless_strapped", ModGameTests::crateBursts);
         ECHO_TESTS.put("crate_a_hopper_pushing_at_a_full_crate_strains_it", ModGameTests::crateHopperStrains);
@@ -1875,6 +1876,30 @@ public final class ModGameTests {
         h.succeed();
     }
 
+    /**
+     * A new crate's lining matches its item (not dyed); a sneak-click with lime wool dyes it lime and uses the wool; again
+     * with lime it goes back to matching its item and keeps the wool.
+     */
+    private static void crateLining(GameTestHelper h) {
+        BlockPos at = new BlockPos(1, 1, 1);
+        crate(h, at);
+        var DYED = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.DYED;
+        var LINING = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.LINING;
+        h.assertFalse(h.getBlockState(at).getValue(DYED), "a new crate's lining follows its item");
+        var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        player.setShiftKeyDown(true);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(com.jax3.barelyfunctionalcontraptions.compat.Vanilla.wool(net.minecraft.world.item.DyeColor.LIME), 2));
+        var use = (java.util.function.Supplier<net.minecraft.world.InteractionResult>) () -> com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.use(
+                h.getLevel(), h.absolutePos(at), h.getBlockState(at), player, InteractionHand.MAIN_HAND, Direction.EAST);
+        h.assertTrue(use.get().consumesAction(), "the sneak-click takes");
+        h.assertTrue(h.getBlockState(at).getValue(DYED) && h.getBlockState(at).getValue(LINING) == net.minecraft.world.item.DyeColor.LIME
+                && player.getMainHandItem().getCount() == 1, "dyed lime, one wool used: " + h.getBlockState(at));
+        use.get();
+        h.assertTrue(!h.getBlockState(at).getValue(DYED) && player.getMainHandItem().getCount() == 1,
+                "lime again: back to matching its item, wool kept: " + h.getBlockState(at));
+        h.succeed();
+    }
+
     /** Each Wool Bale adds 32 stacks, up to 4; a crate with something in it can't go in another. */
     private static void crateBales(GameTestHelper h) {
         var be = crate(h, new BlockPos(1, 1, 1));
@@ -1964,7 +1989,8 @@ public final class ModGameTests {
         var be = crate(h, at);
         BlockPos abs = h.absolutePos(at);
         h.getLevel().setBlockAndUpdate(abs, h.getLevel().getBlockState(abs).setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.LINING,
-                net.minecraft.world.item.DyeColor.LIME).setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.STRAPPED, true));
+                net.minecraft.world.item.DyeColor.LIME).setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.DYED, true)
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.STRAPPED, true));
         be = h.getBlockEntity(at, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity.class);
         be.setContents(new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.REDSTONE), 1500, true, 2));
         var drops = net.minecraft.world.level.block.Block.getDrops(h.getLevel().getBlockState(abs), h.getLevel(), abs, be);
@@ -1974,7 +2000,8 @@ public final class ModGameTests {
         h.assertTrue(contents != null && contents.count() == 1500 && contents.item().is(Items.REDSTONE) && contents.locked() && contents.bales() == 2,
                 "with its 1,500 redstone, lock and bales: " + contents);
         var blockState = dropped.get(net.minecraft.core.component.DataComponents.BLOCK_STATE);
-        h.assertTrue(blockState != null && "lime".equals(blockState.properties().get("lining")) && "true".equals(blockState.properties().get("strapped")),
+        h.assertTrue(blockState != null && "lime".equals(blockState.properties().get("lining")) && "true".equals(blockState.properties().get("dyed"))
+                        && "true".equals(blockState.properties().get("strapped")),
                 "and its lime lining and strap: " + blockState);
         // Placed again by a player.
         h.setBlock(at, Blocks.AIR);
@@ -1985,7 +2012,8 @@ public final class ModGameTests {
                 new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(below).add(0, 0.5, 0), Direction.UP, below, false)));
         var state = h.getLevel().getBlockState(abs);
         h.assertTrue(state.is(ModBlocks.CRATE.get()) && state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.LINING)
-                == net.minecraft.world.item.DyeColor.LIME && state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.STRAPPED)
+                == net.minecraft.world.item.DyeColor.LIME && state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.DYED)
+                && state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.STRAPPED)
                 && state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.BULGING) == false, "placed lime and strapped: " + state);
         var again = h.getBlockEntity(at, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity.class);
         h.assertTrue(again.count() == 1500 && again.locked() && again.bales() == 2, "and full again: " + again.contents());

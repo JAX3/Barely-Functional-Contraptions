@@ -193,9 +193,9 @@ A little screen that counts the sheep in the pen in front of it (all of them, th
 
 ### Wool-Lined Crate
 
-A crate that holds lots of one kind of item (2,048 of most things) and shows it on its front. Line it with any colour of wool, pack Wool Bales in to make it bigger, and lock it to its item. Overfill it and it bursts at the seams, unless you strap it shut.
+A crate that holds lots of one kind of item (2,048 of most things) and shows it on its front. Its wool lining takes the colour of what it holds (or dye it yourself), pack Wool Bales in to make it bigger, and lock it to its item. Overfill it and it bursts at the seams, unless you strap it shut.
 
-![A row of Wool-Lined Crates lined in different colours, showing cobblestone, redstone, lime wool, swords, wheat and oak logs with their counts](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/111_crate.png)
+![A row of Wool-Lined Crates, each lined the colour of what it holds, showing cobblestone, redstone, lime wool, swords, wheat and oak logs with their counts](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/111_crate.png)
 
 ### Machine Status Panel
 

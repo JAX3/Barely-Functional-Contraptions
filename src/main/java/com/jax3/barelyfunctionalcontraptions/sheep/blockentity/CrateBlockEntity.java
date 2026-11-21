@@ -242,6 +242,7 @@ public class CrateBlockEntity extends BlockEntity {
     /** Pops open: a handful of its items fly out, its lock breaks, and the wool lining puffs out. */
     public void burst(ServerLevel level) {
         int spill = Math.min(count, ModConfigs.getInt(ModConfigs.SERVER.crateBurstItems));
+        ItemStack burstItem = item;
         var random = level.getRandom();
         for (int i = 0; i < spill; i++) {
             ItemEntity entity = new ItemEntity(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.05, worldPosition.getZ() + 0.5, item.copyWithCount(1));
@@ -252,9 +253,12 @@ public class CrateBlockEntity extends BlockEntity {
         count -= spill;
         locked = false;
         if (count <= 0) item = ItemStack.EMPTY;
-        Block wool = Block.byItem(com.jax3.barelyfunctionalcontraptions.compat.Vanilla.wool(getBlockState().getValue(CrateBlock.LINING)));
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, wool.defaultBlockState()), worldPosition.getX() + 0.5, worldPosition.getY() + 1.0,
-                worldPosition.getZ() + 0.5, 40, 0.35, 0.15, 0.35, 0.15);
+        // Its lining puffs out: in its dyed colour, or (matching its item) as bits of the item itself.
+        net.minecraft.core.particles.ParticleOptions puff = getBlockState().getValue(CrateBlock.DYED) || spill == 0
+                ? new BlockParticleOption(ParticleTypes.BLOCK, Block.byItem(com.jax3.barelyfunctionalcontraptions.compat.Vanilla.wool(
+                        getBlockState().getValue(CrateBlock.DYED) ? getBlockState().getValue(CrateBlock.LINING) : net.minecraft.world.item.DyeColor.WHITE)).defaultBlockState())
+                : new net.minecraft.core.particles.ItemParticleOption(ParticleTypes.ITEM, burstItem.getItem());
+        level.sendParticles(puff, worldPosition.getX() + 0.5, worldPosition.getY() + 1.0, worldPosition.getZ() + 0.5, 40, 0.35, 0.15, 0.35, 0.15);
         level.sendParticles(ParticleTypes.POOF, worldPosition.getX() + 0.5, worldPosition.getY() + 1.0, worldPosition.getZ() + 0.5, 8, 0.3, 0.1, 0.3, 0.02);
         level.playSound(null, worldPosition, SoundEvents.WOOL_BREAK, SoundSource.BLOCKS, 1.0F, 0.7F);
         level.playSound(null, worldPosition, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 0.8F, 1.6F);
@@ -435,5 +439,29 @@ public class CrateBlockEntity extends BlockEntity {
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         return saveCustomOnly(registries);
+    }
+
+    /**
+     * Client only: works out the colour of an item for its lining, on the main thread, ahead of the chunk being drawn
+     * (set by the client; chunks are built on other threads, which can't work it out).
+     */
+    public static java.util.function.Consumer<ItemStack> clientLiningWarmer = stack -> {};
+
+    /** Loaded on a client: its item's lining colour is ready before its chunk is drawn. */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && level.isClientSide() && !item.isEmpty()) clientLiningWarmer.accept(item);
+    }
+
+    /** A new kind of item: its lining (which matches the item, unless dyed) is redrawn. */
+    @Override
+    public void onDataPacket(net.minecraft.network.Connection net, ValueInput input) {
+        var before = item.getItem();
+        super.onDataPacket(net, input);
+        if (level != null && level.isClientSide() && item.getItem() != before) {
+            if (!item.isEmpty()) clientLiningWarmer.accept(item);
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 8);
+        }
     }
 }

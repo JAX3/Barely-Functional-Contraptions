@@ -12,7 +12,8 @@ import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
 /**
- * Wool-Lined Crate: what it holds out of how many (gold when locked), whether it's locked, its bales, its lining, and
+ * Wool-Lined Crate: what it holds out of how many (gold when locked), whether it's locked, its bales, its lining (dyed,
+ * or matching its item), and
  * whether it's strapped or at risk of bursting. Everything comes from what the client already knows of it (its item,
  * count, lock and bales are synced for its front; its lining and strap are in its block state).
  */
@@ -36,8 +37,13 @@ public enum CrateProvider implements IBlockComponentProvider {
         }
         if (be.locked()) tooltip.add(Component.translatable(key + "locked").withColor(GOLD));
         if (be.bales() > 0) tooltip.add(Component.translatable(key + "bales", be.bales(), CrateBlockEntity.maxBales(), be.stacks()).withColor(GREY));
-        tooltip.add(Component.translatable(key + "lining", Component.translatable("color.minecraft." + state.getValue(CrateBlock.LINING).getName()))
-                .withColor(lighter(state.getValue(CrateBlock.LINING).getTextureDiffuseColor())));
+        if (state.getValue(CrateBlock.DYED)) {
+            tooltip.add(Component.translatable(key + "lining", Component.translatable("color.minecraft." + state.getValue(CrateBlock.LINING).getName()))
+                    .withColor(lighter(state.getValue(CrateBlock.LINING).getTextureDiffuseColor())));
+        } else if (!be.item().isEmpty()) {
+            tooltip.add(Component.translatable(key + "lining_auto").withColor(
+                    lighter(0xFFFFFF & com.jax3.barelyfunctionalcontraptions.sheep.client.CrateLiningTint.colourOf(be.item()))));
+        }
         if (state.getValue(CrateBlock.STRAPPED)) {
             tooltip.add(Component.translatable(key + "strapped").withColor(GREY));
         } else if (be.isFull()) {

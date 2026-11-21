@@ -1729,6 +1729,9 @@ public final class DevScreenshotHarness {
         for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(10, 6, 9),
                 e -> e instanceof net.minecraft.world.entity.Display.TextDisplay || e instanceof net.minecraft.world.entity.item.ItemEntity)) e.discard();
         for (BlockPos p : BlockPos.betweenClosed(g.offset(-9, 0, -7), g.offset(9, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        // (An earlier build's chests and hoppers spill what they held as they go.)
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(12, 8, 12),
+                e -> e instanceof net.minecraft.world.entity.item.ItemEntity)) e.discard();
         // A spruce floor for the storeroom.
         for (BlockPos p : BlockPos.betweenClosed(g.offset(-6, -1, -5), g.offset(6, -1, 3))) level.setBlock(p, Blocks.SPRUCE_PLANKS.defaultBlockState(), 2);
         Object[][] wall = {
@@ -1741,16 +1744,16 @@ public final class DevScreenshotHarness {
         };
         for (int i = 0; i < wall.length; i++) {
             BlockPos at = g.offset(-3 + i % 7, i / 7, -4);
-            placeCrate(level, at, net.minecraft.world.item.DyeColor.valueOf((String) wall[i][1]), false,
+            placeCrate(level, at, null, false,
                     new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack((net.minecraft.world.item.Item) wall[i][0]),
                             (Integer) wall[i][2], (Boolean) wall[i][3], (Integer) wall[i][4]));
         }
         // In front: a chest and hopper pushing redstone at a full crate (it bursts now and then), and the same at a
         // strapped crate of cobblestone (it never does).
         BlockPos burst = g.offset(-4, 0, 1), strapped = g.offset(4, 0, 1);
-        placeCrate(level, burst, net.minecraft.world.item.DyeColor.RED, false,
+        placeCrate(level, burst, null, false,
                 new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.REDSTONE), 2048, false, 0));
-        placeCrate(level, strapped, net.minecraft.world.item.DyeColor.ORANGE, true,
+        placeCrate(level, strapped, null, true,
                 new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.COBBLESTONE), 2048, true, 0));
         for (BlockPos crate : new BlockPos[]{burst, strapped}) {
             net.minecraft.world.item.Item fill = crate == burst ? Items.REDSTONE : Items.COBBLESTONE;
@@ -3284,11 +3287,12 @@ public final class DevScreenshotHarness {
      * Hume Energy Cube and a Herd Counter (that one through the real wrench clicks), with a comparator lighting a lamp
      * while anything has a problem: {@code -PharnessScene=status_panel}.
      */
-    /** A crate with {@code contents}, lined {@code lining}, front to the south. */
+    /** A crate with {@code contents}, front to the south: dyed {@code lining}, or (null) lined to match its item. */
     private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity placeCrate(ServerLevel level, BlockPos at,
-            net.minecraft.world.item.DyeColor lining, boolean strapped, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents contents) {
+            net.minecraft.world.item.@org.jspecify.annotations.Nullable DyeColor lining, boolean strapped, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents contents) {
         level.setBlock(at, ModBlocks.CRATE.get().defaultBlockState().setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.FACING, Direction.SOUTH)
-                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.LINING, lining)
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.LINING, lining == null ? net.minecraft.world.item.DyeColor.WHITE : lining)
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.DYED, lining != null)
                 .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.STRAPPED, strapped), 3);
         var be = (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity) level.getBlockEntity(at);
         be.setContents(contents);
@@ -3301,7 +3305,7 @@ public final class DevScreenshotHarness {
     }
 
     /**
-     * Five Wool-Lined Crates in a row, all lined differently: cobblestone, redstone full to bursting (its lid bulging),
+     * Five Wool-Lined Crates in a row, each lined to match its item: cobblestone, redstone full to bursting (its lid bulging),
      * lime wool locked, a few swords, and an empty strapped one. Then real clicks: cobblestone in, a stack out, a
      * sneak-click lining one with blue wool; and the full one bursts: {@code -PharnessScene=crate}.
      */
@@ -3318,20 +3322,20 @@ public final class DevScreenshotHarness {
                 BlockPos o = origin, r = o.offset(0, 0, -4);
                 for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, 0, -8), o.offset(7, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
                 for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, -1, -8), o.offset(7, -1, 3))) level.setBlock(p, Blocks.SPRUCE_PLANKS.defaultBlockState(), 2);
-                placeCrate(level, r.offset(-4, 0, 0), net.minecraft.world.item.DyeColor.WHITE, false,
+                placeCrate(level, r.offset(-4, 0, 0), null, false,
                         new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.COBBLESTONE), 1287, false, 0));
-                placeCrate(level, r.offset(-2, 0, 0), net.minecraft.world.item.DyeColor.RED, false,
+                placeCrate(level, r.offset(-2, 0, 0), null, false,
                         new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.REDSTONE), 2048, false, 0));
-                placeCrate(level, r, net.minecraft.world.item.DyeColor.LIME, false,
+                placeCrate(level, r, null, false,
                         new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(com.jax3.barelyfunctionalcontraptions.compat.Vanilla.wool(net.minecraft.world.item.DyeColor.LIME)), 900, true, 2));
-                placeCrate(level, r.offset(2, 0, 0), net.minecraft.world.item.DyeColor.LIGHT_BLUE, false,
+                placeCrate(level, r.offset(2, 0, 0), null, false,
                         new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.DIAMOND_SWORD), 12, false, 0));
                 placeCrate(level, r.offset(4, 0, 0), net.minecraft.world.item.DyeColor.ORANGE, true,
                         com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents.EMPTY);
                 // A second row stacked on top, so a wall of them shows.
-                placeCrate(level, r.offset(-3, 1, 0), net.minecraft.world.item.DyeColor.YELLOW, false,
+                placeCrate(level, r.offset(-3, 1, 0), null, false,
                         new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.WHEAT), 340, false, 0));
-                placeCrate(level, r.offset(3, 1, 0), net.minecraft.world.item.DyeColor.PURPLE, false,
+                placeCrate(level, r.offset(3, 1, 0), null, false,
                         new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.OAK_LOG), 12_480, false, 4));
                 player.getInventory().setItem(0, new ItemStack(Items.COBBLESTONE, 64));
                 player.getInventory().setItem(1, new ItemStack(com.jax3.barelyfunctionalcontraptions.compat.Vanilla.wool(net.minecraft.world.item.DyeColor.BLUE), 3));

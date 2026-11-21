@@ -42,8 +42,9 @@ import org.jspecify.annotations.Nullable;
  *     <li>right-click its front with an item to put it in; twice quickly to put in every one you carry;</li>
  *     <li>left-click its front to take a stack out, sneak-left-click to take one;</li>
  *     <li>sneak-right-click with an empty hand to lock it to its item (or unlock it);</li>
- *     <li>sneak-right-click with dyed wool to line it with that colour, with a Wool Bale to pack it bigger, with a
- *     Crate Strap to strap it so it never bursts.</li>
+ *     <li>sneak-right-click with dyed wool to line it with that colour (again with the same colour: back to its
+ *     lining matching its item), with a Wool Bale to pack it bigger, with a Crate Strap to strap it so it never
+ *     bursts.</li>
  * </ul>
  * Sneaking works on any side; storing and taking only on its front, so other sides place blocks and break it as usual.
  * The clicks are handled in {@link CrateEvents}, ahead of the held item, so sneaking with wool lines the crate instead
@@ -60,8 +61,13 @@ public class CrateBlock extends BaseEntityBlock {
 
     /** The way its front (where it shows its item) faces. */
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
-    /** The colour of the wool lining that shows round its front and lid. */
+    /** The colour of the wool lining that shows round its front and lid, once it's been dyed ({@link #DYED}). */
     public static final EnumProperty<DyeColor> LINING = EnumProperty.create("lining", DyeColor.class);
+    /**
+     * Lined by hand with dyed wool, in {@link #LINING}'s colour. If not, its lining takes the colour of the item it
+     * holds (worked out on the client from the item's texture; plain white while it's empty).
+     */
+    public static final BooleanProperty DYED = BooleanProperty.create("dyed");
     /** Over 90% full: its lid bulges, wool squeezing out under it. */
     public static final BooleanProperty BULGING = BooleanProperty.create("bulging");
     /** Strapped with a Crate Strap: it never bursts. */
@@ -72,12 +78,12 @@ public class CrateBlock extends BaseEntityBlock {
     public CrateBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(LINING, DyeColor.WHITE)
-                .setValue(BULGING, false).setValue(STRAPPED, false).setValue(LOCKED, false));
+                .setValue(BULGING, false).setValue(STRAPPED, false).setValue(LOCKED, false).setValue(DYED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, LINING, BULGING, STRAPPED, LOCKED);
+        builder.add(FACING, LINING, BULGING, STRAPPED, LOCKED, DYED);
     }
 
     /** Its front faces whoever places it. */
@@ -137,11 +143,19 @@ public class CrateBlock extends BaseEntityBlock {
         if (player.isSecondaryUseActive()) {
             DyeColor colour = liningColour(held);
             if (colour != null) {
-                if (colour == state.getValue(LINING)) return InteractionResult.PASS;
                 if (level.isClientSide()) return InteractionResult.SUCCESS;
-                level.setBlock(pos, state.setValue(LINING, colour), Block.UPDATE_ALL);
+                if (state.getValue(DYED) && colour == state.getValue(LINING)) {
+                    // The same colour again: back to matching its item (the wool isn't used).
+                    level.setBlock(pos, state.setValue(DYED, false), Block.UPDATE_ALL);
+                    level.playSound(null, pos, SoundEvents.WOOL_BREAK, SoundSource.BLOCKS, 0.8F, 1.2F);
+                    message(player, Component.translatable("message.barelyfunctionalcontraptions.crate.lining_auto"));
+                    return InteractionResult.SUCCESS;
+                }
+                level.setBlock(pos, state.setValue(LINING, colour).setValue(DYED, true), Block.UPDATE_ALL);
                 held.consume(1, player);
                 level.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+                message(player, Component.translatable("message.barelyfunctionalcontraptions.crate.lining_dyed",
+                        Component.translatable("color.minecraft." + colour.getName())));
                 return InteractionResult.SUCCESS;
             }
             if (held.is(ModItems.WOOL_BALE.get())) {

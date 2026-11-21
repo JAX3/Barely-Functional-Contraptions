@@ -24,6 +24,7 @@
               "block": "barelyfunctionalcontraptions:wool_lined_crate",
               "properties": [
                 "lining",
+                "dyed",
                 "strapped"
               ]
             }

@@ -36,8 +36,10 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
   the item and how many. No power.
 - Right-click its front to put items in (twice quickly: every one you carry), left-click it to take a stack
   (sneaking, one). Sneak-right-click with an empty hand to lock it to its item; a padlock shows.
-- **Lining:** sneak-right-click it with dyed wool to reline it in that colour. **Packing:** each Wool Bale packed in
-  adds 32 stacks, up to 4.
+- **Lining:** its wool lining takes the colour of the item it holds (worked out from the item's texture, so any
+  mod's items work), so a storeroom colour-codes itself. Sneak-right-click it with dyed wool to line it a colour of
+  your own instead; again with the same colour to go back. **Packing:** each Wool Bale packed in adds 32 stacks, up
+  to 4.
 - **Bursting at the seams:** past 90% its lid bulges; full, pushing more at it can burst it (2% a push, or a second of
   a pipe pushing), throwing out 8 items and breaking its lock. A **Crate Strap** stops it bursting.
 - Pipes and hoppers on every side, a comparator for how full it is, and it shows on the Machine Status Panel. A full

@@ -98,6 +98,7 @@ public final class ResourcefulSheepClient {
         NeoForge.EVENT_BUS.register(TreadmillWalkAnimation.class);
 
         com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.clientTickHandler = ZeroPointHumSound::tick;
+        com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity.clientLiningWarmer = CrateLiningTint::colourOf;
         com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem.openGuide = () -> McClient.setScreen(net.minecraft.client.Minecraft.getInstance(), new GuideScreen());
         if (Boolean.getBoolean("barelyfunctionalcontraptions.screenshotHarness")) {
             com.jax3.barelyfunctionalcontraptions.BarelyFunctionalContraptions.devOnly("sheep.client.DevScreenshotHarness", "registerIfEnabled", null, null);
@@ -156,6 +157,7 @@ public final class ResourcefulSheepClient {
     }
 
     private static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        CrateLiningTint.clear();
         SheepResourceRegistry.setClient(new SheepResourceRegistry(Map.of()));
         SeparationLookup.setClientRecipes(RecipeMap.EMPTY);
     }
