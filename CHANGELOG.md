@@ -1,5 +1,103 @@
 # Changelog
 
+## Storage, the Static Generator and the Machine Status Panel (20–21 November 2026)
+
+Three new contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage, a mid-game
+generator that runs on static, and a wall screen that keeps an eye on all your machines. They come after 1.5.5 and go
+out in the next release. Numbers are the defaults; almost all of them can be changed in the synced config.
+
+### Storage: the Wool-Lined Crate
+A wooden crate lined with wool that holds **lots of one kind of item** and shows it on its front, like a drawer. It
+needs no power.
+- **Holds** 32 stacks of one item: 2,048 of most things, 512 Ender Pearls, 32 swords. Once something's in, it only takes
+  that item until it's empty again.
+- **Its front** shows the item and how many, lit by the light in front of it.
+- **Putting items in:** right-click its front with the item; right-click twice quickly to put in every one you carry.
+- **Taking items out:** left-click its front for a stack, sneak-left-click for one. Its other sides break it as usual,
+  and so does its front once it's empty.
+- **Lock:** sneak-right-click it with an empty hand to lock it to its item. A little gold padlock shows, its count
+  turns gold, and it keeps that item even when it's emptied, so nothing else gets in.
+- **A colour-coded storeroom for free:** its wool lining takes the **colour of the item it holds** (red for redstone,
+  cyan for diamonds, grey for cobblestone, white while it's empty). It's worked out from the item's own texture, so
+  items from other mods work too. Sneak-right-click it with dyed wool to line it a colour of your own; again with the
+  same colour to go back to matching its item.
+- **Packing:** sneak-right-click it with a Wool Bale to pack it in. Each bale adds 32 stacks, up to 4 bales: 160 stacks,
+  10,240 items.
+- **Bursting at the seams:** past 90% full its lid bulges, wool squeezing out under it. Once it's full, pushing more at
+  it makes it creak, and each push has a 2% chance to **burst** it: 8 of its items fly out and its lock breaks. A pipe
+  or hopper pushing at a full crate gets one roll a second (a full crate tells them it has room for one more, so they
+  keep straining it).
+- **Crate Strap:** sneak-right-click a crate with one to strap its lid down. A strapped crate never bursts.
+- **Automation:** pipes and hoppers put items in and take them out on every side; a comparator reads how full it is.
+- **Breaking it** keeps everything: its items, lock, bales, lining and strap, shown in its tooltip. A crate with
+  something in it (or a shulker box) can't go in another crate.
+- **JEI:** a Wool-Lined Crate page, and information pages for the crate and the strap. **Jade:** its item, how many out
+  of how many, how full, its lock, bales, lining, and whether it's strapped, bulging or about to burst.
+- **Advancement:** *Bursting at the Seams*, for being near a crate when it bursts.
+- **Recipes:** Wool-Lined Crate: planks, wool, Iron Nuggets and a Chest. Crate Strap: three Iron Ingots over an Iron
+  Nugget.
+- New config section `[crate]`: `stacks`, `stacksPerBale`, `maxBales`, `bursting`, `burstChance`, `burstItems`.
+
+### Power: the Static Generator and Copper Comb (mid-game)
+Two blocks tall, like a Van de Graaff generator. Sheep rubbing against **Copper Combs** in its 5x5 pen build up static,
+and its copper dome arcs the charge into power.
+- **Power:** each grown sheep with its fleece on, standing at a comb, gives **100 FE/t**; Copper sheep give 150 and
+  Redstone sheep 125. Up to six count, each in full: **600 FE/t** from six plain sheep, 900 from six Copper sheep.
+- **Its dome** arcs the charge into its buffer every 3 seconds, with a crackle of sparks. It stores 500,000 FE and
+  pushes up to 2,000 FE/t out of every face of its base but the top.
+- **Copper Combs:** up to 4 in its pen. They oxidise as they're worked (passing on 100, 75, 50 and 25% of a sheep's
+  charge), a stage about every 20 minutes. An axe scrapes one back a stage; Honeycomb waxes it so it stops ageing, at
+  85%. A broken comb keeps its stage and wax.
+- **Shocks:** with nothing taking its power, its buffer fills and the dome keeps charging. Past half full it's
+  **Overcharged** and shocks players and mobs in its pen, knocking them back. Woollen Armour insulates you, a quarter
+  per piece.
+- **Window:** energy, herd and output, the dome's charge with the shock line marked, and a chip for each comb.
+- Sneak-right-click to outline its pen; a comparator reads the dome's charge.
+- **JEI:** a Static Generator page (the power for one to six plain or Copper sheep, the comb stages, the shock), and
+  information pages for the generator and the comb. **Jade:** status, output, herd, dome charge, combs and energy.
+- **Advancement:** *Shocking!* (goal), for being knocked back by an overcharged Static Generator.
+- **Recipes:** a Lightning Rod, two Copper Blocks, Redstone, two wool and a Functional Machine Block; a Copper Comb from
+  three Copper Ingots and a Brush.
+- New config section `[static_generator]`, and a chapter in the Contraptions Manual (Power → Mid Game).
+
+### Utility: the Machine Status Panel
+A thin wall screen that shows how your machines are doing, all in one place. It needs no power.
+- **Linking:** with the Barely Functional Wrench, click the panel (the wrench glows), then each machine within
+  **200 blocks** (again to unlink one), then the panel again to finish. Any block of a bigger machine links it: the
+  Static Generator's dome, any block of the Echo Chamber, either end of the Sheep Treadmill.
+- **Its screen:** two lines for each machine: its name with a status lamp, then its status and one key number (FE/t for
+  generators; progress, stored energy, Ice made, wool held, grass or items stored for the rest). **Green** working,
+  **amber** waiting, **red** a problem, **grey** idle. A broken machine reads *Missing*.
+- **Bigger screens:** panels facing the same way in a rectangle up to **3x3** join into one seamless screen, 4 machines
+  a panel (36 on a 3x3), its rows sized to fill it. Break one and the rest regroup.
+- **Comparator:** reads how many of its machines have a problem, up to 15, for an alarm lamp or bell (or, if you
+  choose, how many are working).
+- **Window:** right-click it to name machines, move them up and down, unlink them, choose which ones' problems set off
+  the alarm, sort the screen (your order, problems first, by machine), pick its colours (classic, green, amber), and
+  set what its comparator counts.
+- **Machines it shows:** every generator, the Powered Furnace, Snow Sheep Chiller, Mechanical Separator, Automatic
+  Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Herd Counter, Wool-Lined Crates, Hume Energy
+  Cubes, Energy Meter and Zero Point Energy Module.
+- **JEI:** a Machine Status Panel page and an information page. **Jade:** machines linked, screen size, how many have a
+  problem and the first two, and its signal.
+- **Advancement:** *Mission Control* (goal), for linking 8 machines to one screen.
+- **Recipe:** four Glass Panes, two Redstone, a Functional Machine Block, a Comparator and an Iron Ingot.
+- New config section `[status_panel]`, and a chapter in the Contraptions Manual (Utility).
+
+### Fixes
+- **Static Generator window:** the dome's charge bar no longer flashes while it's overcharged.
+- **Machine Status Panel:** clicking a Static Generator's dome with the wrench now links it (only its base did), and the
+  panel reaches 200 blocks (it was 64, too short to reach across a base). A config file from before keeps its old
+  `range`: set it to 200, or delete the line.
+- **Snow Sheep Chiller on the panel:** out of water, it reads *No water* (it read *No power*).
+
+### Test world
+- The platform grew a **seventh row** of cells, and you now start at its new south edge.
+- **Static Generator:** six sheep at four fresh combs, making 600 FE/t into a bank of Hume Energy Cubes.
+- **Machine Status Panel:** a 3x3 screen showing 21 machines from across the platform, with an alarm lamp.
+- **Wool-Lined Crates:** a storeroom wall of fourteen crates, each lined the colour of what it holds; and a hopper
+  overfilling a crate of redstone (it bursts now and then) beside a strapped one that never does.
+
 ## 1.5.5 (17–19 November 2026)
 
 Everything added or changed in Barely Functional Contraptions from 17 November 2026 to now, for Minecraft 26.3, 26.2
@@ -13,64 +111,6 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 - JEI 30.x and Jade 26.2.x work on 26.2; JEI 29.x and Jade 26.1.x work on 26.1.
 
 ### New machines
-
-#### Static Generator and Copper Comb (mid-game generator)
-- Two blocks tall, like a Van de Graaff generator. Sheep rubbing against Copper Combs in its 5x5 pen build up static,
-  and its copper dome arcs the charge into its buffer every 3 seconds.
-- **Power:** a grown sheep with its fleece on gives 100 FE/t; Copper sheep 150, Redstone sheep 125. Up to six count,
-  each in full: 600 FE/t from plain sheep, 900 from Copper sheep.
-- **Copper Combs:** up to 4 in its pen. They oxidise as they're worked (100, 75, 50, 25%), about every 20 minutes. An
-  axe scrapes one back a stage; Honeycomb waxes it so it stops ageing, at 85%. A broken comb keeps its stage and wax.
-- **Shocks:** with its buffer full the dome keeps charging; past half full it shocks players and mobs in its pen,
-  knocking them back. Woollen Armour insulates, a quarter per piece. A comparator reads the dome's charge.
-- **Window:** energy, herd and output, the dome's charge with the shock line, and a chip for each comb.
-- **JEI:** a Static Generator page (the power for one to six plain or Copper sheep, the comb stages, the shock), and
-  information pages for the generator and the comb. **Jade:** status, output, herd, dome charge, combs and energy.
-- **Advancement:** *Shocking!* (goal), for being knocked back by an overcharged Static Generator.
-- **Recipes:** a Lightning Rod, two Copper Blocks, Redstone, two wool and a Functional Machine Block; a Copper Comb
-  from three Copper Ingots and a Brush.
-- New config section `[static_generator]`.
-
-#### Wool-Lined Crate (storage)
-- A wooden crate lined with wool that holds lots of one kind of item: 32 stacks, 2,048 of most things. Its front shows
-  the item and how many. No power.
-- Right-click its front to put items in (twice quickly: every one you carry), left-click it to take a stack
-  (sneaking, one). Sneak-right-click with an empty hand to lock it to its item; a padlock shows.
-- **Lining:** its wool lining takes the colour of the item it holds (worked out from the item's texture, so any
-  mod's items work), so a storeroom colour-codes itself. Sneak-right-click it with dyed wool to line it a colour of
-  your own instead; again with the same colour to go back. **Packing:** each Wool Bale packed in adds 32 stacks, up
-  to 4.
-- **Bursting at the seams:** past 90% its lid bulges; full, pushing more at it can burst it (2% a push, or a second of
-  a pipe pushing), throwing out 8 items and breaking its lock. A **Crate Strap** stops it bursting.
-- Pipes and hoppers on every side, a comparator for how full it is, and it shows on the Machine Status Panel. A full
-  crate tells hoppers and pipes it has room for one more, so they keep straining it.
-- **JEI:** a Wool-Lined Crate page and information pages for the crate and strap. **Jade:** its item and count, how
-  full, lock, bales, lining, and whether it's strapped or about to burst.
-- **Test world:** a new seventh row of cells, the crates in its first: a colour-coded storeroom wall, and a hopper
-  overfilling a full crate (it bursts now and then) beside a strapped one. The spawn moved to the new south edge.
-- It keeps its items, lock, bales, lining and strap when broken; its tooltip shows them. A filled crate can't go in
-  another.
-- **Advancement:** *Bursting at the Seams*. **Recipes:** planks, wool, a Chest and Iron Nuggets; the strap from Iron.
-- New config section `[crate]`, and a chapter in the Contraptions Manual (Logistics).
-
-#### Machine Status Panel (utility)
-- A thin wall screen that shows how up to 4 machines are doing: their name, status (green working, amber waiting,
-  red a problem, grey idle) and one key number each. Link them with the Barely Functional Wrench (click the panel,
-  then each machine, then the panel). A broken machine reads Missing. No power.
-- A comparator reads how many of its machines have a problem, for an alarm.
-- **Bigger screens:** panels in a rectangle up to 3x3 join into one seamless screen showing 4 machines a panel (36 on a
-  3x3), its rows sized to fill it. Config `maxWidth`, `maxHeight`.
-- **Window:** name machines, move them up and down, unlink them, switch each one's alert (whether its problems count
-  for the comparator), sort the screen (your order, problems first, by machine), pick its colours (classic, green,
-  amber), and set its comparator to count problems or working machines.
-- **JEI:** a Machine Status Panel page and an information page. **Jade:** machines linked, screen size, problems and the
-  first two, and its signal.
-- **Advancement:** *Mission Control* (goal), for linking 8 machines to one screen.
-- **Test world:** a 3x3 screen in the last cell, showing 20 of the machines on the platform.
-- **Range:** machines link from up to 200 blocks away (was 64), so a panel reaches across a base: the Static Generator
-  at the far side of the test world was too far to link. A config file made before keeps its old `range`.
-- **Recipe:** four Glass Panes, two Redstone, a Functional Machine Block, a Comparator and an Iron Ingot.
-- New config section `[status_panel]`, and a chapter in the Contraptions Manual (Utility).
 
 #### Herd Counter (utility)
 - A little screen that counts the sheep in the 7x7 pen in front of it every second, and puts the count on a comparator
