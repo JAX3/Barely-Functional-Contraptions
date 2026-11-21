@@ -111,6 +111,14 @@ public final class JeiDevHook {
         return true;
     }
 
+    /** Opens the Wool-Lined Crate page. */
+    public static boolean showCrate() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        rt.getRecipesGui().showTypes(java.util.List.of(CrateCategory.TYPE));
+        return true;
+    }
+
     /** Opens the Herd Counter page. */
     public static boolean showHerdCounter() {
         IJeiRuntime rt = runtime;

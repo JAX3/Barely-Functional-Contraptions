@@ -62,6 +62,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(StaticGeneratorProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.class);
         StaticGeneratorProvider.redirect(registration);
         registration.registerBlockComponent(StatusPanelProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.class);
+        registration.registerBlockComponent(CrateProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.class);
         registration.registerBlockComponent(HerdCounterProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock.class);
         registration.registerBlockComponent(GrassSeederProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.GrassSeederBlock.class);
         registration.registerEntityComponent(ThermalFatigueProvider.Client.INSTANCE, net.minecraft.world.entity.animal.sheep.Sheep.class);

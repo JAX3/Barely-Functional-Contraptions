@@ -16,12 +16,14 @@ facing it.
 
 ## What's where
 
-Every scene stands on one square platform of smooth stone, 146 blocks a side, floating at y = 34 above the sand. It's
-split into a grid of cells by stone-brick lines, five across and six deep, and the scenes fill it in the order below,
-from the north-west corner: west to east, then the next row south. The Themed sheep take two cells; the last three
-cells were left free for new contraptions; the Grass Seeder, the Herd Counter and the Machine Status Panel have them now. Each scene keeps its own floor (grass, sculk, andesite and so on), and the ones
-without a label of their own have their name floating over their north edge. Hostile mobs don't spawn (the
-`spawn_mobs` game rule is off), so nothing gathers in the platform's shadow.
+Every scene stands on one platform of smooth stone, 146 blocks wide and 169 deep, floating at y = 34 above the sand.
+It's split into a grid of cells by stone-brick lines, five across and seven deep, and the scenes fill it in the order
+below, from the north-west corner: west to east, then the next row south. The Themed sheep take two cells. The last three
+cells of the sixth row went to the Grass Seeder, the Herd Counter and the Machine Status Panel; the seventh row was
+added for the Wool-Lined Crates, which have its first cell, and its other four are free. Each scene keeps its own floor
+(grass, sculk, andesite and so on), and the ones without a label of their own have their name floating over their north
+edge. You spawn at the middle of the south edge (73, 35, 190). Hostile mobs don't spawn (the `spawn_mobs` game rule is
+off), so nothing gathers in the platform's shadow.
 
 | Scene | Teleport |
 |---|---|
@@ -53,7 +55,8 @@ without a label of their own have their name floating over their north edge. Hos
 | Static Generator on grass: six sheep standing still at four fresh Copper Combs in its fenced pen (outlined, a gate at the front), making 600 FE/t through an Energy Meter into a bank of eight Hume Energy Cubes | `/tp @s 17.5 40 163.5 180 32` |
 | Grass Seeder in a fenced pen of grass eaten into patches of dirt (outlined, a gate at the front), with 64 Bone Meal and Trim on (so it never overgrows); four sheep free to graze, and Automatic Shears in the back fence (powered by a Creative Generator) shearing the ones that wander in front of them: the pen runs itself | `/tp @s 73.5 41 163.5 180 38` |
 | Herd Counter: a fenced pen of eight sheep free to wander (Iron, Gold, Copper and plain, one sheared, one a lamb); a counter on the west side in Full at 8, lighting a lamp through a comparator while the whole herd is in, and one on the north side counting the Iron sheep ready to shear, with Steady on | `/tp @s 101.5 41 163.5 180 38` |
-| Machine Status Panel: nine panels joined into a 3x3 screen on a stone-brick wall, showing 20 of the machines round it on the platform (the nearest of each kind, right across the platform: the Echo Chamber and its cubes and meter, the Thermal Reaction Chamber, a Herd Counter, the Grass Seeder, the Powered Furnaces, the Chiller, a Mycelial Generator, the Static Generator and more), with a comparator lighting a lamp while any has a problem | `/tp @s 129.5 38 162.5 180 12` |
+| Machine Status Panel: nine panels joined into a 3x3 screen on a stone-brick wall, showing 21 of the machines on the platform (the nearest of each kind, right across the platform, and the overfilled Wool-Lined Crate: the Echo Chamber and its cubes and meter, the Thermal Reaction Chamber, a Herd Counter, the Grass Seeder, the Powered Furnaces, the Chiller, a Mycelial Generator, the Static Generator and more), with a comparator lighting a lamp while any has a problem | `/tp @s 129.5 38 162.5 180 12` |
+| Wool-Lined Crates on a spruce floor: a storeroom wall of fourteen crates in two rows, each lined its own colour (cobblestone, oak logs bulging, wheat, iron and emerald locked, redstone and string packed with bales, coal, copper, gold, diamonds, bone meal and glass); in front, a chest and hopper overfilling a full crate of redstone (it bursts now and then, and gets you *Bursting at the Seams*), beside one strapped shut that never does. The Machine Status Panel shows the overfilled one | `/tp @s 17.5 38.5 187.5 180 18` |
 | A row of running machines: two Mycelial Generators (one fuelled and watered), two Mechanical Separators (one fed wool and powered by a Creative Generator) and two Automatic Shears (one charged) | `/tp @s 45.5 38 161 180 25` |
 
 The scenes used to stand in a long row of separate platforms; `-PharnessScene=square_world` moved them all onto the
@@ -71,6 +74,10 @@ level 6, so after about 10 seconds it starts listening (about 18,000 FE/t, and p
 its buffer and cube bank fill in about half a minute, and then it waits as *Buffer full*. Walking around near it adds
 noise of your own, unless you're wearing Woollen Boots. To see it shriek, put another note block on the clock; to see
 its sheep fall asleep, break a repeater.
+
+The overfilled crate's chest holds 27 stacks of redstone, so it keeps pushing for a long time: each second it's pushed
+while full is a 2% chance it bursts, so about once a minute while you're nearby. The scattered redstone lies on the floor
+until you pick it up (or it despawns), and the hopper fills the crate back up.
 
 The Static Generator is saved empty too, and runs while you're near it: 600 FE/t from its six sheep, in bursts as its
 dome arcs every 3 seconds. Its combs oxidise a stage for every 20 minutes they're worked, so scrape them with an axe or

@@ -100,6 +100,11 @@ public class CrateBlockEntity extends BlockEntity {
         return (int) Math.min(Integer.MAX_VALUE, (long) stacks() * stackSize);
     }
 
+    /** Whether a pipe or hopper has pushed at it while it's full since its last burst roll. */
+    public boolean straining() {
+        return pressed;
+    }
+
     public boolean isFull() {
         return count > 0 && count >= capacity();
     }
@@ -288,10 +293,17 @@ public class CrateBlockEntity extends BlockEntity {
             return count;
         }
 
+        /**
+         * Full and unstrapped, it says it has room for one more: so hoppers and pipes (which skip anything full) keep
+         * pushing at it, its seams strain, and it can burst. The push itself still gets nothing in.
+         */
         @Override
         public long getCapacityAsLong(int index, ItemResource resource) {
             if (resource.isEmpty()) return capacity();
-            return accepts(resource.toStack()) ? capacityFor(resource.toStack().getMaxStackSize()) : 0;
+            if (!accepts(resource.toStack())) return 0;
+            long capacity = capacityFor(resource.toStack().getMaxStackSize());
+            boolean strains = ModConfigs.getBool(ModConfigs.SERVER.crateBursting) && !getBlockState().getValue(CrateBlock.STRAPPED);
+            return strains && count >= capacity ? count + 1L : capacity;
         }
 
         @Override

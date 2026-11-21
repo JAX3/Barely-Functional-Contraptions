@@ -1679,10 +1679,98 @@ public final class DevScreenshotHarness {
      * saves: {@code -PharnessScene=extend_world -PharnessWorld="BFC Test World"}. With no scenes listed it only drains.
      */
     private static final Object[][] EXTRA_SCENES = {
-            // Every cell is taken: up to (1, 5) by the moved scenes, (2, 5) by the Grass Seeder, (3, 5) by the Herd Counter
-            // and (4, 5) by the Machine Status Panel. A new scene needs a new row of cells.
-            {"status panel", 4, 5},
+            // Rows 0 to 5 are full: up to (1, 5) by the moved scenes, (2, 5) by the Grass Seeder, (3, 5) by the Herd
+            // Counter and (4, 5) by the Machine Status Panel. Row 6, added by extendPlatform: (0, 6) the Wool-Lined Crates;
+            // (1, 6) to (4, 6) are free.
+            {"crates", 0, 6},
     };
+    /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
+    private static final int PLATFORM_ROWS = 7;
+
+    /**
+     * Grows the square platform south by a row of cells (from {@link #SQUARE_SIDE} deep to {@link #PLATFORM_ROWS} rows):
+     * the old south rim becomes floor, the cell lines carry on, a new rim goes round, and the spawn moves to the new south
+     * edge. Run again it changes nothing.
+     */
+    private static void extendPlatform(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        int south = SQUARE_Z + GRID_Z + PLATFORM_ROWS * CELL_D + 3; // the new rim: three blocks past the last cell line, as before
+        for (int x = SQUARE_X; x < SQUARE_X + SQUARE_SIDE; x++) {
+            for (int z = SQUARE_Z + SQUARE_SIDE - 4; z <= south; z++) {
+                boolean rim = x == SQUARE_X || x == SQUARE_X + SQUARE_SIDE - 1 || z == south;
+                int gx = x - SQUARE_X - GRID_X, gz = z - SQUARE_Z - GRID_Z;
+                boolean line = (gx >= 0 && gx <= 5 * CELL_W && gx % CELL_W == 0 && gz >= 0 && gz <= PLATFORM_ROWS * CELL_D)
+                        || (gz >= 0 && gz <= PLATFORM_ROWS * CELL_D && gz % CELL_D == 0 && gx >= 0 && gx <= 5 * CELL_W);
+                level.setBlock(new BlockPos(x, 34, z), (rim ? Blocks.POLISHED_DEEPSLATE : line ? Blocks.STONE_BRICKS : Blocks.SMOOTH_STONE).defaultBlockState(), 2);
+            }
+        }
+        int sx = SQUARE_X + SQUARE_SIDE / 2;
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), String.format(java.util.Locale.ROOT, "setworldspawn %d 35 %d", sx, south - 2));
+        extendReturn = new net.minecraft.world.phys.Vec3(sx + 0.5, 35, south - 1.5);
+        extendYaw = 180;
+        extendPitch = 10;
+        ResourcefulSheep.LOGGER.info("EXTEND platform to z {}; spawn {} 35 {}", south, sx, south - 2);
+    }
+
+    /**
+     * The Wool-Lined Crates' cell (0, 6): a storeroom wall of fourteen crates in two rows, each lined its own colour
+     * (cobblestone grey, wood brown, wheat yellow, iron locked, two packed with bales, one bulging); in front, a chest
+     * and hopper overfilling a full crate of redstone, so it bursts now and then, beside one strapped shut that never does.
+     * The Machine Status Panel (cell 4, 5) is linked to the overfilled one.
+     */
+    private static void crateWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos o = origin, g = o.offset(0, 0, -3);
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(10, 6, 9),
+                e -> e instanceof net.minecraft.world.entity.Display.TextDisplay || e instanceof net.minecraft.world.entity.item.ItemEntity)) e.discard();
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-9, 0, -7), g.offset(9, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        // A spruce floor for the storeroom.
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-6, -1, -5), g.offset(6, -1, 3))) level.setBlock(p, Blocks.SPRUCE_PLANKS.defaultBlockState(), 2);
+        Object[][] wall = {
+                {Items.COBBLESTONE, "GRAY", 1287, false, 0}, {Items.OAK_LOG, "BROWN", 1950, false, 0}, {Items.WHEAT, "YELLOW", 640, false, 0},
+                {Items.IRON_INGOT, "WHITE", 412, true, 0}, {Items.REDSTONE, "RED", 3000, false, 2}, {Items.LAPIS_LAZULI, "BLUE", 255, false, 0},
+                {Items.EMERALD, "LIME", 37, true, 0},
+                {Items.COAL, "BLACK", 1024, false, 0}, {Items.COPPER_INGOT, "ORANGE", 733, false, 0}, {Items.GOLD_INGOT, "YELLOW", 96, true, 0},
+                {Items.DIAMOND, "CYAN", 18, true, 0}, {Items.STRING, "WHITE", 5120, false, 4}, {Items.BONE_MEAL, "LIGHT_GRAY", 820, false, 0},
+                {Items.GLASS, "LIGHT_BLUE", 300, false, 0},
+        };
+        for (int i = 0; i < wall.length; i++) {
+            BlockPos at = g.offset(-3 + i % 7, i / 7, -4);
+            placeCrate(level, at, net.minecraft.world.item.DyeColor.valueOf((String) wall[i][1]), false,
+                    new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack((net.minecraft.world.item.Item) wall[i][0]),
+                            (Integer) wall[i][2], (Boolean) wall[i][3], (Integer) wall[i][4]));
+        }
+        // In front: a chest and hopper pushing redstone at a full crate (it bursts now and then), and the same at a
+        // strapped crate of cobblestone (it never does).
+        BlockPos burst = g.offset(-4, 0, 1), strapped = g.offset(4, 0, 1);
+        placeCrate(level, burst, net.minecraft.world.item.DyeColor.RED, false,
+                new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.REDSTONE), 2048, false, 0));
+        placeCrate(level, strapped, net.minecraft.world.item.DyeColor.ORANGE, true,
+                new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.COBBLESTONE), 2048, true, 0));
+        for (BlockPos crate : new BlockPos[]{burst, strapped}) {
+            net.minecraft.world.item.Item fill = crate == burst ? Items.REDSTONE : Items.COBBLESTONE;
+            level.setBlock(crate.above(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
+            level.setBlock(crate.above(2), Blocks.CHEST.defaultBlockState(), 3);
+            if (level.getBlockEntity(crate.above(2)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity chest) {
+                for (int s = 0; s < chest.getContainerSize(); s++) chest.setItem(s, new ItemStack(fill, 64));
+            }
+        }
+        label(server, g.above(3).relative(Direction.NORTH, 4), "Wool-Lined Crates", "gold");
+        label(server, burst.above(3), "Overfilled: bursts", "red");
+        label(server, strapped.above(3), "Strapped: never bursts", "gray");
+        // The status panel shows the overfilled one.
+        BlockPos panelMaster = new BlockPos(128, 37, 152);
+        if (level.getBlockEntity(panelMaster) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel) {
+            var result = panel.links().contains(burst) ? null : panel.toggleLink(level, burst);
+            ResourcefulSheep.LOGGER.info("EXTEND crates: linked the overfilled crate to the status panel: {}", result);
+        }
+        ResourcefulSheep.LOGGER.info("EXTEND crates built round {}", g);
+    }
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
         ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
@@ -3300,7 +3388,18 @@ public final class DevScreenshotHarness {
             });
             case 245 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 22", row.getX() + 0.5, row.getY(), row.getZ() + 2.6));
             case 270 -> shot(mc, "111_crate_relined");
-            case 280 -> mc.stop();
+            case 272 -> {
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 25", row.getX() + 0.5, row.getY(), row.getZ() + 2.6));
+            }
+            case 276 -> { setHudHidden(mc, false); McClient.clearChat(mc); }
+            case 296 -> shot(mc, "111_crate_jade");
+            case 298 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showCrate();
+            }
+            case 306 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 316 -> shot(mc, "111_crate_jei");
+            case 320 -> mc.stop();
             default -> {}
         }
     }
@@ -3474,7 +3573,8 @@ public final class DevScreenshotHarness {
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
         // The whole square platform from above its south edge and from straight overhead, then the latest scene.
-        String[] tps = {"tp @a 73.5 95 205.5 180 40", "tp @a 73.5 175 97 180 90", "tp @a 129.5 38 162.5 180 12", "tp @a 129.5 35.4 156.8 180 4"};
+        String[] tps = {"tp @a 73.5 95 218.5 180 40", "tp @a 73.5 185 108 180 90", "tp @a 129.5 38 162.5 180 12", "tp @a 17.5 38.5 187.5 180 18",
+                "tp @a 17.5 36.6 182.2 180 14"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -3491,6 +3591,11 @@ public final class DevScreenshotHarness {
             server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
                 if (level.getBlockEntity(new BlockPos(128, 37, 152)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel) {
+                    for (BlockPos p : new BlockPos[]{new BlockPos(13, 35, 178), new BlockPos(21, 35, 178), new BlockPos(16, 35, 173)}) {
+                        if (level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity crate) {
+                            ResourcefulSheep.LOGGER.warn("TOUR crate at {}: {} {}", p, crate.contents(), level.getBlockState(p));
+                        }
+                    }
                     ResourcefulSheep.LOGGER.warn("TOUR status panel: {} machines, signal {}, lamp {}", panel.rows().size(), panel.comparatorSignal(),
                             level.getBlockState(new BlockPos(129, 35, 154)));
                     for (var row : panel.rows()) ResourcefulSheep.LOGGER.warn("TOUR   {} {} {} at {}", row.name().replace("block.barelyfunctionalcontraptions.", ""),
@@ -3748,6 +3853,9 @@ public final class DevScreenshotHarness {
                 extendYaw = player.getYRot();
                 extendPitch = player.getXRot();
                 ResourcefulSheep.LOGGER.info("EXTEND player starts at {}", extendReturn);
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "forceload add 0 160 145 200");
+                extendPlatform(server); // (moves the return spot to the new spawn)
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "forceload remove 0 160 145 200");
             });
         }
         if (tick >= start && tick < end) {
@@ -3775,6 +3883,7 @@ public final class DevScreenshotHarness {
                         case "grass seeder" -> seederWorldScene(server);
                         case "herd counter" -> herdWorldScene(server);
                         case "status panel" -> panelWorldScene(server);
+                        case "crates" -> crateWorldScene(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);

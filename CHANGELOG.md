@@ -40,7 +40,12 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
   adds 32 stacks, up to 4.
 - **Bursting at the seams:** past 90% its lid bulges; full, pushing more at it can burst it (2% a push, or a second of
   a pipe pushing), throwing out 8 items and breaking its lock. A **Crate Strap** stops it bursting.
-- Pipes and hoppers on every side, a comparator for how full it is, and it shows on the Machine Status Panel.
+- Pipes and hoppers on every side, a comparator for how full it is, and it shows on the Machine Status Panel. A full
+  crate tells hoppers and pipes it has room for one more, so they keep straining it.
+- **JEI:** a Wool-Lined Crate page and information pages for the crate and strap. **Jade:** its item and count, how
+  full, lock, bales, lining, and whether it's strapped or about to burst.
+- **Test world:** a new seventh row of cells, the crates in its first: a colour-coded storeroom wall, and a hopper
+  overfilling a full crate (it bursts now and then) beside a strapped one. The spawn moved to the new south edge.
 - It keeps its items, lock, bales, lining and strap when broken; its tooltip shows them. A filled crate can't go in
   another.
 - **Advancement:** *Bursting at the Seams*. **Recipes:** planks, wool, a Chest and Iron Nuggets; the strap from Iron.

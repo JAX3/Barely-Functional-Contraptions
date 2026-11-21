@@ -188,6 +188,7 @@ public final class ModGameTests {
         ECHO_TESTS.put("crate_bales_make_it_bigger_and_crates_stay_out", ModGameTests::crateBales);
         ECHO_TESTS.put("crate_fills_from_hoppers_and_pipes_and_reads_on_a_comparator", ModGameTests::crateAutomation);
         ECHO_TESTS.put("crate_bulges_then_bursts_unless_strapped", ModGameTests::crateBursts);
+        ECHO_TESTS.put("crate_a_hopper_pushing_at_a_full_crate_strains_it", ModGameTests::crateHopperStrains);
         ECHO_TESTS.put("crate_keeps_its_items_lining_and_strap_when_broken", ModGameTests::crateKeeps);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
@@ -1914,6 +1915,20 @@ public final class ModGameTests {
             h.assertTrue(be.count() == 1005, "an aborted take leaves it: " + be.count());
             int signal = h.getLevel().getBlockState(h.absolutePos(at)).getAnalogOutputSignal(h.getLevel(), h.absolutePos(at), Direction.NORTH);
             h.assertTrue(signal == 1 + 14 * 1005 / 2048, "the comparator reads how full: " + signal);
+        });
+    }
+
+    /** A hopper pushing at a full crate strains it (each second of that is a burst roll), and leaves the hopper full. */
+    private static void crateHopperStrains(GameTestHelper h) {
+        BlockPos at = new BlockPos(1, 1, 1);
+        var be = crate(h, at);
+        be.setContents(new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.REDSTONE), 2048, false, 0));
+        h.setBlock(at.above(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN));
+        var hopper = h.getBlockEntity(at.above(), net.minecraft.world.level.block.entity.HopperBlockEntity.class);
+        hopper.setItem(0, new ItemStack(Items.REDSTONE, 5));
+        h.succeedWhen(() -> {
+            h.assertTrue(be.straining() || be.count() < 2048, "the hopper strains it (or it burst): " + be.count());
+            h.assertTrue(hopper.getItem(0).getCount() == 5 || be.count() < 2048, "and nothing goes in while it's full");
         });
     }
 
