@@ -29,5 +29,10 @@ public final class ModDataComponents {
             "fluid_contents", b -> b.persistent(net.neoforged.neoforge.fluids.SimpleFluidContent.CODEC)
                     .networkSynchronized(net.neoforged.neoforge.fluids.SimpleFluidContent.STREAM_CODEC));
 
+    /** What a broken Wool-Lined Crate held: its item, how many, its lock and its bales. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents>> CRATE_CONTENTS = REGISTER.registerComponentType(
+            "crate_contents", b -> b.persistent(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents.CODEC)
+                    .networkSynchronized(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents.STREAM_CODEC));
+
     private ModDataComponents() {}
 }

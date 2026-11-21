@@ -67,4 +67,9 @@ public final class McClient {
     public static com.mojang.blaze3d.pipeline.RenderTarget mainTarget(Minecraft mc) {
         return mc.gameRenderer.mainRenderTarget();
     }
+
+    /** The packed block and sky light at {@code pos}, for drawing something lit as that spot is. */
+    public static int lightAt(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) {
+        return net.minecraft.util.LightCoordsUtil.getLightCoords(level, pos);
+    }
 }

@@ -44,6 +44,8 @@ public final class ModAdvancements {
     /** Linking a Machine Status Panel's screen to {@link #MISSION_CONTROL_MACHINES} machines. */
     public static final String MISSION_CONTROL = "contraptions/mission_control";
     public static final int MISSION_CONTROL_MACHINES = 8;
+    /** Being near a Wool-Lined Crate when it bursts. */
+    public static final String BURSTING_AT_THE_SEAMS = "contraptions/bursting_at_the_seams";
     public static final String INFUSE_SHEEP = "contraptions/infuse_sheep";
     /** Players this close to Automatic Shears when they shear a sheep get {@link #AUTO_SHEAR}. */
     public static final double AUTO_SHEAR_RADIUS = 16;

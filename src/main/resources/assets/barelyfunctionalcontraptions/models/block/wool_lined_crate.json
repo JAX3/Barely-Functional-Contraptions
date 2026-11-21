@@ -1,0 +1,123 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/wool_lined_crate/side",
+    "front": "barelyfunctionalcontraptions:block/wool_lined_crate/front",
+    "side": "barelyfunctionalcontraptions:block/wool_lined_crate/side",
+    "top": "barelyfunctionalcontraptions:block/wool_lined_crate/top",
+    "bottom": "barelyfunctionalcontraptions:block/wool_lined_crate/bottom",
+    "lining_front": "barelyfunctionalcontraptions:block/wool_lined_crate/lining_front",
+    "lining_side": "barelyfunctionalcontraptions:block/wool_lined_crate/lining_side",
+    "lining_top": "barelyfunctionalcontraptions:block/wool_lined_crate/lining_top"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#side",
+          "cullface": "south"
+        },
+        "east": {
+          "texture": "#side",
+          "cullface": "east"
+        },
+        "west": {
+          "texture": "#side",
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#top",
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#bottom",
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        -0.01,
+        -0.01,
+        -0.01
+      ],
+      "to": [
+        16.01,
+        16.01,
+        16.01
+      ],
+      "shade": true,
+      "faces": {
+        "north": {
+          "texture": "#lining_front",
+          "cullface": "north",
+          "tintindex": 0,
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#lining_side",
+          "cullface": "south",
+          "tintindex": 0,
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#lining_side",
+          "cullface": "east",
+          "tintindex": 0,
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#lining_side",
+          "cullface": "west",
+          "tintindex": 0,
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#lining_top",
+          "cullface": "up",
+          "tintindex": 0,
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

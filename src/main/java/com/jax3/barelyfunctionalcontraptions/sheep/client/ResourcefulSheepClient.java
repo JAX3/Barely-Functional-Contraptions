@@ -45,6 +45,8 @@ public final class ResourcefulSheepClient {
         modBus.addListener(ResourcefulSheepClient::registerTintSources);
         modBus.addListener((RegisterColorHandlersEvent.BlockTintSources event) -> event.register(
                 java.util.List.of(WoolBaleTint.INSTANCE), com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.WOOL_BALE.get()));
+        modBus.addListener((RegisterColorHandlersEvent.BlockTintSources event) -> event.register(
+                java.util.List.of(CrateLiningTint.INSTANCE), com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.CRATE.get()));
         modBus.addListener(ResourcefulSheepClient::registerRenderStateModifiers);
         modBus.addListener(ResourcefulSheepClient::addLayers);
         modBus.addListener((EntityRenderersEvent.RegisterLayerDefinitions event) -> {
@@ -82,6 +84,8 @@ public final class ResourcefulSheepClient {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.HERD_COUNTER.get(), context -> new HerdCounterRenderer());
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.STATUS_PANEL.get(), context -> new StatusPanelRenderer());
+            event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.CRATE.get(), context -> new CrateRenderer());
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.POWERED_FURNACE.get(), context -> new AreaOutlineRenderer<>());
         });
@@ -157,6 +161,24 @@ public final class ResourcefulSheepClient {
     }
 
     private static void onItemTooltip(net.neoforged.neoforge.event.entity.player.ItemTooltipEvent event) {
+        // A broken Wool-Lined Crate: what's still in it.
+        var crate = event.getItemStack().get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.CRATE_CONTENTS.get());
+        if (crate != null) {
+            var lines = event.getToolTip();
+            int at = Math.min(1, lines.size());
+            if (crate.count() > 0) {
+                lines.add(at++, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.crate.holds",
+                        String.format(java.util.Locale.ROOT, "%,d", crate.count()), crate.item().getHoverName()).withStyle(net.minecraft.ChatFormatting.GOLD));
+            }
+            if (crate.locked()) {
+                lines.add(at++, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.crate.locked",
+                        crate.item().getHoverName()).withStyle(net.minecraft.ChatFormatting.GRAY));
+            }
+            if (crate.bales() > 0) {
+                lines.add(at, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.crate.bales", crate.bales())
+                        .withStyle(net.minecraft.ChatFormatting.GRAY));
+            }
+        }
         if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_BOOTS.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.woollen_boots")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
@@ -174,7 +196,9 @@ public final class ResourcefulSheepClient {
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.COPPER_COMB,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GRASS_SEEDER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HERD_COUNTER,
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATUS_PANEL)) {
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATUS_PANEL,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_STRAP)) {
             if (event.getItemStack().is(tipped.get())) {
                 event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions." + tipped.getId().getPath())
                         .withStyle(net.minecraft.ChatFormatting.GRAY));

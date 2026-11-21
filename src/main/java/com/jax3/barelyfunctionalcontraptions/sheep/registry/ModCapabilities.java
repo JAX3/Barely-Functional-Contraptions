@@ -76,6 +76,8 @@ public final class ModCapabilities {
                 (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Energy Meter: in at the back, out at the front, nothing on the other faces.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.ENERGY_METER.get(), (be, side) -> be.getEnergyHandler(side));
+        // Wool-Lined Crate: its one slot, in and out, on every face.
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.CRATE.get(), (be, side) -> be.getItemHandler());
         // Fluid Tank: the whole connected group, in and out, on every face.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.FLUID_TANK.get(), (be, side) -> be.getFluidHandler());
         // Zero Point Energy Module: output only, on every face.

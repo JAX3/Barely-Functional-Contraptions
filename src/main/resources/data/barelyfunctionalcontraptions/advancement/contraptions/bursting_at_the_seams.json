@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:wool_lined_crate"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.bursting_at_the_seams.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.bursting_at_the_seams.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

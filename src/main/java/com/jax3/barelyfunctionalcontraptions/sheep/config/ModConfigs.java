@@ -231,6 +231,12 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue statusPanelRefresh;
         public final ModConfigSpec.IntValue statusPanelMaxWidth;
         public final ModConfigSpec.IntValue statusPanelMaxHeight;
+        public final ModConfigSpec.IntValue crateStacks;
+        public final ModConfigSpec.IntValue crateStacksPerBale;
+        public final ModConfigSpec.IntValue crateMaxBales;
+        public final ModConfigSpec.BooleanValue crateBursting;
+        public final ModConfigSpec.DoubleValue crateBurstChance;
+        public final ModConfigSpec.IntValue crateBurstItems;
         public final ModConfigSpec.IntValue herdRadius;
         public final ModConfigSpec.IntValue herdInterval;
         public final ModConfigSpec.IntValue herdSignalPerSheep;
@@ -651,6 +657,21 @@ public final class ModConfigs {
                     .defineInRange("maxWidth", 3, 1, 3);
             statusPanelMaxHeight = b.comment("Most panels high that join into one screen.")
                     .defineInRange("maxHeight", 3, 1, 3);
+            b.pop();
+
+            b.comment("Wool-Lined Crate (holds lots of one kind of item and shows it on its front; bulges when nearly full, and may burst)").push("crate");
+            crateStacks = b.comment("Stacks of its item a crate holds (32 = 2,048 of an item that stacks to 64).")
+                    .defineInRange("stacks", 32, 1, 1_024);
+            crateStacksPerBale = b.comment("Stacks each Wool Bale packed into it adds.")
+                    .defineInRange("stacksPerBale", 32, 0, 1_024);
+            crateMaxBales = b.comment("Most Wool Bales one crate takes.")
+                    .defineInRange("maxBales", 4, 0, 16);
+            crateBursting = b.comment("Whether a full crate pushed for more can burst.")
+                    .define("bursting", true);
+            crateBurstChance = b.comment("Chance a full crate bursts each time a player pushes more at it, or each second a pipe or hopper does.")
+                    .defineInRange("burstChance", 0.02, 0.0, 1.0);
+            crateBurstItems = b.comment("Items a bursting crate scatters.")
+                    .defineInRange("burstItems", 8, 0, 64);
             b.pop();
 
             b.comment("Herd Counter (counts the sheep in a pen in front of its screen, and puts any count on a comparator; needs no power)").push("herd_counter");

@@ -4709,6 +4709,118 @@ def generate_status_panel():
     back.save(out(base + "back.png"))
 
 
+
+def generate_crate():
+    """Wool-Lined Crate: oak boards in a darker frame, wool lining showing in the gaps (grey, tinted the lining's
+    colour in game), a dark panel on the front for its item, wool for its bulging lid, an iron strap, and the strap item."""
+    rnd = random.Random(207)
+    base = "block/wool_lined_crate/"
+    plank = [hexc("#a8804c"), hexc("#9a7444"), hexc("#b58d57")]
+    frame_l, frame_d, nail = hexc("#6e4c2a"), hexc("#553a1f"), hexc("#c9c3b8")
+    gap = hexc("#2b1d10")
+
+    def boards(img, rows, x0=0, x1=16, y0=0, y1=16):
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                if y in rows:
+                    img.putpixel((x, y), gap)
+                    continue
+                c = plank[(y // 4 + x // 7) % 3]
+                v = rnd.uniform(0.92, 1.06)
+                if (x * 3 + y * 5) % 11 == 0:
+                    v *= 0.86                      # grain
+                img.putpixel((x, y), shade(c, v))
+
+    def border(img, width=2):
+        for y in range(16):
+            for x in range(16):
+                if x < width or y < width or x >= 16 - width or y >= 16 - width:
+                    edge = x in (0, 15) or y in (0, 15)
+                    img.putpixel((x, y), shade(frame_d if edge else frame_l, rnd.uniform(0.94, 1.04)))
+        for x, y in ((1, 1), (14, 1), (1, 14), (14, 14)):
+            img.putpixel((x, y), nail)
+
+    side = Image.new("RGBA", (16, 16), CLEAR)
+    boards(side, (6, 10))
+    border(side)
+    side.save(out(base + "side.png"))
+
+    top = Image.new("RGBA", (16, 16), CLEAR)
+    boards(top, (8,))
+    border(top)
+    top.save(out(base + "top.png"))
+
+    bottom = Image.new("RGBA", (16, 16), CLEAR)
+    boards(bottom, ())
+    border(bottom)
+    bottom.save(out(base + "bottom.png"))
+
+    front = Image.new("RGBA", (16, 16), CLEAR)
+    boards(front, ())
+    border(front, 3)
+    for y in range(3, 13):
+        for x in range(3, 13):
+            front.putpixel((x, y), hexc("#2a2018") if (x + y) % 5 else hexc("#30251c"))
+    front.save(out(base + "front.png"))
+
+    def wool_px(x, y):
+        v = 236 - (y % 3) * 12 - (10 if (x + y // 3) % 4 == 3 else 0) + rnd.randint(-6, 6)
+        return _grey(v)
+
+    # The lining, showing in the side gaps, round the front panel and in the lid's seam: grey wool, tinted in game.
+    lining_side = Image.new("RGBA", (16, 16), CLEAR)
+    for y in (6, 10):
+        for x in range(2, 14):
+            lining_side.putpixel((x, y), wool_px(x, y))
+    lining_side.save(out(base + "lining_side.png"))
+    lining_top = Image.new("RGBA", (16, 16), CLEAR)
+    for x in range(2, 14):
+        lining_top.putpixel((x, 8), wool_px(x, 8))
+    lining_top.save(out(base + "lining_top.png"))
+    lining_front = Image.new("RGBA", (16, 16), CLEAR)
+    for i in range(3, 13):
+        for x, y in ((i, 3), (i, 12), (3, i), (12, i)):
+            lining_front.putpixel((x, y), wool_px(x, y))
+    lining_front.save(out(base + "lining_front.png"))
+    wool = Image.new("RGBA", (16, 16), CLEAR)
+    for y in range(16):
+        for x in range(16):
+            wool.putpixel((x, y), wool_px(x, y))
+    wool.save(out(base + "wool.png"))
+
+    # The Crate Strap: an iron band with rivets and a buckle, on the crate and as an item.
+    strap = Image.new("RGBA", (16, 16), CLEAR)
+    for x in range(16):
+        strap.putpixel((x, 0), CARTOON["H"])
+        strap.putpixel((x, 1), CARTOON["M"])
+        strap.putpixel((x, 2), CARTOON["S"])
+        if x % 5 == 2:
+            strap.putpixel((x, 1), CARTOON["B"])
+    for x in (7, 8):
+        for y in range(3):
+            strap.putpixel((x, y), CARTOON["C"] if y < 2 else CARTOON["c"])
+    strap.save(out(base + "strap.png"))
+
+    lock = Image.new("RGBA", (16, 16), CLEAR)    # a padlock, drawn in its top-left 4x5 corner
+    for y, row in enumerate([".SS.", "S..S", "GGGG", "GKGG", "gggg"]):
+        for x, ch in enumerate(row):
+            if ch != ".":
+                lock.putpixel((x, y), {"S": CARTOON["b"], "G": CARTOON["Y"], "K": CARTOON["c"], "g": CARTOON["C"]}[ch])
+    lock.save(out(base + "lock.png"))
+
+    item = Image.new("RGBA", (16, 16), CLEAR)
+    for a in range(360):                      # a coiled band, seen from the side
+        t = math.radians(a)
+        for r, c in ((6.0, CARTOON["H"]), (5.0, CARTOON["M"]), (4.0, CARTOON["S"])):
+            x, y = int(round(7.5 + math.cos(t) * r)), int(round(8.5 + math.sin(t) * r * 0.62))
+            if 0 <= x < 16 and 0 <= y < 16:
+                item.putpixel((x, y), c)
+    for x, y in ((6, 3), (7, 3), (8, 3), (9, 3), (6, 4), (9, 4), (6, 5), (7, 5), (8, 5), (9, 5)):
+        item.putpixel((x, y), CARTOON["C"] if y != 5 else CARTOON["c"])
+    for x, y in ((2, 8), (13, 8), (4, 12), (11, 12)):
+        item.putpixel((x, y), CARTOON["B"])
+    item.save(out("item/crate_strap.png"))
+
 def generate_static_generator_gui():
     """Static Generator window: energy gauge, then a panel with the herd and output, the dome's charge bar (the shock
     line marked) and four comb chips; the status lamp below."""
@@ -4796,6 +4908,7 @@ def main():
     generate_herd_counter()
     generate_herd_counter_gui()
     generate_status_panel()
+    generate_crate()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

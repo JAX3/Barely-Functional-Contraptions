@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PWP",
+    "NCN",
+    "PWP"
+  ],
+  "key": {
+    "P": "#minecraft:planks",
+    "W": "#minecraft:wool",
+    "N": "minecraft:iron_nugget",
+    "C": "minecraft:chest"
+  },
+  "result": {
+    "id": "barelyfunctionalcontraptions:wool_lined_crate",
+    "count": 1
+  }
+}

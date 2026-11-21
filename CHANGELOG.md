@@ -31,6 +31,21 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
   from three Copper Ingots and a Brush.
 - New config section `[static_generator]`.
 
+#### Wool-Lined Crate (storage)
+- A wooden crate lined with wool that holds lots of one kind of item: 32 stacks, 2,048 of most things. Its front shows
+  the item and how many. No power.
+- Right-click its front to put items in (twice quickly: every one you carry), left-click it to take a stack
+  (sneaking, one). Sneak-right-click with an empty hand to lock it to its item; a padlock shows.
+- **Lining:** sneak-right-click it with dyed wool to reline it in that colour. **Packing:** each Wool Bale packed in
+  adds 32 stacks, up to 4.
+- **Bursting at the seams:** past 90% its lid bulges; full, pushing more at it can burst it (2% a push, or a second of
+  a pipe pushing), throwing out 8 items and breaking its lock. A **Crate Strap** stops it bursting.
+- Pipes and hoppers on every side, a comparator for how full it is, and it shows on the Machine Status Panel.
+- It keeps its items, lock, bales, lining and strap when broken; its tooltip shows them. A filled crate can't go in
+  another.
+- **Advancement:** *Bursting at the Seams*. **Recipes:** planks, wool, a Chest and Iron Nuggets; the strap from Iron.
+- New config section `[crate]`, and a chapter in the Contraptions Manual (Logistics).
+
 #### Machine Status Panel (utility)
 - A thin wall screen that shows how up to 4 machines are doing: their name, status (green working, amber waiting,
   red a problem, grey idle) and one key number each. Link them with the Barely Functional Wrench (click the panel,

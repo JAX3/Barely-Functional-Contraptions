@@ -134,6 +134,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | ⭐ **Running Ewe Ragged** (goal) | Be within 16 blocks of a Sheep Treadmill when a sheep starts walking it |
 | ⭐ **Thermal Shock** (challenge) | Be within 16 blocks of a Thermal Reaction Chamber when it starts reacting |
 | ⭐ **Mission Control** (goal) | Link 8 machines to one Machine Status Panel screen |
+| Bursting at the Seams | Be near a Wool-Lined Crate when it's overfilled and bursts |
 | ⭐ **Count Your Sheep** (goal) | Be near a Herd Counter counting 20 sheep at once |
 | ⭐ **Keep Off the Grass** (goal) | Be near a Grass Seeder that has tended 100 blocks of its pen |
 | ⭐ **Shocking!** (goal) | Get knocked back by an overcharged Static Generator |
@@ -1008,6 +1009,36 @@ O M C      O = Observer, M = Functional Machine Block, C = Comparator
 - **Advancement:** ⭐ *Count Your Sheep* (goal), for being near a Herd Counter counting 20 sheep at once.
 - Mine it with a pickaxe. **Config:** `[herd_counter]`: `radius` (3), `interval` (20 ticks), `signalPerSheep` (1), `lowInfusion` (0.25), `fullTarget` (6), `doubleCount` (true), `steadySeconds` (5).
 
+### Wool-Lined Crate
+A wooden crate lined with wool that holds **lots of one kind of item** and shows it on its front, like a drawer. It needs no power.
+
+```
+P W P      P = any Planks, W = any Wool
+N C N      N = Iron Nugget, C = Chest
+P W P
+```
+
+The **Crate Strap** is three Iron Ingots over an Iron Nugget.
+
+| A row of crates, each lined a different colour | Close up |
+|---|---|
+| ![Seven Wool-Lined Crates on spruce planks, lined white, red, lime, light blue, orange, yellow and purple, showing cobblestone 1,287, redstone 2,048 with its lid bulging, lime wool 900, diamond swords 12, an empty strapped one, wheat 340 and oak logs 12,480 with its lid bulging](screenshots/111_crate.png) | ![A white-lined crate showing a block of cobblestone and 1,287 under it](screenshots/111_crate_close.png) |
+| ![The full redstone crate bursting: red wool puffing out of its lid and redstone flying, its count down to 2,040](screenshots/111_crate_burst.png) | ![The lime wool crate relined blue with a sneak-click, its count 900 in gold and a little gold padlock in its corner: locked](screenshots/111_crate_relined.png) |
+
+- **Size:** **32 stacks** (`stacks`) of the one item it holds: 2,048 of anything that stacks to 64, 512 Ender Pearls, 32 swords. It's empty until something goes in, and then takes only that item until it's empty again (and not locked).
+- **Its front:** the item and how many, lit by the light in front of it. Gold when it's locked.
+- **Putting items in:** right-click its **front** with the item. Right-click **twice quickly** (within 8 ticks) and it takes every one of that item you carry.
+- **Taking items out:** left-click its **front** for a stack, **sneak-left-click** for one. Left-clicking any other side breaks it as usual, and so does the front once it's empty, or a wrench hit (which picks it up whole).
+- **Lock:** sneak-right-click it with an **empty hand** to lock it to its item; a little gold **padlock** shows on its front. Locked, it keeps that item when it's emptied, so nothing else gets in. Again to unlock it.
+- **Lining:** sneak-right-click it with any **dyed wool** to reline it in that colour (it uses the wool). The lining shows round its front, between the boards and in its lid's seam, for colour-coding a storeroom.
+- **Packing:** sneak-right-click it with a **Wool Bale** to pack it in: each adds **32 stacks** (`stacksPerBale`), up to **4 bales** (`maxBales`): 160 stacks, 10,240 items.
+- **Bursting at the seams:** past **90% full** its lid **bulges**, wool squeezing out under it. Full, it **creaks** when more is pushed at it, and each push has a **2%** chance (`burstChance`) to **burst** it: **8** of its items (`burstItems`) fly out, its lining puffs out and its **lock breaks**. A pipe or hopper pushing at a full crate gets one roll a second. Sneak-right-click it with a **Crate Strap** to strap its lid down: it **never bursts**. `bursting` = false turns it off.
+- **Pipes and hoppers:** one slot, in and out, on **every side**; a crate with something in it, or a shulker box, can't go in. A **comparator** reads how full it is (1 to 15).
+- **Breaking it:** it keeps **everything**: its items, lock, bales, lining colour and strap. The item's tooltip shows what's inside. In creative, one with something in it drops itself.
+- **Machine Status Panel:** it shows a crate's count, *Stored* (grey), *Empty*, or *Full* in red.
+- **Advancement:** *Bursting at the Seams*, for being near a crate when it bursts.
+- Mine it with an axe; it sounds like wood. **Config:** `[crate]`: `stacks` (32), `stacksPerBale` (32), `maxBales` (4), `bursting` (true), `burstChance` (0.02), `burstItems` (8).
+
 ### Machine Status Panel
 A thin **wall screen** that shows how the machines linked to it are doing, all in one place. It needs no power.
 
@@ -1032,7 +1063,7 @@ G C I      C = Comparator, I = Iron Ingot
 - **Comparator:** reads how many of its machines have a **problem** (with their alert on), up to 15, for an alarm lamp or bell; or, set to *Signal: working*, how many are working.
 - **JEI:** a *Machine Status Panel* page (the wrench and machines into the panel, a comparator out, and what each colour means) and an information page. **Jade:** on any panel of a screen, how many machines it shows out of how many, its size, how many have a problem and the first two, and its signal.
 - **Advancement:** ⭐ *Mission Control* (goal), for linking 8 machines to one screen (so a screen of 2 panels or more).
-- **Machines it shows:** every generator (Blaze Sheep Furnace, Wool Burner, Thermal Reaction Chamber, Echo Chamber, Static Generator, Sheep Treadmill, Glow Panel, Mycelial Generator), the Powered Furnace, Snow Sheep Chiller, Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Herd Counter, Hume Energy Cubes, Energy Meter and Zero Point Energy Module.
+- **Machines it shows:** every generator (Blaze Sheep Furnace, Wool Burner, Thermal Reaction Chamber, Echo Chamber, Static Generator, Sheep Treadmill, Glow Panel, Mycelial Generator), the Powered Furnace, Snow Sheep Chiller, Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Herd Counter, Wool-Lined Crates, Hume Energy Cubes, Energy Meter and Zero Point Energy Module.
 - Mine it with a pickaxe. **Config:** `[status_panel]`: `rowsPerPanel` (4), `range` (128), `refreshTicks` (20), `maxWidth` and `maxHeight` (3).
 
 ### Woollen Armour and Muffled

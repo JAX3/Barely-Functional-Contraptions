@@ -8,7 +8,7 @@ import groovy.json.JsonSlurper
  *     <li>loot conditions: a single {@code "condition": {"type": ...}} (several in a {@code minecraft:all_of}) instead of
  *     a {@code "conditions": [{"condition": ...}]} list; {@code minecraft:match_block} ({@code blocks}, {@code state})
  *     was {@code minecraft:block_state_property} ({@code block}, {@code properties});</li>
- *     <li>loot functions: a single {@code "modifier": {"type": ...}} instead of {@code "functions": [{"function": ...}]};</li>
+ *     <li>loot functions: a {@code "modifier": {"type": ...}} (or a list of them) instead of {@code "functions": [{"function": ...}]};</li>
  *     <li>the {@code minecraft:recipe_unlocked} trigger: {@code "recipes"} instead of {@code "recipe"}.</li>
  * </ul>
  * Anything else passes through unchanged.
@@ -30,6 +30,8 @@ class McDataDowngrade extends FilterReader {
                     out.conditions = conditions(v)
                 } else if (key == 'modifier' && v instanceof Map && v.containsKey('type')) {
                     out.functions = [function(v)]
+                } else if (key == 'modifier' && v instanceof List && v.every { it instanceof Map && it.containsKey('type') }) {
+                    out.functions = v.collect { function(it as Map) }
                 } else if (key == 'recipes' && v instanceof String) {
                     out.recipe = v
                 } else {

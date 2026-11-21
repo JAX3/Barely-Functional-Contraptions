@@ -184,6 +184,11 @@ public final class ModGameTests {
         ECHO_TESTS.put("status_panels_join_into_one_screen_up_to_3x3", ModGameTests::statusPanelJoin);
         ECHO_TESTS.put("status_panel_window_names_orders_and_alerts", ModGameTests::statusPanelWindow);
         ECHO_TESTS.put("status_panel_links_big_machines_from_any_of_their_blocks", ModGameTests::statusPanelBigMachines);
+        ECHO_TESTS.put("crate_holds_one_kind_of_item_and_locks_to_it", ModGameTests::crateStores);
+        ECHO_TESTS.put("crate_bales_make_it_bigger_and_crates_stay_out", ModGameTests::crateBales);
+        ECHO_TESTS.put("crate_fills_from_hoppers_and_pipes_and_reads_on_a_comparator", ModGameTests::crateAutomation);
+        ECHO_TESTS.put("crate_bulges_then_bursts_unless_strapped", ModGameTests::crateBursts);
+        ECHO_TESTS.put("crate_keeps_its_items_lining_and_strap_when_broken", ModGameTests::crateKeeps);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
         TESTS.put("sheep_treadmill_calls_a_sheep_over", ModGameTests::sheepTreadmillAttracts);
@@ -1829,6 +1834,151 @@ public final class ModGameTests {
         h.succeed();
     }
 
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity crate(GameTestHelper h, BlockPos rel) {
+        h.setBlock(rel.below(), Blocks.STONE);
+        h.setBlock(rel, ModBlocks.CRATE.get().defaultBlockState().setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.FACING, Direction.SOUTH));
+        return h.getBlockEntity(rel, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity.class);
+    }
+
+    /** 2,048 cobblestone and no dirt; it hands back a stack at a time; locked, it keeps cobblestone when emptied. */
+    private static void crateStores(GameTestHelper h) {
+        var be = crate(h, new BlockPos(1, 1, 1));
+        h.assertTrue(be.capacity() == 32 * 64, "32 stacks of 64: " + be.capacity());
+        ItemStack cobble = new ItemStack(Items.COBBLESTONE, 64);
+        h.assertTrue(be.add(cobble) == 64 && cobble.isEmpty() && be.count() == 64, "it takes a stack of cobblestone");
+        h.assertFalse(be.accepts(new ItemStack(Items.DIRT)), "then only cobblestone");
+        h.assertTrue(be.room(new ItemStack(Items.COBBLESTONE)) == 2048 - 64, "room for the rest");
+        ItemStack out = be.take(100);
+        h.assertTrue(out.is(Items.COBBLESTONE) && out.getCount() == 64 && be.count() == 0, "a take is a stack at most: " + out);
+        h.assertTrue(be.item().isEmpty() && be.accepts(new ItemStack(Items.DIRT)), "empty and unlocked, it takes anything");
+        be.add(new ItemStack(Items.COBBLESTONE, 3));
+        be.setLocked(true);
+        be.take(3);
+        h.assertTrue(be.item().is(Items.COBBLESTONE) && be.locked() && !be.accepts(new ItemStack(Items.DIRT)),
+                "locked, it keeps cobblestone when empty");
+        be.setLocked(false);
+        h.assertTrue(be.item().isEmpty(), "unlocked when empty: it forgets it");
+        // Unstackables: 32 of them.
+        h.assertTrue(be.room(new ItemStack(Items.IRON_SWORD)) == 32, "32 swords: " + be.room(new ItemStack(Items.IRON_SWORD)));
+        // A player's double-click puts in every matching item they carry.
+        var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        player.getInventory().setItem(3, new ItemStack(Items.COBBLESTONE, 40));
+        player.getInventory().setItem(7, new ItemStack(Items.COBBLESTONE, 20));
+        player.getInventory().setItem(8, new ItemStack(Items.DIRT, 5));
+        ItemStack held = new ItemStack(Items.COBBLESTONE, 10);
+        be.store(h.getLevel(), player, held);
+        h.assertTrue(be.count() == 10 && player.getInventory().getItem(3).getCount() == 40, "one click: what's in hand");
+        be.store(h.getLevel(), player, ItemStack.EMPTY);
+        h.assertTrue(be.count() == 70 && player.getInventory().getItem(3).isEmpty() && player.getInventory().getItem(8).getCount() == 5,
+                "a second click straight after: all the cobblestone, not the dirt: " + be.count());
+        h.succeed();
+    }
+
+    /** Each Wool Bale adds 32 stacks, up to 4; a crate with something in it can't go in another. */
+    private static void crateBales(GameTestHelper h) {
+        var be = crate(h, new BlockPos(1, 1, 1));
+        for (int i = 0; i < 4; i++) h.assertTrue(be.addBale(), "bale " + (i + 1) + " packs in");
+        h.assertFalse(be.addBale(), "but not a fifth");
+        h.assertTrue(be.stacks() == 160 && be.capacity() == 160 * 64, "160 stacks: " + be.stacks());
+        ItemStack full = new ItemStack(ModItems.CRATE.get());
+        full.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.CRATE_CONTENTS.get(),
+                new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.DIRT), 5, false, 0));
+        h.assertFalse(be.accepts(full), "a crate of dirt can't go in a crate");
+        h.assertTrue(be.accepts(new ItemStack(ModItems.CRATE.get())), "an empty one can");
+        h.assertFalse(be.accepts(new ItemStack(Items.SHULKER_BOX)), "nor can a shulker box");
+        h.succeed();
+    }
+
+    /** A hopper above fills it, the item capability fills and empties it, and a comparator reads how full it is. */
+    private static void crateAutomation(GameTestHelper h) {
+        BlockPos at = new BlockPos(1, 1, 1);
+        var be = crate(h, at);
+        h.setBlock(at.above(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN));
+        var hopper = h.getBlockEntity(at.above(), net.minecraft.world.level.block.entity.HopperBlockEntity.class);
+        hopper.setItem(0, new ItemStack(Items.OAK_LOG, 5));
+        var handler = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK, h.absolutePos(at), Direction.EAST);
+        h.assertTrue(handler != null, "pipes reach it from the side");
+        h.succeedWhen(() -> {
+            h.assertTrue(be.count() == 5 && be.item().is(Items.OAK_LOG), "the hopper empties into it: " + be.count());
+            try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                int in = handler.insert(0, net.neoforged.neoforge.transfer.item.ItemResource.of(Items.OAK_LOG), 1000, tx);
+                h.assertTrue(in == 1000, "a pipe puts in 1000: " + in);
+                h.assertTrue(handler.insert(0, net.neoforged.neoforge.transfer.item.ItemResource.of(Items.DIRT), 1, tx) == 0, "but no dirt");
+                tx.commit();
+            }
+            h.assertTrue(be.count() == 1005, "committed: " + be.count());
+            try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                handler.extract(0, net.neoforged.neoforge.transfer.item.ItemResource.of(Items.OAK_LOG), 500, tx);
+                // not committed: nothing moves
+            }
+            h.assertTrue(be.count() == 1005, "an aborted take leaves it: " + be.count());
+            int signal = h.getLevel().getBlockState(h.absolutePos(at)).getAnalogOutputSignal(h.getLevel(), h.absolutePos(at), Direction.NORTH);
+            h.assertTrue(signal == 1 + 14 * 1005 / 2048, "the comparator reads how full: " + signal);
+        });
+    }
+
+    /** Past 90% its lid bulges; a full crate pushed over and over bursts, scattering 8 and losing its lock; a strapped one never does. */
+    private static void crateBursts(GameTestHelper h) {
+        var BULGING = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.BULGING;
+        var be = crate(h, new BlockPos(1, 1, 1));
+        var strapped = crate(h, new BlockPos(4, 1, 1));
+        h.setBlock(new BlockPos(4, 1, 1), h.getBlockState(new BlockPos(4, 1, 1)).setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.STRAPPED, true));
+        strapped = h.getBlockEntity(new BlockPos(4, 1, 1), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity.class);
+        be.add(new ItemStack(Items.COBBLESTONE, 64));
+        h.assertFalse(h.getBlockState(new BlockPos(1, 1, 1)).getValue(BULGING), "a stack in: flat lid");
+        be.setContents(new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.COBBLESTONE), 1900, true, 0));
+        h.assertTrue(h.getBlockState(new BlockPos(1, 1, 1)).getValue(BULGING), "over 90%: it bulges");
+        be.setContents(new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.COBBLESTONE), 2048, true, 0));
+        strapped.setContents(new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.COBBLESTONE), 2048, true, 0));
+        var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        // 2% a push: 600 pushes all but certainly burst it (1 in 180,000 that it holds).
+        for (int i = 0; i < 600 && be.isFull(); i++) {
+            be.store(h.getLevel(), player, new ItemStack(Items.COBBLESTONE));
+            strapped.store(h.getLevel(), player, new ItemStack(Items.COBBLESTONE));
+        }
+        h.assertTrue(be.count() == 2040 && !be.locked(), "it burst: 8 out and its lock broken, holds " + be.count());
+        var spilled = h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(h.absolutePos(new BlockPos(1, 1, 1))).inflate(3));
+        h.assertTrue(spilled.stream().mapToInt(e -> e.getItem().getCount()).sum() == 8, "8 cobblestone scattered: " + spilled.size());
+        h.assertTrue(strapped.isFull() && strapped.locked(), "the strapped one held");
+        h.succeed();
+    }
+
+    /** Broken, it drops itself with its items, lock and bales, its lining and its strap; placed again, it has them all back. */
+    private static void crateKeeps(GameTestHelper h) {
+        BlockPos at = new BlockPos(1, 1, 1);
+        var be = crate(h, at);
+        BlockPos abs = h.absolutePos(at);
+        h.getLevel().setBlockAndUpdate(abs, h.getLevel().getBlockState(abs).setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.LINING,
+                net.minecraft.world.item.DyeColor.LIME).setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.STRAPPED, true));
+        be = h.getBlockEntity(at, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity.class);
+        be.setContents(new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.REDSTONE), 1500, true, 2));
+        var drops = net.minecraft.world.level.block.Block.getDrops(h.getLevel().getBlockState(abs), h.getLevel(), abs, be);
+        h.assertTrue(drops.size() == 1 && drops.get(0).is(ModItems.CRATE.get()), "it drops itself: " + drops);
+        ItemStack dropped = drops.get(0);
+        var contents = dropped.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.CRATE_CONTENTS.get());
+        h.assertTrue(contents != null && contents.count() == 1500 && contents.item().is(Items.REDSTONE) && contents.locked() && contents.bales() == 2,
+                "with its 1,500 redstone, lock and bales: " + contents);
+        var blockState = dropped.get(net.minecraft.core.component.DataComponents.BLOCK_STATE);
+        h.assertTrue(blockState != null && "lime".equals(blockState.properties().get("lining")) && "true".equals(blockState.properties().get("strapped")),
+                "and its lime lining and strap: " + blockState);
+        // Placed again by a player.
+        h.setBlock(at, Blocks.AIR);
+        var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, dropped);
+        BlockPos below = abs.below();
+        dropped.useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND,
+                new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(below).add(0, 0.5, 0), Direction.UP, below, false)));
+        var state = h.getLevel().getBlockState(abs);
+        h.assertTrue(state.is(ModBlocks.CRATE.get()) && state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.LINING)
+                == net.minecraft.world.item.DyeColor.LIME && state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.STRAPPED)
+                && state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.BULGING) == false, "placed lime and strapped: " + state);
+        var again = h.getBlockEntity(at, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity.class);
+        h.assertTrue(again.count() == 1500 && again.locked() && again.bales() == 2, "and full again: " + again.contents());
+        var report = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.report(again);
+        h.assertTrue(report != null && report.status().equals("stored") && report.number().equals("1500"), "a status panel shows it: " + report);
+        h.succeed();
+    }
+
     /** Full mode reads 0 until it counts its target, then 15. */
     private static void herdCounterFull(GameTestHelper h) {
         var be = buildHerdCounter(h);
@@ -2881,7 +3031,7 @@ public final class ModGameTests {
         return drops.stream().filter(filter).mapToInt(ItemStack::getCount).sum();
     }
 
-    /** Every block in the mod places, breaks and steps with the vanilla Iron Block's sounds, except the wool bale. */
+    /** Every block in the mod places, breaks and steps with the vanilla Iron Block's sounds, except the wool bale and the crate. */
     private static void ironSounds(GameTestHelper h) {
         var ironPlace = net.minecraft.world.level.block.Blocks.IRON_BLOCK.defaultBlockState().getSoundType().getPlaceSound();
         int checked = 0;
@@ -2890,6 +3040,7 @@ public final class ModGameTests {
             if (!id.getNamespace().equals(ResourcefulSheep.MOD_ID)) continue;
             if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.SHEEP_GLOW.get()) continue; // invisible light, never placed by hand
             if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.WOOL_BALE.get()) continue; // wool, so it sounds like wool
+            if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.CRATE.get()) continue; // a wooden crate, so it sounds like wood
             var sound = block.defaultBlockState().getSoundType();
             h.assertTrue(sound == net.minecraft.world.level.block.SoundType.IRON && sound.getPlaceSound() == ironPlace,
                     id + " should use the iron block sound type");

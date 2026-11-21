@@ -191,6 +191,12 @@ A little screen that counts the sheep in the pen in front of it (all of them, th
 
 ![A Herd Counter beside a pen of mixed sheep, its area outlined, a comparator and redstone lamp behind it](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/109_herd_counter.png)
 
+### Wool-Lined Crate
+
+A crate that holds lots of one kind of item (2,048 of most things) and shows it on its front. Line it with any colour of wool, pack Wool Bales in to make it bigger, and lock it to its item. Overfill it and it bursts at the seams, unless you strap it shut.
+
+![A row of Wool-Lined Crates lined in different colours, showing cobblestone, redstone, lime wool, swords, wheat and oak logs with their counts](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/111_crate.png)
+
 ### Machine Status Panel
 
 A wall screen that shows how your machines are doing, all in one place: link them with the Barely Functional Wrench and each gets its name, its status (green, amber, red or grey) and a key number. A comparator reads how many have a problem, for an alarm.

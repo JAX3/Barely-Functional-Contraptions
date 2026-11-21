@@ -1,0 +1,31 @@
+{
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/wool_lined_crate/lock",
+    "lock": "barelyfunctionalcontraptions:block/wool_lined_crate/lock"
+  },
+  "elements": [
+    {
+      "from": [
+        3.25,
+        10.25,
+        -0.15
+      ],
+      "to": [
+        5.25,
+        12.75,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lock",
+          "uv": [
+            0,
+            0,
+            4,
+            5
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -42,7 +42,7 @@ public final class MachineReports {
     /** Status names that mean a problem someone should look at. */
     private static final Set<String> PROBLEMS = Set.of("no_energy", "output_full", "invalid_input", "missing_catalysts", "no_sheep_altar",
             "not_enough_items", "no_source", "no_water", "overheated", "frozen", "too_loud", "shrieked", "needs_combs", "overcharged", "hungry",
-            "no_fuel", "no_ground", "overgrown", "missing");
+            "no_fuel", "no_ground", "overgrown", "missing", "crate_full");
     /** ... that mean it's working. */
     private static final Set<String> RUNNING = Set.of("processing", "infusing", "reacting", "listening", "charging", "walking", "tending",
             "filling", "burning", "boosted", "running", "counting");
@@ -137,6 +137,10 @@ public final class MachineReports {
             return of("counting", b.mode() == HerdCounterBlockEntity.Mode.FULL ? b.value() + "/" + b.target() : Integer.toString(b.value()));
         }
         // Storage and meters: how full, or the FE/t passing.
+        if (be instanceof CrateBlockEntity b) {
+            String status = b.count() <= 0 ? "empty" : b.isFull() ? "crate_full" : "stored";
+            return of(status, b.count() >= 10_000 ? String.format(Locale.ROOT, "%.1fk", b.count() / 1000.0) : Integer.toString(b.count()));
+        }
         if (be instanceof EnergyCubeBlockEntity b) return of("stored", stored(b.getEnergyHandler()));
         if (be instanceof EnergyMeterBlockEntity b) return of(b.rate() > 0 ? "running" : "idle", fe(b.rate()));
         if (be instanceof ZeroPointEnergyModuleBlockEntity b) return of("stored", stored(b.getEnergyHandler()));

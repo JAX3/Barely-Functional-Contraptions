@@ -1,0 +1,96 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "bulging": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate_bulge"
+      }
+    },
+    {
+      "when": {
+        "strapped": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate_strap"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "locked": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate_lock",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "locked": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate_lock",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "locked": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate_lock",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "locked": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate_lock",
+        "y": 270
+      }
+    }
+  ]
+}

@@ -232,6 +232,10 @@ public final class DevScreenshotHarness {
             echoChamberTick(mc, server);
             return;
         }
+        if ("crate".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            crateTick(mc, server);
+            return;
+        }
         if ("status_panel".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             statusPanelTick(mc, server);
             return;
@@ -3192,6 +3196,115 @@ public final class DevScreenshotHarness {
      * Hume Energy Cube and a Herd Counter (that one through the real wrench clicks), with a comparator lighting a lamp
      * while anything has a problem: {@code -PharnessScene=status_panel}.
      */
+    /** A crate with {@code contents}, lined {@code lining}, front to the south. */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity placeCrate(ServerLevel level, BlockPos at,
+            net.minecraft.world.item.DyeColor lining, boolean strapped, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents contents) {
+        level.setBlock(at, ModBlocks.CRATE.get().defaultBlockState().setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.FACING, Direction.SOUTH)
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.LINING, lining)
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.STRAPPED, strapped), 3);
+        var be = (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity) level.getBlockEntity(at);
+        be.setContents(contents);
+        return be;
+    }
+
+    private static String crateLine(ServerLevel level, BlockPos at) {
+        return level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity be
+                ? be.contents() + " " + level.getBlockState(at) : "no crate";
+    }
+
+    /**
+     * Five Wool-Lined Crates in a row, all lined differently: cobblestone, redstone full to bursting (its lid bulging),
+     * lime wool locked, a few swords, and an empty strapped one. Then real clicks: cobblestone in, a stack out, a
+     * sneak-click lining one with blue wool; and the full one bursts: {@code -PharnessScene=crate}.
+     */
+    private static void crateTick(Minecraft mc, MinecraftServer server) {
+        BlockPos row = origin == null ? null : origin.offset(0, 0, -4);
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode survival @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                BlockPos o = origin, r = o.offset(0, 0, -4);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, 0, -8), o.offset(7, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, -1, -8), o.offset(7, -1, 3))) level.setBlock(p, Blocks.SPRUCE_PLANKS.defaultBlockState(), 2);
+                placeCrate(level, r.offset(-4, 0, 0), net.minecraft.world.item.DyeColor.WHITE, false,
+                        new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.COBBLESTONE), 1287, false, 0));
+                placeCrate(level, r.offset(-2, 0, 0), net.minecraft.world.item.DyeColor.RED, false,
+                        new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.REDSTONE), 2048, false, 0));
+                placeCrate(level, r, net.minecraft.world.item.DyeColor.LIME, false,
+                        new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(com.jax3.barelyfunctionalcontraptions.compat.Vanilla.wool(net.minecraft.world.item.DyeColor.LIME)), 900, true, 2));
+                placeCrate(level, r.offset(2, 0, 0), net.minecraft.world.item.DyeColor.LIGHT_BLUE, false,
+                        new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.DIAMOND_SWORD), 12, false, 0));
+                placeCrate(level, r.offset(4, 0, 0), net.minecraft.world.item.DyeColor.ORANGE, true,
+                        com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents.EMPTY);
+                // A second row stacked on top, so a wall of them shows.
+                placeCrate(level, r.offset(-3, 1, 0), net.minecraft.world.item.DyeColor.YELLOW, false,
+                        new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.WHEAT), 340, false, 0));
+                placeCrate(level, r.offset(3, 1, 0), net.minecraft.world.item.DyeColor.PURPLE, false,
+                        new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.OAK_LOG), 12_480, false, 4));
+                player.getInventory().setItem(0, new ItemStack(Items.COBBLESTONE, 64));
+                player.getInventory().setItem(1, new ItemStack(com.jax3.barelyfunctionalcontraptions.compat.Vanilla.wool(net.minecraft.world.item.DyeColor.BLUE), 3));
+                player.getInventory().setItem(2, new ItemStack(ModItems.CRATE.get()));
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 18", o.getX() + 0.5, o.getY(), o.getZ() + 0.5));
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 120 -> shot(mc, "111_crate");
+            case 122 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 22", row.getX() - 3.5, row.getY(), row.getZ() + 2.3));
+            case 150 -> shot(mc, "111_crate_close");
+            case 155 -> {
+                // Right-click the cobblestone crate's front with a stack of cobblestone.
+                mc.player.getInventory().setSelectedSlot(0);
+                BlockPos crate = row.offset(-4, 0, 0);
+                var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(crate).add(0, 0, 0.5), Direction.SOUTH, crate, false);
+                ResourcefulSheep.LOGGER.warn("CRATE store click {}", mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, hit));
+            }
+            case 165 -> {
+                // Left-click it: a stack back.
+                BlockPos crate = row.offset(-4, 0, 0);
+                mc.gameMode.startDestroyBlock(crate, Direction.SOUTH);
+            }
+            case 170 -> mc.gameMode.stopDestroyBlock();
+            case 175 -> {
+                // Sneak-right-click the lime one with blue wool: relined.
+                mc.player.getInventory().setSelectedSlot(1);
+                mc.options.keyShift.setDown(true);
+            }
+            case 180 -> {
+                BlockPos crate = row;
+                var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(crate).add(0.5, 0, 0), Direction.EAST, crate, false);
+                ResourcefulSheep.LOGGER.warn("CRATE sneak lining click {}", mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, hit));
+            }
+            case 185 -> mc.options.keyShift.setDown(false);
+            case 195 -> server.execute(() -> {
+                ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                ResourcefulSheep.LOGGER.warn("CRATE cobblestone {} ; lime {} ; player slot0 {} slot1 {} slot3 {}", crateLine(level, row.offset(-4, 0, 0)),
+                        crateLine(level, row), server.getPlayerList().getPlayers().getFirst().getInventory().getItem(0),
+                        server.getPlayerList().getPlayers().getFirst().getInventory().getItem(1),
+                        server.getPlayerList().getPlayers().getFirst().getInventory().getItem(3));
+            });
+            case 200 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 30", row.getX() - 1.5, row.getY() + 1, row.getZ() + 3.2));
+            case 230 -> server.execute(() -> {
+                ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                if (level.getBlockEntity(row.offset(-2, 0, 0)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity be) be.burst(level);
+            });
+            case 233 -> shot(mc, "111_crate_burst");
+            case 240 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ResourcefulSheep.LOGGER.warn("CRATE burst: redstone {} ; Bursting at the Seams {}", crateLine(player.level(), row.offset(-2, 0, 0)),
+                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player,
+                                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.BURSTING_AT_THE_SEAMS));
+            });
+            case 245 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 22", row.getX() + 0.5, row.getY(), row.getZ() + 2.6));
+            case 270 -> shot(mc, "111_crate_relined");
+            case 280 -> mc.stop();
+            default -> {}
+        }
+    }
+
     private static void statusPanelTick(Minecraft mc, MinecraftServer server) {
         BlockPos at = origin == null ? null : origin.offset(0, 0, -5);
         switch (tick) {

@@ -207,6 +207,12 @@ public final class ModBlocks {
                     p -> p.mapColor(MapColor.COLOR_BLUE).strength(1.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion()
                             .lightLevel(state -> 4));
 
+    /** Holds lots of one kind of item and shows it on its front; bulges when nearly full, and may burst. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock> CRATE =
+            REGISTER.registerBlock("wool_lined_crate",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock::new,
+                    p -> p.mapColor(MapColor.WOOD).strength(2.5F).sound(SoundType.WOOD).ignitedByLava());
+
     /** Counts the sheep in the pen in front of its screen, and puts any count on a comparator. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock> HERD_COUNTER =
             REGISTER.registerBlock("herd_counter",

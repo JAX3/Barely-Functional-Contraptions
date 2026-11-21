@@ -309,6 +309,28 @@
       "tab": "logistics"
     },
     {
+      "title": "Wool-Lined Crate",
+      "icon": "barelyfunctionalcontraptions:wool_lined_crate",
+      "text": [
+        "A wooden crate lined with wool that holds lots of one kind of item: 2,048 of anything that stacks to 64 (32 stacks). Its front shows the item and how many. It needs no power.",
+        "- Right-click its front with an item to put it in. Right-click twice quickly to put in every one of it you're carrying.",
+        "- Left-click its front to take a stack out, or sneak-left-click to take one. Its other sides break it as usual, and so does its front once it's empty.",
+        "- Once it holds something it only takes that item, until it's empty again.",
+        "- Sneak-right-click it with an empty hand to lock it to its item: a padlock shows, and it keeps that item even when it's emptied. Again to unlock it.",
+        "- Hoppers and pipes put items in and take them out on every side. A comparator reads how full it is.",
+        "## Lining and packing",
+        "Sneak-right-click it with any dyed wool to line it in that colour, to colour-code a storeroom. Sneak-right-click it with a Wool Bale to pack it in: each bale adds 32 stacks, up to 4 bales (160 stacks).",
+        "## Bursting at the seams",
+        "Past 90% full its lid bulges, wool squeezing out from under it. Once it's full, pushing more at it makes it creak, and now and then it bursts: 8 of its items fly out and its lock breaks. A pipe or hopper pushing at a full crate can burst it too.",
+        "A Crate Strap stops that for good: sneak-right-click the crate with one to strap its lid down.",
+        "## Breaking it",
+        "A crate keeps everything when it's broken: its items, lock, bales, lining and strap. Its tooltip shows what's inside. A crate with something in it can't go in another crate.",
+        "## Config",
+        "Its size, how much a bale adds, and how often it bursts are in the [crate] section of the server config."
+      ],
+      "tab": "logistics"
+    },
+    {
       "title": "Infusing Sheep",
       "icon": "minecraft:iron_ingot",
       "text": [

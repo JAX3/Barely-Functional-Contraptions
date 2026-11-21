@@ -68,6 +68,7 @@ public final class ResourcefulSheep {
         modBus.addListener((net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent event) ->
                 event.register(com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceBoostDataMap.TYPE));
         NeoForge.EVENT_BUS.register(SheepInfusionEvents.class);
+        NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepStatsEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepTrailEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.armor.MuffledEvents.class);

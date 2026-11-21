@@ -1,0 +1,136 @@
+{
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/wool_lined_crate/wool",
+    "wool": "barelyfunctionalcontraptions:block/wool_lined_crate/wool"
+  },
+  "elements": [
+    {
+      "from": [
+        2,
+        16,
+        2
+      ],
+      "to": [
+        14,
+        17.5,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wool",
+          "uv": [
+            2,
+            0,
+            14,
+            1.5
+          ],
+          "tintindex": 0
+        },
+        "south": {
+          "texture": "#wool",
+          "uv": [
+            2,
+            0,
+            14,
+            1.5
+          ],
+          "tintindex": 0
+        },
+        "east": {
+          "texture": "#wool",
+          "uv": [
+            2,
+            0,
+            14,
+            1.5
+          ],
+          "tintindex": 0
+        },
+        "west": {
+          "texture": "#wool",
+          "uv": [
+            2,
+            0,
+            14,
+            1.5
+          ],
+          "tintindex": 0
+        },
+        "up": {
+          "texture": "#wool",
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "tintindex": 0
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        17.5,
+        4
+      ],
+      "to": [
+        12,
+        18,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wool",
+          "uv": [
+            4,
+            0,
+            12,
+            0.5
+          ],
+          "tintindex": 0
+        },
+        "south": {
+          "texture": "#wool",
+          "uv": [
+            4,
+            0,
+            12,
+            0.5
+          ],
+          "tintindex": 0
+        },
+        "east": {
+          "texture": "#wool",
+          "uv": [
+            4,
+            0,
+            12,
+            0.5
+          ],
+          "tintindex": 0
+        },
+        "west": {
+          "texture": "#wool",
+          "uv": [
+            4,
+            0,
+            12,
+            0.5
+          ],
+          "tintindex": 0
+        },
+        "up": {
+          "texture": "#wool",
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "tintindex": 0
+        }
+      }
+    }
+  ]
+}
