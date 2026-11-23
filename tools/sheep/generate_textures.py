@@ -4855,10 +4855,11 @@ def generate_crate():
 
 
 def generate_woollen_steel():
-    """Woollen Steel: a steel ingot wrapped in two bands of white wool; its block, steel plates riveted together with
-    wool stitched along the seams."""
+    """Woollen Steel: a blue-steel ingot wrapped in two bands of white wool; its block, blue-steel plates bolted together
+    with wool stitched along the seams."""
     rnd = random.Random(311)
-    steel_l, steel, steel_d, edge = hexc("#e4e8ee"), hexc("#b5bcc7"), hexc("#7d8592"), hexc("#3f4550")
+    # The machines' blue steel (the same palette as the Functional Machine Block and every machine casing).
+    steel_l, steel, steel_d, edge = CARTOON["H"], CARTOON["M"], CARTOON["S"], CARTOON["O"]
     wool_l, wool, wool_d = hexc("#ffffff"), hexc("#ece8e0"), hexc("#c9c3b8")
     item = Image.new("RGBA", (16, 16), CLEAR)
     # A steel bar, seen from the front (lit top, darker face), with two bands of wool wrapped round it.
@@ -4887,21 +4888,28 @@ def generate_woollen_steel():
                     item.putpixel((x, y), shade_c)
     item.save(out("item/woollen_steel.png"))
 
+    # The block: the casing's dark outline round four blue-steel plates (lit top-left, shaded bottom-right), each with
+    # a lit bolt in its outer corner, and white wool stitched along the cross of seams between them.
     block = Image.new("RGBA", (16, 16), CLEAR)
     for y in range(16):
         for x in range(16):
-            px, py = x % 8, y % 8
-            if px == 7 or py == 7:
-                c = wool_l if (x + y) % 2 else wool_d       # wool stitched along the seams
-            elif px == 0 or py == 0:
-                c = steel_l
-            elif px == 6 or py == 6:
-                c = steel_d
+            if x in (0, 15) or y in (0, 15):
+                c = edge
+            elif x in (7, 8) or y in (7, 8):
+                c = wool_l if (x + y) % 2 else wool_d       # the wool seams
             else:
-                c = shade(steel, rnd.uniform(0.95, 1.05))
+                px = x - 1 if x < 7 else x - 9                 # 0..5 within its plate
+                py = y - 1 if y < 7 else y - 9
+                if px == 0 or py == 0:
+                    c = steel_l
+                elif px == 5 or py == 5:
+                    c = steel_d
+                else:
+                    c = shade(steel, rnd.uniform(0.96, 1.04))
             block.putpixel((x, y), c)
-    for x, y in ((1, 1), (5, 1), (1, 5), (5, 5), (9, 1), (13, 1), (9, 5), (13, 5), (1, 9), (5, 9), (1, 13), (5, 13), (9, 9), (13, 9), (9, 13), (13, 13)):
-        block.putpixel((x, y), edge)                       # rivets
+    for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
+        block.putpixel((x, y), CARTOON["B"])                # bolts, lit like the casing's
+        block.putpixel((x + (1 if x < 8 else -1), y + (1 if y < 8 else -1)), CARTOON["b"])
     block.save(out("block/woollen_steel_block.png"))
 
 def generate_static_generator_gui():
