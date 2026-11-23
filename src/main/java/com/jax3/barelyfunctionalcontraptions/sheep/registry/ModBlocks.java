@@ -58,6 +58,13 @@ public final class ModBlocks {
                     .sound(SoundType.IRON)
                     .noOcclusion());
 
+    /** Nine Woollen Steel in a block: what the mod's recipes use where they once took a Block of Iron. */
+    public static final DeferredBlock<net.minecraft.world.level.block.Block> WOOLLEN_STEEL_BLOCK = REGISTER.registerSimpleBlock("woollen_steel_block",
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(5.0F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.IRON));
+
     /** Crafting component for every machine: the blue-steel casing on its own. Stone pickaxe, like the machines. */
     public static final DeferredBlock<net.minecraft.world.level.block.Block> FUNCTIONAL_MACHINE_BLOCK = REGISTER.registerSimpleBlock("functional_machine_block",
             p -> p.mapColor(MapColor.METAL)

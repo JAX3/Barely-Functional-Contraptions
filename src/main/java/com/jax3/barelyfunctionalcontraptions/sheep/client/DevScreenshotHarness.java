@@ -297,6 +297,10 @@ public final class DevScreenshotHarness {
             powerBlocksTick(mc, server);
             return;
         }
+        if ("woollen_steel".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            woollenSteelTick(mc, server);
+            return;
+        }
         if ("block_wool".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             blockWoolTick(mc, server);
             return;
@@ -4848,6 +4852,55 @@ public final class DevScreenshotHarness {
             command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 18", origin.getX() + 0.5, origin.getY() + 2, origin.getZ() + 5.5));
         } else if (tick == night + 50) shot(mc, "54_themed_sheep_night");
         else if (tick == night + 60) mc.stop();
+    }
+
+    /**
+     * Woollen Steel: a few Blocks of it and Woollen Steel in an item frame; then JEI's recipes for it and for the
+     * Functional Machine Block (which takes it now): {@code -PharnessScene=woollen_steel}.
+     */
+    private static void woollenSteelTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode creative @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                BlockPos o = origin, w = o.offset(0, 0, -3);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-4, 0, -6), o.offset(4, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-4, -1, -6), o.offset(4, -1, 2))) level.setBlock(p, Blocks.SPRUCE_PLANKS.defaultBlockState(), 2);
+                for (BlockPos p : new BlockPos[]{w.west(), w, w.east(), w.above()}) level.setBlock(p, ModBlocks.WOOLLEN_STEEL_BLOCK.get().defaultBlockState(), 3);
+                level.setBlock(w.north().above(), Blocks.STONE_BRICKS.defaultBlockState(), 3);
+                level.setBlock(w.east().north().above(), Blocks.STONE_BRICKS.defaultBlockState(), 3);
+                var frame2 = new net.minecraft.world.entity.decoration.ItemFrame(level, w.east().above(), Direction.SOUTH);
+                frame2.setItem(new ItemStack(ModItems.WOOLLEN_STEEL.get()));
+                level.addFreshEntity(frame2);
+                player.getInventory().setItem(0, new ItemStack(ModItems.WOOLLEN_STEEL.get(), 32));
+                player.getInventory().setItem(1, new ItemStack(ModItems.WOOLLEN_STEEL_BLOCK.get(), 8));
+                player.getInventory().setSelectedSlot(0);
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 20", o.getX() + 0.5, o.getY(), o.getZ() - 0.5));
+            });
+            case 100 -> { McClient.clearChat(mc); shot(mc, "114_woollen_steel"); }
+            case 104 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
+                    com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.show(new ItemStack(ModItems.WOOLLEN_STEEL.get()), true);
+                }
+            }
+            case 112 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 124 -> shot(mc, "114_woollen_steel_jei");
+            case 126 -> {
+                McClient.setScreen(mc, null);
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
+                    com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.show(new ItemStack(ModItems.FUNCTIONAL_MACHINE_BLOCK.get()), true);
+                }
+            }
+            case 134 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 146 -> shot(mc, "114_woollen_steel_machine_block");
+            case 150 -> mc.stop();
+            default -> {}
+        }
     }
 
     /** Every built-in resource, for {@link #blockWoolTick}. */

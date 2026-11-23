@@ -11,7 +11,7 @@
     "R": "minecraft:redstone",
     "M": "barelyfunctionalcontraptions:functional_machine_block",
     "C": "minecraft:comparator",
-    "I": "minecraft:iron_ingot"
+    "I": "barelyfunctionalcontraptions:woollen_steel"
   },
   "result": {
     "id": "barelyfunctionalcontraptions:status_panel",

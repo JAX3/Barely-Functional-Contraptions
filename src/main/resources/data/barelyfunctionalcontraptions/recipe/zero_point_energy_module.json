@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "I": "minecraft:iron_ingot",
+    "I": "barelyfunctionalcontraptions:woollen_steel",
     "C": "minecraft:copper_ingot",
     "B": "minecraft:beacon",
     "A": "minecraft:amethyst_shard",

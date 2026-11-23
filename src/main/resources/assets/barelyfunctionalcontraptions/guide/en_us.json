@@ -6,7 +6,9 @@
       "text": [
         "Barely Functional Contraptions makes power from mushrooms, light and empty space, and grows resources on sheep.",
         "## The machine casing",
-        "Every machine is built around a Functional Machine Block: craft it from iron ingots, copper ingots and redstone, and use it in the machine recipes.",
+        "Every machine is built around a Functional Machine Block: craft it from Woollen Steel, copper ingots and redstone, and use it in the machine recipes.",
+        "## Woollen Steel",
+        "Every contraption's recipe takes Woollen Steel where it would take an Iron Ingot: craft one from an Iron Ingot and any wool. Nine make a Block of Woollen Steel, which recipes take where they'd take a Block of Iron (and it gives the nine back).",
         "## The loop",
         "- Mycelial Generators burn mushrooms and water to make Forge Energy (FE).",
         "- Infuse sheep with a resource (an iron ingot, a diamond...) at an Infusion Altar to change their wool.",
@@ -238,7 +240,7 @@
         "- Too loud for 10 seconds and the room shrieks: players nearby get Darkness, and it stops for a minute.",
         "- A note block on a steady redstone clock, shut in with the chamber behind wool walls, is the easy way.",
         "## Making it",
-        "- Iron Block, Echo Shard, Iron Block on top; Echo Shard, Warden Wool Bale, Echo Shard in the middle; Blackstone, Functional Machine Block, Blackstone at the bottom."
+        "- Block of Woollen Steel, Echo Shard, Block of Woollen Steel on top; Echo Shard, Warden Wool Bale, Echo Shard in the middle; Blackstone, Functional Machine Block, Blackstone at the bottom."
       ]
     },
     {

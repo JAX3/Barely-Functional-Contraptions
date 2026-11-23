@@ -5,7 +5,7 @@
     "G": "minecraft:glass",
     "Q": "minecraft:quartz",
     "D": "minecraft:daylight_detector",
-    "I": "minecraft:iron_ingot",
+    "I": "barelyfunctionalcontraptions:woollen_steel",
     "R": "minecraft:redstone"
   },
   "pattern": [

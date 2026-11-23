@@ -4853,6 +4853,57 @@ def generate_crate():
         item.putpixel((x, y), CARTOON["B"])
     item.save(out("item/crate_strap.png"))
 
+
+def generate_woollen_steel():
+    """Woollen Steel: a steel ingot wrapped in two bands of white wool; its block, steel plates riveted together with
+    wool stitched along the seams."""
+    rnd = random.Random(311)
+    steel_l, steel, steel_d, edge = hexc("#e4e8ee"), hexc("#b5bcc7"), hexc("#7d8592"), hexc("#3f4550")
+    wool_l, wool, wool_d = hexc("#ffffff"), hexc("#ece8e0"), hexc("#c9c3b8")
+    item = Image.new("RGBA", (16, 16), CLEAR)
+    # A steel bar, seen from the front (lit top, darker face), with two bands of wool wrapped round it.
+    bar = ["",
+           "", "", "", "",
+           "....OOOOOOOO....",
+           "...OLLLLLLLLO...",
+           "..OLLLLLLLLLLO..",
+           ".OSSSSSSSSSSSSO.",
+           ".OSSSSSSSSSSSSO.",
+           ".ODDDDDDDDDDDDO.",
+           "..OOOOOOOOOOOO.."]
+    palette = {"O": edge, "L": steel_l, "S": steel, "D": steel_d}
+    for y, row in enumerate(bar):
+        for x, ch in enumerate(row):
+            if ch != ".":
+                item.putpixel((x, y), palette[ch])
+    for bx in (4, 10):
+        for y in range(4, 13):
+            for x in (bx, bx + 1):
+                inside = item.getpixel((x, y))[3] > 0
+                if inside or y in (4, 12):
+                    shade_c = wool_l if y <= 7 else wool if y <= 9 else wool_d
+                    if y in (4, 12):
+                        shade_c = wool_l if (x + y) % 2 else wool
+                    item.putpixel((x, y), shade_c)
+    item.save(out("item/woollen_steel.png"))
+
+    block = Image.new("RGBA", (16, 16), CLEAR)
+    for y in range(16):
+        for x in range(16):
+            px, py = x % 8, y % 8
+            if px == 7 or py == 7:
+                c = wool_l if (x + y) % 2 else wool_d       # wool stitched along the seams
+            elif px == 0 or py == 0:
+                c = steel_l
+            elif px == 6 or py == 6:
+                c = steel_d
+            else:
+                c = shade(steel, rnd.uniform(0.95, 1.05))
+            block.putpixel((x, y), c)
+    for x, y in ((1, 1), (5, 1), (1, 5), (5, 5), (9, 1), (13, 1), (9, 5), (13, 5), (1, 9), (5, 9), (1, 13), (5, 13), (9, 9), (13, 9), (9, 13), (13, 13)):
+        block.putpixel((x, y), edge)                       # rivets
+    block.save(out("block/woollen_steel_block.png"))
+
 def generate_static_generator_gui():
     """Static Generator window: energy gauge, then a panel with the herd and output, the dome's charge bar (the shock
     line marked) and four comb chips; the status lamp below."""
@@ -4941,6 +4992,7 @@ def main():
     generate_herd_counter_gui()
     generate_status_panel()
     generate_crate()
+    generate_woollen_steel()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

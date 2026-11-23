@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "SSS",
+    "SSS",
+    "SSS"
+  ],
+  "key": {
+    "S": "barelyfunctionalcontraptions:woollen_steel"
+  },
+  "result": {
+    "id": "barelyfunctionalcontraptions:woollen_steel_block",
+    "count": 1
+  }
+}

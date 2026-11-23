@@ -11,7 +11,7 @@
     "C": "minecraft:composter",
     "B": "minecraft:bone_block",
     "M": "barelyfunctionalcontraptions:functional_machine_block",
-    "I": "minecraft:iron_ingot",
+    "I": "barelyfunctionalcontraptions:woollen_steel",
     "H": "minecraft:hopper"
   },
   "result": {

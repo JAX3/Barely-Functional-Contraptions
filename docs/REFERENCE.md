@@ -94,9 +94,24 @@ Hover over a tab to see its name. A resource pack's guide file can still use the
 - Pick a tab, then a chapter on the left; long chapters turn over with the arrow buttons.
 - The text lives in `assets/barelyfunctionalcontraptions/guide/en_us.json`. A resource pack can replace it or add a translation (`guide/<language>.json`, e.g. `de_de.json`), which is used when the game is in that language. Each chapter has a `title`, an `icon` item, a `tab` (`power`, `logistics`, `production` or `utility`) and a list of `text` paragraphs; a paragraph starting with `## ` is a heading and one starting with `- ` is a list item.
 
+### Woollen Steel
+An Iron Ingot worked with wool. **Every crafting recipe in the mod takes Woollen Steel where it would take an Iron Ingot**, and a **Block of Woollen Steel** where it would take a Block of Iron (the Functional Machine Block, every machine, the wrench, cables, tanks, crates and so on). Iron Nuggets stay Iron Nuggets, and the Infusion Altar still takes a real Iron Ingot to make an Iron sheep.
+
+```
+Woollen Steel: an Iron Ingot and any wool, in any shape (shapeless)
+Block of Woollen Steel: 9 Woollen Steel (and back to 9)
+```
+
+- It's in `#c:ingots` (`#c:ingots/woollen_steel`) and its block in `#c:storage_blocks`, so other mods can use them.
+- The block mines with a stone pickaxe and sounds like iron.
+
+| Blocks of Woollen Steel, and Woollen Steel in an item frame | Its recipes in JEI | The Functional Machine Block, made with it |
+|---|---|---|
+| ![Four Blocks of Woollen Steel: riveted steel plates with white wool stitched along their seams, and a Woollen Steel bar wrapped in two bands of wool in an item frame](screenshots/114_woollen_steel.png) | ![JEI: an Iron Ingot and wool make Woollen Steel; a Block of Woollen Steel makes nine](screenshots/114_woollen_steel_jei.png) | ![JEI: Woollen Steel in the corners, copper ingots on the sides and redstone in the middle make a Functional Machine Block](screenshots/114_woollen_steel_machine_block.png) |
+
 ### Functional Machine Block
 
-Every machine is built around a **Functional Machine Block**: the blue-steel casing of the machines on its own, with corner bolts and an empty, unlit port in the middle. Craft it from 4 iron ingots, 4 copper ingots and 1 redstone, then put one in the recipe of the Mycelial Generator, Mechanical Separator, Automatic Shears, Fluid Reservoir or Hume Energy Cube. It can also be placed as a decorative block (stone pickaxe, drops itself).
+Every machine is built around a **Functional Machine Block**: the blue-steel casing of the machines on its own, with corner bolts and an empty, unlit port in the middle. Craft it from 4 Woollen Steel, 4 copper ingots and 1 redstone, then put one in the recipe of the Mycelial Generator, Mechanical Separator, Automatic Shears, Fluid Reservoir or Hume Energy Cube. It can also be placed as a decorative block (stone pickaxe, drops itself).
 
 ![Functional Machine Block recipe: iron ingots in the corners, copper ingots on each side, redstone in the centre](screenshots/recipe_functional_machine_block.png)
 
@@ -244,6 +259,7 @@ Full configuration reference: [docs/CONFIGURATION-MYCELIAL.md](CONFIGURATION-MYC
 
 Adding a modded fuel takes one line in `config/barelyfunctionalcontraptions-mycelial-synced.toml`:
 
+```toml
 [fuel]
 	fuels = ["minecraft:brown_mushroom;burn=400", "minecraft:red_mushroom;burn=600;energy=1.25", "#c:mushrooms;burn=400"]
 ```
@@ -593,7 +609,7 @@ C T C      C = Copper Block, T = Fluid Tank
 A late-game generator, **3x3x3**, that turns **noise** into power. Warden sheep stand in a pen in front of its dish and listen for vibrations; keep the noise around it steady and in its sweet spot. Its casing is the machines' blue steel lined with sculk: a big resonator dish on the front whose rings pulse outward from a glowing heart, egg-crate foam walls between baffle ribs, a power port between louvred vents at the back, and a sculk roof with a catalyst dome in a crown of sculk fronds, the biggest two like the Warden sheep's ears.
 
 ```
-I E I      I = Iron Block, E = Echo Shard
+I E I      I = Block of Woollen Steel, E = Echo Shard
 E W E      W = Warden Wool Bale
 B M B      B = Blackstone, M = Functional Machine Block
 ```
@@ -609,7 +625,7 @@ B M B      B = Blackstone, M = Functional Machine Block
 - **Shriek:** too loud for 10 seconds and the room shrieks like a sculk shrieker: shriek rings rise off its roof, players in survival within 16 blocks of its dish get Darkness for 10 seconds, and it stops for a minute. Out of the loud end, the shriek meter drains again.
 - **Window:** right-click any block of it. Left, its energy gauge. In the panel: the herd and output, the **noise meter** (16 segments from silence to 15: amber is too quiet, green the sweet spot, red too loud, lit up to the noise level now), the steadiness bar, and two small bars under it: drowsiness (towards its sheep falling asleep) and the shriek meter (towards a shriek; after one, the cooldown draining). Bottom: a status lamp and line. Every part has a tooltip, and the button top right shows or hides its listening pen (so does sneak-right-click).
 - **Comparator:** against any block of it, reads the noise level, 0-15, for circuits that turn the noise up or down.
-- **Recipe:** see above: three Echo Shards, two Iron Blocks, a Warden Wool Bale, two Blackstone and a Functional Machine Block. It needs a pickaxe; breaking any block of it drops the one machine.
+- **Recipe:** see above: three Echo Shards, two Blocks of Woollen Steel, a Warden Wool Bale, two Blackstone and a Functional Machine Block. It needs a pickaxe; breaking any block of it drops the one machine.
 - **JEI:** an *Echo Chamber* page (the Warden sheep, a note block for the noise, the sweet spot, and the power for one to four sheep with a steady noise and an erratic one) and an information page. **Jade:** its status, output, herd, noise level and steadiness, how drowsy or close to shrieking it is, and its stored energy, whichever of its blocks you look at.
 - **Advancement:** ⭐ **Good Vibrations** (challenge), for being within 16 blocks when one starts listening with its noise in the sweet spot.
 - Still to come: sculk catalysts that wear out, Echo Shard boosts and fleece fatigue.
@@ -742,7 +758,7 @@ Keeps a sheep pen **green**, so sheared sheep regrow their wool sooner. Sheep ea
 ```
 S C S      S = Wheat Seeds, C = Composter
 B M B      B = Bone Block, M = Functional Machine Block
-I H I      I = Iron Ingot, H = Hopper
+I H I      I = Woollen Steel, H = Hopper
 ```
 
 | A pen its sheep have eaten bare | Green again, with short grass growing |
@@ -765,10 +781,10 @@ I H I      I = Iron Ingot, H = Hopper
 - **Goes well with:** **Automatic Shears** on the same pen (the shears take the wool, the Seeder grows it back), and a **Static Generator**, whose sheep only count with their fleece on. Mine it with a pickaxe. **Config:** `[grass_seeder]` (see below).
 
 ### Sheep Treadmill
-A generator a sheep runs: a belt one block wide and two long in the machines' blue-steel casing, with a bundle of wheat hanging from a gantry at the front and the generator housing at the back. Crafted from two Iron Ingots, three wool (the belt), two Copper Ingots and a Functional Machine Block:
+A generator a sheep runs: a belt one block wide and two long in the machines' blue-steel casing, with a bundle of wheat hanging from a gantry at the front and the generator housing at the back. Crafted from two Woollen Steel, three wool (the belt), two Copper Ingots and a Functional Machine Block:
 
 ```
-I . I      I = Iron Ingot
+I . I      I = Woollen Steel
 W W W      W = any wool
 C M C      C = Copper Ingot, M = Functional Machine Block
 ```
@@ -982,7 +998,7 @@ Each side where a Fluid or Item Pipe meets a block can be set up on its own, wit
 A little screen that **counts the sheep in a pen** and puts the count on a **comparator**. It needs no power. A slim blue-steel panel with a green-on-black screen and a tally wheel on its side; its screen faces whoever places it, and it counts the pen on that side.
 
 ```
-I G I      I = Iron Ingot, G = Glass Pane
+I G I      I = Woollen Steel, G = Glass Pane
 O M C      O = Observer, M = Functional Machine Block, C = Comparator
 ```
 
@@ -1020,7 +1036,7 @@ N C N      N = Iron Nugget, C = Chest
 P W P
 ```
 
-The **Crate Strap** is three Iron Ingots over an Iron Nugget.
+The **Crate Strap** is three Woollen Steel over an Iron Nugget.
 
 | A row of crates, each lined to match its item | Close up |
 |---|---|
@@ -1048,7 +1064,7 @@ The **Crate Strap** is three Iron Ingots over an Iron Nugget.
 Links **Wool-Lined Crates** into **one store**, for pipes, hoppers and the Machine Status Panel. It needs no power.
 
 ```
-I H I      I = Iron Ingot, H = Hopper
+I H I      I = Woollen Steel, H = Hopper
 O C O      O = Comparator, C = Wool-Lined Crate
   M        M = Functional Machine Block
 ```
@@ -1076,7 +1092,7 @@ A thin **wall screen** that shows how the machines linked to it are doing, all i
 ```
 G G G      G = Glass Pane
 R M R      R = Redstone, M = Functional Machine Block
-G C I      C = Comparator, I = Iron Ingot
+G C I      C = Comparator, I = Woollen Steel
 ```
 
 | A 3x3 screen on a wall, its alarm lamp lit | Its screen |

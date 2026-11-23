@@ -3,7 +3,7 @@
   "category": "redstone",
   "key": {
     "C": "barelyfunctionalcontraptions:energy_cable",
-    "I": "minecraft:iron_ingot",
+    "I": "barelyfunctionalcontraptions:woollen_steel",
     "Q": "minecraft:comparator",
     "G": "minecraft:glass_pane"
   },
