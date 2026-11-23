@@ -160,6 +160,7 @@ public final class ResourcefulSheepClient {
 
     private static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         CrateLiningTint.clear();
+        BlockWoolTextures.clear();
         SheepResourceRegistry.setClient(new SheepResourceRegistry(Map.of()));
         SeparationLookup.setClientRecipes(RecipeMap.EMPTY);
     }

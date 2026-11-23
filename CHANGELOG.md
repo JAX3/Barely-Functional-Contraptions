@@ -103,6 +103,15 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
 - **Recipe:** four Glass Panes, two Redstone, a Functional Machine Block, a Comparator and an Iron Ingot.
 - New config section `[status_panel]`, and a chapter in the Contraptions Manual (Utility).
 
+### Sheep wear their blocks
+- An infused sheep's fleece is now **its resource's block**: Block of Redstone on a Redstone sheep, Block of Iron on an
+  Iron sheep, oak bark on a Wood sheep, sculk on a Warden sheep, magma on a Blaze sheep, mushroom blocks on the
+  mushroom sheep. It's the block that grows out of it, shaded by the wool's fluff.
+- It's made on your client from the block's own texture, so data-pack resources, modded blocks and resource packs
+  all work. Hay and Snow keep their hand-drawn fleeces; lambs keep a plain one in the resource's colour.
+- The glinting overlay is gone from block fleeces (the blocks have their own pattern), except where it glows (Glow
+  Ink, the Warden's sculk). Client config `blockTexturedWool` (on) brings back the old plain fleece when off.
+
 ### Fixes
 - **Static Generator window:** the dome's charge bar no longer flashes while it's overcharged.
 - **Machine Status Panel:** clicking a Static Generator's dome with the wrench now links it (only its base did), and the

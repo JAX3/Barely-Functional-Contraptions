@@ -297,6 +297,10 @@ public final class DevScreenshotHarness {
             powerBlocksTick(mc, server);
             return;
         }
+        if ("block_wool".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            blockWoolTick(mc, server);
+            return;
+        }
         if ("themed_sheep".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             themedSheepTick(mc, server);
             return;
@@ -4844,6 +4848,62 @@ public final class DevScreenshotHarness {
             command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 18", origin.getX() + 0.5, origin.getY() + 2, origin.getZ() + 5.5));
         } else if (tick == night + 50) shot(mc, "54_themed_sheep_night");
         else if (tick == night + 60) mc.stop();
+    }
+
+    /** Every built-in resource, for {@link #blockWoolTick}. */
+    private static final String[] ALL_RESOURCES = {"stone", "coal", "iron", "copper", "gold", "redstone", "lapis", "diamond", "emerald", "quartz",
+            "netherite", "wood", "hay", "brown_mushroom", "red_mushroom", "snow", "glow_ink", "blaze", "ghast", "spider", "skeleton", "wither_skeleton",
+            "warden", "wither", "dragon"};
+
+    /**
+     * One sheep of every built-in resource, side on in five rows of five, each with its name over it, wearing the fleece
+     * made of its block; then each row close up: {@code -PharnessScene=block_wool}.
+     */
+    private static void blockWoolTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                BlockPos o = origin;
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-14, 0, -26), o.offset(14, 6, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-14, -1, -26), o.offset(14, -1, 4))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                for (int i = 0; i < ALL_RESOURCES.length; i++) {
+                    int col = i % 5, row = i / 5;
+                    double x = o.getX() - 9.5 + col * 4.5, z = o.getZ() - 4.5 - row * 4.5;
+                    Sheep sh = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+                    sh.snapTo(x, o.getY(), z, 90, 0);
+                    sh.setYHeadRot(90);
+                    sh.yHeadRotO = 90;
+                    sh.setYBodyRot(90);
+                    sh.yBodyRotO = 90;
+                    sh.setNoAi(true);
+                    SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id(ALL_RESOURCES[i])), 9, 0));
+                    level.addFreshEntity(sh);
+                    label(server, BlockPos.containing(x, o.getY() + 2.2, z), ALL_RESOURCES[i].replace('_', ' '), "white");
+                }
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 40", origin.getX() + 0.5, origin.getY() + 8, origin.getZ() + 0.5));
+            case 130 -> shot(mc, "113_block_wool");
+            default -> {
+                // Each row close up, from in front of it.
+                int start = 140, per = 40;
+                if (tick >= start && tick < start + 5 * per) {
+                    int row = (tick - start) / per, step = (tick - start) % per;
+                    if (step == 0) {
+                        command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 16", origin.getX() + 0.5, origin.getY() + 1.6,
+                                origin.getZ() - 4.5 - row * 4.5 + 5.2));
+                    } else if (step == per - 1) {
+                        shot(mc, "113_block_wool_row_" + (row + 1));
+                    }
+                }
+                if (tick == start + 5 * per + 10) mc.stop();
+            }
+        }
     }
 
     private static double themedX(int i) {
