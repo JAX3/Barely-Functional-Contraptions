@@ -4855,61 +4855,74 @@ def generate_crate():
 
 
 def generate_woollen_steel():
-    """Woollen Steel: a blue-steel ingot wrapped in two bands of white wool; its block, blue-steel plates bolted together
-    with wool stitched along the seams."""
+    """Woollen Steel in the style of Minecraft's own ingots and metal blocks, in the machines' blue steel: the ingot a
+    bar seen corner-on (lit top face, darker front and end) with a band of wool wrapped round it; the block rows of
+    plates like a Block of Iron, each lit along its top edge, with wool stitched along the seams between them."""
     rnd = random.Random(311)
-    # The machines' blue steel (the same palette as the Functional Machine Block and every machine casing).
     steel_l, steel, steel_d, edge = CARTOON["H"], CARTOON["M"], CARTOON["S"], CARTOON["O"]
+    shine = CARTOON["B"]
     wool_l, wool, wool_d = hexc("#ffffff"), hexc("#ece8e0"), hexc("#c9c3b8")
+
+    # The ingot: the usual bar silhouette, shaded here: top face light, front face mid, the end and underside dark.
+    silhouette = [
+        "................",
+        "................",
+        "..........##....",
+        ".......#######..",
+        "....##########..",
+        ".##############.",
+        "################",
+        "################",
+        "################",
+        "################",
+        "###############.",
+        ".############...",
+        "..########......",
+        "...####.........",
+        "................",
+        "................",
+    ]
+    mask = {(x, y) for y, row in enumerate(silhouette) for x, ch in enumerate(row) if ch == "#"}
     item = Image.new("RGBA", (16, 16), CLEAR)
-    # A steel bar, seen from the front (lit top, darker face), with two bands of wool wrapped round it.
-    bar = ["",
-           "", "", "", "",
-           "....OOOOOOOO....",
-           "...OLLLLLLLLO...",
-           "..OLLLLLLLLLLO..",
-           ".OSSSSSSSSSSSSO.",
-           ".OSSSSSSSSSSSSO.",
-           ".ODDDDDDDDDDDDO.",
-           "..OOOOOOOOOOOO.."]
-    palette = {"O": edge, "L": steel_l, "S": steel, "D": steel_d}
-    for y, row in enumerate(bar):
-        for x, ch in enumerate(row):
-            if ch != ".":
-                item.putpixel((x, y), palette[ch])
-    for bx in (4, 10):
-        for y in range(4, 13):
-            for x in (bx, bx + 1):
-                inside = item.getpixel((x, y))[3] > 0
-                if inside or y in (4, 12):
-                    shade_c = wool_l if y <= 7 else wool if y <= 9 else wool_d
-                    if y in (4, 12):
-                        shade_c = wool_l if (x + y) % 2 else wool
-                    item.putpixel((x, y), shade_c)
+    # The bar's lit front edge: down from its left tip, along the front, and up to its right end.
+    ridge = {0: 6, 1: 6, 2: 7, 3: 8, 4: 9, 5: 9, 6: 8, 7: 8, 8: 8, 9: 7, 10: 7, 11: 7, 12: 6, 13: 6, 14: 6, 15: 6}
+    for (x, y) in mask:
+        boundary = any((x + dx, y + dy) not in mask for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        r = ridge[x]
+        if y == r:
+            c = shine                          # the lit edge
+        elif y < r:
+            c = steel_l if not boundary else steel # the top face
+        elif x >= 13:
+            c = steel_d if not boundary else edge  # the end
+        else:
+            c = edge if boundary else steel if y <= r + 2 else steel_d  # the front face
+        item.putpixel((x, y), c)
+    # A band of wool wrapped round the middle of the bar.
+    for (x, y) in mask:
+        if x in (7, 8):
+            r = ridge[x]
+            item.putpixel((x, y), wool_l if y <= r else wool if y <= r + 2 else wool_d)
     item.save(out("item/woollen_steel.png"))
 
-    # The block: the casing's dark outline round four blue-steel plates (lit top-left, shaded bottom-right), each with
-    # a lit bolt in its outer corner, and white wool stitched along the cross of seams between them.
+    # The block: rows of plates like a Block of Iron, each lit along its top, with a seam under it stitched now and then
+    # with wool; a lit top-left and shaded bottom-right edge.
     block = Image.new("RGBA", (16, 16), CLEAR)
     for y in range(16):
         for x in range(16):
-            if x in (0, 15) or y in (0, 15):
-                c = edge
-            elif x in (7, 8) or y in (7, 8):
-                c = wool_l if (x + y) % 2 else wool_d       # the wool seams
+            if y == 0 or x == 0:
+                c = steel_l
+            elif y == 15 or x == 15:
+                c = steel_d
             else:
-                px = x - 1 if x < 7 else x - 9                 # 0..5 within its plate
-                py = y - 1 if y < 7 else y - 9
-                if px == 0 or py == 0:
-                    c = steel_l
-                elif px == 5 or py == 5:
-                    c = steel_d
+                band = (y - 1) % 3
+                if band == 0:
+                    c = shine if x < 4 + (y * 5) % 7 else steel_l
+                elif band == 1:
+                    c = steel_l if rnd.random() < 0.7 else mix(steel_l, steel, 0.5)
                 else:
-                    c = shade(steel, rnd.uniform(0.96, 1.04))
+                    c = wool_l if (x + y) % 5 == 0 else steel
             block.putpixel((x, y), c)
-    for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
-        block.putpixel((x, y), CARTOON["B"])                # bolts, lit like the casing's
-        block.putpixel((x + (1 if x < 8 else -1), y + (1 if y < 8 else -1)), CARTOON["b"])
     block.save(out("block/woollen_steel_block.png"))
 
 def generate_static_generator_gui():
