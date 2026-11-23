@@ -1,10 +1,10 @@
 # Changelog
 
-## Storage, the Static Generator and the Machine Status Panel (20–23 November 2026)
+## 1.5.7: storage, the Static Generator and the Machine Status Panel (20–23 November 2026)
 
 New contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage (crates and a controller that links them into one store), a mid-game
-generator that runs on static, and a wall screen that keeps an eye on all your machines. They come after 1.5.5 and go
-out in the next release. Numbers are the defaults; almost all of them can be changed in the synced config.
+generator that runs on static, and a wall screen that keeps an eye on all your machines. They come after 1.5.5,
+in 1.5.7. Numbers are the defaults; almost all of them can be changed in the synced config.
 
 ### Storage: the Wool-Lined Crate
 A wooden crate lined with wool that holds **lots of one kind of item** and shows it on its front, like a drawer. It
