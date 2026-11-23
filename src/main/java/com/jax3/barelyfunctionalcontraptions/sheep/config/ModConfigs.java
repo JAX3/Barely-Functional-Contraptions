@@ -894,7 +894,7 @@ public final class ModConfigs {
                     .define("showSheepSparkleOverlay", true);
             showResourceGrowths = b.comment("Render small blocks of the infused resource growing out of the sheep's fleece (fewer as the infusion is used up).")
                     .define("showResourceGrowths", true);
-            blockTexturedWool = b.comment("Infused sheep wear a fleece made from their resource's block (Block of Redstone, Oak Log...); off, a plain fleece in the resource's colour.")
+            blockTexturedWool = b.comment("Infused sheep wear a fleece made from their resource's block (Block of Redstone, Oak Log...; not the themed sheep, which keep their own designs); off, a plain fleece in the resource's colour.")
                     .define("blockTexturedWool", true);
             detailedWoolTooltips = b.comment("Show separation output, energy and time in resource wool tooltips (otherwise only while holding Shift).")
                     .define("detailedWoolTooltips", false);

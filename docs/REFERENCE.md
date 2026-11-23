@@ -258,7 +258,7 @@ Every sheep is infused at a powered **Infusion Altar** (below): the resource in 
 
 - Right-clicking a sheep with a resource no longer infuses it; the action bar points you to the altar. A server can bring hand feeding back with `[infusion_altar] handFeedingMaxTier` (1 = tier 1 sheep by hand, as before).
 - You'll see coloured particles and hear a chime when the sheep takes the resource.
-- The sheep's fleece becomes **its resource's block**: a Redstone sheep wears a fleece of Block of Redstone, an Iron sheep Block of Iron, a Wood sheep oak bark, a Warden sheep sculk, a Blaze sheep magma. It's the block that grows out of it (below), shaded by the wool's fluff so it still looks woolly. The fleece is made on your client from the block's own texture, so data-pack resources, modded blocks and resource packs all work; where a block is see-through (the Spider sheep's cobweb), the wool shows through in the resource's colour. Resources with a hand-drawn fleece (Hay, Snow) keep theirs, and lambs keep a plain fleece in the resource's colour. Turn it off with the client config `blockTexturedWool` for the old plain fleece in the resource's colour with glinting strands.
+- The sheep's fleece becomes **its resource's block**: a Redstone sheep wears a fleece of Block of Redstone, an Iron sheep Block of Iron, a Wood sheep oak bark, a Lapis sheep Block of Lapis. It's the block that grows out of it (below), shaded by the wool's fluff so it still looks woolly. The fleece is made on your client from the block's own texture, so data-pack resources, modded blocks and resource packs all work; where a block is see-through, the wool shows through in the resource's colour. The **themed sheep** (the Ghast, Spider, Wither, Dragon, Blaze, Warden, Glow Ink, Skeleton and Wither Skeleton sheep: anything with extra parts, a skull, a glow, flames or sculk) keep their own designs, resources with a hand-drawn fleece (Hay, Snow) keep theirs, and lambs keep a plain fleece in the resource's colour. Turn it off with the client config `blockTexturedWool` for the old plain fleece in the resource's colour with glinting strands.
 - **Small blocks of the resource grow out of it**: Blocks of Iron on an iron sheep, Blocks of Diamond on a diamond sheep, Red Mushroom Blocks on a red mushroom sheep, Cobblestone on a stone sheep. The cluster shrinks as the infusion is sheared away. The block is the resource's storage block (`<name>_block`, found from the feeding item or the separator output), or the item itself when it is already a block (Oak Log). A data pack can choose another with `growth_item`.
 - With the plain fleece (`blockTexturedWool` off), its dye colour still shows through slightly, so a blue diamond sheep looks different from a white one.
 - **Each infusion lasts 100 shearings by default**, whatever the resource (`infusionUsesOverride` in the config). Set that to `-1` to use each resource's own count instead: iron, gold, copper, redstone, lapis and coal last **9** shearings, and diamond, emerald, netherite scrap, cobblestone, oak log, quartz and the mushrooms last **1** or **3**.
@@ -1489,8 +1489,8 @@ Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already 
 | `ambientParticles` | Particles around infused sheep |
 | `dyeTintStrength` | How strongly the dye colour shows through infused wool |
 | `showResourceGrowths` | Small blocks of the resource growing out of infused fleece |
-| `showSheepSparkleOverlay` | The glinting overlay on infused fleece (the plain fleece; block fleeces only keep it where it glows) |
-| `blockTexturedWool` | Infused sheep wear a fleece made of their resource's block (default on); off, a plain fleece in the resource's colour |
+| `showSheepSparkleOverlay` | The glinting overlay on infused fleece (not on block fleeces) |
+| `blockTexturedWool` | Infused sheep wear a fleece made of their resource's block (default on; not the themed sheep); off, a plain fleece in the resource's colour |
 | `detailedWoolTooltips` | Always show separator details in wool tooltips |
 | `detailedMachineTooltips` | Extra detail in the separator GUI tooltips |
 
@@ -1657,7 +1657,7 @@ Together with the `barelyfunctionalcontraptions:separating` recipe type above, t
 Shearing drops are hooked through a global loot modifier on loot tables whose path starts with `shearing/`. That means hand shears, dispensers and modded shears are all covered, along with modded sheep that use their own `shearing/...` table. Infused-fleece rendering is applied to any entity whose renderer extends the vanilla `SheepRenderer`.
 
 #### Custom wool textures
-The 12 built-in wools have hand-made textures. Any other resource uses a greyscale wool texture tinted with its `wool_color` and `accent_color`, so it never shows a missing texture. (That's the wool item; a data-pack resource's sheep wear a fleece made of its block, like the built-in ones, worked out from the block's texture.)
+The 12 built-in wools have hand-made textures. Any other resource uses a greyscale wool texture tinted with its `wool_color` and `accent_color`, so it never shows a missing texture. (That's the wool item; a data-pack resource's sheep wear a fleece made of its block, like the built-in ones, worked out from the block's texture, unless its `appearance` gives it features or a skull.)
 
 To give a data-pack resource its own icon, ship a resource pack that overrides `assets/barelyfunctionalcontraptions/items/resource_wool.json` and adds a `case` for your resource id. The file is a `minecraft:select` on the `barelyfunctionalcontraptions:sheep_resource` component.
 

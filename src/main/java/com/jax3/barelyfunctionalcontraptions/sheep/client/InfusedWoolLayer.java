@@ -155,15 +155,16 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
             }
         }
         SheepAppearance appearance = resource.get().appearance();
-        // A fleece made of its resource's block (a Redstone sheep wears Block of Redstone), drawn untinted, unless
-        // the resource has a hand-drawn fleece of its own.
-        if (!melon && appearance.woolTexture().isEmpty() && ModConfigs.getBool(ModConfigs.CLIENT.blockTexturedWool)) {
+        // A fleece made of its resource's block (a Redstone sheep wears Block of Redstone), drawn untinted and without
+        // the sparkle (the block has its own pattern). Only for plain resource sheep: themed sheep (extra parts, a skull,
+        // glowing, burning, sculk) and ones with a hand-drawn fleece keep their own design.
+        if (!melon && appearance.woolTexture().isEmpty() && appearance.features().isEmpty() && appearance.skullTexture().isEmpty()
+                && ModConfigs.getBool(ModConfigs.CLIENT.blockTexturedWool)) {
             Optional<Identifier> blockWool = BlockWoolTextures.textureFor(resource.get());
             if (blockWool.isPresent()) {
                 appearance = appearance.withWoolTexture(blockWool.get());
                 wool = -1;
-                // The block has its own pattern: no sparkle over it, except where the sparkle glows (glow ink, sculk).
-                if (!appearance.has(Feature.GLOWING) && !appearance.has(Feature.SCULK)) accent = 0;
+                accent = 0;
             }
         }
         if (melon) {
