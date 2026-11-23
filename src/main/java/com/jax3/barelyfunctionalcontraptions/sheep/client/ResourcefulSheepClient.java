@@ -87,6 +87,8 @@ public final class ResourcefulSheepClient {
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.CRATE.get(), context -> new CrateRenderer());
             event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.CRATE_CONTROLLER.get(), context -> new CrateControllerRenderer());
+            event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.POWERED_FURNACE.get(), context -> new AreaOutlineRenderer<>());
         });
 
@@ -200,6 +202,7 @@ public final class ResourcefulSheepClient {
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HERD_COUNTER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATUS_PANEL,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_CONTROLLER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_STRAP)) {
             if (event.getItemStack().is(tipped.get())) {
                 event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions." + tipped.getId().getPath())

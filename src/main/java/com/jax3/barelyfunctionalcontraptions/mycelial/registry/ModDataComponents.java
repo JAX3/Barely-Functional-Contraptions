@@ -27,6 +27,13 @@ public final class ModDataComponents {
                     .networkSynchronized(GlobalPos.STREAM_CODEC)
                     .build());
 
+    /** The Crate Controller a Barely Functional Wrench is linking crates to. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<GlobalPos>> LINKING_CONTROLLER =
+            COMPONENTS.register("linking_controller", () -> DataComponentType.<GlobalPos>builder()
+                    .persistent(GlobalPos.CODEC)
+                    .networkSynchronized(GlobalPos.STREAM_CODEC)
+                    .build());
+
     /** Successful links made with a Barely Functional Wrench (for the configurable durability). */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> WRENCH_USES =
             COMPONENTS.register("wrench_uses", () -> DataComponentType.<Integer>builder()

@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "barelyfunctionalcontraptions:wool_lined_crate"
+    "barelyfunctionalcontraptions:wool_lined_crate",
+    "barelyfunctionalcontraptions:crate_controller"
   ]
 }

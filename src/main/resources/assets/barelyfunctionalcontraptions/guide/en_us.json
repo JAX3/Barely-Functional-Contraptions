@@ -333,6 +333,25 @@
       "tab": "logistics"
     },
     {
+      "title": "Crate Controller",
+      "icon": "barelyfunctionalcontraptions:crate_controller",
+      "text": [
+        "Links Wool-Lined Crates into one store, so pipes and hoppers can reach them all through one block. It needs no power.",
+        "- Crates touching it, or touching a crate already in its store, join by themselves. Build it into a wall of crates and it's done.",
+        "- For crates elsewhere, use the Barely Functional Wrench: click the controller (the wrench glows), then a crate (every crate touching it comes too), then the controller again to finish. Up to 200 blocks away.",
+        "- A store holds up to 64 crates. Crates in a store wear a little brass tag on their front, and a crate is only ever in one store.",
+        "## Pipes and hoppers",
+        "Items put into the controller go to a crate already holding them, then to an empty unlocked crate, and only then into crates whose lids are bulging. Pipes can take anything stored out of it.",
+        "If nothing fits anywhere, the fullest crate holding that item strains, and may burst, unless it's strapped.",
+        "## Keeping an eye on it",
+        "Its front shows how many crates are in its store and how full it all is: green, amber when it's nearly full or has no empty crates, red when a linked crate is missing or a full crate could burst. A comparator reads how full it all is.",
+        "Link it to a Machine Status Panel and the whole store takes one line there, and its problems set off the panel's alarm.",
+        "## Config",
+        "Its range and how many crates it holds are in the [crate_controller] section of the server config."
+      ],
+      "tab": "logistics"
+    },
+    {
       "title": "Infusing Sheep",
       "icon": "minecraft:iron_ingot",
       "text": [

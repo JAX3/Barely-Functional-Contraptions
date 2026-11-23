@@ -46,6 +46,9 @@ public final class ModAdvancements {
     public static final int MISSION_CONTROL_MACHINES = 8;
     /** Being near a Wool-Lined Crate when it bursts. */
     public static final String BURSTING_AT_THE_SEAMS = "contraptions/bursting_at_the_seams";
+    /** Being near a Crate Controller with {@link #DEWEY_DECIMAL_CRATES} crates in its store. */
+    public static final String DEWEY_DECIMAL_SHEEP = "contraptions/dewey_decimal_sheep";
+    public static final int DEWEY_DECIMAL_CRATES = 16;
     public static final String INFUSE_SHEEP = "contraptions/infuse_sheep";
     /** Players this close to Automatic Shears when they shear a sheep get {@link #AUTO_SHEAR}. */
     public static final double AUTO_SHEAR_RADIUS = 16;

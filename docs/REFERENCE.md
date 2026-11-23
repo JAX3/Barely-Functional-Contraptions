@@ -135,6 +135,7 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | ⭐ **Thermal Shock** (challenge) | Be within 16 blocks of a Thermal Reaction Chamber when it starts reacting |
 | ⭐ **Mission Control** (goal) | Link 8 machines to one Machine Status Panel screen |
 | Bursting at the Seams | Be near a Wool-Lined Crate when it's overfilled and bursts |
+| ⭐ **Dewey Decimal Sheep** (goal) | Link 16 Wool-Lined Crates into one Crate Controller's store |
 | ⭐ **Count Your Sheep** (goal) | Be near a Herd Counter counting 20 sheep at once |
 | ⭐ **Keep Off the Grass** (goal) | Be near a Grass Seeder that has tended 100 blocks of its pen |
 | ⭐ **Shocking!** (goal) | Get knocked back by an overcharged Static Generator |
@@ -1042,6 +1043,29 @@ The **Crate Strap** is three Iron Ingots over an Iron Nugget.
 - **Advancement:** *Bursting at the Seams*, for being near a crate when it bursts.
 - Mine it with an axe; it sounds like wood. **Config:** `[crate]`: `stacks` (32), `stacksPerBale` (32), `maxBales` (4), `bursting` (true), `burstChance` (0.02), `burstItems` (8).
 
+### Crate Controller
+Links **Wool-Lined Crates** into **one store**, for pipes, hoppers and the Machine Status Panel. It needs no power.
+
+```
+I H I      I = Iron Ingot, H = Hopper
+O C O      O = Comparator, C = Wool-Lined Crate
+  M        M = Functional Machine Block
+```
+
+| In a wall of crates: 7 crates, 34%, in red (one could burst) | Its front, and the brass tags of the crates in its store |
+|---|---|
+| ![A Crate Controller in the middle of a wall of five crates, and two more crates across the room linked with the wrench, all wearing brass tags](screenshots/112_crate_controller_linked.png) | ![Close up: the controller's brass front with its little screen reading 7 crates and 34% in red, between crates of cobblestone and redstone](screenshots/112_crate_controller_close.png) |
+
+- **Joining it:** crates **touching** it, or touching a crate already in its store, join by themselves. Crates elsewhere link with the **Barely Functional Wrench**: click the controller (the wrench glows), then a crate (and **every crate touching it** comes too), again to unlink it, then the controller again to finish; up to **200 blocks** away (`range`). A store holds up to **64 crates** (`maxCrates`).
+- **One store per crate:** a crate in a store wears a little **brass tag** on its front, and another controller leaves it alone (its wrench says so). A controller renews its claim every second; break it, or let its chunk unload, and its crates go free within a few seconds.
+- **Only Wool-Lined Crates** join: not chests, barrels or other storage.
+- **Pipes and hoppers** on the controller reach the whole store. Items in go to a crate **already holding them** (and not bulging), then to an **empty unlocked** crate, and only then into **bulging** ones. Pipes take anything stored out. If nothing fits anywhere, the **fullest unstrapped crate** holding that item (or any full one) strains, and may burst.
+- **Its front:** a little screen with how many crates are in its store and how full it all is: **green**, **amber** past 90% or with no empty crates, **red** when a linked crate is missing or a full crate could burst. Right-click it for a summary (its window comes next).
+- **Comparator:** how full the whole store is (1 to 15).
+- **Machine Status Panel:** link it like a machine; the whole store is one line: *Stored*, *Nearly full* or *No empty crates* (amber), *Crate missing* or *Could burst* (red), with how full it is.
+- **Advancement:** ⭐ *Dewey Decimal Sheep* (goal), for being near a controller with 16 crates in its store.
+- Mine it with an axe; it sounds like wood. **Config:** `[crate_controller]`: `range` (200), `maxCrates` (64).
+
 ### Machine Status Panel
 A thin **wall screen** that shows how the machines linked to it are doing, all in one place. It needs no power.
 
@@ -1066,7 +1090,7 @@ G C I      C = Comparator, I = Iron Ingot
 - **Comparator:** reads how many of its machines have a **problem** (with their alert on), up to 15, for an alarm lamp or bell; or, set to *Signal: working*, how many are working.
 - **JEI:** a *Machine Status Panel* page (the wrench and machines into the panel, a comparator out, and what each colour means) and an information page. **Jade:** on any panel of a screen, how many machines it shows out of how many, its size, how many have a problem and the first two, and its signal.
 - **Advancement:** ⭐ *Mission Control* (goal), for linking 8 machines to one screen (so a screen of 2 panels or more).
-- **Machines it shows:** every generator (Blaze Sheep Furnace, Wool Burner, Thermal Reaction Chamber, Echo Chamber, Static Generator, Sheep Treadmill, Glow Panel, Mycelial Generator), the Powered Furnace, Snow Sheep Chiller, Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Herd Counter, Wool-Lined Crates, Hume Energy Cubes, Energy Meter and Zero Point Energy Module.
+- **Machines it shows:** every generator (Blaze Sheep Furnace, Wool Burner, Thermal Reaction Chamber, Echo Chamber, Static Generator, Sheep Treadmill, Glow Panel, Mycelial Generator), the Powered Furnace, Snow Sheep Chiller, Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Herd Counter, Wool-Lined Crates, Crate Controllers, Hume Energy Cubes, Energy Meter and Zero Point Energy Module.
 - Mine it with a pickaxe. **Config:** `[status_panel]`: `rowsPerPanel` (4), `range` (200), `refreshTicks` (20), `maxWidth` and `maxHeight` (3).
 
 ### Woollen Armour and Muffled

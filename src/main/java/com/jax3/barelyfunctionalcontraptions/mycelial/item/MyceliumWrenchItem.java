@@ -62,6 +62,9 @@ public class MyceliumWrenchItem extends Item {
         // machine links or unlinks it, before anything else the wrench or the machine would do.
         InteractionResult panel = linkToPanel(stack, context);
         if (panel != InteractionResult.PASS) return panel;
+        // Crate Controller: clicking one starts (or finishes) linking crates to its store.
+        InteractionResult controller = linkToController(stack, context);
+        if (controller != InteractionResult.PASS) return controller;
         // Energy Meter: the wrench flips it (sneak: turns it).
         if (context.getPlayer() != null && context.getLevel().getBlockState(context.getClickedPos()).getBlock()
                 instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock) {
@@ -102,6 +105,7 @@ public class MyceliumWrenchItem extends Item {
                 stack.remove(ModDataComponents.LINKING_PANEL.get());
                 ok(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.done"));
             } else {
+                stack.remove(ModDataComponents.LINKING_CONTROLLER.get());
                 stack.set(ModDataComponents.LINKING_PANEL.get(), clicked);
                 ok(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.linking"));
             }
@@ -135,6 +139,52 @@ public class MyceliumWrenchItem extends Item {
             case TOO_FAR -> fail(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.too_far",
                     com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.range()));
             case NOT_A_MACHINE -> fail(player, Component.translatable("message.barelyfunctionalcontraptions.status_panel.not_a_machine", name));
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    private InteractionResult linkToController(ItemStack stack, UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Player player = context.getPlayer();
+        if (player == null) return InteractionResult.PASS;
+        boolean onController = level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity;
+        GlobalPos linking = stack.get(ModDataComponents.LINKING_CONTROLLER.get());
+        if (!onController && linking == null) return InteractionResult.PASS;
+        if (level.isClientSide() || !(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
+        String key = "message.barelyfunctionalcontraptions.crate_controller.";
+        if (onController) {
+            if (linking != null && linking.dimension().equals(level.dimension()) && linking.pos().equals(pos)) {
+                stack.remove(ModDataComponents.LINKING_CONTROLLER.get());
+                ok(player, Component.translatable(key + "done"));
+            } else {
+                stack.set(ModDataComponents.LINKING_CONTROLLER.get(), GlobalPos.of(level.dimension(), pos));
+                ok(player, Component.translatable(key + "linking"));
+            }
+            level.playSound(null, pos, SoundEvents.CHISELED_BOOKSHELF_INSERT, SoundSource.BLOCKS, 0.8F, 1.0F);
+            return InteractionResult.SUCCESS;
+        }
+        if (!linking.dimension().equals(level.dimension())
+                || !(level.getBlockEntity(linking.pos()) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity controller)) {
+            stack.remove(ModDataComponents.LINKING_CONTROLLER.get());
+            fail(player, Component.translatable(key + "gone"));
+            return InteractionResult.SUCCESS;
+        }
+        var result = controller.toggleLink(serverLevel, pos);
+        switch (result) {
+            case LINKED -> {
+                ok(player, Component.translatable(key + "linked", controller.crateCount(), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity.maxCrates()));
+                level.playSound(null, pos, SoundEvents.CHISELED_BOOKSHELF_INSERT, SoundSource.BLOCKS, 0.8F, 1.4F);
+            }
+            case UNLINKED -> {
+                ok(player, Component.translatable(key + "unlinked"));
+                level.playSound(null, pos, SoundEvents.CHISELED_BOOKSHELF_PICKUP, SoundSource.BLOCKS, 0.8F, 0.9F);
+            }
+            case ALREADY_IN -> ok(player, Component.translatable(key + "already_in"));
+            case NOT_A_CRATE -> fail(player, Component.translatable(key + "not_a_crate", level.getBlockState(pos).getBlock().getName()));
+            case TOO_FAR -> fail(player, Component.translatable(key + "too_far", com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity.range()));
+            case FULL -> fail(player, Component.translatable(key + "full", com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity.maxCrates()));
+            case TAKEN -> fail(player, Component.translatable(key + "taken"));
         }
         return InteractionResult.SUCCESS;
     }
@@ -314,7 +364,7 @@ public class MyceliumWrenchItem extends Item {
     @Override
     public boolean isFoil(ItemStack stack) {
         return stack.has(ModDataComponents.SELECTED_GENERATOR.get()) || stack.has(ModDataComponents.LINK_GLOW_UNTIL.get())
-                || stack.has(ModDataComponents.LINKING_PANEL.get());
+                || stack.has(ModDataComponents.LINKING_PANEL.get()) || stack.has(ModDataComponents.LINKING_CONTROLLER.get());
     }
 
     /** Ends the post-link glint once its time is up (server side; the change syncs to the client). */

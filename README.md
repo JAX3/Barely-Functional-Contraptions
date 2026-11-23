@@ -191,6 +191,12 @@ A crate that holds lots of one kind of item (2,048 of most things) and shows it 
 
 ![A row of Wool-Lined Crates, each lined the colour of what it holds, showing cobblestone, redstone, lime wool, swords, wheat and oak logs with their counts](docs/screenshots/111_crate.png)
 
+### Crate Controller
+
+Links your Wool-Lined Crates into one store: crates touching it join by themselves, others link with the wrench. Pipes and hoppers on the controller reach every crate, items find the crate they belong in, and the whole store shows as one line on a Machine Status Panel.
+
+![A Crate Controller in a wall of crates, its little screen reading 7 crates and 34 percent full](docs/screenshots/112_crate_controller_close.png)
+
 ### Machine Status Panel
 
 A wall screen that shows how your machines are doing, all in one place: link them with the Barely Functional Wrench and each gets its name, its status (green, amber, red or grey) and a key number. A comparator reads how many have a problem, for an alarm.

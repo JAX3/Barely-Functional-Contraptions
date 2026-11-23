@@ -1,0 +1,31 @@
+{
+  "textures": {
+    "particle": "barelyfunctionalcontraptions:block/wool_lined_crate/tag",
+    "tag": "barelyfunctionalcontraptions:block/wool_lined_crate/tag"
+  },
+  "elements": [
+    {
+      "from": [
+        6.5,
+        0.75,
+        -0.12
+      ],
+      "to": [
+        9.5,
+        2.25,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tag",
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ]
+        }
+      }
+    }
+  ]
+}

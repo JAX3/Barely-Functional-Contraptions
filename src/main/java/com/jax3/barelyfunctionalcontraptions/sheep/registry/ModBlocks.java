@@ -213,6 +213,12 @@ public final class ModBlocks {
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock::new,
                     p -> p.mapColor(MapColor.WOOD).strength(2.5F).sound(SoundType.WOOD).ignitedByLava());
 
+    /** Links Wool-Lined Crates into one store, for pipes, hoppers and a Machine Status Panel. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateControllerBlock> CRATE_CONTROLLER =
+            REGISTER.registerBlock("crate_controller",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateControllerBlock::new,
+                    p -> p.mapColor(MapColor.WOOD).strength(2.5F).sound(SoundType.WOOD).ignitedByLava());
+
     /** Counts the sheep in the pen in front of its screen, and puts any count on a comparator. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock> HERD_COUNTER =
             REGISTER.registerBlock("herd_counter",

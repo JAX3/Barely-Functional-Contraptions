@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "barelyfunctionalcontraptions:block/crate_controller"
+    },
+    "facing=east": {
+      "model": "barelyfunctionalcontraptions:block/crate_controller",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "barelyfunctionalcontraptions:block/crate_controller",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "barelyfunctionalcontraptions:block/crate_controller",
+      "y": 270
+    }
+  }
+}

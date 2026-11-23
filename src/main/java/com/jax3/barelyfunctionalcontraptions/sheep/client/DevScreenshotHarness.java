@@ -232,6 +232,10 @@ public final class DevScreenshotHarness {
             echoChamberTick(mc, server);
             return;
         }
+        if ("crate_controller".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            crateControllerTick(mc, server);
+            return;
+        }
         if ("crate".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             crateTick(mc, server);
             return;
@@ -3302,6 +3306,78 @@ public final class DevScreenshotHarness {
     private static String crateLine(ServerLevel level, BlockPos at) {
         return level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity be
                 ? be.contents() + " " + level.getBlockState(at) : "no crate";
+    }
+
+    /**
+     * A Crate Controller in a wall of five crates, and two crates across the room linked with real wrench clicks
+     * (controller, crate, controller); then 200 wheat put in through it, which goes to the far empty crate:
+     * {@code -PharnessScene=crate_controller}.
+     */
+    private static void crateControllerTick(Minecraft mc, MinecraftServer server) {
+        BlockPos wall = origin == null ? null : origin.offset(0, 0, -4);
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode survival @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                BlockPos o = origin, w = o.offset(0, 0, -4);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, 0, -8), o.offset(7, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-7, -1, -8), o.offset(7, -1, 3))) level.setBlock(p, Blocks.SPRUCE_PLANKS.defaultBlockState(), 2);
+                net.minecraft.world.item.Item[] items = {Items.COBBLESTONE, Items.REDSTONE, Items.IRON_INGOT, Items.COAL, Items.LAPIS_LAZULI};
+                int[] counts = {1287, 2048, 412, 900, 64};
+                int k = 0;
+                for (int y = 0; y <= 1; y++) for (int x = -1; x <= 1; x++) {
+                    BlockPos p = w.offset(x, y, 0);
+                    if (x == 0 && y == 0) continue; // the controller
+                    placeCrate(level, p, null, false, new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(items[k]), counts[k], false, 0));
+                    k++;
+                }
+                level.setBlock(w, ModBlocks.CRATE_CONTROLLER.get().defaultBlockState()
+                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateControllerBlock.FACING, Direction.SOUTH), 3);
+                // Across the room: two crates touching each other, not touching the wall.
+                placeCrate(level, w.offset(-5, 0, 2), null, false, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents.EMPTY);
+                placeCrate(level, w.offset(-5, 1, 2), null, false,
+                        new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(Items.EMERALD), 37, true, 0));
+                player.getInventory().setItem(0, new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()));
+                player.getInventory().setSelectedSlot(0);
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 200 15", o.getX() + 0.5, o.getY(), o.getZ() + 0.5));
+            });
+            case 80 -> setHudHidden(mc, true);
+            case 90, 100, 110 -> {
+                // The wrench: the controller, the crate across the room, the controller again.
+                BlockPos target = tick == 100 ? wall.offset(-5, 0, 2) : wall;
+                Direction face = tick == 100 ? Direction.EAST : Direction.SOUTH;
+                var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(target).add(face.getStepX() * 0.5, 0, face.getStepZ() * 0.5), face, target, false);
+                ResourcefulSheep.LOGGER.warn("CONTROLLER wrench click {} on {}", mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, hit), target);
+            }
+            case 140 -> server.execute(() -> {
+                ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                if (level.getBlockEntity(wall) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity c) {
+                    c.refresh(level);
+                    ResourcefulSheep.LOGGER.warn("CONTROLLER {} crates, {} / {} ({}%), {} empty, {} could burst, links {}, report {}", c.crateCount(), c.stored(), c.capacity(),
+                            c.percent(), c.empties(), c.risky(), c.links(), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.report(c));
+                    var handler = c.getItemHandler();
+                    try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                        int in = handler.insert(net.neoforged.neoforge.transfer.item.ItemResource.of(Items.WHEAT), 200, tx);
+                        tx.commit();
+                        ResourcefulSheep.LOGGER.warn("CONTROLLER took {} wheat; the far empty crate now {}", in,
+                                level.getBlockEntity(wall.offset(-5, 0, 2)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity e ? e.contents() : null);
+                    }
+                }
+            });
+            case 150 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 12", wall.getX() + 0.5, wall.getY(), wall.getZ() + 3.6));
+            case 190 -> shot(mc, "112_crate_controller");
+            case 192 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.1f %.2f 180 6", wall.getX() + 0.5, wall.getY() - 0.4, wall.getZ() + 2.4));
+            case 230 -> shot(mc, "112_crate_controller_close");
+            case 232 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.1f %.2f 153 18", wall.getX() + 1.5, wall.getY() + 1.0, wall.getZ() + 8.5));
+            case 270 -> shot(mc, "112_crate_controller_linked");
+            case 280 -> mc.stop();
+            default -> {}
+        }
     }
 
     /**

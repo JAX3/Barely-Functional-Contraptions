@@ -74,16 +74,18 @@ public class CrateBlock extends BaseEntityBlock {
     public static final BooleanProperty STRAPPED = BooleanProperty.create("strapped");
     /** Locked to its item: a little gold padlock in the corner of its front. */
     public static final BooleanProperty LOCKED = BooleanProperty.create("locked");
+    /** Part of a Crate Controller's store: a little brass tag on its front. */
+    public static final BooleanProperty TAGGED = BooleanProperty.create("tagged");
 
     public CrateBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(LINING, DyeColor.WHITE)
-                .setValue(BULGING, false).setValue(STRAPPED, false).setValue(LOCKED, false).setValue(DYED, false));
+                .setValue(BULGING, false).setValue(STRAPPED, false).setValue(LOCKED, false).setValue(DYED, false).setValue(TAGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, LINING, BULGING, STRAPPED, LOCKED, DYED);
+        builder.add(FACING, LINING, BULGING, STRAPPED, LOCKED, DYED, TAGGED);
     }
 
     /** Its front faces whoever places it. */

@@ -54,6 +54,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> HERD_COUNTER = REGISTER.registerSimpleBlockItem(ModBlocks.HERD_COUNTER);
     public static final DeferredItem<BlockItem> STATUS_PANEL = REGISTER.registerSimpleBlockItem(ModBlocks.STATUS_PANEL);
     public static final DeferredItem<BlockItem> CRATE = REGISTER.registerSimpleBlockItem(ModBlocks.CRATE);
+    public static final DeferredItem<BlockItem> CRATE_CONTROLLER = REGISTER.registerSimpleBlockItem(ModBlocks.CRATE_CONTROLLER);
     /** Straps a Wool-Lined Crate shut so it never bursts. */
     public static final DeferredItem<net.minecraft.world.item.Item> CRATE_STRAP = REGISTER.registerSimpleItem("crate_strap");
     public static final DeferredItem<BlockItem> SHEEP_TREADMILL = REGISTER.registerSimpleBlockItem(ModBlocks.SHEEP_TREADMILL);

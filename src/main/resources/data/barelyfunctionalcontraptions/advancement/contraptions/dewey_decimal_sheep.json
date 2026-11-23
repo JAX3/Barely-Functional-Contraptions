@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:crate_controller"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.dewey_decimal_sheep.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.dewey_decimal_sheep.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

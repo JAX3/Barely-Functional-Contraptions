@@ -42,13 +42,13 @@ public final class MachineReports {
     /** Status names that mean a problem someone should look at. */
     private static final Set<String> PROBLEMS = Set.of("no_energy", "output_full", "invalid_input", "missing_catalysts", "no_sheep_altar",
             "not_enough_items", "no_source", "no_water", "overheated", "frozen", "too_loud", "shrieked", "needs_combs", "overcharged", "hungry",
-            "no_fuel", "no_ground", "overgrown", "missing", "crate_full");
+            "no_fuel", "no_ground", "overgrown", "missing", "crate_full", "crate_missing", "could_burst");
     /** ... that mean it's working. */
     private static final Set<String> RUNNING = Set.of("processing", "infusing", "reacting", "listening", "charging", "walking", "tending",
             "filling", "burning", "boosted", "running", "counting");
     /** ... that mean it's fine but waiting on something. */
     private static final Set<String> WAITING = Set.of("full", "energy_full", "redstone_disabled", "too_quiet", "asleep", "waking", "resting",
-            "all_green", "running_hot", "running_cold", "not_infinite", "cold");
+            "all_green", "running_hot", "running_cold", "not_infinite", "cold", "nearly_full", "no_empty_crates", "no_crates");
 
     private static Report of(Enum<?> status, String number) {
         return of(status.name().toLowerCase(Locale.ROOT), number);
@@ -137,6 +137,11 @@ public final class MachineReports {
             return of("counting", b.mode() == HerdCounterBlockEntity.Mode.FULL ? b.value() + "/" + b.target() : Integer.toString(b.value()));
         }
         // Storage and meters: how full, or the FE/t passing.
+        if (be instanceof CrateControllerBlockEntity b) {
+            String status = b.missing() > 0 ? "crate_missing" : b.risky() > 0 ? "could_burst" : b.crateCount() == 0 ? "no_crates"
+                    : b.percent() >= 90 ? "nearly_full" : b.empties() == 0 ? "no_empty_crates" : "stored";
+            return of(status, b.percent() + "%");
+        }
         if (be instanceof CrateBlockEntity b) {
             String status = b.count() <= 0 ? "empty" : b.isFull() ? "crate_full" : "stored";
             return of(status, b.count() >= 10_000 ? String.format(Locale.ROOT, "%.1fk", b.count() / 1000.0) : Integer.toString(b.count()));

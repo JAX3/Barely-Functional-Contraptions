@@ -91,6 +91,46 @@
         "model": "barelyfunctionalcontraptions:block/wool_lined_crate_lock",
         "y": 270
       }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "tagged": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate_tag",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "tagged": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate_tag",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "tagged": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate_tag",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "tagged": "true"
+      },
+      "apply": {
+        "model": "barelyfunctionalcontraptions:block/wool_lined_crate_tag",
+        "y": 270
+      }
     }
   ]
 }

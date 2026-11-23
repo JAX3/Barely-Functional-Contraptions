@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IHI",
+    "OCO",
+    " M "
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "H": "minecraft:hopper",
+    "O": "minecraft:comparator",
+    "C": "barelyfunctionalcontraptions:wool_lined_crate",
+    "M": "barelyfunctionalcontraptions:functional_machine_block"
+  },
+  "result": {
+    "id": "barelyfunctionalcontraptions:crate_controller",
+    "count": 1
+  }
+}

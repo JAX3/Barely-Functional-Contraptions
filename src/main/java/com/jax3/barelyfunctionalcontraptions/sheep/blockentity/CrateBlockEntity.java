@@ -26,6 +26,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -98,6 +99,51 @@ public class CrateBlockEntity extends BlockEntity {
 
     private int capacityFor(int stackSize) {
         return (int) Math.min(Integer.MAX_VALUE, (long) stacks() * stackSize);
+    }
+
+    // ------------------------------------------------------------------ its Crate Controller
+
+    /** How long a Crate Controller's claim lasts without being renewed (it renews every second). */
+    public static final int CLAIM_TICKS = 60;
+    private @org.jspecify.annotations.Nullable BlockPos controller;
+    private long claimedAt;
+
+    /** When its controller last claimed it (game time). */
+    public long claimedAt() {
+        return claimedAt;
+    }
+
+    /** The Crate Controller whose store it's in, or null. */
+    public @org.jspecify.annotations.Nullable BlockPos controller() {
+        return controller;
+    }
+
+    /**
+     * {@code by} claims it for its store (or renews its claim): true if it's now in {@code by}'s store, false if another
+     * controller's claim on it still holds.
+     */
+    public boolean claim(Level level, BlockPos by, long now) {
+        if (controller != null && !controller.equals(by) && now - claimedAt <= CLAIM_TICKS) return false;
+        boolean fresh = !by.equals(controller);
+        controller = by.immutable();
+        claimedAt = now;
+        if (fresh) {
+            setChanged();
+            if (!getBlockState().getValue(CrateBlock.TAGGED)) level.setBlock(worldPosition, getBlockState().setValue(CrateBlock.TAGGED, true), Block.UPDATE_ALL);
+        }
+        return true;
+    }
+
+    /** Out of its controller's store. */
+    public void release(Level level) {
+        controller = null;
+        setChanged();
+        if (getBlockState().getValue(CrateBlock.TAGGED)) level.setBlock(worldPosition, getBlockState().setValue(CrateBlock.TAGGED, false), Block.UPDATE_ALL);
+    }
+
+    /** Its controller pushed something at it that didn't fit anywhere: its seams strain (a burst roll within a second). */
+    public void strain() {
+        if (isFull()) pressed = true;
     }
 
     /** Whether a pipe or hopper has pushed at it while it's full since its last burst roll. */
@@ -227,6 +273,8 @@ public class CrateBlockEntity extends BlockEntity {
     // ------------------------------------------------------------------ bursting
 
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, CrateBlockEntity be) {
+        // Its controller has stopped renewing its claim (gone, or unloaded): it's on its own again.
+        if (be.controller != null && level.getGameTime() - be.claimedAt > CLAIM_TICKS) be.release(level);
         // Pipes and hoppers pushing at a full crate: one roll a second, however hard they push.
         if (be.pressed && level.getGameTime() % 20 == Math.floorMod(pos.asLong(), 20)) {
             be.pressed = false;
@@ -393,6 +441,8 @@ public class CrateBlockEntity extends BlockEntity {
         count = item.isEmpty() ? 0 : input.getIntOr("count", 0);
         locked = input.getBooleanOr("locked", false) && !item.isEmpty();
         bales = input.getIntOr("bales", 0);
+        controller = input.read("controller", BlockPos.CODEC).orElse(null);
+        claimedAt = input.getLongOr("claimed_at", 0);
     }
 
     @Override
@@ -402,6 +452,10 @@ public class CrateBlockEntity extends BlockEntity {
         output.putInt("count", count);
         output.putBoolean("locked", locked);
         output.putInt("bales", bales);
+        if (controller != null) {
+            output.store("controller", BlockPos.CODEC, controller);
+            output.putLong("claimed_at", claimedAt);
+        }
     }
 
     @Override

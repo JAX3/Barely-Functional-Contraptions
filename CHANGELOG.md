@@ -1,8 +1,8 @@
 # Changelog
 
-## Storage, the Static Generator and the Machine Status Panel (20–21 November 2026)
+## Storage, the Static Generator and the Machine Status Panel (20–23 November 2026)
 
-Three new contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage, a mid-game
+New contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage (crates and a controller that links them into one store), a mid-game
 generator that runs on static, and a wall screen that keeps an eye on all your machines. They come after 1.5.5 and go
 out in the next release. Numbers are the defaults; almost all of them can be changed in the synced config.
 
@@ -37,6 +37,22 @@ needs no power.
 - **Recipes:** Wool-Lined Crate: planks, wool, Iron Nuggets and a Chest. Crate Strap: three Iron Ingots over an Iron
   Nugget.
 - New config section `[crate]`: `stacks`, `stacksPerBale`, `maxBales`, `bursting`, `burstChance`, `burstItems`.
+
+### Storage: the Crate Controller
+Links Wool-Lined Crates into one store. It needs no power.
+- **Joining:** crates touching it, or touching a crate already in its store, join by themselves. Link crates elsewhere
+  with the Barely Functional Wrench (the controller, a crate, the controller again): every crate touching the one you
+  click comes too. Up to 64 crates, up to 200 blocks away. Crates in a store wear a brass tag, and a crate is only
+  ever in one store. Only Wool-Lined Crates join.
+- **Pipes and hoppers** on it reach every crate: items go to a crate already holding them, then to an empty unlocked
+  crate, and only then into bulging ones; anything stored can be piped out. If nothing fits, the fullest unstrapped
+  crate strains, and may burst.
+- **Its front** shows how many crates and how full it all is, in green, amber or red. A comparator reads how full.
+- **Machine Status Panel:** one line for the whole store (*Stored*, *Nearly full*, *No empty crates*, *Crate missing*,
+  *Could burst*), and its problems set off the panel's alarm.
+- **Advancement:** *Dewey Decimal Sheep* (goal), for 16 crates in one store.
+- **Recipe:** a Wool-Lined Crate, a Hopper, two Comparators, two Iron Ingots and a Functional Machine Block.
+- New config section `[crate_controller]`: `range`, `maxCrates`; a chapter in the Contraptions Manual (Logistics).
 
 ### Power: the Static Generator and Copper Comb (mid-game)
 Two blocks tall, like a Van de Graaff generator. Sheep rubbing against **Copper Combs** in its 5x5 pen build up static,
@@ -76,7 +92,8 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
   the alarm, sort the screen (your order, problems first, by machine), pick its colours (classic, green, amber), and
   set what its comparator counts.
 - **Machines it shows:** every generator, the Powered Furnace, Snow Sheep Chiller, Mechanical Separator, Automatic
-  Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Herd Counter, Wool-Lined Crates, Hume Energy
+  Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Herd Counter, Wool-Lined Crates, Crate
+  Controllers, Hume Energy
   Cubes, Energy Meter and Zero Point Energy Module.
 - **JEI:** a Machine Status Panel page and an information page. **Jade:** machines linked, screen size, how many have a
   problem and the first two, and its signal.

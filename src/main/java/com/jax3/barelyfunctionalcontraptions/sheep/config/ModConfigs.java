@@ -237,6 +237,8 @@ public final class ModConfigs {
         public final ModConfigSpec.BooleanValue crateBursting;
         public final ModConfigSpec.DoubleValue crateBurstChance;
         public final ModConfigSpec.IntValue crateBurstItems;
+        public final ModConfigSpec.IntValue crateControllerRange;
+        public final ModConfigSpec.IntValue crateControllerMaxCrates;
         public final ModConfigSpec.IntValue herdRadius;
         public final ModConfigSpec.IntValue herdInterval;
         public final ModConfigSpec.IntValue herdSignalPerSheep;
@@ -672,6 +674,13 @@ public final class ModConfigs {
                     .defineInRange("burstChance", 0.02, 0.0, 1.0);
             crateBurstItems = b.comment("Items a bursting crate scatters.")
                     .defineInRange("burstItems", 8, 0, 64);
+            b.pop();
+
+            b.comment("Crate Controller (links Wool-Lined Crates into one store: crates touching it join by themselves, others with the wrench)").push("crate_controller");
+            crateControllerRange = b.comment("How far from the controller a crate linked with the wrench can be, in blocks.")
+                    .defineInRange("range", 200, 1, 356);
+            crateControllerMaxCrates = b.comment("Most crates one controller's store holds.")
+                    .defineInRange("maxCrates", 64, 1, 1_024);
             b.pop();
 
             b.comment("Herd Counter (counts the sheep in a pen in front of its screen, and puts any count on a comparator; needs no power)").push("herd_counter");

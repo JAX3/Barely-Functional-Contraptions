@@ -190,6 +190,13 @@ public final class ModGameTests {
         ECHO_TESTS.put("crate_fills_from_hoppers_and_pipes_and_reads_on_a_comparator", ModGameTests::crateAutomation);
         ECHO_TESTS.put("crate_bulges_then_bursts_unless_strapped", ModGameTests::crateBursts);
         ECHO_TESTS.put("crate_a_hopper_pushing_at_a_full_crate_strains_it", ModGameTests::crateHopperStrains);
+        ECHO_TESTS.put("crate_controller_takes_in_the_crates_touching_it", ModGameTests::controllerJoins);
+        ECHO_TESTS.put("crate_controller_puts_items_where_they_belong", ModGameTests::controllerRoutes);
+        ECHO_TESTS.put("crate_controller_links_far_crates_with_their_neighbours", ModGameTests::controllerLinks);
+        ECHO_TESTS.put("crate_controller_leaves_another_controllers_crates", ModGameTests::controllerTaken);
+        ECHO_TESTS.put("crate_controller_strains_a_full_crate_and_reports_it", ModGameTests::controllerFull);
+        ECHO_TESTS.put("crate_controller_fills_from_a_hopper", ModGameTests::controllerHopper);
+        ECHO_TESTS.put("crate_controller_crates_go_free_when_it_goes", ModGameTests::controllerGone);
         ECHO_TESTS.put("crate_keeps_its_items_lining_and_strap_when_broken", ModGameTests::crateKeeps);
         TESTS.put("sheep_treadmill_is_two_blocks_long", ModGameTests::sheepTreadmill);
         TESTS.put("sheep_treadmill_makes_power_from_a_walking_sheep", ModGameTests::sheepTreadmillPower);
@@ -1943,6 +1950,130 @@ public final class ModGameTests {
         });
     }
 
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity controller(GameTestHelper h, BlockPos rel) {
+        h.setBlock(rel.below(), Blocks.STONE);
+        h.setBlock(rel, ModBlocks.CRATE_CONTROLLER.get());
+        return h.getBlockEntity(rel, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity.class);
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents contents(net.minecraft.world.item.Item item, int count, boolean locked) {
+        return new com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents(new ItemStack(item), count, locked, 0);
+    }
+
+    /** Crates touching it, and touching those, join its store and get a brass tag; one across a gap doesn't. */
+    private static void controllerJoins(GameTestHelper h) {
+        var c = controller(h, new BlockPos(1, 1, 1));
+        crate(h, new BlockPos(2, 1, 1));
+        crate(h, new BlockPos(3, 1, 1));
+        h.setBlock(new BlockPos(3, 2, 1), ModBlocks.CRATE.get());
+        crate(h, new BlockPos(5, 1, 1));
+        c.refresh(h.getLevel());
+        h.assertTrue(c.crateCount() == 3, "three touching crates join: " + c.crateCount());
+        var TAGGED = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.TAGGED;
+        h.assertTrue(h.getBlockState(new BlockPos(2, 1, 1)).getValue(TAGGED) && h.getBlockState(new BlockPos(3, 2, 1)).getValue(TAGGED), "with brass tags");
+        h.assertFalse(h.getBlockState(new BlockPos(5, 1, 1)).getValue(TAGGED), "the one across the gap stays out");
+        h.assertTrue(c.empties() == 3 && c.capacity() == 3 * 2048, "three empty crates of 2,048: " + c.capacity());
+        h.succeed();
+    }
+
+    /** Cobblestone goes to the cobblestone crate, iron to an empty one (not the one locked to dirt), dirt to the dirt one. */
+    private static void controllerRoutes(GameTestHelper h) {
+        var c = controller(h, new BlockPos(1, 1, 1));
+        var cobble = crate(h, new BlockPos(2, 1, 1));
+        var dirt = crate(h, new BlockPos(3, 1, 1));
+        var empty = crate(h, new BlockPos(4, 1, 1));
+        cobble.setContents(contents(Items.COBBLESTONE, 100, false));
+        dirt.setContents(contents(Items.DIRT, 0, true));
+        c.refresh(h.getLevel());
+        var handler = h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK, h.absolutePos(new BlockPos(1, 1, 1)), Direction.UP);
+        h.assertTrue(handler != null && handler.size() == 3, "pipes see a slot for each crate");
+        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+            h.assertTrue(handler.insert(net.neoforged.neoforge.transfer.item.ItemResource.of(Items.COBBLESTONE), 50, tx) == 50, "50 cobblestone in");
+            h.assertTrue(handler.insert(net.neoforged.neoforge.transfer.item.ItemResource.of(Items.IRON_INGOT), 10, tx) == 10, "10 iron in");
+            h.assertTrue(handler.insert(net.neoforged.neoforge.transfer.item.ItemResource.of(Items.DIRT), 5, tx) == 5, "5 dirt in");
+            tx.commit();
+        }
+        h.assertTrue(cobble.count() == 150, "the cobblestone went to its crate: " + cobble.count());
+        h.assertTrue(empty.item().is(Items.IRON_INGOT) && empty.count() == 10, "the iron to the empty crate: " + empty.contents());
+        h.assertTrue(dirt.item().is(Items.DIRT) && dirt.count() == 5, "the dirt to the crate locked to it: " + dirt.contents());
+        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+            h.assertTrue(handler.extract(net.neoforged.neoforge.transfer.item.ItemResource.of(Items.COBBLESTONE), 64, tx) == 64, "a pipe takes 64 cobblestone");
+            tx.commit();
+        }
+        h.assertTrue(cobble.count() == 86, "out of its crate: " + cobble.count());
+        h.succeed();
+    }
+
+    /** The wrench links a crate across the room, and the crate touching it comes too; unlinked, they go. */
+    private static void controllerLinks(GameTestHelper h) {
+        var c = controller(h, new BlockPos(1, 1, 1));
+        crate(h, new BlockPos(5, 1, 4));
+        crate(h, new BlockPos(6, 1, 4));
+        h.setBlock(new BlockPos(3, 1, 3), Blocks.STONE);
+        var LINKED = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity.LinkResult.LINKED;
+        h.assertTrue(c.toggleLink(h.getLevel(), h.absolutePos(new BlockPos(3, 1, 3)))
+                == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity.LinkResult.NOT_A_CRATE, "stone isn't a crate");
+        h.assertTrue(c.toggleLink(h.getLevel(), h.absolutePos(new BlockPos(5, 1, 4))) == LINKED && c.crateCount() == 2,
+                "the far crate and its neighbour join: " + c.crateCount());
+        h.assertTrue(c.toggleLink(h.getLevel(), h.absolutePos(new BlockPos(6, 1, 4)))
+                == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity.LinkResult.ALREADY_IN, "its neighbour's in already");
+        h.assertTrue(c.toggleLink(h.getLevel(), h.absolutePos(new BlockPos(5, 1, 4)))
+                == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity.LinkResult.UNLINKED && c.crateCount() == 0, "unlinked, both go");
+        h.succeed();
+    }
+
+    /** Two controllers either side of one crate: the first has it, the second leaves it (and says so). */
+    private static void controllerTaken(GameTestHelper h) {
+        var a = controller(h, new BlockPos(1, 1, 1));
+        crate(h, new BlockPos(2, 1, 1));
+        var b = controller(h, new BlockPos(3, 1, 1));
+        a.refresh(h.getLevel());
+        b.refresh(h.getLevel());
+        h.assertTrue(a.crateCount() == 1 && b.crateCount() == 0 && b.taken() == 1, "the crate stays with the first: " + a.crateCount() + " / " + b.crateCount());
+        h.assertTrue(b.toggleLink(h.getLevel(), h.absolutePos(new BlockPos(2, 1, 1)))
+                == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity.LinkResult.TAKEN, "and the wrench can't take it");
+        h.succeed();
+    }
+
+    /** Its only crate full: cobblestone has nowhere to go, the crate strains, and the panel and comparator say so. */
+    private static void controllerFull(GameTestHelper h) {
+        var c = controller(h, new BlockPos(1, 1, 1));
+        var full = crate(h, new BlockPos(2, 1, 1));
+        full.setContents(contents(Items.COBBLESTONE, 2048, false));
+        c.refresh(h.getLevel());
+        var handler = c.getItemHandler();
+        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+            h.assertTrue(handler.insert(net.neoforged.neoforge.transfer.item.ItemResource.of(Items.COBBLESTONE), 1, tx) == 0, "nothing fits");
+        }
+        h.assertTrue(full.straining(), "so the full crate strains");
+        var report = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.report(c);
+        h.assertTrue(report != null && report.status().equals("could_burst") && report.number().equals("100%"), "the status panel: " + report);
+        int signal = h.getLevel().getBlockState(h.absolutePos(new BlockPos(1, 1, 1))).getAnalogOutputSignal(h.getLevel(), h.absolutePos(new BlockPos(1, 1, 1)), Direction.NORTH);
+        h.assertTrue(signal == 15, "the comparator reads it full: " + signal);
+        h.succeed();
+    }
+
+    /** A hopper on the controller fills the crates in its store. */
+    private static void controllerHopper(GameTestHelper h) {
+        var c = controller(h, new BlockPos(1, 1, 1));
+        var crate = crate(h, new BlockPos(2, 1, 1));
+        c.refresh(h.getLevel());
+        h.setBlock(new BlockPos(1, 2, 1), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN));
+        h.getBlockEntity(new BlockPos(1, 2, 1), net.minecraft.world.level.block.entity.HopperBlockEntity.class).setItem(0, new ItemStack(Items.WHEAT, 4));
+        h.succeedWhen(() -> h.assertTrue(crate.item().is(Items.WHEAT) && crate.count() == 4, "the wheat goes into the crate: " + crate.contents()));
+    }
+
+    /** With its controller gone, a crate loses its tag within a few seconds and can join another store. */
+    private static void controllerGone(GameTestHelper h) {
+        var c = controller(h, new BlockPos(1, 1, 1));
+        crate(h, new BlockPos(2, 1, 1));
+        c.refresh(h.getLevel());
+        var TAGGED = com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock.TAGGED;
+        h.assertTrue(h.getBlockState(new BlockPos(2, 1, 1)).getValue(TAGGED), "tagged");
+        h.setBlock(new BlockPos(1, 1, 1), Blocks.AIR);
+        h.succeedWhen(() -> h.assertFalse(h.getBlockState(new BlockPos(2, 1, 1)).getValue(TAGGED), "its tag comes off"));
+    }
+
     /** A hopper pushing at a full crate strains it (each second of that is a burst roll), and leaves the hopper full. */
     private static void crateHopperStrains(GameTestHelper h) {
         BlockPos at = new BlockPos(1, 1, 1);
@@ -3083,7 +3214,7 @@ public final class ModGameTests {
             if (!id.getNamespace().equals(ResourcefulSheep.MOD_ID)) continue;
             if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.SHEEP_GLOW.get()) continue; // invisible light, never placed by hand
             if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.WOOL_BALE.get()) continue; // wool, so it sounds like wool
-            if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.CRATE.get()) continue; // a wooden crate, so it sounds like wood
+            if (block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.CRATE.get() || block == com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.CRATE_CONTROLLER.get()) continue; // wooden crates, so they sound like wood
             var sound = block.defaultBlockState().getSoundType();
             h.assertTrue(sound == net.minecraft.world.level.block.SoundType.IRON && sound.getPlaceSound() == ironPlace,
                     id + " should use the iron block sound type");

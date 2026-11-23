@@ -75,6 +75,7 @@ public final class ContraptionsCreativeTab {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.ITEM_PIPE,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_PACKER,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_CONTROLLER,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_STRAP)),
             guide("production", 0xFF468F46, () -> new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get()), items(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.INFUSION_ALTAR,

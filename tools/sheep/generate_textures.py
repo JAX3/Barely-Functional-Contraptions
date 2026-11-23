@@ -4808,6 +4808,38 @@ def generate_crate():
                 lock.putpixel((x, y), {"S": CARTOON["b"], "G": CARTOON["Y"], "K": CARTOON["c"], "g": CARTOON["C"]}[ch])
     lock.save(out(base + "lock.png"))
 
+    tag = Image.new("RGBA", (16, 16), CLEAR)     # the brass tag of a crate in a controller's store, top-left 3x2
+    for y, row in enumerate(["CYC", "ccc"]):
+        for x, ch in enumerate(row):
+            tag.putpixel((x, y), CARTOON[ch])
+    tag.save(out(base + "tag.png"))
+
+    # The Crate Controller: a crate whose front is a brass plate with a little dark screen and a row of card drawers.
+    cbase = "block/crate_controller/"
+    cfront = Image.new("RGBA", (16, 16), CLEAR)
+    boards(cfront, ())
+    border(cfront, 2)
+    brass, brass_d, brass_l = CARTOON["C"], CARTOON["c"], CARTOON["Y"]
+    for y in range(2, 14):
+        for x in range(2, 14):
+            c = brass if (x + y) % 7 else brass_l
+            if x == 13 or y == 13:
+                c = brass_d
+            cfront.putpixel((x, y), c)
+    for y in range(3, 9):                       # the screen (the readout is drawn over it)
+        for x in range(3, 13):
+            cfront.putpixel((x, y), hexc("#0f1a12") if (x + y) % 5 else hexc("#132018"))
+    for x in range(3, 13):
+        cfront.putpixel((x, 9), brass_d)
+    for dx in (3, 8):                           # two card drawers, each with a pull
+        for y in range(10, 13):
+            for x in range(dx, dx + 5):
+                cfront.putpixel((x, y), brass_d if y in (10, 12) or x in (dx, dx + 4) else brass)
+        cfront.putpixel((dx + 2, 11), CARTOON["B"])
+    for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
+        cfront.putpixel((x, y), nail)
+    cfront.save(out(cbase + "front.png"))
+
     item = Image.new("RGBA", (16, 16), CLEAR)
     for a in range(360):                      # a coiled band, seen from the side
         t = math.radians(a)
