@@ -1767,14 +1767,32 @@ public final class DevScreenshotHarness {
                 for (int s = 0; s < chest.getContainerSize(); s++) chest.setItem(s, new ItemStack(fill, 64));
             }
         }
-        label(server, g.above(3).relative(Direction.NORTH, 4), "Wool-Lined Crates", "gold");
+        // On top of the wall: a Crate Controller (the wall's crates join it by touch) beside an empty crate, fed by a
+        // hopper under a chest of things that go in the wall's crates (and bread, which goes in the empty one).
+        BlockPos controller = g.offset(0, 2, -4);
+        level.setBlock(controller, ModBlocks.CRATE_CONTROLLER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateControllerBlock.FACING, Direction.SOUTH), 3);
+        placeCrate(level, controller.east(), null, false, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateContents.EMPTY);
+        level.setBlock(controller.above(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
+        level.setBlock(controller.above(2), Blocks.CHEST.defaultBlockState(), 3);
+        if (level.getBlockEntity(controller.above(2)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity feed) {
+            net.minecraft.world.item.Item[] fill = {Items.COBBLESTONE, Items.BREAD, Items.COAL, Items.WHEAT, Items.BREAD, Items.COBBLESTONE, Items.COAL,
+                    Items.WHEAT, Items.GLASS, Items.COBBLESTONE};
+            for (int s = 0; s < fill.length; s++) feed.setItem(s, new ItemStack(fill[s], s == 0 ? 16 : 64));
+        }
+        if (level.getBlockEntity(controller) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity c) {
+            c.refresh(level);
+            ResourcefulSheep.LOGGER.info("EXTEND crates: the controller has {} crates", c.crateCount());
+        }
+        label(server, g.above(6).relative(Direction.NORTH, 4), "Wool-Lined Crates and a Crate Controller", "gold");
         label(server, burst.above(3), "Overfilled: bursts", "red");
         label(server, strapped.above(3), "Strapped: never bursts", "gray");
         // The status panel shows the overfilled one.
         BlockPos panelMaster = new BlockPos(128, 37, 152);
         if (level.getBlockEntity(panelMaster) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel) {
             var result = panel.links().contains(burst) ? null : panel.toggleLink(level, burst);
-            ResourcefulSheep.LOGGER.info("EXTEND crates: linked the overfilled crate to the status panel: {}", result);
+            var store = panel.links().contains(controller) ? null : panel.toggleLink(level, controller);
+            ResourcefulSheep.LOGGER.info("EXTEND crates: linked the overfilled crate to the status panel: {}, and the controller: {}", result, store);
         }
         ResourcefulSheep.LOGGER.info("EXTEND crates built round {}", g);
     }
@@ -3375,7 +3393,18 @@ public final class DevScreenshotHarness {
             case 230 -> shot(mc, "112_crate_controller_close");
             case 232 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.1f %.2f 153 18", wall.getX() + 1.5, wall.getY() + 1.0, wall.getZ() + 8.5));
             case 270 -> shot(mc, "112_crate_controller_linked");
-            case 280 -> mc.stop();
+            case 272 -> {
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 38", wall.getX() + 0.5, wall.getY(), wall.getZ() + 2.4));
+            }
+            case 276 -> { setHudHidden(mc, false); McClient.clearChat(mc); }
+            case 296 -> shot(mc, "112_crate_controller_jade");
+            case 298 -> {
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showCrateController();
+            }
+            case 306 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 316 -> shot(mc, "112_crate_controller_jei");
+            case 320 -> mc.stop();
             default -> {}
         }
     }
@@ -3654,7 +3683,7 @@ public final class DevScreenshotHarness {
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
         // The whole square platform from above its south edge and from straight overhead, then the latest scene.
         String[] tps = {"tp @a 73.5 95 218.5 180 40", "tp @a 73.5 185 108 180 90", "tp @a 129.5 38 162.5 180 12", "tp @a 17.5 38.5 187.5 180 18",
-                "tp @a 17.5 36.6 182.2 180 14"};
+                "tp @a 17.5 38.2 181.5 180 22"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -3671,6 +3700,20 @@ public final class DevScreenshotHarness {
             server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
                 if (level.getBlockEntity(new BlockPos(128, 37, 152)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel) {
+                    if (level.getBlockEntity(new BlockPos(17, 37, 173)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity cc) {
+                        ResourcefulSheep.LOGGER.warn("TOUR crate controller: {} crates, {} / {} ({}%), {} empty, report {}", cc.crateCount(), cc.stored(), cc.capacity(),
+                                cc.percent(), cc.empties(), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.report(cc));
+                    }
+                    StringBuilder wallReport = new StringBuilder();
+                    for (int y = 35; y <= 36; y++) for (int x = 14; x <= 20; x++) {
+                        if (level.getBlockEntity(new BlockPos(x, y, 173)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity w) {
+                            wallReport.append(' ').append(w.item().getItem()).append('=').append(w.count());
+                        }
+                    }
+                    ResourcefulSheep.LOGGER.warn("TOUR crate wall:{}", wallReport);
+                    if (level.getBlockEntity(new BlockPos(18, 37, 173)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity bread) {
+                        ResourcefulSheep.LOGGER.warn("TOUR the controller's empty crate now {}", bread.contents());
+                    }
                     for (BlockPos p : new BlockPos[]{new BlockPos(13, 35, 178), new BlockPos(21, 35, 178), new BlockPos(16, 35, 173)}) {
                         if (level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity crate) {
                             ResourcefulSheep.LOGGER.warn("TOUR crate at {}: {} {}", p, crate.contents(), level.getBlockState(p));

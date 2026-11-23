@@ -44,6 +44,7 @@ public enum CrateProvider implements IBlockComponentProvider {
             tooltip.add(Component.translatable(key + "lining_auto").withColor(
                     lighter(0xFFFFFF & com.jax3.barelyfunctionalcontraptions.sheep.client.CrateLiningTint.colourOf(be.item()))));
         }
+        if (state.getValue(CrateBlock.TAGGED)) tooltip.add(Component.translatable(key + "in_store").withColor(0xC9923A));
         if (state.getValue(CrateBlock.STRAPPED)) {
             tooltip.add(Component.translatable(key + "strapped").withColor(GREY));
         } else if (be.isFull()) {

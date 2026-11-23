@@ -50,6 +50,8 @@ Links Wool-Lined Crates into one store. It needs no power.
 - **Its front** shows how many crates and how full it all is, in green, amber or red. A comparator reads how full.
 - **Machine Status Panel:** one line for the whole store (*Stored*, *Nearly full*, *No empty crates*, *Crate missing*,
   *Could burst*), and its problems set off the panel's alarm.
+- **JEI:** a Crate Controller page and an information page. **Jade:** crates, items stored and how full, empty crates,
+  problems and its signal, with every item in the store; on a crate, whether it's in a store.
 - **Advancement:** *Dewey Decimal Sheep* (goal), for 16 crates in one store.
 - **Recipe:** a Wool-Lined Crate, a Hopper, two Comparators, two Iron Ingots and a Functional Machine Block.
 - New config section `[crate_controller]`: `range`, `maxCrates`; a chapter in the Contraptions Manual (Logistics).
@@ -111,9 +113,12 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
 ### Test world
 - The platform grew a **seventh row** of cells, and you now start at its new south edge.
 - **Static Generator:** six sheep at four fresh combs, making 600 FE/t into a bank of Hume Energy Cubes.
-- **Machine Status Panel:** a 3x3 screen showing 21 machines from across the platform, with an alarm lamp.
+- **Machine Status Panel:** a 3x3 screen showing 22 machines from across the platform (the crate store among them), with an alarm lamp.
 - **Wool-Lined Crates:** a storeroom wall of fourteen crates, each lined the colour of what it holds; and a hopper
   overfilling a crate of redstone (it bursts now and then) beside a strapped one that never does.
+- **Crate Controller:** on top of the storeroom wall (all its crates join by touch) beside an empty crate, fed by a
+  hopper and a chest: cobblestone, coal and wheat go to their crates, bread to the empty one. The status panel shows
+  the whole store as one line.
 
 ## 1.5.5 (17–19 November 2026)
 

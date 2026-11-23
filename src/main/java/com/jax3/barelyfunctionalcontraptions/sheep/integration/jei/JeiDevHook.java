@@ -119,6 +119,14 @@ public final class JeiDevHook {
         return true;
     }
 
+    /** Opens the Crate Controller page. */
+    public static boolean showCrateController() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        rt.getRecipesGui().showTypes(java.util.List.of(CrateControllerCategory.TYPE));
+        return true;
+    }
+
     /** Opens the Herd Counter page. */
     public static boolean showHerdCounter() {
         IJeiRuntime rt = runtime;

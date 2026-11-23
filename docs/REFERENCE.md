@@ -1055,6 +1055,8 @@ O C O      O = Comparator, C = Wool-Lined Crate
 | In a wall of crates: 7 crates, 34%, in red (one could burst) | Its front, and the brass tags of the crates in its store |
 |---|---|
 | ![A Crate Controller in the middle of a wall of five crates, and two more crates across the room linked with the wrench, all wearing brass tags](screenshots/112_crate_controller_linked.png) | ![Close up: the controller's brass front with its little screen reading 7 crates and 34% in red, between crates of cobblestone and redstone](screenshots/112_crate_controller_close.png) |
+| ![Jade on the controller: Crates: 7 / 64, 4,948 / 14,336 items (34%), Empty crates: 0, Full, could burst: 1, Bulging: 1, Signal 5, and every item in the store](screenshots/112_crate_controller_jade.png) | ![JEI's Crate Controller page: a crate and a hopper or pipe into the controller, a comparator and a status panel out; Crates only, one store each; to a crate holding it, else an empty crate, else a bulging one; Nowhere? A crate strains!](screenshots/112_crate_controller_jei.png) |
+| ![The test world's controller on top of the crate storeroom wall, beside an empty crate, with a hopper and chest feeding it](screenshots/112_crate_controller_world.png) | |
 
 - **Joining it:** crates **touching** it, or touching a crate already in its store, join by themselves. Crates elsewhere link with the **Barely Functional Wrench**: click the controller (the wrench glows), then a crate (and **every crate touching it** comes too), again to unlink it, then the controller again to finish; up to **200 blocks** away (`range`). A store holds up to **64 crates** (`maxCrates`).
 - **One store per crate:** a crate in a store wears a little **brass tag** on its front, and another controller leaves it alone (its wrench says so). A controller renews its claim every second; break it, or let its chunk unload, and its crates go free within a few seconds.
@@ -1063,6 +1065,7 @@ O C O      O = Comparator, C = Wool-Lined Crate
 - **Its front:** a little screen with how many crates are in its store and how full it all is: **green**, **amber** past 90% or with no empty crates, **red** when a linked crate is missing or a full crate could burst. Right-click it for a summary (its window comes next).
 - **Comparator:** how full the whole store is (1 to 15).
 - **Machine Status Panel:** link it like a machine; the whole store is one line: *Stored*, *Nearly full* or *No empty crates* (amber), *Crate missing* or *Could burst* (red), with how full it is.
+- **JEI:** a *Crate Controller* page (crates and a hopper or pipe into it, a comparator and a status panel out, and where items go) and an information page. **Jade:** how many crates out of how many, items stored out of how many and how full, empty crates, and its problems (missing crates, full crates that could burst, bulging ones, crates in another store), its signal, and Jade's own list of every item in the store. On a crate in a store, Jade says so.
 - **Advancement:** ⭐ *Dewey Decimal Sheep* (goal), for being near a controller with 16 crates in its store.
 - Mine it with an axe; it sounds like wood. **Config:** `[crate_controller]`: `range` (200), `maxCrates` (64).
 
