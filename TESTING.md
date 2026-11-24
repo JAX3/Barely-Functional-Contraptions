@@ -106,6 +106,12 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | Real client (`-PharnessScene=themed_sheep`) | ✅ Each sheep photographed side-on (`52_themed_sheep.png`): Wither Skeleton Skulls either side of the Wither sheep's head, using the game's skull texture (front view `53_themed_wither_front.png`), Dragon wings, spider legs, ghast tentacles, Skeleton and Wither Skeleton Skull faces (front views `53_themed_skeleton_front.png`, `53_themed_wither_skeleton_front.png`) and bony legs, sculk tendrils with glowing strands, on-fire flames, hay fleece. At night (`53_themed_sheep_night.png`) the Glow Ink sheep is fully bright and lights the grass, and glowing eyes and sculk strands stay lit. No errors from the mod in the log. |
 | Not yet checked in the client | The replaced sounds are only covered by the GameTest, not listened to in game (the client loads the definitions with no errors) |
 
+### Faster processing machines (`old_config_gets_faster_machine_timings`)
+
+The separator, Wool Packer, Infusion Altar, Powered Furnace, Snow Sheep Chiller and Automatic Shears got new, faster defaults (timing revision 2). The test makes a config like a file from revision 1: every setting at its old default except the shears' interval, set to 12 by hand. After `migrate()` the old defaults have moved to the new ones (speed 2.0, 20, 50, 0.35 with 31 FE/t, 100), the hand-set 12 is kept, and the file reads revision 2; a file from before revision 1 gets both passes (speed 1.0 to 2.0, interval 20 to 10). The machine tests were retimed to match: iron wool 50 ticks, 12 ticks of progress on 5,000 FE, an Iron Wool Bale 450 ticks, a bale pressed in 20 ticks, Raw Iron smelted in 70 ticks (about 48 with two Blaze sheep) at 31 FE/t. All 201 pass on 26.1, 26.2 and 26.3.
+
+`infusion_altar_waits_for_what_it_needs` had failed now and then: its hand-fed sheep stood two blocks from the altar meant to have *No sheep*, inside its reach, so that altar could infuse it. The faster altar made that more likely; the sheep now stands out of reach of every altar that could infuse it.
+
 ### Integration GameTests (`com.jax3.barelyfunctionalcontraptions.gametest.IntegrationGameTests`)
 
 | Test | Verifies |

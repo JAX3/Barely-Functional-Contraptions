@@ -47,8 +47,8 @@ import org.jspecify.annotations.Nullable;
  * The Powered Furnace: smelts anything a Furnace can, on Forge Energy instead of fuel.
  *
  * <ul>
- *     <li><b>Speed:</b> each item takes {@code [powered_furnace] cookTimeMultiplier} (0.75) of its Furnace time, so a
- *     10-second smelt takes 7.5 seconds.</li>
+ *     <li><b>Speed:</b> each item takes {@code [powered_furnace] cookTimeMultiplier} (0.35) of its Furnace time, so a
+ *     10-second smelt takes 3.5 seconds.</li>
  *     <li><b>Blaze sheep:</b> heat sources (the Blaze Sheep Furnace's: Blaze sheep with their fleece on) with their
  *     feet in the 5x5 area around it speed it up: +{@code blazeBonus} (25%) for the first, each one after it adding a
  *     little less, up to {@code maxHeatSources}. It uses the same power per tick, so the sheep save power too.</li>

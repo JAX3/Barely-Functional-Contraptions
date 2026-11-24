@@ -155,6 +155,21 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
   hand-drawn fleeces; lambs keep a plain one in the resource's colour.
 - Client config `blockTexturedWool` (on) brings back the old plain fleece when off.
 
+### Processing machines about half as fast again
+Each job still costs the same total FE; it just finishes sooner.
+
+| Machine | Before | Now |
+|---|---|---|
+| Mechanical Separator | Iron wool: 3.75 s (×1.35 speed) | 2.5 s (×2 speed); a Wither Wool Bale 22.5 s for its 9 wool's worth |
+| Wool Packer | 1.5 s a bale | 1 s |
+| Infusion Altar | 3.75 s | 2.5 s (a tier 2 infusion draws 4,000 FE/t) |
+| Powered Furnace | 0.55 of a Furnace's time (Raw Iron: 5.5 s), 20 FE/t | 0.35 (3.5 s), 31 FE/t, so a smelt costs about the same |
+| Snow Sheep Chiller | 7.5 s an Ice with one sheep, about 2.3 s with four | 5 s, about 1.5 s with four |
+| Automatic Shears | sweeps every 0.75 s | every 0.5 s |
+
+Older config files are updated once, the first time they load: settings still at their old defaults (from either
+speed-up) move to the new ones, and anything you changed is kept.
+
 ### Removed: wireless power to machines
 - The Barely Functional Wrench no longer links a Mycelial Generator to a Mechanical Separator, Automatic Shears or Hume
   Energy Cube to power it wirelessly. Run **Energy Cables** from the generator instead, or put the machine against it.

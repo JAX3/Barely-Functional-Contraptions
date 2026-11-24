@@ -173,7 +173,7 @@ Smelts anything a Furnace can, on power instead of fuel, in a little over half t
 
 ### Snow Sheep Chiller
 
-The Blaze Furnace's icy opposite: Snow sheep standing round it freeze water into Ice, one every 7.5 seconds with one sheep and about every 2.3 with four. It needs no power, just a bucket of water per Ice, and hoppers can take the Ice out.
+The Blaze Furnace's icy opposite: Snow sheep standing round it freeze water into Ice, one every 5 seconds with one sheep and about every 1.5 with four. It needs no power, just a bucket of water per Ice, and hoppers can take the Ice out.
 
 ![A Snow Sheep Chiller on a snowy floor with three Snow sheep round it inside its blue area outline, snowflakes drifting in, and a hopper underneath](docs/screenshots/100_chiller.png)
 

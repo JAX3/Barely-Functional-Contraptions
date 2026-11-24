@@ -295,7 +295,7 @@
       "title": "Wool Packer",
       "icon": "barelyfunctionalcontraptions:wool_packer",
       "text": [
-        "The Wool Packer presses 9 of the same resource wool into one Wool Bale. Each bale takes 1,000 FE over 1.5 seconds.",
+        "The Wool Packer presses 9 of the same resource wool into one Wool Bale. Each bale takes 1,000 FE over 1 second.",
         "Right-click it with resource wool, put wool in the left slot of its window, or feed it with a hopper or pipe. The nine pips light up as the wool for the next bale comes in. Hoppers and pipes take the bales out of any side, but never the wool.",
         "## Separating bales",
         "Put a whole bale in the Mechanical Separator. It takes 15 times the power of one wool, more than its 9 wool would, and as long as those 9 one at a time. In return it gives 12 wool's worth of everything: a third more resources.",
@@ -400,12 +400,12 @@
         "- Uncommon, a Golden Carrot: Iron, Gold, Redstone, Lapis, Quartz, Glow Ink, Spider, Skeleton.",
         "- Rare, a Golden Apple: Diamond, Emerald, Blaze, Ghast.",
         "- Epic, an Eye of Ender: Netherite (with Ancient Debris), Wither Skeleton (with Nether Bricks).",
-        "For example, Iron is an Iron Ingot in the centre with 2 Blocks of Iron and a Golden Carrot. They take 20,000 FE over 3.75 seconds.",
+        "For example, Iron is an Iron Ingot in the centre with 2 Blocks of Iron and a Golden Carrot. They take 20,000 FE over 2.5 seconds.",
         "## Tier 2: legendary sheep",
         "- Wither: Nether Star, with 4 Soul Sand, 2 Bone Blocks, 1 Wither Rose.",
         "- Dragon: Dragon's Breath, with 4 End Stone, 4 Popped Chorus Fruit, 2 Eyes of Ender.",
         "- Warden: Echo Shard, with 4 Sculk, 4 Amethyst Shards, 1 Sculk Catalyst.",
-        "Tier 2 takes 200,000 FE over 3.75 seconds.",
+        "Tier 2 takes 200,000 FE over 2.5 seconds.",
         "The catalysts still needed show faded in the empty slots, and the Recipes tab lists every sheep's. Hoppers and pipes can feed it from any side, so it can infuse a pen without you. The spyglass button in its window, or a sneak-right-click with an empty hand, outlines the area the sheep must stand in.",
         "When the resource and all its catalysts are in, the altar gives a one-tick redstone pulse on every side, so a dispenser or piston can bring the next sheep, or a circuit can stop the hoppers. A comparator reads its progress.",
         "Data packs set a resource's tier, catalysts and power in its \"altar\" block."
@@ -430,7 +430,7 @@
       "icon": "barelyfunctionalcontraptions:powered_furnace",
       "tab": "production",
       "text": [
-        "Smelts anything a Furnace can, on power instead of fuel, in a little over half the time: Raw Iron takes 5.5 seconds instead of 10.",
+        "Smelts anything a Furnace can, on power instead of fuel, in about a third of the time: Raw Iron takes 3.5 seconds instead of 10.",
         "- It uses 20 FE/t while smelting, from any side.",
         "- Blaze sheep with their fleece on, standing in the 5x5 area around it or on top, speed it up: x1.25 with one, about x1.47, x1.66 and x1.81 with two, three and four. They don't use any more power, so they save power too.",
         "- Hoppers and pipes put items in and take results out from any side. A comparator reads the input.",
@@ -445,7 +445,7 @@
       "tab": "production",
       "text": [
         "The Blaze Sheep Furnace's icy opposite: it freezes water into Ice with the cold of Snow sheep standing in the 5x5 area around it, on its own level or on top of it. It needs no power.",
-        "- One Snow sheep freezes a block of Ice every 7.5 seconds. Each extra one adds a little less: about 4, 2.9 and 2.3 seconds for two, three and four. It counts up to four.",
+        "- One Snow sheep freezes a block of Ice every 5 seconds. Each extra one adds a little less: about 2.7, 1.9 and 1.5 seconds for two, three and four. It counts up to four.",
         "- Only a grown sheep with its snowy fleece on counts; a sheared one or a lamb gives nothing until its wool grows back.",
         "- Each Ice takes a bucket of water. Pour Water Buckets in, pipe water in, or place a Fluid Reservoir beside it. It holds 8 buckets.",
         "- The Ice goes in its slot; a hopper or pipe can take it out of any side, and a comparator reads how full the slot is.",
@@ -515,9 +515,9 @@
       "tab": "production",
       "text": [
         "## Mechanical Separator",
-        "Put resource wool in and supply FE. Each wool gives 2 to 4 of its resource, 2 string and sometimes a bonus. Iron wool takes 20,000 FE over 3.75 seconds.",
+        "Put resource wool in and supply FE. Each wool gives 2 to 4 of its resource, 2 string and sometimes a bonus. Iron wool takes 20,000 FE over 2.5 seconds.",
         "Its redstone button sets whether redstone turns it on or off. Hoppers and pipes can feed it and empty it.",
-        "It also separates Wool Bales from the Wool Packer, for more resources (see Wool Packer under Logistics). Bales use more power a tick, so it takes power in faster for them: a Wither Wool Bale needs about 2,250 FE/t.",
+        "It also separates Wool Bales from the Wool Packer, for more resources (see Wool Packer under Logistics). Bales use more power a tick, so it takes power in faster for them: a Wither Wool Bale needs about 3,333 FE/t.",
         "## Automatic Shears",
         "Shears every sheep in the 3x3 area in front of its blades, using 2,000 FE per sheep, and keeps the wool in 9 slots. Put a hopper or pipe under it to collect the wool."
       ]

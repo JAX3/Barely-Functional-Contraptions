@@ -57,26 +57,41 @@ public final class ModConfigs {
         return get(value);
     }
 
-    /** The machine timings sped up in timing revision 1: each setting, its old default, and its new one. */
-    private static final double[][] TIMING_PASS_1 = {{1.0, 1.35}, {40, 30}, {100, 75}, {0.75, 0.55}, {200, 150}, {20, 15}};
+    /**
+     * The machine timings sped up by each timing revision: the settings (see {@link #timedValues}), each with its old
+     * default and its new one. Revision 1 made the machines about a quarter faster, revision 2 about half as fast again.
+     */
+    private static final double[][][] TIMING_PASSES = {
+            // separator speed, packer ticks, altar ticks, furnace cook time, chiller ticks, shears interval, furnace FE/t
+            {{1.0, 1.35}, {40, 30}, {100, 75}, {0.75, 0.55}, {200, 150}, {20, 15}, {20, 20}},
+            {{1.35, 2.0}, {30, 20}, {75, 50}, {0.55, 0.35}, {150, 100}, {15, 10}, {20, 31}},
+    };
+
+    private static List<ModConfigSpec.ConfigValue<? extends Number>> timedValues() {
+        return List.of(SERVER.processingSpeedMultiplier, SERVER.woolPackerTicksPerBale, SERVER.altarTicks, SERVER.poweredFurnaceCookTime,
+                SERVER.chillerTicksPerIce, SERVER.automaticShearsInterval, SERVER.poweredFurnaceEnergyPerTick);
+    }
 
     /**
      * Brings an existing config file up to the latest machine timings. NeoForge keeps whatever a file already holds,
-     * so a changed default never reaches an old file on its own: a setting still at its old default moves to the new
-     * one, while one the player changed is left alone. Runs once per file, then records the revision.
+     * so a changed default never reaches an old file on its own: each pass the file hasn't had yet moves a setting still
+     * at that pass's old default to its new one, while one the player changed is left alone. Then records the revision.
      */
     public static void migrate() {
         try {
-            if (SERVER.timingRevision.get() >= 1) return;
-            List<ModConfigSpec.ConfigValue<? extends Number>> values = List.of(SERVER.processingSpeedMultiplier, SERVER.woolPackerTicksPerBale,
-                    SERVER.altarTicks, SERVER.poweredFurnaceCookTime, SERVER.chillerTicksPerIce, SERVER.automaticShearsInterval);
-            for (int i = 0; i < values.size(); i++) {
-                var value = values.get(i);
-                if (Math.abs(value.get().doubleValue() - TIMING_PASS_1[i][0]) > 1e-9) continue;
-                if (value instanceof ModConfigSpec.IntValue intValue) intValue.set((int) TIMING_PASS_1[i][1]);
-                else if (value instanceof ModConfigSpec.DoubleValue doubleValue) doubleValue.set(TIMING_PASS_1[i][1]);
+            int revision = SERVER.timingRevision.get();
+            if (revision >= TIMING_PASSES.length) return;
+            List<ModConfigSpec.ConfigValue<? extends Number>> values = timedValues();
+            for (int pass = revision; pass < TIMING_PASSES.length; pass++) {
+                for (int i = 0; i < values.size(); i++) {
+                    var value = values.get(i);
+                    double[] change = TIMING_PASSES[pass][i];
+                    if (change[0] == change[1] || Math.abs(value.get().doubleValue() - change[0]) > 1e-9) continue;
+                    if (value instanceof ModConfigSpec.IntValue intValue) intValue.set((int) change[1]);
+                    else if (value instanceof ModConfigSpec.DoubleValue doubleValue) doubleValue.set(change[1]);
+                }
             }
-            SERVER.timingRevision.set(1);
+            SERVER.timingRevision.set(TIMING_PASSES.length);
             SERVER_SPEC.save();
         } catch (IllegalStateException | NullPointerException notLoaded) {
             // A copy received from a server (already migrated there), or not loaded yet: nothing to do.
@@ -370,7 +385,7 @@ public final class ModConfigs {
             b.pop();
 
             b.comment("Bookkeeping: which machine-speed pass this file has had. Leave it alone.").push("revision");
-            timingRevision = b.comment("1 = the machines' faster timings have been applied: settings still at their old defaults were moved to the new ones; anything you had changed was left as it was.")
+            timingRevision = b.comment("How many of the machines' speed-ups have been applied (2 = both): settings still at their old defaults were moved to the new ones; anything you had changed was left as it was.")
                     .defineInRange("timingRevision", 0, 0, 100);
             b.pop();
 
@@ -401,8 +416,8 @@ public final class ModConfigs {
                     .defineInRange("bonusPrimaryChance", 0.0, 0.0, 1.0);
             energyCostMultiplier = b.comment("Efficiency multiplier on total energy cost. 0.5 = half the FE per operation.")
                     .defineInRange("energyCostMultiplier", 1.0, 0.0, 100.0);
-            processingSpeedMultiplier = b.comment("Speed multiplier. 2.0 = operations take half as many ticks (total energy is unchanged). 1.35 = about three quarters of each wool's processing_ticks.")
-                    .defineInRange("processingSpeedMultiplier", 1.35, 0.01, 100.0);
+            processingSpeedMultiplier = b.comment("Speed multiplier. 2.0 = operations take half as many ticks as each wool's processing_ticks (total energy is unchanged).")
+                    .defineInRange("processingSpeedMultiplier", 2.0, 0.01, 100.0);
             resetProgressWhenUnpowered = b.comment("If true, progress resets when the machine runs out of energy instead of pausing.")
                     .define("resetProgressWhenUnpowered", false);
             String sideHelp = "Valid values: FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM (relative to the machine's front face).";
@@ -472,7 +487,7 @@ public final class ModConfigs {
             altarHighTierEnergy = b.comment("FE a tier 2 or 3 infusion takes, when its definition doesn't say.")
                     .defineInRange("highTierEnergy", 200_000, 0, Integer.MAX_VALUE);
             altarTicks = b.comment("Ticks one infusion takes at the altar (the energy is spread over them).")
-                    .defineInRange("ticks", 75, 1, 72_000);
+                    .defineInRange("ticks", 50, 1, 72_000);
             altarCapacity = b.comment("FE the altar stores.")
                     .defineInRange("energyCapacity", 250_000, 1, Integer.MAX_VALUE);
             altarMaxInput = b.comment("Most FE the altar accepts per tick.")
@@ -489,7 +504,7 @@ public final class ModConfigs {
             woolPackerEnergyPerBale = b.comment("FE to press one bale. 0 = the packer needs no power.")
                     .defineInRange("energyPerBale", 1_000, 0, Integer.MAX_VALUE);
             woolPackerTicksPerBale = b.comment("Ticks to press one bale (20 = one second).")
-                    .defineInRange("ticksPerBale", 30, 1, 72_000);
+                    .defineInRange("ticksPerBale", 20, 1, 72_000);
             baleYield = b.comment("What separating one bale gives, in pieces of wool's worth of outputs. One bale holds 9 wool, so above 9 is the reward for baling: 12 = a third more of every output. Counts are capped at a stack so a bale never jams the separator.")
                     .defineInRange("baleYield", 12.0, 1.0, 64.0);
             baleEnergy = b.comment("FE to separate one bale, in pieces of wool's worth: 15 = 15 times the wool's energy cost, more than its 9 wool would take.")
@@ -512,10 +527,10 @@ public final class ModConfigs {
             b.pop();
 
             b.comment("Powered Furnace (smelts anything a Furnace can, on FE; Blaze sheep around it speed it up)").push("powered_furnace");
-            poweredFurnaceCookTime = b.comment("Its smelting time as a share of a Furnace's: 0.55 = a little over half the time (a 10 s smelt takes 5.5 s).")
-                    .defineInRange("cookTimeMultiplier", 0.55, 0.01, 10.0);
-            poweredFurnaceEnergyPerTick = b.comment("FE it uses per tick while smelting.")
-                    .defineInRange("energyPerTick", 20, 0, 1_000_000);
+            poweredFurnaceCookTime = b.comment("Its smelting time as a share of a Furnace's: 0.35 = about a third of the time (a 10 s smelt takes 3.5 s).")
+                    .defineInRange("cookTimeMultiplier", 0.35, 0.01, 10.0);
+            poweredFurnaceEnergyPerTick = b.comment("FE it uses per tick while smelting (31: about 2,200 FE a 10 s smelt).")
+                    .defineInRange("energyPerTick", 31, 0, 1_000_000);
             poweredFurnaceBlazeBonus = b.comment("Extra speed from each Blaze sheep (heat source) in the area around it: 0.25 = 25% faster for the first; each one after it adds less, with the Blaze Sheep Furnace's falloff. The area is the furnace's ([blaze_furnace] radius).")
                     .defineInRange("blazeBonus", 0.25, 0.0, 10.0);
             poweredFurnaceMaxHeaters = b.comment("Most Blaze sheep it counts.")
@@ -771,8 +786,8 @@ public final class ModConfigs {
                     .defineInRange("maxColdSources", 4, 1, 64);
             chillerFalloff = b.comment("How much less each extra Snow sheep adds to the speed: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on. 0 = no falloff.")
                     .defineInRange("falloff", 0.125, 0.0, 1.0);
-            chillerTicksPerIce = b.comment("Ticks to freeze one Ice with one Snow sheep (150 = 7.5 seconds). More sheep freeze faster.")
-                    .defineInRange("ticksPerIce", 150, 1, 72_000);
+            chillerTicksPerIce = b.comment("Ticks to freeze one Ice with one Snow sheep (100 = 5 seconds). More sheep freeze faster.")
+                    .defineInRange("ticksPerIce", 100, 1, 72_000);
             chillerWaterPerIce = b.comment("mB of water each Ice takes (1000 = a bucket).")
                     .defineInRange("waterPerIce", 1_000, 0, 1_000_000);
             chillerTankCapacity = b.comment("mB of water a chiller holds.")
@@ -782,8 +797,8 @@ public final class ModConfigs {
             b.pop();
 
             b.comment("Automatic Shears (FE-powered; shears sheep in the 3x3 area in front of it into its inventory)").push("automatic_shears");
-            automaticShearsInterval = b.comment("Ticks between shearing sweeps (15 = three quarters of a second). Each sweep shears every ready sheep in the area.")
-                    .defineInRange("shearInterval", 15, 1, 72_000);
+            automaticShearsInterval = b.comment("Ticks between shearing sweeps (10 = half a second). Each sweep shears every ready sheep in the area.")
+                    .defineInRange("shearInterval", 10, 1, 72_000);
             automaticShearsEnergyPerShear = b.comment("FE used for each sheep sheared. 0 = runs without power.")
                     .defineInRange("energyPerShear", 2_000, 0, Integer.MAX_VALUE);
             automaticShearsEnergyCapacity = b.comment("FE buffer.")

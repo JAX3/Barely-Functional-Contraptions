@@ -306,7 +306,7 @@ The **Infusion Altar** is a powered pedestal. Put the feeding item in its **cent
 | Epic: Netherite, Wither Skeleton | the resource | 2 Ancient Debris or 2 Nether Bricks, 1 Eye of Ender | 20,000 FE |
 | Generated (`/barelyfunctionalcontraptions generate`) | 2 of the block | an ingot, gem or dust of the material, 1 Golden Carrot | 20,000 FE |
 
-- **Window:** the energy buffer, the cross of slots, a progress bar, the tier and FE/t (about 2,667 FE/t for tier 2 over 3.75 seconds). The catalysts still needed show **faded in the empty side slots**, and hovering a side slot lists them, with the missing ones in red. A status lamp shows *Waiting*, *Infusing*, *No energy*, *Missing catalysts*, *No sheep* or *Not enough items*.
+- **Window:** the energy buffer, the cross of slots, a progress bar, the tier and FE/t (about 4,000 FE/t for tier 2 over 2.5 seconds). The catalysts still needed show **faded in the empty side slots**, and hovering a side slot lists them, with the missing ones in red. A status lamp shows *Waiting*, *Infusing*, *No energy*, *Missing catalysts*, *No sheep* or *Not enough items*.
 - **Which sheep:** the nearest grown sheep in reach that can take the resource: not already infused with something else, not a lamb (unless `allowBabies` is on). Its Endurance counts.
 - **Automation:** an altar fed by hoppers (the resource, its blocks and its rarity item) keeps a pen infused without you. **Redstone pulse:** the moment the centre slot and every catalyst are complete, the altar powers every side for **one redstone tick** (2 game ticks), once each time they become complete, to trigger a dispenser, piston or the next step of a contraption. Hoppers and pipes put feeding items and catalysts in from any side and can't take them out. A comparator reads its progress. Jade shows its status.
 - **Advancements:** the nearest player within 16 blocks gets the infusion advancements, as if they had fed the sheep.
@@ -333,8 +333,8 @@ Put the wool into a **Mechanical Separator** and supply Forge Energy (FE).
 | Example | Value |
 |---|---|
 | Input | 1 Iron Wool |
-| Energy | 20,000 FE (about 267 FE/t) |
-| Time | 75 ticks (3.75 s) |
+| Energy | 20,000 FE (400 FE/t) |
+| Time | 50 ticks (2.5 s) |
 | Output | **2–4** Raw Iron (random each time) + 2 String (+10% chance of 3 Iron Nuggets) |
 
 **Balance:** every wool separates into **2–4** of its resource (3 on average). With the default of 100 shearings per feeding, one Iron Ingot yields about 300 Raw Iron and one Diamond about 300 Diamonds, so infused sheep **multiply** resources a lot. (With `infusionUsesOverride = -1`, one Iron Ingot gives about 27 Raw Iron and one Diamond about 3 Diamonds.) The cost is the shearing time and the machine's energy. To tone it down, lower `primaryOutputMultiplier` (e.g. `0.34` brings it back to about 1 per wool), lower `infusionUsesOverride` (or set it to `-1`) or `infusionUsesMultiplier`, or set `primary_count` per resource.
@@ -352,7 +352,7 @@ An FE-powered machine that shears sheep for you and keeps the wool.
 
 - **Where it shears:** the **3×3 area in front of its face** (the face with the crossed blades, which points at you when you place it). That's the three block columns 1–3 blocks out, one column either side, from one block below the machine to one block above it. A sheep counts when its feet are in that area.
 - **Power:** it runs on Forge Energy and uses **2,000 FE per sheep sheared** (`energyPerShear`). It holds 50,000 FE and accepts up to 1,000 FE/t on every face except the front, from any FE cable or generator. A Mycelial Generator placed against its back powers it directly. Without enough FE it waits, showing *No Energy*.
-- **How often:** every three quarters of a second by default (`shearInterval` in `[automatic_shears]`), shearing every ready sheep in the area each time. Once a sheep eats grass and regrows its wool, it gets sheared again.
+- **How often:** every half a second by default (`shearInterval` in `[automatic_shears]`), shearing every ready sheep in the area each time. Once a sheep eats grass and regrows its wool, it gets sheared again.
 - **Infused sheep:** these work exactly like hand shears. They drop their resource wool and use up one infusion shearing.
 - **GUI:** right-click to open it. It's in the same style as the Mechanical Separator: an energy gauge, a status lamp and line (*Waiting for Sheep*, *Shearing*, *No Energy*, *Storage Full*, *Disabled by Redstone*), the redstone button, a shears icon that snips while it works, a bar counting down to the next sweep, and its 9 storage slots. Hover over things for details.
 - **Inventory:** 9 slots. Take the wool out by hand (shift-click works), or put a **hopper underneath** (or any pipe) to pull it out automatically. Nothing can be put *into* it. A comparator reads how full it is.
@@ -709,7 +709,7 @@ When several files match, the most specific one wins: `sheep`, then `entity`, th
 |---|---|
 | ![Two Powered Furnaces fed by hoppers, the one on the right with two burning Blaze sheep beside it inside its orange area outline](screenshots/101_powered_furnace.png) | ![The Powered Furnace's window: the energy gauge, Raw Iron in the input with a lit flame under it, the smelting arrow, an Iron Ingot out, Speed x1.47 and Blaze sheep 2 / 4, status Smelting](screenshots/101_powered_furnace_gui.png) |
 
-- **Speed:** each item takes **0.55 of its Furnace time** (`cookTimeMultiplier`): Raw Iron 5.5 s instead of 10.
+- **Speed:** each item takes **0.35 of its Furnace time** (`cookTimeMultiplier`): Raw Iron 3.5 s instead of 10. It uses 31 FE/t while smelting (`energyPerTick`), about 2,200 FE a Furnace-length smelt.
 - **Blaze sheep:** heat sources (the Blaze Sheep Furnace's: Blaze sheep with their fleece on, by default) with their feet in the furnace's area (`[blaze_furnace] radius`, 5x5 by default, on its level and the block above) speed it up by **25%** for the first (`blazeBonus`), each one after it adding a little less (the Blaze Furnace's falloff), up to four (`maxBlazeSheep`): x1.25, about x1.47, x1.66 and x1.81. The flame under its input slot lights while they do. They don't add to its power use, so they save power too.
 - **Power:** **20 FE/t while smelting** (`energyPerTick`), from any face; it stores 20,000 FE and accepts 1,000 FE/t. It pauses without power.
 - **Items:** hoppers and pipes put smeltable items in on any side and take only the results out. A comparator reads the input. Only items a Furnace can smelt go in.
@@ -727,7 +727,7 @@ The Blaze Sheep Furnace's icy opposite: it **freezes water into Ice with the col
 | ![A Snow Sheep Chiller on a snowy floor with three Snow sheep round it inside its blue area outline, snowflakes drifting in, and a hopper underneath](screenshots/100_chiller.png) | ![The chiller's window: the water gauge, the cold column with pips for 3 of 4 Snow sheep, Speed x2.63, the freezing arrow into the Ice slot and 3.8 s per Ice, status Freezing](screenshots/100_chiller_gui.png) |
 
 - **Cold:** every half second it counts the grown **Snow sheep with their fleece on** whose feet are in the **5x5 columns around it**, on its level or the block above (the Blaze Furnace's area). A sheared sheep or a lamb gives nothing until its wool grows back. Snowflakes drift from each one into it.
-- **Speed:** one Snow sheep freezes an Ice every **7.5 seconds** (`ticksPerIce`); each one after the first adds 12.5% less (`falloff`), up to four (`maxColdSources`): about 4, 2.9 and 2.3 seconds for two, three and four.
+- **Speed:** one Snow sheep freezes an Ice every **5 seconds** (`ticksPerIce`); each one after the first adds 12.5% less (`falloff`), up to four (`maxColdSources`): about 2.7, 1.9 and 1.5 seconds for two, three and four.
 - **Water:** each Ice takes **1 bucket** (`waterPerIce`) from its **8-bucket tank** (`tankCapacity`). Right-click it with a Water Bucket, pipe water in from any side, or place a **Fluid Reservoir** beside it. Water can't be taken back out.
 - **Ice:** it goes in the chiller's one slot (a stack of 64). Hoppers and pipes take it out of any side; a comparator reads how full the slot is. While the slot is full it stops and keeps its water.
 - **Window:** right-click with an empty hand. The water gauge, the **cold column** (frost rising with the cold, a mark and pip for each Snow sheep), the speed, the freezing arrow into the Ice slot, how long each Ice takes, and the status (*Too warm*, *Freezing*, *No water*, *Ice slot full*).
@@ -861,7 +861,7 @@ The **Wool Packer** presses 9 of the same resource wool into one **Wool Bale**. 
 
 ![Two Wool Packers fed Iron and Gold Wool by hoppers from chests, a Mechanical Separator working an Iron Wool Bale, and placed bales of every built-in wool in front, some standing and some lying down](screenshots/85_wool_packers.png)
 
-- **Pressing:** each bale takes 1,000 FE over 1.5 seconds (about 34 FE/t). The packer only starts once 9 wool are in and the bale will fit, and the press pauses without power.
+- **Pressing:** each bale takes 1,000 FE over 1 second (50 FE/t). The packer only starts once 9 wool are in and the bale will fit, and the press pauses without power.
 - **Loading it:**
   - right-click it with resource wool;
   - put wool in the left slot of its window (shift-click works);
@@ -881,13 +881,13 @@ Put a bale in the Mechanical Separator like any wool. With the default config, c
 | String | 18 | **24** |
 | Iron nuggets | 3 each, 10% chance per wool | 36, 10% chance |
 | Energy | 180,000 FE | **300,000 FE** |
-| Time | 33.75 s | 33.35 s |
+| Time | 22.5 s | 22.5 s |
 
 So a bale gives a third more of everything for two-thirds more power. Every count is capped at one stack, so a bale never jams the separator (ender pearls, for example, stop at 16). Bales stack to 64, so they also carry nine times as much wool in a chest or pipe.
 
 All of this is in `[wool_packer]` in the synced config: `baleYield` (12 = 12 wool's worth of outputs), `baleEnergy` (15 = 15 wool's energy) and `baleTime` (9 = 9 wool's time). A separating recipe whose ingredient matches a Wool Bale with its `sheep_resource` component gives that bale its own outputs instead.
 
-**Power for costly bales:** a bale uses its wool's FE a tick times `baleEnergy ÷ baleTime` (15 ÷ 9 by default), so with the separator's x1.35 speed a Wither Wool Bale needs about **2,250 FE/t**. The separator's input rate rises to twice what the bale in it uses (over its usual 1,000 FE/t), so any bale runs at full speed when the power is there. That much takes a big supply: a Hume Energy Cube bank, a Zero Point Module or several generators on one cable.
+**Power for costly bales:** a bale uses its wool's FE a tick times `baleEnergy ÷ baleTime` (15 ÷ 9 by default), so with the separator's x2 speed a Wither Wool Bale needs about **3,333 FE/t**. The separator's input rate rises to twice what the bale in it uses (over its usual 1,000 FE/t), so any bale runs at full speed when the power is there. That much takes a big supply: a Hume Energy Cube bank, a Zero Point Module or several generators on one cable.
 
 #### Unpacking bales
 Put a bale on its own anywhere in a crafting grid (the inventory's 2x2 grid works) to get its **9 wool** back, of the same resource. JEI lists this for every wool type. The recipe is `data/barelyfunctionalcontraptions/recipe/unpack_wool_bale.json`; a data pack can remove it by overriding that file.
@@ -1157,20 +1157,20 @@ An endless power source for creative mode, for testing builds without setting up
 
 | Fed item | Wool | Separator output (per wool) | Own uses (`-1`) | FE / time |
 |---|---|---|---|---|
-| Iron Ingot | Iron Wool | 2–4 Raw Iron | 9 | 20,000 / 3.75 s |
-| Gold Ingot | Gold Wool | 2–4 Raw Gold | 9 | 20,000 / 3.75 s |
-| Copper Ingot | Copper Wool | 2–4 Raw Copper | 9 | 16,000 / 3.75 s |
-| Diamond | Diamond Wool | 2–4 Diamond | 1 | 40,000 / 5.95 s |
-| Emerald | Emerald Wool | 2–4 Emerald | 1 | 40,000 / 5.95 s |
-| Redstone Dust | Redstone Wool | 2–4 Redstone Dust | 9 | 12,000 / 3 s |
-| Lapis Lazuli | Lapis Wool | 2–4 Lapis Lazuli | 9 | 12,000 / 3 s |
-| Coal | Coal Wool | 2–4 Coal | 9 | 8,000 / 3 s |
-| Netherite Scrap | Netherite Wool | 2–4 Netherite Scrap | 1 | 80,000 / 7.45 s |
-| Cobblestone | Stone Wool | 2–4 Cobblestone | 1 | 4,000 / 1.5 s |
-| Oak Log | Wood Wool | 2–4 Oak Log | 1 | 4,000 / 1.5 s |
-| Quartz | Quartz Wool | 2–4 Nether Quartz | 1 | 16,000 / 3.75 s |
-| Red Mushroom | Red Mushroom Wool | 2–4 Red Mushroom (+5% Mycelium) | 3 | 8,000 / 3 s |
-| Brown Mushroom | Brown Mushroom Wool | 2–4 Brown Mushroom (+5% Mycelium) | 3 | 8,000 / 3 s |
+| Iron Ingot | Iron Wool | 2–4 Raw Iron | 9 | 20,000 / 2.5 s |
+| Gold Ingot | Gold Wool | 2–4 Raw Gold | 9 | 20,000 / 2.5 s |
+| Copper Ingot | Copper Wool | 2–4 Raw Copper | 9 | 16,000 / 2.5 s |
+| Diamond | Diamond Wool | 2–4 Diamond | 1 | 40,000 / 4 s |
+| Emerald | Emerald Wool | 2–4 Emerald | 1 | 40,000 / 4 s |
+| Redstone Dust | Redstone Wool | 2–4 Redstone Dust | 9 | 12,000 / 2 s |
+| Lapis Lazuli | Lapis Wool | 2–4 Lapis Lazuli | 9 | 12,000 / 2 s |
+| Coal | Coal Wool | 2–4 Coal | 9 | 8,000 / 2 s |
+| Netherite Scrap | Netherite Wool | 2–4 Netherite Scrap | 1 | 80,000 / 5 s |
+| Cobblestone | Stone Wool | 2–4 Cobblestone | 1 | 4,000 / 1 s |
+| Oak Log | Wood Wool | 2–4 Oak Log | 1 | 4,000 / 1 s |
+| Quartz | Quartz Wool | 2–4 Nether Quartz | 1 | 16,000 / 2.5 s |
+| Red Mushroom | Red Mushroom Wool | 2–4 Red Mushroom (+5% Mycelium) | 3 | 8,000 / 2 s |
+| Brown Mushroom | Brown Mushroom Wool | 2–4 Brown Mushroom (+5% Mycelium) | 3 | 8,000 / 2 s |
 
 Every resource also gives 2 String, unless its row says otherwise. Plain wool (`#minecraft:wool`) can be separated into 3 string through the bundled `barelyfunctionalcontraptions:separating` recipe.
 
@@ -1182,17 +1182,17 @@ Twelve more built-in resources turn the sheep into a little version of the mob (
 
 | Fed item | Sheep | What's different | Separator output (per wool) | FE / time |
 |---|---|---|---|---|
-| Hay Bale | Hay | A hay-bale fleece with binding bands | 2–4 Wheat | 4,000 / 1.5 s |
-| Snow Block | Snow | A snowy fleece, and it **leaves snow wherever it walks** like a Snow Golem (while its fleece is on, onto any block snow can lie on, when mobs may change blocks) | 2–4 Snowball (+5% Ice) | 4,000 / 1.5 s |
-| Nether Star | Wither | Two Wither Skeleton Skulls either side of its own head that look around on their own, and glowing eyes | 2–4 Nether Star + 1 Soul Sand | 400,000 / 14.85 s |
-| Dragon's Breath | Dragon | Flapping dragon wings, glowing purple eyes | 2–4 Dragon's Breath (+5% Ender Pearl) | 80,000 / 7.45 s |
-| Glow Ink Sac | Glow Ink | Its fleece glows in the dark and **lights up the block it stands in** (light level 12) | 2–4 Glow Ink Sac | 8,000 / 2.25 s |
-| Bone Block | Skeleton | A Skeleton Skull for a face (the game's own skull texture) and bony legs | 2–4 Bone (+10% Arrow) | 6,000 / 2.25 s |
-| Wither Rose | Wither Skeleton | A Wither Skeleton Skull for a face and charred, bony legs | 2–4 Bone + 2 Coal (+2.5% Wither Skeleton Skull) | 20,000 / 3.75 s |
-| Spider Eye | Spider | Four extra spider legs that move as it walks, and glowing red eyes | 2–4 Spider Eye + 4 String | 6,000 / 2.25 s |
-| Echo Shard | Sculk | Sculk tendrils on its head, sculk sensors on its back and fleece strands that glow | 2–4 Echo Shard + 2 Sculk | 80,000 / 7.45 s |
-| Blaze Rod | Blaze | Permanently on fire, without burning or taking damage | 2–4 Blaze Rod (+10% Glowstone Dust) | 20,000 / 3.75 s |
-| Ghast Tear | Ghast | **Twice the size**, ghast tentacles under its belly, and it **screams like a ghast** (the ghast's scream instead of a bleat, and its hurt and death sounds) | 2–4 Ghast Tear + 1 Gunpowder | 40,000 / 5.95 s |
+| Hay Bale | Hay | A hay-bale fleece with binding bands | 2–4 Wheat | 4,000 / 1 s |
+| Snow Block | Snow | A snowy fleece, and it **leaves snow wherever it walks** like a Snow Golem (while its fleece is on, onto any block snow can lie on, when mobs may change blocks) | 2–4 Snowball (+5% Ice) | 4,000 / 1 s |
+| Nether Star | Wither | Two Wither Skeleton Skulls either side of its own head that look around on their own, and glowing eyes | 2–4 Nether Star + 1 Soul Sand | 400,000 / 10 s |
+| Dragon's Breath | Dragon | Flapping dragon wings, glowing purple eyes | 2–4 Dragon's Breath (+5% Ender Pearl) | 80,000 / 5 s |
+| Glow Ink Sac | Glow Ink | Its fleece glows in the dark and **lights up the block it stands in** (light level 12) | 2–4 Glow Ink Sac | 8,000 / 1.5 s |
+| Bone Block | Skeleton | A Skeleton Skull for a face (the game's own skull texture) and bony legs | 2–4 Bone (+10% Arrow) | 6,000 / 1.5 s |
+| Wither Rose | Wither Skeleton | A Wither Skeleton Skull for a face and charred, bony legs | 2–4 Bone + 2 Coal (+2.5% Wither Skeleton Skull) | 20,000 / 2.5 s |
+| Spider Eye | Spider | Four extra spider legs that move as it walks, and glowing red eyes | 2–4 Spider Eye + 4 String | 6,000 / 1.5 s |
+| Echo Shard | Sculk | Sculk tendrils on its head, sculk sensors on its back and fleece strands that glow | 2–4 Echo Shard + 2 Sculk | 80,000 / 5 s |
+| Blaze Rod | Blaze | Permanently on fire, without burning or taking damage | 2–4 Blaze Rod (+10% Glowstone Dust) | 20,000 / 2.5 s |
+| Ghast Tear | Ghast | **Twice the size**, ghast tentacles under its belly, and it **screams like a ghast** (the ghast's scream instead of a bleat, and its hurt and death sounds) | 2–4 Ghast Tear + 1 Gunpowder | 40,000 / 4 s |
 | Prismarine Crystals | Tide | A **fin along its back and gills** on its neck; it **breathes underwater**, bubbles as it swims, and calls like a dolphin. It drives the **Fleece Trawler** | 2–4 Prismarine Shard + 1 Prismarine Crystals | 30,000 / 7 s |
 
 ![The themed sheep at night](screenshots/53_themed_sheep_night.png)
@@ -1243,7 +1243,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 #### Global config (per world, synced to clients)
 `config/barelyfunctionalcontraptions-sheep-synced.toml`, synced to every client. A copy placed in `<world>/syncedconfig/` overrides it for that world only. You can also edit it in-game from *Mods → Barely Functional Contraptions → Config*.
 
-**Faster machines (timing revision 1):** the Mechanical Separator (`processingSpeedMultiplier` 1.35), Wool Packer (`ticksPerBale` 30), Infusion Altar (`ticks` 75), Powered Furnace (`cookTimeMultiplier` 0.55), Snow Sheep Chiller (`ticksPerIce` 150) and Automatic Shears (`shearInterval` 15) now work about a quarter faster; each job still costs the same FE. An older config file is brought up to date the first time it loads: any of these settings still at its old default moves to the new one, while one you changed is left as it was. `[revision] timingRevision = 1` records that this has been done.
+**Faster machines (timing revisions 1 and 2):** the processing machines have been sped up twice: first by about a quarter, then by about half again. Now: the Mechanical Separator (`processingSpeedMultiplier` 2.0, was 1.35, first 1.0), Wool Packer (`ticksPerBale` 20, was 30), Infusion Altar (`ticks` 50, was 75), Powered Furnace (`cookTimeMultiplier` 0.35, was 0.55, with `energyPerTick` 31, was 20, so a smelt costs about the same), Snow Sheep Chiller (`ticksPerIce` 100, was 150) and Automatic Shears (`shearInterval` 10, was 15). Each job still costs the same FE. An older config file is brought up to date the first time it loads: any of these settings still at an old default moves to the new one, while one you changed is left as it was. `[revision] timingRevision = 2` records that this has been done.
 
 **`[sheep]`**
 
@@ -1285,7 +1285,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `primaryOutputMultiplier` | 1.0 | Scales the resource output; fractional parts become a chance |
 | `bonusPrimaryChance` | 0.0 | Global chance of +1 resource output |
 | `energyCostMultiplier` | 1.0 | Efficiency multiplier for energy |
-| `processingSpeedMultiplier` | 1.35 | Speed multiplier (total energy is unchanged): 1.35 = about three quarters of each wool's `processing_ticks` |
+| `processingSpeedMultiplier` | 2.0 | Speed multiplier (total energy is unchanged): 2.0 = half of each wool's `processing_ticks` |
 | `resetProgressWhenUnpowered` | false | Reset progress instead of pausing it |
 | `energyInputSides` | BACK, LEFT, RIGHT, TOP, BOTTOM | Faces that accept FE |
 | `itemInputSides` | TOP, BACK, LEFT, RIGHT | Faces that accept wool |
@@ -1297,7 +1297,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 
 | Key | Default | Meaning |
 |---|---|---|
-| `shearInterval` | 15 | Ticks between shearing sweeps (15 = three quarters of a second) |
+| `shearInterval` | 10 | Ticks between shearing sweeps (10 = half a second) |
 | `energyPerShear` | 2000 | FE used per sheep sheared (0 = runs without power) |
 | `energyCapacity` | 50000 | FE buffer |
 | `maxEnergyInput` | 1000 | FE accepted per tick (every face except the front) |
@@ -1319,7 +1319,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 |---|---|---|
 | `handFeedingMaxTier` | 0 | The highest tier that can still be fed by hand; above it, only the altar (0 = every sheep needs the altar, 3 = none do). Replaces `altarOnlyFromTier` |
 | `baseEnergy` / `highTierEnergy` | 20000 / 200000 | FE for a tier 1 / tier 2+ infusion when the definition doesn't say |
-| `ticks` | 75 | Ticks one infusion takes |
+| `ticks` | 50 | Ticks one infusion takes |
 | `energyCapacity` / `maxEnergyInput` | 250000 / 5000 | The altar's buffer and input rate |
 | `sheepSlowness` | 5 | Slowness level on the sheep while it is infused, taken off when it ends (0 = off) |
 
@@ -1327,8 +1327,8 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 
 | Key | Default | Meaning |
 |---|---|---|
-| `cookTimeMultiplier` | 0.55 | Its smelting time as a share of a Furnace's |
-| `energyPerTick` | 20 | FE/t while smelting |
+| `cookTimeMultiplier` | 0.35 | Its smelting time as a share of a Furnace's |
+| `energyPerTick` | 31 | FE/t while smelting |
 | `blazeBonus` / `maxBlazeSheep` | 0.25 / 4 | Extra speed from the first Blaze sheep (each one after adds less), and the most counted |
 | `energyCapacity` / `maxEnergyInput` | 20000 / 1000 | Its buffer and input rate |
 
@@ -1419,7 +1419,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 |---|---|---|
 | `radius` | 2 | How far the chilling area reaches (2 = 5x5), at its level and the block above |
 | `maxColdSources` / `falloff` | 4 / 0.125 | Most Snow sheep counted, and how much less each extra one adds |
-| `ticksPerIce` | 150 | Ticks per Ice with one Snow sheep |
+| `ticksPerIce` | 100 | Ticks per Ice with one Snow sheep |
 | `waterPerIce` / `tankCapacity` | 1000 / 8000 | mB of water per Ice, and the tank |
 | `coldSources` | `barelyfunctionalcontraptions:snow` | Sheep resources whose sheep give cold |
 
@@ -1430,7 +1430,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `energyCapacity` | 20000 | FE each Wool Packer stores |
 | `maxEnergyInput` | 1000 | FE it accepts per tick |
 | `energyPerBale` | 1000 | FE to press one bale (0 = needs no power) |
-| `ticksPerBale` | 30 | Ticks to press one bale |
+| `ticksPerBale` | 20 | Ticks to press one bale |
 | `baleYield` | 12.0 | What separating a bale gives, in wool's worth of outputs (a bale holds 9) |
 | `baleEnergy` | 15.0 | FE to separate a bale, in wool's worth |
 | `baleTime` | 9.0 | Time to separate a bale, in wool's worth |
