@@ -580,6 +580,7 @@
   "barelyfunctionalcontraptions.configuration.itemInputSides": "Wool Input Sides",
   "barelyfunctionalcontraptions.configuration.itemOutputSides": "Output Sides",
   "barelyfunctionalcontraptions.configuration.autoPushOutputs": "Push Out Outputs",
+  "barelyfunctionalcontraptions.configuration.pipesTakeOutputsFromAnySide": "Pipes Take Outputs From Any Side",
   "barelyfunctionalcontraptions.configuration.autoPushInterval": "Ticks Between Output Pushes",
   "barelyfunctionalcontraptions.configuration.redstoneControlEnabled": "Redstone Mode Button",
   "barelyfunctionalcontraptions.configuration.defaultRedstoneMode": "Default Redstone Mode",

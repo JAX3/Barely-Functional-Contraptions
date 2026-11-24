@@ -229,6 +229,7 @@ public final class ModGameTests {
         TESTS.put("item_pipe_hopper_pushes_but_chests_are_not_drained", ModGameTests::itemPipePushAndChests);
         TESTS.put("item_pipe_respects_transfer_rate", ModGameTests::itemPipeRate);
         TESTS.put("item_pipe_pull_side_drains_a_chest_through_a_filter", ModGameTests::itemPipePullFilter);
+        TESTS.put("item_pipe_on_a_separators_top_empties_it_into_a_crate_controller", ModGameTests::separatorTopToController);
         TESTS.put("item_pipe_side_modes_and_destination_filters", ModGameTests::itemPipeSideModes);
         TESTS.put("wrench_sets_pipe_modes_and_filters", ModGameTests::wrenchConfiguresPipes);
         TESTS.put("themed_sheep_have_their_features", ModGameTests::themedSheep);
@@ -530,6 +531,34 @@ public final class ModGameTests {
             h.getBlockEntity(new BlockPos(2, 1, 2), BlockEntity.class).saveWithoutMetadata(saved);
             String tag = saved.buildResult().toString();
             h.assertTrue(tag.contains("pull") && tag.contains("minecraft:iron_ingot"), "the side's mode and filter are saved: " + tag);
+        });
+    }
+
+    /**
+     * A Mechanical Separator full of outputs, its bales waiting, with an Item Pipe on its top (an input side) running
+     * over to a Crate Controller: the network takes the outputs from the top into the controller's crates (raw iron to
+     * the crate holding it, string to the empty one), and leaves the bales in the separator's input.
+     */
+    private static void separatorTopToController(GameTestHelper h) {
+        BlockPos sepPos = new BlockPos(1, 1, 2);
+        MechanicalSeparatorBlockEntity sep = separator(h, sepPos);
+        sep.getInventory().setStack(SeparatorInventory.INPUT, com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(IRON, 8));
+        sep.getInventory().setStack(SeparatorInventory.PRIMARY, new ItemStack(Items.RAW_IRON, 40));
+        sep.getInventory().setStack(SeparatorInventory.SECONDARY, new ItemStack(Items.STRING, 20));
+        var iron = crate(h, new BlockPos(5, 1, 2));
+        iron.setContents(contents(Items.RAW_IRON, 10, false));
+        var empty = crate(h, new BlockPos(4, 1, 3));
+        var c = controller(h, new BlockPos(4, 1, 2));
+        c.refresh(h.getLevel());
+        // Up from the separator's top, across, and down into the controller's west face.
+        for (BlockPos p : List.of(new BlockPos(1, 2, 2), new BlockPos(2, 2, 2), new BlockPos(3, 2, 2), new BlockPos(3, 1, 2))) itemPipe(h, p);
+        h.assertTrue(c.crateCount() == 2, "two crates in the store, got " + c.crateCount());
+        h.succeedWhen(() -> {
+            h.assertTrue(sep.getInventory().getStack(SeparatorInventory.PRIMARY).isEmpty() && sep.getInventory().getStack(SeparatorInventory.SECONDARY).isEmpty(),
+                    "the separator is emptied through its top, has " + sep.getInventory().getStack(SeparatorInventory.PRIMARY) + " / " + sep.getInventory().getStack(SeparatorInventory.SECONDARY));
+            h.assertTrue(iron.count() == 50 && iron.item().is(Items.RAW_IRON), "raw iron joins the iron crate, has " + iron.count());
+            h.assertTrue(empty.item().is(Items.STRING) && empty.count() == 20, "string goes to the empty crate, has " + empty.count() + " " + empty.item());
+            h.assertTrue(sep.getInventory().getStack(SeparatorInventory.INPUT).getCount() == 8, "the bales stay in its input");
         });
     }
 
@@ -2293,7 +2322,7 @@ public final class ModGameTests {
             c.poweredFurnaceEnergyPerTick.set(20);
             c.chillerTicksPerIce.set(150);
             c.automaticShearsInterval.set(12); // the player's own
-            ModConfigs.migrate();
+            ModConfigs.applyTimingPasses();
             h.assertTrue(c.processingSpeedMultiplier.get() == 2.0 && c.woolPackerTicksPerBale.get() == 20 && c.altarTicks.get() == 50
                             && c.poweredFurnaceCookTime.get() == 0.35 && c.poweredFurnaceEnergyPerTick.get() == 31 && c.chillerTicksPerIce.get() == 100,
                     "old defaults move to the new ones");
@@ -2303,7 +2332,7 @@ public final class ModGameTests {
             c.timingRevision.set(0);
             c.processingSpeedMultiplier.set(1.0);
             c.automaticShearsInterval.set(20);
-            ModConfigs.migrate();
+            ModConfigs.applyTimingPasses();
             h.assertTrue(c.processingSpeedMultiplier.get() == 2.0 && c.automaticShearsInterval.get() == 10,
                     "a file from before both passes gets both, got " + c.processingSpeedMultiplier.get() + " / " + c.automaticShearsInterval.get());
         } finally {
@@ -3865,8 +3894,23 @@ public final class ModGameTests {
         h.assertTrue(insertItem(top, ResourceWoolItem.create(IRON, 4)) == 4, "wool accepted from top");
         h.assertTrue(insertItem(bottom, ResourceWoolItem.create(IRON, 1)) == 0, "bottom is output-only");
         be.getInventory().setStack(SeparatorInventory.PRIMARY, new ItemStack(Items.RAW_IRON, 5));
+        // By default a pipe on any side (here the top, an input side) can take the outputs, like the shears'.
         try (Transaction tx = Transaction.openRoot()) {
-            h.assertTrue(top.extract(ItemResource.of(Items.RAW_IRON), 5, tx) == 0, "top cannot extract outputs");
+            h.assertTrue(top.extract(ItemResource.of(Items.RAW_IRON), 5, tx) == 5, "the top gives up outputs too");
+        }
+        // With pipesTakeOutputsFromAnySide off, only the output sides (the bottom) do.
+        var anySide = ModConfigs.SERVER.extractFromAnySide;
+        try {
+            anySide.set(false);
+            ResourceHandler<ItemResource> inputOnly = level.getCapability(Capabilities.Item.BLOCK, abs, Direction.UP);
+            try (Transaction tx = Transaction.openRoot()) {
+                h.assertTrue(inputOnly.extract(ItemResource.of(Items.RAW_IRON), 5, tx) == 0, "switched off, the top can't take outputs");
+            }
+            h.assertTrue(insertItem(inputOnly, ResourceWoolItem.create(IRON, 1)) == 1, "but still takes wool");
+        } finally {
+            anySide.set(true);
+        }
+        try (Transaction tx = Transaction.openRoot()) {
             h.assertTrue(bottom.extract(ItemResource.of(Items.RAW_IRON), 5, tx) == 5, "bottom extracts outputs");
             h.assertTrue(bottom.extract(ResourceWoolItem.getResource(ResourceWoolItem.create(IRON, 1), false).map(r -> ItemResource.of(ResourceWoolItem.create(IRON, 1))).orElseThrow(), 1, tx) == 0,
                     "input cannot be extracted");

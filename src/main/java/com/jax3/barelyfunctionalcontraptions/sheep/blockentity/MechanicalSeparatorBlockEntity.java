@@ -227,6 +227,8 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
         Set<RelativeSide> outputs = ModConfigs.SERVER.sides(ModConfigs.SERVER.itemOutputSides);
         boolean in = inputs.contains(rel), out = outputs.contains(rel);
         if (!in && !out) return null;
+        // Any side pipes can reach may also give up the outputs (a pipe on its top, say), unless that's switched off.
+        if (ModConfigs.getBool(ModConfigs.SERVER.extractFromAnySide)) out = true;
         return sidedHandlers[(in ? 1 : 0) + (out ? 2 : 0)];
     }
 

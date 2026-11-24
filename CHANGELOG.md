@@ -180,6 +180,11 @@ speed-up) move to the new ones, and anything you changed is kept.
   still links generators to generators, machines to a Machine Status Panel and crates to a Crate Controller.
 
 ### Fixes
+- **Item Pipe on a Mechanical Separator's top:** it never took the separator's outputs, even set to pull: outputs only
+  came out of the bottom, so the separator filled up and stopped (*Output Full*). Pipes now take its outputs from any
+  side that has one, as they do from the Automatic Shears; it still pushes outputs only out of its bottom, so a hopper
+  feeding it from above gets nothing back. `pipesTakeOutputsFromAnySide = false` in `[separator]` brings back the old
+  way.
 - **Static Generator window:** the dome's charge bar no longer flashes while it's overcharged.
 - **Machine Status Panel:** clicking a Static Generator's dome with the wrench now links it (only its base did), and the
   panel reaches 200 blocks (it was 64, too short to reach across a base). A config file from before keeps its old

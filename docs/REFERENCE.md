@@ -1216,7 +1216,7 @@ With JEI installed, click the Mechanical Separator in JEI (or press **U** over i
 - **Slots:** wool input, resource output, string output and bonus output.
 
 ### Automation
-- **Items:** by default, hoppers and pipes insert wool through the top, back, left and right faces, and extract outputs from the bottom. Outputs are also auto-pushed into any inventory below the machine. Only items the machine can process are accepted.
+- **Items:** by default, hoppers and pipes insert wool through the top, back, left and right faces. Hoppers take outputs from the bottom, and pipes can take them from any of those faces too (a pipe on the top, say), like the Automatic Shears (`pipesTakeOutputsFromAnySide`). Outputs are also auto-pushed into any inventory below the machine. Only items the machine can process are accepted.
 - **Energy:** FE is accepted on every face except the front, through NeoForge's `EnergyHandler` capability (`Capabilities.Energy.BLOCK`). Any FE cable or generator works with it.
 - **No voiding:** the machine never starts or finishes an operation unless all outputs are guaranteed to fit.
 - **No power:** when energy runs out, progress pauses and resumes later.
@@ -1290,6 +1290,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `energyInputSides` | BACK, LEFT, RIGHT, TOP, BOTTOM | Faces that accept FE |
 | `itemInputSides` | TOP, BACK, LEFT, RIGHT | Faces that accept wool |
 | `itemOutputSides` | BOTTOM | Faces to extract from and auto-push into |
+| `pipesTakeOutputsFromAnySide` | true | Pipes (and other mods' item handlers) may take outputs from every face that has an item handler, not just `itemOutputSides`; auto-push still uses only those |
 | `autoPushOutputs` / `autoPushInterval` | true / 10 | Automatic output |
 | `redstoneControlEnabled` / `defaultRedstoneMode` | true / IGNORED | Redstone behaviour |
 

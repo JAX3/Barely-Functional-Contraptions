@@ -79,23 +79,31 @@ public final class ModConfigs {
      */
     public static void migrate() {
         try {
-            int revision = SERVER.timingRevision.get();
-            if (revision >= TIMING_PASSES.length) return;
-            List<ModConfigSpec.ConfigValue<? extends Number>> values = timedValues();
-            for (int pass = revision; pass < TIMING_PASSES.length; pass++) {
-                for (int i = 0; i < values.size(); i++) {
-                    var value = values.get(i);
-                    double[] change = TIMING_PASSES[pass][i];
-                    if (change[0] == change[1] || Math.abs(value.get().doubleValue() - change[0]) > 1e-9) continue;
-                    if (value instanceof ModConfigSpec.IntValue intValue) intValue.set((int) change[1]);
-                    else if (value instanceof ModConfigSpec.DoubleValue doubleValue) doubleValue.set(change[1]);
-                }
-            }
-            SERVER.timingRevision.set(TIMING_PASSES.length);
-            SERVER_SPEC.save();
+            if (applyTimingPasses()) SERVER_SPEC.save();
         } catch (IllegalStateException | NullPointerException notLoaded) {
             // A copy received from a server (already migrated there), or not loaded yet: nothing to do.
         }
+    }
+
+    /**
+     * {@link #migrate()} without saving the file (saving makes NeoForge reload it a moment later, which would undo any
+     * value set in memory since, as GameTests do): applies the passes the loaded config hasn't had; false if none.
+     */
+    public static boolean applyTimingPasses() {
+        int revision = SERVER.timingRevision.get();
+        if (revision >= TIMING_PASSES.length) return false;
+        List<ModConfigSpec.ConfigValue<? extends Number>> values = timedValues();
+        for (int pass = revision; pass < TIMING_PASSES.length; pass++) {
+            for (int i = 0; i < values.size(); i++) {
+                var value = values.get(i);
+                double[] change = TIMING_PASSES[pass][i];
+                if (change[0] == change[1] || Math.abs(value.get().doubleValue() - change[0]) > 1e-9) continue;
+                if (value instanceof ModConfigSpec.IntValue intValue) intValue.set((int) change[1]);
+                else if (value instanceof ModConfigSpec.DoubleValue doubleValue) doubleValue.set(change[1]);
+            }
+        }
+        SERVER.timingRevision.set(TIMING_PASSES.length);
+        return true;
     }
 
     public static final class Server {
@@ -142,6 +150,7 @@ public final class ModConfigs {
         public final ModConfigSpec.ConfigValue<List<? extends String>> energyInputSides;
         public final ModConfigSpec.ConfigValue<List<? extends String>> itemInputSides;
         public final ModConfigSpec.ConfigValue<List<? extends String>> itemOutputSides;
+        public final ModConfigSpec.BooleanValue extractFromAnySide;
         public final ModConfigSpec.BooleanValue autoPushOutputs;
         public final ModConfigSpec.IntValue autoPushInterval;
         public final ModConfigSpec.BooleanValue redstoneControlEnabled;
@@ -427,6 +436,9 @@ public final class ModConfigs {
                     .defineListAllowEmpty("itemInputSides", List.of("TOP", "BACK", "LEFT", "RIGHT"), () -> "TOP", ModConfigs::isSide);
             itemOutputSides = b.comment("Sides through which hoppers/pipes may extract outputs, and that outputs are auto-pushed into.", sideHelp)
                     .defineListAllowEmpty("itemOutputSides", List.of("BOTTOM"), () -> "BOTTOM", ModConfigs::isSide);
+            extractFromAnySide = b.comment("Whether pipes (and other mods' item handlers) may take outputs from every side that has one, input sides",
+                            "included, like the Automatic Shears. Off: only from itemOutputSides. Automatic pushing always uses itemOutputSides.")
+                    .define("pipesTakeOutputsFromAnySide", true);
             autoPushOutputs = b.comment("Automatically push outputs into inventories adjacent to output sides.")
                     .define("autoPushOutputs", true);
             autoPushInterval = b.comment("Ticks between automatic output pushes.")
