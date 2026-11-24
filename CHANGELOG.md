@@ -1,9 +1,9 @@
 # Changelog
 
-## 1.5.7: storage, the Static Generator and the Machine Status Panel (20–23 November 2026)
+## 1.5.7: storage, the Fleece Trawler, the Static Generator and the Machine Status Panel (20–24 November 2026)
 
-New contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage (crates and a controller that links them into one store), a mid-game
-generator that runs on static, and a wall screen that keeps an eye on all your machines. They come after 1.5.5,
+New contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage (crates and a controller that links them into one store), a fishing
+machine driven by a new sea-going sheep, a mid-game generator that runs on static, and a wall screen that keeps an eye on all your machines. They come after 1.5.5,
 in 1.5.7. Numbers are the defaults; almost all of them can be changed in the synced config.
 
 ### Storage: the Wool-Lined Crate
@@ -57,26 +57,36 @@ Links Wool-Lined Crates into one store. It needs no power.
 - New config section `[crate_controller]`: `range`, `maxCrates`; a chapter in the Contraptions Manual (Logistics).
 
 ### Production: the Fleece Trawler and the Tide sheep
+A dockside winch that **fishes the pool in front of it**. It needs no power: **Tide sheep swimming in the pool drive
+it**.
 - **Tide sheep:** a new themed sheep, infused at the altar with Prismarine Crystals (2 Prismarine and a Nautilus Shell
   round it). A fin along its back and gills on its neck; it breathes underwater, bubbles as it swims and calls like a
   dolphin. Its wool separates into Prismarine Shards and Crystals. Advancement *Making Waves*; it's in the
   collect-every-wool challenge too.
-- **Fleece Trawler:** a dockside winch that fishes the pool in front of it (the 7x7, down to 4 deep; at least a 3x3
-  two deep). No power: **Tide sheep swimming in the pool drive it**, each one faster, up to 4. A haul takes 30 seconds
-  with one sheep in a full pool; ocean or river water and rain speed it up.
-- Hauls are the vanilla fishing loot. **Lures:** resource wool in its lure slot gives each haul a 30% chance of 1–2 of
-  that resource instead (Raw Iron on Iron Wool...); one wool lasts 8 resource hauls.
-- **Barely functional:** its net tangles now and then and it stops until it's cut free with shears (some string back);
-  very rarely it drags up a confused sheep.
-- Hoppers and pipes on every side, a comparator, a Machine Status Panel line, the advancement *Reel Ewe In*, config
-  `[fleece_trawler]`, and a chapter in the Contraptions Manual (Production).
-- **Its window:** its lure slot (hauls left), a pip for each Tide sheep, a pool bar, the winch winding in each haul,
-  its 9 catch slots and its status, with a button (or sneak-right-click) to show its pool's outline.
-- **JEI** pages for its fishing and for each resource wool as a lure; **Jade** shows its status, sheep, pool, winch,
-  lure and hauls.
-- **Test world:** cell (1, 6) has a full pool in a dark prismarine basin with three Tide sheep, a trawler on an Iron
-  Wool lure and a hopper into a chest; the Machine Status Panel shows it.
+- **Placing it:** its net faces away from you, so place it on the bank looking out over the water.
+- **Its pool:** the water in the 7x7 in front of it, from its own level down to 4 deep. It needs at least 18 water (a
+  3x3 two deep) and fishes faster the bigger the pool, at full speed with all 196.
+- **Its sheep:** each grown Tide sheep swimming in the pool adds speed, up to 4. A haul takes 30 seconds with one sheep
+  in a full pool, and a quarter of that with four. Ocean or river biomes and rain each make it a quarter faster again.
+- **Hauls** are the vanilla fishing loot: fish, and now and then junk.
+- **Lures:** put resource wool in its lure slot (right-click it with the wool, or pipe it in) and each haul has a 30%
+  chance to bring up 1–2 of that resource instead: Raw Iron on Iron Wool, Diamonds on Diamond Wool. One wool lasts 8
+  resource hauls, then it's used up.
+- **Barely functional:** now and then (4% of hauls) its net **tangles** and it stops until you cut it free with
+  shears, which gives back a little string. Very rarely a haul drags up a confused, dripping sheep onto the bank.
+- **Its window:** right-click it with an empty hand. Its lure slot and how many hauls the lure has left, a pip for each
+  Tide sheep, a bar for its pool, the winch winding in each haul, its 9 catch slots and its status; hover over any of
+  them for more. A button shows its pool's outline in the world, and so does sneak-right-clicking it.
+- **Automation:** hoppers and pipes take the catch out of every side and put lures in; a comparator reads how many of
+  its catch slots are in use. Broken, it drops its lures and catch.
+- **Machine Status Panel:** *Hauling* (and how far through the haul), *No water*, *No sheep*, *Tangled* or *Output
+  full*.
+- **JEI:** a page for its fishing (a Tide sheep in, fish and junk out) and one for each resource wool as a lure, plus an
+  information page. **Jade:** its status, sheep, pool, winch, lure and how many hauls it's made.
+- **Advancement:** *Reel Ewe In*, for being near one when it hauls up a resource on a lure.
 - **Recipe:** Blue Steel, a Fishing Rod, two Tide Wool Bales, a Functional Machine Block and a Hopper.
+- New config section `[fleece_trawler]`: `haulTicks`, `maxSheep`, `minPool`, `lureChance`, `lureUses`,
+  `tangleChance`, `straySheepChance`, `waterBonus`, `rainBonus`; a chapter in the Contraptions Manual (Production).
 
 ### Power: the Static Generator and Copper Comb (mid-game)
 Two blocks tall, like a Van de Graaff generator. Sheep rubbing against **Copper Combs** in its 5x5 pen build up static,
@@ -155,12 +165,14 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
 ### Test world
 - The platform grew a **seventh row** of cells, and you now start at its new south edge.
 - **Static Generator:** six sheep at four fresh combs, making 600 FE/t into a bank of Hume Energy Cubes.
-- **Machine Status Panel:** a 3x3 screen showing 22 machines from across the platform (the crate store among them), with an alarm lamp.
+- **Machine Status Panel:** a 3x3 screen showing 23 machines from across the platform (the crate store and the Fleece Trawler among them), with an alarm lamp.
 - **Wool-Lined Crates:** a storeroom wall of fourteen crates, each lined the colour of what it holds; and a hopper
   overfilling a crate of redstone (it bursts now and then) beside a strapped one that never does.
 - **Crate Controller:** on top of the storeroom wall (all its crates join by touch) beside an empty crate, fed by a
   hopper and a chest: cobblestone, coal and wheat go to their crates, bread to the empty one. The status panel shows
   the whole store as one line.
+- **Fleece Trawler:** a full 7x7 pool, four deep, sunk into a fenced dark prismarine basin, with three Tide sheep
+  swimming in it; the trawler on its rim with an Iron Wool lure, and a hopper under it into a chest in the floor.
 
 ## 1.5.5 (17–19 November 2026)
 
