@@ -4856,7 +4856,7 @@ def generate_crate():
 
 def generate_woollen_steel():
     """Woollen Steel in the style of Minecraft's own ingots and metal blocks, in the machines' blue steel: the ingot a
-    bar seen corner-on (lit top face, darker front and end) with a band of wool wrapped round it; the block rows of
+    bar seen corner-on (lit top face, darker front and end); the block rows of
     plates like a Block of Iron, each lit along its top edge, with wool stitched along the seams between them."""
     rnd = random.Random(311)
     steel_l, steel, steel_d, edge = CARTOON["H"], CARTOON["M"], CARTOON["S"], CARTOON["O"]
@@ -4898,11 +4898,6 @@ def generate_woollen_steel():
         else:
             c = edge if boundary else steel if y <= r + 2 else steel_d  # the front face
         item.putpixel((x, y), c)
-    # A band of wool wrapped round the middle of the bar.
-    for (x, y) in mask:
-        if x in (7, 8):
-            r = ridge[x]
-            item.putpixel((x, y), wool_l if y <= r else wool if y <= r + 2 else wool_d)
     item.save(out("item/woollen_steel.png"))
 
     # The block: rows of plates like a Block of Iron, each lit along its top, with a seam under it stitched now and then

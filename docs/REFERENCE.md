@@ -107,7 +107,7 @@ Block of Woollen Steel: 9 Woollen Steel (and back to 9)
 
 | Blocks of Woollen Steel, and Woollen Steel in an item frame | Its recipes in JEI | The Functional Machine Block, made with it |
 |---|---|---|
-| ![Blocks of Woollen Steel: rows of blue-steel plates like a Block of Iron, each lit along its top, with white wool stitched now and then along the seams; and Woollen Steel, a blue-steel ingot shaped like the vanilla ingots with a band of wool round it, in an item frame](screenshots/114_woollen_steel.png) | ![JEI: an Iron Ingot and wool make Woollen Steel; a Block of Woollen Steel makes nine](screenshots/114_woollen_steel_jei.png) | ![JEI: Woollen Steel in the corners, copper ingots on the sides and redstone in the middle make a Functional Machine Block](screenshots/114_woollen_steel_machine_block.png) |
+| ![Blocks of Woollen Steel: rows of blue-steel plates like a Block of Iron, each lit along its top, with white wool stitched now and then along the seams; and Woollen Steel, a blue-steel ingot shaped like the vanilla ingots, in an item frame](screenshots/114_woollen_steel.png) | ![JEI: an Iron Ingot and wool make Woollen Steel; a Block of Woollen Steel makes nine](screenshots/114_woollen_steel_jei.png) | ![JEI: Woollen Steel in the corners, copper ingots on the sides and redstone in the middle make a Functional Machine Block](screenshots/114_woollen_steel_machine_block.png) |
 
 ### Functional Machine Block
 
