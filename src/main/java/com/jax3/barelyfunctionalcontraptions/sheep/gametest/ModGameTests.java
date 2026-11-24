@@ -160,6 +160,7 @@ public final class ModGameTests {
         TESTS.put("range_upgrade_grows_working_areas", ModGameTests::rangeUpgrade);
         TESTS.put("yield_upgrade_adds_to_each_output", ModGameTests::yieldUpgrade);
         TESTS.put("muffler_upgrade_silences_and_syncs", ModGameTests::mufflerUpgrade);
+        TESTS.put("machine_frame_saves_like_before_and_offers_its_modules", ModGameTests::machineFrame);
         TESTS.put("infusion_altar_pulses_when_ready", ModGameTests::altarPulse);
         TESTS.put("list_command_lists_every_sheep", ModGameTests::listCommand);
         TESTS.put("snow_sheep_leaves_snow", ModGameTests::snowSheep);
@@ -2543,6 +2544,43 @@ public final class ModGameTests {
         sep.upgrades().setItem(0, card.copy());
         h.assertTrue(sep.muffled() && sep.getUpdateTag(h.getLevel().registryAccess()).getBooleanOr("upgrade_muffled", false),
                 "with the card, muffled, and clients are told");
+        h.succeed();
+    }
+
+    /**
+     * The machine frame: a machine saves its modules under the keys it always used (so old worlds load), loads them back
+     * the same, and offers cables, pipes and hoppers only what its modules provide: the furnace power and items but no
+     * fluid, the chiller water and items but no power.
+     */
+    private static void machineFrame(GameTestHelper h) {
+        var furnace = poweredFurnace(h, new BlockPos(1, 1, 1), true, new ItemStack(Items.RAW_IRON, 5));
+        furnace.setItem(1, new ItemStack(Items.IRON_INGOT, 3));
+        furnace.upgrades().setItem(0, new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE.get()));
+        int energy = furnace.getEnergyHandler().getAmountAsInt();
+        var saved = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess());
+        furnace.saveWithoutMetadata(saved);
+        var tag = saved.buildResult();
+        for (String key : List.of("energy", "input", "output", "upgrades", "progress")) h.assertTrue(tag.contains(key), "it saves " + key + " as before: " + tag);
+        h.setBlock(new BlockPos(1, 1, 1), Blocks.AIR);
+        var copy = poweredFurnace(h, new BlockPos(1, 1, 1), false, ItemStack.EMPTY);
+        copy.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess(), tag));
+        h.assertTrue(copy.input().is(Items.RAW_IRON) && copy.input().getCount() == 5 && copy.output().getCount() == 3, "its items load back");
+        h.assertTrue(copy.getEnergyHandler().getAmountAsInt() == energy, "its energy loads back");
+        h.assertTrue(copy.upgrades().getItem(0).is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE.get()), "its card loads back");
+        var level = h.getLevel();
+        BlockPos at = h.absolutePos(new BlockPos(1, 1, 1));
+        h.assertTrue(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, at, Direction.UP) != null
+                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK, at, Direction.UP) != null
+                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, at, Direction.UP) == null,
+                "the furnace offers power and items, no fluid");
+        h.setBlock(new BlockPos(4, 1, 1), ModBlocks.CHILLER.get());
+        BlockPos chiller = h.absolutePos(new BlockPos(4, 1, 1));
+        h.assertTrue(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, chiller, Direction.UP) != null
+                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK, chiller, Direction.UP) != null
+                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, chiller, Direction.UP) == null,
+                "the chiller offers water and items, no power");
+        var modules = h.getBlockEntity(new BlockPos(4, 1, 1), com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame.class).modules();
+        h.assertTrue(modules.size() == 3, "the chiller has three modules switched on (fluid, upgrades, inventory): " + modules);
         h.succeed();
     }
 

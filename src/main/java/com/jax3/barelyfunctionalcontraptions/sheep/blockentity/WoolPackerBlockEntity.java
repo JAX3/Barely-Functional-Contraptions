@@ -8,26 +8,20 @@ import com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolPackerMenu;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
 import com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Container;
-import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import org.jspecify.annotations.Nullable;
 
 /**
  * The Wool Packer: presses 9 of the same resource wool from its input slot into one Wool Bale in its output slot.
@@ -39,17 +33,22 @@ import org.jspecify.annotations.Nullable;
  *     <li>Hoppers and pipes put wool in on any side and take bales out on any side. A comparator reads the input.</li>
  * </ul>
  */
-public class WoolPackerBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MachineContainer, WorldlyContainer, MenuProvider {
-    /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
-    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
+public class WoolPackerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
+        implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, MenuProvider {
     public static final int INPUT = 0, OUTPUT = 1;
     public static final int DATA_COUNT = 9;
-    private static final int[] SLOTS = {INPUT, OUTPUT};
 
-    private final MachineEnergy energy = new MachineEnergy(
-            () -> ModConfigs.getInt(ModConfigs.SERVER.woolPackerCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.woolPackerMaxInput), this::setChanged);
-    private ItemStack input = ItemStack.EMPTY;
-    private ItemStack output = ItemStack.EMPTY;
+    // Its modules: power in on every side, two upgrade slots, and a slot for resource wool and one for bales.
+    private final MachineEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new MachineEnergy(
+            () -> ModConfigs.getInt(ModConfigs.SERVER.woolPackerCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.woolPackerMaxInput), this::setChanged))).handler();
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = install(new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this));
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder()
+            .input("input", WoolPackerBlockEntity::isPackable)
+            .output("output")
+            .onReplaced((slot, old, now) -> {
+                if (slot == INPUT && !ItemStack.isSameItemSameComponents(old, now)) progress = 0; // different wool starts over
+            })
+            .build());
     private int progress;
     private int maxProgress;
     private int energyPerTick;
@@ -98,6 +97,7 @@ public class WoolPackerBlockEntity extends BlockEntity implements com.jax3.barel
         int cost = fx.energy(ModConfigs.getInt(ModConfigs.SERVER.woolPackerEnergyPerBale));
         energyPerTick = (cost + maxProgress - 1) / maxProgress;
 
+        ItemStack input = inventory.get(INPUT), output = inventory.get(OUTPUT);
         ItemStack bale = WoolBaleItem.of(input);
         if (input.isEmpty()) {
             status = MachineStatus.IDLE;
@@ -108,7 +108,7 @@ public class WoolPackerBlockEntity extends BlockEntity implements com.jax3.barel
         } else if (input.getCount() < WoolBaleItem.WOOL_PER_BALE) {
             status = MachineStatus.IDLE;
             progress = 0;
-        } else if (!fits(bale)) {
+        } else if (!fits(output, bale)) {
             status = MachineStatus.OUTPUT_FULL;
         } else if (energy.getAmountAsInt() < EnergyShare.forTick(cost, maxProgress, progress)) {
             status = MachineStatus.NO_ENERGY;
@@ -119,8 +119,8 @@ public class WoolPackerBlockEntity extends BlockEntity implements com.jax3.barel
             if (progress >= maxProgress) {
                 progress = 0;
                 input.shrink(WoolBaleItem.WOOL_PER_BALE);
-                if (input.isEmpty()) input = ItemStack.EMPTY;
-                if (output.isEmpty()) output = bale;
+                if (input.isEmpty()) inventory.set(INPUT, ItemStack.EMPTY);
+                if (output.isEmpty()) inventory.set(OUTPUT, bale);
                 else output.grow(1);
             }
             setChanged();
@@ -129,7 +129,7 @@ public class WoolPackerBlockEntity extends BlockEntity implements com.jax3.barel
         if (state.getValue(WoolPackerBlock.ACTIVE) != active) level.setBlock(pos, state.setValue(WoolPackerBlock.ACTIVE, active), Block.UPDATE_ALL);
     }
 
-    private boolean fits(ItemStack bale) {
+    private static boolean fits(ItemStack output, ItemStack bale) {
         return output.isEmpty() || (ItemStack.isSameItemSameComponents(output, bale) && output.getCount() < output.getMaxStackSize());
     }
 
@@ -158,14 +158,20 @@ public class WoolPackerBlockEntity extends BlockEntity implements com.jax3.barel
     }
 
     public ItemStack input() {
-        return input;
+        return inventory.get(INPUT);
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
     }
 
     public ItemStack output() {
-        return output;
+        return inventory.get(OUTPUT);
     }
 
     public int getComparatorSignal() {
+        ItemStack input = inventory.get(INPUT);
         if (input.isEmpty()) return 0;
         return Math.max(1, Math.round(15.0F * input.getCount() / input.getMaxStackSize()));
     }
@@ -180,130 +186,29 @@ public class WoolPackerBlockEntity extends BlockEntity implements com.jax3.barel
         return new WoolPackerMenu(containerId, inventory, this, data);
     }
 
-    // ------------------------------------------------------------------ container
-
-    @Override
-    public int getContainerSize() {
-        return 2;
-    }
-
-    @Override
-    public ItemStack getItem(int slot) {
-        return slot == INPUT ? input : slot == OUTPUT ? output : ItemStack.EMPTY;
-    }
-
-    @Override
-    public void putItem(int slot, ItemStack stack) {
-        if (slot == INPUT) {
-            if (!ItemStack.isSameItemSameComponents(input, stack)) progress = 0;
-            input = stack;
-        } else if (slot == OUTPUT) {
-            output = stack;
-        }
-    }
+    // ------------------------------------------------------------------ its wool (the inventory module's rule)
 
     /** Resource wool goes in the input; the output is the packer's own. */
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        return slot == INPUT && isPackable(stack);
-    }
-
     public static boolean isPackable(ItemStack stack) {
         return stack.getItem() instanceof ResourceWoolItem && ResourceWoolItem.getResourceId(stack) != null;
     }
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return SLOTS;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return canPlaceItem(slot, stack);
-    }
-
-    /** Hoppers and pipes take bales only, never the wool waiting to be pressed. */
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return slot == OUTPUT;
-    }
-
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
-        if (level != null) Containers.dropContents(level, pos, this);
-    }
-
-    // ------------------------------------------------------------------ energy
 
     // ------------------------------------------------------------------ persistence
 
     @Override
     protected void loadAdditional(ValueInput in) {
-        super.loadAdditional(in);
-        upgrades.load(in);
-        in.child("energy").ifPresent(energy::deserialize);
-        input = in.read("input", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
-        output = in.read("output", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        super.loadAdditional(in); // its modules: energy, upgrades, input and output
         progress = in.getIntOr("progress", 0);
     }
 
     @Override
     protected void saveAdditional(ValueOutput out) {
-        super.saveAdditional(out);
-        upgrades.save(out);
-        energy.serialize(out.child("energy"));
-        if (!input.isEmpty()) out.store("input", ItemStack.OPTIONAL_CODEC, input);
-        if (!output.isEmpty()) out.store("output", ItemStack.OPTIONAL_CODEC, output);
+        super.saveAdditional(out); // its modules
         out.putInt("progress", progress);
     }
 
     @Override
     public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
         return upgrades;
-    }
-
-    @Override
-    protected void collectImplicitComponents(net.minecraft.core.component.DataComponentMap.Builder components) {
-        super.collectImplicitComponents(components);
-        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
-    }
-
-    @Override
-    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter components) {
-        super.applyImplicitComponents(components);
-        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
-        if (cards != null) upgrades.fromComponent(cards);
-    }
-
-    @Override
-    public void removeComponentsFromTag(ValueOutput output) {
-        super.removeComponentsFromTag(output);
-        output.discard("upgrades");
-    }
-
-    // ------------------------------------------------------------------ client sync (its upgrade cards: Muffler)
-
-    @Override
-    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
-        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    /** Clients only need what its upgrade cards do to it there (a Muffler silences it). */
-    @Override
-    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
-        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-        upgrades.writeSync(tag);
-        return tag;
-    }
-
-    @Override
-    public void onDataPacket(net.minecraft.network.Connection net, ValueInput input) {
-        upgrades.readSync(input);
-    }
-
-    @Override
-    public void handleUpdateTag(ValueInput input) {
-        upgrades.readSync(input);
     }
 }

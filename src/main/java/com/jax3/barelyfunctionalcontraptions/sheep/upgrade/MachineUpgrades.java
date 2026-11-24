@@ -21,7 +21,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * Saved with the machine and kept on its item when it's broken or picked up (as {@code machine_upgrades}). Pipes and
  * hoppers never see these slots: they belong to the window only.
  */
-public class MachineUpgrades extends SimpleContainer {
+public class MachineUpgrades extends SimpleContainer implements com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineModule {
     public static final int SIZE = 2;
     private final BlockEntity owner;
 
@@ -128,6 +128,7 @@ public class MachineUpgrades extends SimpleContainer {
     }
 
     /** Adds what clients need to a block entity's update tag. */
+    @Override
     public void writeSync(net.minecraft.nbt.CompoundTag tag) {
         UpgradeEffects effects = effects();
         tag.putInt("upgrade_range", effects.range());
@@ -135,6 +136,7 @@ public class MachineUpgrades extends SimpleContainer {
     }
 
     /** Reads what {@link #writeSync} wrote (on a client). */
+    @Override
     public void readSync(ValueInput input) {
         syncedRange = input.getIntOr("upgrade_range", 0);
         syncedMuffled = input.getBooleanOr("upgrade_muffled", false);
@@ -150,12 +152,32 @@ public class MachineUpgrades extends SimpleContainer {
         for (int i = 0; i < SIZE; i++) getItems().set(i, items.get(i));
     }
 
+    @Override
     public void save(ValueOutput output) {
         if (!isEmpty()) output.store("upgrades", ItemContainerContents.CODEC, toComponent());
     }
 
+    @Override
     public void load(ValueInput input) {
         clearContent();
         input.read("upgrades", ItemContainerContents.CODEC).ifPresent(this::fromComponent);
+    }
+
+    // ---------------------------------------------------------------- as a machine module: kept on the machine's item
+
+    @Override
+    public void collectComponents(net.minecraft.core.component.DataComponentMap.Builder components) {
+        if (!isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), toComponent());
+    }
+
+    @Override
+    public void applyComponents(net.minecraft.core.component.DataComponentGetter components) {
+        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
+        if (cards != null) fromComponent(cards);
+    }
+
+    @Override
+    public void removeComponents(ValueOutput output) {
+        output.discard("upgrades");
     }
 }

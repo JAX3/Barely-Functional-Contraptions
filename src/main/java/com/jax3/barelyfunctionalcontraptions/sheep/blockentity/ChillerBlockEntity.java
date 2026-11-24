@@ -8,28 +8,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Containers;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import org.jspecify.annotations.Nullable;
 
 /**
  * The Snow Sheep Chiller: freezes water into Ice with the cold of the Snow sheep around it, the Blaze Sheep Furnace's
@@ -46,18 +37,21 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * Its comparator signal reads how full the output slot is.
  */
-public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MachineContainer, WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
+public class ChillerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
+        implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider {
     /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
-    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
     public static final int SCAN_INTERVAL = 10;
     public static final int AREA_COLOR = 0xFF7FD8FF;
-    private static final int[] SLOTS = {0};
     /** Values synced to the window ({@link com.jax3.barelyfunctionalcontraptions.sheep.menu.ChillerMenu}). */
     public static final int DATA_COUNT = 10;
     public static final FluidResource WATER = WaterTank.WATER;
 
-    private final WaterTank tank = new WaterTank(8_000, this::setChanged);
-    private ItemStack output = ItemStack.EMPTY;
+    // Its modules: water in on every side, two upgrade slots (Range, Muffler), and the Ice it makes (hoppers take it out).
+    private final WaterTank tank = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.FluidModule.of(new WaterTank(8_000, this::setChanged))).tank();
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = install(new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this));
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder()
+            .output("output")
+            .build());
     /** Progress towards the next Ice, in hundredths of a tick at one sheep's speed. */
     private int progress;
     /** Speed from the cold, in hundredths (100 = one Snow sheep), set on each scan. */
@@ -147,6 +141,7 @@ public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfu
             scanCooldown = SCAN_INTERVAL;
             scan(level, pos, state);
         }
+        ItemStack output = inventory.get(0);
         boolean room = output.isEmpty() || (output.is(Items.ICE) && output.getCount() < output.getMaxStackSize());
         if (cold <= 0) {
             status = MachineStatus.IDLE;
@@ -160,7 +155,7 @@ public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfu
             if (progress >= ticksPerIce() * 100) {
                 progress = 0;
                 tank.drain(waterPerIce());
-                if (output.isEmpty()) output = new ItemStack(Items.ICE);
+                if (output.isEmpty()) inventory.set(0, new ItemStack(Items.ICE));
                 else output.grow(1);
                 if (!muffled()) level.playSound(null, pos, net.minecraft.sounds.SoundEvents.GLASS_PLACE, net.minecraft.sounds.SoundSource.BLOCKS, 0.5F, 1.4F);
             }
@@ -217,11 +212,17 @@ public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfu
         return status;
     }
 
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
+    }
+
     public ItemStack output() {
-        return output;
+        return inventory.get(0);
     }
 
     public int comparatorSignal() {
+        ItemStack output = inventory.get(0);
         return output.isEmpty() ? 0 : 1 + output.getCount() * 14 / output.getMaxStackSize();
     }
 
@@ -268,62 +269,11 @@ public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfu
         return new com.jax3.barelyfunctionalcontraptions.sheep.menu.ChillerMenu(containerId, inventory, this, data);
     }
 
-    // ------------------------------------------------------------------ container (the Ice output)
-
-    @Override
-    public int getContainerSize() {
-        return 1;
-    }
-
-    @Override
-    public ItemStack getItem(int slot) {
-        return slot == 0 ? output : ItemStack.EMPTY;
-    }
-
-    @Override
-    public void putItem(int slot, ItemStack stack) {
-        if (slot == 0) output = stack;
-    }
-
-    /** Nothing goes in: the slot is the Ice it makes. */
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        return false;
-    }
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return SLOTS;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return false;
-    }
-
-    /** Hoppers and pipes take the Ice out of any side. */
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return true;
-    }
-
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
-        if (level != null) Containers.dropContents(level, pos, this);
-    }
-
-    // ------------------------------------------------------------------ water
-
     // ------------------------------------------------------------------ persistence and sync
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        upgrades.load(input);
-        upgrades.readSync(input);
-        input.child("tank").ifPresent(tank::deserialize);
-        output = input.read("output", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        super.loadAdditional(input); // its modules: water, upgrades, the Ice
         progress = input.getIntOr("progress", 0);
         showArea = input.getBooleanOr("show_area", false);
         chillers = input.getIntArray("chillers").orElse(new int[0]);
@@ -331,50 +281,20 @@ public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfu
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        upgrades.save(output);
-        tank.serialize(output.child("tank"));
-        if (!this.output.isEmpty()) output.store("output", ItemStack.OPTIONAL_CODEC, this.output);
+        super.saveAdditional(output); // its modules
         output.putInt("progress", progress);
         output.putBoolean("show_area", showArea);
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
     /** Clients get the area setting and the Snow sheep (for the snowflakes). */
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = new CompoundTag();
+    protected void writeClientData(CompoundTag tag) {
         tag.putBoolean("show_area", showArea);
-        upgrades.writeSync(tag);
         tag.putIntArray("chillers", chillers);
-        return tag;
     }
 
     @Override
     public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
         return upgrades;
-    }
-
-    @Override
-    protected void collectImplicitComponents(net.minecraft.core.component.DataComponentMap.Builder components) {
-        super.collectImplicitComponents(components);
-        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
-    }
-
-    @Override
-    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter components) {
-        super.applyImplicitComponents(components);
-        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
-        if (cards != null) upgrades.fromComponent(cards);
-    }
-
-    @Override
-    public void removeComponentsFromTag(ValueOutput output) {
-        super.removeComponentsFromTag(output);
-        output.discard("upgrades");
     }
 }

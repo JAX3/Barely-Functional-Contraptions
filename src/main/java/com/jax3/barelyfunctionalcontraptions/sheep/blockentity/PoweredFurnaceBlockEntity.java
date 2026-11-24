@@ -9,19 +9,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.world.Container;
-import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Inventory;
@@ -35,7 +27,6 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -57,19 +48,24 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * Hoppers and pipes put items in on any side and take the results out on any side; a comparator reads the input.
  */
-public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
-    /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
-    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
+public class PoweredFurnaceBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
+        implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, MenuProvider, AreaDisplay {
     public static final int INPUT = 0, OUTPUT = 1;
     public static final int DATA_COUNT = 13;
     public static final int SCAN_INTERVAL = 10;
     public static final int AREA_COLOR = 0xFFFF8A1F;
-    private static final int[] SLOTS = {INPUT, OUTPUT};
 
-    private final MachineEnergy energy = new MachineEnergy(
-            () -> ModConfigs.getInt(ModConfigs.SERVER.poweredFurnaceCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.poweredFurnaceMaxInput), this::setChanged);
-    private ItemStack input = ItemStack.EMPTY;
-    private ItemStack output = ItemStack.EMPTY;
+    // Its modules: power in on every side, two upgrade slots, and an input (anything a Furnace can smelt) and output.
+    private final MachineEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new MachineEnergy(
+            () -> ModConfigs.getInt(ModConfigs.SERVER.poweredFurnaceCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.poweredFurnaceMaxInput), this::setChanged))).handler();
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = install(new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this));
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder()
+            .input("input", stack -> level != null && canSmelt(level, stack))
+            .output("output")
+            .onReplaced((slot, old, now) -> {
+                if (slot == INPUT && !ItemStack.isSameItemSameComponents(old, now)) progress = 0; // a different item starts over
+            })
+            .build());
     /** Progress in hundredths of a tick, so the Blaze sheep's speed-up can be fractional. */
     private int progress;
     private int maxProgress;
@@ -156,6 +152,7 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
             scanCooldown = SCAN_INTERVAL;
             scan(level, pos, state);
         }
+        ItemStack input = inventory.get(INPUT), output = inventory.get(OUTPUT);
         Optional<RecipeHolder<SmeltingRecipe>> recipe = recipeFor(level, input);
         if (input.isEmpty()) {
             status = MachineStatus.IDLE;
@@ -167,7 +164,7 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
             SmeltingRecipe r = recipe.get().value();
             ItemStack result = r.assemble(new SingleRecipeInput(input));
             maxProgress = Math.max(100, (int) Math.round(r.cookingTime() * cookMultiplier() * upgrades.effects().time() * 100));
-            if (!fits(result)) {
+            if (!fits(output, result)) {
                 status = MachineStatus.OUTPUT_FULL;
             } else if (energy.getAmountAsInt() < upgradedEnergyPerTick()) {
                 status = MachineStatus.NO_ENERGY;
@@ -178,8 +175,8 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
                 if (progress >= maxProgress) {
                     progress = 0;
                     input.shrink(1);
-                    if (input.isEmpty()) input = ItemStack.EMPTY;
-                    if (output.isEmpty()) output = result.copy();
+                    if (input.isEmpty()) inventory.set(INPUT, ItemStack.EMPTY);
+                    if (output.isEmpty()) inventory.set(OUTPUT, result.copy());
                     else output.grow(result.getCount());
                     experience += r.experience();
                 }
@@ -225,7 +222,7 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
                 .getRecipesFor(RecipeType.SMELTING, new SingleRecipeInput(stack), level).findAny().isPresent();
     }
 
-    private boolean fits(ItemStack result) {
+    private static boolean fits(ItemStack output, ItemStack result) {
         return output.isEmpty() || (ItemStack.isSameItemSameComponents(output, result) && output.getCount() + result.getCount() <= output.getMaxStackSize());
     }
 
@@ -263,11 +260,16 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
     }
 
     public ItemStack input() {
-        return input;
+        return inventory.get(INPUT);
     }
 
     public ItemStack output() {
-        return output;
+        return inventory.get(OUTPUT);
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
     }
 
     public float storedExperience() {
@@ -275,6 +277,7 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
     }
 
     public int getComparatorSignal() {
+        ItemStack input = inventory.get(INPUT);
         if (input.isEmpty()) return 0;
         return Math.max(1, Math.round(15.0F * input.getCount() / input.getMaxStackSize()));
     }
@@ -317,68 +320,19 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
         return new PoweredFurnaceMenu(containerId, inventory, this, data);
     }
 
-    // ------------------------------------------------------------------ container
-
-    @Override
-    public int getContainerSize() {
-        return 2;
-    }
-
-    @Override
-    public ItemStack getItem(int slot) {
-        return slot == INPUT ? input : slot == OUTPUT ? output : ItemStack.EMPTY;
-    }
-
-    @Override
-    public void putItem(int slot, ItemStack stack) {
-        if (slot == INPUT) {
-            if (!ItemStack.isSameItemSameComponents(input, stack)) progress = 0;
-            input = stack;
-        } else if (slot == OUTPUT) {
-            output = stack;
-        }
-    }
-
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        return slot == INPUT && level != null && canSmelt(level, stack);
-    }
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return SLOTS;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return canPlaceItem(slot, stack);
-    }
-
-    /** Hoppers and pipes take only the results, never what's waiting to be smelted. */
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return slot == OUTPUT;
-    }
+    // ------------------------------------------------------------------ breaking (its slots drop through the frame)
 
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
-        if (level != null) Containers.dropContents(level, pos, this);
         if (level instanceof ServerLevel server && experience >= 1) ExperienceOrb.award(server, net.minecraft.world.phys.Vec3.atCenterOf(pos), Mth.floor(experience));
     }
-
-    // ------------------------------------------------------------------ energy
 
     // ------------------------------------------------------------------ persistence and sync
 
     @Override
     protected void loadAdditional(ValueInput in) {
-        super.loadAdditional(in);
-        upgrades.load(in);
-        upgrades.readSync(in);
-        in.child("energy").ifPresent(energy::deserialize);
-        input = in.read("input", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
-        output = in.read("output", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        super.loadAdditional(in); // its modules: energy, upgrades, input and output
         progress = in.getIntOr("progress", 0);
         experience = in.getFloatOr("experience", 0F);
         showArea = in.getBooleanOr("show_area", false);
@@ -387,28 +341,16 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
 
     @Override
     protected void saveAdditional(ValueOutput out) {
-        super.saveAdditional(out);
-        upgrades.save(out);
-        energy.serialize(out.child("energy"));
-        if (!input.isEmpty()) out.store("input", ItemStack.OPTIONAL_CODEC, input);
-        if (!output.isEmpty()) out.store("output", ItemStack.OPTIONAL_CODEC, output);
+        super.saveAdditional(out); // its modules
         out.putInt("progress", progress);
         out.putFloat("experience", experience);
         out.putBoolean("show_area", showArea);
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = new CompoundTag();
+    protected void writeClientData(CompoundTag tag) {
         tag.putBoolean("show_area", showArea);
-        upgrades.writeSync(tag);
         tag.putIntArray("heaters", heaters);
-        return tag;
     }
 
     @Override
@@ -416,22 +358,4 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
         return upgrades;
     }
 
-    @Override
-    protected void collectImplicitComponents(net.minecraft.core.component.DataComponentMap.Builder components) {
-        super.collectImplicitComponents(components);
-        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
-    }
-
-    @Override
-    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter components) {
-        super.applyImplicitComponents(components);
-        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
-        if (cards != null) upgrades.fromComponent(cards);
-    }
-
-    @Override
-    public void removeComponentsFromTag(ValueOutput output) {
-        super.removeComponentsFromTag(output);
-        output.discard("upgrades");
-    }
 }

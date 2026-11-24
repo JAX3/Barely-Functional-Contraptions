@@ -7,6 +7,9 @@ public final class ModCapabilities {
     private ModCapabilities() {}
 
     public static void register(RegisterCapabilitiesEvent event) {
+        // Machines built on the machine frame: each offers the energy, fluid and items of the modules it has switched on.
+        com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame.registerCapabilities(event,
+                ModBlockEntities.POWERED_FURNACE.get(), ModBlockEntities.WOOL_PACKER.get(), ModBlockEntities.CHILLER.get());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.MECHANICAL_SEPARATOR.get(), (be, side) -> be.getItemHandler(side));
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.MECHANICAL_SEPARATOR.get(), (be, side) -> be.getEnergyHandler(side));
         // Automatic Shears: its vanilla Container, for pipes from other mods (vanilla hoppers use the Container directly).
@@ -44,10 +47,6 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.WOOL_BURNER.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.WOOL_BURNER.get(),
                 (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
-        // Wool Packer: its buffer (in only) on every face; wool in and bales out for hoppers and pipes.
-        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.WOOL_PACKER.get(), (be, side) -> be.getEnergyHandler());
-        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.WOOL_PACKER.get(),
-                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Infusion Altar: its buffer (in only), and feeding items and catalysts in (never out) for hoppers and pipes.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.INFUSION_ALTAR.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.INFUSION_ALTAR.get(),
@@ -56,18 +55,10 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.BLAZE_FURNACE.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.BLAZE_FURNACE.get(),
                 (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
-        // Powered Furnace: power in on every face; items in to the input and out of the output, on every face.
-        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.POWERED_FURNACE.get(), (be, side) -> be.getEnergyHandler());
-        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.POWERED_FURNACE.get(),
-                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Grass Seeder: power and water in, and Bone Meal in for hoppers and pipes, on every face.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.GRASS_SEEDER.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.GRASS_SEEDER.get(), (be, side) -> be.getTank());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.GRASS_SEEDER.get(),
-                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
-        // Snow Sheep Chiller: water in on every face (buckets, pipes, a Fluid Reservoir), and its Ice out for hoppers and pipes.
-        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.CHILLER.get(), (be, side) -> be.getTank());
-        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.CHILLER.get(),
                 (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Thermal Reaction Chamber: power out and water in on every face, and its boost slots (in only) for hoppers and pipes.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.THERMAL_REACTION_CHAMBER.get(), (be, side) -> be.getEnergyHandler());
