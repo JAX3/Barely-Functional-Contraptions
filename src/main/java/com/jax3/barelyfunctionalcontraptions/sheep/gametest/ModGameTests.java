@@ -151,6 +151,11 @@ public final class ModGameTests {
         TESTS.put("infusion_altar_infuses_a_wither_sheep", ModGameTests::altarWither);
         TESTS.put("infusion_altar_waits_for_what_it_needs", ModGameTests::altarWaits);
         TESTS.put("old_config_gets_faster_machine_timings", ModGameTests::timingMigration);
+        TESTS.put("upgrade_cards_change_time_and_power", ModGameTests::upgradeNumbers);
+        TESTS.put("speed_upgrade_separates_sooner_for_more_power", ModGameTests::speedUpgradeSeparator);
+        TESTS.put("efficiency_upgrade_packs_for_less_power", ModGameTests::efficiencyUpgradePacker);
+        TESTS.put("upgrade_slots_in_the_window", ModGameTests::upgradeWindow);
+        TESTS.put("machine_keeps_its_upgrades_when_broken", ModGameTests::upgradesKept);
         TESTS.put("infusion_altar_pulses_when_ready", ModGameTests::altarPulse);
         TESTS.put("list_command_lists_every_sheep", ModGameTests::listCommand);
         TESTS.put("snow_sheep_leaves_snow", ModGameTests::snowSheep);
@@ -2303,6 +2308,133 @@ public final class ModGameTests {
             energy.set(energy.getCapacityAsInt());
         }
         return be;
+    }
+
+    private static ItemStack card(boolean speed) {
+        return new ItemStack(speed ? com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE.get() : com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.EFFICIENCY_UPGRADE.get());
+    }
+
+    /**
+     * The cards' numbers: Speed 60% of the time for 150% of the power, Efficiency 115% of the time for 75%; a second
+     * card of a kind does half as much; together they multiply. What each machine makes of them: a 50-tick altar
+     * infusion in 30, the shears' 10-tick sweep in 6 at 1.5x the FE a sheep, the furnace's 31 FE/t at 78.
+     */
+    private static void upgradeNumbers(GameTestHelper h) {
+        var none = com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of());
+        var speed = com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(card(true)));
+        var twoSpeed = com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(card(true), card(true)));
+        var efficiency = com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(card(false)));
+        var both = com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(card(true), card(false)));
+        h.assertTrue(none.isNone() && none.ticks(50) == 50 && none.energy(20_000L) == 20_000, "no cards, no change");
+        h.assertTrue(Math.abs(speed.time() - 0.6) < 1e-9 && Math.abs(speed.energy() - 1.5) < 1e-9, "Speed: 60% time, 150% power, got " + speed);
+        h.assertTrue(Math.abs(twoSpeed.time() - 0.48) < 1e-9 && Math.abs(twoSpeed.energy() - 1.875) < 1e-9, "a second Speed card at half strength, got " + twoSpeed);
+        h.assertTrue(Math.abs(efficiency.time() - 1.15) < 1e-9 && Math.abs(efficiency.energy() - 0.75) < 1e-9, "Efficiency: 115% time, 75% power, got " + efficiency);
+        h.assertTrue(Math.abs(both.time() - 0.69) < 1e-9 && Math.abs(both.energy() - 1.125) < 1e-9, "both multiply, got " + both);
+        h.assertTrue(speed.ticks(50) == 30 && speed.energy(20_000L) == 30_000 && efficiency.ticks(20) == 23 && efficiency.energy(1_000) == 750,
+                "a 50-tick job in 30 for 30,000 FE; a 20-tick one in 23 for 750");
+        h.assertTrue(speed.perTick(31) == 78, "the furnace's FE/t with Speed, got " + speed.perTick(31));
+        var shears = shearsAt(h, new BlockPos(1, 1, 1), Direction.NORTH);
+        int plain = shears.energyPerShear();
+        shears.upgrades().setItem(0, card(true));
+        h.assertTrue(shears.energyPerShear() == (int) Math.ceil(plain * 1.5), "the shears cost 1.5x the FE a sheep, " + shears.energyPerShear() + " from " + plain);
+        h.runAfterDelay(3, () -> {
+            h.assertTrue(shears.getInterval() == 6, "and sweep every 6 ticks, got " + shears.getInterval());
+            h.succeed();
+        });
+    }
+
+    /** Two separators on the same Iron Wool: with a Speed card it's done in 30 ticks for 30,000 FE; without, 50 for 20,000. */
+    private static void speedUpgradeSeparator(GameTestHelper h) {
+        MechanicalSeparatorBlockEntity plain = separator(h, new BlockPos(1, 1, 1));
+        MechanicalSeparatorBlockEntity fast = separator(h, new BlockPos(4, 1, 1));
+        for (var be : List.of(plain, fast)) {
+            be.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(IRON, 1));
+            insertEnergy(be.getEnergy(), 100_000);
+        }
+        fast.upgrades().setItem(0, card(true));
+        h.runAfterDelay(40, () -> {
+            h.assertTrue(fast.getInventory().getStack(SeparatorInventory.PRIMARY).is(Items.RAW_IRON), "with Speed the wool is done by 40 ticks");
+            h.assertTrue(fast.getEnergy().getEnergy() == 70_000, "for 30,000 FE, has " + fast.getEnergy().getEnergy());
+            h.assertTrue(plain.getInventory().getStack(SeparatorInventory.PRIMARY).isEmpty(), "without, not yet");
+        });
+        h.runAfterDelay(60, () -> {
+            h.assertTrue(plain.getInventory().getStack(SeparatorInventory.PRIMARY).is(Items.RAW_IRON) && plain.getEnergy().getEnergy() == 80_000,
+                    "without: done by 60 for 20,000 FE, has " + plain.getEnergy().getEnergy());
+            h.succeed();
+        });
+    }
+
+    /** A Wool Packer with an Efficiency card presses a bale for 750 FE instead of 1,000, in 23 ticks instead of 20. */
+    private static void efficiencyUpgradePacker(GameTestHelper h) {
+        var be = packer(h, new BlockPos(1, 1, 1), ResourceWoolItem.create(IRON, 9), true);
+        be.upgrades().setItem(0, card(false));
+        int start = be.getEnergyHandler().getAmountAsInt();
+        h.runAfterDelay(21, () -> h.assertTrue(be.output().isEmpty(), "not done at 21 ticks (23 with the card)"));
+        h.runAfterDelay(30, () -> {
+            h.assertTrue(isBaleOf(be.output(), IRON, 1), "one bale by 30 ticks, got " + be.output());
+            int used = start - be.getEnergyHandler().getAmountAsInt();
+            h.assertTrue(used == 750, "for 750 FE, used " + used);
+            h.succeed();
+        });
+    }
+
+    /**
+     * The window: two upgrade slots after the player's inventory. Shift-clicking a card puts one in a free slot (so
+     * a stack of three leaves one once both are full); the chiller's block takes no cards, dirt goes in no upgrade slot; shift-
+     * clicking a card out sends it back. Pipes and hoppers still see only the machine's own slots.
+     */
+    private static void upgradeWindow(GameTestHelper h) {
+        var furnace = poweredFurnace(h, new BlockPos(1, 1, 1), false, ItemStack.EMPTY);
+        Player player = h.makeMockPlayer(GameType.SURVIVAL);
+        player.getInventory().setItem(0, new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE.get(), 3));
+        player.getInventory().setItem(1, new ItemStack(Items.DIRT, 8));
+        var menu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.MachineMenu) furnace.createMenu(0, player.getInventory(), player);
+        h.assertTrue(menu.hasUpgradeSlots(), "the furnace's window has upgrade slots");
+        int cardsAt = -1, dirtAt = -1;
+        for (var slot : menu.slots) {
+            if (slot.container == player.getInventory() && slot.getContainerSlot() == 0) cardsAt = slot.index;
+            if (slot.container == player.getInventory() && slot.getContainerSlot() == 1) dirtAt = slot.index;
+        }
+        menu.quickMoveStack(player, cardsAt);
+        h.assertTrue(furnace.upgrades().getItem(0).getCount() == 1 && furnace.upgrades().getItem(1).isEmpty()
+                && player.getInventory().getItem(0).getCount() == 2, "a shift-click puts one card in, got " + furnace.upgrades().getItem(0));
+        menu.quickMoveStack(player, cardsAt);
+        h.assertTrue(furnace.upgrades().getItem(1).getCount() == 1 && player.getInventory().getItem(0).getCount() == 1, "another fills the second slot");
+        menu.quickMoveStack(player, cardsAt);
+        h.assertTrue(countIn(player.getInventory(), com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE.get()) == 1
+                && furnace.upgrades().cards().size() == 2, "with both full, the third stays with the player");
+        menu.quickMoveStack(player, dirtAt);
+        h.assertTrue(furnace.upgrades().cards().size() == 2 && furnace.upgrades().cards().stream().allMatch(c -> c.is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE.get())), "no dirt in the upgrade slots");
+        var upgradeSlot = menu.slots.stream().filter(menu::isUpgradeSlot).findFirst().orElseThrow();
+        menu.quickMoveStack(player, upgradeSlot.index);
+        h.assertTrue(furnace.upgrades().cards().size() == 1, "shift-clicking a card takes it back out");
+        h.assertFalse(upgradeSlot.mayPlace(new ItemStack(Items.DIRT)), "the slot refuses dirt");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(furnace.getBlockState(), card(false)), "the furnace takes Efficiency");
+        h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(ModBlocks.CHILLER.get().defaultBlockState(), card(true)), "the Snow Sheep Chiller takes no cards");
+        h.assertTrue(furnace.getContainerSize() == 2, "pipes and hoppers still see 2 slots, not the upgrades");
+        h.succeed();
+    }
+
+    /** A Powered Furnace broken with cards in drops itself with them on its item; placed again, it has them back. */
+    private static void upgradesKept(GameTestHelper h) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        var furnace = poweredFurnace(h, pos, false, ItemStack.EMPTY);
+        furnace.upgrades().setItem(0, card(true));
+        furnace.upgrades().setItem(1, card(false));
+        var drops = net.minecraft.world.level.block.Block.getDrops(furnace.getBlockState(), h.getLevel(), h.absolutePos(pos), furnace);
+        h.assertTrue(drops.size() == 1 && drops.getFirst().is(ModItems.POWERED_FURNACE.get()), "it drops itself, got " + drops);
+        var kept = drops.getFirst().get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
+        h.assertTrue(kept != null && kept.nonEmptyItemCopyStream().count() == 2, "with both cards on it, got " + kept);
+        h.setBlock(pos, Blocks.AIR);
+        var placed = poweredFurnace(h, pos, false, ItemStack.EMPTY);
+        placed.applyComponentsFromItemStack(drops.getFirst());
+        h.assertTrue(placed.upgrades().getItem(0).is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE.get()) && placed.upgrades().getItem(1).is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.EFFICIENCY_UPGRADE.get()),
+                "placed again, it has them back: " + placed.upgrades().cards());
+        // Saved and loaded with the world.
+        var saved = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess());
+        placed.saveWithoutMetadata(saved);
+        h.assertTrue(saved.buildResult().toString().contains("speed_upgrade"), "and saved with it");
+        h.succeed();
     }
 
     /**

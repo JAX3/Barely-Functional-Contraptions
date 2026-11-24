@@ -15,7 +15,8 @@
             "source": "block_entity",
             "include": [
               "minecraft:custom_name",
-              "barelyfunctionalcontraptions:machine_contents"
+              "barelyfunctionalcontraptions:machine_contents",
+              "barelyfunctionalcontraptions:machine_upgrades"
             ]
           }
         }

@@ -64,6 +64,7 @@ public class MechanicalSeparatorMenu extends MachineMenu {
         addSlot(new ResourceHandlerSlot(inventory, inventory::set, SeparatorInventory.SECONDARY, SECONDARY_X, SECONDARY_Y));
         addSlot(new ResourceHandlerSlot(inventory, inventory::set, SeparatorInventory.BONUS, BONUS_X, BONUS_Y));
         addStandardInventorySlots(playerInventory, 8, INVENTORY_Y);
+        addUpgradeSlots(be, playerInventory.player.level(), pos);
         addDataSlots(data);
     }
 

@@ -27,7 +27,7 @@ import net.minecraft.world.entity.player.Inventory;
  * {@code tools/sheep/generate_textures.py}. Energy gauge, status lamps and redstone button share the separator's
  * sprite positions.
  */
-public class AutomaticShearsScreen extends AbstractContainerScreen<AutomaticShearsMenu> {
+public class AutomaticShearsScreen extends MachineScreen<AutomaticShearsMenu> {
     private static final Identifier TEXTURE = ResourcefulSheep.id("textures/gui/automatic_shears.png");
     private static final int TEX = 256;
 

@@ -26,7 +26,7 @@ import net.neoforged.neoforge.common.crafting.SizedIngredient;
  * catalyst slots (the catalysts still needed show faded in the empty ones), a progress bar under it, and the tier and
  * FE/t on the right. Art: {@code textures/gui/infusion_altar.png}, see {@code tools/sheep/generate_textures.py}.
  */
-public class InfusionAltarScreen extends AbstractContainerScreen<InfusionAltarMenu> {
+public class InfusionAltarScreen extends MachineScreen<InfusionAltarMenu> {
     private static final Identifier TEXTURE = ResourcefulSheep.id("textures/gui/infusion_altar.png");
     private static final int TEX = 256;
     private static final int GAUGE_X = 11, GAUGE_Y = 19, GAUGE_W = 30, GAUGE_H = 64;

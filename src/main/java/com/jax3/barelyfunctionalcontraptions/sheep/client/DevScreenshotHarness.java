@@ -297,6 +297,10 @@ public final class DevScreenshotHarness {
             powerBlocksTick(mc, server);
             return;
         }
+        if ("upgrades".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            upgradesTick(mc, server);
+            return;
+        }
         if ("fleece_trawler".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             fleeceTrawlerTick(mc, server);
             return;
@@ -4965,6 +4969,70 @@ public final class DevScreenshotHarness {
      * its fins and gills), Iron Wool on its lure; then its hauls, and shears cutting a tangle free:
      * {@code -PharnessScene=fleece_trawler}.
      */
+    /**
+     * Upgrade cards: a Mechanical Separator with a Speed card in, its window open (the upgrade panel on its right, JEI's
+     * list beside it), the player holding the cards; then a card's tooltip, and the window of a furnace with none.
+     * {@code -PharnessScene=upgrades}.
+     */
+    private static void upgradesTick(Minecraft mc, MinecraftServer server) {
+        BlockPos at = origin == null ? null : origin.offset(0, 0, -3);
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode creative @a"}) command(server, c);
+                BlockPos o = origin, s = o.offset(0, 0, -3);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-4, 0, -6), o.offset(4, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-4, -1, -6), o.offset(4, -1, 2))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+                level.setBlock(s, ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState().setValue(MechanicalSeparatorBlock.FACING, Direction.SOUTH), 3);
+                if (level.getBlockEntity(s) instanceof MechanicalSeparatorBlockEntity be) {
+                    be.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 16));
+                    be.upgrades().setItem(0, new ItemStack(ModItems.SPEED_UPGRADE.get()));
+                }
+                level.setBlock(s.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+                level.setBlock(s.east(2), ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+                player.getInventory().clearContent();
+                player.getInventory().setItem(0, new ItemStack(ModItems.SPEED_UPGRADE.get(), 3));
+                player.getInventory().setItem(1, new ItemStack(ModItems.EFFICIENCY_UPGRADE.get(), 2));
+                player.getInventory().setItem(2, new ItemStack(ModItems.UPGRADE_BASE.get(), 4));
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", s.getX() + 0.5, s.getY(), s.getZ() + 2.5));
+            });
+            case 100 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                if (player.level().getBlockEntity(at) instanceof MechanicalSeparatorBlockEntity be) player.openMenu(be, at);
+            });
+            case 120 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 135 -> shot(mc, "116_upgrades_gui");
+            case 140 -> {
+                // Hover the Speed card in the hotbar row of the window for its tooltip.
+                if (McClient.screen(mc) instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen) {
+                    var window = mc.getWindow();
+                    double scale = window.getGuiScale();
+                    int left = (window.getGuiScaledWidth() - 176) / 2, top = (window.getGuiScaledHeight() - 193) / 2; // the separator's window
+                    for (var slot : screen.getMenu().slots) {
+                        if (slot.container == mc.player.getInventory() && slot.getContainerSlot() == 0) {
+                            McClient.mouseMove(mc, window.handle(), (left + slot.x + 8) * scale, (top + slot.y + 8) * scale);
+                        }
+                    }
+                }
+            }
+            case 155 -> shot(mc, "116_upgrade_tooltip");
+            case 160 -> {
+                McClient.setScreen(mc, null);
+                server.execute(() -> {
+                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                    BlockPos f = at.east(2);
+                    if (player.level().getBlockEntity(f) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity be) player.openMenu(be, f);
+                });
+            }
+            case 175 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 190 -> shot(mc, "116_upgrades_furnace_empty");
+            case 200 -> mc.stop();
+            default -> {}
+        }
+    }
+
     private static void fleeceTrawlerTick(Minecraft mc, MinecraftServer server) {
         BlockPos dock = origin == null ? null : origin.offset(0, 0, -3);
         switch (tick) {

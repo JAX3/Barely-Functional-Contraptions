@@ -23,7 +23,7 @@ import com.jax3.barelyfunctionalcontraptions.sheep.menu.PoweredFurnaceMenu;
  * Bottom: the status lamp and line. Top right: the show-area button. Art: {@code textures/gui/powered_furnace.png}, see
  * {@code tools/sheep/generate_textures.py}.
  */
-public class PoweredFurnaceScreen extends AbstractContainerScreen<PoweredFurnaceMenu> {
+public class PoweredFurnaceScreen extends MachineScreen<PoweredFurnaceMenu> {
     private static final Identifier TEXTURE = ResourcefulSheep.id("textures/gui/powered_furnace.png");
     private static final int TEX = 256;
     private static final int GAUGE_X = 11, GAUGE_Y = 19, GAUGE_W = 30, GAUGE_H = 64;

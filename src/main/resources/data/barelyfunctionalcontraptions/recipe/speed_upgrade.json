@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "barelyfunctionalcontraptions:upgrade_base",
+    "minecraft:redstone_block",
+    "minecraft:sugar",
+    "minecraft:red_wool"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:speed_upgrade",
+    "count": 1
+  }
+}

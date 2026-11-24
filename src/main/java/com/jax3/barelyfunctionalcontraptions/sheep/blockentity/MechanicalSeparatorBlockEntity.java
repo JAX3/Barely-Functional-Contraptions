@@ -43,7 +43,9 @@ import org.jspecify.annotations.Nullable;
  * <p>Progress pauses (or resets, per config) without power, and the machine never starts or finishes an operation
  * unless every output is guaranteed to fit, so items are never voided or duplicated.</p>
  */
-public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuProvider {
+public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MenuProvider {
+    /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
     /** Number of int fields synced to the menu (split into 16-bit halves where needed). */
     public static final int DATA_COUNT = 13;
 
@@ -133,18 +135,22 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
             energyPerTick = 0;
         } else {
             Separation sep = separation.get();
-            maxProgress = sep.effectiveTicks();
-            energyPerTick = sep.energyPerTick();
+            // Its upgrade cards change the job's time and total FE.
+            var fx = upgrades.effects();
+            maxProgress = fx.ticks(sep.effectiveTicks());
+            long total = fx.energy(sep.totalEnergy());
+            energyPerTick = (int) Math.min(Integer.MAX_VALUE, (total + maxProgress - 1) / maxProgress);
+            int thisTick = EnergyShare.forTick(total, maxProgress, progress);
             if (!mode.allows(powered)) {
                 newStatus = MachineStatus.REDSTONE_DISABLED;
             } else if (!outputsFit(sep)) {
                 newStatus = MachineStatus.OUTPUT_FULL;
-            } else if (energy.getEnergy() < sep.energyForTick(progress)) {
+            } else if (energy.getEnergy() < thisTick) {
                 newStatus = MachineStatus.NO_ENERGY;
                 if (ModConfigs.getBool(ModConfigs.SERVER.resetProgressWhenUnpowered)) progress = 0;
             } else {
                 newStatus = MachineStatus.PROCESSING;
-                energy.consume(sep.energyForTick(progress));
+                energy.consume(thisTick);
                 progress++;
                 if (progress >= maxProgress) {
                     finish(sep, level.getRandom());
@@ -310,6 +316,7 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        upgrades.save(output);
         inventory.serialize(output.child("inventory"));
         energy.serialize(output.child("energy"));
         output.putInt("progress", progress);
@@ -319,6 +326,7 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        upgrades.load(input);
         input.child("inventory").ifPresent(inventory::deserialize);
         input.child("energy").ifPresent(energy::deserialize);
         progress = input.getIntOr("progress", 0);
@@ -329,6 +337,7 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
+        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
         if (energy.getEnergy() > 0 || redstoneMode != RedstoneMode.IGNORED) {
             components.set(ModDataComponents.MACHINE_CONTENTS.get(), new MachineContents(energy.getEnergy(), redstoneMode));
         }
@@ -337,6 +346,8 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
     @Override
     protected void applyImplicitComponents(DataComponentGetter components) {
         super.applyImplicitComponents(components);
+        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
+        if (cards != null) upgrades.fromComponent(cards);
         MachineContents contents = components.get(ModDataComponents.MACHINE_CONTENTS.get());
         if (contents != null) {
             energy.set(Math.min(contents.energy(), energy.getCapacityAsInt()));
@@ -347,6 +358,7 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
     @Override
     public void removeComponentsFromTag(ValueOutput output) {
         super.removeComponentsFromTag(output);
+        output.discard("upgrades");
         output.discard("energy");
         output.discard("redstone_mode");
     }
@@ -361,5 +373,10 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
     @Override
     public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new MechanicalSeparatorMenu(containerId, playerInventory, this, data);
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
+        return upgrades;
     }
 }

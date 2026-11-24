@@ -25,7 +25,7 @@ import net.minecraft.world.entity.player.Inventory;
  * GUI of the Mechanical Separator. All art comes from {@code textures/gui/mechanical_separator.png} (256x256):
  * the 176x193 background at (0,0) and sprites in the strip below it, see {@code tools/generate_textures.py}.
  */
-public class MechanicalSeparatorScreen extends AbstractContainerScreen<MechanicalSeparatorMenu> {
+public class MechanicalSeparatorScreen extends MachineScreen<MechanicalSeparatorMenu> {
     private static final Identifier TEXTURE = ResourcefulSheep.id("textures/gui/mechanical_separator.png");
     private static final int TEX = 256;
 

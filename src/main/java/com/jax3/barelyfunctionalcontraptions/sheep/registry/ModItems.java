@@ -19,6 +19,12 @@ public final class ModItems {
     /** An Iron Ingot worked with wool: what the mod's recipes take where they once took an Iron Ingot. */
     public static final DeferredItem<net.minecraft.world.item.Item> BLUE_STEEL = REGISTER.registerSimpleItem("blue_steel");
     public static final DeferredItem<BlockItem> BLUE_STEEL_BLOCK = REGISTER.registerSimpleBlockItem(ModBlocks.BLUE_STEEL_BLOCK);
+    /** A blank upgrade card: crafted into the Speed and Efficiency cards. */
+    public static final DeferredItem<net.minecraft.world.item.Item> UPGRADE_BASE = REGISTER.registerSimpleItem("upgrade_base");
+    public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem> SPEED_UPGRADE = REGISTER.registerItem("speed_upgrade",
+            p -> new com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.UpgradeType.SPEED, p));
+    public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem> EFFICIENCY_UPGRADE = REGISTER.registerItem("efficiency_upgrade",
+            p -> new com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.UpgradeType.EFFICIENCY, p));
 
     public static final DeferredItem<BlockItem> MECHANICAL_SEPARATOR = REGISTER.registerSimpleBlockItem(ModBlocks.MECHANICAL_SEPARATOR);
 

@@ -200,6 +200,15 @@ public final class ResourcefulSheepClient {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.hume_field_generator")
                     .withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE, net.minecraft.ChatFormatting.ITALIC));
         }
+        // A machine item carrying upgrade cards (broken or picked up with them in) lists them.
+        var upgrades = event.getItemStack().get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
+        if (upgrades != null) {
+            var names = upgrades.nonEmptyItemCopyStream().map(card -> card.getHoverName().getString()).toList();
+            if (!names.isEmpty()) {
+                event.getToolTip().add(Math.min(1, event.getToolTip().size()), net.minecraft.network.chat.Component.translatable(
+                        "tooltip.barelyfunctionalcontraptions.machine_upgrades", String.join(", ", names)).withStyle(net.minecraft.ChatFormatting.AQUA));
+            }
+        }
         for (var tipped : java.util.List.of(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATIC_GENERATOR,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.COPPER_COMB,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GRASS_SEEDER,
@@ -210,7 +219,8 @@ public final class ResourcefulSheepClient {
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLUE_STEEL_BLOCK,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_CONTROLLER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLEECE_TRAWLER,
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_STRAP)) {
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_STRAP,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.UPGRADE_BASE)) {
             if (event.getItemStack().is(tipped.get())) {
                 event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions." + tipped.getId().getPath())
                         .withStyle(net.minecraft.ChatFormatting.GRAY));

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "barelyfunctionalcontraptions:upgrade_base",
+    "minecraft:copper_block",
+    "minecraft:lime_wool"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:efficiency_upgrade",
+    "count": 1
+  }
+}

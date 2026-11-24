@@ -208,6 +208,19 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         JeiDevHook.runtime = null;
     }
 
+    /** Keeps JEI's item list clear of the machines' upgrade panels. */
+    @Override
+    public void registerGuiHandlers(mezz.jei.api.registration.IGuiHandlerRegistration registration) {
+        registration.addGenericGuiContainerHandler(com.jax3.barelyfunctionalcontraptions.sheep.client.MachineScreen.class,
+                new mezz.jei.api.gui.handlers.IGuiContainerHandler<com.jax3.barelyfunctionalcontraptions.sheep.client.MachineScreen<?>>() {
+                    @Override
+                    public List<net.minecraft.client.renderer.Rect2i> getGuiExtraAreas(com.jax3.barelyfunctionalcontraptions.sheep.client.MachineScreen<?> screen) {
+                        var area = screen.upgradePanelArea();
+                        return area == null ? List.of() : List.of(area);
+                    }
+                });
+    }
+
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registration.addCraftingStation(SeparationCategory.TYPE, ModItems.MECHANICAL_SEPARATOR.get());

@@ -272,6 +272,11 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue trawlerRainBonus;
         public final ModConfigSpec.IntValue crateControllerRange;
         public final ModConfigSpec.IntValue crateControllerMaxCrates;
+        public final ModConfigSpec.DoubleValue speedUpgradeTime;
+        public final ModConfigSpec.DoubleValue speedUpgradeEnergy;
+        public final ModConfigSpec.DoubleValue efficiencyUpgradeTime;
+        public final ModConfigSpec.DoubleValue efficiencyUpgradeEnergy;
+        public final ModConfigSpec.DoubleValue secondUpgradeStrength;
         public final ModConfigSpec.IntValue herdRadius;
         public final ModConfigSpec.IntValue herdInterval;
         public final ModConfigSpec.IntValue herdSignalPerSheep;
@@ -738,6 +743,20 @@ public final class ModConfigs {
                     .defineInRange("range", 200, 1, 356);
             crateControllerMaxCrates = b.comment("Most crates one controller's store holds.")
                     .defineInRange("maxCrates", 64, 1, 1_024);
+            b.pop();
+
+            b.comment("Upgrade cards (two slots in the Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar and Automatic Shears).",
+                    "Each card multiplies a job's time and its total FE.").push("upgrades");
+            speedUpgradeTime = b.comment("Speed card: its job time (0.6 = 60% of the time).")
+                    .defineInRange("speedTime", 0.6, 0.05, 10.0);
+            speedUpgradeEnergy = b.comment("Speed card: its FE a job (1.5 = half as much again).")
+                    .defineInRange("speedEnergy", 1.5, 0.0, 100.0);
+            efficiencyUpgradeTime = b.comment("Efficiency card: its job time (1.15 = 15% longer).")
+                    .defineInRange("efficiencyTime", 1.15, 0.05, 10.0);
+            efficiencyUpgradeEnergy = b.comment("Efficiency card: its FE a job (0.75 = three quarters).")
+                    .defineInRange("efficiencyEnergy", 0.75, 0.0, 100.0);
+            secondUpgradeStrength = b.comment("How much of its effect a second card of the same kind has (0.5 = half; 1 = as much as the first).")
+                    .defineInRange("secondCardStrength", 0.5, 0.0, 1.0);
             b.pop();
 
             b.comment("Herd Counter (counts the sheep in a pen in front of its screen, and puts any count on a comparator; needs no power)").push("herd_counter");

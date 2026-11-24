@@ -18,6 +18,11 @@ import net.minecraft.world.item.ItemStack;
  * player's 27 inventory slots and 9 hotbar slots ({@code [playerStart, playerStart + 36)}).
  */
 public abstract class MachineMenu extends AbstractContainerMenu {
+    /** Where the upgrade slots sit: in a panel just right of the 176-wide window. */
+    public static final int UPGRADE_X = 184, UPGRADE_Y = 12, UPGRADE_SPACING = 20;
+    /** Index of the first upgrade slot, after the player's; -1 for a window without them. */
+    private int upgradeStart = -1;
+
     protected MachineMenu(@Nullable MenuType<?> type, int containerId) {
         super(type, containerId);
     }
@@ -54,12 +59,18 @@ public abstract class MachineMenu extends AbstractContainerMenu {
         ItemStack stack = slot.getItem();
         ItemStack original = stack.copy();
         int inventoryEnd = playerStart + 27, playerEnd = playerStart + 36;
-        if (index < playerStart) {
+        if (index < playerStart || isUpgradeSlot(slot)) {
             if (!moveItemStackTo(stack, playerStart, playerEnd, true)) return ItemStack.EMPTY;
             if (quickCraft) slot.onQuickCraft(stack, original);
         } else {
             Boolean moved = null;
+            // An upgrade card goes into a free upgrade slot the machine takes it in.
+            if (upgradeStart >= 0 && stack.getItem() instanceof com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem
+                    && moveItemStackTo(stack, upgradeStart, upgradeStart + com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.SIZE, false)) {
+                moved = Boolean.TRUE;
+            }
             for (IntoMachine route : into) {
+                if (moved != null) break;
                 moved = route.move(stack);
                 if (moved != null) break;
             }
@@ -76,6 +87,40 @@ public abstract class MachineMenu extends AbstractContainerMenu {
         if (stack.getCount() == original.getCount()) return ItemStack.EMPTY;
         slot.onTake(player, stack);
         return original;
+    }
+
+    /**
+     * Adds the machine's two upgrade slots (call after the player's inventory). {@code owner} is its block entity on the
+     * server; on the client (null, or not {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable}) the
+     * slots hold a stand-in the server keeps in step. They take only cards the machine at {@code pos} accepts, one each.
+     */
+    protected void addUpgradeSlots(@Nullable Object owner, net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) {
+        net.minecraft.world.Container upgrades = owner instanceof com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable u
+                ? u.upgrades() : new net.minecraft.world.SimpleContainer(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.SIZE);
+        upgradeStart = slots.size();
+        for (int i = 0; i < com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.SIZE; i++) {
+            addSlot(new Slot(upgrades, i, UPGRADE_X, UPGRADE_Y + i * UPGRADE_SPACING) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(level.getBlockState(pos), stack);
+                }
+
+                @Override
+                public int getMaxStackSize() {
+                    return 1;
+                }
+            });
+        }
+    }
+
+    /** Whether this window has upgrade slots. */
+    public boolean hasUpgradeSlots() {
+        return upgradeStart >= 0;
+    }
+
+    /** Whether {@code slot} is one of the upgrade slots. */
+    public boolean isUpgradeSlot(Slot slot) {
+        return upgradeStart >= 0 && slot.index >= upgradeStart && slot.index < upgradeStart + com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.SIZE;
     }
 
     /** The show-area button: toggles {@code area}'s outline when {@code id} is {@code areaButton}. */

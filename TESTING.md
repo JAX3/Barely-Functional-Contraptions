@@ -106,6 +106,18 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | Real client (`-PharnessScene=themed_sheep`) | ✅ Each sheep photographed side-on (`52_themed_sheep.png`): Wither Skeleton Skulls either side of the Wither sheep's head, using the game's skull texture (front view `53_themed_wither_front.png`), Dragon wings, spider legs, ghast tentacles, Skeleton and Wither Skeleton Skull faces (front views `53_themed_skeleton_front.png`, `53_themed_wither_skeleton_front.png`) and bony legs, sculk tendrils with glowing strands, on-fire flames, hay fleece. At night (`53_themed_sheep_night.png`) the Glow Ink sheep is fully bright and lights the grass, and glowing eyes and sculk strands stay lit. No errors from the mod in the log. |
 | Not yet checked in the client | The replaced sounds are only covered by the GameTest, not listened to in game (the client loads the definitions with no errors) |
 
+### Upgrade cards
+
+| Test | What it checks |
+|---|---|
+| `upgrade_cards_change_time_and_power` | Speed: 60% time, 150% FE; Efficiency 115%, 75%; two Speed cards 48% / 187.5% (the second at half strength); Speed and Efficiency together 69% / 112.5%. A 50-tick job in 30 for 30,000 FE, a 20-tick one in 23 for 750; the furnace's 31 FE/t becomes 78; the shears cost 1.5x per sheep and sweep every 6 ticks |
+| `speed_upgrade_separates_sooner_for_more_power` | Two separators on Iron Wool: with a Speed card done by 40 ticks for exactly 30,000 FE; without, not yet, then done by 60 for 20,000 |
+| `efficiency_upgrade_packs_for_less_power` | A packer with an Efficiency card isn't done at 21 ticks, has a bale by 30, for exactly 750 FE |
+| `upgrade_slots_in_the_window` | The furnace's window has the slots; shift-clicking a stack of three cards puts one in per click, the third stays with the player; dirt doesn't go in; shift-clicking a card takes it out; the chiller's block takes no cards; pipes still see the furnace's 2 slots |
+| `machine_keeps_its_upgrades_when_broken` | A furnace broken with two cards drops itself with both on its item; placed again from that item it has them back; they're saved with it |
+
+In the real client (`-PharnessScene=upgrades`): the separator's window with its panel on the right, a Speed card in the top slot and an empty slot with a faint card outline below (`116_upgrades_gui.png`); JEI's item list moved over to clear the panel. The Speed card's tooltip (`116_upgrade_tooltip.png`): *Time a job: 60%* in green, *Power a job: 150%* in red, what it does and where it goes. A furnace with no cards shows two empty slots (`116_upgrades_furnace_empty.png`). 207 pass on 26.1, 26.2 and 26.3.
+
 ### Item Pipe on a separator's top (`item_pipe_on_a_separators_top_empties_it_into_a_crate_controller`)
 
 From a reported build: a separator full of Tide outputs (*Output Full*) with an Item Pipe on its top running to a Crate Controller. The test copies it (40 Raw Iron and 20 String in the separator, 8 bales waiting, a pipe from its top over to a controller with a raw-iron crate and an empty one). Before the fix it failed exactly like the build: nothing moved in 400 ticks, because the separator's top only took wool in. Now the raw iron joins the iron crate (50), the string fills the empty crate (20), and the bales stay in the separator. `separator_automation_sides` now checks the top gives up outputs, and that with `pipesTakeOutputsFromAnySide = false` it doesn't (but still takes wool).

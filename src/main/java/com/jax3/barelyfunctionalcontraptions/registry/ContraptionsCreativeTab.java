@@ -85,7 +85,11 @@ public final class ContraptionsCreativeTab {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLEECE_TRAWLER,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.AUTOMATIC_SHEARS,
-                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_RESERVOIR)),
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLUID_RESERVOIR,
+                    // Upgrade cards for the processing machines
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.UPGRADE_BASE,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.EFFICIENCY_UPGRADE)),
             guide("utility", 0xFF7552AE, () -> new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()), items(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CONTRAPTIONS_MANUAL,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FUNCTIONAL_MACHINE_BLOCK,

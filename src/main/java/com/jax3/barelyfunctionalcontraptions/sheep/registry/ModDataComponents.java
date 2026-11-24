@@ -24,6 +24,11 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<MachineContents>> MACHINE_CONTENTS = REGISTER.registerComponentType(
             "machine_contents", b -> b.persistent(MachineContents.CODEC).networkSynchronized(MachineContents.STREAM_CODEC));
 
+    /** The upgrade cards kept on a broken or picked-up machine's item. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<net.minecraft.world.item.component.ItemContainerContents>> MACHINE_UPGRADES = REGISTER.registerComponentType(
+            "machine_upgrades", b -> b.persistent(net.minecraft.world.item.component.ItemContainerContents.CODEC)
+                    .networkSynchronized(net.minecraft.world.item.component.ItemContainerContents.STREAM_CODEC));
+
     /** Fluid kept on a broken Fluid Tank item (that tank's own share of its group). */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<net.neoforged.neoforge.fluids.SimpleFluidContent>> FLUID_CONTENTS = REGISTER.registerComponentType(
             "fluid_contents", b -> b.persistent(net.neoforged.neoforge.fluids.SimpleFluidContent.CODEC)

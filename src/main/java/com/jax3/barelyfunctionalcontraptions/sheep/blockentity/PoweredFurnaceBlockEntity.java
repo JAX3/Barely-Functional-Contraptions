@@ -57,7 +57,9 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * Hoppers and pipes put items in on any side and take the results out on any side; a comparator reads the input.
  */
-public class PoweredFurnaceBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
+public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
+    /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
     public static final int INPUT = 0, OUTPUT = 1;
     public static final int DATA_COUNT = 13;
     public static final int SCAN_INTERVAL = 10;
@@ -91,7 +93,7 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements MachineCon
                 case 3 -> energy.getCapacityAsInt() >>> 16;
                 case 4 -> Math.min(0xFFFF, progress / 100);
                 case 5 -> Math.min(0xFFFF, maxProgress / 100);
-                case 6 -> energyPerTick();
+                case 6 -> upgradedEnergyPerTick();
                 case 7 -> status.ordinal();
                 case 8 -> speed;
                 case 9 -> heaters.length;
@@ -117,6 +119,11 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements MachineCon
 
     public static double cookMultiplier() {
         return ModConfigs.getDouble(ModConfigs.SERVER.poweredFurnaceCookTime);
+    }
+
+    /** FE a tick while smelting, with its upgrade cards: enough that a smelt costs what the cards say. */
+    public int upgradedEnergyPerTick() {
+        return upgrades.effects().perTick(energyPerTick());
     }
 
     public static int energyPerTick() {
@@ -159,14 +166,14 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements MachineCon
         } else {
             SmeltingRecipe r = recipe.get().value();
             ItemStack result = r.assemble(new SingleRecipeInput(input));
-            maxProgress = Math.max(100, (int) Math.round(r.cookingTime() * cookMultiplier() * 100));
+            maxProgress = Math.max(100, (int) Math.round(r.cookingTime() * cookMultiplier() * upgrades.effects().time() * 100));
             if (!fits(result)) {
                 status = MachineStatus.OUTPUT_FULL;
-            } else if (energy.getAmountAsInt() < energyPerTick()) {
+            } else if (energy.getAmountAsInt() < upgradedEnergyPerTick()) {
                 status = MachineStatus.NO_ENERGY;
             } else {
                 status = MachineStatus.PROCESSING;
-                energy.drain(energyPerTick());
+                energy.drain(upgradedEnergyPerTick());
                 progress += speed;
                 if (progress >= maxProgress) {
                     progress = 0;
@@ -367,6 +374,7 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements MachineCon
     @Override
     protected void loadAdditional(ValueInput in) {
         super.loadAdditional(in);
+        upgrades.load(in);
         in.child("energy").ifPresent(energy::deserialize);
         input = in.read("input", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         output = in.read("output", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
@@ -379,6 +387,7 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements MachineCon
     @Override
     protected void saveAdditional(ValueOutput out) {
         super.saveAdditional(out);
+        upgrades.save(out);
         energy.serialize(out.child("energy"));
         if (!input.isEmpty()) out.store("input", ItemStack.OPTIONAL_CODEC, input);
         if (!output.isEmpty()) out.store("output", ItemStack.OPTIONAL_CODEC, output);
@@ -398,5 +407,29 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements MachineCon
         tag.putBoolean("show_area", showArea);
         tag.putIntArray("heaters", heaters);
         return tag;
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
+        return upgrades;
+    }
+
+    @Override
+    protected void collectImplicitComponents(net.minecraft.core.component.DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
+    }
+
+    @Override
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter components) {
+        super.applyImplicitComponents(components);
+        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
+        if (cards != null) upgrades.fromComponent(cards);
+    }
+
+    @Override
+    public void removeComponentsFromTag(ValueOutput output) {
+        super.removeComponentsFromTag(output);
+        output.discard("upgrades");
     }
 }

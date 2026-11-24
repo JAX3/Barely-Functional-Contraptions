@@ -905,6 +905,27 @@ A bale can be placed like a hay bale, standing up or lying down, in the colour o
 |---|---|
 | ![The Mechanical Separator window with 3 Iron Wool Bales in its input slot and the tooltip: Iron Wool Bale, 9 x Iron Wool, pressed together](screenshots/88_separator_bale_gui.png) | ![The Contraptions Manual's Logistics tab with the new Wool Packer chapter open](screenshots/89_guide_wool_packer.png) |
 
+### Upgrade cards
+Cards that go in a processing machine to trade time for power or power for time. The **Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar and Automatic Shears** each have **two upgrade slots**, in a small panel on the right of their window.
+
+![The blank Upgrade Base, the Speed Upgrade (a red strip and a lightning bolt) and the Efficiency Upgrade (a lime strip and a copper coil): Blue Steel circuit cards with gold contacts](screenshots/116_upgrade_cards.png)
+
+| Card | Recipe | Time a job | Power a job |
+|---|---|---|---|
+| **Upgrade Base** (2) | Blue Steel, Redstone, Blue Steel over Blue Steel, any wool, Blue Steel | – | – |
+| **Speed Upgrade** | Upgrade Base, Block of Redstone, Sugar, Red Wool (shapeless) | **60%** (`speedTime`) | **150%** (`speedEnergy`) |
+| **Efficiency Upgrade** | Upgrade Base, Block of Copper, Lime Wool (shapeless) | **115%** (`efficiencyTime`) | **75%** (`efficiencyEnergy`) |
+
+- **What they change:** a job's time and its total FE. Separator: Iron Wool in 1.5 s for 30,000 FE with a Speed card (2.5 s, 20,000 FE without). Wool Packer: a bale for 750 FE in 1.15 s with an Efficiency card. Powered Furnace: shorter smelts at more FE/t, so a smelt costs what the card says. Infusion Altar: the infusion's time and FE. Automatic Shears: the time between sweeps, and the FE each sheep costs.
+- **Two cards:** one in each slot. A **second card of the same kind** does half as much (`secondCardStrength`): two Speed cards make jobs 48% as long for 187.5% of the power. A Speed and an Efficiency card multiply: 69% of the time for 112.5% of the power.
+- **Putting them in:** drag a card into a slot, or shift-click it: each shift-click puts one card in a free slot. Shift-click a card in the panel to take it back. A slot takes only one card, and only cards the machine accepts (the block tags `#barelyfunctionalcontraptions:accepts_upgrade/speed` and `/efficiency`, so a data pack can change which machines take which). The Snow Sheep Chiller takes none.
+- **Kept:** the cards stay with the machine when it's broken or picked up with the wrench (its item lists them, *Upgrades: Speed Upgrade*), and come back when it's placed. Hoppers and pipes never touch the upgrade slots.
+- **Config:** `[upgrades]`: `speedTime` (0.6), `speedEnergy` (1.5), `efficiencyTime` (1.15), `efficiencyEnergy` (0.75), `secondCardStrength` (0.5).
+
+| The Mechanical Separator with a Speed card, more in the hotbar | A card's tooltip |
+|---|---|
+| ![The separator's window: two upgrade slots in a panel on its right, a Speed Upgrade in the top one; JEI's item list moved over beside it](screenshots/116_upgrades_gui.png) | ![The Speed Upgrade's tooltip: Time a job 60% in green, Power a job 150% in red, and the machines it goes in](screenshots/116_upgrade_tooltip.png) |
+
 ### Energy Cable
 Cables carry Forge Energy from the **power generators** (Mycelial Generator, Zero Point Energy Module, Creative Generator) and the **Hume Energy Cube** to the machines that use it, so a machine no longer has to touch its power source.
 

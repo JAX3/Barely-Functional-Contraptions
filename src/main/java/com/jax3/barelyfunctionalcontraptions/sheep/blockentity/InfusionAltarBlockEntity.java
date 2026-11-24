@@ -57,7 +57,9 @@ import org.jspecify.annotations.Nullable;
  *     <li>Hoppers and pipes can put feeding items and catalysts in from any side, but can't take anything out.</li>
  * </ul>
  */
-public class InfusionAltarBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
+public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
+    /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
     /** The area outline's colour: the altar's amethyst purple. */
     public static final int AREA_COLOR = 0xFFB574FF;
     public static final int FEED = 0, SIZE = 1 + AltarRitual.MAX_CATALYSTS;
@@ -122,7 +124,8 @@ public class InfusionAltarBlockEntity extends BlockEntity implements MachineCont
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
         energy.refreshLimits();
-        maxProgress = ModConfigs.getInt(ModConfigs.SERVER.altarTicks);
+        var fx = upgrades.effects();
+        maxProgress = fx.ticks(ModConfigs.getInt(ModConfigs.SERVER.altarTicks));
         sheepId = -1;
         ItemStack feed = items.get(FEED);
         Optional<SheepResource> resource = resourceFor(level, feed);
@@ -133,7 +136,8 @@ public class InfusionAltarBlockEntity extends BlockEntity implements MachineCont
         } else {
             SheepResource r = resource.get();
             AltarRitual ritual = r.altar();
-            energyPerTick = (ritual.effectiveEnergy() + maxProgress - 1) / maxProgress;
+            long total = fx.energy((long) ritual.effectiveEnergy());
+            energyPerTick = (int) Math.min(Integer.MAX_VALUE, (total + maxProgress - 1) / maxProgress);
             LivingEntity sheep = findSheep(level, pos, r);
             if (feed.getCount() < r.effectiveFeedingAmount()) {
                 set(AltarStatus.NOT_ENOUGH_ITEMS, progress);
@@ -141,13 +145,13 @@ public class InfusionAltarBlockEntity extends BlockEntity implements MachineCont
                 set(AltarStatus.MISSING_CATALYSTS, progress);
             } else if (sheep == null) {
                 set(AltarStatus.NO_SHEEP, progress);
-            } else if (energy.getAmountAsInt() < EnergyShare.forTick(ritual.effectiveEnergy(), maxProgress, progress)) {
+            } else if (energy.getAmountAsInt() < EnergyShare.forTick(total, maxProgress, progress)) {
                 sheepId = sheep.getId();
                 set(AltarStatus.NO_ENERGY, progress);
             } else {
                 sheepId = sheep.getId();
                 status = AltarStatus.INFUSING;
-                energy.drain(EnergyShare.forTick(ritual.effectiveEnergy(), maxProgress, progress));
+                energy.drain(EnergyShare.forTick(total, maxProgress, progress));
                 progress++;
                 if (level.getGameTime() % 4 == 0) beam(level, pos, sheep, r);
                 slow(level, sheep);
@@ -398,6 +402,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements MachineCont
     @Override
     protected void loadAdditional(ValueInput in) {
         super.loadAdditional(in);
+        upgrades.load(in);
         items.clear();
         ContainerHelper.loadAllItems(in, items);
         in.child("energy").ifPresent(energy::deserialize);
@@ -409,6 +414,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements MachineCont
     @Override
     protected void saveAdditional(ValueOutput out) {
         super.saveAdditional(out);
+        upgrades.save(out);
         ContainerHelper.saveAllItems(out, items);
         energy.serialize(out.child("energy"));
         out.putInt("progress", progress);
@@ -439,5 +445,29 @@ public class InfusionAltarBlockEntity extends BlockEntity implements MachineCont
     @Override
     public void handleUpdateTag(ValueInput input) {
         showArea = input.getBooleanOr("show_area", false);
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
+        return upgrades;
+    }
+
+    @Override
+    protected void collectImplicitComponents(net.minecraft.core.component.DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
+    }
+
+    @Override
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter components) {
+        super.applyImplicitComponents(components);
+        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
+        if (cards != null) upgrades.fromComponent(cards);
+    }
+
+    @Override
+    public void removeComponentsFromTag(ValueOutput output) {
+        super.removeComponentsFromTag(output);
+        output.discard("upgrades");
     }
 }

@@ -50,7 +50,9 @@ import org.jspecify.annotations.Nullable;
  *     Energy and the redstone mode are kept when the block is broken.</li>
  * </ul>
  */
-public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity implements AreaDisplay {
+public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, AreaDisplay {
+    /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
     public static final int AREA_COLOR = 0xFF7FD3FF;
     public static final int SIZE = 9;
     /** Number of int fields synced to the menu (split into 16-bit halves where needed). */
@@ -114,7 +116,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
         energy.refreshLimits();
         powered = level.hasNeighborSignal(pos);
-        interval = Math.max(1, ModConfigs.getInt(ModConfigs.SERVER.automaticShearsInterval));
+        interval = upgrades.effects().ticks(Math.max(1, ModConfigs.getInt(ModConfigs.SERVER.automaticShearsInterval)));
         if (cooldown > interval) cooldown = interval;
         if (shearingDisplay > 0) shearingDisplay--;
         RedstoneMode mode = ModConfigs.getBool(ModConfigs.SERVER.redstoneControlEnabled) ? redstoneMode : ModConfigs.get(ModConfigs.SERVER.defaultRedstoneMode);
@@ -138,8 +140,9 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
         }
     }
 
+    /** FE each sheep it shears costs, with its upgrade cards. */
     public int energyPerShear() {
-        return ModConfigs.getInt(ModConfigs.SERVER.automaticShearsEnergyPerShear);
+        return upgrades.effects().energy(ModConfigs.getInt(ModConfigs.SERVER.automaticShearsEnergyPerShear));
     }
 
     /**
@@ -228,6 +231,11 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     public @Nullable EnergyHandler getEnergyHandler(@Nullable Direction side) {
         if (side != null && side == getBlockState().getValue(AutomaticShearsBlock.FACING)) return null;
         return energy;
+    }
+
+    /** Ticks between its sweeps now, with its upgrade cards. */
+    public int getInterval() {
+        return interval;
     }
 
     public MachineStatus getStatus() {
@@ -323,6 +331,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        upgrades.load(input);
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(input, items);
         input.child("energy").ifPresent(energy::deserialize);
@@ -334,6 +343,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        upgrades.save(output);
         ContainerHelper.saveAllItems(output, items);
         energy.serialize(output.child("energy"));
         output.putInt("cooldown", cooldown);
@@ -345,6 +355,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
+        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
         if (energy.getEnergy() > 0 || redstoneMode != RedstoneMode.IGNORED) {
             components.set(ModDataComponents.MACHINE_CONTENTS.get(), new MachineContents(energy.getEnergy(), redstoneMode));
         }
@@ -353,6 +364,8 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     @Override
     protected void applyImplicitComponents(DataComponentGetter components) {
         super.applyImplicitComponents(components);
+        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
+        if (cards != null) upgrades.fromComponent(cards);
         MachineContents contents = components.get(ModDataComponents.MACHINE_CONTENTS.get());
         if (contents != null) {
             energy.set(Math.min(contents.energy(), energy.getCapacityAsInt()));
@@ -364,7 +377,13 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     @SuppressWarnings("deprecation")
     public void removeComponentsFromTag(ValueOutput output) {
         super.removeComponentsFromTag(output);
+        output.discard("upgrades");
         output.discard("energy");
         output.discard("redstone_mode");
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
+        return upgrades;
     }
 }

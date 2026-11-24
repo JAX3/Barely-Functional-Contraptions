@@ -39,7 +39,9 @@ import org.jspecify.annotations.Nullable;
  *     <li>Hoppers and pipes put wool in on any side and take bales out on any side. A comparator reads the input.</li>
  * </ul>
  */
-public class WoolPackerBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, MenuProvider {
+public class WoolPackerBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MachineContainer, WorldlyContainer, MenuProvider {
+    /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
     public static final int INPUT = 0, OUTPUT = 1;
     public static final int DATA_COUNT = 9;
     private static final int[] SLOTS = {INPUT, OUTPUT};
@@ -91,8 +93,9 @@ public class WoolPackerBlockEntity extends BlockEntity implements MachineContain
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
         energy.refreshLimits();
-        maxProgress = ModConfigs.getInt(ModConfigs.SERVER.woolPackerTicksPerBale);
-        int cost = ModConfigs.getInt(ModConfigs.SERVER.woolPackerEnergyPerBale);
+        var fx = upgrades.effects();
+        maxProgress = fx.ticks(ModConfigs.getInt(ModConfigs.SERVER.woolPackerTicksPerBale));
+        int cost = fx.energy(ModConfigs.getInt(ModConfigs.SERVER.woolPackerEnergyPerBale));
         energyPerTick = (cost + maxProgress - 1) / maxProgress;
 
         ItemStack bale = WoolBaleItem.of(input);
@@ -238,6 +241,7 @@ public class WoolPackerBlockEntity extends BlockEntity implements MachineContain
     @Override
     protected void loadAdditional(ValueInput in) {
         super.loadAdditional(in);
+        upgrades.load(in);
         in.child("energy").ifPresent(energy::deserialize);
         input = in.read("input", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         output = in.read("output", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
@@ -247,9 +251,34 @@ public class WoolPackerBlockEntity extends BlockEntity implements MachineContain
     @Override
     protected void saveAdditional(ValueOutput out) {
         super.saveAdditional(out);
+        upgrades.save(out);
         energy.serialize(out.child("energy"));
         if (!input.isEmpty()) out.store("input", ItemStack.OPTIONAL_CODEC, input);
         if (!output.isEmpty()) out.store("output", ItemStack.OPTIONAL_CODEC, output);
         out.putInt("progress", progress);
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
+        return upgrades;
+    }
+
+    @Override
+    protected void collectImplicitComponents(net.minecraft.core.component.DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
+    }
+
+    @Override
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter components) {
+        super.applyImplicitComponents(components);
+        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
+        if (cards != null) upgrades.fromComponent(cards);
+    }
+
+    @Override
+    public void removeComponentsFromTag(ValueOutput output) {
+        super.removeComponentsFromTag(output);
+        output.discard("upgrades");
     }
 }

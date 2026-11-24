@@ -59,6 +59,7 @@ public class InfusionAltarMenu extends MachineMenu {
             });
         }
         addStandardInventorySlots(playerInventory, 8, INVENTORY_Y);
+        addUpgradeSlots(container, playerInventory.player.level(), pos);
         addDataSlots(data);
     }
 

@@ -70,6 +70,7 @@ public class PoweredFurnaceMenu extends MachineMenu {
             }
         });
         addStandardInventorySlots(playerInventory, 8, INVENTORY_Y);
+        addUpgradeSlots(be, playerInventory.player.level(), pos);
         addDataSlots(data);
     }
 

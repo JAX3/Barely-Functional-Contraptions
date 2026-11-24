@@ -9,7 +9,15 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "barelyfunctionalcontraptions:powered_furnace"
+          "name": "barelyfunctionalcontraptions:powered_furnace",
+          "modifier": {
+            "type": "minecraft:copy_components",
+            "source": "block_entity",
+            "include": [
+              "minecraft:custom_name",
+              "barelyfunctionalcontraptions:machine_upgrades"
+            ]
+          }
         }
       ]
     }

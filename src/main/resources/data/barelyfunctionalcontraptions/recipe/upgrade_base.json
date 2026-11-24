@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BRB",
+    "BWB"
+  ],
+  "key": {
+    "B": "barelyfunctionalcontraptions:blue_steel",
+    "R": "minecraft:redstone",
+    "W": "#minecraft:wool"
+  },
+  "result": {
+    "id": "barelyfunctionalcontraptions:upgrade_base",
+    "count": 2
+  }
+}
