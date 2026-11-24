@@ -112,9 +112,6 @@ public class MycelialGeneratorBlockEntity extends BlockEntity implements MenuPro
     private long extractedWindow;
     private int windowTicks;
     private double extractionRate;
-    /** FE sent over wireless power links: this window's total, and the per-tick average of the last window. */
-    private long wirelessWindow;
-    private double wirelessRate;
     private int outputTimer;
     private int containerTimer;
     private boolean registered;
@@ -369,8 +366,6 @@ public class MycelialGeneratorBlockEntity extends BlockEntity implements MenuPro
                 budget -= accepted;
             }
         }
-        // Then machines linked wirelessly with the Barely Functional Wrench share what is left of this interval's budget.
-        wirelessWindow += com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.push(level, worldPosition, energy, budget);
     }
 
     private BlockCapabilityCache<EnergyHandler, Direction> energyCache(ServerLevel level, Direction direction) {
@@ -387,8 +382,6 @@ public class MycelialGeneratorBlockEntity extends BlockEntity implements MenuPro
         extractedWindow += energy.takeExtractedThisTick();
         if (++windowTicks >= 20) {
             extractionRate = extractedWindow / (double) windowTicks;
-            wirelessRate = wirelessWindow / (double) windowTicks;
-            wirelessWindow = 0;
             extractedWindow = 0;
             windowTicks = 0;
         }
@@ -619,22 +612,7 @@ public class MycelialGeneratorBlockEntity extends BlockEntity implements MenuPro
                 ServerConfig.get(ServerConfig.ATTEMPT_INTERVAL), convertedThisSession, ServerConfig.get(ServerConfig.TRACK_CONVERSIONS),
                 state.ordinal(),
                 manualLinkCount(), activeLinks, ServerConfig.get(ServerConfig.MAX_MANUAL_CONNECTIONS), connection.ordinal(),
-                hugeMushroomsThisSession,
-                powerLinkStatus(), ServerConfig.get(ServerConfig.MAX_POWER_LINKS), wirelessRate);
-    }
-
-    /** The machines this generator powers wirelessly, for the GUI. */
-    private java.util.List<GeneratorStatus.PowerLink> powerLinkStatus() {
-        if (!(level instanceof ServerLevel serverLevel)) return java.util.List.of();
-        GlobalPos self = getGlobalPos();
-        java.util.List<GeneratorStatus.PowerLink> links = new java.util.ArrayList<>();
-        for (GlobalPos machine : com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinkData.get(serverLevel.getServer()).machinesOf(self)) {
-            boolean loaded = machine.dimension().equals(serverLevel.dimension()) && serverLevel.isLoaded(machine.pos());
-            String blockId = loaded ? BuiltInRegistries.BLOCK.getKey(serverLevel.getBlockState(machine.pos()).getBlock()).toString() : "";
-            links.add(new GeneratorStatus.PowerLink(blockId, machine.pos(),
-                    com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.isActive(serverLevel, self, machine)));
-        }
-        return links;
+                hugeMushroomsThisSession);
     }
 
     private int manualLinkCount() {

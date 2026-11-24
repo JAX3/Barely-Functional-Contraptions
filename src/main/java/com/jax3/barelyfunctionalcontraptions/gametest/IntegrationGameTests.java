@@ -68,10 +68,7 @@ public final class IntegrationGameTests {
         TESTS.put("integration_mycelial_generator_powers_automatic_shears", IntegrationGameTests::generatorPowersAutomaticShears);
         TESTS.put("shift_placing_faces_machines_away", IntegrationGameTests::shiftPlacingFacesAway);
         TESTS.put("integration_fluid_reservoir_waters_generator", IntegrationGameTests::reservoirWatersGenerator);
-        TESTS.put("integration_wireless_power_to_separator_and_shears", IntegrationGameTests::wirelessPower);
-        TESTS.put("integration_wrench_links_machines", IntegrationGameTests::wrenchLinksMachines);
-        TESTS.put("integration_wireless_link_rules", IntegrationGameTests::wirelessLinkRules);
-        TESTS.put("integration_generator_status_lists_wireless_links", IntegrationGameTests::statusListsWirelessLinks);
+        TESTS.put("integration_wrench_leaves_machines_alone", IntegrationGameTests::wrenchLeavesMachines);
         TESTS.put("integration_generator_charges_energy_cube", IntegrationGameTests::generatorChargesCube);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
     }
@@ -519,45 +516,19 @@ public final class IntegrationGameTests {
         });
     }
 
-    // ------------------------------------------------------------------ wireless power (Barely Functional Wrench)
+    // ------------------------------------------------------------------ the Barely Functional Wrench and machines
 
     private static net.minecraft.core.GlobalPos global(GameTestHelper h, BlockPos pos) {
         return net.minecraft.core.GlobalPos.of(h.getLevel().dimension(), h.absolutePos(pos));
     }
 
     /**
-     * A running generator in one corner, linked with the wrench to a separator and an Automatic Shears that it does
-     * not touch: both get its power, the separator finishes iron wool and the shears shear the sheep.
+     * Wireless power to machines is gone: the wrench neither selects a machine nor links a selected generator to one
+     * (the click passes on to the machine), and the generator's status still survives the trip to the client.
      */
-    private static void wirelessPower(GameTestHelper h) {
-        MycelialGeneratorBlockEntity generator = generator(h, new BlockPos(0, 1, 6), new ItemStack(Items.BROWN_MUSHROOM, 8), 4000);
-        BlockPos separatorPos = new BlockPos(6, 1, 6);
-        MechanicalSeparatorBlockEntity separator = separator(h, separatorPos);
-        separator.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(IRON, 1));
-        BlockPos shearsPos = new BlockPos(3, 1, 0);
-        h.setBlock(shearsPos, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
-                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, net.minecraft.core.Direction.SOUTH));
-        var shears = h.getBlockEntity(shearsPos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.class);
-        Sheep sheep = h.spawn(Vanilla.SHEEP, new BlockPos(3, 1, 2));
-        sheep.setNoAi(true);
-        sheep.setColor(DyeColor.WHITE);
-
-        var server = h.getLevel().getServer();
-        h.assertTrue(com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, global(h, new BlockPos(0, 1, 6)), global(h, separatorPos)).success(),
-                "generator -> separator link");
-        h.assertTrue(com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, global(h, shearsPos), global(h, new BlockPos(0, 1, 6))).success(),
-                "shears -> generator link (either order)");
-        h.succeedWhen(() -> {
-            h.assertTrue(generator.getState() == GeneratorState.RUNNING, "generator running, was " + generator.getState());
-            h.assertTrue(separator.getInventory().getStack(SeparatorInventory.PRIMARY).is(Items.RAW_IRON), "separator finishes iron wool on wireless power");
-            h.assertTrue(sheep.isSheared(), "shears shear the sheep on wireless power, shears FE " + shears.getEnergy().getEnergy() + " status " + shears.getStatus() + " gen FE " + generator.getEnergyStorage().getAmountAsInt());
-        });
-    }
-
-    /** The wrench itself: machine then generator links them; shift-clicking the machine removes the link. */
-    private static void wrenchLinksMachines(GameTestHelper h) {
+    private static void wrenchLeavesMachines(GameTestHelper h) {
         BlockPos generatorPos = new BlockPos(0, 1, 0);
-        generator(h, generatorPos, ItemStack.EMPTY, 0);
+        MycelialGeneratorBlockEntity generator = generator(h, generatorPos, ItemStack.EMPTY, 0);
         BlockPos separatorPos = new BlockPos(5, 1, 5);
         separator(h, separatorPos);
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
@@ -567,95 +538,24 @@ public final class IntegrationGameTests {
         java.util.function.Function<BlockPos, net.minecraft.world.item.context.UseOnContext> click = pos -> new net.minecraft.world.item.context.UseOnContext(
                 player, InteractionHand.MAIN_HAND, new net.minecraft.world.phys.BlockHitResult(
                         net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(pos)), net.minecraft.core.Direction.UP, h.absolutePos(pos), false));
-        var data = com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinkData.get(h.getLevel().getServer());
+        var selected = com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModDataComponents.SELECTED_GENERATOR.get();
 
-        // The machine is handled before its GUI would open; the generator passes the click to useOn.
-        h.assertTrue(item.onItemUseFirst(wrench, click.apply(separatorPos)) != net.minecraft.world.InteractionResult.PASS, "wrench handles the separator click");
-        h.assertTrue(global(h, separatorPos).equals(wrench.get(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModDataComponents.SELECTED_GENERATOR.get())),
-                "separator selected");
-        h.assertTrue(item.onItemUseFirst(wrench, click.apply(generatorPos)) == net.minecraft.world.InteractionResult.PASS, "generators go through useOn");
+        h.assertTrue(item.onItemUseFirst(wrench, click.apply(separatorPos)) == net.minecraft.world.InteractionResult.PASS,
+                "the wrench passes a click on a machine on (it opens as usual)");
+        h.assertFalse(wrench.has(selected), "and doesn't select it");
         item.useOn(click.apply(generatorPos));
-        h.assertTrue(data.isLinked(global(h, generatorPos), global(h, separatorPos)), "linked by the wrench");
-        h.assertFalse(wrench.has(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModDataComponents.SELECTED_GENERATOR.get()), "selection cleared after linking");
+        h.assertTrue(global(h, generatorPos).equals(wrench.get(selected)), "a generator is still selected");
+        h.assertTrue(item.onItemUseFirst(wrench, click.apply(separatorPos)) == net.minecraft.world.InteractionResult.PASS,
+                "a machine after a generator is passed on too");
+        h.assertTrue(global(h, generatorPos).equals(wrench.get(selected)), "so the generator stays selected");
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData.get(h.getLevel().getServer()).count(global(h, generatorPos)) == 0,
-                "a machine is not a generator-network link");
-
-        player.setShiftKeyDown(true);
-        item.onItemUseFirst(wrench, click.apply(separatorPos));
-        h.assertFalse(data.isLinked(global(h, generatorPos), global(h, separatorPos)), "shift-click on the machine removes its links");
-        h.succeed();
-    }
-
-    /** Two machines can't link; distance and per-generator limits apply; breaking a machine drops its link. */
-    private static void wirelessLinkRules(GameTestHelper h) {
-        var server = h.getLevel().getServer();
-        BlockPos generatorPos = new BlockPos(0, 1, 0);
-        MycelialGeneratorBlockEntity generator = generator(h, generatorPos, ItemStack.EMPTY, 0);
-        BlockPos a = new BlockPos(2, 1, 0), b = new BlockPos(6, 1, 6);
-        separator(h, a);
-        separator(h, b);
-        h.assertTrue(com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, global(h, a), global(h, b))
-                == com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.Result.NOT_LINKABLE, "two machines can't be linked");
-        var cfg = com.jax3.barelyfunctionalcontraptions.mycelial.config.ServerConfig.MAX_LINK_DISTANCE;
-        var limit = com.jax3.barelyfunctionalcontraptions.mycelial.config.ServerConfig.MAX_POWER_LINKS;
-        int oldDistance = cfg.get(), oldLimit = limit.get();
-        try {
-            cfg.set(4);
-            h.assertTrue(com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, global(h, generatorPos), global(h, b))
-                    == com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.Result.TOO_FAR, "8.5 blocks is too far with a 4 block limit");
-            limit.set(1);
-            h.assertTrue(com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, global(h, generatorPos), global(h, a)).success(), "near one links");
-            h.assertTrue(com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, global(h, generatorPos), global(h, a))
-                    == com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.Result.ALREADY_LINKED, "no duplicate links");
-            cfg.set(64);
-            h.assertTrue(com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, global(h, generatorPos), global(h, b))
-                    == com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.Result.AT_LIMIT, "one machine per generator with max_power_links_per_generator = 1");
-        } finally {
-            cfg.set(oldDistance);
-            limit.set(oldLimit);
-        }
-        // Break the linked machine: the generator drops the link the next time it sends power.
-        h.setBlock(a, net.minecraft.world.level.block.Blocks.AIR);
-        generator.getEnergyStorage().setEnergy(10_000);
-        var data = com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinkData.get(server);
-        h.succeedWhen(() -> h.assertTrue(data.machinesOf(global(h, generatorPos)).isEmpty(), "link to the broken separator removed"));
-    }
-
-    /** The generator GUI's status lists its wireless machines, which are active, and survives the network round trip. */
-    private static void statusListsWirelessLinks(GameTestHelper h) {
-        var server = h.getLevel().getServer();
-        BlockPos generatorPos = new BlockPos(0, 1, 0);
-        MycelialGeneratorBlockEntity generator = generator(h, generatorPos, ItemStack.EMPTY, 0);
-        BlockPos near = new BlockPos(2, 1, 0), far = new BlockPos(6, 1, 6);
-        separator(h, near);
-        h.setBlock(far, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.AUTOMATIC_SHEARS.get());
-        h.assertTrue(generator.createStatus().powerLinks().isEmpty(), "no wireless links yet");
-        var PL = (java.util.function.BiFunction<BlockPos, BlockPos, Boolean>) (a, b) ->
-                com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, global(h, a), global(h, b)).success();
-        h.assertTrue(PL.apply(generatorPos, near) && PL.apply(generatorPos, far), "both linked");
+                "and no link was made");
 
         var status = generator.createStatus();
-        h.assertTrue(status.powerLinks().size() == 2 && status.activePowerLinks() == 2, "2 of 2 active, got " + status.powerLinks());
-        h.assertTrue(status.maxPowerLinks() == 8, "max 8 by default, got " + status.maxPowerLinks());
-        h.assertTrue(status.powerLinks().get(0).blockId().equals("barelyfunctionalcontraptions:mechanical_separator")
-                && status.powerLinks().get(0).pos().equals(h.absolutePos(near)), "first is the separator: " + status.powerLinks().get(0));
-        h.assertTrue(status.powerLinks().get(1).blockId().equals("barelyfunctionalcontraptions:automatic_shears"), "second is the shears");
-
-        var cfg = com.jax3.barelyfunctionalcontraptions.mycelial.config.ServerConfig.MAX_LINK_DISTANCE;
-        int old = cfg.get();
-        try {
-            cfg.set(4);
-            var limited = generator.createStatus();
-            h.assertTrue(limited.activePowerLinks() == 1 && limited.powerLinks().get(0).active() && !limited.powerLinks().get(1).active(),
-                    "the far shears are inactive with a 4 block limit: " + limited.powerLinks());
-        } finally {
-            cfg.set(old);
-        }
-
         var buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
         com.jax3.barelyfunctionalcontraptions.mycelial.menu.GeneratorStatus.STREAM_CODEC.encode(buf, status);
         var decoded = com.jax3.barelyfunctionalcontraptions.mycelial.menu.GeneratorStatus.STREAM_CODEC.decode(buf);
-        h.assertTrue(decoded.equals(status), "status survives the trip to the client");
+        h.assertTrue(decoded.equals(status), "the generator's status survives the trip to the client");
         h.assertTrue(buf.readableBytes() == 0, "nothing left unread");
         h.succeed();
     }

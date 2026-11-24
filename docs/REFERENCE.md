@@ -194,7 +194,7 @@ A generator stops when it runs out of fuel or water. When its buffer is full it 
 
 Generators connect automatically in all six directions. By default only **running** generators count towards `N`, so a network grows as more members are fed. Networks update instantly when generators are placed, broken, loaded or unloaded. Generators in unloaded chunks simply stop counting, and **no chunk is ever loaded by the mod**. Networks are capped at 64 members by default.
 
-### Barely Functional Wrench (wireless links)
+### Barely Functional Wrench (generator links)
 
 A stylized crowbar, in the same art style as the blocks: purple-painted shaft, steel claw and chisel tip.
 
@@ -210,26 +210,8 @@ A stylized crowbar, in the same art style as the blocks: purple-painted shaft, s
 * **Dismantling:** hit (left-click) any of the mod's blocks with the wrench and it breaks at once. The block, with anything that spills out of it (a machine's fuel, wool, input or output), goes straight into your inventory; what doesn't fit drops as usual. It works on every block of the mod, needs no pickaxe, doesn't wear the wrench out, and leaves other mods' blocks alone. Blocks that can't be broken in survival (the Creative Generator) still can't be. Turn it off with `dismantle_blocks = false` in `[network.wrench]`.
 * **Tags:** the wrench is in `#c:tools` and `#c:tools/wrench`, so mods that accept any wrench (for rotating or picking up their machines) treat it as one, and in `#c:storable_item`. Those mods' wrench actions are their own; the linking, pipe sides and dismantling only work on this mod's blocks.
 
-#### Wireless power to machines
-The wrench can also power a **Mechanical Separator** or **Automatic Shears** from a generator that isn't touching it.
-
-* **Right-click the generator, then the machine** (or the machine first, then the generator). The same red and white particles run between them.
-* The generator sends the machine FE as if it were touching it. This comes out of the generator's normal output (`outputTransferRate` per tick), after any machines it actually touches. When it powers several machines, it shares the energy evenly between them.
-* One generator can power up to **8** machines (`max_power_links_per_generator`), within the usual **64 block** limit (`max_link_distance`), in the same dimension. A machine can be powered by several generators.
-* Machines don't join the generator's network, so they don't count towards its boost.
-* **Shift + right-click a machine** to remove its wireless links. Shift + right-clicking a generator removes all its links, including wireless ones.
-* Right-clicking a machine with the wrench selects it instead of opening its GUI.
-* Breaking the machine or the generator removes the link. Links are saved with the world, and they only carry power while both blocks are loaded.
-* Which machines can be powered is the block tag `#barelyfunctionalcontraptions:wireless_power_receivers`. A data pack can add other mods' FE machines to it.
-* **Generator screen:** a small **wireless button** (signal bars) under the *Running* lamp. The bars are purple while linked machines are getting power, yellow when every link is idle, and grey with no links. Next to it, a count shows how many machines are powered out of how many are linked, e.g. *2/2*. **Hover over the button** for the details: the limit, the FE/t being sent, and each machine with its position. Machines in unloaded chunks are marked *(not loaded)*, and links a lowered range limit no longer allows are marked *(inactive)*.
-
-| Linking a generator to two machines | The separator running on wireless power only |
-|---|---|
-| ![Wireless power](screenshots/17_wireless_power.png) | ![Separator on wireless power](screenshots/18_wireless_separator_gui.png) |
-
-| The wireless button under the lamp | Hovering it shows the machines |
-|---|---|
-| ![Generator status](screenshots/19_generator_wireless_status.png) | ![Wireless tooltip](screenshots/20_generator_wireless_tooltip.png) |
+#### Powering machines
+The wrench doesn't carry power to machines: run **Energy Cables** from a generator to them, or put them against it. (Earlier versions could link a generator to a Mechanical Separator, Automatic Shears or Hume Energy Cube wirelessly; that's gone. See the changelog.)
 
 ### Mycelium
 
@@ -438,7 +420,6 @@ Any shape works, not just full boxes. L-shapes, rings and walls with bends get p
   It shows the whole group, whichever cube you open. Hover over things for details.
 
   ![Hume Energy Cube GUI](screenshots/22_energy_cube_gui.png)
-- **Wireless:** a Mycelial Generator can charge a cube from a distance with the Barely Functional Wrench, like the other machines.
 - Groups are limited to 64 cubes (`maxGroupSize`); extra cubes form another group. Mine it with a stone pickaxe or better.
 
 ![Hume Energy Cube recipe: iron ingots in the corners, amethyst shards on the top and sides, a block of redstone in the centre, a Functional Machine Block bottom middle](screenshots/recipe_hume_energy_cube.png)

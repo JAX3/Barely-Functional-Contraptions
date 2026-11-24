@@ -183,7 +183,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
 
     /**
      * JEI lists every tag as a "tag recipe" page (Block Tags, Item Tags...), so looking up a machine showed this mod's
-     * internal tags, such as {@code #barelyfunctionalcontraptions:wireless_power_receivers}. Those are configuration
+     * internal tags (the ones data packs use to configure it). Those are configuration
      * for data packs, not something players need, so their pages are hidden. Vanilla and other mods' tags (like
      * {@code minecraft:mineable/pickaxe}) are shared by many blocks and are left alone.
      */

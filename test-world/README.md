@@ -30,7 +30,7 @@ off), so nothing gathers in the platform's shadow.
 | Infused sheep, Mechanical Separators and Automatic Shears | `/tp @s 15 35 47` |
 | Fluid Reservoir on its pool | `/tp @s 71 35 43` |
 | Hume Energy Cubes: groups, towers, an L, a ring, steps | `/tp @s 43 37 43` |
-| Mycelial Generator powering a separator and shears wirelessly (Barely Functional Wrench) | `/tp @s 95 37 45` |
+| Mycelial Generator cabled to a separator and shears (it powered them wirelessly with the Barely Functional Wrench until that was removed) | `/tp @s 95 37 45` |
 | Creative Generator | `/tp @s 111 37 45` |
 | Zero Point Energy Modules (floor and ceiling pair, coloured beam) | `/tp @s 129 36 47` |
 | Energy Cables: a generator feeding a cube, a separator and shears | `/tp @s 15 37 68` |
@@ -61,7 +61,7 @@ off), so nothing gathers in the platform's shadow.
 | A row of running machines: two Mycelial Generators (one fuelled and watered), two Mechanical Separators (one fed wool and powered by a Creative Generator) and two Automatic Shears (one charged) | `/tp @s 45.5 38 161 180 25` |
 
 The scenes used to stand in a long row of separate platforms; `-PharnessScene=square_world` moved them all onto the
-square platform, with their sheep, labels and the wrench's wireless links. New scenes go into the free cells with
+square platform, with their sheep, labels and the wrench's generator links. New scenes go into the free cells with
 `./gradlew runClient -PscreenshotHarness -PharnessScene=extend_world "-PharnessWorld=BFC Test World"` (unzip this
 world into `run/saves` first). This file is updated whenever a new contraption is added.
 

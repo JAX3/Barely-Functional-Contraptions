@@ -243,9 +243,9 @@ The mod's creative tab is split into the same sections as the manual, and the Re
 
 ### Wrench and Links
 
-The Barely Functional Wrench links generators into one network and powers machines wirelessly, up to 64 blocks away. It also sets the sides of pipes, and hitting any contraption with it picks it up at once, straight into your inventory with whatever was inside.
+The Barely Functional Wrench links Mycelial Generators into one network up to 64 blocks apart, and links machines to a Machine Status Panel and crates to a Crate Controller. It also sets the sides of pipes, and hitting any contraption with it picks it up at once, straight into your inventory with whatever was inside.
 
-![Generators powering machines wirelessly across a gap](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/17_wireless_power.png)
+![A Crate Controller in a wall of crates, a crate across the room linked to it with the wrench, brass tags on every crate in its store](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/112_crate_controller_linked.png)
 
 ### Woollen Armour
 

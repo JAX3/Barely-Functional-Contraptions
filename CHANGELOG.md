@@ -155,6 +155,15 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
   hand-drawn fleeces; lambs keep a plain one in the resource's colour.
 - Client config `blockTexturedWool` (on) brings back the old plain fleece when off.
 
+### Removed: wireless power to machines
+- The Barely Functional Wrench no longer links a Mycelial Generator to a Mechanical Separator, Automatic Shears or Hume
+  Energy Cube to power it wirelessly. Run **Energy Cables** from the generator instead, or put the machine against it.
+- Gone with it: the generator window's wireless button, the `max_power_links_per_generator` config setting and the
+  `#barelyfunctionalcontraptions:wireless_power_receivers` block tag. Right-clicking a machine with the wrench now
+  opens it as usual.
+- **Existing worlds:** wireless links already made are ignored (machines that ran on them stop until cabled). The wrench
+  still links generators to generators, machines to a Machine Status Panel and crates to a Crate Controller.
+
 ### Fixes
 - **Static Generator window:** the dome's charge bar no longer flashes while it's overcharged.
 - **Machine Status Panel:** clicking a Static Generator's dome with the wrench now links it (only its base did), and the
@@ -166,6 +175,7 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
 - The platform grew a **seventh row** of cells, and you now start at its new south edge.
 - **Static Generator:** six sheep at four fresh combs, making 600 FE/t into a bank of Hume Energy Cubes.
 - **Machine Status Panel:** a 3x3 screen showing 23 machines from across the platform (the crate store and the Fleece Trawler among them), with an alarm lamp.
+- **Wireless power scene:** its generator is now cabled to the separator and shears it used to power wirelessly.
 - **Wool-Lined Crates:** a storeroom wall of fourteen crates, each lined the colour of what it holds; and a hopper
   overfilling a crate of redstone (it bursts now and then) beside a strapped one that never does.
 - **Crate Controller:** on top of the storeroom wall (all its crates join by touch) beside an empty crate, fed by a

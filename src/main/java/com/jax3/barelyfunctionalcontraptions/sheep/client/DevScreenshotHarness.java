@@ -418,34 +418,7 @@ public final class DevScreenshotHarness {
             case 800 -> {
                 mc.player.closeContainer();
                 setHudHidden(mc, true);
-                server.execute(() -> wirelessScene(server));
             }
-            case 860 -> server.execute(() -> linkWireless(server));
-            case 866 -> shot(mc, "17_wireless_power");
-            case 960 -> server.execute(() -> openWirelessSeparator(server));
-            case 990 -> shot(mc, "18_wireless_separator_gui");
-            case 995 -> {
-                mc.player.closeContainer();
-                server.execute(() -> {
-                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
-                    if (player.level().getBlockEntity(wirelessBase) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity be) {
-                        player.openMenu(be, buf -> buf.writeBlockPos(wirelessBase));
-                    }
-                });
-            }
-            case 1005 -> com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); // park the cursor in a corner
-            case 1015 -> shot(mc, "19_generator_wireless_status");
-            case 1020 -> {
-                // Hover the wireless button so its tooltip (the list of linked machines) shows.
-                var window = mc.getWindow();
-                int scale = window.getGuiScale();
-                int left = (window.getGuiScaledWidth() - com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.IMAGE_WIDTH) / 2;
-                int top = (window.getGuiScaledHeight() - com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.IMAGE_HEIGHT) / 2;
-                double mx = (left + com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.WIRELESS_X + 8) * scale;
-                double my = (top + com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen.WIRELESS_Y + 8) * scale;
-                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, window.handle(), mx, my);
-            }
-            case 1030 -> shot(mc, "20_generator_wireless_tooltip");
             case 1040 -> {
                 mc.player.closeContainer();
                 server.execute(() -> cubeScene(server));
@@ -1120,49 +1093,6 @@ public final class DevScreenshotHarness {
         }
     }
 
-    private static BlockPos wirelessBase;
-
-    /** A running generator on one stone pad, and a separator and Automatic Shears on others a few blocks away. */
-    private static void wirelessScene(MinecraftServer server) {
-        ServerLevel level = server.overworld();
-        wirelessBase = origin.offset(12, 30, -4);
-        for (int x = -1; x <= 9; x++) {
-            for (int z = -1; z <= 1; z++) {
-                level.setBlock(wirelessBase.offset(x, -1, z), (x <= 1 || x >= 7 || x == 4) ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(), 3);
-            }
-        }
-        level.setBlock(wirelessBase, com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get().defaultBlockState()
-                .setValue(com.jax3.barelyfunctionalcontraptions.mycelial.block.MycelialGeneratorBlock.FACING, Direction.SOUTH), 3);
-        if (level.getBlockEntity(wirelessBase) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity generator) {
-            generator.getInventory().setStackInSlot(com.jax3.barelyfunctionalcontraptions.mycelial.capability.GeneratorItemHandler.FUEL_SLOT, new ItemStack(Items.RED_MUSHROOM, 32));
-            generator.getTank().fillInternal(net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER), 8000);
-        }
-        level.setBlock(wirelessBase.offset(4, 0, 0), ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState().setValue(MechanicalSeparatorBlock.FACING, Direction.SOUTH), 3);
-        if (level.getBlockEntity(wirelessBase.offset(4, 0, 0)) instanceof MechanicalSeparatorBlockEntity be) {
-            // Wool but no FE: everything it runs on comes over the wireless link.
-            be.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 16));
-        }
-        level.setBlock(wirelessBase.offset(8, 0, 0), ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
-                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.SOUTH), 3);
-        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
-                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 22", wirelessBase.getX() + 4.5, wirelessBase.getY() + 2, wirelessBase.getZ() + 7.5));
-    }
-
-    private static void linkWireless(MinecraftServer server) {
-        var dim = server.overworld().dimension();
-        var gen = net.minecraft.core.GlobalPos.of(dim, wirelessBase);
-        com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, gen, net.minecraft.core.GlobalPos.of(dim, wirelessBase.offset(4, 0, 0)));
-        com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking.tryLink(server, gen, net.minecraft.core.GlobalPos.of(dim, wirelessBase.offset(8, 0, 0)));
-    }
-
-    private static void openWirelessSeparator(MinecraftServer server) {
-        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
-        BlockPos pos = wirelessBase.offset(4, 0, 0);
-        if (player.level().getBlockEntity(pos) instanceof MechanicalSeparatorBlockEntity be) {
-            player.openMenu(be, pos);
-        }
-    }
-
     private static BlockPos cubeBase;
 
     /**
@@ -1697,8 +1627,11 @@ public final class DevScreenshotHarness {
     private static final Object[][] EXTRA_SCENES = {
             // Rows 0 to 5 are full: up to (1, 5) by the moved scenes, (2, 5) by the Grass Seeder, (3, 5) by the Herd
             // Counter and (4, 5) by the Machine Status Panel. Row 6, added by extendPlatform: (0, 6) the Wool-Lined Crates
-            // (built by an earlier run, as "crates"), (1, 6) the Fleece Trawler; (2, 6) to (4, 6) are free.
-            {"fleece trawler", 1, 6},
+            // (built by an earlier run, as "crates"), (1, 6) the Fleece Trawler (as "fleece trawler"); (2, 6) to (4, 6)
+            // are free.
+            // Not a new scene: cables the scene that showed wireless power (cell 1, 3) now that the wrench no longer
+            // powers machines; built from the generator in (1, 6) so the platform's extension is a no-op.
+            {"cable the wireless scene", 1, 6},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -1864,6 +1797,66 @@ public final class DevScreenshotHarness {
             ResourcefulSheep.LOGGER.info("EXTEND trawler: linked to the status panel: {}", result);
         }
         ResourcefulSheep.LOGGER.info("EXTEND trawler built at {}", g);
+    }
+
+    /**
+     * The scene that showed a Mycelial Generator powering a Mechanical Separator (4 blocks east of it) and Automatic
+     * Shears (8 east) wirelessly, from before wireless power was removed: lays Energy Cable from the generator to both
+     * along the row, and renames its label. Found by that layout anywhere on the platform; run again it changes nothing.
+     */
+    private static void cableWirelessScene(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        var cable = ModBlocks.ENERGY_CABLE.get();
+        int found = 0;
+        for (BlockPos p : BlockPos.betweenClosed(0, 35, 24, 145, 40, 192)) {
+            if (!level.getBlockState(p).is(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get())) continue;
+            BlockPos gen = p.immutable();
+            if (!(level.getBlockEntity(gen.east(4)) instanceof MechanicalSeparatorBlockEntity)
+                    || !(level.getBlockEntity(gen.east(8)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity)) continue;
+            // Only that scene: nothing but air (or cable, from an earlier run) between them, so rows of machines
+            // standing side by side elsewhere are left alone.
+            boolean open = true;
+            for (int dx : new int[]{1, 2, 3, 5, 6, 7}) {
+                var between = level.getBlockState(gen.east(dx));
+                if (!between.isAir() && !between.is(cable)) open = false;
+            }
+            if (!open) continue;
+            found++;
+            for (int dx : new int[]{1, 2, 3, 5, 6, 7}) {
+                BlockPos at = gen.east(dx);
+                if (!level.getBlockState(at).isAir() && !level.getBlockState(at).is(cable)) {
+                    ResourcefulSheep.LOGGER.warn("EXTEND cable: {} is {}, left alone", at, level.getBlockState(at));
+                    continue;
+                }
+                // (Bridging the gaps between the pads.)
+                if (level.getBlockState(at.below()).isAir()) level.setBlock(at.below(), Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+                level.setBlock(at, cable.withConnections(cable.defaultBlockState(), level, at), 3);
+            }
+            for (int dx = 1; dx <= 7; dx++) {
+                BlockPos at = gen.east(dx);
+                if (level.getBlockState(at).is(cable)) level.setBlock(at, cable.withConnections(level.getBlockState(at), level, at), 3);
+            }
+            var box = new net.minecraft.world.phys.AABB(gen).inflate(16, 10, 12);
+            for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.Display.TextDisplay.class, box, e -> true)) {
+                String text;
+                try { // (private; this is a dev tool)
+                    var getText = net.minecraft.world.entity.Display.TextDisplay.class.getDeclaredMethod("getText");
+                    getText.setAccessible(true);
+                    text = ((net.minecraft.network.chat.Component) getText.invoke(e)).getString();
+                } catch (ReflectiveOperationException ex) {
+                    throw new IllegalStateException(ex);
+                }
+                ResourcefulSheep.LOGGER.warn("EXTEND cable: label '{}' at {}", text, e.blockPosition());
+                if (text.toLowerCase(java.util.Locale.ROOT).contains("wireless")) {
+                    BlockPos at = BlockPos.containing(e.getX() - 0.5, e.getY() - 0.2, e.getZ() - 0.5);
+                    e.discard();
+                    label(server, at, text.replace("Wireless power", "A Mycelial Generator cabled to machines")
+                            .replace("wireless power", "a Mycelial Generator cabled to machines"), "white");
+                }
+            }
+            ResourcefulSheep.LOGGER.info("EXTEND cable: cabled the generator at {} to its separator and shears", gen);
+        }
+        ResourcefulSheep.LOGGER.info("EXTEND cable: {} wireless scene(s) found", found);
     }
 
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
@@ -3753,7 +3746,7 @@ public final class DevScreenshotHarness {
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
         // The whole square platform from above its south edge and from straight overhead, then the latest scene.
         String[] tps = {"tp @a 73.5 95 218.5 180 40", "tp @a 73.5 185 108 180 90", "tp @a 129.5 38 162.5 180 12", "tp @a 45.5 40 184.5 180 32",
-                "tp @a 49.5 36.5 179.5 145 22"};
+                "tp @a 95.5 39 45.5 180 30"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -3769,6 +3762,14 @@ public final class DevScreenshotHarness {
         if (tick == report) {
             server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                // The generator cabled to a separator and shears, once wireless.
+                if (level.getBlockEntity(new BlockPos(91, 35, 38)) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity gen
+                        && level.getBlockEntity(new BlockPos(95, 35, 38)) instanceof MechanicalSeparatorBlockEntity sep
+                        && level.getBlockEntity(new BlockPos(99, 35, 38)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity shears) {
+                    ResourcefulSheep.LOGGER.warn("TOUR cabled generator {} {} FE; separator {} FE, {} {}; shears {} FE, {}", gen.getState(), gen.createStatus().energy(),
+                            sep.getEnergy().getEnergy(), sep.getInventory().getStack(SeparatorInventory.INPUT), sep.getInventory().getStack(SeparatorInventory.PRIMARY),
+                            shears.getEnergy().getEnergy(), shears.getStatus());
+                }
                 if (level.getBlockEntity(new BlockPos(45, 35, 177)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity t) {
                     StringBuilder chest = new StringBuilder();
                     if (level.getBlockEntity(new BlockPos(45, 34, 178)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity c) {
@@ -3878,7 +3879,7 @@ public final class DevScreenshotHarness {
 
     /**
      * Moves every scene of the test world off its own platform onto one square platform at y = 34, in a grid, with its
-     * sheep, labels and armour stands, and re-points the Barely Functional Wrench's wireless links; then sets the
+     * sheep, labels and armour stands, and re-points the Barely Functional Wrench's generator links; then sets the
      * spawn at the platform's south edge: {@code -PharnessScene=square_world -PharnessWorld="BFC Test World"}.
      */
     private static void squareWorldTick(Minecraft mc, MinecraftServer server) {
@@ -3918,15 +3919,13 @@ public final class DevScreenshotHarness {
             }
             return null;
         };
-        // The wireless links (generator to machine, and generator to generator) whose ends both move, before moving.
-        var powerLinks = com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinkData.get(server);
+        // The wrench's generator-to-generator links whose ends both move, before moving.
         var manualLinks = com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData.get(server);
-        java.util.List<GlobalPos[]> power = new java.util.ArrayList<>(), manual = new java.util.ArrayList<>();
+        java.util.List<GlobalPos[]> manual = new java.util.ArrayList<>();
         for (int i = 0; i < n; i++) {
             int[] b = (int[]) SQUARE_SCENES[i][1];
             for (BlockPos p : BlockPos.betweenClosed(b[0] - 1, b[4], b[2] - 1, b[1] + 1, b[5] + 6, b[3] + 1)) {
                 GlobalPos gp = GlobalPos.of(level.dimension(), p.immutable());
-                for (GlobalPos m : powerLinks.machinesOf(gp)) power.add(new GlobalPos[]{gp, m});
                 for (GlobalPos m : manualLinks.linksOf(gp)) if (gp.pos().asLong() < m.pos().asLong()) manual.add(new GlobalPos[]{gp, m});
             }
         }
@@ -3965,19 +3964,13 @@ public final class DevScreenshotHarness {
                     entities.get(i).size(), centre[0], centre[1]);
         }
         // Re-point the links that moved.
-        for (GlobalPos[] link : power) {
-            BlockPos a = moved.apply(link[0].pos()), c = moved.apply(link[1].pos());
-            if (a == null || c == null) continue;
-            powerLinks.remove(link[0], link[1]);
-            powerLinks.add(GlobalPos.of(level.dimension(), a), GlobalPos.of(level.dimension(), c));
-        }
         for (GlobalPos[] link : manual) {
             BlockPos a = moved.apply(link[0].pos()), c = moved.apply(link[1].pos());
             if (a == null || c == null) continue;
             manualLinks.remove(link[0], link[1]);
             manualLinks.add(GlobalPos.of(level.dimension(), a), GlobalPos.of(level.dimension(), c));
         }
-        ResourcefulSheep.LOGGER.warn("SQUARE links moved: {} power, {} manual", power.size(), manual.size());
+        ResourcefulSheep.LOGGER.warn("SQUARE links moved: {} manual", manual.size());
         // A crafting table left over from an old screenshot.
         level.setBlock(new BlockPos(-17, 39, 8), Blocks.AIR.defaultBlockState(), 3);
         // Clear out wild mobs and leftovers, and stop them spawning in the platform's shadow on the sand below.
@@ -4038,7 +4031,7 @@ public final class DevScreenshotHarness {
             for (var e : ents) kinds.merge(net.minecraft.world.entity.EntityType.getKey(e.getType()).getPath(), 1, Integer::sum);
             ResourcefulSheep.LOGGER.warn("SURVEY x {}..{} y {}..{} z {}..{} blocks {} entities {}", minX + x0, maxX + x0, minY + y0, maxY + y0, minZ + z0, maxZ + z0, count, kinds);
         }
-        ResourcefulSheep.LOGGER.warn("SURVEY links {}", com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinkData.get(server));
+        ResourcefulSheep.LOGGER.warn("SURVEY links {}", com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData.get(server));
     }
 
     private static net.minecraft.world.phys.Vec3 extendReturn = net.minecraft.world.phys.Vec3.ZERO;
@@ -4086,6 +4079,7 @@ public final class DevScreenshotHarness {
                         case "status panel" -> panelWorldScene(server);
                         case "crates" -> crateWorldScene(server);
                         case "fleece trawler" -> trawlerWorldScene(server);
+                        case "cable the wireless scene" -> cableWirelessScene(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);

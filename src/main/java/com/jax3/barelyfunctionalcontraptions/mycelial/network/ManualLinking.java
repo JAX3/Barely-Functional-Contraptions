@@ -121,7 +121,6 @@ public final class ManualLinking {
     /** Called when a generator block is permanently removed (broken, replaced), not on chunk unload. */
     public static void onGeneratorDestroyed(ServerLevel level, BlockPos pos) {
         unlinkAll(level.getServer(), GlobalPos.of(level.dimension(), pos));
-        PowerLinking.unlinkAll(level.getServer(), GlobalPos.of(level.dimension(), pos));
     }
 
     /**

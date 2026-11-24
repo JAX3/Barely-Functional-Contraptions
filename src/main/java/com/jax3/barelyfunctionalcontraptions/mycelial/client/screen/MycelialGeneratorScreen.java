@@ -37,8 +37,6 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
     public static final int TANK_X = 29, TANK_Y = 19;
     public static final int BURN_X = 52, BURN_Y = 38, BURN_W = 16, BURN_H = 14;
     public static final int LAMP_X = 8, LAMP_Y = 112;
-    /** The wireless-power button under the state lamp; hover it for the machines this generator powers. */
-    public static final int WIRELESS_X = 8, WIRELESS_Y = 124, WIRELESS_SIZE = 16;
     public static final int PANEL_X = 78, PANEL_Y = 19, PANEL_W = 170, ROW_H = 11;
     private static final float TEXT_SCALE = 0.75F;
     private static final boolean JEI_LOADED = ModList.get().isLoaded("jei");
@@ -110,21 +108,6 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
         };
         graphics.fill(x + LAMP_X, y + LAMP_Y, x + LAMP_X + 8, y + LAMP_Y + 8, 0xFF111214);
         graphics.fill(x + LAMP_X + 1, y + LAMP_Y + 1, x + LAMP_X + 7, y + LAMP_Y + 7, lamp);
-
-        // Wireless power button: signal bars, purple while machines are powered, yellow when every link is idle.
-        boolean hovered = mouseX >= x + WIRELESS_X && mouseX < x + WIRELESS_X + WIRELESS_SIZE
-                && mouseY >= y + WIRELESS_Y && mouseY < y + WIRELESS_Y + WIRELESS_SIZE;
-        int bx = x + WIRELESS_X, by = y + WIRELESS_Y;
-        graphics.fill(bx, by, bx + WIRELESS_SIZE, by + WIRELESS_SIZE, 0xFF111214);
-        graphics.fill(bx + 1, by + 1, bx + WIRELESS_SIZE - 1, by + WIRELESS_SIZE - 1, 0xFF202228);
-        graphics.fill(bx + 1, by + 1, bx + WIRELESS_SIZE - 2, by + WIRELESS_SIZE - 2, 0xFF5F6470);
-        graphics.fill(bx + 2, by + 2, bx + WIRELESS_SIZE - 2, by + WIRELESS_SIZE - 2, hovered ? 0xFF4C505B : 0xFF3A3D45);
-        int signal = s.powerLinks().isEmpty() ? 0xFF6A6F7C : s.activePowerLinks() > 0 ? 0xFFB98CFF : 0xFFE3D459;
-        for (int i = 0; i < 3; i++) {
-            int barHeight = 3 + i * 3;
-            int left = bx + 3 + i * 4;
-            graphics.fill(left, by + 13 - barHeight, left + 2, by + 13, signal);
-        }
 
         // Mycelium attempt progress bar
         int barX = x + PANEL_X + 92;
@@ -240,39 +223,6 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
                         Component.translatable(connection.translationKey() + ".desc").withStyle(ChatFormatting.DARK_GRAY),
                         Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.links", s.manualLinks(), s.maxManualLinks(),
                                 s.activeManualLinks()).withStyle(ChatFormatting.GRAY)));
-
-        // Wireless power (Barely Functional Wrench links to machines): shown by hovering the button under the state lamp
-        List<Component> wirelessTooltip = new ArrayList<>();
-        wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.section.wireless").withStyle(ChatFormatting.AQUA));
-        wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.count", s.powerLinks().size(), s.maxPowerLinks())
-                .withStyle(ChatFormatting.GRAY));
-        if (!s.powerLinks().isEmpty()) {
-            wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.rate", NumberFormatting.decimal(s.wirelessRate()))
-                    .withStyle(ChatFormatting.GRAY));
-        }
-        for (GeneratorStatus.PowerLink link : s.powerLinks()) {
-            Component name = link.blockId().isEmpty() ? Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.unknown")
-                    : blockName(link.blockId());
-            Component where = Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.machine", name,
-                    link.pos().getX(), link.pos().getY(), link.pos().getZ());
-            wirelessTooltip.add(link.active()
-                    ? Component.literal(" \u2022 ").append(where).withStyle(ChatFormatting.WHITE)
-                    : Component.literal(" \u2022 ").append(where).append(" ")
-                            .append(Component.translatable(link.blockId().isEmpty() ? "gui.barelyfunctionalcontraptions.tooltip.wireless.unloaded"
-                                    : "gui.barelyfunctionalcontraptions.tooltip.wireless.inactive")).withStyle(ChatFormatting.DARK_GRAY));
-        }
-        wirelessTooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.tooltip.wireless.howto").withStyle(ChatFormatting.DARK_GRAY));
-        Component wirelessLine = s.powerLinks().isEmpty()
-                ? Component.translatable("gui.barelyfunctionalcontraptions.wireless.none", s.maxPowerLinks())
-                : Component.translatable("gui.barelyfunctionalcontraptions.wireless.line", s.activePowerLinks(), s.powerLinks().size(),
-                        s.maxPowerLinks(), NumberFormatting.compact(Math.round(s.wirelessRate())));
-        wirelessTooltip.set(0, Component.translatable("gui.barelyfunctionalcontraptions.section.wireless").withStyle(ChatFormatting.AQUA)
-                .append(" ").append(wirelessLine.copy().withStyle(ChatFormatting.WHITE)));
-        hoverAreas.add(new HoverArea(WIRELESS_X, WIRELESS_Y, WIRELESS_SIZE, WIRELESS_SIZE, wirelessTooltip));
-        if (!s.powerLinks().isEmpty()) {
-            drawSmall(graphics, Component.literal(s.activePowerLinks() + "/" + s.powerLinks().size()), WIRELESS_X + WIRELESS_SIZE + 3,
-                    WIRELESS_Y + 5, COLOR_DIM);
-        }
 
         // Mycelium
         List<Component> myceliumTooltip = List.of(

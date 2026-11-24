@@ -4,8 +4,6 @@ import com.jax3.barelyfunctionalcontraptions.mycelial.config.ServerConfig;
 import com.jax3.barelyfunctionalcontraptions.mycelial.network.LinkRules;
 import com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData;
 import com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinking;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinkData;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.PowerLinking;
 import com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks;
 import com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModDataComponents;
 import net.minecraft.ChatFormatting;
@@ -31,14 +29,11 @@ import net.minecraft.world.level.Level;
 import java.util.function.Consumer;
 
 /**
- * Links Mycelial Generators that are not touching, and links generators to machines for wireless power.
+ * Links Mycelial Generators that are not touching.
  * <ul>
- *     <li>Right-click a generator or a machine: select it (first end).</li>
+ *     <li>Right-click a generator: select it (first end).</li>
  *     <li>Right-click another generator: link the two, merging their networks.</li>
- *     <li>Generator then machine (or machine then generator): the generator powers the machine wirelessly
- *     ({@link PowerLinking}).</li>
- *     <li>Shift + right-click a generator: remove all of its manual and wireless power links; on a machine, its
- *     wireless power links.</li>
+ *     <li>Shift + right-click a generator: remove all of its manual links.</li>
  *     <li>Shift + right-click air: clear the selection.</li>
  * </ul>
  * Everything is decided on the server; the selection is stored on the item stack and synced to the client
@@ -53,8 +48,8 @@ public class MyceliumWrenchItem extends Item {
     }
 
     /**
-     * Machines open their GUI on right-click, so the wrench handles them here, before the block is used. Generators
-     * already pass wrench clicks on to {@link #useOn}.
+     * Blocks that open a GUI on right-click (status panels, crate controllers, pipes, the Energy Meter) are handled
+     * here, before the block is used. Generators already pass wrench clicks on to {@link #useOn}.
      */
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
@@ -81,10 +76,7 @@ public class MyceliumWrenchItem extends Item {
                     context.getLevel(), context.getClickedPos(), context.getPlayer(), context.getHand(), hit);
             if (result != InteractionResult.PASS) return result;
         }
-        if (!PowerLinking.isReceiver(context.getLevel(), context.getClickedPos())) {
-            return InteractionResult.PASS;
-        }
-        return handle(context);
+        return InteractionResult.PASS;
     }
 
     private InteractionResult linkToPanel(ItemStack stack, UseOnContext context) {
@@ -212,24 +204,8 @@ public class MyceliumWrenchItem extends Item {
             return InteractionResult.CONSUME;
         }
 
-        boolean clickedMachine = PowerLinking.isReceiver(level, pos);
-        if (player.isSecondaryUseActive() && clickedMachine) {
-            int removed = PowerLinking.unlinkAll(serverLevel.getServer(), clicked);
-            if (clicked.equals(stack.get(ModDataComponents.SELECTED_GENERATOR.get()))) {
-                stack.remove(ModDataComponents.SELECTED_GENERATOR.get());
-            }
-            if (removed > 0) {
-                ok(player, Component.translatable("message.barelyfunctionalcontraptions.power.unlinked", removed));
-                level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.BLOCKS, 0.8F, 0.7F);
-            } else {
-                fail(player, Component.translatable("message.barelyfunctionalcontraptions.power.no_links"));
-            }
-            return InteractionResult.CONSUME;
-        }
-
         if (player.isSecondaryUseActive()) {
-            int removed = ManualLinking.unlinkAll(serverLevel.getServer(), clicked)
-                    + PowerLinking.unlinkAll(serverLevel.getServer(), clicked);
+            int removed = ManualLinking.unlinkAll(serverLevel.getServer(), clicked);
             if (clicked.equals(stack.get(ModDataComponents.SELECTED_GENERATOR.get()))) {
                 stack.remove(ModDataComponents.SELECTED_GENERATOR.get());
             }
@@ -243,47 +219,12 @@ public class MyceliumWrenchItem extends Item {
         }
 
         GlobalPos selected = stack.get(ModDataComponents.SELECTED_GENERATOR.get());
-        if (selected == null && clickedMachine) {
-            stack.set(ModDataComponents.SELECTED_GENERATOR.get(), clicked);
-            ok(player, Component.translatable("message.barelyfunctionalcontraptions.power.selected_machine",
-                    level.getBlockState(pos).getBlock().getName(), formatPos(clicked),
-                    PowerLinkData.get(serverLevel.getServer()).generatorsOf(clicked).size()));
-            level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.BLOCKS, 0.8F, 1.2F);
-            return InteractionResult.CONSUME;
-        }
         if (selected == null) {
             stack.set(ModDataComponents.SELECTED_GENERATOR.get(), clicked);
             ok(player, Component.translatable("message.barelyfunctionalcontraptions.selected", formatPos(clicked),
                     ManualLinkData.get(serverLevel.getServer()).count(clicked),
                     ServerConfig.get(ServerConfig.MAX_MANUAL_CONNECTIONS)));
             level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.BLOCKS, 0.8F, 1.2F);
-            return InteractionResult.CONSUME;
-        }
-
-        ServerLevel selectedLevel = serverLevel.getServer().getLevel(selected.dimension());
-        boolean selectedMachine = selectedLevel != null && selectedLevel.isLoaded(selected.pos())
-                && PowerLinking.isReceiver(selectedLevel, selected.pos());
-        if (clickedMachine || selectedMachine) {
-            PowerLinking.Result power = PowerLinking.tryLink(serverLevel.getServer(), selected, clicked);
-            if (power.success()) {
-                stack.remove(ModDataComponents.SELECTED_GENERATOR.get());
-                stack.set(ModDataComponents.LINK_GLOW_UNTIL.get(), level.getGameTime() + LINK_GLOW_TICKS);
-                GlobalPos generator = clickedMachine ? selected : clicked;
-                GlobalPos machine = clickedMachine ? clicked : selected;
-                ok(player, Component.translatable(power.translationKey(), formatPos(generator), formatPos(machine)));
-                consumeUse(stack, player, context.getHand());
-            } else {
-                if (power == PowerLinking.Result.NOT_LINKABLE && clicked.equals(selected)) {
-                    fail(player, Component.translatable("message.barelyfunctionalcontraptions.link.same_generator"));
-                } else {
-                    fail(player, Component.translatable(power.translationKey(),
-                            ServerConfig.get(ServerConfig.MAX_LINK_DISTANCE), ServerConfig.get(ServerConfig.MAX_POWER_LINKS)));
-                }
-                level.playSound(null, pos, SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 0.5F, 1.4F);
-                if (power == PowerLinking.Result.NOT_LOADED) {
-                    stack.remove(ModDataComponents.SELECTED_GENERATOR.get());
-                }
-            }
             return InteractionResult.CONSUME;
         }
 
@@ -416,7 +357,6 @@ public class MyceliumWrenchItem extends Item {
         tooltip.accept(Component.empty());
         tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.select").withStyle(ChatFormatting.WHITE));
         tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.link").withStyle(ChatFormatting.WHITE));
-        tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.power").withStyle(ChatFormatting.WHITE));
         tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.unlink").withStyle(ChatFormatting.WHITE));
         if (ServerConfig.get(ServerConfig.WRENCH_DISMANTLE)) {
             tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.dismantle").withStyle(ChatFormatting.WHITE));

@@ -144,19 +144,15 @@ In the real client (`12_automatic_shears_gui.png`, `13_automatic_shears.png`): t
 
 In the real client (`21_energy_cubes.png`, `23_energy_cubes_below.png`): the 2x2x2 group renders as one large cube with a single window and one plain top plate, with no repeating ports. A 3-high tower at 60% shows the energy level running on from the bottom cube into the middle one. A floating 3x2 slab seen from below is one plain plate with its frame only around the outside, so the bottom faces are oriented correctly. The group's GUI (`22_energy_cube_gui.png`) still reads *x8 · 80,000 FE/t*. No missing-model warnings in the log. `24_energy_cube_corners.png`: an L of seven cubes and a 3x3 ring with no middle, seen from above. Every inside corner is a continuous turn of the frame (outline, purple rim, steel) instead of the strips stopping short at the corner cube. The diagonal neighbour this needs isn't in the block state, so a dynamic model part looks it up when the chunk is built; this is checked visually only, since GameTests run without a renderer. `25_energy_cube_folds.png`: a 2x2 base with a wall on its back row, and a three-step staircase. The base's top plate is framed along the foot of the wall, and the wall's window has a frame along its bottom instead of running into the plate. The staircase side is one stepped window with its corners turned, and each step top is framed (and shows the port, since no cube top continues beside it).
 
-### Wireless power with the Barely Functional Wrench
+### The Barely Functional Wrench and machines
+
+Wireless power to machines was removed: the wrench now only links generators to generators (and machines to a Machine Status Panel, crates to a Crate Controller).
 
 | Test | What it checks |
 |---|---|
-| `integration_wireless_power_to_separator_and_shears` | A running generator in one corner, linked to a separator and an Automatic Shears that it doesn't touch, powers both: the separator turns iron wool into Raw Iron and the shears shear a sheep. The links work in either order. (The first version of this test caught a bug: the first machine took the whole buffer and the shears got nothing. Energy is now shared evenly.) |
-| `integration_wrench_links_machines` | With the wrench item: clicking the separator selects it (handled before its GUI would open), clicking the generator links them, the selection clears, and no generator-network link is made. Shift-clicking the separator removes the link. |
-| `integration_wireless_link_rules` | Two machines can't be linked. A machine 8.5 blocks away is *too far* with `max_link_distance = 4`. Duplicate links are refused, and `max_power_links_per_generator = 1` blocks a second machine. Breaking the linked separator removes the link the next time the generator sends power. |
+| `integration_wrench_leaves_machines_alone` | Clicking a Mechanical Separator with the wrench passes the click on (it opens as usual) and selects nothing; with a generator selected, clicking the separator leaves the generator selected and makes no link. The generator's status round-trips through its network codec unchanged, with nothing left unread. |
 
-| `integration_generator_status_lists_wireless_links` | The generator's GUI status lists no machines at first, then both linked machines in order, with their block ids and positions, all active, max 8. With `max_link_distance = 4` the far one is reported inactive. The status (now carrying the machine list) round-trips through its network codec unchanged, with nothing left unread. |
-
-In the real client (`19_generator_wireless_status.png`, `20_generator_wireless_tooltip.png`): the generator screen keeps its original size. Under the *Running* lamp is the wireless button with purple signal bars and *2/2* beside it. Hovering it shows *Wireless: 2/2 powered (max 8), 250 FE/t* and lists *Mechanical Separator at 6, 34, -2* and *Automatic Shears at 10, 34, -2*.
-
-In the real client (`17_wireless_power.png`, `18_wireless_separator_gui.png`): a running generator on its own pad is linked to a separator and an Automatic Shears on other pads, and the link particles run to both. The separator started with wool and 0 FE. Five seconds later its screen shows it processing iron wool with 3 Raw Iron already made, all on wireless power.
+In the test world, the scene that showed wireless power (cell 3, 0) now has Energy Cable from its generator to the separator and shears (`17_cabled_generator_world.png`). During the tour the separator was full (100,000 FE) and had turned its wool into 46 Raw Iron, and the shears were charged (50,000 FE). The generator's window (`11_generator_gui.png`) no longer has the wireless button under its *Running* lamp.
 
 ### Fluid Reservoir
 
