@@ -189,6 +189,12 @@ Keeps a sheep pen green. It turns the dirt your sheep have eaten bare back to gr
 
 ![A pen of sheep round a Grass Seeder, all grass again with tufts of short grass](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/108_grass_seeder.png)
 
+### Fleece Trawler
+
+A dockside winch that fishes the pool in front of it, powered by **Tide sheep** (a new themed sheep with fins and gills) swimming in the water. Give it resource wool as a lure and it hauls up that resource as well as fish; now and then its net tangles and needs cutting free.
+
+![A Fleece Trawler on its dock, Tide sheep swimming in its pool](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/115_tide_sheep.png)
+
 ### Herd Counter
 
 A little screen that counts the sheep in the pen in front of it (all of them, the ones ready to shear, the sheared ones, lambs, or ones low on infusion, of every resource or just one) and puts the count on a comparator. Use it to run shears, seeders or breeders only when they're needed.

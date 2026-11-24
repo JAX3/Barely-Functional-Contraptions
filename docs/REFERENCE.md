@@ -150,6 +150,8 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | ⭐ **Thermal Shock** (challenge) | Be within 16 blocks of a Thermal Reaction Chamber when it starts reacting |
 | ⭐ **Mission Control** (goal) | Link 8 machines to one Machine Status Panel screen |
 | Bursting at the Seams | Be near a Wool-Lined Crate when it's overfilled and bursts |
+| Reel Ewe In | Be near a Fleece Trawler when it hauls up a resource on a wool lure |
+| Making Waves | Infuse a sheep with Prismarine Crystals |
 | ⭐ **Dewey Decimal Sheep** (goal) | Link 16 Wool-Lined Crates into one Crate Controller's store |
 | ⭐ **Count Your Sheep** (goal) | Be near a Herd Counter counting 20 sheep at once |
 | ⭐ **Keep Off the Grass** (goal) | Be near a Grass Seeder that has tended 100 blocks of its pen |
@@ -315,6 +317,7 @@ The **Infusion Altar** is a powered pedestal. Put the feeding item in its **cent
 | Wither | Nether Star | 4 Soul Sand, 2 Bone Blocks, 1 Wither Rose | 200,000 FE |
 | Dragon | Dragon's Breath | 4 End Stone, 4 Popped Chorus Fruit, 2 Eyes of Ender | 200,000 FE |
 | Warden | Echo Shard | 4 Sculk, 4 Amethyst Shards, 1 Sculk Catalyst | 200,000 FE |
+| Tide | Prismarine Crystals | 2 Prismarine, 1 Nautilus Shell | 20,000 FE |
 | Common: Stone, Wood, Coal, Copper, Hay, Snow, Red and Brown Mushroom | the resource | 2 of its blocks (Stone, logs, Block of Coal, Block of Copper, Hay Bales, Snow Blocks, mushroom blocks), 1 Wheat | 20,000 FE |
 | Uncommon: Iron, Gold, Redstone, Lapis, Quartz, Glow Ink, Spider, Skeleton | the resource | 2 of its blocks (Blocks of Iron, Gold, Redstone, Lapis, Quartz; Glowstone; Cobwebs; Bone Blocks), 1 Golden Carrot | 20,000 FE |
 | Rare: Diamond, Emerald, Blaze, Ghast | the resource | 2 of its blocks (Blocks of Diamond, Emerald; Magma Blocks; Soul Sand), 1 Golden Apple | 20,000 FE |
@@ -752,6 +755,32 @@ The Blaze Sheep Furnace's icy opposite: it **freezes water into Ice with the col
 - **Recipe:** iron ingots in the four corners, a Snow Block above a Functional Machine Block, Packed Ice either side of it, and a Cauldron below. Mine it with a pickaxe.
 - **Config:** `[chiller]` sets the radius, the most Snow sheep counted, the falloff, the time and water per Ice, the tank, and which sheep resources give cold (`coldSources`, the Snow sheep by default).
 
+### Fleece Trawler
+A dockside winch in the machines' blue-steel casing, with a drum of wool net on its front. Set it at the edge of a pool, its net facing the water, and **Tide sheep swimming in the pool drive it**: it needs **no power**.
+
+```
+I R I      I = Blue Steel, R = Fishing Rod
+W M W      W = Tide Wool Bale, M = Functional Machine Block
+I H I      H = Hopper
+```
+
+| On its dock, Tide sheep swimming in its pool | Its net drum |
+|---|---|
+| ![A Fleece Trawler on a stone-brick dock at the edge of a pool, three teal Tide sheep with fins and gills swimming in it, prismarine growing from their fleece](screenshots/115_tide_sheep.png) | ![The Fleece Trawler from behind its dock, its pool and sheep beyond it](screenshots/115_fleece_trawler_close.png) |
+
+- **Placing it:** its net faces away from you, so place it standing on the bank, looking out over the water.
+- **Its pool:** the water source blocks in the **7x7 in front of it**, from its own level to **4 down**. It needs at least **18** (`minPool`: a 3x3 two deep); a bigger pool fishes faster, at full speed with all 196.
+- **Its sheep:** grown **Tide sheep** (or any infused sheep with fins) **swimming in that pool**; each one adds speed, up to **4** (`maxSheep`). No Tide sheep, no fishing.
+- **Hauls:** one haul takes **30 seconds** with one Tide sheep in a full pool (`haulTicks`); four sheep take a quarter of that. **Ocean or river** biomes (`waterBonus`) and **rain** (`rainBonus`) each make it a quarter faster again. A haul is the **vanilla fishing loot** (fish, now and then junk).
+- **Lures:** right-click it with **resource wool**, or pipe it in, to put a **lure** in its lure slot. Each haul then has a **30%** chance (`lureChance`) to bring up **1–2 of that resource** instead: Raw Iron on Iron Wool, Diamonds on Diamond Wool, whatever that wool separates into. One wool lasts **8 resource hauls** (`lureUses`).
+- **Tangles:** now and then (**4%** of hauls, `tangleChance`) its net **tangles** and it stops (*Tangled*) until you **right-click it with shears**, which cuts it free and gives back a little string.
+- **Stray sheep:** very rarely (`straySheepChance`) a haul drags up a confused, dripping plain sheep onto the bank beside it.
+- **Taking the catch:** right-click it with an empty hand: you get everything it's caught, and it tells you how it's doing. **Hoppers and pipes** take the catch out of every side and put lures in. Broken, it drops its lures and catch.
+- **Comparator:** how many of its 9 catch slots hold something.
+- **Machine Status Panel:** *Hauling* (with how far through the haul), *No water*, *No sheep*, *Tangled* or *Output full*.
+- **Advancement:** *Reel Ewe In*, for being near one when it hauls up a resource on a lure.
+- Mine it with a pickaxe. **Config:** `[fleece_trawler]`: `haulTicks` (600), `maxSheep` (4), `minPool` (18), `lureChance` (0.3), `lureUses` (8), `tangleChance` (0.04), `straySheepChance` (0.005), `waterBonus` and `rainBonus` (1.25).
+
 ### Grass Seeder
 Keeps a sheep pen **green**, so sheared sheep regrow their wool sooner. Sheep eat grass down to dirt, and a sheared sheep only grows its wool back when it eats, so a bare pen is a slow one. A squat machine on four legs with a window full of seeds, a seed hopper on top and a brass sprinkler that drips while it works.
 
@@ -1110,7 +1139,7 @@ G C I      C = Comparator, I = Blue Steel
 - **Comparator:** reads how many of its machines have a **problem** (with their alert on), up to 15, for an alarm lamp or bell; or, set to *Signal: working*, how many are working.
 - **JEI:** a *Machine Status Panel* page (the wrench and machines into the panel, a comparator out, and what each colour means) and an information page. **Jade:** on any panel of a screen, how many machines it shows out of how many, its size, how many have a problem and the first two, and its signal.
 - **Advancement:** ⭐ *Mission Control* (goal), for linking 8 machines to one screen (so a screen of 2 panels or more).
-- **Machines it shows:** every generator (Blaze Sheep Furnace, Wool Burner, Thermal Reaction Chamber, Echo Chamber, Static Generator, Sheep Treadmill, Glow Panel, Mycelial Generator), the Powered Furnace, Snow Sheep Chiller, Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Herd Counter, Wool-Lined Crates, Crate Controllers, Hume Energy Cubes, Energy Meter and Zero Point Energy Module.
+- **Machines it shows:** every generator (Blaze Sheep Furnace, Wool Burner, Thermal Reaction Chamber, Echo Chamber, Static Generator, Sheep Treadmill, Glow Panel, Mycelial Generator), the Powered Furnace, Snow Sheep Chiller, Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Fleece Trawler, Herd Counter, Wool-Lined Crates, Crate Controllers, Hume Energy Cubes, Energy Meter and Zero Point Energy Module.
 - Mine it with a pickaxe. **Config:** `[status_panel]`: `rowsPerPanel` (4), `range` (200), `refreshTicks` (20), `maxWidth` and `maxHeight` (3).
 
 ### Woollen Armour and Muffled
@@ -1162,7 +1191,7 @@ Every resource also gives 2 String, unless its row says otherwise. Plain wool (`
 
 ### Themed sheep
 
-Eleven more built-in resources turn the sheep into a little version of the mob the resource comes from. Each one grows extra body parts or gets an extra behaviour while it has its infused fleece. Lambs and sheared sheep look normal.
+Twelve more built-in resources turn the sheep into a little version of the mob (or place) the resource comes from. Each one grows extra body parts or gets an extra behaviour while it has its infused fleece. Lambs and sheared sheep look normal.
 
 ![The ten themed sheep](screenshots/52_themed_sheep.png)
 
@@ -1179,6 +1208,7 @@ Eleven more built-in resources turn the sheep into a little version of the mob t
 | Echo Shard | Sculk | Sculk tendrils on its head, sculk sensors on its back and fleece strands that glow | 2–4 Echo Shard + 2 Sculk | 80,000 / 7.45 s |
 | Blaze Rod | Blaze | Permanently on fire, without burning or taking damage | 2–4 Blaze Rod (+10% Glowstone Dust) | 20,000 / 3.75 s |
 | Ghast Tear | Ghast | **Twice the size**, ghast tentacles under its belly, and it **screams like a ghast** (the ghast's scream instead of a bleat, and its hurt and death sounds) | 2–4 Ghast Tear + 1 Gunpowder | 40,000 / 5.95 s |
+| Prismarine Crystals | Tide | A **fin along its back and gills** on its neck; it **breathes underwater**, bubbles as it swims, and calls like a dolphin. It drives the **Fleece Trawler** | 2–4 Prismarine Shard + 1 Prismarine Crystals | 30,000 / 7 s |
 
 ![The themed sheep at night](screenshots/53_themed_sheep_night.png)
 
@@ -1568,6 +1598,7 @@ Definitions live in `data/<namespace>/barelyfunctionalcontraptions/sheep_resourc
 | `wings` | A pair of flapping dragon wings |
 | `extra_legs` | Four long spider legs along the sides |
 | `tentacles` | Ghast tentacles hanging under the belly |
+| `fins` | A fin along the back and gills on the neck; it breathes underwater and bubbles as it swims (a Fleece Trawler counts any sheep with fins) |
 | `bones` | A drawn skull face and bony legs (a `skull_texture` covers the face) |
 | `sculk` | Sculk tendrils on the head, and accent strands that glow |
 | `glowing_eyes` | Eyes in the `accent_color` that glow in the dark |

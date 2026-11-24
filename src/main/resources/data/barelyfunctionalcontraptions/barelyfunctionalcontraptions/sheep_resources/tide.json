@@ -1,0 +1,45 @@
+{
+  "feeding_item": "minecraft:prismarine_crystals",
+  "feeding_amount": 1,
+  "wool_color": "#2E9C8F",
+  "accent_color": "#8FF2E0",
+  "category": "material",
+  "wool_drop_count": 1,
+  "infusion_uses": 1,
+  "separator": {
+    "primary_output": "minecraft:prismarine_shard",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_output": "minecraft:prismarine_crystals",
+    "secondary_count": 1,
+    "energy_cost": 30000,
+    "processing_ticks": 140
+  },
+  "growth_item": "minecraft:prismarine",
+  "appearance": {
+    "features": [
+      "fins"
+    ],
+    "feature_color": "#3FB8A6",
+    "sounds": {
+      "ambient": "minecraft:entity.dolphin.ambient",
+      "hurt": "minecraft:entity.dolphin.hurt",
+      "death": "minecraft:entity.dolphin.death"
+    }
+  },
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:prismarine",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:nautilus_shell",
+        "count": 1
+      }
+    ]
+  }
+}

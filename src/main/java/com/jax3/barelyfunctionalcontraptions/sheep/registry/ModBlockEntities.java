@@ -35,6 +35,9 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity>> CRATE =
             REGISTER.register("wool_lined_crate",
                     () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateBlockEntity::new, ModBlocks.CRATE.get()));
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity>> FLEECE_TRAWLER =
+            REGISTER.register("fleece_trawler",
+                    () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity::new, ModBlocks.FLEECE_TRAWLER.get()));
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity>> CRATE_CONTROLLER =
             REGISTER.register("crate_controller",
                     () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity::new, ModBlocks.CRATE_CONTROLLER.get()));

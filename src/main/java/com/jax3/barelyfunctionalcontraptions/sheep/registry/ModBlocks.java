@@ -220,6 +220,12 @@ public final class ModBlocks {
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateBlock::new,
                     p -> p.mapColor(MapColor.WOOD).strength(2.5F).sound(SoundType.WOOD).ignitedByLava());
 
+    /** Fishes the pool in front of it, its winch driven by Tide sheep swimming there. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.FleeceTrawlerBlock> FLEECE_TRAWLER =
+            REGISTER.registerBlock("fleece_trawler",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.FleeceTrawlerBlock::new,
+                    p -> p.mapColor(MapColor.COLOR_BLUE).strength(3.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON));
+
     /** Links Wool-Lined Crates into one store, for pipes, hoppers and a Machine Status Panel. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateControllerBlock> CRATE_CONTROLLER =
             REGISTER.registerBlock("crate_controller",

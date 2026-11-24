@@ -373,7 +373,7 @@
       "title": "Themed Sheep",
       "icon": "minecraft:nether_star",
       "text": [
-        "Eleven resources turn sheep into little versions of the mob they come from:",
+        "Twelve resources turn sheep into little versions of the mob (or place) they come from:",
         "- Hay Bale: a hay fleece (wheat).",
         "- Snow Block: a snowy fleece, and it leaves snow wherever it walks, like a Snow Golem (snowballs).",
         "- Nether Star: two Wither Skeleton Skulls beside its head (nether stars).",
@@ -384,6 +384,7 @@
         "- Echo Shard: sculk tendrils (echo shards).",
         "- Blaze Rod: always on fire, but never hurt (blaze rods).",
         "- Ghast Tear: twice the size, tentacles, and it screams like a ghast (ghast tears).",
+        "- Prismarine Crystals: a fin and gills; it breathes underwater and drives the Fleece Trawler (prismarine shards).",
         "Each one has its own advancement, and collecting every wool is a challenge."
       ],
       "tab": "production"
@@ -451,6 +452,21 @@
         "- The Ice goes in its slot; a hopper or pipe can take it out of any side, and a comparator reads how full the slot is.",
         "- Its Snow sheep stay close: one that wanders up to 4 blocks out of the area walks back in while it has room for more.",
         "Right-click it with an empty hand to open its window: the water gauge, the cold column with a pip for each Snow sheep, the freezing arrow and how long each Ice takes. Its spyglass button, or a sneak-right-click with an empty hand, outlines the area."
+      ]
+    },
+    {
+      "title": "Fleece Trawler",
+      "icon": "barelyfunctionalcontraptions:fleece_trawler",
+      "tab": "production",
+      "text": [
+        "A dockside winch that fishes the pool in front of it. It needs no power: Tide sheep swimming in the pool drive it. Infuse a sheep with Prismarine Crystals at the altar (2 Prismarine and a Nautilus Shell round it) for a Tide sheep.",
+        "- Place it on the bank looking out over the water: its net faces away from you. Its pool is the water in the 7x7 in front of it, down to 4 deep; it needs at least a 3x3 two deep, and fishes faster the bigger it is.",
+        "- Each Tide sheep swimming in the pool adds speed, up to 4. A haul takes 30 seconds with one sheep in a full pool; ocean or river water and rain make it quicker.",
+        "- Hauls are fish (and now and then junk). Right-click it with resource wool for a lure: each haul then has a 30% chance of bringing up that resource instead, Raw Iron on Iron Wool, Diamonds on Diamond Wool. One wool lasts 8 resource hauls.",
+        "- Now and then its net tangles and it stops: cut it free with shears. Very rarely it drags up a confused sheep.",
+        "Right-click it with an empty hand to take the catch, or take it out with a hopper or pipe. A comparator reads how full it is.",
+        "## Config",
+        "Its speed, pool, lures and tangles are in the [fleece_trawler] section of the server config."
       ]
     },
     {

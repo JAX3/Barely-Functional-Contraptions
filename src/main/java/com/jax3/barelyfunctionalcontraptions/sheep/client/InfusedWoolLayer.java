@@ -217,7 +217,7 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
             coloredCutoutModelCopyLayerRender(skulls, SheepSkullsModel.TEXTURE, poseStack, collector, lightCoords, state, -1, 1);
         }
         if (appearance.has(Feature.WINGS) || appearance.has(Feature.EXTRA_LEGS)
-                || appearance.has(Feature.TENTACLES) || appearance.has(Feature.SCULK)) {
+                || appearance.has(Feature.TENTACLES) || appearance.has(Feature.SCULK) || appearance.has(Feature.FINS)) {
             int light = appearance.has(Feature.GLOWING) ? LightCoordsUtil.FULL_BRIGHT : lightCoords;
             coloredCutoutModelCopyLayerRender(extras, EXTRAS_TEXTURE, poseStack, collector, light, state, tint, 1);
         }

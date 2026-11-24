@@ -237,6 +237,15 @@ public final class ModConfigs {
         public final ModConfigSpec.BooleanValue crateBursting;
         public final ModConfigSpec.DoubleValue crateBurstChance;
         public final ModConfigSpec.IntValue crateBurstItems;
+        public final ModConfigSpec.IntValue trawlerHaulTicks;
+        public final ModConfigSpec.IntValue trawlerMaxSheep;
+        public final ModConfigSpec.IntValue trawlerMinPool;
+        public final ModConfigSpec.DoubleValue trawlerLureChance;
+        public final ModConfigSpec.IntValue trawlerLureUses;
+        public final ModConfigSpec.DoubleValue trawlerTangleChance;
+        public final ModConfigSpec.DoubleValue trawlerStraySheepChance;
+        public final ModConfigSpec.DoubleValue trawlerWaterBonus;
+        public final ModConfigSpec.DoubleValue trawlerRainBonus;
         public final ModConfigSpec.IntValue crateControllerRange;
         public final ModConfigSpec.IntValue crateControllerMaxCrates;
         public final ModConfigSpec.IntValue herdRadius;
@@ -674,6 +683,27 @@ public final class ModConfigs {
                     .defineInRange("burstChance", 0.02, 0.0, 1.0);
             crateBurstItems = b.comment("Items a bursting crate scatters.")
                     .defineInRange("burstItems", 8, 0, 64);
+            b.pop();
+
+            b.comment("Fleece Trawler (fishes the pool in front of it, powered by Tide sheep swimming in it)").push("fleece_trawler");
+            trawlerHaulTicks = b.comment("Ticks one haul takes with one Tide sheep in a full-size pool (600 = 30 seconds); more sheep, a bigger pool, ocean or river water and rain make it quicker.")
+                    .defineInRange("haulTicks", 600, 20, 72_000);
+            trawlerMaxSheep = b.comment("Most Tide sheep that count.")
+                    .defineInRange("maxSheep", 4, 1, 16);
+            trawlerMinPool = b.comment("Fewest water source blocks its pool needs (18 = 3x3, 2 deep).")
+                    .defineInRange("minPool", 18, 1, 196);
+            trawlerLureChance = b.comment("Chance a haul with resource wool in its lure slot brings up that resource instead of fish.")
+                    .defineInRange("lureChance", 0.3, 0.0, 1.0);
+            trawlerLureUses = b.comment("Resource hauls one resource wool lure lasts.")
+                    .defineInRange("lureUses", 8, 1, 1_000);
+            trawlerTangleChance = b.comment("Chance a haul tangles its net (it stops until it's cut free with shears).")
+                    .defineInRange("tangleChance", 0.04, 0.0, 1.0);
+            trawlerStraySheepChance = b.comment("Chance a haul drags up a confused sheep.")
+                    .defineInRange("straySheepChance", 0.005, 0.0, 1.0);
+            trawlerWaterBonus = b.comment("Speed in ocean or river biomes.")
+                    .defineInRange("waterBonus", 1.25, 1.0, 10.0);
+            trawlerRainBonus = b.comment("Speed while it's raining on it.")
+                    .defineInRange("rainBonus", 1.25, 1.0, 10.0);
             b.pop();
 
             b.comment("Crate Controller (links Wool-Lined Crates into one store: crates touching it join by themselves, others with the wrench)").push("crate_controller");

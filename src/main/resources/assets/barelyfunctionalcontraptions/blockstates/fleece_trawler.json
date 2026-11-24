@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "barelyfunctionalcontraptions:block/fleece_trawler"
+    },
+    "facing=east": {
+      "model": "barelyfunctionalcontraptions:block/fleece_trawler",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "barelyfunctionalcontraptions:block/fleece_trawler",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "barelyfunctionalcontraptions:block/fleece_trawler",
+      "y": 270
+    }
+  }
+}

@@ -92,6 +92,8 @@ public final class SheepFeatureEvents {
         Level level = sheep.level();
         if (!level.isClientSide()) {
             if (appearance.get().has(Feature.GLOWING)) placeGlow(level, sheep.blockPosition());
+            // Gills: it never runs out of air.
+            if (appearance.get().has(Feature.FINS)) sheep.setAirSupply(sheep.getMaxAirSupply());
             return;
         }
         if (sheep.isInvisible()) return;
@@ -102,6 +104,9 @@ public final class SheepFeatureEvents {
         }
         if (appearance.get().has(Feature.GLOWING) && random.nextInt(4) == 0) {
             level.addParticle(ParticleTypes.GLOW, sheep.getRandomX(0.6), sheep.getY() + sheep.getBbHeight() * (0.5 + random.nextDouble() * 0.5), sheep.getRandomZ(0.6), 0, 0.02, 0);
+        }
+        if (appearance.get().has(Feature.FINS) && sheep.isInWater() && random.nextInt(2) == 0) {
+            level.addParticle(ParticleTypes.BUBBLE, sheep.getRandomX(0.6), sheep.getY() + sheep.getBbHeight() * random.nextDouble(), sheep.getRandomZ(0.6), 0, 0.05, 0);
         }
         if (appearance.get().has(Feature.SCULK) && random.nextInt(12) == 0) {
             level.addParticle(ParticleTypes.SCULK_SOUL, sheep.getRandomX(0.5), sheep.getY() + sheep.getBbHeight(), sheep.getRandomZ(0.5), 0, 0.03, 0);

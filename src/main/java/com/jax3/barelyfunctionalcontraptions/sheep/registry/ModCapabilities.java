@@ -78,6 +78,9 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.ENERGY_METER.get(), (be, side) -> be.getEnergyHandler(side));
         // Wool-Lined Crate: its one slot, in and out, on every face.
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.CRATE.get(), (be, side) -> be.getItemHandler());
+        // Fleece Trawler: lures in, its catch out, on every face.
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.FLEECE_TRAWLER.get(),
+                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Crate Controller: every crate in its store, in and out, on every face.
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.CRATE_CONTROLLER.get(), (be, side) -> be.getItemHandler());
         // Fluid Tank: the whole connected group, in and out, on every face.

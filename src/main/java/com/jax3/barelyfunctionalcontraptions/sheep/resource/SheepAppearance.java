@@ -94,6 +94,8 @@ public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> fe
         EXTRA_LEGS,
         /** Ghast tentacles hanging under its belly. */
         TENTACLES,
+        /** A fin along its back and gills on its neck: it breathes underwater, and bubbles while it swims. */
+        FINS,
         /** Glowing eyes (in the accent colour) that show in the dark. */
         GLOWING_EYES,
         /** A bony skull face and bony legs. */

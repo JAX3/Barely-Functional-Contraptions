@@ -191,6 +191,11 @@ public final class ModGameTests {
         ECHO_TESTS.put("crate_bulges_then_bursts_unless_strapped", ModGameTests::crateBursts);
         ECHO_TESTS.put("crate_a_hopper_pushing_at_a_full_crate_strains_it", ModGameTests::crateHopperStrains);
         ECHO_TESTS.put("blue_steel_replaces_iron_in_every_recipe", ModGameTests::blueSteel);
+        ECHO_TESTS.put("tide_sheep_breathe_underwater", ModGameTests::tideBreathes);
+        ECHO_TESTS.put("fleece_trawler_needs_water_and_tide_sheep", ModGameTests::trawlerNeeds);
+        ECHO_TESTS.put("fleece_trawler_hauls_fish_and_lured_resources", ModGameTests::trawlerLures);
+        ECHO_TESTS.put("fleece_trawler_tangles_until_cut_free", ModGameTests::trawlerTangles);
+        ECHO_TESTS.put("fleece_trawler_hauls_on_its_own_with_four_sheep", ModGameTests::trawlerRuns);
         ECHO_TESTS.put("crate_controller_takes_in_the_crates_touching_it", ModGameTests::controllerJoins);
         ECHO_TESTS.put("crate_controller_puts_items_where_they_belong", ModGameTests::controllerRoutes);
         ECHO_TESTS.put("crate_controller_links_far_crates_with_their_neighbours", ModGameTests::controllerLinks);
@@ -678,6 +683,7 @@ public final class ModGameTests {
         expected.put("warden", List.of(Feature.SCULK));
         expected.put("blaze", List.of(Feature.ON_FIRE));
         expected.put("ghast", List.of(Feature.TENTACLES));
+        expected.put("tide", List.of(Feature.FINS));
         expected.forEach((name, features) -> {
             SheepResource resource = registry.byId(ResourcefulSheep.id(name)).orElseThrow(() -> new AssertionError("missing themed sheep " + name));
             for (var feature : features) {
@@ -760,13 +766,13 @@ public final class ModGameTests {
 
     private static void themedAdvancements(GameTestHelper h) {
         var server = h.getLevel().getServer();
-        for (String name : List.of("hay", "snow", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast")) {
+        for (String name : List.of("hay", "snow", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast", "tide")) {
             var adv = server.getAdvancements().get(ResourcefulSheep.id("contraptions/sheep/" + name));
             h.assertTrue(adv != null && adv.value().parent().map(ResourcefulSheep.id("contraptions/infuse_sheep")::equals).orElse(false),
                     "themed advancement " + name + " is loaded under Infuse a Sheep");
         }
         var every = server.getAdvancements().get(ResourcefulSheep.id("contraptions/every_wool"));
-        h.assertTrue(every != null && every.value().criteria().size() == 25, "the every-wool challenge has one criterion per built-in wool");
+        h.assertTrue(every != null && every.value().criteria().size() == 26, "the every-wool challenge has one criterion per built-in wool");
         h.assertTrue(every.value().criteria().keySet().containsAll(SheepResourceRegistry.server().all().stream()
                 .filter(r -> r.id().getNamespace().equals(ResourcefulSheep.MOD_ID)).map(r -> r.id().getPath()).toList()), "every built-in resource is in the challenge");
 
@@ -2325,6 +2331,100 @@ public final class ModGameTests {
         }
         h.assertTrue(checked >= 20, "checked the mod's crafting recipes: " + checked);
         h.succeed();
+    }
+
+    // ------------------------------------------------------------------ Tide sheep and the Fleece Trawler
+
+    /** A Tide sheep at the bottom of a pool never runs out of air (a plain one does). */
+    private static void tideBreathes(GameTestHelper h) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 1, 0), new BlockPos(6, 4, 4))) h.setBlock(p, Blocks.STONE);
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(1, 2, 1), new BlockPos(5, 4, 3))) h.setBlock(p, Blocks.WATER);
+        Sheep tide = sheepAt(h, new BlockPos(2, 2, 2), ResourcefulSheep.id("tide"));
+        Sheep plain = sheepAt(h, new BlockPos(4, 2, 2), null);
+        h.runAfterDelay(120, () -> {
+            h.assertTrue(tide.getAirSupply() > tide.getMaxAirSupply() - 10, "the Tide sheep has its air: " + tide.getAirSupply());
+            h.assertTrue(plain.getAirSupply() < plain.getMaxAirSupply() - 60, "a plain one is running out: " + plain.getAirSupply());
+            h.succeed();
+        });
+    }
+
+    /** A trawler at (4, 3, 1) facing south, over a 3x3, 2-deep pit (filled with water if {@code water}). */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity trawler(GameTestHelper h, boolean water) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(2, 1, 0), new BlockPos(6, 3, 5))) h.setBlock(p, Blocks.STONE);
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(3, 2, 2), new BlockPos(5, 3, 4))) h.setBlock(p, water ? Blocks.WATER : Blocks.AIR);
+        h.setBlock(new BlockPos(4, 3, 1), ModBlocks.FLEECE_TRAWLER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.FleeceTrawlerBlock.FACING, Direction.SOUTH));
+        return h.getBlockEntity(new BlockPos(4, 3, 1), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity.class);
+    }
+
+    /** No water: No water. Water but no Tide sheep (a plain one doesn't count): No sheep. A Tide sheep swimming: Hauling. */
+    private static void trawlerNeeds(GameTestHelper h) {
+        var be = trawler(h, false);
+        var NO_WATER = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity.Status.NO_WATER;
+        be.look(h.getLevel());
+        h.assertTrue(be.status() == NO_WATER, "a dry pit: " + be.status());
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(3, 2, 2), new BlockPos(5, 3, 4))) h.setBlock(p, Blocks.WATER);
+        sheepAt(h, new BlockPos(3, 2, 3), null);
+        be.look(h.getLevel());
+        h.assertTrue(be.pool() == 18 && be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity.Status.NO_SHEEP,
+                "18 water and a plain sheep: " + be.pool() + " " + be.status());
+        sheepAt(h, new BlockPos(5, 2, 3), ResourcefulSheep.id("tide"));
+        h.runAfterDelay(5, () -> { // (once it's ticked, the game knows it's in the water)
+            be.look(h.getLevel());
+            h.assertTrue(be.sheepCount() == 1 && be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity.Status.HAULING,
+                    "a Tide sheep swimming: " + be.sheepCount() + " " + be.status());
+            var report = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.report(be);
+            h.assertTrue(report != null && report.status().equals("hauling"), "the status panel: " + report);
+            h.succeed();
+        });
+    }
+
+    /** A plain haul brings up fishing loot; with Iron Wool on its lure, Raw Iron, the wool lasting 8 resource hauls. */
+    private static void trawlerLures(GameTestHelper h) {
+        var be = trawler(h, true);
+        sheepAt(h, new BlockPos(4, 2, 3), ResourcefulSheep.id("tide"));
+        be.look(h.getLevel());
+        var random = net.minecraft.util.RandomSource.create(7);
+        be.haul(h.getLevel(), random, false, false, false);
+        int caught = 0;
+        for (int i = 1; i < be.getContainerSize(); i++) caught += be.getItem(i).getCount();
+        h.assertTrue(caught > 0, "a haul of fishing loot");
+        for (int i = 1; i < be.getContainerSize(); i++) be.setItem(i, ItemStack.EMPTY);
+        ItemStack wool = ResourceWoolItem.create(IRON, 2);
+        h.assertTrue(be.addLure(wool) == 2 && wool.isEmpty(), "two Iron Wool go in as lures");
+        h.assertFalse(be.canPlaceItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity.LURE, new ItemStack(com.jax3.barelyfunctionalcontraptions.compat.Vanilla.wool(net.minecraft.world.item.DyeColor.WHITE))), "plain wool isn't a lure");
+        for (int i = 0; i < 8; i++) be.haul(h.getLevel(), random, false, false, true);
+        int iron = 0;
+        for (int i = 1; i < be.getContainerSize(); i++) if (be.getItem(i).is(Items.RAW_IRON)) iron += be.getItem(i).getCount();
+        h.assertTrue(iron >= 8 && iron <= 16, "8 lured hauls of Raw Iron: " + iron);
+        h.assertTrue(be.getItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity.LURE).getCount() == 1, "one wool used up for 8 hauls");
+        be.haul(h.getLevel(), random, false, false, true);
+        h.assertTrue(be.getItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity.LURE).isEmpty(), "the ninth starts on the second wool");
+        h.succeed();
+    }
+
+    /** A tangled net stops it; shears cut it free (and give back string). */
+    private static void trawlerTangles(GameTestHelper h) {
+        var be = trawler(h, true);
+        sheepAt(h, new BlockPos(4, 2, 3), ResourcefulSheep.id("tide"));
+        be.haul(h.getLevel(), net.minecraft.util.RandomSource.create(1), true, false, false);
+        h.assertTrue(be.tangled() && be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity.Status.TANGLED, "tangled: " + be.status());
+        var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        ItemStack shears = new ItemStack(Items.SHEARS);
+        player.setItemInHand(InteractionHand.MAIN_HAND, shears);
+        BlockPos at = h.absolutePos(new BlockPos(4, 3, 1));
+        h.getLevel().getBlockState(at).useItemOn(shears, h.getLevel(), player, InteractionHand.MAIN_HAND,
+                new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at), Direction.UP, at, false));
+        h.assertTrue(!be.tangled() && player.getInventory().countItem(Items.STRING) > 0, "cut free, with some string");
+        h.assertTrue(shears.getDamageValue() == 1, "the shears wear");
+        h.succeed();
+    }
+
+    /** With four Tide sheep in its pool it hauls by itself before long. */
+    private static void trawlerRuns(GameTestHelper h) {
+        var be = trawler(h, true);
+        for (int i = 0; i < 4; i++) sheepAt(h, new BlockPos(3 + (i % 2) * 2, 2, 2 + (i / 2) * 2), ResourcefulSheep.id("tide"));
+        h.succeedWhen(() -> h.assertTrue(be.hauls() > 0 || be.tangled(), "a haul: " + be.status() + " " + be.progressPercent() + "%"));
     }
 
     /** Crafts with whatever crafting recipe matches the grid, or EMPTY. */

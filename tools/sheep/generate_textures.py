@@ -2550,6 +2550,20 @@ def generate_sheep_extras():
     fill((40, 0, 46, 7), tendril)
     fill((46, 0, 52, 7), tendril)
 
+    # Tide sheep's dorsal fin (texOffs 0,46; a 0x6x12 plane: its sides are 12x6 at (0,58) and (12,58)): a fish's fin,
+    # tall in the middle, with spines running up it and a ragged top edge.
+    def fin(x, y, w, h):
+        height = int(round(6 - abs(x - (w - 1) / 2.0) * 0.75))   # tallest in the middle, low at the ends
+        if h - 1 - y >= height:
+            return None
+        if h - 1 - y == height - 1 and x % 3 == 0:
+            return None                                         # the ragged top
+        return grey(150) if x % 3 == 1 else grey(214 - (h - 1 - y) * 6 + rnd.randint(-6, 6))
+    fill((0, 58, 12, 64), fin)
+    fill((12, 58, 24, 64), lambda x, y, w, h: fin(w - 1 - x, y, w, h))
+    # Its gill flaps (texOffs 28,46; 0x3x2 planes: sides 2x3 at (28,48) and (30,48)): slits.
+    fill((28, 48, 32, 51), lambda x, y, w, h: grey(120 if y == 1 else 196))
+
     # Glowing eyes (texOffs 40,8; 6x6 plane on the face): the vanilla sheep's eye pixels, white so the accent tints them.
     for x, y in ((0, 2), (1, 2), (4, 2), (5, 2)):
         img.putpixel((40 + x, 8 + y), (255, 255, 255, 255))
@@ -4920,6 +4934,75 @@ def generate_blue_steel():
             block.putpixel((x, y), c)
     block.save(out("block/blue_steel_block.png"))
 
+
+def generate_fleece_trawler():
+    """Fleece Trawler: the machines' blue-steel casing. Its front a drum wound with wool net in a dark recess; its sides
+    a crank wheel; its top the winch, with the net's rope running over a pulley."""
+    rnd = random.Random(523)
+    base = "block/fleece_trawler/"
+    O, H, M, S, B, b = (CARTOON[k] for k in ("O", "H", "M", "S", "B", "b"))
+    wool_l, wool, wool_d = hexc("#ffffff"), hexc("#e3dfd6"), hexc("#b9b2a6")
+    rope, rope_d = hexc("#c9a46a"), hexc("#8a6a3c")
+
+    def casing():
+        img = Image.new("RGBA", (16, 16), CLEAR)
+        for y in range(16):
+            for x in range(16):
+                if x in (0, 15) or y in (0, 15):
+                    c = O
+                elif x == 1 or y == 1:
+                    c = H
+                elif x == 14 or y == 14:
+                    c = S
+                else:
+                    c = shade(M, rnd.uniform(0.96, 1.04))
+                img.putpixel((x, y), c)
+        for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
+            img.putpixel((x, y), B)
+        return img
+
+    front = casing()
+    for y in range(3, 13):
+        for x in range(3, 13):
+            front.putpixel((x, y), CARTOON["K"])
+    for y in range(4, 12):                      # the drum, wound with net: wool strands crossing in a diamond mesh
+        for x in range(3, 13):
+            mesh = (x + y) % 3 == 0 or (x - y) % 3 == 0
+            c = (wool_l if y < 6 else wool if y < 10 else wool_d) if mesh else hexc("#3a4458")
+            front.putpixel((x, y), c)
+    for y in (4, 11):                           # the drum's steel rims
+        for x in range(3, 13):
+            front.putpixel((x, y), H if y == 4 else S)
+    front.save(out(base + "front.png"))
+
+    side = casing()
+    for y in range(3, 13):                      # a crank wheel: a ring with four spokes and a handle
+        for x in range(3, 13):
+            d = math.hypot(x - 7.5, y - 7.5)
+            if 3.6 <= d <= 4.9:
+                side.putpixel((x, y), H if y < 8 else S)
+            elif d < 3.6 and (abs(x - 7.5) < 0.6 or abs(y - 7.5) < 0.6):
+                side.putpixel((x, y), M)
+            elif d < 3.6:
+                side.putpixel((x, y), CARTOON["K"])
+    for x, y in ((7, 7), (8, 7), (7, 8), (8, 8)):
+        side.putpixel((x, y), b)
+    side.putpixel((11, 4), CARTOON["C"])
+    side.putpixel((12, 3), CARTOON["c"])
+    side.save(out(base + "side.png"))
+
+    top = casing()
+    for x in range(3, 13):                      # the rope running across the top, over a pulley at the front
+        top.putpixel((x, 7), rope if x % 2 else rope_d)
+        top.putpixel((x, 8), rope_d if x % 2 else rope)
+    for y in range(5, 11):
+        for x in (2, 3):
+            top.putpixel((x, y), S if y in (5, 10) else b)
+    top.save(out(base + "top.png"))
+
+    bottom = casing()
+    bottom.save(out(base + "bottom.png"))
+
 def generate_static_generator_gui():
     """Static Generator window: energy gauge, then a panel with the herd and output, the dome's charge bar (the shock
     line marked) and four comb chips; the status lamp below."""
@@ -5009,6 +5092,7 @@ def main():
     generate_status_panel()
     generate_crate()
     generate_blue_steel()
+    generate_fleece_trawler()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

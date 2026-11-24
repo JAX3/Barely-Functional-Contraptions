@@ -297,6 +297,10 @@ public final class DevScreenshotHarness {
             powerBlocksTick(mc, server);
             return;
         }
+        if ("fleece_trawler".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            fleeceTrawlerTick(mc, server);
+            return;
+        }
         if ("blue_steel".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             blueSteelTick(mc, server);
             return;
@@ -4903,10 +4907,70 @@ public final class DevScreenshotHarness {
         }
     }
 
+    /**
+     * A Fleece Trawler on a stone dock at the edge of a 7x7 pool, three Tide sheep swimming in it (one close up, to show
+     * its fins and gills), Iron Wool on its lure; then its hauls, and shears cutting a tangle free:
+     * {@code -PharnessScene=fleece_trawler}.
+     */
+    private static void fleeceTrawlerTick(Minecraft mc, MinecraftServer server) {
+        BlockPos dock = origin == null ? null : origin.offset(0, 0, -3);
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a", "gamerule advance_time false"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                BlockPos o = origin, d = o.offset(0, 0, -3);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-6, -5, -13), o.offset(6, 5, 3))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-6, -5, -13), o.offset(6, -1, 3))) level.setBlock(p, Blocks.SAND.defaultBlockState(), 2);
+                // The pool: 7 wide, 7 out from the dock, 4 deep, its surface a block below the trawler (level with the sand).
+                for (BlockPos p : BlockPos.betweenClosed(d.offset(-3, -4, -7), d.offset(3, -1, -1))) level.setBlock(p, Blocks.WATER.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(d.offset(-4, -1, 0), d.offset(4, -1, 2))) level.setBlock(p, Blocks.STONE_BRICKS.defaultBlockState(), 2);
+                level.setBlock(d, ModBlocks.FLEECE_TRAWLER.get().defaultBlockState()
+                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.FleeceTrawlerBlock.FACING, Direction.NORTH), 3);
+                if (level.getBlockEntity(d) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity t) {
+                    t.addLure(com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("iron"), 4));
+                }
+                for (int i = 0; i < 3; i++) {
+                    Sheep sh = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+                    sh.snapTo(d.getX() - 1.5 + i * 2, d.getY() - 1.4, d.getZ() - 3.5 + (i == 1 ? -1.5 : 0), 90, 0);
+                    SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id("tide")), 9, 0));
+                    if (i == 0) sh.setNoAi(true);
+                    level.addFreshEntity(sh);
+                }
+                label(server, d.above(3), "Fleece Trawler", "aqua");
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.1f %.2f 200 32", dock.getX() + 2.5, dock.getY() + 3.5, dock.getZ() + 3.0));
+            case 140 -> shot(mc, "115_fleece_trawler");
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.1f %.2f -60 18", dock.getX() - 4.2, dock.getY() + 0.3, dock.getZ() - 5.0));
+            case 180 -> shot(mc, "115_tide_sheep");
+            case 182 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.1f %.2f 180 25", dock.getX() + 0.5, dock.getY() + 1.6, dock.getZ() + 2.3));
+            case 220 -> shot(mc, "115_fleece_trawler_close");
+            case 230 -> server.execute(() -> {
+                ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                if (level.getBlockEntity(dock) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity t) {
+                    t.look(level);
+                    ResourcefulSheep.LOGGER.warn("TRAWLER {}: pool {}, sheep {}, {}%", t.status(), t.pool(), t.sheepCount(), t.progressPercent());
+                    for (int i = 0; i < 6; i++) t.haul(level, level.getRandom(), false, false, i % 2 == 0);
+                    StringBuilder caught = new StringBuilder();
+                    for (int i = 1; i < t.getContainerSize(); i++) if (!t.getItem(i).isEmpty()) caught.append(' ').append(t.getItem(i));
+                    ResourcefulSheep.LOGGER.warn("TRAWLER after 6 hauls ({} total): lure {}, caught{}; Reel Ewe In {}", t.hauls(), t.getItem(0), caught,
+                            com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(server.getPlayerList().getPlayers().getFirst(),
+                                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.REEL_EWE_IN));
+                }
+            });
+            case 240 -> mc.stop();
+            default -> {}
+        }
+    }
+
     /** Every built-in resource, for {@link #blockWoolTick}. */
     private static final String[] ALL_RESOURCES = {"stone", "coal", "iron", "copper", "gold", "redstone", "lapis", "diamond", "emerald", "quartz",
             "netherite", "wood", "hay", "brown_mushroom", "red_mushroom", "snow", "glow_ink", "blaze", "ghast", "spider", "skeleton", "wither_skeleton",
-            "warden", "wither", "dragon"};
+            "warden", "wither", "dragon", "tide"};
 
     /**
      * One sheep of every built-in resource, side on in five rows of five, each with its name over it, wearing the fleece

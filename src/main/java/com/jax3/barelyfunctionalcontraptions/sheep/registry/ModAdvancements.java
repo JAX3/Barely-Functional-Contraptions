@@ -46,6 +46,8 @@ public final class ModAdvancements {
     public static final int MISSION_CONTROL_MACHINES = 8;
     /** Being near a Wool-Lined Crate when it bursts. */
     public static final String BURSTING_AT_THE_SEAMS = "contraptions/bursting_at_the_seams";
+    /** Being near a Fleece Trawler when it hauls up a resource on a lure. */
+    public static final String REEL_EWE_IN = "contraptions/reel_ewe_in";
     /** Being near a Crate Controller with {@link #DEWEY_DECIMAL_CRATES} crates in its store. */
     public static final String DEWEY_DECIMAL_SHEEP = "contraptions/dewey_decimal_sheep";
     public static final int DEWEY_DECIMAL_CRATES = 16;

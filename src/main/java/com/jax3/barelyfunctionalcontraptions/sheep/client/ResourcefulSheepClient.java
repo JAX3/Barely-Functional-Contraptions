@@ -206,6 +206,7 @@ public final class ResourcefulSheepClient {
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLUE_STEEL,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLUE_STEEL_BLOCK,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_CONTROLLER,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLEECE_TRAWLER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_STRAP)) {
             if (event.getItemStack().is(tipped.get())) {
                 event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions." + tipped.getId().getPath())

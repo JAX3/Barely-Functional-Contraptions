@@ -19,7 +19,7 @@ import net.minecraft.util.Mth;
 
 /**
  * The extra body parts an infused sheep can grow ({@link SheepAppearance.Feature}): dragon wings, spider legs, ghast
- * tentacles, sculk tendrils and glowing eyes. The Wither's extra heads are {@link SheepSkullsModel}.
+ * tentacles, a fish's fin and gills, sculk tendrils and glowing eyes. The Wither's extra heads are {@link SheepSkullsModel}.
  *
  * <p>It uses the vanilla sheep model's coordinates, so the parts sit on the vanilla body: the body spans x -4..4,
  * y 6..12 (the fleece reaches up to about y 4.25) and z -8..8, the head pivots at (0, 6, -8) and faces -z, and the
@@ -50,6 +50,9 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
     private final List<ModelPart> leftLegs = new ArrayList<>();
     private final List<ModelPart> rightLegs = new ArrayList<>();
     private final List<ModelPart> tentacles = new ArrayList<>();
+    private final ModelPart dorsalFin;
+    private final ModelPart leftGill;
+    private final ModelPart rightGill;
 
     private SheepExtrasModel(ModelPart root, boolean eyesOnly) {
         super(root, eyesOnly ? RenderTypes::eyes : RenderTypes::entityCutout);
@@ -65,6 +68,9 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
             rightLegs.add(root.getChild("right_spider_leg_" + i));
         }
         for (int i = 0; i < TENTACLES.length; i++) tentacles.add(root.getChild("tentacle_" + i));
+        this.dorsalFin = root.getChild("dorsal_fin");
+        this.leftGill = head.getChild("left_gill");
+        this.rightGill = head.getChild("right_gill");
     }
 
     /** The body parts, drawn in the resource's {@code feature_color}. */
@@ -115,6 +121,14 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
             root.addOrReplaceChild("tentacle_" + i, CubeListBuilder.create().texOffs(0, 30).addBox(-1.0F, 0.0F, -1.0F, 2.0F, t[2], 2.0F),
                     PartPose.offset(t[0], 11.5F, t[1]));
         }
+        // A fish's fin standing up along the middle of the back (out of the fleece), and gill flaps either side of
+        // the neck.
+        root.addOrReplaceChild("dorsal_fin", CubeListBuilder.create().texOffs(0, 46).addBox(0.0F, -6.0F, -6.0F, 0.0F, 6.0F, 12.0F),
+                PartPose.offset(0.0F, 4.5F, 1.0F));
+        head.addOrReplaceChild("left_gill", CubeListBuilder.create().texOffs(28, 46).addBox(0.0F, -1.5F, 0.0F, 0.0F, 3.0F, 2.0F),
+                PartPose.offsetAndRotation(3.05F, 0.0F, -1.0F, 0.0F, 0.35F, 0.0F));
+        head.addOrReplaceChild("right_gill", CubeListBuilder.create().texOffs(28, 46).mirror().addBox(0.0F, -1.5F, 0.0F, 0.0F, 3.0F, 2.0F),
+                PartPose.offsetAndRotation(-3.05F, 0.0F, -1.0F, 0.0F, -0.35F, 0.0F));
         return LayerDefinition.create(mesh, 64, 64);
     }
 
@@ -162,6 +176,16 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
             left.yRot = SPIDER_LEGS[i][1] + swing;
             right.yRot = -SPIDER_LEGS[i][1] - swing;
         }
+
+        boolean fins = parts && appearance.has(Feature.FINS);
+        dorsalFin.visible = fins;
+        leftGill.visible = fins;
+        rightGill.visible = fins;
+        // The fin sways a little, faster while swimming; the gills flutter.
+        dorsalFin.zRot = Mth.sin(t * (0.15F + state.walkAnimationSpeed * 0.3F)) * 0.12F;
+        float gill = 0.35F + Mth.sin(t * 0.25F) * 0.15F;
+        leftGill.yRot = gill;
+        rightGill.yRot = -gill;
 
         boolean tentacles = parts && appearance.has(Feature.TENTACLES);
         for (int i = 0; i < this.tentacles.size(); i++) {

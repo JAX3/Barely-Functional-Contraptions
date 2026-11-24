@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "barelyfunctionalcontraptions:fleece_trawler"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "barelyfunctionalcontraptions:blocks/fleece_trawler"
+}

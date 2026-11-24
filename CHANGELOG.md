@@ -56,6 +56,22 @@ Links Wool-Lined Crates into one store. It needs no power.
 - **Recipe:** a Wool-Lined Crate, a Hopper, two Comparators, two Iron Ingots and a Functional Machine Block.
 - New config section `[crate_controller]`: `range`, `maxCrates`; a chapter in the Contraptions Manual (Logistics).
 
+### Production: the Fleece Trawler and the Tide sheep
+- **Tide sheep:** a new themed sheep, infused at the altar with Prismarine Crystals (2 Prismarine and a Nautilus Shell
+  round it). A fin along its back and gills on its neck; it breathes underwater, bubbles as it swims and calls like a
+  dolphin. Its wool separates into Prismarine Shards and Crystals. Advancement *Making Waves*; it's in the
+  collect-every-wool challenge too.
+- **Fleece Trawler:** a dockside winch that fishes the pool in front of it (the 7x7, down to 4 deep; at least a 3x3
+  two deep). No power: **Tide sheep swimming in the pool drive it**, each one faster, up to 4. A haul takes 30 seconds
+  with one sheep in a full pool; ocean or river water and rain speed it up.
+- Hauls are the vanilla fishing loot. **Lures:** resource wool in its lure slot gives each haul a 30% chance of 1–2 of
+  that resource instead (Raw Iron on Iron Wool...); one wool lasts 8 resource hauls.
+- **Barely functional:** its net tangles now and then and it stops until it's cut free with shears (some string back);
+  very rarely it drags up a confused sheep.
+- Hoppers and pipes on every side, a comparator, a Machine Status Panel line, the advancement *Reel Ewe In*, config
+  `[fleece_trawler]`, and a chapter in the Contraptions Manual (Production).
+- **Recipe:** Blue Steel, a Fishing Rod, two Tide Wool Bales, a Functional Machine Block and a Hopper.
+
 ### Power: the Static Generator and Copper Comb (mid-game)
 Two blocks tall, like a Van de Graaff generator. Sheep rubbing against **Copper Combs** in its 5x5 pen build up static,
 and its copper dome arcs the charge into power.

@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:fleece_trawler"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.reel_ewe_in.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.reel_ewe_in.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -340,6 +340,19 @@
           }
         ]
       }
+    },
+    "tide": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "barelyfunctionalcontraptions:resource_wool",
+            "components": {
+              "barelyfunctionalcontraptions:sheep_resource": "barelyfunctionalcontraptions:tide"
+            }
+          }
+        ]
+      }
     }
   },
   "requirements": [
@@ -417,6 +430,9 @@
     ],
     [
       "snow"
+    ],
+    [
+      "tide"
     ]
   ],
   "rewards": {

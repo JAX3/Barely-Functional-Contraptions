@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IRI",
+    "WMW",
+    "IHI"
+  ],
+  "key": {
+    "I": "barelyfunctionalcontraptions:blue_steel",
+    "R": "minecraft:fishing_rod",
+    "W": {
+      "neoforge:ingredient_type": "barelyfunctionalcontraptions:wool_bale",
+      "resource": "barelyfunctionalcontraptions:tide"
+    },
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
+    "H": "minecraft:hopper"
+  },
+  "result": {
+    "id": "barelyfunctionalcontraptions:fleece_trawler",
+    "count": 1
+  }
+}

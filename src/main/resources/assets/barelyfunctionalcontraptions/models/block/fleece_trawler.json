@@ -1,0 +1,10 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "front": "barelyfunctionalcontraptions:block/fleece_trawler/front",
+    "side": "barelyfunctionalcontraptions:block/fleece_trawler/side",
+    "top": "barelyfunctionalcontraptions:block/fleece_trawler/top",
+    "bottom": "barelyfunctionalcontraptions:block/fleece_trawler/bottom",
+    "particle": "barelyfunctionalcontraptions:block/fleece_trawler/side"
+  }
+}
