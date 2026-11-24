@@ -169,6 +169,10 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
 - **Range Upgrade** (Ender Pearl and Purple Wool): one more block of working area on every side, in the Automatic
   Shears (3x3 to 5x5), Infusion Altar (7x7) and Snow Sheep Chiller (7x7), which gets upgrade slots for it. Its outline
   wobbles between colours, and a chiller with one calls its sheep back only every other second.
+- **Yield Upgrade** (Diamond and Yellow Wool): each separation gives one more of its resource and of its string. The
+  separator waits until there's room for the extra, so it never jams. Only in the Mechanical Separator.
+- **Muffler Upgrade** (Woollen Helmet and Black Wool): silences a machine's own sounds; it works just the same. In
+  the separator, packer, furnace, altar and chiller.
 - Config `[upgrades]` for each card's numbers and the second card's strength.
 
 ### Processing machines about half as fast again

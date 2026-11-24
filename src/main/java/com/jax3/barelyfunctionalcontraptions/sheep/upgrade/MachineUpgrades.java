@@ -72,7 +72,8 @@ public class MachineUpgrades extends SimpleContainer {
         }
         if (counts.isEmpty()) return UpgradeEffects.NONE;
         double second = ModConfigs.getDouble(ModConfigs.SERVER.secondUpgradeStrength);
-        double time = 1, energy = 1, capacity = 1, range = 0;
+        double time = 1, energy = 1, capacity = 1, range = 0, yield = 0;
+        boolean muffled = false;
         for (var entry : counts.entrySet()) {
             UpgradeType type = entry.getKey();
             for (int n = 0; n < entry.getValue(); n++) {
@@ -81,9 +82,11 @@ public class MachineUpgrades extends SimpleContainer {
                 energy *= 1 + (type.energy() - 1) * strength;
                 capacity *= 1 + (type.capacity() - 1) * strength;
                 range += type.range() * strength;
+                yield += type.yield() * strength;
+                if (type == UpgradeType.MUFFLER) muffled = true;
             }
         }
-        return new UpgradeEffects(time, energy, capacity, (int) Math.round(range));
+        return new UpgradeEffects(time, energy, capacity, (int) Math.round(range), yield, muffled);
     }
 
     /** The installed cards, for a tooltip or Jade. */
@@ -91,6 +94,39 @@ public class MachineUpgrades extends SimpleContainer {
         List<ItemStack> list = new ArrayList<>();
         for (ItemStack stack : getItems()) if (!stack.isEmpty()) list.add(stack);
         return list;
+    }
+
+    // ---------------------------------------------------------------- what clients need (the outline, its sounds)
+
+    /** On a client: the range and muffling last synced from the server (its own copy of the cards isn't kept). */
+    private int syncedRange;
+    private boolean syncedMuffled;
+
+    private boolean onClient() {
+        return owner.getLevel() != null && owner.getLevel().isClientSide();
+    }
+
+    /** Blocks its Range cards add to its working area. */
+    public int range() {
+        return onClient() ? syncedRange : effects().range();
+    }
+
+    /** Whether a Muffler card silences it. */
+    public boolean muffled() {
+        return onClient() ? syncedMuffled : effects().muffled();
+    }
+
+    /** Adds what clients need to a block entity's update tag. */
+    public void writeSync(net.minecraft.nbt.CompoundTag tag) {
+        UpgradeEffects effects = effects();
+        tag.putInt("upgrade_range", effects.range());
+        tag.putBoolean("upgrade_muffled", effects.muffled());
+    }
+
+    /** Reads what {@link #writeSync} wrote (on a client). */
+    public void readSync(ValueInput input) {
+        syncedRange = input.getIntOr("upgrade_range", 0);
+        syncedMuffled = input.getBooleanOr("upgrade_muffled", false);
     }
 
     public ItemContainerContents toComponent() {

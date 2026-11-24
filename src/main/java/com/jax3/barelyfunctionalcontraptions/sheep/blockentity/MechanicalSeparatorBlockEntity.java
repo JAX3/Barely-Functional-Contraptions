@@ -179,11 +179,13 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
     }
 
     private boolean outputsFit(Separation sep) {
+        // Room for the most a job can give, Yield cards included, so a job never finishes into a full slot.
+        int extra = upgrades.effects().maxExtra();
         ItemStack primary = sep.primary().create();
-        if (inventory.spaceFor(SeparatorInventory.PRIMARY, primary) < sep.maxPrimaryCount()) return false;
+        if (inventory.spaceFor(SeparatorInventory.PRIMARY, primary) < sep.maxPrimaryCount() + extra) return false;
         if (sep.secondary().isPresent()) {
             ItemStack secondary = sep.secondary().get().create();
-            if (inventory.spaceFor(SeparatorInventory.SECONDARY, secondary) < secondary.getCount()) return false;
+            if (inventory.spaceFor(SeparatorInventory.SECONDARY, secondary) < secondary.getCount() + extra) return false;
         }
         if (sep.bonus().isPresent()) {
             ItemStack bonus = sep.bonus().get().item().create();
@@ -193,10 +195,14 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
     }
 
     private void finish(Separation sep, RandomSource random) {
-        int primaryCount = sep.rollPrimaryCount(random);
-        // outputsFit() guaranteed room for maxPrimaryCount, which is an upper bound of primaryCount.
+        var fx = upgrades.effects();
+        int primaryCount = sep.rollPrimaryCount(random) + fx.extra(random); // a Yield card adds to it
+        // outputsFit() guaranteed room for maxPrimaryCount plus the most a Yield card adds, an upper bound of primaryCount.
         if (primaryCount > 0) inventory.addOutput(SeparatorInventory.PRIMARY, sep.primary().create().copyWithCount(primaryCount));
-        sep.secondary().ifPresent(s -> inventory.addOutput(SeparatorInventory.SECONDARY, s.create()));
+        sep.secondary().ifPresent(s -> {
+            ItemStack secondary = s.create();
+            inventory.addOutput(SeparatorInventory.SECONDARY, secondary.copyWithCount(secondary.getCount() + fx.extra(random)));
+        });
         sep.bonus().ifPresent(b -> {
             if (random.nextFloat() < b.chance()) inventory.addOutput(SeparatorInventory.BONUS, b.item().create());
         });
@@ -380,5 +386,30 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
     @Override
     public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
         return upgrades;
+    }
+
+    // ------------------------------------------------------------------ client sync (its upgrade cards: Muffler)
+
+    @Override
+    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    /** Clients only need what its upgrade cards do to it there (a Muffler silences it). */
+    @Override
+    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+        upgrades.writeSync(tag);
+        return tag;
+    }
+
+    @Override
+    public void onDataPacket(net.minecraft.network.Connection net, ValueInput input) {
+        upgrades.readSync(input);
+    }
+
+    @Override
+    public void handleUpdateTag(ValueInput input) {
+        upgrades.readSync(input);
     }
 }

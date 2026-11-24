@@ -375,6 +375,7 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
     protected void loadAdditional(ValueInput in) {
         super.loadAdditional(in);
         upgrades.load(in);
+        upgrades.readSync(in);
         in.child("energy").ifPresent(energy::deserialize);
         input = in.read("input", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         output = in.read("output", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
@@ -405,6 +406,7 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("show_area", showArea);
+        upgrades.writeSync(tag);
         tag.putIntArray("heaters", heaters);
         return tag;
     }

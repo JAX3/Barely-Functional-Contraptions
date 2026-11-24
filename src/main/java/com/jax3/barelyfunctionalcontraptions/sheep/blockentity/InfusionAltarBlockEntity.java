@@ -60,8 +60,6 @@ import org.jspecify.annotations.Nullable;
 public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
     /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
     private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
-    /** On a client: the blocks its Range cards add to its area, as last synced. */
-    private int syncedRange;
     /** The area outline's colour: the altar's amethyst purple. */
     public static final int AREA_COLOR = 0xFFB574FF;
     public static final int FEED = 0, SIZE = 1 + AltarRitual.MAX_CATALYSTS;
@@ -410,7 +408,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
     protected void loadAdditional(ValueInput in) {
         super.loadAdditional(in);
         upgrades.load(in);
-        syncedRange = in.getIntOr("upgrade_range", 0);
+        upgrades.readSync(in);
         items.clear();
         ContainerHelper.loadAllItems(in, items);
         in.child("energy").ifPresent(energy::deserialize);
@@ -442,30 +440,25 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
     public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         tag.putBoolean("show_area", showArea);
-        tag.putInt("upgrade_range", upgrades.effects().range());
+        upgrades.writeSync(tag);
         return tag;
     }
 
     @Override
     public void onDataPacket(net.minecraft.network.Connection net, ValueInput input) {
         showArea = input.getBooleanOr("show_area", false);
-        syncedRange = input.getIntOr("upgrade_range", 0);
+        upgrades.readSync(input);
     }
 
     @Override
     public void handleUpdateTag(ValueInput input) {
         showArea = input.getBooleanOr("show_area", false);
-        syncedRange = input.getIntOr("upgrade_range", 0);
+        upgrades.readSync(input);
     }
 
     @Override
     public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
         return upgrades;
-    }
-
-    @Override
-    public int rangeBonus() {
-        return level != null && level.isClientSide() ? syncedRange : upgrades.effects().range();
     }
 
     @Override

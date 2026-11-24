@@ -279,6 +279,7 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue secondUpgradeStrength;
         public final ModConfigSpec.DoubleValue capacityUpgradeMultiplier;
         public final ModConfigSpec.IntValue rangeUpgradeBlocks;
+        public final ModConfigSpec.IntValue yieldUpgradeBonus;
         public final ModConfigSpec.IntValue herdRadius;
         public final ModConfigSpec.IntValue herdInterval;
         public final ModConfigSpec.IntValue herdSignalPerSheep;
@@ -749,7 +750,7 @@ public final class ModConfigs {
 
             b.comment("Upgrade cards: two slots in the Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears",
                     "and Snow Sheep Chiller. Speed and Efficiency multiply a job's time and its total FE; Capacity the energy buffer;",
-                    "Range grows the working area.").push("upgrades");
+                    "Range grows the working area; Yield adds to a separation's outputs; Muffler silences a machine.").push("upgrades");
             speedUpgradeTime = b.comment("Speed card: its job time (0.6 = 60% of the time).")
                     .defineInRange("speedTime", 0.6, 0.05, 10.0);
             speedUpgradeEnergy = b.comment("Speed card: its FE a job (1.5 = half as much again).")
@@ -764,6 +765,8 @@ public final class ModConfigs {
                     .defineInRange("capacityMultiplier", 4.0, 1.0, 1_000.0);
             rangeUpgradeBlocks = b.comment("Range card: blocks added to the working area on every side.")
                     .defineInRange("rangeBlocks", 1, 0, 8);
+            yieldUpgradeBonus = b.comment("Yield card: extra of each output a separation gives (its main output and its second one).")
+                    .defineInRange("yieldBonus", 1, 0, 64);
             b.pop();
 
             b.comment("Herd Counter (counts the sheep in a pen in front of its screen, and puts any count on a comparator; needs no power)").push("herd_counter");

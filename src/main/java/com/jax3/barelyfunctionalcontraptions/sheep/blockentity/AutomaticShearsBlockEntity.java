@@ -53,8 +53,6 @@ import org.jspecify.annotations.Nullable;
 public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, AreaDisplay {
     /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
     private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
-    /** On a client: the blocks its Range cards add to its area, as last synced. */
-    private int syncedRange;
     public static final int AREA_COLOR = 0xFF7FD3FF;
     public static final int SIZE = 9;
     /** Number of int fields synced to the menu (split into 16-bit halves where needed). */
@@ -301,7 +299,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         tag.putBoolean("show_area", showArea);
-        tag.putInt("upgrade_range", upgrades.effects().range());
+        upgrades.writeSync(tag);
         return tag;
     }
 
@@ -344,7 +342,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         upgrades.load(input);
-        syncedRange = input.getIntOr("upgrade_range", 0);
+        upgrades.readSync(input);
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(input, items);
         input.child("energy").ifPresent(energy::deserialize);
@@ -399,10 +397,5 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     @Override
     public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
         return upgrades;
-    }
-
-    @Override
-    public int rangeBonus() {
-        return level != null && level.isClientSide() ? syncedRange : upgrades.effects().range();
     }
 }

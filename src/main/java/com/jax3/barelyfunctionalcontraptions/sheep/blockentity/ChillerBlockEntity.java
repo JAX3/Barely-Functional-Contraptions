@@ -49,8 +49,6 @@ import org.jspecify.annotations.Nullable;
 public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MachineContainer, WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
     /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
     private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
-    /** On a client: the blocks its Range cards add to its area, as last synced. */
-    private int syncedRange;
     public static final int SCAN_INTERVAL = 10;
     public static final int AREA_COLOR = 0xFF7FD8FF;
     private static final int[] SLOTS = {0};
@@ -164,7 +162,7 @@ public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfu
                 tank.drain(waterPerIce());
                 if (output.isEmpty()) output = new ItemStack(Items.ICE);
                 else output.grow(1);
-                level.playSound(null, pos, net.minecraft.sounds.SoundEvents.GLASS_PLACE, net.minecraft.sounds.SoundSource.BLOCKS, 0.5F, 1.4F);
+                if (!muffled()) level.playSound(null, pos, net.minecraft.sounds.SoundEvents.GLASS_PLACE, net.minecraft.sounds.SoundSource.BLOCKS, 0.5F, 1.4F);
             }
             setChanged();
         }
@@ -323,7 +321,7 @@ public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfu
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         upgrades.load(input);
-        syncedRange = input.getIntOr("upgrade_range", 0);
+        upgrades.readSync(input);
         input.child("tank").ifPresent(tank::deserialize);
         output = input.read("output", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         progress = input.getIntOr("progress", 0);
@@ -351,7 +349,7 @@ public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfu
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("show_area", showArea);
-        tag.putInt("upgrade_range", upgrades.effects().range());
+        upgrades.writeSync(tag);
         tag.putIntArray("chillers", chillers);
         return tag;
     }
@@ -359,11 +357,6 @@ public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfu
     @Override
     public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
         return upgrades;
-    }
-
-    @Override
-    public int rangeBonus() {
-        return level != null && level.isClientSide() ? syncedRange : upgrades.effects().range();
     }
 
     @Override

@@ -90,10 +90,28 @@ for y in range(5, 10):
 for (x, y) in ((11, 6), (12, 6), (11, 7), (12, 7), (11, 8), (12, 8)):
     RANGE[(x, y)] = PURPLE_LIGHT if y == 7 else STEEL
 
+GREEN, GREEN_LIGHT = (70, 200, 120, 255), (160, 240, 180, 255)
+WHITE, GREY = (236, 236, 240, 255), (150, 150, 160, 255)
+# Yield: a plus.
+YIELD = {}
+for x in range(10, 14):
+    YIELD[(x, 7)] = GREEN_LIGHT
+for y in range(5, 10):
+    YIELD[(11, y)] = GREEN_LIGHT if y != 7 else GREEN_LIGHT
+    YIELD[(12, y)] = GREEN if y != 7 else GREEN_LIGHT
+YIELD[(10, 8)] = GREEN
+YIELD[(13, 8)] = GREEN
+# Muffler: a tuft of wool over a little speaker.
+MUFFLER = {(10, 6): GREY, (10, 7): GREY, (10, 8): GREY, (11, 5): GREY, (11, 9): GREY}
+for (x, y) in ((11, 6), (12, 5), (13, 6), (12, 7), (13, 7), (11, 8), (12, 8), (13, 8), (12, 9), (11, 7)):
+    MUFFLER[(x, y)] = WHITE
+
 OUT.mkdir(parents=True, exist_ok=True)
 card((176, 176, 186, 255), (140, 140, 152, 255)).save(OUT / "upgrade_base.png")
 card((214, 58, 58, 255), (160, 36, 40, 255), SPEED).save(OUT / "speed_upgrade.png")
 card((112, 190, 56, 255), (74, 140, 36, 255), EFFICIENCY).save(OUT / "efficiency_upgrade.png")
 card((58, 175, 217, 255), (36, 120, 160, 255), CAPACITY).save(OUT / "capacity_upgrade.png")
 card((137, 50, 184, 255), (98, 30, 140, 255), RANGE).save(OUT / "range_upgrade.png")
+card((254, 216, 61, 255), (200, 160, 30, 255), YIELD).save(OUT / "yield_upgrade.png")
+card((50, 50, 58, 255), (30, 30, 36, 255), MUFFLER).save(OUT / "muffler_upgrade.png")
 print("wrote the upgrade card textures to", OUT)

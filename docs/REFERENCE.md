@@ -906,9 +906,9 @@ A bale can be placed like a hay bale, standing up or lying down, in the colour o
 | ![The Mechanical Separator window with 3 Iron Wool Bales in its input slot and the tooltip: Iron Wool Bale, 9 x Iron Wool, pressed together](screenshots/88_separator_bale_gui.png) | ![The Contraptions Manual's Logistics tab with the new Wool Packer chapter open](screenshots/89_guide_wool_packer.png) |
 
 ### Upgrade cards
-Cards that go in a processing machine: to trade time for power or power for time, to hold more power, or to reach further. The **Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears and Snow Sheep Chiller** each have **two upgrade slots**, in a small panel on the right of their window.
+Cards that go in a processing machine: to trade time for power or power for time, to hold more power, to reach further, to get more out of each wool, or to quieten it. The **Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears and Snow Sheep Chiller** each have **two upgrade slots**, in a small panel on the right of their window.
 
-![The blank Upgrade Base, the Speed Upgrade (a red strip and a lightning bolt), the Efficiency Upgrade (a lime strip and a copper coil), the Capacity Upgrade (a light blue strip and a battery) and the Range Upgrade (a purple strip and a target): Blue Steel circuit cards with gold contacts](screenshots/116_upgrade_cards.png)
+![The blank Upgrade Base, the Speed Upgrade (a red strip and a lightning bolt), the Efficiency Upgrade (a lime strip and a copper coil), the Capacity Upgrade (a light blue strip and a battery), the Range Upgrade (a purple strip and a target), the Yield Upgrade (a yellow strip and a green plus) and the Muffler Upgrade (a black strip and a wool tuft over a speaker): Blue Steel circuit cards with gold contacts](screenshots/116_upgrade_cards.png)
 
 | Card | Recipe | Time a job | Power a job |
 |---|---|---|---|
@@ -917,19 +917,23 @@ Cards that go in a processing machine: to trade time for power or power for time
 | **Efficiency Upgrade** | Upgrade Base, Block of Copper, Lime Wool (shapeless) | **115%** (`efficiencyTime`) | **75%** (`efficiencyEnergy`) |
 | **Capacity Upgrade** | Upgrade Base, Wool Bale (any), Light Blue Wool (shapeless) | – | – |
 | **Range Upgrade** | Upgrade Base, Ender Pearl, Purple Wool (shapeless) | – | – |
+| **Yield Upgrade** | Upgrade Base, Diamond, Yellow Wool (shapeless) | – | – |
+| **Muffler Upgrade** | Upgrade Base, Woollen Helmet (any colour), Black Wool (shapeless) | – | – |
 
 - **Capacity:** **four times** the energy buffer and the most FE it takes in a tick (`capacityMultiplier`); ten times with two. A separator holds 400,000 FE and takes 4,000 a tick. Taking the card out loses any FE over the usual buffer. A machine picked up with its energy and the card keeps all of it. In the five powered machines.
+- **Yield:** each separation gives **one more** of its resource and of its string (`yieldBonus`): Iron Wool gives 3–5 Raw Iron and 3 String. With two cards, one more and a 50% chance of another. The separator only starts a job when there's room for the most it could give, extra included, so nothing ever jams or spills. Only in the Mechanical Separator; it has no catch.
+- **Muffler:** silences the machine's own sounds: the separator's wool tearing, the packer's thumps, the furnace's crackle, the altar's hum and the chiller's clink of Ice. It works just the same, and its particles still show; sounds you make (putting wool in) still play. In the separator, packer, furnace, altar and chiller (the shears' only sound is the sheep's). A second Muffler does nothing more.
 - **Range:** the working area grows by **one block on every side** (`rangeBlocks`; two with two cards). The Automatic Shears' 3x3 becomes 5x5 (still starting a block in front of them), the Infusion Altar reaches 7x7, the Snow Sheep Chiller's 5x5 becomes 7x7. In those three only. Its catch: the area outline **wobbles between colours** and never quite settles, and a chiller with one calls its sheep back only every other second, so they wander a bit more.
 
 - **What they change:** a job's time and its total FE. Separator: Iron Wool in 1.5 s for 30,000 FE with a Speed card (2.5 s, 20,000 FE without). Wool Packer: a bale for 750 FE in 1.15 s with an Efficiency card. Powered Furnace: shorter smelts at more FE/t, so a smelt costs what the card says. Infusion Altar: the infusion's time and FE. Automatic Shears: the time between sweeps, and the FE each sheep costs.
 - **Two cards:** one in each slot. A **second card of the same kind** does half as much (`secondCardStrength`): two Speed cards make jobs 48% as long for 187.5% of the power. A Speed and an Efficiency card multiply: 69% of the time for 112.5% of the power.
-- **Putting them in:** drag a card into a slot, or shift-click it: each shift-click puts one card in a free slot. Shift-click a card in the panel to take it back. A slot takes only one card, and only cards the machine accepts (the block tags `#barelyfunctionalcontraptions:accepts_upgrade/speed`, `/efficiency`, `/capacity` and `/range`, so a data pack can change which machines take which). The Snow Sheep Chiller takes only Range.
+- **Putting them in:** drag a card into a slot, or shift-click it: each shift-click puts one card in a free slot. Shift-click a card in the panel to take it back. A slot takes only one card, and only cards the machine accepts (the block tags `#barelyfunctionalcontraptions:accepts_upgrade/speed`, `/efficiency`, `/capacity`, `/range`, `/yield` and `/muffler`, so a data pack can change which machines take which). The Snow Sheep Chiller takes Range and Muffler.
 - **Kept:** the cards stay with the machine when it's broken or picked up with the wrench (its item lists them, *Upgrades: Speed Upgrade*), and come back when it's placed. Hoppers and pipes never touch the upgrade slots.
-- **Config:** `[upgrades]`: `speedTime` (0.6), `speedEnergy` (1.5), `efficiencyTime` (1.15), `efficiencyEnergy` (0.75), `capacityMultiplier` (4), `rangeBlocks` (1), `secondCardStrength` (0.5).
+- **Config:** `[upgrades]`: `speedTime` (0.6), `speedEnergy` (1.5), `efficiencyTime` (1.15), `efficiencyEnergy` (0.75), `capacityMultiplier` (4), `rangeBlocks` (1), `yieldBonus` (1), `secondCardStrength` (0.5).
 
-| The Mechanical Separator with a Speed card, more in the hotbar | A card's tooltip |
+| The Mechanical Separator with a Speed card and a Muffler, more in the hotbar | A card's tooltip |
 |---|---|
-| ![The separator's window: two upgrade slots in a panel on its right, a Speed Upgrade in the top one; JEI's item list moved over beside it](screenshots/116_upgrades_gui.png) | ![The Speed Upgrade's tooltip: Time a job 60% in green, Power a job 150% in red, and the machines it goes in](screenshots/116_upgrade_tooltip.png) |
+| ![The separator's window: two upgrade slots in a panel on its right, a Speed Upgrade and a Muffler Upgrade in them, all six cards in the hotbar; JEI's item list moved over beside it](screenshots/116_upgrades_gui.png) | ![The Speed Upgrade's tooltip: Time a job 60% in green, Power a job 150% in red, and the machines it goes in](screenshots/116_upgrade_tooltip.png) |
 | ![Two Automatic Shears with their areas shown: a plain one's 3x3, and one with a Range card's 5x5, its outline a shifting blue](screenshots/116_range_upgrade_areas.png) | ![The Snow Sheep Chiller's window with a Range Upgrade in its panel](screenshots/116_upgrades_chiller.png) |
 
 ### Energy Cable

@@ -92,7 +92,7 @@ public class PoweredFurnaceBlock extends FacingMachineBlock {
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (!state.getValue(LIT)) return;
         double x = pos.getX() + 0.5, y = pos.getY(), z = pos.getZ() + 0.5;
-        if (random.nextDouble() < 0.1) level.playLocalSound(x, y, z, SoundEvents.FURNACE_FIRE_CRACKLE, SoundSource.BLOCKS, 1.0F, 1.0F, false);
+        if (random.nextDouble() < 0.1 && !(level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable muffler && muffler.muffled())) level.playLocalSound(x, y, z, SoundEvents.FURNACE_FIRE_CRACKLE, SoundSource.BLOCKS, 1.0F, 1.0F, false);
         Direction facing = state.getValue(FACING);
         double side = random.nextDouble() * 0.5 - 0.25;
         double dx = facing.getAxis() == Direction.Axis.X ? facing.getStepX() * 0.52 : side;

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "barelyfunctionalcontraptions:upgrade_base",
+    "barelyfunctionalcontraptions:woollen_helmet",
+    "minecraft:black_wool"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:muffler_upgrade",
+    "count": 1
+  }
+}

@@ -11,6 +11,11 @@ public interface Upgradeable {
 
     /** Blocks a Range card adds to its working area: from its cards on the server, as last synced on a client. */
     default int rangeBonus() {
-        return upgradeEffects().range();
+        return upgrades().range();
+    }
+
+    /** Whether a Muffler card silences it: from its cards on the server, as last synced on a client. */
+    default boolean muffled() {
+        return upgrades().muffled();
     }
 }

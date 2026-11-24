@@ -4998,13 +4998,20 @@ public final class DevScreenshotHarness {
                 player.getInventory().setItem(2, new ItemStack(ModItems.UPGRADE_BASE.get(), 4));
                 player.getInventory().setItem(3, new ItemStack(ModItems.CAPACITY_UPGRADE.get(), 2));
                 player.getInventory().setItem(4, new ItemStack(ModItems.RANGE_UPGRADE.get(), 2));
+                player.getInventory().setItem(5, new ItemStack(ModItems.YIELD_UPGRADE.get(), 2));
+                player.getInventory().setItem(6, new ItemStack(ModItems.MUFFLER_UPGRADE.get(), 2));
                 command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", s.getX() + 0.5, s.getY(), s.getZ() + 2.5));
             });
             case 100 -> server.execute(() -> {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                 if (player.level().getBlockEntity(at) instanceof MechanicalSeparatorBlockEntity be) player.openMenu(be, at);
             });
+            case 105 -> server.execute(() -> {
+                if (server.overworld().getBlockEntity(at) instanceof MechanicalSeparatorBlockEntity be) be.upgrades().setItem(1, new ItemStack(ModItems.MUFFLER_UPGRADE.get()));
+            });
             case 120 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 130 -> ResourcefulSheep.LOGGER.warn("UPGRADES client sees the separator muffled: {}",
+                    mc.level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable u && u.muffled());
             case 135 -> shot(mc, "116_upgrades_gui");
             case 140 -> {
                 // Hover the Speed card in the hotbar row of the window for its tooltip.

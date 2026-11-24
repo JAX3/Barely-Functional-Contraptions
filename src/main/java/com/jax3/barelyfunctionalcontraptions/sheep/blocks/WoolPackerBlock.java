@@ -99,7 +99,7 @@ public class WoolPackerBlock extends FacingMachineBlock {
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (!state.getValue(ACTIVE)) return;
         double x = pos.getX() + 0.5, y = pos.getY(), z = pos.getZ() + 0.5;
-        if (random.nextInt(8) == 0) {
+        if (random.nextInt(8) == 0 && !(level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable muffler && muffler.muffled())) { // silent with a Muffler card
             level.playLocalSound(x, y, z, SoundEvents.WOOL_STEP, SoundSource.BLOCKS, 0.6F, 0.7F + random.nextFloat() * 0.2F, false);
         }
         Direction facing = state.getValue(FACING);

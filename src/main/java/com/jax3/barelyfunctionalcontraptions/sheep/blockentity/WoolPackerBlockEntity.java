@@ -281,4 +281,29 @@ public class WoolPackerBlockEntity extends BlockEntity implements com.jax3.barel
         super.removeComponentsFromTag(output);
         output.discard("upgrades");
     }
+
+    // ------------------------------------------------------------------ client sync (its upgrade cards: Muffler)
+
+    @Override
+    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    /** Clients only need what its upgrade cards do to it there (a Muffler silences it). */
+    @Override
+    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+        upgrades.writeSync(tag);
+        return tag;
+    }
+
+    @Override
+    public void onDataPacket(net.minecraft.network.Connection net, ValueInput input) {
+        upgrades.readSync(input);
+    }
+
+    @Override
+    public void handleUpdateTag(ValueInput input) {
+        upgrades.readSync(input);
+    }
 }

@@ -87,7 +87,7 @@ public class InfusionAltarBlock extends BaseEntityBlock {
         for (int i = 0; i < 2; i++) {
             level.addParticle(ParticleTypes.ENCHANT, x + random.nextGaussian() * 0.3, y + random.nextDouble() * 0.6, z + random.nextGaussian() * 0.3, 0, 0.05, 0);
         }
-        if (random.nextInt(20) == 0) level.playLocalSound(x, y, z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 0.5F, 1.2F, false);
+        if (random.nextInt(20) == 0 && !(level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable muffler && muffler.muffled())) level.playLocalSound(x, y, z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 0.5F, 1.2F, false);
     }
 
     @Override

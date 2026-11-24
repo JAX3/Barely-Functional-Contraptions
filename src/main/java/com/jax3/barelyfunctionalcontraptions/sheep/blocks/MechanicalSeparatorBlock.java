@@ -96,7 +96,7 @@ public class MechanicalSeparatorBlock extends FacingMachineBlock {
         if (random.nextInt(8) == 0) {
             level.addParticle(ParticleTypes.WHITE_ASH, pos.getX() + 0.5, pos.getY() + 1.05, pos.getZ() + 0.5, 0, 0.05, 0);
         }
-        if (random.nextInt(40) == 0) {
+        if (random.nextInt(40) == 0 && !(level.getBlockEntity(pos) instanceof com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable muffler && muffler.muffled())) { // silent with a Muffler card
             level.playLocalSound(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.WOOL_BREAK, SoundSource.BLOCKS, 0.4F, 0.8F, false);
         }
     }

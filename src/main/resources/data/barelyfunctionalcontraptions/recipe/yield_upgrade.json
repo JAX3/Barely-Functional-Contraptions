@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "barelyfunctionalcontraptions:upgrade_base",
+    "minecraft:diamond",
+    "minecraft:yellow_wool"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:yield_upgrade",
+    "count": 1
+  }
+}

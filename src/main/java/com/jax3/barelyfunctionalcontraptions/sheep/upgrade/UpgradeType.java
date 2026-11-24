@@ -20,7 +20,11 @@ public enum UpgradeType {
     /** Stores and takes in more FE. */
     CAPACITY,
     /** A bigger working area. */
-    RANGE;
+    RANGE,
+    /** More of each output (the Mechanical Separator). */
+    YIELD,
+    /** Silences the machine. */
+    MUFFLER;
 
     private final TagKey<Block> machines = TagKey.create(Registries.BLOCK, ResourcefulSheep.id("accepts_upgrade/" + id()));
 
@@ -54,6 +58,11 @@ public enum UpgradeType {
     /** Multiplier on the energy buffer and the most FE taken in a tick, with one card. */
     public double capacity() {
         return this == CAPACITY ? ModConfigs.getDouble(ModConfigs.SERVER.capacityUpgradeMultiplier) : 1;
+    }
+
+    /** Extra of each output a job gives, with one card. */
+    public int yield() {
+        return this == YIELD ? ModConfigs.getInt(ModConfigs.SERVER.yieldUpgradeBonus) : 0;
     }
 
     /** Blocks added to the working area on every side, with one card. */

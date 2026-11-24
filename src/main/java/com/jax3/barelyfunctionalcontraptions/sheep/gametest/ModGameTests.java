@@ -158,6 +158,8 @@ public final class ModGameTests {
         TESTS.put("machine_keeps_its_upgrades_when_broken", ModGameTests::upgradesKept);
         TESTS.put("capacity_upgrade_holds_and_takes_in_more", ModGameTests::capacityUpgrade);
         TESTS.put("range_upgrade_grows_working_areas", ModGameTests::rangeUpgrade);
+        TESTS.put("yield_upgrade_adds_to_each_output", ModGameTests::yieldUpgrade);
+        TESTS.put("muffler_upgrade_silences_and_syncs", ModGameTests::mufflerUpgrade);
         TESTS.put("infusion_altar_pulses_when_ready", ModGameTests::altarPulse);
         TESTS.put("list_command_lists_every_sheep", ModGameTests::listCommand);
         TESTS.put("snow_sheep_leaves_snow", ModGameTests::snowSheep);
@@ -2488,6 +2490,60 @@ public final class ModGameTests {
             h.assertTrue(nearFar.isSheared(), "the shears with a Range card reach the sheep 4 blocks out");
             h.assertFalse(nearPlain.isSheared(), "plain shears don't");
         });
+    }
+
+    /**
+     * Yield: +1 of the main output and of the string with one card (+1.5 on average with two: one, and a 50% chance of
+     * another). A separator with one turns an Iron Wool into 3-5 Raw Iron and 3 String; with its outputs nearly full it
+     * waits instead of overfilling. Only the separator takes it.
+     */
+    private static void yieldUpgrade(GameTestHelper h) {
+        var card = new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.YIELD_UPGRADE.get());
+        var one = com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(card));
+        var two = com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(card, card.copy()));
+        h.assertTrue(one.yield() == 1 && one.maxExtra() == 1 && Math.abs(two.yield() - 1.5) < 1e-9 && two.maxExtra() == 2, "+1, and +1.5 with two: " + one + " " + two);
+        h.assertTrue(one.time() == 1 && one.energy() == 1, "it changes nothing else");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState(), card), "the separator takes it");
+        h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(ModBlocks.WOOL_PACKER.get().defaultBlockState(), card), "the packer doesn't");
+        MechanicalSeparatorBlockEntity sep = separator(h, new BlockPos(1, 1, 1));
+        sep.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(IRON, 1));
+        insertEnergy(sep.getEnergy(), 100_000);
+        sep.upgrades().setItem(0, card.copy());
+        // One with room for a plain job's outputs but not the extra: it waits.
+        MechanicalSeparatorBlockEntity full = separator(h, new BlockPos(4, 1, 1));
+        full.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(IRON, 1));
+        full.getInventory().setStack(SeparatorInventory.PRIMARY, new ItemStack(Items.RAW_IRON, 60));
+        insertEnergy(full.getEnergy(), 100_000);
+        full.upgrades().setItem(0, card.copy());
+        h.runAfterDelay(70, () -> {
+            ItemStack iron = sep.getInventory().getStack(SeparatorInventory.PRIMARY), string = sep.getInventory().getStack(SeparatorInventory.SECONDARY);
+            h.assertTrue(iron.is(Items.RAW_IRON) && iron.getCount() >= 3 && iron.getCount() <= 5, "3-5 Raw Iron with the card, got " + iron);
+            h.assertTrue(string.is(Items.STRING) && string.getCount() == 3, "and 3 String, got " + string);
+            h.assertTrue(full.getStatus() == MachineStatus.OUTPUT_FULL && full.getInventory().getStack(SeparatorInventory.PRIMARY).getCount() == 60,
+                    "with room for 4 but not 5 more, it waits: " + full.getStatus());
+            h.succeed();
+        });
+    }
+
+    /**
+     * Muffler: silences a machine (its own sounds, on each player's client): the separator, packer, furnace, altar and
+     * chiller take it, the shears (whose only sound is the sheep's) don't. The server tells clients it's in.
+     */
+    private static void mufflerUpgrade(GameTestHelper h) {
+        var card = new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MUFFLER_UPGRADE.get());
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(card)).muffled() && !com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of()).muffled(), "it mutes");
+        for (var block : List.of(ModBlocks.MECHANICAL_SEPARATOR.get(), ModBlocks.WOOL_PACKER.get(), ModBlocks.POWERED_FURNACE.get(),
+                ModBlocks.INFUSION_ALTAR.get(), ModBlocks.CHILLER.get())) {
+            h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(block.defaultBlockState(), card), block + " takes a Muffler");
+        }
+        h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState(), card), "the shears don't");
+        MechanicalSeparatorBlockEntity sep = separator(h, new BlockPos(1, 1, 1));
+        h.assertFalse(sep.muffled(), "not muffled at first");
+        h.assertFalse(sep.getUpdateTag(h.getLevel().registryAccess()).getBooleanOr("upgrade_muffled", true), "and clients are told so");
+        sep.upgrades().setItem(0, card.copy());
+        h.assertTrue(sep.muffled() && sep.getUpdateTag(h.getLevel().registryAccess()).getBooleanOr("upgrade_muffled", false),
+                "with the card, muffled, and clients are told");
+        h.succeed();
     }
 
     /** A Powered Furnace broken with cards in drops itself with them on its item; placed again, it has them back. */

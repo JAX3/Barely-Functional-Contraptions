@@ -34,10 +34,17 @@ public class UpgradeItem extends Item {
             }
             case CAPACITY -> tooltip.accept(Component.translatable(tip + "capacity", percent(type.capacity())).withStyle(ChatFormatting.GREEN));
             case RANGE -> tooltip.accept(Component.translatable(tip + "range", type.range()).withStyle(ChatFormatting.GREEN));
+            case YIELD -> tooltip.accept(Component.translatable(tip + "yield", type.yield()).withStyle(ChatFormatting.GREEN));
+            case MUFFLER -> tooltip.accept(Component.translatable(tip + "muffler").withStyle(ChatFormatting.GREEN));
         }
         tooltip.accept(Component.translatable(key + "desc").withStyle(ChatFormatting.GRAY));
-        tooltip.accept(Component.translatable(tip + (type == UpgradeType.RANGE ? "machines_range" : "machines")).withStyle(ChatFormatting.DARK_GRAY));
-        tooltip.accept(Component.translatable(tip + "second").withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.accept(Component.translatable(tip + switch (type) {
+            case RANGE -> "machines_range";
+            case YIELD -> "machines_yield";
+            case MUFFLER -> "machines_muffler";
+            default -> "machines";
+        }).withStyle(ChatFormatting.DARK_GRAY));
+        if (type != UpgradeType.MUFFLER) tooltip.accept(Component.translatable(tip + "second").withStyle(ChatFormatting.DARK_GRAY));
     }
 
     private static String percent(double factor) {

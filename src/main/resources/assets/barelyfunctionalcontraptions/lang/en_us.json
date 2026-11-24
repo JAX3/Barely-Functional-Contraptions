@@ -1560,7 +1560,7 @@
   "item.barelyfunctionalcontraptions.upgrade_base": "Upgrade Base",
   "item.barelyfunctionalcontraptions.speed_upgrade": "Speed Upgrade",
   "item.barelyfunctionalcontraptions.efficiency_upgrade": "Efficiency Upgrade",
-  "tooltip.barelyfunctionalcontraptions.upgrade_base": "A blank upgrade card. Craft it with a Block of Redstone, Sugar and Red Wool for Speed; a Block of Copper and Lime Wool for Efficiency; a Wool Bale and Light Blue Wool for Capacity; or an Ender Pearl and Purple Wool for Range.",
+  "tooltip.barelyfunctionalcontraptions.upgrade_base": "A blank upgrade card. Craft it with a Block of Redstone, Sugar and Red Wool for Speed; a Block of Copper and Lime Wool for Efficiency; a Wool Bale and Light Blue Wool for Capacity; an Ender Pearl and Purple Wool for Range; a Diamond and Yellow Wool for Yield; or a Woollen Helmet and Black Wool for a Muffler.",
   "item.barelyfunctionalcontraptions.speed_upgrade.desc": "Jobs finish sooner, but each costs more power.",
   "item.barelyfunctionalcontraptions.efficiency_upgrade.desc": "Jobs cost less power, but take a little longer.",
   "tooltip.barelyfunctionalcontraptions.upgrade.time": "Time a job: %s",
@@ -1568,7 +1568,7 @@
   "tooltip.barelyfunctionalcontraptions.upgrade.machines": "Goes in a Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar or Automatic Shears.",
   "tooltip.barelyfunctionalcontraptions.machine_upgrades": "Upgrades: %s",
   "gui.barelyfunctionalcontraptions.upgrade_slot": "Upgrade slot",
-  "gui.barelyfunctionalcontraptions.upgrade_slot.desc": "Takes an upgrade card this machine accepts: Speed, Efficiency, Capacity or Range.",
+  "gui.barelyfunctionalcontraptions.upgrade_slot.desc": "Takes an upgrade card this machine accepts: Speed, Efficiency, Capacity, Range, Yield or Muffler.",
   "barelyfunctionalcontraptions.configuration.upgrades": "Upgrades",
   "barelyfunctionalcontraptions.configuration.speedTime": "Speed Card: Time",
   "barelyfunctionalcontraptions.configuration.speedEnergy": "Speed Card: Power",
@@ -1584,5 +1584,14 @@
   "item.barelyfunctionalcontraptions.capacity_upgrade.desc": "Holds more power, and takes it in faster.",
   "item.barelyfunctionalcontraptions.range_upgrade.desc": "Reaches further. Its area outline never quite settles, and a chiller's sheep wander a bit more.",
   "barelyfunctionalcontraptions.configuration.capacityMultiplier": "Capacity Card: Multiplier",
-  "barelyfunctionalcontraptions.configuration.rangeBlocks": "Range Card: Blocks"
+  "barelyfunctionalcontraptions.configuration.rangeBlocks": "Range Card: Blocks",
+  "item.barelyfunctionalcontraptions.yield_upgrade": "Yield Upgrade",
+  "item.barelyfunctionalcontraptions.muffler_upgrade": "Muffler Upgrade",
+  "item.barelyfunctionalcontraptions.yield_upgrade.desc": "Each wool gives a little more.",
+  "item.barelyfunctionalcontraptions.muffler_upgrade.desc": "Stuffs wool into it. It works as well, just quietly.",
+  "tooltip.barelyfunctionalcontraptions.upgrade.yield": "Outputs: +%s of its resource and of its string",
+  "tooltip.barelyfunctionalcontraptions.upgrade.muffler": "Silences its own sounds",
+  "tooltip.barelyfunctionalcontraptions.upgrade.machines_yield": "Goes in a Mechanical Separator.",
+  "tooltip.barelyfunctionalcontraptions.upgrade.machines_muffler": "Goes in a Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar or Snow Sheep Chiller.",
+  "barelyfunctionalcontraptions.configuration.yieldBonus": "Yield Card: Extra Outputs"
 }
