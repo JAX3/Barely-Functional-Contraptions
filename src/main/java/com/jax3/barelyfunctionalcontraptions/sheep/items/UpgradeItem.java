@@ -26,10 +26,18 @@ public class UpgradeItem extends Item {
     @SuppressWarnings("deprecation")
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
         String key = "item.barelyfunctionalcontraptions." + type.id() + "_upgrade.";
-        tooltip.accept(Component.translatable("tooltip.barelyfunctionalcontraptions.upgrade.time", percent(type.time())).withStyle(type.time() <= 1 ? ChatFormatting.GREEN : ChatFormatting.RED));
-        tooltip.accept(Component.translatable("tooltip.barelyfunctionalcontraptions.upgrade.energy", percent(type.energy())).withStyle(type.energy() <= 1 ? ChatFormatting.GREEN : ChatFormatting.RED));
+        String tip = "tooltip.barelyfunctionalcontraptions.upgrade.";
+        switch (type) {
+            case SPEED, EFFICIENCY -> {
+                tooltip.accept(Component.translatable(tip + "time", percent(type.time())).withStyle(type.time() <= 1 ? ChatFormatting.GREEN : ChatFormatting.RED));
+                tooltip.accept(Component.translatable(tip + "energy", percent(type.energy())).withStyle(type.energy() <= 1 ? ChatFormatting.GREEN : ChatFormatting.RED));
+            }
+            case CAPACITY -> tooltip.accept(Component.translatable(tip + "capacity", percent(type.capacity())).withStyle(ChatFormatting.GREEN));
+            case RANGE -> tooltip.accept(Component.translatable(tip + "range", type.range()).withStyle(ChatFormatting.GREEN));
+        }
         tooltip.accept(Component.translatable(key + "desc").withStyle(ChatFormatting.GRAY));
-        tooltip.accept(Component.translatable("tooltip.barelyfunctionalcontraptions.upgrade.machines").withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.accept(Component.translatable(tip + (type == UpgradeType.RANGE ? "machines_range" : "machines")).withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.accept(Component.translatable(tip + "second").withStyle(ChatFormatting.DARK_GRAY));
     }
 
     private static String percent(double factor) {

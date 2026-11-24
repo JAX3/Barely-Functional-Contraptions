@@ -16,7 +16,11 @@ public enum UpgradeType {
     /** Jobs take less time, but cost more FE. */
     SPEED,
     /** Jobs cost less FE, but take a little longer. */
-    EFFICIENCY;
+    EFFICIENCY,
+    /** Stores and takes in more FE. */
+    CAPACITY,
+    /** A bigger working area. */
+    RANGE;
 
     private final TagKey<Block> machines = TagKey.create(Registries.BLOCK, ResourcefulSheep.id("accepts_upgrade/" + id()));
 
@@ -31,11 +35,29 @@ public enum UpgradeType {
 
     /** Multiplier on a job's time with one card. */
     public double time() {
-        return ModConfigs.getDouble(this == SPEED ? ModConfigs.SERVER.speedUpgradeTime : ModConfigs.SERVER.efficiencyUpgradeTime);
+        return switch (this) {
+            case SPEED -> ModConfigs.getDouble(ModConfigs.SERVER.speedUpgradeTime);
+            case EFFICIENCY -> ModConfigs.getDouble(ModConfigs.SERVER.efficiencyUpgradeTime);
+            default -> 1;
+        };
     }
 
     /** Multiplier on a job's total FE with one card. */
     public double energy() {
-        return ModConfigs.getDouble(this == SPEED ? ModConfigs.SERVER.speedUpgradeEnergy : ModConfigs.SERVER.efficiencyUpgradeEnergy);
+        return switch (this) {
+            case SPEED -> ModConfigs.getDouble(ModConfigs.SERVER.speedUpgradeEnergy);
+            case EFFICIENCY -> ModConfigs.getDouble(ModConfigs.SERVER.efficiencyUpgradeEnergy);
+            default -> 1;
+        };
+    }
+
+    /** Multiplier on the energy buffer and the most FE taken in a tick, with one card. */
+    public double capacity() {
+        return this == CAPACITY ? ModConfigs.getDouble(ModConfigs.SERVER.capacityUpgradeMultiplier) : 1;
+    }
+
+    /** Blocks added to the working area on every side, with one card. */
+    public int range() {
+        return this == RANGE ? ModConfigs.getInt(ModConfigs.SERVER.rangeUpgradeBlocks) : 0;
     }
 }

@@ -151,7 +151,7 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements com.jax3.b
     }
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
-        energy.refreshLimits();
+        energy.refreshLimits(0, upgrades.effects().capacity()); // a Capacity card holds and takes in more
         if (--scanCooldown <= 0) {
             scanCooldown = SCAN_INTERVAL;
             scan(level, pos, state);

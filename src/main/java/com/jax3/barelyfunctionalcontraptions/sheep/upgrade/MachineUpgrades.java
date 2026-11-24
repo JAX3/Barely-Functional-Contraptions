@@ -54,6 +54,9 @@ public class MachineUpgrades extends SimpleContainer {
     public void setChanged() {
         super.setChanged();
         owner.setChanged();
+        // Clients draw the working area, which a Range card changes.
+        var level = owner.getLevel();
+        if (level != null && !level.isClientSide()) level.sendBlockUpdated(owner.getBlockPos(), owner.getBlockState(), owner.getBlockState(), 3);
     }
 
     /** What the installed cards do: each kind's effect, a second card of a kind at {@code secondCardStrength}. */
@@ -69,16 +72,18 @@ public class MachineUpgrades extends SimpleContainer {
         }
         if (counts.isEmpty()) return UpgradeEffects.NONE;
         double second = ModConfigs.getDouble(ModConfigs.SERVER.secondUpgradeStrength);
-        double time = 1, energy = 1;
+        double time = 1, energy = 1, capacity = 1, range = 0;
         for (var entry : counts.entrySet()) {
             UpgradeType type = entry.getKey();
             for (int n = 0; n < entry.getValue(); n++) {
                 double strength = n == 0 ? 1 : second;
                 time *= 1 + (type.time() - 1) * strength;
                 energy *= 1 + (type.energy() - 1) * strength;
+                capacity *= 1 + (type.capacity() - 1) * strength;
+                range += type.range() * strength;
             }
         }
-        return new UpgradeEffects(time, energy);
+        return new UpgradeEffects(time, energy, capacity, (int) Math.round(range));
     }
 
     /** The installed cards, for a tooltip or Jade. */

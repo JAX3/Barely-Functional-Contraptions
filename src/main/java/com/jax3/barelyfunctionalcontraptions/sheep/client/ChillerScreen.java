@@ -23,7 +23,7 @@ import com.jax3.barelyfunctionalcontraptions.sheep.menu.ChillerMenu;
  * and how long each Ice takes. Bottom: the status lamp and line. Top right: the show-area button. Art:
  * {@code textures/gui/chiller.png}, see {@code tools/sheep/generate_textures.py}.
  */
-public class ChillerScreen extends AbstractContainerScreen<ChillerMenu> {
+public class ChillerScreen extends MachineScreen<ChillerMenu> {
     private static final Identifier TEXTURE = ResourcefulSheep.id("textures/gui/chiller.png");
     private static final int TEX = 256;
     private static final int GAUGE_X = 11, GAUGE_Y = 19, GAUGE_W = 30, GAUGE_H = 64;

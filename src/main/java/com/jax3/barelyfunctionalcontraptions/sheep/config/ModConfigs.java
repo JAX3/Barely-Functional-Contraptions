@@ -277,6 +277,8 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue efficiencyUpgradeTime;
         public final ModConfigSpec.DoubleValue efficiencyUpgradeEnergy;
         public final ModConfigSpec.DoubleValue secondUpgradeStrength;
+        public final ModConfigSpec.DoubleValue capacityUpgradeMultiplier;
+        public final ModConfigSpec.IntValue rangeUpgradeBlocks;
         public final ModConfigSpec.IntValue herdRadius;
         public final ModConfigSpec.IntValue herdInterval;
         public final ModConfigSpec.IntValue herdSignalPerSheep;
@@ -745,8 +747,9 @@ public final class ModConfigs {
                     .defineInRange("maxCrates", 64, 1, 1_024);
             b.pop();
 
-            b.comment("Upgrade cards (two slots in the Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar and Automatic Shears).",
-                    "Each card multiplies a job's time and its total FE.").push("upgrades");
+            b.comment("Upgrade cards: two slots in the Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears",
+                    "and Snow Sheep Chiller. Speed and Efficiency multiply a job's time and its total FE; Capacity the energy buffer;",
+                    "Range grows the working area.").push("upgrades");
             speedUpgradeTime = b.comment("Speed card: its job time (0.6 = 60% of the time).")
                     .defineInRange("speedTime", 0.6, 0.05, 10.0);
             speedUpgradeEnergy = b.comment("Speed card: its FE a job (1.5 = half as much again).")
@@ -757,6 +760,10 @@ public final class ModConfigs {
                     .defineInRange("efficiencyEnergy", 0.75, 0.0, 100.0);
             secondUpgradeStrength = b.comment("How much of its effect a second card of the same kind has (0.5 = half; 1 = as much as the first).")
                     .defineInRange("secondCardStrength", 0.5, 0.0, 1.0);
+            capacityUpgradeMultiplier = b.comment("Capacity card: its energy buffer and the most FE it takes in a tick (4 = four times).")
+                    .defineInRange("capacityMultiplier", 4.0, 1.0, 1_000.0);
+            rangeUpgradeBlocks = b.comment("Range card: blocks added to the working area on every side.")
+                    .defineInRange("rangeBlocks", 1, 0, 8);
             b.pop();
 
             b.comment("Herd Counter (counts the sheep in a pen in front of its screen, and puts any count on a comparator; needs no power)").push("herd_counter");

@@ -4996,6 +4996,8 @@ public final class DevScreenshotHarness {
                 player.getInventory().setItem(0, new ItemStack(ModItems.SPEED_UPGRADE.get(), 3));
                 player.getInventory().setItem(1, new ItemStack(ModItems.EFFICIENCY_UPGRADE.get(), 2));
                 player.getInventory().setItem(2, new ItemStack(ModItems.UPGRADE_BASE.get(), 4));
+                player.getInventory().setItem(3, new ItemStack(ModItems.CAPACITY_UPGRADE.get(), 2));
+                player.getInventory().setItem(4, new ItemStack(ModItems.RANGE_UPGRADE.get(), 2));
                 command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", s.getX() + 0.5, s.getY(), s.getZ() + 2.5));
             });
             case 100 -> server.execute(() -> {
@@ -5028,7 +5030,46 @@ public final class DevScreenshotHarness {
             }
             case 175 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
             case 190 -> shot(mc, "116_upgrades_furnace_empty");
-            case 200 -> mc.stop();
+            case 195 -> {
+                McClient.setScreen(mc, null);
+                server.execute(() -> {
+                    // Two Automatic Shears, their areas shown: one plain, one with a Range card (bigger, and wobbling).
+                    ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                    ServerLevel level = player.level();
+                    BlockPos plain = at.offset(-6, 0, 6), ranged = at.offset(1, 0, 6);
+                    for (BlockPos p : BlockPos.betweenClosed(at.offset(-9, -1, 4), at.offset(6, -1, 14))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                    for (BlockPos p : new BlockPos[]{plain, ranged}) {
+                        level.setBlock(p, ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
+                                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.SOUTH), 3);
+                        if (level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity sh) {
+                            if (p == ranged) sh.upgrades().setItem(0, new ItemStack(ModItems.RANGE_UPGRADE.get()));
+                            sh.setShowsArea(true);
+                        }
+                    }
+                    level.setBlock(at.offset(5, 0, 3), ModBlocks.CHILLER.get().defaultBlockState(), 3);
+                    command(server, "gamemode spectator @a"); // hover above them
+                    command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 50", at.getX() - 1.5, at.getY() + 7, at.getZ() + 15.5));
+                });
+            }
+            case 200 -> { setHudHidden(mc, true); McClient.clearChat(mc); }
+            case 230 -> shot(mc, "116_range_upgrade_areas");
+            case 240 -> shot(mc, "116_range_upgrade_areas_2");
+            case 246 -> setHudHidden(mc, false);
+            case 247 -> {
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", at.getX() + 5.5, at.getY(), at.getZ() + 5.5));
+            }
+            case 250 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                BlockPos c = at.offset(5, 0, 3);
+                if (player.level().getBlockEntity(c) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity be) {
+                    be.upgrades().setItem(0, new ItemStack(ModItems.RANGE_UPGRADE.get()));
+                    player.openMenu(be, c);
+                }
+            });
+            case 265 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 280 -> shot(mc, "116_upgrades_chiller");
+            case 290 -> mc.stop();
             default -> {}
         }
     }

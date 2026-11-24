@@ -68,8 +68,32 @@ for y in (5, 7, 9):
 EFFICIENCY.pop((10, 10), None)
 EFFICIENCY.pop((13, 10), None)
 
+BLUE, BLUE_LIGHT, BLUE_DARK = (88, 196, 236, 255), (170, 230, 250, 255), (40, 120, 170, 255)
+PURPLE, PURPLE_LIGHT = (190, 110, 240, 255), (230, 180, 255, 255)
+# Capacity: a battery, standing up, three cells lit.
+CAPACITY = {(11, 4): STEEL_LIGHT, (12, 4): STEEL_LIGHT}
+for y in range(5, 11):
+    CAPACITY[(10, y)] = BLUE_DARK
+    CAPACITY[(13, y)] = BLUE_DARK
+for y in range(5, 11):
+    for x in (11, 12):
+        CAPACITY[(x, y)] = BLUE_LIGHT if y in (5, 7, 9) else BLUE
+CAPACITY[(10, 10)] = BLUE_DARK
+# Range: a target, a ring round a bright centre.
+RANGE = {}
+for x in range(10, 14):
+    RANGE[(x, 4)] = PURPLE
+    RANGE[(x, 10)] = PURPLE
+for y in range(5, 10):
+    RANGE[(10, y)] = PURPLE
+    RANGE[(13, y)] = PURPLE
+for (x, y) in ((11, 6), (12, 6), (11, 7), (12, 7), (11, 8), (12, 8)):
+    RANGE[(x, y)] = PURPLE_LIGHT if y == 7 else STEEL
+
 OUT.mkdir(parents=True, exist_ok=True)
 card((176, 176, 186, 255), (140, 140, 152, 255)).save(OUT / "upgrade_base.png")
 card((214, 58, 58, 255), (160, 36, 40, 255), SPEED).save(OUT / "speed_upgrade.png")
 card((112, 190, 56, 255), (74, 140, 36, 255), EFFICIENCY).save(OUT / "efficiency_upgrade.png")
-print("wrote", OUT / "upgrade_base.png", OUT / "speed_upgrade.png", OUT / "efficiency_upgrade.png")
+card((58, 175, 217, 255), (36, 120, 160, 255), CAPACITY).save(OUT / "capacity_upgrade.png")
+card((137, 50, 184, 255), (98, 30, 140, 255), RANGE).save(OUT / "range_upgrade.png")
+print("wrote the upgrade card textures to", OUT)

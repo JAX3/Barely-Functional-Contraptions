@@ -25,6 +25,10 @@ public final class ModItems {
             p -> new com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.UpgradeType.SPEED, p));
     public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem> EFFICIENCY_UPGRADE = REGISTER.registerItem("efficiency_upgrade",
             p -> new com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.UpgradeType.EFFICIENCY, p));
+    public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem> CAPACITY_UPGRADE = REGISTER.registerItem("capacity_upgrade",
+            p -> new com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.UpgradeType.CAPACITY, p));
+    public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem> RANGE_UPGRADE = REGISTER.registerItem("range_upgrade",
+            p -> new com.jax3.barelyfunctionalcontraptions.sheep.items.UpgradeItem(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.UpgradeType.RANGE, p));
 
     public static final DeferredItem<BlockItem> MECHANICAL_SEPARATOR = REGISTER.registerSimpleBlockItem(ModBlocks.MECHANICAL_SEPARATOR);
 

@@ -3,11 +3,12 @@ package com.jax3.barelyfunctionalcontraptions.sheep.upgrade;
 import net.minecraft.util.Mth;
 
 /**
- * What a machine's installed upgrades do: a multiplier on each job's time and one on its total FE. {@link #NONE} with
- * no cards in.
+ * What a machine's installed upgrades do: multipliers on each job's time and on its total FE, on its energy buffer and
+ * input rate ({@link #capacity}), and blocks added to its working area on every side ({@link #range}). {@link #NONE}
+ * with no cards in.
  */
-public record UpgradeEffects(double time, double energy) {
-    public static final UpgradeEffects NONE = new UpgradeEffects(1, 1);
+public record UpgradeEffects(double time, double energy, double capacity, int range) {
+    public static final UpgradeEffects NONE = new UpgradeEffects(1, 1, 1, 0);
 
     /** A job of {@code ticks} ticks with the upgrades: at least 1. */
     public int ticks(int ticks) {
@@ -32,7 +33,12 @@ public record UpgradeEffects(double time, double energy) {
         return perTick <= 0 ? perTick : Math.max(1, (int) Math.round(perTick * energy / time));
     }
 
+    /** An energy buffer or input rate of {@code amount} with the upgrades (capped). */
+    public int scaled(int amount) {
+        return (int) Math.min(Integer.MAX_VALUE, Math.round(amount * capacity));
+    }
+
     public boolean isNone() {
-        return time == 1 && energy == 1;
+        return time == 1 && energy == 1 && capacity == 1 && range == 0;
     }
 }

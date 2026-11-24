@@ -60,6 +60,8 @@ import org.jspecify.annotations.Nullable;
 public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
     /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
     private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
+    /** On a client: the blocks its Range cards add to its area, as last synced. */
+    private int syncedRange;
     /** The area outline's colour: the altar's amethyst purple. */
     public static final int AREA_COLOR = 0xFFB574FF;
     public static final int FEED = 0, SIZE = 1 + AltarRitual.MAX_CATALYSTS;
@@ -123,7 +125,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
     }
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
-        energy.refreshLimits();
+        energy.refreshLimits(0, upgrades.effects().capacity()); // a Capacity card holds and takes in more
         var fx = upgrades.effects();
         maxProgress = fx.ticks(ModConfigs.getInt(ModConfigs.SERVER.altarTicks));
         sheepId = -1;
@@ -138,7 +140,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
             AltarRitual ritual = r.altar();
             long total = fx.energy((long) ritual.effectiveEnergy());
             energyPerTick = (int) Math.min(Integer.MAX_VALUE, (total + maxProgress - 1) / maxProgress);
-            LivingEntity sheep = findSheep(level, pos, r);
+            LivingEntity sheep = findSheep(level, pos, r, rangeBonus());
             if (feed.getCount() < r.effectiveFeedingAmount()) {
                 set(AltarStatus.NOT_ENOUGH_ITEMS, progress);
             } else if (catalystSlots(ritual) == null) {
@@ -255,7 +257,12 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
      * down, so a sheep on the floor beside the pedestal or on a step counts.
      */
     public static AABB sheepArea(BlockPos pos) {
-        return new AABB(pos).inflate(REACH, 1, REACH);
+        return sheepArea(pos, 0);
+    }
+
+    /** {@link #sheepArea(BlockPos)} reaching {@code extra} blocks further sideways (Range upgrade cards). */
+    public static AABB sheepArea(BlockPos pos, int extra) {
+        return new AABB(pos).inflate(REACH + extra, 1, REACH + extra);
     }
 
     @Override
@@ -272,7 +279,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
 
     @Override
     public AABB displayedArea() {
-        return sheepArea(worldPosition);
+        return sheepArea(worldPosition, rangeBonus());
     }
 
     @Override
@@ -281,8 +288,8 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
     }
 
     /** The nearest grown, infusable sheep within reach that can take {@code resource} now. */
-    private static @Nullable LivingEntity findSheep(ServerLevel level, BlockPos pos, SheepResource resource) {
-        AABB area = sheepArea(pos);
+    private static @Nullable LivingEntity findSheep(ServerLevel level, BlockPos pos, SheepResource resource, int extra) {
+        AABB area = sheepArea(pos, extra);
         Vec3 centre = Vec3.atCenterOf(pos);
         return level.getEntitiesOfClass(LivingEntity.class, area, e -> ModTags.isInfusable(e) && e.isAlive()
                         && SheepInfusionEvents.checkSheep(e, resource, false) == null)
@@ -403,6 +410,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
     protected void loadAdditional(ValueInput in) {
         super.loadAdditional(in);
         upgrades.load(in);
+        syncedRange = in.getIntOr("upgrade_range", 0);
         items.clear();
         ContainerHelper.loadAllItems(in, items);
         in.child("energy").ifPresent(energy::deserialize);
@@ -434,22 +442,30 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
     public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         tag.putBoolean("show_area", showArea);
+        tag.putInt("upgrade_range", upgrades.effects().range());
         return tag;
     }
 
     @Override
     public void onDataPacket(net.minecraft.network.Connection net, ValueInput input) {
         showArea = input.getBooleanOr("show_area", false);
+        syncedRange = input.getIntOr("upgrade_range", 0);
     }
 
     @Override
     public void handleUpdateTag(ValueInput input) {
         showArea = input.getBooleanOr("show_area", false);
+        syncedRange = input.getIntOr("upgrade_range", 0);
     }
 
     @Override
     public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
         return upgrades;
+    }
+
+    @Override
+    public int rangeBonus() {
+        return level != null && level.isClientSide() ? syncedRange : upgrades.effects().range();
     }
 
     @Override

@@ -46,7 +46,11 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * Its comparator signal reads how full the output slot is.
  */
-public class ChillerBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
+public class ChillerBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MachineContainer, WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
+    /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
+    /** On a client: the blocks its Range cards add to its area, as last synced. */
+    private int syncedRange;
     public static final int SCAN_INTERVAL = 10;
     public static final int AREA_COLOR = 0xFF7FD8FF;
     private static final int[] SLOTS = {0};
@@ -99,7 +103,12 @@ public class ChillerBlockEntity extends BlockEntity implements MachineContainer,
 
     /** The chilling area: the same as the furnace's, (2 radius + 1) square columns at its level and the one above. */
     public static AABB chillingArea(BlockPos pos) {
-        return BlazeFurnaceBlockEntity.heatingArea(pos, ModConfigs.getInt(ModConfigs.SERVER.chillerRadius));
+        return chillingArea(pos, 0);
+    }
+
+    /** {@link #chillingArea(BlockPos)} grown by {@code extra} blocks on every side (Range upgrade cards). */
+    public static AABB chillingArea(BlockPos pos, int extra) {
+        return BlazeFurnaceBlockEntity.heatingArea(pos, ModConfigs.getInt(ModConfigs.SERVER.chillerRadius) + extra);
     }
 
     public static int ticksPerIce() {
@@ -170,12 +179,15 @@ public class ChillerBlockEntity extends BlockEntity implements MachineContainer,
 
     /** Counts the Snow sheep in the area. */
     public void scan(ServerLevel level, BlockPos pos, BlockState state) {
-        AABB area = chillingArea(pos);
+        AABB area = chillingArea(pos, rangeBonus());
         List<Sheep> found = level.getEntitiesOfClass(Sheep.class, area, s -> area.contains(s.position()) && isColdSource(s));
         int[] ids = found.stream().limit(maxSources()).mapToInt(Sheep::getId).sorted().toArray();
         // Keep its Snow sheep close: call strays back while it has room for more.
         SheepAttraction.claim(found, level.getGameTime());
-        SheepAttraction.attract(level, area, ChillerBlockEntity::isColdSource, maxSources() - found.size(), level.getGameTime());
+        // With a Range card it calls them back only every other second, so they wander a bit more.
+        if (rangeBonus() == 0 || level.getGameTime() / 20 % 2 == 0) {
+            SheepAttraction.attract(level, area, ChillerBlockEntity::isColdSource, maxSources() - found.size(), level.getGameTime());
+        }
         cold = coldFrom(ids.length);
         if (!Arrays.equals(ids, chillers)) {
             chillers = ids;
@@ -240,7 +252,7 @@ public class ChillerBlockEntity extends BlockEntity implements MachineContainer,
 
     @Override
     public AABB displayedArea() {
-        return chillingArea(worldPosition);
+        return chillingArea(worldPosition, rangeBonus());
     }
 
     @Override
@@ -310,6 +322,8 @@ public class ChillerBlockEntity extends BlockEntity implements MachineContainer,
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        upgrades.load(input);
+        syncedRange = input.getIntOr("upgrade_range", 0);
         input.child("tank").ifPresent(tank::deserialize);
         output = input.read("output", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         progress = input.getIntOr("progress", 0);
@@ -320,6 +334,7 @@ public class ChillerBlockEntity extends BlockEntity implements MachineContainer,
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        upgrades.save(output);
         tank.serialize(output.child("tank"));
         if (!this.output.isEmpty()) output.store("output", ItemStack.OPTIONAL_CODEC, this.output);
         output.putInt("progress", progress);
@@ -336,7 +351,37 @@ public class ChillerBlockEntity extends BlockEntity implements MachineContainer,
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("show_area", showArea);
+        tag.putInt("upgrade_range", upgrades.effects().range());
         tag.putIntArray("chillers", chillers);
         return tag;
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
+        return upgrades;
+    }
+
+    @Override
+    public int rangeBonus() {
+        return level != null && level.isClientSide() ? syncedRange : upgrades.effects().range();
+    }
+
+    @Override
+    protected void collectImplicitComponents(net.minecraft.core.component.DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
+    }
+
+    @Override
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter components) {
+        super.applyImplicitComponents(components);
+        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
+        if (cards != null) upgrades.fromComponent(cards);
+    }
+
+    @Override
+    public void removeComponentsFromTag(ValueOutput output) {
+        super.removeComponentsFromTag(output);
+        output.discard("upgrades");
     }
 }

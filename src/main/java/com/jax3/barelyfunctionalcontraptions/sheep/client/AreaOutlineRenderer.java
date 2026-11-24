@@ -48,6 +48,11 @@ public class AreaOutlineRenderer<T extends BlockEntity & AreaDisplay> implements
         state.boxes = areas.stream().map(a -> a.move(-pos.getX(), -pos.getY(), -pos.getZ()).deflate(INSET)).toList();
         state.colors = new int[areas.size()];
         for (int i = 0; i < areas.size(); i++) state.colors[i] = be.areaColor(i);
+        // A Range upgrade card makes the outline wobble between colours (its catch: it never looks quite settled).
+        if (be instanceof com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable upgraded && upgraded.rangeBonus() > 0 && be.getLevel() != null) {
+            float t = (be.getLevel().getGameTime() % 24_000) + partialTicks;
+            for (int i = 0; i < state.colors.length; i++) state.colors[i] = wobble(state.colors[i], t);
+        }
         state.reaches = be.attractsSheep() && com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepAttraction.enabled()
                 ? areas.stream().map(a -> com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepAttraction.reach(a)
                         .move(-pos.getX(), -pos.getY(), -pos.getZ()).deflate(INSET)).toList()
@@ -62,6 +67,14 @@ public class AreaOutlineRenderer<T extends BlockEntity & AreaDisplay> implements
     }
 
     /** The attraction area: a faint box with dashed edges and no floor grid, so it reads as "nearby", not "inside". */
+    /** {@code color} with its hue swinging back and forth over a few seconds. */
+    static int wobble(int color, float t) {
+        float[] hsb = java.awt.Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
+        float hue = hsb[0] + 0.08F * net.minecraft.util.Mth.sin(t * 0.12F);
+        int rgb = net.minecraft.util.Mth.hsvToRgb(hue - (float) Math.floor(hue), hsb[1], hsb[2]);
+        return (color & 0xFF000000) | (rgb & 0xFFFFFF);
+    }
+
     private static void drawReach(AABB b, int color, PoseStack poseStack, SubmitNodeCollector collector) {
         int faint = (color & 0x00FFFFFF) | 0x60000000;
         collector.submitCustomGeometry(poseStack, RenderTypes.LINES, (pose, buffer) -> {

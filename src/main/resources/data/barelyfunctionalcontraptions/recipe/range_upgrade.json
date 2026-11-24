@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "barelyfunctionalcontraptions:upgrade_base",
+    "minecraft:ender_pearl",
+    "minecraft:purple_wool"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:range_upgrade",
+    "count": 1
+  }
+}

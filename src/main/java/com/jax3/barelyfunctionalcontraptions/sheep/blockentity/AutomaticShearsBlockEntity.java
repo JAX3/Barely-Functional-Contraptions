@@ -53,6 +53,8 @@ import org.jspecify.annotations.Nullable;
 public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, AreaDisplay {
     /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
     private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
+    /** On a client: the blocks its Range cards add to its area, as last synced. */
+    private int syncedRange;
     public static final int AREA_COLOR = 0xFF7FD3FF;
     public static final int SIZE = 9;
     /** Number of int fields synced to the menu (split into 16-bit halves where needed). */
@@ -114,7 +116,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     }
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
-        energy.refreshLimits();
+        energy.refreshLimits(0, upgrades.effects().capacity()); // a Capacity card holds and takes in more
         powered = level.hasNeighborSignal(pos);
         interval = upgrades.effects().ticks(Math.max(1, ModConfigs.getInt(ModConfigs.SERVER.automaticShearsInterval)));
         if (cooldown > interval) cooldown = interval;
@@ -150,14 +152,23 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
      * line, from one block below the machine to one block above it. A mob counts when its feet are inside.
      */
     public static AABB shearingArea(BlockPos pos, Direction facing) {
-        BlockPos centre = pos.relative(facing, 2);
-        return new AABB(centre.getX() - 1, pos.getY() - 1, centre.getZ() - 1, centre.getX() + 2, pos.getY() + 2, centre.getZ() + 2);
+        return shearingArea(pos, facing, 0);
+    }
+
+    /**
+     * {@link #shearingArea(BlockPos, Direction)} grown by {@code extra} blocks on every side but its back (Range upgrade
+     * cards): still starting one block in front of the shears, {@code 3 + 2 x extra} wide and deep.
+     */
+    public static AABB shearingArea(BlockPos pos, Direction facing, int extra) {
+        BlockPos centre = pos.relative(facing, 2 + extra);
+        int r = 1 + extra;
+        return new AABB(centre.getX() - r, pos.getY() - 1, centre.getZ() - r, centre.getX() + r + 1, pos.getY() + 2, centre.getZ() + r + 1);
     }
 
     /** Shears every ready mob in the area that it has energy and room for. Returns how many were sheared. */
     public int shearArea(ServerLevel level, BlockPos pos, Direction facing) {
         if (!hasSpace()) return 0;
-        AABB area = shearingArea(pos, facing);
+        AABB area = shearingArea(pos, facing, rangeBonus());
         List<Mob> mobs = level.getEntitiesOfClass(Mob.class, area, mob -> mob.isAlive()
                 && mob.getType().builtInRegistryHolder().is(ModTags.AUTO_SHEARABLE) && area.contains(mob.position()));
         int cost = energyPerShear();
@@ -272,7 +283,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
 
     @Override
     public AABB displayedArea() {
-        return shearingArea(worldPosition, getBlockState().getValue(AutomaticShearsBlock.FACING));
+        return shearingArea(worldPosition, getBlockState().getValue(AutomaticShearsBlock.FACING), rangeBonus());
     }
 
     @Override
@@ -290,6 +301,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         tag.putBoolean("show_area", showArea);
+        tag.putInt("upgrade_range", upgrades.effects().range());
         return tag;
     }
 
@@ -332,6 +344,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         upgrades.load(input);
+        syncedRange = input.getIntOr("upgrade_range", 0);
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(input, items);
         input.child("energy").ifPresent(energy::deserialize);
@@ -366,6 +379,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
         super.applyImplicitComponents(components);
         var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
         if (cards != null) upgrades.fromComponent(cards);
+        energy.refreshLimits(0, upgrades.effects().capacity()); // so the energy it kept fits a Capacity card's buffer
         MachineContents contents = components.get(ModDataComponents.MACHINE_CONTENTS.get());
         if (contents != null) {
             energy.set(Math.min(contents.energy(), energy.getCapacityAsInt()));
@@ -385,5 +399,10 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     @Override
     public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
         return upgrades;
+    }
+
+    @Override
+    public int rangeBonus() {
+        return level != null && level.isClientSide() ? syncedRange : upgrades.effects().range();
     }
 }

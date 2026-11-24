@@ -26,8 +26,16 @@ public class MachineEnergy extends SimpleEnergyHandler {
 
     /** As {@link #refreshLimits()}, but holding and taking at least twice {@code neededPerTick} (so it can keep up). */
     public void refreshLimits(int neededPerTick) {
-        capacity = Math.max(configCapacity.getAsInt(), neededPerTick * 2);
-        maxInsert = Math.max(configMaxInput.getAsInt(), neededPerTick * 2);
+        refreshLimits(neededPerTick, 1);
+    }
+
+    /**
+     * As {@link #refreshLimits(int)}, with the config's capacity and input rate times {@code scale} (a Capacity
+     * upgrade card).
+     */
+    public void refreshLimits(int neededPerTick, double scale) {
+        capacity = (int) Math.max(Math.min(Integer.MAX_VALUE, Math.round(configCapacity.getAsInt() * scale)), (long) neededPerTick * 2);
+        maxInsert = (int) Math.max(Math.min(Integer.MAX_VALUE, Math.round(configMaxInput.getAsInt() * scale)), (long) neededPerTick * 2);
         if (energy > capacity) set(capacity);
     }
 

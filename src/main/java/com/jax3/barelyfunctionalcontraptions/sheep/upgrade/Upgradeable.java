@@ -8,4 +8,9 @@ public interface Upgradeable {
     default UpgradeEffects upgradeEffects() {
         return upgrades().effects();
     }
+
+    /** Blocks a Range card adds to its working area: from its cards on the server, as last synced on a client. */
+    default int rangeBonus() {
+        return upgradeEffects().range();
+    }
 }

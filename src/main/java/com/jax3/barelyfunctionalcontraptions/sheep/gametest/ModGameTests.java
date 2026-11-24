@@ -156,6 +156,8 @@ public final class ModGameTests {
         TESTS.put("efficiency_upgrade_packs_for_less_power", ModGameTests::efficiencyUpgradePacker);
         TESTS.put("upgrade_slots_in_the_window", ModGameTests::upgradeWindow);
         TESTS.put("machine_keeps_its_upgrades_when_broken", ModGameTests::upgradesKept);
+        TESTS.put("capacity_upgrade_holds_and_takes_in_more", ModGameTests::capacityUpgrade);
+        TESTS.put("range_upgrade_grows_working_areas", ModGameTests::rangeUpgrade);
         TESTS.put("infusion_altar_pulses_when_ready", ModGameTests::altarPulse);
         TESTS.put("list_command_lists_every_sheep", ModGameTests::listCommand);
         TESTS.put("snow_sheep_leaves_snow", ModGameTests::snowSheep);
@@ -2413,6 +2415,79 @@ public final class ModGameTests {
         h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(ModBlocks.CHILLER.get().defaultBlockState(), card(true)), "the Snow Sheep Chiller takes no cards");
         h.assertTrue(furnace.getContainerSize() == 2, "pipes and hoppers still see 2 slots, not the upgrades");
         h.succeed();
+    }
+
+    /**
+     * Capacity: four times the buffer and input rate with one card (ten with two); the separator holds 400,000 FE and
+     * takes 4,000 a tick. Taking the card out loses what's over. Shears kept with energy over their usual buffer and the
+     * card keep it all when placed again. Capacity goes in powered machines, not the chiller.
+     */
+    private static void capacityUpgrade(GameTestHelper h) {
+        var one = com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CAPACITY_UPGRADE.get())));
+        var two = com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CAPACITY_UPGRADE.get()), new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CAPACITY_UPGRADE.get())));
+        h.assertTrue(Math.abs(one.capacity() - 4) < 1e-9 && Math.abs(two.capacity() - 10) < 1e-9 && one.time() == 1 && one.energy() == 1,
+                "Capacity: x4, x10 with two (the second at half strength), nothing else: " + one + " " + two);
+        MechanicalSeparatorBlockEntity sep = separator(h, new BlockPos(1, 1, 1));
+        int baseCapacity = ModConfigs.getInt(ModConfigs.SERVER.energyCapacity), baseInput = ModConfigs.getInt(ModConfigs.SERVER.maxEnergyInput);
+        sep.upgrades().setItem(0, new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CAPACITY_UPGRADE.get()));
+        var shears = shearsAt(h, new BlockPos(5, 1, 1), Direction.NORTH);
+        shears.upgrades().setItem(0, new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CAPACITY_UPGRADE.get()));
+        h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(ModBlocks.CHILLER.get().defaultBlockState(), new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CAPACITY_UPGRADE.get())), "the chiller takes no Capacity card");
+        h.runAfterDelay(2, () -> {
+            h.assertTrue(sep.getEnergy().getCapacityAsInt() == baseCapacity * 4, "the separator holds four times as much, " + sep.getEnergy().getCapacityAsInt());
+            h.assertTrue(insertEnergy(sep.getEnergy(), baseCapacity * 3) == baseCapacity * 3, "and fills past its usual buffer");
+            try (Transaction tx = Transaction.openRoot()) {
+                h.assertTrue(sep.getEnergy().insert(Integer.MAX_VALUE, tx) == baseInput * 4, "taking in four times as much a tick");
+            }
+            sep.upgrades().setItem(0, ItemStack.EMPTY);
+        });
+        h.runAfterDelay(4, () -> {
+            h.assertTrue(sep.getEnergy().getEnergy() == baseCapacity, "without the card, what's over its usual buffer is lost: " + sep.getEnergy().getEnergy());
+            int shearsBase = shears.getEnergy().getCapacityAsInt() / 4;
+            shears.getEnergy().set(shearsBase * 3);
+            var drops = net.minecraft.world.level.block.Block.getDrops(shears.getBlockState(), h.getLevel(), shears.getBlockPos(), shears);
+            h.setBlock(new BlockPos(5, 1, 1), Blocks.AIR);
+            var placed = shearsAt(h, new BlockPos(5, 1, 1), Direction.NORTH);
+            placed.applyComponentsFromItemStack(drops.getFirst());
+            h.assertTrue(placed.getEnergy().getEnergy() == shearsBase * 3, "picked up and placed again, the shears keep all their energy, have "
+                    + placed.getEnergy().getEnergy() + " of " + shearsBase * 3);
+            h.succeed();
+        });
+    }
+
+    /**
+     * Range: one block more on every side, two with two cards. The shears' 3x3 becomes 5x5 (still starting a block in
+     * front) and shears a sheep 4 blocks out that plain shears can't reach; the altar reaches 7x7, the chiller 7x7. It
+     * goes in those three, not the separator.
+     */
+    private static void rangeUpgrade(GameTestHelper h) {
+        var range = new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.RANGE_UPGRADE.get());
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(range)).range() == 1 && com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(range, range.copy())).range() == 2,
+                "one block a card");
+        h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState(), range), "the separator takes no Range card");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(ModBlocks.CHILLER.get().defaultBlockState(), range), "the chiller does");
+        var plain = shearsAt(h, new BlockPos(1, 1, 1), Direction.SOUTH);
+        var far = shearsAt(h, new BlockPos(6, 1, 1), Direction.SOUTH);
+        far.upgrades().setItem(0, range.copy());
+        for (var s : List.of(plain, far)) insertEnergy(s.getEnergy(), 50_000);
+        h.assertTrue(plain.displayedArea().getXsize() == 3 && far.displayedArea().getXsize() == 5 && far.displayedArea().getZsize() == 5,
+                "the shears' area grows from 3x3 to 5x5: " + far.displayedArea());
+        h.assertTrue(far.displayedArea().minZ == h.absolutePos(new BlockPos(6, 1, 2)).getZ(), "still starting a block in front");
+        Sheep nearPlain = sheepAt(h, new BlockPos(1, 1, 5), null);
+        Sheep nearFar = sheepAt(h, new BlockPos(6, 1, 5), null);
+        h.setBlock(new BlockPos(3, 1, 7), ModBlocks.INFUSION_ALTAR.get());
+        var altar = h.getBlockEntity(new BlockPos(3, 1, 7), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity.class);
+        altar.upgrades().setItem(0, range.copy());
+        h.assertTrue(altar.displayedArea().getXsize() == 7 && altar.displayedArea().getZsize() == 7, "the altar reaches 7x7: " + altar.displayedArea());
+        h.setBlock(new BlockPos(8, 1, 7), ModBlocks.CHILLER.get());
+        var chiller = h.getBlockEntity(new BlockPos(8, 1, 7), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.class);
+        int plainSize = (int) chiller.displayedArea().getXsize();
+        chiller.upgrades().setItem(0, range.copy());
+        h.assertTrue(chiller.displayedArea().getXsize() == plainSize + 2, "the chiller's area grows by a block each way: " + chiller.displayedArea());
+        h.succeedWhen(() -> {
+            h.assertTrue(nearFar.isSheared(), "the shears with a Range card reach the sheep 4 blocks out");
+            h.assertFalse(nearPlain.isSheared(), "plain shears don't");
+        });
     }
 
     /** A Powered Furnace broken with cards in drops itself with them on its item; placed again, it has them back. */

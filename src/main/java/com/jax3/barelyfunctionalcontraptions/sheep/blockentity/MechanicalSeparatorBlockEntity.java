@@ -110,7 +110,8 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
     }
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
-        energy.refreshLimits(energyPerTick); // what it used last tick: the wool or bale in it now
+        // What it used last tick (the wool or bale in it now); a Capacity card holds and takes in more.
+        energy.refreshLimits(energyPerTick, upgrades.effects().capacity());
         powered = level.hasNeighborSignal(pos);
         RedstoneMode mode = ModConfigs.getBool(ModConfigs.SERVER.redstoneControlEnabled) ? redstoneMode : ModConfigs.get(ModConfigs.SERVER.defaultRedstoneMode);
 
@@ -348,6 +349,7 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
         super.applyImplicitComponents(components);
         var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
         if (cards != null) upgrades.fromComponent(cards);
+        energy.refreshLimits(0, upgrades.effects().capacity()); // so the energy it kept fits a Capacity card's buffer
         MachineContents contents = components.get(ModDataComponents.MACHINE_CONTENTS.get());
         if (contents != null) {
             energy.set(Math.min(contents.energy(), energy.getCapacityAsInt()));

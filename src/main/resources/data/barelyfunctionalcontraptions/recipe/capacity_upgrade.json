@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "barelyfunctionalcontraptions:upgrade_base",
+    "barelyfunctionalcontraptions:wool_bale",
+    "minecraft:light_blue_wool"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:capacity_upgrade",
+    "count": 1
+  }
+}

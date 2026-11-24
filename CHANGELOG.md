@@ -156,14 +156,19 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
 - Client config `blockTexturedWool` (on) brings back the old plain fleece when off.
 
 ### Upgrade cards
-- **Two upgrade slots** in the Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar and Automatic Shears,
-  in a small panel on the right of their window.
+- **Two upgrade slots** in the Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears and
+  Snow Sheep Chiller, in a small panel on the right of their window.
 - **Speed Upgrade:** jobs take 60% of the time and cost 150% of the power. **Efficiency Upgrade:** 75% of the power,
   115% of the time. A second card of the same kind does half as much; a Speed and an Efficiency card multiply.
 - Crafted from an **Upgrade Base** (Blue Steel, Redstone and wool, two at a time): with a Block of Redstone, Sugar and
   Red Wool for Speed, or a Block of Copper and Lime Wool for Efficiency.
 - Cards stay with a machine that's broken or picked up, and only go in machines that take them (block tags, for data
   packs). Hoppers and pipes leave them alone. JEI's item list keeps clear of the panel.
+- **Capacity Upgrade** (Wool Bale and Light Blue Wool): four times the energy buffer and power input, in the five
+  powered machines.
+- **Range Upgrade** (Ender Pearl and Purple Wool): one more block of working area on every side, in the Automatic
+  Shears (3x3 to 5x5), Infusion Altar (7x7) and Snow Sheep Chiller (7x7), which gets upgrade slots for it. Its outline
+  wobbles between colours, and a chiller with one calls its sheep back only every other second.
 - Config `[upgrades]` for each card's numbers and the second card's strength.
 
 ### Processing machines about half as fast again

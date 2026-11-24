@@ -92,7 +92,7 @@ public class WoolPackerBlockEntity extends BlockEntity implements com.jax3.barel
     }
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
-        energy.refreshLimits();
+        energy.refreshLimits(0, upgrades.effects().capacity()); // a Capacity card holds and takes in more
         var fx = upgrades.effects();
         maxProgress = fx.ticks(ModConfigs.getInt(ModConfigs.SERVER.woolPackerTicksPerBale));
         int cost = fx.energy(ModConfigs.getInt(ModConfigs.SERVER.woolPackerEnergyPerBale));
