@@ -245,7 +245,7 @@ public final class ResourceGenerator {
         int accent = lighten(color, 0.55F);
 
         JsonObject json = new JsonObject();
-        json.addProperty("_generated", "by /barelyfunctionalcontraptions generate; safe to edit");
+        json.addProperty("_generated", "by /bfc generate; safe to edit");
         json.add("feeding_item", feedingJson);
         // Infused at the altar like the built-in sheep: 2 of the block in the centre, round it an ingot (or gem or
         // dust) of the material when there is one, and a Golden Carrot.

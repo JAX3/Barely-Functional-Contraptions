@@ -306,7 +306,7 @@ The **Infusion Altar** is a powered pedestal. Put the feeding item in its **cent
 | Uncommon: Iron, Gold, Redstone, Lapis, Quartz, Glow Ink, Spider, Skeleton | the resource | 2 of its blocks (Blocks of Iron, Gold, Redstone, Lapis, Quartz; Glowstone; Cobwebs; Bone Blocks), 1 Golden Carrot | 20,000 FE |
 | Rare: Diamond, Emerald, Blaze, Ghast | the resource | 2 of its blocks (Blocks of Diamond, Emerald; Magma Blocks; Soul Sand), 1 Golden Apple | 20,000 FE |
 | Epic: Netherite, Wither Skeleton | the resource | 2 Ancient Debris or 2 Nether Bricks, 1 Eye of Ender | 20,000 FE |
-| Generated (`/barelyfunctionalcontraptions generate`) | 2 of the block | an ingot, gem or dust of the material, 1 Golden Carrot | 20,000 FE |
+| Generated (`/bfc generate`) | 2 of the block | an ingot, gem or dust of the material, 1 Golden Carrot | 20,000 FE |
 
 - **Window:** the energy buffer, the cross of slots, a progress bar, the tier and FE/t (about 4,000 FE/t for tier 2 over 2.5 seconds). The catalysts still needed show **faded in the empty side slots**, and hovering a side slot lists them, with the missing ones in red. A status lamp shows *Waiting*, *Infusing*, *No energy*, *Missing catalysts*, *No sheep* or *Not enough items*.
 - **Which sheep:** the nearest grown sheep in reach that can take the resource: not already infused with something else, not a lamb (unless `allowBabies` is on). Its Endurance counts.
@@ -1242,7 +1242,7 @@ Twelve more built-in resources turn the sheep into a little version of the mob (
 The glow is a real light. A Glow Ink sheep leaves an invisible light block where it stands, and the light goes out within half a second of the sheep moving away, being sheared or losing its infusion. The light block can't be seen or touched and never drops anything.
 
 ### JEI: every wool type the separator handles
-With JEI installed, click the Mechanical Separator in JEI (or press **U** over it) to open **Mechanical Separation**. It lists **every wool type that's loaded**: built-in, mushroom, command-generated and data-pack ones, sorted by name. Plain wool → string and other explicit recipes come after them. Each wool type is one compact row: wool → resource (cycling through 2–4) + string + bonus chance, with energy and time. Like the Resource Infusion page and the Mycelial Generator's fuel page, it uses the same dark slate style as the machine screens: slate panels, recessed slots, and the separator's purple arrow filling over the real processing time. Hover over things for the details. JEI updates by itself after `/reload` or `/barelyfunctionalcontraptions generate`. Press **U** on any resource wool to jump to its row (**R** shows how to make it: the infusion page).
+With JEI installed, click the Mechanical Separator in JEI (or press **U** over it) to open **Mechanical Separation**. It lists **every wool type that's loaded**: built-in, mushroom, command-generated and data-pack ones, sorted by name. Plain wool → string and other explicit recipes come after them. Each wool type is one compact row: wool → resource (cycling through 2–4) + string + bonus chance, with energy and time. Like the Resource Infusion page and the Mycelial Generator's fuel page, it uses the same dark slate style as the machine screens: slate panels, recessed slots, and the separator's purple arrow filling over the real processing time. Hover over things for the details. JEI updates by itself after `/reload` or `/bfc generate`. Press **U** on any resource wool to jump to its row (**R** shows how to make it: the infusion page).
 
 ![JEI Mechanical Separation](screenshots/06_jei_separation.png)
 
@@ -1544,7 +1544,7 @@ Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already 
 | `transferRate` | 16 | Most items per tick one pipe network carries in total, however many pipes and blocks are on it |
 | `maxNetworkSize` | 4096 | Most pipes in one network. A longer run splits into separate networks, which only pass items on through blocks plugged into both |
 
-**`[generator]`** (limits for `/barelyfunctionalcontraptions generate`; see [What the generator may use](#what-the-generator-may-use))
+**`[generator]`** (limits for `/bfc generate`; see [What the generator may use](#what-the-generator-may-use))
 
 | Key | Default | Meaning |
 |---|---|---|
@@ -1649,15 +1649,15 @@ You don't have to write a definition for every metal by hand. In a world with ch
 
 | Command | What it does |
 |---|---|
-| `/barelyfunctionalcontraptions preview` | Lists what would be generated, without changing anything |
-| `/barelyfunctionalcontraptions generate` | Creates a resource for every material that doesn't have one yet, saves them into the world data pack `barelyfunctionalcontraptions_generated`, and reloads |
-| `/barelyfunctionalcontraptions generate all` | Same, but also regenerates materials that already have a definition |
-| `/barelyfunctionalcontraptions generate material <material>` | Adds just one material from the storage-block tags. Press Tab to pick one (`slime`, `tin`, `osmium`...) |
-| `/barelyfunctionalcontraptions generate item <item>` | Adds a wool type fed with **any** item you choose, e.g. `minecraft:amethyst_block`. If the item is a storage block, its whole `c:storage_blocks` tag is used. |
-| `/barelyfunctionalcontraptions generate hand` | Same as `item`, using the item in your main hand |
-| `/barelyfunctionalcontraptions generate remove <name>` | Deletes one generated wool type (press Tab to list them) |
-| `/barelyfunctionalcontraptions generate dedupe` | Deletes generated wool types that duplicate another one, then reloads. A duplicate has the same feeding block or the same name as another type, for example a generated Iron next to the built-in Iron after `generate all`. Built-in and hand-written definitions are never removed. Of two generated duplicates, the first by id is kept. |
-| `/barelyfunctionalcontraptions list` | Lists every loaded resource |
+| `/bfc preview` | Lists what would be generated, without changing anything |
+| `/bfc generate` | Creates a resource for every material that doesn't have one yet, saves them into the world data pack `barelyfunctionalcontraptions_generated`, and reloads |
+| `/bfc generate all` | Same, but also regenerates materials that already have a definition |
+| `/bfc generate material <material>` | Adds just one material from the storage-block tags. Press Tab to pick one (`slime`, `tin`, `osmium`...) |
+| `/bfc generate item <item>` | Adds a wool type fed with **any** item you choose, e.g. `minecraft:amethyst_block`. If the item is a storage block, its whole `c:storage_blocks` tag is used. |
+| `/bfc generate hand` | Same as `item`, using the item in your main hand |
+| `/bfc generate remove <name>` | Deletes one generated wool type (press Tab to list them) |
+| `/bfc generate dedupe` | Deletes generated wool types that duplicate another one, then reloads. A duplicate has the same feeding block or the same name as another type, for example a generated Iron next to the built-in Iron after `generate all`. Built-in and hand-written definitions are never removed. Of two generated duplicates, the first by id is kept. |
+| `/bfc list` | Lists every loaded resource |
 
 #### What the generator may use
 By default the generator only makes wool types whose resource is something from the **Building Blocks**, **Ingredients** or **Food & Drinks** creative tabs, and it **blacklists every item that doesn't stack** (tools, weapons, armour, buckets, potions, stews and so on). This applies to `generate`, `generate all`, `preview`, `material`, `item` and `hand`, and to tab-completion:
@@ -1765,7 +1765,7 @@ All four can be edited in-game from *Mods → Barely Functional Contraptions →
 
 ## Commands
 
-`/barelyfunctionalcontraptions preview | generate | list` (operator level 2). This is the Resourceful Sheep resource generator described above, which used to be `/resourcefulsheep`.
+`/bfc preview | generate | list` (operator level 2). This is the Resourceful Sheep resource generator described above, which used to be `/resourcefulsheep`.
 
 ---
 

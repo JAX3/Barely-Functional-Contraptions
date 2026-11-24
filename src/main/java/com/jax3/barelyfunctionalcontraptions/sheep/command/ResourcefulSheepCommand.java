@@ -54,8 +54,11 @@ public final class ResourcefulSheepCommand {
             SharedSuggestionProvider.suggest(SheepResourceRegistry.server().all().stream()
                     .filter(ResourceGenerator::isGenerated).map(r -> r.id().getPath()), builder);
 
+    /** The command: {@code /bfc}, short for Barely Functional Contraptions. */
+    public static final String NAME = "bfc";
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
-        dispatcher.register(Commands.literal(ResourcefulSheep.MOD_ID)
+        dispatcher.register(Commands.literal(NAME)
                 .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("generate")
                         .executes(ctx -> generate(ctx, false))

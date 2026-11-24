@@ -319,16 +319,16 @@ public final class DevScreenshotHarness {
         }
         switch (tick) {
             case 60 -> server.execute(() -> setupScene(server));
-            case 90 -> command(server, "barelyfunctionalcontraptions generate material slime");
-            case 110 -> command(server, "barelyfunctionalcontraptions generate item minecraft:amethyst_block");
-            case 130 -> command(server, "barelyfunctionalcontraptions generate item minecraft:iron_block");
-            case 140 -> command(server, "barelyfunctionalcontraptions generate item minecraft:emerald_block");
+            case 90 -> command(server, "bfc generate material slime");
+            case 110 -> command(server, "bfc generate item minecraft:amethyst_block");
+            case 130 -> command(server, "bfc generate item minecraft:iron_block");
+            case 140 -> command(server, "bfc generate item minecraft:emerald_block");
             case 150 -> server.execute(() -> {
                 ServerPlayer p = server.getPlayerList().getPlayers().getFirst();
                 p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.HONEY_BLOCK));
-                server.getCommands().performPrefixedCommand(p.createCommandSourceStack(), "barelyfunctionalcontraptions generate hand");
+                server.getCommands().performPrefixedCommand(p.createCommandSourceStack(), "bfc generate hand");
             });
-            case 175 -> command(server, "barelyfunctionalcontraptions generate remove slime");
+            case 175 -> command(server, "bfc generate remove slime");
             case 190 -> setHudHidden(mc, true);
             case 200 -> shot(mc, "01_world_sheep");
             case 210 -> server.execute(() -> look(server, 180, 28));
@@ -3769,7 +3769,7 @@ public final class DevScreenshotHarness {
     }
 
     /**
-     * Runs {@code /barelyfunctionalcontraptions list} as the player, the way it's typed in chat, and photographs the
+     * Runs {@code /bfc list} as the player, the way it's typed in chat, and photographs the
      * chat: {@code -PharnessScene=list_command} (with {@code -PharnessWorld="BFC Test World"} to check that world).
      */
     private static void listCommandTick(Minecraft mc) {
@@ -4142,7 +4142,7 @@ public final class DevScreenshotHarness {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                 player.teleportTo(player.level(), extendReturn.x, extendReturn.y, extendReturn.z, java.util.Set.of(), extendYaw, extendPitch, true);
                 // The scenes turn command feedback off for clean shots; the shared world must keep it on, or commands
-                // such as /barelyfunctionalcontraptions list show nothing.
+                // such as /bfc list show nothing.
                 server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamerule send_command_feedback true");
                 // Save the Thermal Reaction Chamber, the Echo Chamber, the Static Generator and their cube banks empty, so they
                 // run for a while when someone visits.

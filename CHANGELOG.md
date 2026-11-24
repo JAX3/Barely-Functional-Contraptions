@@ -205,6 +205,12 @@ Each job still costs the same total FE; it just finishes sooner.
 Older config files are updated once, the first time they load: settings still at their old defaults (from either
 speed-up) move to the new ones, and anything you changed is kept.
 
+### Shorter command
+- The mod's command is now **`/bfc`** (short for Barely Functional Contraptions) instead of
+  `/barelyfunctionalcontraptions`: `/bfc generate`, `/bfc generate all`, `/bfc generate material <material>`,
+  `/bfc generate item <item>`, `/bfc generate hand`, `/bfc generate dedupe`, `/bfc generate remove <name>`,
+  `/bfc preview` and `/bfc list`. Command blocks and scripts using the long name need updating.
+
 ### Removed: wireless power to machines
 - The Barely Functional Wrench no longer links a Mycelial Generator to a Mechanical Separator, Automatic Shears or Hume
   Energy Cube to power it wirelessly. Run **Energy Cables** from the generator instead, or put the machine against it.

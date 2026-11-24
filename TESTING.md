@@ -477,7 +477,7 @@ Run `./gradlew runClient -Puse_jei_runtime=false`. The game loads, and the gener
 
 # Resourceful Sheep module: report from the standalone mod
 
-> Recorded before the merge, when the mod id was `resourcefulsheep`. Commands are now `/barelyfunctionalcontraptions …` and the jar is `barelyfunctionalcontraptions-1.5.5-mc26.3.jar` (or `-mc26.2.jar`). The test counts above are the current ones.
+> Recorded before the merge, when the mod id was `resourcefulsheep`. Commands are now `/bfc …` and the jar is `barelyfunctionalcontraptions-1.5.5-mc26.3.jar` (or `-mc26.2.jar`). The test counts above are the current ones.
 
 
 Environment:
@@ -517,7 +517,7 @@ These run on a **dedicated-server** game test server, which also confirms the mo
 | `separating_recipe_handles_plain_wool` | The custom recipe type matches `#minecraft:wool` → 3 String. Dirt is not separable. |
 | `config_multipliers_affect_values` | Speed ×2 → 50 ticks and energy ×0.5 → 10,000 FE. Restored afterwards. |
 | `creative_generator_powers_separator` | Generator placed behind a separator pushes FE in, and the separator processes Iron Wool on that power alone. Any face allows unlimited extraction (5,000,000 FE pulled in one call). |
-| `generator_creates_valid_definitions` | `/barelyfunctionalcontraptions generate` logic: discovers slime, wheat and bone meal; skips already-defined iron, diamond and netherite and the raw ore blocks; slime block → 9 slime balls. Every generated JSON parses through the real codec, and writing produces one file per resource plus `pack.mcmeta`. |
+| `generator_creates_valid_definitions` | `/bfc generate` logic: discovers slime, wheat and bone meal; skips already-defined iron, diamond and netherite and the raw ore blocks; slime block → 9 slime balls. Every generated JSON parses through the real codec, and writing produces one file per resource plus `pack.mcmeta`. |
 | `generator_dedupe_removes_duplicate_wool` | After `generate all`: iron, gold, copper, redstone, lapis, coal, diamond, emerald and netherite are flagged as duplicates. Slime, wheat and bone meal are kept, and built-ins are never flagged. Only the duplicate files are deleted. |
 | `generator_pick_and_choose` | Material suggestions list slime but not raw ore blocks. An unknown material is rejected. `material slime` uses the storage tag ×9. `item amethyst_block` is fed directly, gives amethyst shard ×1 and parses. `item iron_block` uses the iron tag and is reported as already covered by the built-in. `writeOne` keeps the existing files. |
 | `separator_output_rolls_two_to_four` | Every resource's separator output is labelled 2-4 and the machine reserves room for 4. 1,000 rolls per resource stay within 2-4 and produce all of 2, 3 and 4. A plain number still means a fixed count, and min > max is rejected. |
@@ -532,7 +532,7 @@ The harness creates a world, stages the scene and saves screenshots to `run/scre
 - Client definitions are synced from the integrated server (12 received).
 
 #### Generator, end to end in the real client
-The harness ran `/barelyfunctionalcontraptions generate` in a live world:
+The harness ran `/bfc generate` in a live world:
 - The command wrote 5 definitions and reloaded automatically.
 - The server went from 12 to 17 loaded definitions, and all 17 synced to the client.
 - JEI showed 17 infusion recipes, including the generated Bone Meal resource with auto-tinted wool.

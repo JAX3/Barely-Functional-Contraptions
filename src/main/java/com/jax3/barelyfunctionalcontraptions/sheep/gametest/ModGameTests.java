@@ -279,7 +279,7 @@ public final class ModGameTests {
             int maxTicks = name.equals(LONG_BALE_TEST) ? 1200 : 400; // a whole bale takes 45 seconds
             event.registerTest(ResourcefulSheep.id(name), new FunctionGameTestInstance(fn, new TestData<>(env, STRUCTURE, maxTicks, 0, true)));
         }
-        // Tests that run /barelyfunctionalcontraptions generate (which reloads data packs) get their own batch, so the reload
+        // Tests that run /bfc generate (which reloads data packs) get their own batch, so the reload
         // never happens in the middle of the other tests.
         Holder<TestEnvironmentDefinition<?>> reloadEnv = event.registerEnvironment(ResourcefulSheep.id("sheep_reload"), new TestEnvironmentDefinition.AllOf());
         for (String name : RELOAD_TESTS.keySet()) {
@@ -3247,7 +3247,7 @@ public final class ModGameTests {
         });
     }
 
-    /** {@code /barelyfunctionalcontraptions list} prints a header and one line per loaded sheep. */
+    /** {@code /bfc list} prints a header and one line per loaded sheep. */
     private static void listCommand(GameTestHelper h) {
         var server = h.getLevel().getServer();
         List<String> lines = new java.util.ArrayList<>();
@@ -3258,7 +3258,7 @@ public final class ModGameTests {
             @Override public boolean shouldInformAdmins() { return false; }
         };
         var source = server.createCommandSourceStack().withSource(collector);
-        server.getCommands().performPrefixedCommand(source, "barelyfunctionalcontraptions list");
+        server.getCommands().performPrefixedCommand(source, "bfc list");
         ResourcefulSheep.LOGGER.info("[list test] {}", lines);
         int loaded = SheepResourceRegistry.server().all().size();
         h.assertTrue(lines.size() == loaded + 1, "a header and " + loaded + " sheep, got " + lines);
@@ -3945,7 +3945,7 @@ public final class ModGameTests {
     }
 
     /**
-     * A wool type made by {@code /barelyfunctionalcontraptions generate} keeps the sheep's infusion through everything a normal
+     * A wool type made by {@code /bfc generate} keeps the sheep's infusion through everything a normal
      * one does: feeding, saving and loading the sheep, shearing, regrowing, and another data pack reload.
      */
     private static final Identifier AMETHYST_GEN = Identifier.fromNamespaceAndPath(
@@ -3956,7 +3956,7 @@ public final class ModGameTests {
         var server = h.getLevel().getServer();
         Identifier slime = Identifier.fromNamespaceAndPath(com.jax3.barelyfunctionalcontraptions.sheep.command.ResourceGenerator.NAMESPACE, "slime");
         Sheep[] sheep = new Sheep[1];
-        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "barelyfunctionalcontraptions generate material slime");
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "bfc generate material slime");
         h.startSequence()
                 .thenWaitUntil(() -> h.assertTrue(SheepResourceRegistry.server().byId(slime).isPresent(), "generated slime resource loaded"))
                 .thenExecute(() -> {
@@ -3991,7 +3991,7 @@ public final class ModGameTests {
                     ResourcefulSheep.LOGGER.info("[generated test] second shear drops {}, infusion {}", drops, SheepInfusionEvents.getInfusion(sheep[0]));
                     h.assertTrue(drops.stream().anyMatch(st -> slime.equals(ResourceWoolItem.getResourceId(st))), "slime wool again: " + drops);
                     // Now the case that used to break: a wool type added on its own with "generate item"...
-                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "barelyfunctionalcontraptions generate item minecraft:amethyst_block");
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "bfc generate item minecraft:amethyst_block");
                 })
                 .thenWaitUntil(() -> h.assertTrue(SheepResourceRegistry.server().byId(AMETHYST_GEN).isPresent(), "generated amethyst loaded"))
                 .thenExecute(() -> {
@@ -4001,7 +4001,7 @@ public final class ModGameTests {
                             "infused with generated amethyst: " + SheepInfusionEvents.getInfusion(sheep[0]));
                     // ...followed by a plain "generate", which used to delete every generated file it didn't plan itself.
                     REGISTRY_BEFORE[0] = SheepResourceRegistry.server();
-                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "barelyfunctionalcontraptions generate");
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "bfc generate");
                 })
                 .thenWaitUntil(() -> h.assertTrue(SheepResourceRegistry.server() != REGISTRY_BEFORE[0], "generate reloaded"))
                 .thenExecute(() -> {
@@ -4013,7 +4013,7 @@ public final class ModGameTests {
                     List<ItemStack> drops = shear(h, sheep[0]);
                     h.assertTrue(drops.stream().anyMatch(st -> AMETHYST_GEN.equals(ResourceWoolItem.getResourceId(st))), "amethyst wool: " + drops);
                     // Tidy up so later runs in the same world start clean.
-                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "barelyfunctionalcontraptions generate remove amethyst");
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "bfc generate remove amethyst");
                 })
                 .thenSucceed();
     }

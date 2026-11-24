@@ -17,7 +17,7 @@ Everything runs on Forge Energy. You can make it from mushrooms in a network of 
   - **Add sheep:** a new sheep needs only a JSON file. It sets the feeding item, the colours, the separator's outputs, its tier and altar catalysts, and extra looks such as wings, extra heads, glowing or a bigger size.
   - **More data:** Wool Burner fuels, furnace heat sources and boost items, and separator recipes are data too.
   - **For other mods:** the `resource_wool` ingredient lets KubeJS, Create and other mods' recipes use resource wool.
-- **Modpacks:** `/barelyfunctionalcontraptions generate` makes a sheep for every ore and material in the modpack.
+- **Modpacks:** `/bfc generate` makes a sheep for every ore and material in the modpack.
 - **Resource packs:** they can retexture any wool and rewrite or translate the in-game manual.
 - **Optional mods:** JEI and Jade show every recipe and machine status, but the mod runs without them.
 
@@ -251,7 +251,7 @@ While you wear the **Woollen Boots** you're **Muffled**: you make no sound, from
 
 ### Data Packs
 
-Sheep, Wool Burner fuels, furnace heat sources and separator recipes are all data. `/barelyfunctionalcontraptions generate` makes a sheep for every material in the modpack, and every number can be changed in the config (see *Make it your own* above).
+Sheep, Wool Burner fuels, furnace heat sources and separator recipes are all data. `/bfc generate` makes a sheep for every material in the modpack, and every number can be changed in the config (see *Make it your own* above).
 
 ![The Resource Wool creative tab in sections: Resource Wool, a wool for every built-in sheep, then the Wool Bales banner](docs/screenshots/showcase_tab_wool.png)
 

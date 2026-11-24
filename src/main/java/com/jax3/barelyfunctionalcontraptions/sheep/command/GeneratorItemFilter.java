@@ -20,7 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Decides which items {@code /barelyfunctionalcontraptions generate} may use.
+ * Decides which items {@code /bfc generate} may use.
  *
  * <ul>
  *     <li><b>Creative tabs</b> ({@code [generator] allowedCreativeTabs}, default Building Blocks, Ingredients and

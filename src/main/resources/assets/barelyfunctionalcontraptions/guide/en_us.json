@@ -57,9 +57,9 @@
         "Wool Burner fuels are data too: data/<namespace>/barelyfunctionalcontraptions/wool_burner_fuel/<name>.json, each with an ingredient, a burn_time and a power.",
         "A separating recipe whose ingredient matches a Wool Bale (barelyfunctionalcontraptions:wool_bale with its sheep_resource component) gives that bale its own outputs instead of the scaled-up wool ones.",
         "## Commands",
-        "- /barelyfunctionalcontraptions list: every loaded resource.",
-        "- /barelyfunctionalcontraptions generate: a resource for every material in the modpack.",
-        "- /barelyfunctionalcontraptions generate item <item>: a resource fed with any item.",
+        "- /bfc list: every loaded resource.",
+        "- /bfc generate: a resource for every material in the modpack.",
+        "- /bfc generate item <item>: a resource fed with any item.",
         "Every number in the mod can be changed in its config files, from the mod list's Config button."
       ]
     },
@@ -364,7 +364,7 @@
         "- In creative, the Resource Wool tab has a spawn egg for every sheep, which spawns it already infused.",
         "Right-clicking a sheep with a resource does nothing now; wheat, dyes and shears behave as usual. A server can bring hand feeding back in the config ([infusion_altar] handFeedingMaxTier).",
         "## More resources",
-        "Data packs can add any resource, and operators can run /barelyfunctionalcontraptions generate to make one for every metal in the modpack. Generated sheep take 2 of the block, an ingot and a Golden Carrot."
+        "Data packs can add any resource, and operators can run /bfc generate to make one for every metal in the modpack. Generated sheep take 2 of the block, an ingot and a Golden Carrot."
       ],
       "tab": "production"
     },

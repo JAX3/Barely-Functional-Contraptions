@@ -126,7 +126,7 @@
 	# Range: > 0
 	creativeGeneratorOutput = 1000000
 
-#Which items /barelyfunctionalcontraptions generate may turn into wool types (feeding items and separator outputs).
+#Which items /bfc generate may turn into wool types (feeding items and separator outputs).
 #Applies to generate, generate all, preview, material, item and hand. Existing definitions are not touched.
 [generator]
 	#Creative tabs an item must appear in. Default: Building Blocks, Ingredients and Food & Drinks.

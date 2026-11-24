@@ -343,7 +343,7 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue itemPipeTransferRate;
         public final ModConfigSpec.IntValue itemPipeMaxNetworkSize;
 
-        // ---------------------------------------------------------------- /barelyfunctionalcontraptions generate
+        // ---------------------------------------------------------------- /bfc generate
         public final ModConfigSpec.ConfigValue<List<? extends String>> generatorAllowedTabs;
         public final ModConfigSpec.BooleanValue generatorRequireStackable;
 
@@ -939,7 +939,7 @@ public final class ModConfigs {
                     .translation("barelyfunctionalcontraptions.configuration.item_pipe.maxNetworkSize").defineInRange("maxNetworkSize", 4096, 1, 1_000_000);
             b.pop();
 
-            b.comment("Which items /barelyfunctionalcontraptions generate may turn into wool types (feeding items and separator outputs).",
+            b.comment("Which items /bfc generate may turn into wool types (feeding items and separator outputs).",
                     "Applies to generate, generate all, preview, material, item and hand. Existing definitions are not touched.").push("generator");
             generatorAllowedTabs = b.comment("Creative tabs an item must appear in. Default: Building Blocks, Ingredients and Food & Drinks.",
                             "Modded items count when their mod adds them to one of these tabs. Empty = any creative tab.")
