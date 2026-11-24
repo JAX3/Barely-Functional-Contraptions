@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CubeStatus;
 import com.jax3.barelyfunctionalcontraptions.sheep.menu.EnergyCubeMenu;
@@ -63,11 +64,11 @@ public class EnergyCubeScreen extends AbstractContainerScreen<EnergyCubeMenu> {
     protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", fe(menu.getAmount())), 21, ENERGY_TEXT);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", fe(menu.getCapacity())), 31, TEXT_DIM);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.group", menu.getCubes(), fe(menu.getRate())), 44, TEXT_COLOR);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.in", fe(menu.getInRate())), 57, IN_COLOR);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.out", fe(menu.getOutRate())), 67, OUT_COLOR);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", Numbers.grouped(menu.getAmount())), 21, ENERGY_TEXT);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", Numbers.grouped(menu.getCapacity())), 31, TEXT_DIM);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.group", menu.getCubes(), Numbers.grouped(menu.getRate())), 44, TEXT_COLOR);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.in", Numbers.grouped(menu.getInRate())), 57, IN_COLOR);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.out", Numbers.grouped(menu.getOutRate())), 67, OUT_COLOR);
         CubeStatus status = menu.getStatus();
         graphics.text(font, statusName(status), LAMP_X + 13, LAMP_Y + 1, status.color(), false);
     }
@@ -86,7 +87,7 @@ public class EnergyCubeScreen extends AbstractContainerScreen<EnergyCubeMenu> {
         if (!menu.getCarried().isEmpty() || hoveredSlot != null) return;
         List<Component> lines = new ArrayList<>();
         if (isHovering(GAUGE_X - 2, GAUGE_Y - 2, GAUGE_W + 4, GAUGE_H + 4, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", fe(menu.getAmount()), fe(menu.getCapacity())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", Numbers.grouped(menu.getAmount()), Numbers.grouped(menu.getCapacity())));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.cube.percent",
                     String.format(Locale.ROOT, "%.1f", menu.getFillFraction() * 100)).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(48, 40, 120, 16, mouseX, mouseY)) {
@@ -94,7 +95,7 @@ public class EnergyCubeScreen extends AbstractContainerScreen<EnergyCubeMenu> {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.cube.group.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(48, 54, 120, 22, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.cube.flow.tooltip"));
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.cube.flow.desc", fe(menu.getRate())).withStyle(ChatFormatting.GRAY));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.cube.flow.desc", Numbers.grouped(menu.getRate())).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(LAMP_X, LAMP_Y - 1, 120, 10, mouseX, mouseY)) {
             CubeStatus status = menu.getStatus();
             lines.add(statusName(status).copy().withColor(status.color()));
@@ -104,7 +105,4 @@ public class EnergyCubeScreen extends AbstractContainerScreen<EnergyCubeMenu> {
         if (!lines.isEmpty()) graphics.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

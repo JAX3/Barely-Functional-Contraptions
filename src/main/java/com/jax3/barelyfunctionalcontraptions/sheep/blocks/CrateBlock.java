@@ -21,9 +21,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -50,7 +47,7 @@ import org.jspecify.annotations.Nullable;
  * The clicks are handled in {@link CrateEvents}, ahead of the held item, so sneaking with wool lines the crate instead
  * of placing the wool.
  */
-public class CrateBlock extends BaseEntityBlock {
+public class CrateBlock extends FacingMachineBlock {
     /**
      * Minecraft 26.1 and 26.2 ask every block entity block for a codec; 26.3 doesn't. Not an override, so it builds
      * for all of them.
@@ -60,7 +57,6 @@ public class CrateBlock extends BaseEntityBlock {
     }
 
     /** The way its front (where it shows its item) faces. */
-    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     /** The colour of the wool lining that shows round its front and lid, once it's been dyed ({@link #DYED}). */
     public static final EnumProperty<DyeColor> LINING = EnumProperty.create("lining", DyeColor.class);
     /**
@@ -92,16 +88,6 @@ public class CrateBlock extends BaseEntityBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return defaultBlockState().setValue(FACING, PlacementFacing.horizontal(context));
-    }
-
-    @Override
-    protected BlockState rotate(BlockState state, Rotation rotation) {
-        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
-    }
-
-    @Override
-    protected BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override

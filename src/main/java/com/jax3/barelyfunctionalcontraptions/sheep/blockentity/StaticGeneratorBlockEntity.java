@@ -40,10 +40,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 /**
  * The Static Generator, a mid-game generator: sheep rubbing against Copper Combs in its pen build up static, which its
@@ -91,7 +88,7 @@ public class StaticGeneratorBlockEntity extends BlockEntity implements AreaDispl
         }
     }
 
-    private final GeneratorEnergy energy = new GeneratorEnergy();
+    private final GeneratorEnergy energy = new GeneratorEnergy(500_000, this::setChanged);
     /** The combs it uses, nearest first, and how long each has been worked towards its next stage of oxidation. */
     private List<BlockPos> combs = new ArrayList<>();
     private final Map<BlockPos, Integer> wear = new HashMap<>();
@@ -358,20 +355,7 @@ public class StaticGeneratorBlockEntity extends BlockEntity implements AreaDispl
     }
 
     private void push(ServerLevel level, BlockPos pos) {
-        int budget = Math.min(ModConfigs.getInt(ModConfigs.SERVER.staticOutput), energy.getAmountAsInt());
-        for (Direction dir : Direction.values()) {
-            if (budget <= 0) return;
-            if (dir == Direction.UP) continue; // the dome
-            EnergyHandler handler = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (handler == null) continue;
-            try (Transaction tx = Transaction.openRoot()) {
-                int moved = handler.insert(budget, tx);
-                if (moved > 0 && energy.extract(moved, tx) == moved) {
-                    tx.commit();
-                    budget -= moved;
-                }
-            }
-        }
+        energy.pushToNeighbours(level, pos, ModConfigs.getInt(ModConfigs.SERVER.staticOutput), (dir, target) -> dir == Direction.UP); // not up into the dome
     }
 
     // ------------------------------------------------------------------ accessors
@@ -513,29 +497,4 @@ public class StaticGeneratorBlockEntity extends BlockEntity implements AreaDispl
         return tag;
     }
 
-    /** Out only: it makes its own power. */
-    private final class GeneratorEnergy extends SimpleEnergyHandler {
-        GeneratorEnergy() {
-            super(500_000, 0, Integer.MAX_VALUE);
-        }
-
-        void generate(int amount) {
-            int previous = energy;
-            energy = (int) Math.min(capacity, (long) energy + Math.max(0, amount));
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        void resize(int newCapacity) {
-            if (capacity == newCapacity) return;
-            int previous = energy;
-            capacity = newCapacity;
-            energy = Math.min(energy, capacity);
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        @Override
-        protected void onEnergyChanged(int previousAmount) {
-            setChanged();
-        }
-    }
 }

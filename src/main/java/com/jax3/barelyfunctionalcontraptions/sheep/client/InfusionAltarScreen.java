@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AltarStatus;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity;
@@ -8,7 +9,6 @@ import com.jax3.barelyfunctionalcontraptions.sheep.resource.AltarRitual;
 import com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -111,7 +111,7 @@ public class InfusionAltarScreen extends AbstractContainerScreen<InfusionAltarMe
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
         resource().ifPresent(r -> {
             centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.infusion_altar.tier", r.altar().tier()), 22, TIER_COLOR);
-            centred(graphics, Component.literal(fe(menu.getEnergyPerTick())), 40, menu.getStatus() == AltarStatus.INFUSING ? USE_COLOR : TEXT_DIM);
+            centred(graphics, Component.literal(Numbers.grouped(menu.getEnergyPerTick())), 40, menu.getStatus() == AltarStatus.INFUSING ? USE_COLOR : TEXT_DIM);
             centred(graphics, Component.literal("FE/t"), 50, TEXT_DIM);
         });
         graphics.text(font, menu.getStatus().displayName(), LAMP_X + 13, LAMP_Y + 1, menu.getStatus().color, false);
@@ -133,7 +133,7 @@ public class InfusionAltarScreen extends AbstractContainerScreen<InfusionAltarMe
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.infusion_altar." + (centre ? "feed" : "catalyst") + ".desc").withStyle(ChatFormatting.GRAY));
             if (!centre) resource.ifPresent(r -> addRitual(lines, r));
         } else if (hoveredSlot == null && isHovering(GAUGE_X - 2, GAUGE_Y - 2, GAUGE_W + 4, GAUGE_H + 4, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", fe(menu.getEnergy()), fe(menu.getCapacity())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity())));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.infusion_altar.energy.desc").withStyle(ChatFormatting.GRAY));
         } else if (hoveredSlot == null && (isHovering(BAR_X, BAR_Y - 2, BAR_W, BAR_H + 4, mouseX, mouseY) || isHovering(118, 18, 48, 44, mouseX, mouseY))) {
             resource.ifPresentOrElse(r -> {
@@ -161,10 +161,7 @@ public class InfusionAltarScreen extends AbstractContainerScreen<InfusionAltarMe
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.infusion_altar.catalyst_line", c.count(), name)
                     .withStyle(missing.contains(c) ? ChatFormatting.RED : ChatFormatting.DARK_AQUA));
         }
-        lines.add(Component.translatable("gui.barelyfunctionalcontraptions.infusion_altar.energy_line", fe(ritual.effectiveEnergy())).withStyle(ChatFormatting.DARK_GRAY));
+        lines.add(Component.translatable("gui.barelyfunctionalcontraptions.infusion_altar.energy_line", Numbers.grouped(ritual.effectiveEnergy())).withStyle(ChatFormatting.DARK_GRAY));
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

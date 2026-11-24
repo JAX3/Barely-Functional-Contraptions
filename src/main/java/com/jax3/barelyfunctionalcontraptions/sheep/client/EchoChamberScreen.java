@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.State;
@@ -115,7 +116,7 @@ public class EchoChamberScreen extends AbstractContainerScreen<EchoChamberMenu> 
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.echo_chamber.herd", menu.getHerd(), menu.getMaxSheep()), 20,
                 menu.getHerd() > 0 ? SCULK_TEXT : TEXT_DIM);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.echo_chamber.rate", fe(menu.getGenerating())), 30,
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.echo_chamber.rate", Numbers.grouped(menu.getGenerating())), 30,
                 menu.getGenerating() > 0 ? ENERGY_TEXT : TEXT_DIM);
         graphics.text(font, statusText(), LAMP_X + 13, LAMP_Y, statusColor(), false);
     }
@@ -131,7 +132,7 @@ public class EchoChamberScreen extends AbstractContainerScreen<EchoChamberMenu> 
         String key = "gui.barelyfunctionalcontraptions.echo_chamber.";
         List<Component> lines = new ArrayList<>();
         if (isHovering(GAUGE_X - 1, GAUGE_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
-            lines.add(Component.translatable(key + "energy", fe(menu.getEnergy()), fe(menu.getCapacity())).withColor(ENERGY_TEXT));
+            lines.add(Component.translatable(key + "energy", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity())).withColor(ENERGY_TEXT));
             lines.add(Component.translatable(key + "energy.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(CENTRE - 50, 18, 100, 22, mouseX, mouseY)) {
             lines.add(Component.translatable(key + "herd.title", menu.getHerd(), menu.getMaxSheep()).withColor(SCULK_TEXT));
@@ -165,7 +166,4 @@ public class EchoChamberScreen extends AbstractContainerScreen<EchoChamberMenu> 
         if (!lines.isEmpty()) graphics.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
     }
 
-    private static String fe(int value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

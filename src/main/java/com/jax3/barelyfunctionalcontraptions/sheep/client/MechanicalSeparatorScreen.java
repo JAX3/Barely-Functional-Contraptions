@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.RedstoneMode;
@@ -96,7 +97,7 @@ public class MechanicalSeparatorScreen extends AbstractContainerScreen<Mechanica
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
         // Stored / max FE, centred under the bar.
-        Component energy = Component.translatable("gui.barelyfunctionalcontraptions.energy_short", fe(menu.getEnergy()), fe(menu.getCapacity()));
+        Component energy = Component.translatable("gui.barelyfunctionalcontraptions.energy_short", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity()));
         graphics.text(font, energy, 34 + (118 - font.width(energy)) / 2, 28, TEXT_DIM, false);
 
         // Status line, coloured like the lamp.
@@ -120,11 +121,11 @@ public class MechanicalSeparatorScreen extends AbstractContainerScreen<Mechanica
         List<Component> lines = new ArrayList<>();
         boolean detailed = ModConfigs.getBool(ModConfigs.CLIENT.detailedMachineTooltips);
         if (isHovering(BAR_X - 2, BAR_Y - 2, BAR_W + 4, BAR_H + 4, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", fe(menu.getEnergy()), fe(menu.getCapacity())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity())));
             if (detailed) {
-                lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy_input", fe(ModConfigs.getInt(ModConfigs.SERVER.maxEnergyInput))).withStyle(ChatFormatting.GRAY));
+                lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy_input", Numbers.grouped(ModConfigs.getInt(ModConfigs.SERVER.maxEnergyInput))).withStyle(ChatFormatting.GRAY));
                 if (menu.getEnergyPerTick() > 0) {
-                    lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy_usage", fe(menu.getEnergyPerTick())).withStyle(ChatFormatting.GRAY));
+                    lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy_usage", Numbers.grouped(menu.getEnergyPerTick())).withStyle(ChatFormatting.GRAY));
                 }
             }
         } else if (isHovering(ARROW_X, ARROW_Y, ARROW_W, ARROW_H, mouseX, mouseY) || isHovering(GEAR_X, GEAR_Y, GEAR_SIZE, GEAR_SIZE, mouseX, mouseY)) {
@@ -133,7 +134,7 @@ public class MechanicalSeparatorScreen extends AbstractContainerScreen<Mechanica
             if (detailed && max > 0) {
                 double secondsLeft = (max - menu.getProgress()) / 20.0;
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.time_left", String.format(Locale.ROOT, "%.1f", secondsLeft), String.format(Locale.ROOT, "%.1f", max / 20.0)).withStyle(ChatFormatting.GRAY));
-                lines.add(Component.translatable("gui.barelyfunctionalcontraptions.operation_energy", fe((long) menu.getEnergyPerTick() * max)).withStyle(ChatFormatting.GRAY));
+                lines.add(Component.translatable("gui.barelyfunctionalcontraptions.operation_energy", Numbers.grouped((long) menu.getEnergyPerTick() * max)).withStyle(ChatFormatting.GRAY));
             }
         } else if (isHovering(LAMP_X, LAMP_Y - 1, 90, 10, mouseX, mouseY)) {
             MachineStatus status = menu.getStatus();
@@ -165,7 +166,4 @@ public class MechanicalSeparatorScreen extends AbstractContainerScreen<Mechanica
         return super.mouseClicked(event, doubleClick);
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

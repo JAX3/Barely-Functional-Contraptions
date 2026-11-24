@@ -30,10 +30,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -52,7 +49,7 @@ import org.jspecify.annotations.Nullable;
  * It stores {@code capacity} FE and pushes it into every block around it; cables and machines can also pull from it.
  * Its comparator signal is one level per 20 FE/t it is making.
  */
-public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
+public class BlazeFurnaceBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
     /** Ticks between looks for heat sources. */
     public static final int SCAN_INTERVAL = 10;
     /** FE/t per comparator level. */
@@ -62,7 +59,7 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
     /** Number of values synced to the window ({@link com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu}). */
     public static final int DATA_COUNT = 18;
 
-    private final FurnaceEnergy energy = new FurnaceEnergy();
+    private final GeneratorEnergy energy = new GeneratorEnergy(20_000, this::setChanged);
     private ItemStack boostItems = ItemStack.EMPTY;
     private int boostTicks;
     /** How long the boost burning now lasts in all, for the window's countdown. */
@@ -240,21 +237,7 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
     }
 
     private void push(ServerLevel level, BlockPos pos) {
-        int budget = Math.min(ModConfigs.getInt(ModConfigs.SERVER.blazeFurnaceOutput), energy.getAmountAsInt());
-        for (Direction dir : Direction.values()) {
-            if (budget <= 0) return;
-            BlockPos target = pos.relative(dir);
-            if (level.getBlockEntity(target) instanceof BlazeFurnaceBlockEntity) continue; // furnaces don't charge each other
-            EnergyHandler handler = level.getCapability(Capabilities.Energy.BLOCK, target, dir.getOpposite());
-            if (handler == null) continue;
-            try (Transaction tx = Transaction.openRoot()) {
-                int moved = handler.insert(budget, tx);
-                if (moved > 0 && energy.extract(moved, tx) == moved) {
-                    tx.commit();
-                    budget -= moved;
-                }
-            }
-        }
+        energy.pushToNeighbours(level, pos, ModConfigs.getInt(ModConfigs.SERVER.blazeFurnaceOutput), (dir, target) -> level.getBlockEntity(target) instanceof BlazeFurnaceBlockEntity); // furnaces don't charge each other
     }
 
     // ------------------------------------------------------------------ accessors
@@ -361,36 +344,13 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
     }
 
     @Override
-    public boolean isEmpty() {
-        return boostItems.isEmpty();
-    }
-
-    @Override
     public ItemStack getItem(int slot) {
         return slot == 0 ? boostItems : ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeItem(int slot, int count) {
-        if (slot != 0 || boostItems.isEmpty()) return ItemStack.EMPTY;
-        ItemStack taken = boostItems.split(count);
-        setChanged();
-        return taken;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        if (slot != 0) return ItemStack.EMPTY;
-        ItemStack taken = boostItems;
-        boostItems = ItemStack.EMPTY;
-        return taken;
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-        if (slot != 0) return;
-        boostItems = stack;
-        setChanged();
+    public void putItem(int slot, ItemStack stack) {
+        if (slot == 0) boostItems = stack;
     }
 
     /** Only boost items go in, and only on top of the same item. */
@@ -398,17 +358,6 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
     public boolean canPlaceItem(int slot, ItemStack stack) {
         return slot == 0 && FurnaceBoostDataMap.of(stack) != null
                 && (boostItems.isEmpty() || ItemStack.isSameItemSameComponents(boostItems, stack));
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return net.minecraft.world.Container.stillValidBlockEntity(this, player);
-    }
-
-    @Override
-    public void clearContent() {
-        boostItems = ItemStack.EMPTY;
-        setChanged();
     }
 
     @Override
@@ -434,31 +383,6 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements WorldlyConta
     }
 
     // ------------------------------------------------------------------ energy
-
-    private final class FurnaceEnergy extends SimpleEnergyHandler {
-        FurnaceEnergy() {
-            super(20_000, 0, Integer.MAX_VALUE);
-        }
-
-        void generate(int amount) {
-            int previous = energy;
-            energy = Math.min(capacity, energy + Math.max(0, amount));
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        void resize(int newCapacity) {
-            if (capacity == newCapacity) return;
-            int previous = energy;
-            capacity = newCapacity;
-            energy = Math.min(energy, capacity);
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        @Override
-        protected void onEnergyChanged(int previousAmount) {
-            setChanged();
-        }
-    }
 
     // ------------------------------------------------------------------ persistence and sync
 

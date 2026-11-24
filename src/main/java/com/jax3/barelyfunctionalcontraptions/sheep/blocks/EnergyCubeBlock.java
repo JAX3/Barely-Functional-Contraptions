@@ -1,9 +1,9 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.blocks;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeGroup;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
-import java.util.Locale;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -118,10 +118,6 @@ public class EnergyCubeBlock extends BaseEntityBlock {
             return amount <= 0 || capacity <= 0 ? 0 : 1 + (int) (14L * amount / capacity);
         }
         return 0;
-    }
-
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
     }
 
     /** In creative, a cube that still holds energy drops itself with it, like a shulker box. */

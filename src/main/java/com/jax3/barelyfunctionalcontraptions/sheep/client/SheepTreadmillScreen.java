@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepTreadmillBlockEntity.State;
@@ -96,10 +97,10 @@ public class SheepTreadmillScreen extends AbstractContainerScreen<SheepTreadmill
     protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", fe(menu.getEnergy())), 21, ENERGY_TEXT);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", fe(menu.getCapacity())), 31, TEXT_DIM);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", Numbers.grouped(menu.getEnergy())), 21, ENERGY_TEXT);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", Numbers.grouped(menu.getCapacity())), 31, TEXT_DIM);
         boolean walking = menu.getState() == State.WALKING;
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.generating", fe(menu.getGenerating())), 50, walking ? GEN_COLOR : TEXT_DIM);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.generating", Numbers.grouped(menu.getGenerating())), 50, walking ? GEN_COLOR : TEXT_DIM);
         Component sheepLine = switch (menu.getState()) {
             case WALKING, FULL -> Component.translatable("gui.barelyfunctionalcontraptions.sheep_treadmill.stamina", Math.round(menu.getStamina() * 100));
             case RESTING -> Component.translatable("gui.barelyfunctionalcontraptions.sheep_treadmill.resting", (menu.getRestLeft() + 19) / 20);
@@ -124,7 +125,7 @@ public class SheepTreadmillScreen extends AbstractContainerScreen<SheepTreadmill
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.sheep_treadmill.slot.desc").withStyle(ChatFormatting.GRAY));
             }
         } else if (isHovering(GAUGE_X - 2, GAUGE_Y - 2, GAUGE_W + 4, GAUGE_H + 4, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", fe(menu.getEnergy()), fe(menu.getCapacity())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity())));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.sheep_treadmill.energy.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(BOX_X, BOX_Y, BOX_W, BOX_H, mouseX, mouseY) || isHovering(92, 44, 76, 34, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.sheep_treadmill.how"));
@@ -136,7 +137,4 @@ public class SheepTreadmillScreen extends AbstractContainerScreen<SheepTreadmill
         if (!lines.isEmpty()) graphics.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

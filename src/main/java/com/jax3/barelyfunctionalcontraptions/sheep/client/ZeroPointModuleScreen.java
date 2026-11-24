@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointLink;
@@ -156,12 +157,12 @@ public class ZeroPointModuleScreen extends AbstractContainerScreen<ZeroPointModu
     protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", fe(menu.getAmount())), 21, ENERGY_TEXT);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", fe(menu.getCapacity())), 31, TEXT_DIM);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.generating", fe(menu.getPairOutput())), 48, GEN_COLOR);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", Numbers.grouped(menu.getAmount())), 21, ENERGY_TEXT);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", Numbers.grouped(menu.getCapacity())), 31, TEXT_DIM);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.generating", Numbers.grouped(menu.getPairOutput())), 48, GEN_COLOR);
         centred(graphics, Component.translatable(menu.getLink() == ZeroPointLink.LINKED
                 ? "gui.barelyfunctionalcontraptions.zpe.shared" : "gui.barelyfunctionalcontraptions.zpe.not_linked"), 58, TEXT_DIM);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.out", fe(menu.getOutRate())), 68, OUT_COLOR);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.out", Numbers.grouped(menu.getOutRate())), 68, OUT_COLOR);
         graphics.text(font, statusText(), LAMP_X + 13, LAMP_Y + 1, statusLamp().color, false);
     }
 
@@ -176,7 +177,7 @@ public class ZeroPointModuleScreen extends AbstractContainerScreen<ZeroPointModu
         List<Component> lines = new ArrayList<>();
         String dir = menu.towards();
         if (isHovering(GAUGE_X - 2, GAUGE_Y - 2, GAUGE_W + 4, GAUGE_H + 4, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", fe(menu.getAmount()), fe(menu.getCapacity())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", Numbers.grouped(menu.getAmount()), Numbers.grouped(menu.getCapacity())));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.cube.percent",
                     String.format(Locale.ROOT, "%.1f", menu.getFillFraction() * 100)).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(DIAGRAM_X, DIAGRAM_Y, DIAGRAM_W, DIAGRAM_H, mouseX, mouseY)) {
@@ -211,7 +212,4 @@ public class ZeroPointModuleScreen extends AbstractContainerScreen<ZeroPointModu
         };
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

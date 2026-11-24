@@ -41,7 +41,6 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -58,14 +57,15 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * Hoppers and pipes put items in on any side and take the results out on any side; a comparator reads the input.
  */
-public class PoweredFurnaceBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, AreaDisplay {
+public class PoweredFurnaceBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
     public static final int INPUT = 0, OUTPUT = 1;
     public static final int DATA_COUNT = 13;
     public static final int SCAN_INTERVAL = 10;
     public static final int AREA_COLOR = 0xFFFF8A1F;
     private static final int[] SLOTS = {INPUT, OUTPUT};
 
-    private final FurnaceEnergy energy = new FurnaceEnergy();
+    private final MachineEnergy energy = new MachineEnergy(
+            () -> ModConfigs.getInt(ModConfigs.SERVER.poweredFurnaceCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.poweredFurnaceMaxInput), this::setChanged);
     private ItemStack input = ItemStack.EMPTY;
     private ItemStack output = ItemStack.EMPTY;
     /** Progress in hundredths of a tick, so the Blaze sheep's speed-up can be fractional. */
@@ -166,7 +166,7 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements WorldlyCon
                 status = MachineStatus.NO_ENERGY;
             } else {
                 status = MachineStatus.PROCESSING;
-                energy.consume(energyPerTick());
+                energy.drain(energyPerTick());
                 progress += speed;
                 if (progress >= maxProgress) {
                     progress = 0;
@@ -318,58 +318,23 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements WorldlyCon
     }
 
     @Override
-    public boolean isEmpty() {
-        return input.isEmpty() && output.isEmpty();
-    }
-
-    @Override
     public ItemStack getItem(int slot) {
         return slot == INPUT ? input : slot == OUTPUT ? output : ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeItem(int slot, int count) {
-        ItemStack stack = getItem(slot);
-        if (stack.isEmpty()) return ItemStack.EMPTY;
-        ItemStack taken = stack.split(count);
-        if (stack.isEmpty()) setItem(slot, ItemStack.EMPTY);
-        setChanged();
-        return taken;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        ItemStack taken = getItem(slot);
-        setItem(slot, ItemStack.EMPTY);
-        return taken;
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
+    public void putItem(int slot, ItemStack stack) {
         if (slot == INPUT) {
             if (!ItemStack.isSameItemSameComponents(input, stack)) progress = 0;
             input = stack;
         } else if (slot == OUTPUT) {
             output = stack;
         }
-        setChanged();
     }
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         return slot == INPUT && level != null && canSmelt(level, stack);
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return Container.stillValidBlockEntity(this, player);
-    }
-
-    @Override
-    public void clearContent() {
-        input = ItemStack.EMPTY;
-        output = ItemStack.EMPTY;
-        setChanged();
     }
 
     @Override
@@ -396,27 +361,6 @@ public class PoweredFurnaceBlockEntity extends BlockEntity implements WorldlyCon
     }
 
     // ------------------------------------------------------------------ energy
-
-    private final class FurnaceEnergy extends SimpleEnergyHandler {
-        FurnaceEnergy() {
-            super(20_000, 1_000, 0);
-        }
-
-        void refreshLimits() {
-            capacity = ModConfigs.getInt(ModConfigs.SERVER.poweredFurnaceCapacity);
-            maxInsert = ModConfigs.getInt(ModConfigs.SERVER.poweredFurnaceMaxInput);
-            if (energy > capacity) set(capacity);
-        }
-
-        void consume(int amount) {
-            set(Math.max(0, energy - amount));
-        }
-
-        @Override
-        protected void onEnergyChanged(int previousAmount) {
-            setChanged();
-        }
-    }
 
     // ------------------------------------------------------------------ persistence and sync
 

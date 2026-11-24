@@ -57,7 +57,7 @@ import org.jspecify.annotations.Nullable;
  * <p>Its pool: the water source blocks in the 7x7 in front of it, from its own level to four blocks down. Its slots:
  * the lure (0) and nine for the catch (1 to 9); hoppers and pipes put lures in and take the catch out.</p>
  */
-public class FleeceTrawlerBlockEntity extends BlockEntity implements WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
+public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
     public static final int LURE = 0, OUTPUTS = 9, SIZE = 1 + OUTPUTS;
     /** Its pool's reach: 7 wide, 7 out from its front, 4 down. */
     public static final int POOL_HALF_WIDTH = 3, POOL_LENGTH = 7, POOL_DEPTH = 4;
@@ -394,30 +394,17 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements WorldlyCont
     }
 
     @Override
-    public boolean isEmpty() {
-        return items.stream().allMatch(ItemStack::isEmpty);
-    }
-
-    @Override
     public ItemStack getItem(int slot) {
         return items.get(slot);
     }
 
     @Override
-    public ItemStack removeItem(int slot, int count) {
-        ItemStack out = ContainerHelper.removeItem(items, slot, count);
-        if (!out.isEmpty()) changedContents();
-        return out;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        return ContainerHelper.takeItem(items, slot);
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
+    public void putItem(int slot, ItemStack stack) {
         items.set(slot, stack);
+    }
+
+    @Override
+    public void contentsChanged() {
         changedContents();
     }
 
@@ -427,11 +414,6 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements WorldlyCont
         if (slot != LURE || ResourceWoolItem.getResourceId(stack) == null) return false;
         ItemStack lure = items.get(LURE);
         return lure.isEmpty() || ItemStack.isSameItemSameComponents(lure, stack);
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return net.minecraft.world.Container.stillValidBlockEntity(this, player);
     }
 
     @Override

@@ -9,7 +9,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -22,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  * chamber's synced numbers (energy, output, water, herds, balance, danger, boosts, status, area setting). Slot
  * positions match {@code textures/gui/thermal_reaction_chamber.png}.
  */
-public class ThermalReactionChamberMenu extends AbstractContainerMenu {
+public class ThermalReactionChamberMenu extends MachineMenu {
     public static final int HOT_X = 67, COLD_X = 95, BOOST_Y = 62;
     public static final int INVENTORY_Y = 111;
     public static final int BUTTON_AREA = 0;
@@ -74,35 +73,13 @@ public class ThermalReactionChamberMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (index < PLAYER_START) {
-            if (!moveItemStackTo(stack, PLAYER_START, PLAYER_END, true)) return ItemStack.EMPTY;
-        } else if (slots.get(0).mayPlace(stack)) {
-            if (!moveItemStackTo(stack, 0, 1, false)) return ItemStack.EMPTY;
-        } else if (slots.get(1).mayPlace(stack)) {
-            if (!moveItemStackTo(stack, 1, 2, false)) return ItemStack.EMPTY;
-        } else if (index < PLAYER_START + 27) {
-            if (!moveItemStackTo(stack, PLAYER_START + 27, PLAYER_END, false)) return ItemStack.EMPTY;
-        } else if (!moveItemStackTo(stack, PLAYER_START, PLAYER_START + 27, false)) {
-            return ItemStack.EMPTY;
-        }
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        if (stack.getCount() == original.getCount()) return ItemStack.EMPTY;
-        slot.onTake(player, stack);
-        return original;
+        return quickMoveMachine(player, index, PLAYER_START, false,
+                onlyInto(s -> slots.get(0).mayPlace(s), 0, 1), onlyInto(s -> slots.get(1).mayPlace(s), 1, 2));
     }
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id == BUTTON_AREA && blockEntity != null) {
-            blockEntity.toggleArea(player);
-            return true;
-        }
-        return false;
+        return clickAreaButton(player, id, BUTTON_AREA, blockEntity);
     }
 
     @Override

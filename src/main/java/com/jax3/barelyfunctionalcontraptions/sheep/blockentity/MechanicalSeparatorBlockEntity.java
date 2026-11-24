@@ -48,7 +48,8 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
     public static final int DATA_COUNT = 13;
 
     private final SeparatorInventory inventory = new SeparatorInventory(this::isProcessable, this::onContentsChanged);
-    private final SeparatorEnergyStorage energy = new SeparatorEnergyStorage(this::setChanged);
+    private final MachineEnergy energy = new MachineEnergy(
+            () -> ModConfigs.getInt(ModConfigs.SERVER.energyCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.maxEnergyInput), this::setChanged);
     private final SidedItemHandler[] sidedHandlers = {
             new SidedItemHandler(inventory, false, false),
             new SidedItemHandler(inventory, true, false),
@@ -241,7 +242,7 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements MenuP
         return inventory;
     }
 
-    public SeparatorEnergyStorage getEnergy() {
+    public MachineEnergy getEnergy() {
         return energy;
     }
 

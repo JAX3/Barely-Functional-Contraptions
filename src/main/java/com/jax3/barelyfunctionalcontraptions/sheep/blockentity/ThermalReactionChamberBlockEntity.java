@@ -39,19 +39,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -78,7 +71,7 @@ import org.jspecify.annotations.Nullable;
  * It pushes its power into every block around it, up to {@code output} FE/t. Its comparator signal shows how close it
  * is to melting down or freezing (0 = steady), for safety circuits.
  */
-public class ThermalReactionChamberBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, AreaDisplay {
+public class ThermalReactionChamberBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
     public static final int SCAN_INTERVAL = 10;
     public static final int HOT_COLOR = 0xFFFF8A1F, COLD_COLOR = 0xFF7FD8FF;
     public static final int HOT_SLOT = 0, COLD_SLOT = 1;
@@ -87,7 +80,7 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
     public static final int BALANCE_OFFSET = 64;
     /** How long it vents steam after running dry, in ticks. */
     public static final int STEAM_TICKS = 100;
-    public static final FluidResource WATER = FluidResource.of(Fluids.WATER);
+    public static final FluidResource WATER = WaterTank.WATER;
     private static final int[] SLOTS = {HOT_SLOT, COLD_SLOT};
 
     /** What the chamber is doing, for its window and particles: the order matches the window's status keys. */
@@ -110,8 +103,8 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
         }
     }
 
-    private final ChamberTank tank = new ChamberTank();
-    private final ChamberEnergy energy = new ChamberEnergy();
+    private final WaterTank tank = new WaterTank(16_000, this::setChanged);
+    private final GeneratorEnergy energy = new GeneratorEnergy(2_000_000, this::setChanged);
     private final ItemStack[] boosts = {ItemStack.EMPTY, ItemStack.EMPTY};
     /** Ticks left on the Blaze Rod and Blue Ice burning now. */
     private int hotBurn, coldBurn;
@@ -494,19 +487,7 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
     }
 
     private void push(ServerLevel level, BlockPos pos) {
-        int budget = Math.min(ModConfigs.getInt(ModConfigs.SERVER.thermalOutput), energy.getAmountAsInt());
-        for (Direction dir : Direction.values()) {
-            if (budget <= 0) return;
-            EnergyHandler handler = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(dir), dir.getOpposite());
-            if (handler == null) continue;
-            try (Transaction tx = Transaction.openRoot()) {
-                int moved = handler.insert(budget, tx);
-                if (moved > 0 && energy.extract(moved, tx) == moved) {
-                    tx.commit();
-                    budget -= moved;
-                }
-            }
-        }
+        energy.pushToNeighbours(level, pos, ModConfigs.getInt(ModConfigs.SERVER.thermalOutput), (dir, target) -> false);
     }
 
     // ------------------------------------------------------------------ accessors
@@ -515,7 +496,7 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
         return energy;
     }
 
-    public ChamberTank getTank() {
+    public WaterTank getTank() {
         return tank;
     }
 
@@ -585,9 +566,7 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
 
     /** Pours a bucket's worth of water in, if it fits. */
     public boolean fillFromBucket() {
-        if (tank.capacity() - tank.getAmount() < 1000) return false;
-        tank.fill(1000);
-        return true;
+        return tank.fillFromBucket();
     }
 
     /** It calls its sheep back from just outside its area. */
@@ -652,54 +631,19 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
     }
 
     @Override
-    public boolean isEmpty() {
-        return boosts[0].isEmpty() && boosts[1].isEmpty();
-    }
-
-    @Override
     public ItemStack getItem(int slot) {
         return slot >= 0 && slot < 2 ? boosts[slot] : ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeItem(int slot, int count) {
-        if (slot < 0 || slot >= 2 || boosts[slot].isEmpty()) return ItemStack.EMPTY;
-        ItemStack taken = boosts[slot].split(count);
-        setChanged();
-        return taken;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        if (slot < 0 || slot >= 2) return ItemStack.EMPTY;
-        ItemStack taken = boosts[slot];
-        boosts[slot] = ItemStack.EMPTY;
-        return taken;
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-        if (slot < 0 || slot >= 2) return;
-        boosts[slot] = stack;
-        setChanged();
+    public void putItem(int slot, ItemStack stack) {
+        if (slot >= 0 && slot < 2) boosts[slot] = stack;
     }
 
     /** Blaze Rods in the hot slot, Blue Ice in the cold one. */
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         return slot == HOT_SLOT ? stack.is(Items.BLAZE_ROD) : slot == COLD_SLOT && stack.is(Items.BLUE_ICE);
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return net.minecraft.world.Container.stillValidBlockEntity(this, player);
-    }
-
-    @Override
-    public void clearContent() {
-        boosts[0] = ItemStack.EMPTY;
-        boosts[1] = ItemStack.EMPTY;
-        setChanged();
     }
 
     @Override
@@ -724,78 +668,6 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Wo
     }
 
     // ------------------------------------------------------------------ water and energy
-
-    /** Water only, in only: buckets, pipes and a Fluid Reservoir fill it. */
-    public final class ChamberTank extends FluidStacksResourceHandler {
-        ChamberTank() {
-            super(1, 16_000);
-        }
-
-        @Override
-        public boolean isValid(int index, FluidResource resource) {
-            return resource.equals(WATER);
-        }
-
-        @Override
-        public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
-            return 0;
-        }
-
-        @Override
-        protected void onContentsChanged(int index, FluidStack previousContents) {
-            setChanged();
-        }
-
-        public int getAmount() {
-            return getAmountAsInt(0);
-        }
-
-        public int capacity() {
-            return capacity;
-        }
-
-        void fill(int amount) {
-            int added = Math.max(0, Math.min(amount, capacity - getAmount()));
-            if (added > 0) set(0, WATER, getAmount() + added);
-        }
-
-        void drain(int amount) {
-            int left = Math.max(0, getAmount() - amount);
-            set(0, left > 0 ? WATER : FluidResource.EMPTY, left);
-        }
-
-        void resize(int newCapacity) {
-            if (newCapacity == capacity) return;
-            capacity = newCapacity;
-            if (getAmount() > capacity) set(0, WATER, capacity);
-        }
-    }
-
-    /** Out only: it makes its own power. */
-    private final class ChamberEnergy extends SimpleEnergyHandler {
-        ChamberEnergy() {
-            super(2_000_000, 0, Integer.MAX_VALUE);
-        }
-
-        void generate(int amount) {
-            int previous = energy;
-            energy = (int) Math.min(capacity, (long) energy + Math.max(0, amount));
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        void resize(int newCapacity) {
-            if (capacity == newCapacity) return;
-            int previous = energy;
-            capacity = newCapacity;
-            energy = Math.min(energy, capacity);
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        @Override
-        protected void onEnergyChanged(int previousAmount) {
-            setChanged();
-        }
-    }
 
     // ------------------------------------------------------------------ persistence and sync
 

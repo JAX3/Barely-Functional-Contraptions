@@ -10,7 +10,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -22,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  * Window of the Blaze Sheep Furnace: its boost slot, the player inventory and the furnace's synced numbers (energy,
  * heat, heat sources, boost, area setting). Slot positions match {@code textures/gui/blaze_furnace.png}.
  */
-public class BlazeFurnaceMenu extends AbstractContainerMenu {
+public class BlazeFurnaceMenu extends MachineMenu {
     public static final int BOOST_X = 152, BOOST_Y = 87;
     public static final int INVENTORY_Y = 111;
     public static final int BUTTON_AREA = 0;
@@ -71,33 +70,12 @@ public class BlazeFurnaceMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (index == 0) {
-            if (!moveItemStackTo(stack, PLAYER_START, PLAYER_END, true)) return ItemStack.EMPTY;
-        } else if (FurnaceBoostDataMap.of(stack) != null && moveItemStackTo(stack, 0, 1, false)) {
-            // Boost items go straight into the furnace.
-        } else if (index < PLAYER_START + 27) {
-            if (!moveItemStackTo(stack, PLAYER_START + 27, PLAYER_END, false)) return ItemStack.EMPTY;
-        } else if (!moveItemStackTo(stack, PLAYER_START, PLAYER_START + 27, false)) {
-            return ItemStack.EMPTY;
-        }
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        if (stack.getCount() == original.getCount()) return ItemStack.EMPTY;
-        slot.onTake(player, stack);
-        return original;
+        return quickMoveMachine(player, index, PLAYER_START, false, tryInto(s -> FurnaceBoostDataMap.of(s) != null, 0, 1));
     }
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id == BUTTON_AREA && blockEntity != null) {
-            blockEntity.toggleArea(player);
-            return true;
-        }
-        return false;
+        return clickAreaButton(player, id, BUTTON_AREA, blockEntity);
     }
 
     @Override
@@ -107,18 +85,15 @@ public class BlazeFurnaceMenu extends AbstractContainerMenu {
 
     // ------------------------------------------------------------------ synced values (the client reads these)
 
-    private int int32(int low) {
-        return (data.get(low) & 0xFFFF) | ((data.get(low + 1) & 0xFFFF) << 16);
-    }
 
-    public int getEnergy() { return int32(0); }
-    public int getCapacity() { return int32(2); }
+    public int getEnergy() { return int32(data, 0); }
+    public int getCapacity() { return int32(data, 2); }
     /** FE/t made, boost included. */
-    public int getGenerating() { return int32(4); }
+    public int getGenerating() { return int32(data, 4); }
     /** FE/t from heat alone. */
-    public int getHeat() { return int32(6); }
+    public int getHeat() { return int32(data, 6); }
     /** The top of the heat column: the most heat the hottest heat sources can give. */
-    public int getMaxHeat() { return int32(8); }
+    public int getMaxHeat() { return int32(data, 8); }
     public int getHeaters() { return data.get(10); }
     public int getMaxHeaters() { return Math.max(1, data.get(11)); }
     public int getBoostTicks() { return data.get(12) & 0xFFFF; }
@@ -126,7 +101,7 @@ public class BlazeFurnaceMenu extends AbstractContainerMenu {
     public double getBoostMultiplier() { return data.get(14) / 100.0; }
     public boolean isShowingArea() { return data.get(15) != 0; }
     /** FE/t one of the hottest heat sources gives. */
-    public int getBestPower() { return int32(16); }
+    public int getBestPower() { return int32(data, 16); }
 
     public float getEnergyFraction() {
         int capacity = getCapacity();

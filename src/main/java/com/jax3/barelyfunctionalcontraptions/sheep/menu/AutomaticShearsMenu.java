@@ -11,7 +11,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -20,7 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 /** Container menu of the Automatic Shears. Slot coordinates match {@code textures/gui/automatic_shears.png}. */
-public class AutomaticShearsMenu extends AbstractContainerMenu {
+public class AutomaticShearsMenu extends MachineMenu {
     /** Top-left item position of the 3x3 storage grid. */
     public static final int GRID_X = 96, GRID_Y = 20;
     public static final int INVENTORY_Y = 111;
@@ -77,25 +76,7 @@ public class AutomaticShearsMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (index < MACHINE_SLOTS) {
-            // Shift-click wool out into the player's inventory.
-            if (!moveItemStackTo(stack, PLAYER_START, PLAYER_END, true)) return ItemStack.EMPTY;
-            slot.onQuickCraft(stack, original);
-        } else if (index < PLAYER_START + 27) {
-            // Nothing can go into the machine: shuffle between inventory and hotbar instead.
-            if (!moveItemStackTo(stack, PLAYER_START + 27, PLAYER_END, false)) return ItemStack.EMPTY;
-        } else if (!moveItemStackTo(stack, PLAYER_START, PLAYER_START + 27, false)) {
-            return ItemStack.EMPTY;
-        }
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        if (stack.getCount() == original.getCount()) return ItemStack.EMPTY;
-        slot.onTake(player, stack);
-        return original;
+        return quickMoveMachine(player, index, PLAYER_START, true);
     }
 
     @Override
@@ -104,11 +85,7 @@ public class AutomaticShearsMenu extends AbstractContainerMenu {
             blockEntity.cycleRedstoneMode();
             return true;
         }
-        if (id == BUTTON_AREA && blockEntity != null) {
-            blockEntity.toggleArea(player);
-            return true;
-        }
-        return false;
+        return clickAreaButton(player, id, BUTTON_AREA, blockEntity);
     }
 
     @Override
@@ -118,18 +95,15 @@ public class AutomaticShearsMenu extends AbstractContainerMenu {
 
     // ------------------------------------------------------------------ synced values (client reads these)
 
-    private int combine(int low, int high) {
-        return (data.get(low) & 0xFFFF) | ((data.get(high) & 0xFFFF) << 16);
-    }
 
-    public int getEnergy() { return combine(0, 1); }
-    public int getCapacity() { return combine(2, 3); }
+    public int getEnergy() { return int32(data, 0); }
+    public int getCapacity() { return int32(data, 2); }
     public int getCooldown() { return data.get(4); }
     public int getInterval() { return Math.max(1, data.get(5)); }
     public MachineStatus getStatus() { return MachineStatus.byId(data.get(6)); }
     public RedstoneMode getRedstoneMode() { return RedstoneMode.byId(data.get(7)); }
     public boolean isPowered() { return data.get(8) != 0; }
-    public int getEnergyPerShear() { return combine(9, 10); }
+    public int getEnergyPerShear() { return int32(data, 9); }
     public boolean isShowingArea() { return data.get(11) != 0; }
 
     public float getEnergyFraction() {

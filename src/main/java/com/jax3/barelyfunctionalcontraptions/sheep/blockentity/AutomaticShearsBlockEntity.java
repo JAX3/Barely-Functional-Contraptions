@@ -59,7 +59,8 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     private static final int SHEARING_DISPLAY_TICKS = 12;
 
     private NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-    private final ShearsEnergyStorage energy = new ShearsEnergyStorage(this::setChanged);
+    private final MachineEnergy energy = new MachineEnergy(
+            () -> ModConfigs.getInt(ModConfigs.SERVER.automaticShearsEnergyCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.automaticShearsMaxEnergyInput), this::setChanged);
     private int cooldown;
     private int interval = 20;
     private int shearingDisplay;
@@ -219,7 +220,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
 
     // ------------------------------------------------------------------ accessors
 
-    public ShearsEnergyStorage getEnergy() {
+    public MachineEnergy getEnergy() {
         return energy;
     }
 

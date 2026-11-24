@@ -42,7 +42,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -58,7 +57,7 @@ import org.jspecify.annotations.Nullable;
  *     <li>Hoppers and pipes can put feeding items and catalysts in from any side, but can't take anything out.</li>
  * </ul>
  */
-public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, AreaDisplay {
+public class InfusionAltarBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
     /** The area outline's colour: the altar's amethyst purple. */
     public static final int AREA_COLOR = 0xFFB574FF;
     public static final int FEED = 0, SIZE = 1 + AltarRitual.MAX_CATALYSTS;
@@ -67,7 +66,8 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
     private static final int[] SLOTS = {0, 1, 2, 3, 4};
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-    private final AltarEnergy energy = new AltarEnergy();
+    private final MachineEnergy energy = new MachineEnergy(
+            () -> ModConfigs.getInt(ModConfigs.SERVER.altarCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.altarMaxInput), this::setChanged);
     private int progress;
     private int maxProgress;
     private int energyPerTick;
@@ -147,7 +147,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
             } else {
                 sheepId = sheep.getId();
                 status = AltarStatus.INFUSING;
-                energy.consume(EnergyShare.forTick(ritual.effectiveEnergy(), maxProgress, progress));
+                energy.drain(EnergyShare.forTick(ritual.effectiveEnergy(), maxProgress, progress));
                 progress++;
                 if (level.getGameTime() % 4 == 0) beam(level, pos, sheep, r);
                 slow(level, sheep);
@@ -344,33 +344,15 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
     }
 
     @Override
-    public boolean isEmpty() {
-        return items.stream().allMatch(ItemStack::isEmpty);
-    }
-
-    @Override
     public ItemStack getItem(int slot) {
         return slot >= 0 && slot < SIZE ? items.get(slot) : ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeItem(int slot, int count) {
-        ItemStack taken = ContainerHelper.removeItem(items, slot, count);
-        if (!taken.isEmpty()) setChanged();
-        return taken;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        return ContainerHelper.takeItem(items, slot);
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
+    public void putItem(int slot, ItemStack stack) {
         if (slot < 0 || slot >= SIZE) return;
         if (slot == FEED && !ItemStack.isSameItemSameComponents(items.get(FEED), stack)) progress = 0;
         items.set(slot, stack);
-        setChanged();
     }
 
     /** The centre takes feeding items; the sides take catalysts of any resource. */
@@ -386,17 +368,6 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
             for (SizedIngredient c : r.altar().catalysts()) if (c.ingredient().test(stack)) return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return Container.stillValidBlockEntity(this, player);
-    }
-
-    @Override
-    public void clearContent() {
-        items.clear();
-        setChanged();
     }
 
     @Override
@@ -421,27 +392,6 @@ public class InfusionAltarBlockEntity extends BlockEntity implements WorldlyCont
     }
 
     // ------------------------------------------------------------------ energy
-
-    private final class AltarEnergy extends SimpleEnergyHandler {
-        AltarEnergy() {
-            super(ModConfigs.getInt(ModConfigs.SERVER.altarCapacity), ModConfigs.getInt(ModConfigs.SERVER.altarMaxInput), 0);
-        }
-
-        void refreshLimits() {
-            capacity = ModConfigs.getInt(ModConfigs.SERVER.altarCapacity);
-            maxInsert = ModConfigs.getInt(ModConfigs.SERVER.altarMaxInput);
-            if (energy > capacity) set(capacity);
-        }
-
-        void consume(int amount) {
-            set(Math.max(0, energy - amount));
-        }
-
-        @Override
-        protected void onEnergyChanged(int previousAmount) {
-            setChanged();
-        }
-    }
 
     // ------------------------------------------------------------------ persistence
 

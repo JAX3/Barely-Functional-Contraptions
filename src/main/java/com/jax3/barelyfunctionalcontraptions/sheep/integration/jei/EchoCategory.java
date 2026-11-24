@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.integration.jei;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity;
 import com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs;
@@ -7,7 +8,6 @@ import com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceSheepSpawnEggIt
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.placement.HorizontalAlignment;
@@ -63,7 +63,7 @@ public class EchoCategory extends AbstractRecipeCategory<EchoDisplay> {
         int side = ModConfigs.getInt(ModConfigs.SERVER.echoRadius) * 2 + 1;
         builder.addSlot(RecipeIngredientRole.INPUT, 20, 14)
                 .setBackground(slot, -1, -1)
-                .addItemStacks(eggs(ModConfigs.SERVER.echoSources.get(), max))
+                .addItemStacks(ResourceSheepSpawnEggItem.createAll(ModConfigs.SERVER.echoSources.get(), max))
                 .addRichTooltipCallback((view, tooltip) -> {
                     tooltip.add(Component.translatable("jei.barelyfunctionalcontraptions.echo.herd", max, side + "x" + side).withColor(SCULK));
                     tooltip.add(Component.translatable("jei.barelyfunctionalcontraptions.echo.herd_desc").withStyle(ChatFormatting.GRAY));
@@ -96,8 +96,8 @@ public class EchoCategory extends AbstractRecipeCategory<EchoDisplay> {
         for (int i = 1; i <= rows; i++) {
             int n = i == rows ? max : i; // a big config: the last row is the most it counts
             sheep.add(Component.literal(Integer.toString(n)));
-            steady.add(Component.literal(fe(EchoChamberBlockEntity.power(n, quiet, 1.0))));
-            erratic.add(Component.literal(fe(EchoChamberBlockEntity.power(n, quiet, 0.0))));
+            steady.add(Component.literal(Numbers.grouped(EchoChamberBlockEntity.power(n, quiet, 1.0))));
+            erratic.add(Component.literal(Numbers.grouped(EchoChamberBlockEntity.power(n, quiet, 0.0))));
         }
         int height = LINE * sheep.size();
         builder.addText(sheep, 40, height).setPosition(6, TABLE_Y).setLineSpacing(1).setColor(JeiTextures.TEXT_DIM)
@@ -118,16 +118,5 @@ public class EchoCategory extends AbstractRecipeCategory<EchoDisplay> {
     }
 
     /** Each listening resource's spawn egg, in a stack of up to {@code max}. */
-    private static List<ItemStack> eggs(List<? extends String> sources, int max) {
-        List<ItemStack> eggs = new ArrayList<>();
-        for (String id : sources) {
-            net.minecraft.resources.Identifier parsed = net.minecraft.resources.Identifier.tryParse(id);
-            if (parsed != null) eggs.add(ResourceSheepSpawnEggItem.create(parsed, Math.min(64, max)));
-        }
-        return eggs;
-    }
 
-    private static String fe(int value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

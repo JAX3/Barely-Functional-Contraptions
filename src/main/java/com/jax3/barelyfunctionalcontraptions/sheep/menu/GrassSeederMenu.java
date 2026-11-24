@@ -10,7 +10,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -24,7 +23,7 @@ import org.jspecify.annotations.Nullable;
  * status, how green its ground is, the ground map, its sheep grazing). Slot positions match
  * {@code textures/gui/grass_seeder.png}.
  */
-public class GrassSeederMenu extends AbstractContainerMenu {
+public class GrassSeederMenu extends MachineMenu {
     public static final int BONE_X = 128, BONE_Y = 22;
     public static final int INVENTORY_Y = 111;
     public static final int BUTTON_AREA = 0, BUTTON_TRIM = 1;
@@ -63,32 +62,12 @@ public class GrassSeederMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (index == 0) {
-            if (!moveItemStackTo(stack, PLAYER_START, PLAYER_END, true)) return ItemStack.EMPTY;
-        } else if (stack.is(Items.BONE_MEAL)) {
-            if (!moveItemStackTo(stack, 0, 1, false)) return ItemStack.EMPTY;
-        } else if (index < PLAYER_START + 27) {
-            if (!moveItemStackTo(stack, PLAYER_START + 27, PLAYER_END, false)) return ItemStack.EMPTY;
-        } else if (!moveItemStackTo(stack, PLAYER_START, PLAYER_START + 27, false)) {
-            return ItemStack.EMPTY;
-        }
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        if (stack.getCount() == original.getCount()) return ItemStack.EMPTY;
-        slot.onTake(player, stack);
-        return original;
+        return quickMoveMachine(player, index, PLAYER_START, false, onlyInto(s -> s.is(Items.BONE_MEAL), 0, 1));
     }
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id == BUTTON_AREA && blockEntity != null) {
-            blockEntity.toggleArea(player);
-            return true;
-        }
+        if (clickAreaButton(player, id, BUTTON_AREA, blockEntity)) return true;
         if (id == BUTTON_TRIM && blockEntity != null) {
             blockEntity.setTrim(!blockEntity.trims());
             return true;

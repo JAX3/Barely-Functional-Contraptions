@@ -23,16 +23,12 @@ import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -51,7 +47,7 @@ import org.jspecify.annotations.Nullable;
  * looking). Breaking either breaks both and drops the treadmill. {@link #RUNNING} is set on the back while a sheep
  * walks it: the belt moves and the sheep's legs go.</p>
  */
-public class SheepTreadmillBlock extends BaseEntityBlock {
+public class SheepTreadmillBlock extends FacingMachineBlock {
     /**
      * Minecraft 26.2 asks every block entity block for a codec; 26.3 doesn't. Not an override, so it builds for both.
      */
@@ -59,7 +55,6 @@ public class SheepTreadmillBlock extends BaseEntityBlock {
         return com.mojang.serialization.MapCodec.unit(this);
     }
 
-    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final IntegerProperty PART = IntegerProperty.create("part", 0, 1);
     public static final BooleanProperty RUNNING = BooleanProperty.create("running");
 
@@ -141,16 +136,6 @@ public class SheepTreadmillBlock extends BaseEntityBlock {
             }
         }
         return super.playerWillDestroy(level, pos, state, player);
-    }
-
-    @Override
-    protected BlockState rotate(BlockState state, Rotation rotation) {
-        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
-    }
-
-    @Override
-    protected BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     // ------------------------------------------------------------------ block entity

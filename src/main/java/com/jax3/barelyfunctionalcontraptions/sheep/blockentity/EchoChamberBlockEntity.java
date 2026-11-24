@@ -50,8 +50,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 /**
  * The Echo Chamber, a late-game generator: Warden sheep in front of its dish turn the vibrations
@@ -107,7 +105,7 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
     }
 
     private final Ears ears = new Ears();
-    private final ChamberEnergy energy = new ChamberEnergy();
+    private final GeneratorEnergy energy = new GeneratorEnergy(2_000_000, this::setChanged);
     /** Vibrations heard in each fifth of the window, oldest first, and in the fifth being heard now. */
     private int[] buckets = new int[BUCKETS];
     private int hearing, bucketTicks;
@@ -443,15 +441,8 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
     }
 
     private void push(ServerLevel level, BlockPos pos, Direction facing) {
-        int budget = Math.min(ModConfigs.getInt(ModConfigs.SERVER.echoOutput), energy.getAmountAsInt());
-        if (budget <= 0) return;
-        Direction back = facing.getOpposite();
-        EnergyHandler handler = level.getCapability(Capabilities.Energy.BLOCK, port(pos, facing).relative(back), facing);
-        if (handler == null) return;
-        try (Transaction tx = Transaction.openRoot()) {
-            int moved = handler.insert(budget, tx);
-            if (moved > 0 && energy.extract(moved, tx) == moved) tx.commit();
-        }
+        EnergyHandler handler = level.getCapability(Capabilities.Energy.BLOCK, port(pos, facing).relative(facing.getOpposite()), facing);
+        energy.pushInto(handler, ModConfigs.getInt(ModConfigs.SERVER.echoOutput));
     }
 
     // ------------------------------------------------------------------ accessors
@@ -622,29 +613,4 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
         return tag;
     }
 
-    /** Out only: it makes its own power. */
-    private final class ChamberEnergy extends SimpleEnergyHandler {
-        ChamberEnergy() {
-            super(2_000_000, 0, Integer.MAX_VALUE);
-        }
-
-        void generate(int amount) {
-            int previous = energy;
-            energy = (int) Math.min(capacity, (long) energy + Math.max(0, amount));
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        void resize(int newCapacity) {
-            if (capacity == newCapacity) return;
-            int previous = energy;
-            capacity = newCapacity;
-            energy = Math.min(energy, capacity);
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        @Override
-        protected void onEnergyChanged(int previousAmount) {
-            setChanged();
-        }
-    }
 }

@@ -1,7 +1,7 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.integration.jade;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
-import java.util.Locale;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -22,12 +22,8 @@ public enum EnergyCableProvider implements IBlockComponentProvider {
         if (data == null) return;
         tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.cable.network", data.cables(), data.endpoints())
                 .withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.cable.rate", fe(data.rate()), fe(data.maxRate()))
+        tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.cable.rate", Numbers.grouped(data.rate()), Numbers.grouped(data.maxRate()))
                 .withColor(data.rate() > 0 ? 0x3FC8FF : 0xAAAAAA));
-    }
-
-    private static String fe(int value) {
-        return String.format(Locale.ROOT, "%,d", value);
     }
 
     @Override

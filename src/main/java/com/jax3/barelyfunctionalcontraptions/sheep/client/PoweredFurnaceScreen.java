@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus;
 import java.util.ArrayList;
@@ -109,7 +110,7 @@ public class PoweredFurnaceScreen extends AbstractContainerScreen<PoweredFurnace
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.powered_furnace.input.desc", menu.getCookPercent()).withStyle(ChatFormatting.GRAY));
             }
         } else if (isHovering(GAUGE_X - 2, GAUGE_Y - 2, GAUGE_W + 4, GAUGE_H + 4, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", fe(menu.getEnergy()), fe(menu.getCapacity())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity())));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.powered_furnace.energy.desc", menu.getEnergyPerTick()).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(FLAME_X, FLAME_Y, FLAME_SIZE, FLAME_SIZE, mouseX, mouseY) || isHovering(46, 60, 122, 24, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.powered_furnace.blaze", menu.getHeaters(), menu.getMaxHeaters()).withColor(BLAZE_TEXT));
@@ -126,7 +127,4 @@ public class PoweredFurnaceScreen extends AbstractContainerScreen<PoweredFurnace
         if (!lines.isEmpty()) graphics.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

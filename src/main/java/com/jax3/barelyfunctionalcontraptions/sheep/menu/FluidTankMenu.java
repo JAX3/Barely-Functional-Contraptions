@@ -12,14 +12,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
 
 /** Menu of the Fluid Tank: no machine slots, just the group's synced numbers and the player inventory. */
-public class FluidTankMenu extends AbstractContainerMenu {
+public class FluidTankMenu extends MachineMenu {
     public static final int INVENTORY_Y = 111;
     private static final int PLAYER_END = 36;
 
@@ -43,15 +42,7 @@ public class FluidTankMenu extends AbstractContainerMenu {
     /** Shift-click moves items between the inventory and the hotbar. */
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        var slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        boolean moved = index < 27 ? moveItemStackTo(stack, 27, PLAYER_END, false) : moveItemStackTo(stack, 0, 27, false);
-        if (!moved) return ItemStack.EMPTY;
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        return original;
+        return quickMoveMachine(player, index, 0, false);
     }
 
     @Override
@@ -59,16 +50,13 @@ public class FluidTankMenu extends AbstractContainerMenu {
         return stillValid(access, player, ModBlocks.FLUID_TANK.get());
     }
 
-    private int int32(int low) {
-        return (data.get(low) & 0xFFFF) | ((data.get(low + 1) & 0xFFFF) << 16);
-    }
 
-    public int getAmount() { return int32(0); }
-    public int getCapacity() { return int32(2); }
-    public int getRate() { return int32(4); }
+    public int getAmount() { return int32(data, 0); }
+    public int getCapacity() { return int32(data, 2); }
+    public int getRate() { return int32(data, 4); }
     public int getTanks() { return Math.max(1, data.get(6)); }
-    public int getInRate() { return int32(7); }
-    public int getOutRate() { return int32(9); }
+    public int getInRate() { return int32(data, 7); }
+    public int getOutRate() { return int32(data, 9); }
     public CubeStatus getStatus() { return CubeStatus.byId(data.get(11)); }
 
     /** The group's fluid, or {@link Fluids#EMPTY}. */

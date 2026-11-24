@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ReservoirStatus;
 import com.jax3.barelyfunctionalcontraptions.sheep.menu.FluidReservoirMenu;
@@ -68,15 +69,15 @@ public class FluidReservoirScreen extends AbstractContainerScreen<FluidReservoir
     protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
-        Component stored = Component.translatable("gui.barelyfunctionalcontraptions.reservoir.stored", mb(menu.getAmount()));
-        Component capacity = Component.translatable("gui.barelyfunctionalcontraptions.reservoir.capacity", mb(menu.getCapacity()));
+        Component stored = Component.translatable("gui.barelyfunctionalcontraptions.reservoir.stored", Numbers.grouped(menu.getAmount()));
+        Component capacity = Component.translatable("gui.barelyfunctionalcontraptions.reservoir.capacity", Numbers.grouped(menu.getCapacity()));
         Component buckets = Component.translatable("gui.barelyfunctionalcontraptions.reservoir.buckets",
                 String.format(Locale.ROOT, "%.1f", menu.getAmount() / 1000.0));
         graphics.text(font, stored, INFO_CENTRE - font.width(stored) / 2, 26, WATER_TEXT, false);
         graphics.text(font, capacity, INFO_CENTRE - font.width(capacity) / 2, 36, TEXT_DIM, false);
         graphics.text(font, buckets, INFO_CENTRE - font.width(buckets) / 2, 52, TEXT_COLOR, false);
         if (menu.getStatus() == ReservoirStatus.FILLING) {
-            Component rate = Component.translatable("gui.barelyfunctionalcontraptions.reservoir.rate", mb(menu.getWaterPerSecond()));
+            Component rate = Component.translatable("gui.barelyfunctionalcontraptions.reservoir.rate", Numbers.grouped(menu.getWaterPerSecond()));
             graphics.text(font, rate, INFO_CENTRE - font.width(rate) / 2, 64, TEXT_DIM, false);
         }
         ReservoirStatus status = menu.getStatus();
@@ -93,7 +94,7 @@ public class FluidReservoirScreen extends AbstractContainerScreen<FluidReservoir
         if (menu.getCarried().isEmpty() && hoveredSlot == null) {
             List<Component> lines = new ArrayList<>();
             if (isHovering(TANK_X - 2, TANK_Y - 2, TANK_W + 4, TANK_H + 4, mouseX, mouseY)) {
-                lines.add(Component.translatable("gui.barelyfunctionalcontraptions.reservoir.tank", mb(menu.getAmount()), mb(menu.getCapacity())));
+                lines.add(Component.translatable("gui.barelyfunctionalcontraptions.reservoir.tank", Numbers.grouped(menu.getAmount()), Numbers.grouped(menu.getCapacity())));
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.reservoir.tank.desc").withStyle(ChatFormatting.GRAY));
             } else if (isHovering(LAMP_X, LAMP_Y - 1, 120, 10, mouseX, mouseY)) {
                 ReservoirStatus status = menu.getStatus();
@@ -107,7 +108,4 @@ public class FluidReservoirScreen extends AbstractContainerScreen<FluidReservoir
         }
     }
 
-    private static String mb(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

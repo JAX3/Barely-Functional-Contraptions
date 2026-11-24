@@ -20,9 +20,6 @@ import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -50,7 +47,7 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * The lower half holds the block entity and drops the machine; breaking either half removes both.
  */
-public class StaticGeneratorBlock extends BaseEntityBlock {
+public class StaticGeneratorBlock extends FacingMachineBlock {
     /**
      * Minecraft 26.1 and 26.2 ask every block entity block for a codec; 26.3 doesn't. Not an override, so it builds
      * for all of them.
@@ -59,7 +56,6 @@ public class StaticGeneratorBlock extends BaseEntityBlock {
         return com.mojang.serialization.MapCodec.unit(this);
     }
 
-    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
@@ -167,16 +163,6 @@ public class StaticGeneratorBlock extends BaseEntityBlock {
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         StaticGeneratorBlockEntity be = entity(level, pos, state);
         return be == null ? 0 : be.comparatorSignal();
-    }
-
-    @Override
-    protected BlockState rotate(BlockState state, Rotation rotation) {
-        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
-    }
-
-    @Override
-    protected BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     /** The dome crackles while it charges, more as its charge builds. */

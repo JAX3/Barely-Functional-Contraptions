@@ -14,10 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 /**
  * The Glow Panel: makes Forge Energy from the light falling on its top face.
@@ -37,7 +34,7 @@ public class GlowPanelBlockEntity extends BlockEntity {
     public enum Source { NONE, SUN, GLOW }
 
     /** Nothing can be put into the panel from outside; it only fills itself. */
-    private final PanelEnergy energy = new PanelEnergy();
+    private final GeneratorEnergy energy = new GeneratorEnergy(10_000, this::setChanged);
     private int generating;
     private Source source = Source.NONE;
 
@@ -104,47 +101,7 @@ public class GlowPanelBlockEntity extends BlockEntity {
     }
 
     private void push(ServerLevel level, BlockPos pos) {
-        int budget = Math.min(ModConfigs.getInt(ModConfigs.SERVER.glowPanelOutput), energy.getAmountAsInt());
-        for (Direction dir : Direction.values()) {
-            if (budget <= 0) return;
-            if (dir == Direction.UP) continue;
-            BlockPos target = pos.relative(dir);
-            if (level.getBlockEntity(target) instanceof GlowPanelBlockEntity) continue; // panels don't charge each other
-            EnergyHandler handler = level.getCapability(Capabilities.Energy.BLOCK, target, dir.getOpposite());
-            if (handler == null) continue;
-            try (Transaction tx = Transaction.openRoot()) {
-                int moved = handler.insert(budget, tx);
-                if (moved > 0 && energy.extract(moved, tx) == moved) {
-                    tx.commit();
-                    budget -= moved;
-                }
-            }
-        }
-    }
-
-    private final class PanelEnergy extends SimpleEnergyHandler {
-        PanelEnergy() {
-            super(10_000, 0, Integer.MAX_VALUE);
-        }
-
-        void generate(int amount) {
-            int previous = energy;
-            energy = Math.min(capacity, energy + Math.max(0, amount));
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        void resize(int newCapacity) {
-            if (capacity == newCapacity) return;
-            int previous = energy;
-            capacity = newCapacity;
-            energy = Math.min(energy, capacity);
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        @Override
-        protected void onEnergyChanged(int previousAmount) {
-            setChanged();
-        }
+        energy.pushToNeighbours(level, pos, ModConfigs.getInt(ModConfigs.SERVER.glowPanelOutput), (dir, target) -> dir == Direction.UP || level.getBlockEntity(target) instanceof GlowPanelBlockEntity); // not up, and panels don't charge each other
     }
 
     @Override

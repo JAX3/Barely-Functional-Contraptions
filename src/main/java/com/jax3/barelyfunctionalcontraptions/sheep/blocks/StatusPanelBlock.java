@@ -15,15 +15,11 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -39,7 +35,7 @@ import org.jspecify.annotations.Nullable;
  * look at it) holds the links for all of them, and it shows 4 machines for each panel. Anything else (an L, a gap, too
  * big) stays separate panels.
  */
-public class StatusPanelBlock extends BaseEntityBlock {
+public class StatusPanelBlock extends FacingMachineBlock {
     /**
      * Minecraft 26.1 and 26.2 ask every block entity block for a codec; 26.3 doesn't. Not an override, so it builds
      * for all of them.
@@ -49,7 +45,6 @@ public class StatusPanelBlock extends BaseEntityBlock {
     }
 
     /** The way its screen faces (it hangs on the block behind it). */
-    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     /** Which sides (as you look at its screen) join to the next panel of the same screen. */
     public static final net.minecraft.world.level.block.state.properties.BooleanProperty JOINED_UP =
             net.minecraft.world.level.block.state.properties.BooleanProperty.create("joined_up");
@@ -201,16 +196,6 @@ public class StatusPanelBlock extends BaseEntityBlock {
             case WEST -> WEST;
             default -> NORTH;
         };
-    }
-
-    @Override
-    protected BlockState rotate(BlockState state, Rotation rotation) {
-        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
-    }
-
-    @Override
-    protected BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus;
 import java.util.ArrayList;
@@ -129,7 +130,7 @@ public class ChillerScreen extends AbstractContainerScreen<ChillerMenu> {
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.chiller.slot.desc").withStyle(ChatFormatting.GRAY));
             }
         } else if (isHovering(GAUGE_X - 2, GAUGE_Y - 2, GAUGE_W + 4, GAUGE_H + 4, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.chiller.water", mb(menu.getWater()), mb(menu.getTankCapacity())).withColor(WATER_TEXT));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.chiller.water", Numbers.grouped(menu.getWater()), Numbers.grouped(menu.getTankCapacity())).withColor(WATER_TEXT));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.chiller.water.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(COLUMN_X, COLUMN_Y, COLUMN_W, COLUMN_H, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.chiller.cold", menu.getSources(), menu.getMaxSources()).withColor(COLD_TEXT));
@@ -148,7 +149,4 @@ public class ChillerScreen extends AbstractContainerScreen<ChillerMenu> {
         if (!lines.isEmpty()) graphics.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
     }
 
-    private static String mb(int value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

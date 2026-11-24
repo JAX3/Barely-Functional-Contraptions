@@ -10,7 +10,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -22,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  * Window of the Snow Sheep Chiller: its Ice slot (take only), the player inventory and the chiller's synced numbers
  * (water, freezing progress, cold, Snow sheep, status, area setting). Slot positions match {@code textures/gui/chiller.png}.
  */
-public class ChillerMenu extends AbstractContainerMenu {
+public class ChillerMenu extends MachineMenu {
     public static final int OUTPUT_X = 134, OUTPUT_Y = 41;
     public static final int INVENTORY_Y = 111;
     public static final int BUTTON_AREA = 0;
@@ -61,31 +60,12 @@ public class ChillerMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (index == 0) {
-            if (!moveItemStackTo(stack, PLAYER_START, PLAYER_END, true)) return ItemStack.EMPTY;
-        } else if (index < PLAYER_START + 27) {
-            if (!moveItemStackTo(stack, PLAYER_START + 27, PLAYER_END, false)) return ItemStack.EMPTY;
-        } else if (!moveItemStackTo(stack, PLAYER_START, PLAYER_START + 27, false)) {
-            return ItemStack.EMPTY;
-        }
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        if (stack.getCount() == original.getCount()) return ItemStack.EMPTY;
-        slot.onTake(player, stack);
-        return original;
+        return quickMoveMachine(player, index, PLAYER_START, false);
     }
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id == BUTTON_AREA && blockEntity != null) {
-            blockEntity.toggleArea(player);
-            return true;
-        }
-        return false;
+        return clickAreaButton(player, id, BUTTON_AREA, blockEntity);
     }
 
     @Override

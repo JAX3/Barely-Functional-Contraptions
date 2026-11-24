@@ -11,7 +11,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -21,7 +20,7 @@ import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
 /** Window of the Powered Furnace: its input and output slots, the player inventory and the furnace's synced numbers. */
-public class PoweredFurnaceMenu extends AbstractContainerMenu {
+public class PoweredFurnaceMenu extends MachineMenu {
     public static final int INPUT_X = 56, INPUT_Y = 22;
     public static final int OUTPUT_X = 124, OUTPUT_Y = 31;
     public static final int INVENTORY_Y = 111;
@@ -76,33 +75,12 @@ public class PoweredFurnaceMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (index < PLAYER_START) {
-            if (!moveItemStackTo(stack, PLAYER_START, PLAYER_END, true)) return ItemStack.EMPTY;
-        } else if (PoweredFurnaceBlockEntity.canSmelt(level, stack) && moveItemStackTo(stack, 0, 1, false)) {
-            // Smeltable items go straight in.
-        } else if (index < PLAYER_START + 27) {
-            if (!moveItemStackTo(stack, PLAYER_START + 27, PLAYER_END, false)) return ItemStack.EMPTY;
-        } else if (!moveItemStackTo(stack, PLAYER_START, PLAYER_START + 27, false)) {
-            return ItemStack.EMPTY;
-        }
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        if (stack.getCount() == original.getCount()) return ItemStack.EMPTY;
-        slot.onTake(player, stack);
-        return original;
+        return quickMoveMachine(player, index, PLAYER_START, false, tryInto(s -> PoweredFurnaceBlockEntity.canSmelt(level, s), 0, 1));
     }
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id == BUTTON_AREA && blockEntity != null) {
-            blockEntity.toggleArea(player);
-            return true;
-        }
-        return false;
+        return clickAreaButton(player, id, BUTTON_AREA, blockEntity);
     }
 
     @Override
@@ -110,12 +88,9 @@ public class PoweredFurnaceMenu extends AbstractContainerMenu {
         return stillValid(access, player, ModBlocks.POWERED_FURNACE.get());
     }
 
-    private int int32(int low) {
-        return (data.get(low) & 0xFFFF) | ((data.get(low + 1) & 0xFFFF) << 16);
-    }
 
-    public int getEnergy() { return int32(0); }
-    public int getCapacity() { return int32(2); }
+    public int getEnergy() { return int32(data, 0); }
+    public int getCapacity() { return int32(data, 2); }
     public int getProgress() { return data.get(4); }
     public int getMaxProgress() { return Math.max(1, data.get(5)); }
     public int getEnergyPerTick() { return data.get(6); }

@@ -16,7 +16,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.resource.Resource;
-import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jspecify.annotations.Nullable;
@@ -46,13 +45,10 @@ public final class PipeNetwork<T extends Resource> {
     private final List<PipeBlockEntity<T>> pipes;
     private final List<Endpoint> endpoints;
     private boolean valid = true;
-    private final Moved moved = new Moved();
-    private long lastTick = Long.MIN_VALUE;
+    private final TransferMeter moved = new TransferMeter();
     private long lastPull = Long.MIN_VALUE;
     private int rotation;
     private boolean delivering;
-    private long window;
-    private int rate;
 
     private final PipeKind<T> kind;
 
@@ -129,23 +125,16 @@ public final class PipeNetwork<T extends Resource> {
 
     /** Average amount per tick the network moved over the last second. */
     public int rate() {
-        return rate;
+        return moved.rate();
     }
 
     /** How much the network can still move this tick. */
     public int remaining() {
-        return Math.max(0, transferRate() - moved.amount);
+        return Math.max(0, transferRate() - moved.thisTick());
     }
 
     private void startTick(Level level) {
-        long now = level.getGameTime();
-        if (now == lastTick || moved.isInTransaction()) return;
-        if (now % 20 == 0 && lastTick != Long.MIN_VALUE) {
-            rate = (int) Math.min(Integer.MAX_VALUE, window / 20);
-            window = 0;
-        }
-        lastTick = now;
-        moved.amount = 0;
+        moved.startTick(level);
     }
 
     private @Nullable ResourceHandler<T> handler(Level level, Endpoint end) {
@@ -187,10 +176,7 @@ public final class PipeNetwork<T extends Resource> {
         } finally {
             delivering = false;
         }
-        if (sent > 0) {
-            moved.updateSnapshots(transaction);
-            moved.amount += sent;
-        }
+        moved.record(sent, transaction);
         return sent;
     }
 
@@ -253,26 +239,6 @@ public final class PipeNetwork<T extends Resource> {
                     if (handler.extract(resource, sent, tx) == sent) tx.commit();
                 }
             }
-        }
-    }
-
-    /** Amount moved this tick, rolled back with the transactions that moved it. */
-    private final class Moved extends SnapshotJournal<Integer> {
-        int amount;
-
-        @Override
-        protected Integer createSnapshot() {
-            return amount;
-        }
-
-        @Override
-        protected void revertToSnapshot(Integer snapshot) {
-            amount = snapshot;
-        }
-
-        @Override
-        protected void onRootCommit(Integer originalState) {
-            window += amount - originalState;
         }
     }
 }

@@ -25,14 +25,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -50,15 +46,15 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * Its comparator signal reads how full the output slot is.
  */
-public class ChillerBlockEntity extends BlockEntity implements WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
+public class ChillerBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
     public static final int SCAN_INTERVAL = 10;
     public static final int AREA_COLOR = 0xFF7FD8FF;
     private static final int[] SLOTS = {0};
     /** Values synced to the window ({@link com.jax3.barelyfunctionalcontraptions.sheep.menu.ChillerMenu}). */
     public static final int DATA_COUNT = 10;
-    public static final FluidResource WATER = FluidResource.of(Fluids.WATER);
+    public static final FluidResource WATER = WaterTank.WATER;
 
-    private final ChillerTank tank = new ChillerTank();
+    private final WaterTank tank = new WaterTank(8_000, this::setChanged);
     private ItemStack output = ItemStack.EMPTY;
     /** Progress towards the next Ice, in hundredths of a tick at one sheep's speed. */
     private int progress;
@@ -190,7 +186,7 @@ public class ChillerBlockEntity extends BlockEntity implements WorldlyContainer,
 
     // ------------------------------------------------------------------ accessors
 
-    public ChillerTank getTank() {
+    public WaterTank getTank() {
         return tank;
     }
 
@@ -221,9 +217,7 @@ public class ChillerBlockEntity extends BlockEntity implements WorldlyContainer,
 
     /** Pours a bucket's worth of water in, if it fits. */
     public boolean fillFromBucket() {
-        if (tank.capacity() - tank.getAmount() < 1000) return false;
-        tank.fill(1000);
-        return true;
+        return tank.fillFromBucket();
     }
 
     /** It calls its sheep back from just outside its area. */
@@ -272,53 +266,19 @@ public class ChillerBlockEntity extends BlockEntity implements WorldlyContainer,
     }
 
     @Override
-    public boolean isEmpty() {
-        return output.isEmpty();
-    }
-
-    @Override
     public ItemStack getItem(int slot) {
         return slot == 0 ? output : ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeItem(int slot, int count) {
-        if (slot != 0 || output.isEmpty()) return ItemStack.EMPTY;
-        ItemStack taken = output.split(count);
-        setChanged();
-        return taken;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        if (slot != 0) return ItemStack.EMPTY;
-        ItemStack taken = output;
-        output = ItemStack.EMPTY;
-        return taken;
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-        if (slot != 0) return;
-        output = stack;
-        setChanged();
+    public void putItem(int slot, ItemStack stack) {
+        if (slot == 0) output = stack;
     }
 
     /** Nothing goes in: the slot is the Ice it makes. */
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         return false;
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return net.minecraft.world.Container.stillValidBlockEntity(this, player);
-    }
-
-    @Override
-    public void clearContent() {
-        output = ItemStack.EMPTY;
-        setChanged();
     }
 
     @Override
@@ -344,52 +304,6 @@ public class ChillerBlockEntity extends BlockEntity implements WorldlyContainer,
     }
 
     // ------------------------------------------------------------------ water
-
-    /** Water only, in only: buckets, pipes and a Fluid Reservoir fill it; the water can't be taken back out. */
-    public final class ChillerTank extends FluidStacksResourceHandler {
-        ChillerTank() {
-            super(1, 8_000);
-        }
-
-        @Override
-        public boolean isValid(int index, FluidResource resource) {
-            return resource.equals(WATER);
-        }
-
-        @Override
-        public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
-            return 0;
-        }
-
-        @Override
-        protected void onContentsChanged(int index, FluidStack previousContents) {
-            setChanged();
-        }
-
-        public int getAmount() {
-            return getAmountAsInt(0);
-        }
-
-        public int capacity() {
-            return capacity;
-        }
-
-        void fill(int amount) {
-            int added = Math.max(0, Math.min(amount, capacity - getAmount()));
-            if (added > 0) set(0, WATER, getAmount() + added);
-        }
-
-        void drain(int amount) {
-            int left = Math.max(0, getAmount() - amount);
-            set(0, left > 0 ? WATER : FluidResource.EMPTY, left);
-        }
-
-        void resize(int newCapacity) {
-            if (newCapacity == capacity) return;
-            capacity = newCapacity;
-            if (getAmount() > capacity) set(0, WATER, capacity);
-        }
-    }
 
     // ------------------------------------------------------------------ persistence and sync
 

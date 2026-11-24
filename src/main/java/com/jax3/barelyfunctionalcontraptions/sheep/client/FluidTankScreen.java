@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CubeStatus;
 import com.jax3.barelyfunctionalcontraptions.sheep.menu.FluidTankMenu;
@@ -74,10 +75,10 @@ public class FluidTankScreen extends AbstractContainerScreen<FluidTankMenu> {
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
         centred(graphics, fluidName(), 19, FLUID_TEXT);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.tank.stored", fe(menu.getAmount()), fe(menu.getCapacity())), 30, TEXT_DIM);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.tank.group", menu.getTanks(), fe(menu.getRate())), 44, TEXT_COLOR);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.tank.in", fe(menu.getInRate())), 57, IN_COLOR);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.tank.out", fe(menu.getOutRate())), 67, OUT_COLOR);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.tank.stored", Numbers.grouped(menu.getAmount()), Numbers.grouped(menu.getCapacity())), 30, TEXT_DIM);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.tank.group", menu.getTanks(), Numbers.grouped(menu.getRate())), 44, TEXT_COLOR);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.tank.in", Numbers.grouped(menu.getInRate())), 57, IN_COLOR);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.tank.out", Numbers.grouped(menu.getOutRate())), 67, OUT_COLOR);
         CubeStatus status = menu.getStatus();
         graphics.text(font, statusName(status), LAMP_X + 13, LAMP_Y + 1, status.color(), false);
     }
@@ -103,7 +104,7 @@ public class FluidTankScreen extends AbstractContainerScreen<FluidTankMenu> {
         List<Component> lines = new ArrayList<>();
         if (isHovering(GAUGE_X - 2, GAUGE_Y - 2, GAUGE_W + 4, GAUGE_H + 4, mouseX, mouseY)) {
             lines.add(fluidName().copy());
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.tank.stored", fe(menu.getAmount()), fe(menu.getCapacity())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.tank.stored", Numbers.grouped(menu.getAmount()), Numbers.grouped(menu.getCapacity())));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.cube.percent",
                     String.format(Locale.ROOT, "%.1f", menu.getFillFraction() * 100)).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(48, 40, 120, 16, mouseX, mouseY)) {
@@ -111,7 +112,7 @@ public class FluidTankScreen extends AbstractContainerScreen<FluidTankMenu> {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.tank.group.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(48, 54, 120, 22, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.tank.flow.tooltip"));
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.tank.flow.desc", fe(menu.getRate())).withStyle(ChatFormatting.GRAY));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.tank.flow.desc", Numbers.grouped(menu.getRate())).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(LAMP_X, LAMP_Y - 1, 120, 10, mouseX, mouseY)) {
             CubeStatus status = menu.getStatus();
             lines.add(statusName(status).copy().withColor(status.color()));
@@ -121,7 +122,4 @@ public class FluidTankScreen extends AbstractContainerScreen<FluidTankMenu> {
         if (!lines.isEmpty()) graphics.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

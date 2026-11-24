@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.integration.jei;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity;
 import com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs;
@@ -66,7 +67,7 @@ public class ThermalCategory extends AbstractRecipeCategory<ThermalDisplay> {
         String pen = pen();
         builder.addSlot(RecipeIngredientRole.INPUT, 8, 14)
                 .setBackground(slot, -1, -1)
-                .addItemStacks(eggs(ModConfigs.SERVER.thermalHotSources.get(), max))
+                .addItemStacks(ResourceSheepSpawnEggItem.createAll(ModConfigs.SERVER.thermalHotSources.get(), max))
                 .addRichTooltipCallback((view, tooltip) -> {
                     tooltip.add(Component.translatable("jei.barelyfunctionalcontraptions.thermal.hot_herd", max, pen).withStyle(ChatFormatting.GOLD));
                     tooltip.add(Component.translatable("jei.barelyfunctionalcontraptions.thermal.herd_desc").withStyle(ChatFormatting.GRAY));
@@ -86,7 +87,7 @@ public class ThermalCategory extends AbstractRecipeCategory<ThermalDisplay> {
                         Component.translatable("jei.barelyfunctionalcontraptions.thermal.boost", seconds, boost).withStyle(ChatFormatting.GRAY)));
         builder.addSlot(RecipeIngredientRole.INPUT, 152, 14)
                 .setBackground(slot, -1, -1)
-                .addItemStacks(eggs(ModConfigs.SERVER.thermalColdSources.get(), max))
+                .addItemStacks(ResourceSheepSpawnEggItem.createAll(ModConfigs.SERVER.thermalColdSources.get(), max))
                 .addRichTooltipCallback((view, tooltip) -> {
                     tooltip.add(Component.translatable("jei.barelyfunctionalcontraptions.thermal.cold_herd", max, pen).withStyle(ChatFormatting.AQUA));
                     tooltip.add(Component.translatable("jei.barelyfunctionalcontraptions.thermal.herd_desc").withStyle(ChatFormatting.GRAY));
@@ -109,13 +110,13 @@ public class ThermalCategory extends AbstractRecipeCategory<ThermalDisplay> {
         boosted.add(Component.translatable("jei.barelyfunctionalcontraptions.thermal.col_boosted"));
         for (int n = 1; n <= max && pairs.size() <= ROW; n++) {
             pairs.add(Component.literal(Integer.toString(n)));
-            plain.add(Component.literal(fe(ThermalReactionChamberBlockEntity.power(n, false, 0))));
-            boosted.add(Component.literal(fe(ThermalReactionChamberBlockEntity.power(n, true, 0))));
+            plain.add(Component.literal(Numbers.grouped(ThermalReactionChamberBlockEntity.power(n, false, 0))));
+            boosted.add(Component.literal(Numbers.grouped(ThermalReactionChamberBlockEntity.power(n, true, 0))));
         }
         if (max > ROW) { // a big config: the last row is the most it counts
             pairs.set(ROW, Component.literal(Integer.toString(max)));
-            plain.set(ROW, Component.literal(fe(ThermalReactionChamberBlockEntity.power(max, false, 0))));
-            boosted.set(ROW, Component.literal(fe(ThermalReactionChamberBlockEntity.power(max, true, 0))));
+            plain.set(ROW, Component.literal(Numbers.grouped(ThermalReactionChamberBlockEntity.power(max, false, 0))));
+            boosted.set(ROW, Component.literal(Numbers.grouped(ThermalReactionChamberBlockEntity.power(max, true, 0))));
         }
         int height = LINE * pairs.size();
         builder.addText(pairs, 40, height).setPosition(6, TABLE_Y).setLineSpacing(1).setColor(JeiTextures.TEXT_DIM)
@@ -138,14 +139,6 @@ public class ThermalCategory extends AbstractRecipeCategory<ThermalDisplay> {
     }
 
     /** Each source resource's spawn egg, in a stack of up to {@code max} (the most pairs). */
-    private static List<ItemStack> eggs(List<? extends String> sources, int max) {
-        List<ItemStack> eggs = new ArrayList<>();
-        for (String id : sources) {
-            net.minecraft.resources.Identifier parsed = net.minecraft.resources.Identifier.tryParse(id);
-            if (parsed != null) eggs.add(ResourceSheepSpawnEggItem.create(parsed, Math.min(64, max)));
-        }
-        return eggs;
-    }
 
     private static String pen() {
         int side = ModConfigs.getInt(ModConfigs.SERVER.thermalRadius) * 2 + 1;
@@ -156,7 +149,4 @@ public class ThermalCategory extends AbstractRecipeCategory<ThermalDisplay> {
         return value == Math.rint(value) ? Integer.toString((int) value) : String.format(Locale.ROOT, "%.1f", value);
     }
 
-    private static String fe(int value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

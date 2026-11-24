@@ -7,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -18,7 +17,7 @@ import org.jspecify.annotations.Nullable;
  * Window of the Static Generator: no slots, just its synced numbers (energy, output, the dome's charge, the herd, its
  * combs' stages, state, area setting).
  */
-public class StaticGeneratorMenu extends AbstractContainerMenu {
+public class StaticGeneratorMenu extends MachineMenu {
     public static final int BUTTON_AREA = 0;
 
     private final ContainerLevelAccess access;
@@ -49,11 +48,7 @@ public class StaticGeneratorMenu extends AbstractContainerMenu {
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id == BUTTON_AREA && blockEntity != null) {
-            blockEntity.toggleArea(player);
-            return true;
-        }
-        return false;
+        return clickAreaButton(player, id, BUTTON_AREA, blockEntity);
     }
 
     @Override

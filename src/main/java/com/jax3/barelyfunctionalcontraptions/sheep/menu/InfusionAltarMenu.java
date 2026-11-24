@@ -10,7 +10,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -18,7 +17,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /** Window of the Infusion Altar: the feeding item in the centre, four catalysts around it, and the player inventory. */
-public class InfusionAltarMenu extends AbstractContainerMenu {
+public class InfusionAltarMenu extends MachineMenu {
     /** Item positions: centre, then north, east, south, west. */
     public static final int[][] SLOT_POS = {{74, 39}, {74, 18}, {95, 39}, {74, 60}, {53, 39}};
     public static final int INVENTORY_Y = 111;
@@ -65,26 +64,9 @@ public class InfusionAltarMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (index < PLAYER_START) {
-            if (!moveItemStackTo(stack, PLAYER_START, PLAYER_END, true)) return ItemStack.EMPTY;
-        } else if (InfusionAltarBlockEntity.resourceFor(player.level(), stack).isPresent() && moveItemStackTo(stack, 0, 1, false)) {
-            // Feeding items go to the centre.
-        } else if (InfusionAltarBlockEntity.isCatalyst(player.level(), stack) && moveItemStackTo(stack, 1, PLAYER_START, false)) {
-            // Catalysts go round it.
-        } else if (index < PLAYER_START + 27) {
-            if (!moveItemStackTo(stack, PLAYER_START + 27, PLAYER_END, false)) return ItemStack.EMPTY;
-        } else if (!moveItemStackTo(stack, PLAYER_START, PLAYER_START + 27, false)) {
-            return ItemStack.EMPTY;
-        }
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        if (stack.getCount() == original.getCount()) return ItemStack.EMPTY;
-        slot.onTake(player, stack);
-        return original;
+        return quickMoveMachine(player, index, PLAYER_START, false,
+                tryInto(s -> InfusionAltarBlockEntity.resourceFor(player.level(), s).isPresent(), 0, 1), // feeding items to the centre
+                tryInto(s -> InfusionAltarBlockEntity.isCatalyst(player.level(), s), 1, PLAYER_START)); // catalysts round it
     }
 
     @Override
@@ -101,15 +83,12 @@ public class InfusionAltarMenu extends AbstractContainerMenu {
         return stillValid(access, player, ModBlocks.INFUSION_ALTAR.get());
     }
 
-    private int int32(int low) {
-        return (data.get(low) & 0xFFFF) | ((data.get(low + 1) & 0xFFFF) << 16);
-    }
 
-    public int getEnergy() { return int32(0); }
-    public int getCapacity() { return int32(2); }
+    public int getEnergy() { return int32(data, 0); }
+    public int getCapacity() { return int32(data, 2); }
     public int getProgress() { return data.get(4) & 0xFFFF; }
     public int getMaxProgress() { return data.get(5) & 0xFFFF; }
-    public int getEnergyPerTick() { return int32(6); }
+    public int getEnergyPerTick() { return int32(data, 6); }
     public AltarStatus getStatus() { return AltarStatus.byId(data.get(8)); }
     public boolean hasSheep() { return data.get(9) != 0; }
     public boolean isShowingArea() { return data.get(10) != 0; }

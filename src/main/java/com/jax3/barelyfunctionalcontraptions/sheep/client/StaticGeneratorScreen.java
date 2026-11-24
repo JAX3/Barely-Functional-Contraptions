@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.State;
@@ -111,7 +112,7 @@ public class StaticGeneratorScreen extends AbstractContainerScreen<StaticGenerat
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.static_generator.herd", menu.getHerd(), menu.getMaxSheep()), 20,
                 menu.getHerd() > 0 ? SPARK_TEXT : TEXT_DIM);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.static_generator.rate", fe(menu.getGenerating())), 30,
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.static_generator.rate", Numbers.grouped(menu.getGenerating())), 30,
                 menu.getGenerating() > 0 ? ENERGY_TEXT : TEXT_DIM);
         graphics.text(font, statusText(), LAMP_X + 13, LAMP_Y, menu.getState().color, false);
     }
@@ -127,13 +128,13 @@ public class StaticGeneratorScreen extends AbstractContainerScreen<StaticGenerat
         String key = "gui.barelyfunctionalcontraptions.static_generator.";
         List<Component> lines = new ArrayList<>();
         if (isHovering(GAUGE_X - 1, GAUGE_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
-            lines.add(Component.translatable(key + "energy", fe(menu.getEnergy()), fe(menu.getCapacity())).withColor(ENERGY_TEXT));
+            lines.add(Component.translatable(key + "energy", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity())).withColor(ENERGY_TEXT));
             lines.add(Component.translatable(key + "energy.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(CENTRE - 50, 18, 100, 22, mouseX, mouseY)) {
             lines.add(Component.translatable(key + "herd.title", menu.getHerd(), menu.getMaxSheep()).withColor(SPARK_TEXT));
             lines.add(Component.translatable(key + "herd.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(CHARGE_X - 1, CHARGE_Y - 1, CHARGE_W + 2, CHARGE_H + 2, mouseX, mouseY)) {
-            lines.add(Component.translatable(key + "charge", fe(menu.getCharge()), fe(menu.getDomeCapacity())).withColor(SPARK_TEXT));
+            lines.add(Component.translatable(key + "charge", Numbers.grouped(menu.getCharge()), Numbers.grouped(menu.getDomeCapacity())).withColor(SPARK_TEXT));
             lines.add(Component.translatable(key + "charge.desc", menu.getShockAt() / 10).withStyle(ChatFormatting.GRAY));
         } else if (mouseY >= topPos + CHIP_Y && mouseY < topPos + CHIP_Y + CHIP_H) {
             int i = (mouseX - leftPos - CHIP_X) / CHIP_STEP;
@@ -158,7 +159,4 @@ public class StaticGeneratorScreen extends AbstractContainerScreen<StaticGenerat
         if (!lines.isEmpty()) graphics.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
     }
 
-    private static String fe(int value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

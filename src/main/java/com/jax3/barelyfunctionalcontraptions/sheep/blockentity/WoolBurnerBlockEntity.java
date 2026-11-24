@@ -24,10 +24,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -44,11 +41,11 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * It stores {@code [wool_burner] capacity} FE and pushes it into every block around it.
  */
-public class WoolBurnerBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider {
+public class WoolBurnerBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, MenuProvider {
     public static final int DATA_COUNT = 9;
     private static final int[] SLOTS = {0};
 
-    private final BurnerEnergy energy = new BurnerEnergy();
+    private final GeneratorEnergy energy = new GeneratorEnergy(20_000, this::setChanged);
     private ItemStack fuel = ItemStack.EMPTY;
     private int burnTime;
     private int burnTotal;
@@ -122,21 +119,7 @@ public class WoolBurnerBlockEntity extends BlockEntity implements WorldlyContain
     }
 
     private void push(ServerLevel level, BlockPos pos) {
-        int budget = Math.min(ModConfigs.getInt(ModConfigs.SERVER.woolBurnerOutput), energy.getAmountAsInt());
-        for (Direction dir : Direction.values()) {
-            if (budget <= 0) return;
-            BlockPos target = pos.relative(dir);
-            if (level.getBlockEntity(target) instanceof WoolBurnerBlockEntity) continue; // burners don't charge each other
-            EnergyHandler handler = level.getCapability(Capabilities.Energy.BLOCK, target, dir.getOpposite());
-            if (handler == null) continue;
-            try (Transaction tx = Transaction.openRoot()) {
-                int moved = handler.insert(budget, tx);
-                if (moved > 0 && energy.extract(moved, tx) == moved) {
-                    tx.commit();
-                    budget -= moved;
-                }
-            }
-        }
+        energy.pushToNeighbours(level, pos, ModConfigs.getInt(ModConfigs.SERVER.woolBurnerOutput), (dir, target) -> level.getBlockEntity(target) instanceof WoolBurnerBlockEntity); // burners don't charge each other
     }
 
     // ------------------------------------------------------------------ accessors
@@ -181,53 +164,19 @@ public class WoolBurnerBlockEntity extends BlockEntity implements WorldlyContain
     }
 
     @Override
-    public boolean isEmpty() {
-        return fuel.isEmpty();
-    }
-
-    @Override
     public ItemStack getItem(int slot) {
         return slot == 0 ? fuel : ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeItem(int slot, int count) {
-        if (slot != 0 || fuel.isEmpty()) return ItemStack.EMPTY;
-        ItemStack taken = fuel.split(count);
-        setChanged();
-        return taken;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        if (slot != 0) return ItemStack.EMPTY;
-        ItemStack taken = fuel;
-        fuel = ItemStack.EMPTY;
-        return taken;
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-        if (slot != 0) return;
-        fuel = stack;
-        setChanged();
+    public void putItem(int slot, ItemStack stack) {
+        if (slot == 0) fuel = stack;
     }
 
     /** Only fuel goes in. */
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         return slot == 0 && WoolBurnerFuels.isFuel(stack);
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return net.minecraft.world.Container.stillValidBlockEntity(this, player);
-    }
-
-    @Override
-    public void clearContent() {
-        fuel = ItemStack.EMPTY;
-        setChanged();
     }
 
     @Override
@@ -253,31 +202,6 @@ public class WoolBurnerBlockEntity extends BlockEntity implements WorldlyContain
     }
 
     // ------------------------------------------------------------------ energy
-
-    private final class BurnerEnergy extends SimpleEnergyHandler {
-        BurnerEnergy() {
-            super(20_000, 0, Integer.MAX_VALUE);
-        }
-
-        void generate(int amount) {
-            int previous = energy;
-            energy = Math.min(capacity, energy + Math.max(0, amount));
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        void resize(int newCapacity) {
-            if (capacity == newCapacity) return;
-            int previous = energy;
-            capacity = newCapacity;
-            energy = Math.min(energy, capacity);
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        @Override
-        protected void onEnergyChanged(int previousAmount) {
-            setChanged();
-        }
-    }
 
     // ------------------------------------------------------------------ persistence
 

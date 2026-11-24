@@ -9,14 +9,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
 
 /** Menu of the Zero Point Energy Module: no machine slots, just the module's synced numbers and the player inventory. */
-public class ZeroPointModuleMenu extends AbstractContainerMenu {
+public class ZeroPointModuleMenu extends MachineMenu {
     public static final int INVENTORY_Y = 111;
     private static final int PLAYER_END = 36;
 
@@ -40,15 +39,7 @@ public class ZeroPointModuleMenu extends AbstractContainerMenu {
     /** Shift-click moves items between the inventory and the hotbar. */
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        var slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        boolean moved = index < 27 ? moveItemStackTo(stack, 27, PLAYER_END, false) : moveItemStackTo(stack, 0, 27, false);
-        if (!moved) return ItemStack.EMPTY;
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        return original;
+        return quickMoveMachine(player, index, 0, false);
     }
 
     @Override
@@ -56,17 +47,14 @@ public class ZeroPointModuleMenu extends AbstractContainerMenu {
         return stillValid(access, player, ModBlocks.ZERO_POINT_ENERGY_MODULE.get());
     }
 
-    private int int32(int low) {
-        return (data.get(low) & 0xFFFF) | ((data.get(low + 1) & 0xFFFF) << 16);
-    }
 
-    public int getAmount() { return int32(0); }
-    public int getCapacity() { return int32(2); }
+    public int getAmount() { return int32(data, 0); }
+    public int getCapacity() { return int32(data, 2); }
     /** This module's share of the pair's FE/t. */
-    public int getGenerating() { return int32(4); }
-    public int getPairOutput() { return int32(6); }
+    public int getGenerating() { return int32(data, 4); }
+    public int getPairOutput() { return int32(data, 6); }
     public int getLinkDistance() { return data.get(8); }
-    public int getOutRate() { return int32(9); }
+    public int getOutRate() { return int32(data, 9); }
     /** True for a floor module (emitter up), false for a ceiling module. */
     /** Which way this module's emitter points. */
     public Direction facing() { return Direction.from3DDataValue(data.get(11)); }

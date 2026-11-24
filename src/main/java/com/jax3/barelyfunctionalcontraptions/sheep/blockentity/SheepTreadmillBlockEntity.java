@@ -33,10 +33,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -53,7 +50,7 @@ import org.jspecify.annotations.Nullable;
  * While it walks, the treadmill keeps the sheep in the middle of the belt facing the wheat. It doesn't make power, or
  * use up wheat or the sheep's stamina, while its buffer is full. It pushes its energy into every block around it.
  */
-public class SheepTreadmillBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider {
+public class SheepTreadmillBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, MenuProvider {
     public static final int DATA_COUNT = 9;
     /** How far the sheep is above the block's floor: the belt's top. */
     public static final double BELT_TOP = 6.0 / 16.0;
@@ -62,7 +59,7 @@ public class SheepTreadmillBlockEntity extends BlockEntity implements WorldlyCon
     /** What the treadmill is doing, for its window and comparator: the order matches the window's status keys. */
     public enum State { NO_SHEEP, WALKING, HUNGRY, RESTING, FULL }
 
-    private final TreadmillEnergy energy = new TreadmillEnergy();
+    private final GeneratorEnergy energy = new GeneratorEnergy(20_000, this::setChanged);
     private ItemStack food = ItemStack.EMPTY;
     /** Ticks of walking left on the food eaten last. */
     private int fed;
@@ -305,21 +302,7 @@ public class SheepTreadmillBlockEntity extends BlockEntity implements WorldlyCon
     }
 
     private void push(ServerLevel level, BlockPos pos) {
-        int budget = Math.min(ModConfigs.getInt(ModConfigs.SERVER.treadmillOutput), energy.getAmountAsInt());
-        for (Direction dir : Direction.values()) {
-            if (budget <= 0) return;
-            BlockPos target = pos.relative(dir);
-            if (level.getBlockState(target).getBlock() instanceof SheepTreadmillBlock) continue; // not its own front, nor other treadmills
-            EnergyHandler handler = level.getCapability(Capabilities.Energy.BLOCK, target, dir.getOpposite());
-            if (handler == null) continue;
-            try (Transaction tx = Transaction.openRoot()) {
-                int moved = handler.insert(budget, tx);
-                if (moved > 0 && energy.extract(moved, tx) == moved) {
-                    tx.commit();
-                    budget -= moved;
-                }
-            }
-        }
+        energy.pushToNeighbours(level, pos, ModConfigs.getInt(ModConfigs.SERVER.treadmillOutput), (dir, target) -> level.getBlockState(target).getBlock() instanceof SheepTreadmillBlock); // not its own front, nor other treadmills
     }
 
     // ------------------------------------------------------------------ accessors
@@ -358,52 +341,18 @@ public class SheepTreadmillBlockEntity extends BlockEntity implements WorldlyCon
     }
 
     @Override
-    public boolean isEmpty() {
-        return food.isEmpty();
-    }
-
-    @Override
     public ItemStack getItem(int slot) {
         return slot == 0 ? food : ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeItem(int slot, int count) {
-        if (slot != 0 || food.isEmpty()) return ItemStack.EMPTY;
-        ItemStack taken = food.split(count);
-        setChanged();
-        return taken;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        if (slot != 0) return ItemStack.EMPTY;
-        ItemStack taken = food;
-        food = ItemStack.EMPTY;
-        return taken;
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-        if (slot != 0) return;
-        food = stack;
-        setChanged();
+    public void putItem(int slot, ItemStack stack) {
+        if (slot == 0) food = stack;
     }
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         return slot == 0 && feedValue(stack) > 0;
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return net.minecraft.world.Container.stillValidBlockEntity(this, player);
-    }
-
-    @Override
-    public void clearContent() {
-        food = ItemStack.EMPTY;
-        setChanged();
     }
 
     @Override
@@ -428,31 +377,6 @@ public class SheepTreadmillBlockEntity extends BlockEntity implements WorldlyCon
     }
 
     // ------------------------------------------------------------------ energy
-
-    private final class TreadmillEnergy extends SimpleEnergyHandler {
-        TreadmillEnergy() {
-            super(20_000, 0, Integer.MAX_VALUE);
-        }
-
-        void generate(int amount) {
-            int previous = energy;
-            energy = Math.min(capacity, energy + Math.max(0, amount));
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        void resize(int newCapacity) {
-            if (capacity == newCapacity) return;
-            int previous = energy;
-            capacity = newCapacity;
-            energy = Math.min(energy, capacity);
-            if (energy != previous) onEnergyChanged(previous);
-        }
-
-        @Override
-        protected void onEnergyChanged(int previousAmount) {
-            setChanged();
-        }
-    }
 
     // ------------------------------------------------------------------ persistence
 

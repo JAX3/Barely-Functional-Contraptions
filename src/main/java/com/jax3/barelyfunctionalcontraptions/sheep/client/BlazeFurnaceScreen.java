@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus;
@@ -137,9 +138,9 @@ public class BlazeFurnaceScreen extends AbstractContainerScreen<BlazeFurnaceMenu
     protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", fe(menu.getEnergy())), 21, ENERGY_TEXT);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", fe(menu.getCapacity())), 31, TEXT_DIM);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.generating", fe(menu.getGenerating())),
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", Numbers.grouped(menu.getEnergy())), 21, ENERGY_TEXT);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", Numbers.grouped(menu.getCapacity())), 31, TEXT_DIM);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.generating", Numbers.grouped(menu.getGenerating())),
                 48, menu.getGenerating() > 0 ? GEN_COLOR : TEXT_DIM);
         centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.blaze_furnace.sources", menu.getHeaters(), menu.getMaxHeaters()), 58, TEXT_DIM);
         if (menu.getBoostTicks() > 0) {
@@ -166,16 +167,16 @@ public class BlazeFurnaceScreen extends AbstractContainerScreen<BlazeFurnaceMenu
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.blaze_furnace.slot.desc").withStyle(ChatFormatting.GRAY));
             }
         } else if (isHovering(GAUGE_X - 2, GAUGE_Y - 2, GAUGE_W + 4, GAUGE_H + 4, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", fe(menu.getEnergy()), fe(menu.getCapacity())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity())));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.blaze_furnace.energy.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(COLUMN_X, COLUMN_Y, COLUMN_W, COLUMN_H, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.blaze_furnace.heat", fe(menu.getHeat()), fe(menu.getMaxHeat())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.blaze_furnace.heat", Numbers.grouped(menu.getHeat()), Numbers.grouped(menu.getMaxHeat())));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.blaze_furnace.heat.sources", menu.getHeaters(), menu.getMaxHeaters())
                     .withStyle(ChatFormatting.GRAY));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.blaze_furnace.heat.desc").withStyle(ChatFormatting.GRAY));
             if (menu.getBoostTicks() > 0) {
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.blaze_furnace.heat.boosted",
-                        BlazeFurnaceBlock.multiplier(menu.getBoostMultiplier()), fe(menu.getGenerating())).withStyle(ChatFormatting.YELLOW));
+                        BlazeFurnaceBlock.multiplier(menu.getBoostMultiplier()), Numbers.grouped(menu.getGenerating())).withStyle(ChatFormatting.YELLOW));
             }
         } else if (isHovering(80, 44, 88, 34, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.blaze_furnace.boost.tooltip"));
@@ -199,7 +200,4 @@ public class BlazeFurnaceScreen extends AbstractContainerScreen<BlazeFurnaceMenu
         return String.valueOf((ticks + 19) / 20);
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

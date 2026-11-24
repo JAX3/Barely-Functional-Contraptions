@@ -1,7 +1,7 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.integration.jade;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
-import java.util.Locale;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -23,7 +23,7 @@ public enum PipeProvider implements IBlockComponentProvider {
         tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.pipe.network", data.cables(), data.endpoints())
                 .withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable(accessor.getBlock() instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.ItemPipeBlock
-                        ? "jade.barelyfunctionalcontraptions.item_pipe.rate" : "jade.barelyfunctionalcontraptions.pipe.rate", fe(data.rate()), fe(data.maxRate()))
+                        ? "jade.barelyfunctionalcontraptions.item_pipe.rate" : "jade.barelyfunctionalcontraptions.pipe.rate", Numbers.grouped(data.rate()), Numbers.grouped(data.maxRate()))
                 .withColor(data.rate() > 0 ? 0x3FC8FF : 0xAAAAAA));
         boolean items = accessor.getBlock() instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.ItemPipeBlock;
         var kind = items ? com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeKind.ITEM : com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeKind.FLUID;
@@ -41,10 +41,6 @@ public enum PipeProvider implements IBlockComponentProvider {
                 tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.pipe.side_filter", dir, side.mode().displayName(), names).withStyle(ChatFormatting.GOLD));
             }
         }
-    }
-
-    private static String fe(int value) {
-        return String.format(Locale.ROOT, "%,d", value);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus;
 import com.jax3.barelyfunctionalcontraptions.sheep.burner.WoolBurnerFuel;
@@ -88,10 +89,10 @@ public class WoolBurnerScreen extends AbstractContainerScreen<WoolBurnerMenu> {
     protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", fe(menu.getEnergy())), 21, ENERGY_TEXT);
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", fe(menu.getCapacity())), 31, TEXT_DIM);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", Numbers.grouped(menu.getEnergy())), 21, ENERGY_TEXT);
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", Numbers.grouped(menu.getCapacity())), 31, TEXT_DIM);
         boolean burning = menu.getBurnTime() > 0;
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.generating", fe(burning ? menu.getPower() : 0)),
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.generating", Numbers.grouped(burning ? menu.getPower() : 0)),
                 50, burning ? GEN_COLOR : TEXT_DIM);
         centred(graphics, burning
                 ? Component.translatable("gui.barelyfunctionalcontraptions.wool_burner.left", seconds(menu.getBurnTime()))
@@ -114,12 +115,12 @@ public class WoolBurnerScreen extends AbstractContainerScreen<WoolBurnerMenu> {
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_burner.slot.desc").withStyle(ChatFormatting.GRAY));
             }
         } else if (isHovering(GAUGE_X - 2, GAUGE_Y - 2, GAUGE_W + 4, GAUGE_H + 4, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", fe(menu.getEnergy()), fe(menu.getCapacity())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity())));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_burner.energy.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(BOX_X, BOX_Y, BOX_W, BOX_H, mouseX, mouseY) || isHovering(92, 44, 76, 34, mouseX, mouseY)) {
             if (menu.getBurnTime() > 0) {
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_burner.burning",
-                        fe(menu.getPower()), seconds(menu.getBurnTime()), seconds(menu.getBurnTotal())));
+                        Numbers.grouped(menu.getPower()), seconds(menu.getBurnTime()), seconds(menu.getBurnTotal())));
             } else {
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_burner.no_fuel"));
             }
@@ -128,7 +129,7 @@ public class WoolBurnerScreen extends AbstractContainerScreen<WoolBurnerMenu> {
             for (WoolBurnerFuel fuel : WoolBurnerFuels.all()) {
                 if (fuel.ingredient().items().findAny().isEmpty()) continue;
                 Component name = fuelName(fuel);
-                lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_burner.fuel_line", name, fe(fuel.power()), exactSeconds(fuel.burnTime()))
+                lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_burner.fuel_line", name, Numbers.grouped(fuel.power()), exactSeconds(fuel.burnTime()))
                         .withStyle(ChatFormatting.DARK_GRAY));
             }
         } else if (isHovering(LAMP_X, LAMP_Y - 1, 130, 10, mouseX, mouseY)) {
@@ -163,7 +164,4 @@ public class WoolBurnerScreen extends AbstractContainerScreen<WoolBurnerMenu> {
         return String.valueOf((ticks + 19) / 20);
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

@@ -10,7 +10,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -22,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  * Window of the Fleece Trawler: its lure slot (resource wool only), its nine catch slots (take only), the player's
  * inventory, and its synced numbers (status, Tide sheep, pool, haul, lure hauls left, the pool outline, hauls).
  */
-public class FleeceTrawlerMenu extends AbstractContainerMenu {
+public class FleeceTrawlerMenu extends MachineMenu {
     public static final int LURE_X = 26, LURE_Y = 30;
     public static final int CATCH_X = 98, CATCH_Y = 20;
     public static final int INVENTORY_Y = 114;
@@ -72,33 +71,12 @@ public class FleeceTrawlerMenu extends AbstractContainerMenu {
     /** Shift-click: the catch and the lure to the inventory; resource wool from the inventory to the lure slot. */
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (index < PLAYER_START) {
-            if (!moveItemStackTo(stack, PLAYER_START, PLAYER_END, true)) return ItemStack.EMPTY;
-        } else if (ResourceWoolItem.getResourceId(stack) != null && moveItemStackTo(stack, 0, 1, false)) {
-            // into the lure slot
-        } else if (index < PLAYER_START + 27) {
-            if (!moveItemStackTo(stack, PLAYER_START + 27, PLAYER_END, false)) return ItemStack.EMPTY;
-        } else if (!moveItemStackTo(stack, PLAYER_START, PLAYER_START + 27, false)) {
-            return ItemStack.EMPTY;
-        }
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        if (stack.getCount() == original.getCount()) return ItemStack.EMPTY;
-        slot.onTake(player, stack);
-        return original;
+        return quickMoveMachine(player, index, PLAYER_START, false, tryInto(s -> ResourceWoolItem.getResourceId(s) != null, 0, 1));
     }
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id == BUTTON_AREA && blockEntity != null) {
-            blockEntity.toggleArea(player);
-            return true;
-        }
-        return false;
+        return clickAreaButton(player, id, BUTTON_AREA, blockEntity);
     }
 
     @Override

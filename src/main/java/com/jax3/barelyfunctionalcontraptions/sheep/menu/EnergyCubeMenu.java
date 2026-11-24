@@ -8,14 +8,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
 
 /** Menu of the Hume Energy Cube: no machine slots, just the group's synced numbers and the player inventory. */
-public class EnergyCubeMenu extends AbstractContainerMenu {
+public class EnergyCubeMenu extends MachineMenu {
     public static final int INVENTORY_Y = 111;
     private static final int PLAYER_END = 36;
 
@@ -39,15 +38,7 @@ public class EnergyCubeMenu extends AbstractContainerMenu {
     /** Shift-click moves items between the inventory and the hotbar. */
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        var slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        boolean moved = index < 27 ? moveItemStackTo(stack, 27, PLAYER_END, false) : moveItemStackTo(stack, 0, 27, false);
-        if (!moved) return ItemStack.EMPTY;
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        return original;
+        return quickMoveMachine(player, index, 0, false);
     }
 
     @Override
@@ -61,16 +52,13 @@ public class EnergyCubeMenu extends AbstractContainerMenu {
         return value;
     }
 
-    private int int32(int low) {
-        return (data.get(low) & 0xFFFF) | ((data.get(low + 1) & 0xFFFF) << 16);
-    }
 
     public long getAmount() { return long64(0); }
     public long getCapacity() { return long64(4); }
-    public int getRate() { return int32(8); }
+    public int getRate() { return int32(data, 8); }
     public int getCubes() { return Math.max(1, data.get(10)); }
-    public int getInRate() { return int32(11); }
-    public int getOutRate() { return int32(13); }
+    public int getInRate() { return int32(data, 11); }
+    public int getOutRate() { return int32(data, 13); }
     public CubeStatus getStatus() { return CubeStatus.byId(data.get(15)); }
 
     public float getFillFraction() {

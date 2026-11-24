@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.integration.jei;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity;
 import com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs;
@@ -8,7 +9,6 @@ import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.placement.HorizontalAlignment;
@@ -62,10 +62,7 @@ public class StaticCategory extends AbstractRecipeCategory<StaticDisplay> {
         int max = StaticGeneratorBlockEntity.maxSheep();
         List<ItemStack> sheep = new ArrayList<>();
         sheep.add(new ItemStack(Items.SHEEP_SPAWN_EGG, Math.min(64, max)));
-        for (String id : List.of(COPPER_SHEEP, REDSTONE_SHEEP)) {
-            net.minecraft.resources.Identifier parsed = net.minecraft.resources.Identifier.tryParse(id);
-            if (parsed != null) sheep.add(ResourceSheepSpawnEggItem.create(parsed, Math.min(64, max)));
-        }
+        sheep.addAll(ResourceSheepSpawnEggItem.createAll(List.of(COPPER_SHEEP, REDSTONE_SHEEP), max));
         builder.addSlot(RecipeIngredientRole.INPUT, 8, 14)
                 .setBackground(slot, -1, -1)
                 .addItemStacks(sheep)
@@ -110,8 +107,8 @@ public class StaticCategory extends AbstractRecipeCategory<StaticDisplay> {
         for (int i = 1; i <= rows; i++) {
             int n = i == rows ? max : i; // a big config: the last row is the most it counts
             count.add(Component.literal(Integer.toString(n)));
-            plain.add(Component.literal(fe(power(null, n))));
-            copper.add(Component.literal(fe(power(COPPER_SHEEP, n))));
+            plain.add(Component.literal(Numbers.grouped(power(null, n))));
+            copper.add(Component.literal(Numbers.grouped(power(COPPER_SHEEP, n))));
         }
         int height = LINE * count.size();
         builder.addText(count, 40, height).setPosition(6, TABLE_Y).setLineSpacing(1).setColor(JeiTextures.TEXT_DIM)
@@ -135,7 +132,4 @@ public class StaticCategory extends AbstractRecipeCategory<StaticDisplay> {
         return StaticGeneratorBlockEntity.power(new ArrayList<>(Collections.nCopies(n, (double) StaticGeneratorBlockEntity.sheepPower(resource))));
     }
 
-    private static String fe(int value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

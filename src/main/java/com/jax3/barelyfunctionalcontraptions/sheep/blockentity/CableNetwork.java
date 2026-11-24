@@ -17,7 +17,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jspecify.annotations.Nullable;
@@ -48,15 +47,11 @@ public final class CableNetwork {
     private final List<EnergyCableBlockEntity> cables;
     private final List<Endpoint> endpoints;
     private boolean valid = true;
-    private final Moved moved = new Moved();
-    private long lastTick = Long.MIN_VALUE;
+    private final TransferMeter moved = new TransferMeter();
     private long lastPull = Long.MIN_VALUE;
     private int rotation;
     /** True while handing energy out, so a block that pushes straight back into the network can't recurse. */
     private boolean delivering;
-    /** FE moved since the last rate update, and the average FE/t over the last second. */
-    private long window;
-    private int rate;
 
     private CableNetwork(List<EnergyCableBlockEntity> cables, List<Endpoint> endpoints) {
         this.cables = Collections.unmodifiableList(cables);
@@ -123,12 +118,12 @@ public final class CableNetwork {
 
     /** Average FE/t the network moved over the last second. */
     public int rate() {
-        return rate;
+        return moved.rate();
     }
 
     /** FE the network can still move this tick. */
     public int remaining() {
-        return Math.max(0, transferRate() - moved.amount);
+        return Math.max(0, transferRate() - moved.thisTick());
     }
 
     /** Hume Energy Cubes store energy rather than make it: cube-to-cube transfers are skipped. */
@@ -137,14 +132,7 @@ public final class CableNetwork {
     }
 
     private void startTick(Level level) {
-        long now = level.getGameTime();
-        if (now == lastTick || moved.isInTransaction()) return;
-        if (now % 20 == 0 && lastTick != Long.MIN_VALUE) {
-            rate = (int) Math.min(Integer.MAX_VALUE, window / 20);
-            window = 0;
-        }
-        lastTick = now;
-        moved.amount = 0;
+        moved.startTick(level);
     }
 
     /**
@@ -179,10 +167,7 @@ public final class CableNetwork {
         } finally {
             delivering = false;
         }
-        if (sent > 0) {
-            moved.updateSnapshots(transaction);
-            moved.amount += sent;
-        }
+        moved.record(sent, transaction);
         return sent;
     }
 
@@ -227,26 +212,6 @@ public final class CableNetwork {
                 if (sent <= 0) continue;
                 if (handler.extract(sent, tx) == sent) tx.commit();
             }
-        }
-    }
-
-    /** FE moved this tick, rolled back with the transactions that moved it. */
-    private final class Moved extends SnapshotJournal<Integer> {
-        int amount;
-
-        @Override
-        protected Integer createSnapshot() {
-            return amount;
-        }
-
-        @Override
-        protected void revertToSnapshot(Integer snapshot) {
-            amount = snapshot;
-        }
-
-        @Override
-        protected void onRootCommit(Integer originalState) {
-            window += amount - originalState;
         }
     }
 }

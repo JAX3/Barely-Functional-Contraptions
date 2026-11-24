@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.integration.jei;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems;
 import com.jax3.barelyfunctionalcontraptions.sheep.resource.Separation;
@@ -87,14 +88,14 @@ public class SeparationCategory extends AbstractRecipeCategory<SeparationDisplay
         builder.addDrawableWidget(JeiTextures.arrowFilling(gui, s.effectiveTicks())).setPosition(ARROW_X, 2);
         // Energy and time, compact, with the full figures in the tooltip.
         builder.addText(List.<FormattedText>of(Component.translatable("jei.barelyfunctionalcontraptions.energy_time_short",
-                        fe(s.effectiveEnergy()), String.format(Locale.ROOT, "%.1f", s.effectiveTicks() / 20.0))),
+                        Numbers.grouped(s.effectiveEnergy()), String.format(Locale.ROOT, "%.1f", s.effectiveTicks() / 20.0))),
                         WIDTH - TEXT_X - 4, 10)
                 .setPosition(TEXT_X + 2, 6)
                 .setColor(JeiTextures.TEXT)
                 .setTextAlignment(HorizontalAlignment.LEFT);
         builder.addTooltipArea(TEXT_X, 0, WIDTH - TEXT_X, HEIGHT).setTooltip(List.<FormattedText>of(
-                Component.translatable("jei.barelyfunctionalcontraptions.energy", fe(s.effectiveEnergy())),
-                Component.translatable("jei.barelyfunctionalcontraptions.energy_per_tick", fe(s.energyPerTick())).withStyle(ChatFormatting.GRAY),
+                Component.translatable("jei.barelyfunctionalcontraptions.energy", Numbers.grouped(s.effectiveEnergy())),
+                Component.translatable("jei.barelyfunctionalcontraptions.energy_per_tick", Numbers.grouped(s.energyPerTick())).withStyle(ChatFormatting.GRAY),
                 Component.translatable("jei.barelyfunctionalcontraptions.time", String.format(Locale.ROOT, "%.1f", s.effectiveTicks() / 20.0)).withStyle(ChatFormatting.GRAY)));
     }
 
@@ -103,7 +104,4 @@ public class SeparationCategory extends AbstractRecipeCategory<SeparationDisplay
         return recipe.id();
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

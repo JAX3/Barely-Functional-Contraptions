@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.RedstoneMode;
@@ -103,8 +104,8 @@ public class AutomaticShearsScreen extends AbstractContainerScreen<AutomaticShea
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
         // Stored FE over capacity, in the left part of the window.
-        Component stored = Component.translatable("gui.barelyfunctionalcontraptions.shears.energy_stored", fe(menu.getEnergy()));
-        Component capacity = Component.translatable("gui.barelyfunctionalcontraptions.shears.energy_capacity", fe(menu.getCapacity()));
+        Component stored = Component.translatable("gui.barelyfunctionalcontraptions.shears.energy_stored", Numbers.grouped(menu.getEnergy()));
+        Component capacity = Component.translatable("gui.barelyfunctionalcontraptions.shears.energy_capacity", Numbers.grouped(menu.getCapacity()));
         graphics.text(font, stored, INFO_CENTRE - font.width(stored) / 2, 56, TEXT_COLOR, false);
         graphics.text(font, capacity, INFO_CENTRE - font.width(capacity) / 2, 66, TEXT_DIM, false);
         // Status line, coloured like the lamp.
@@ -129,11 +130,11 @@ public class AutomaticShearsScreen extends AbstractContainerScreen<AutomaticShea
         List<Component> lines = new ArrayList<>();
         boolean detailed = ModConfigs.getBool(ModConfigs.CLIENT.detailedMachineTooltips);
         if (isHovering(BAR_X - 2, BAR_Y - 2, BAR_W + 4, BAR_H + 4, mouseX, mouseY) || isHovering(34, 54, 58, 22, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", fe(menu.getEnergy()), fe(menu.getCapacity())));
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.shears.energy_per_shear", fe(menu.getEnergyPerShear())).withStyle(ChatFormatting.GRAY));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.shears.energy_per_shear", Numbers.grouped(menu.getEnergyPerShear())).withStyle(ChatFormatting.GRAY));
             if (detailed) {
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy_input",
-                        fe(ModConfigs.getInt(ModConfigs.SERVER.automaticShearsMaxEnergyInput))).withStyle(ChatFormatting.GRAY));
+                        Numbers.grouped(ModConfigs.getInt(ModConfigs.SERVER.automaticShearsMaxEnergyInput))).withStyle(ChatFormatting.GRAY));
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.shears.energy_sides").withStyle(ChatFormatting.DARK_GRAY));
             }
         } else if (isHovering(ICON_X - 2, ICON_Y - 2, ICON_SIZE + 4, ICON_SIZE + 4, mouseX, mouseY)
@@ -181,7 +182,4 @@ public class AutomaticShearsScreen extends AbstractContainerScreen<AutomaticShea
         return super.mouseClicked(event, doubleClick);
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

@@ -10,7 +10,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -19,7 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 /** Container menu of the Fluid Reservoir. Slot coordinates match {@code textures/gui/fluid_reservoir.png}. */
-public class FluidReservoirMenu extends AbstractContainerMenu {
+public class FluidReservoirMenu extends MachineMenu {
     public static final int INPUT_X = 134, INPUT_Y = 22;
     public static final int OUTPUT_X = 134, OUTPUT_Y = 56;
     public static final int INVENTORY_Y = 111;
@@ -66,25 +65,8 @@ public class FluidReservoirMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (index < MACHINE_SLOTS) {
-            if (!moveItemStackTo(stack, PLAYER_START, PLAYER_END, true)) return ItemStack.EMPTY;
-            slot.onQuickCraft(stack, original);
-        } else if (stack.is(Items.BUCKET)) {
-            if (!moveItemStackTo(stack, FluidReservoirBlockEntity.SLOT_INPUT, FluidReservoirBlockEntity.SLOT_INPUT + 1, false)) return ItemStack.EMPTY;
-        } else if (index < PLAYER_START + 27) {
-            if (!moveItemStackTo(stack, PLAYER_START + 27, PLAYER_END, false)) return ItemStack.EMPTY;
-        } else if (!moveItemStackTo(stack, PLAYER_START, PLAYER_START + 27, false)) {
-            return ItemStack.EMPTY;
-        }
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        if (stack.getCount() == original.getCount()) return ItemStack.EMPTY;
-        slot.onTake(player, stack);
-        return original;
+        return quickMoveMachine(player, index, PLAYER_START, true,
+                onlyInto(s -> s.is(Items.BUCKET), FluidReservoirBlockEntity.SLOT_INPUT, FluidReservoirBlockEntity.SLOT_INPUT + 1));
     }
 
     @Override
@@ -92,14 +74,11 @@ public class FluidReservoirMenu extends AbstractContainerMenu {
         return stillValid(access, player, ModBlocks.FLUID_RESERVOIR.get());
     }
 
-    private int combine(int low, int high) {
-        return (data.get(low) & 0xFFFF) | ((data.get(high) & 0xFFFF) << 16);
-    }
 
-    public int getAmount() { return combine(0, 1); }
-    public int getCapacity() { return combine(2, 3); }
+    public int getAmount() { return int32(data, 0); }
+    public int getCapacity() { return int32(data, 2); }
     public ReservoirStatus getStatus() { return ReservoirStatus.byId(data.get(4)); }
-    public int getWaterPerSecond() { return combine(5, 6); }
+    public int getWaterPerSecond() { return int32(data, 5); }
 
     public float getFillFraction() {
         int cap = getCapacity();

@@ -4102,21 +4102,13 @@ public final class DevScreenshotHarness {
                 // Save the Thermal Reaction Chamber, the Echo Chamber, the Static Generator and their cube banks empty, so they
                 // run for a while when someone visits.
                 ServerLevel level = player.level();
-                // The Echo Chamber (its port, from the back) and its cube bank, and the Static Generator and its cubes.
-                for (BlockPos p : new BlockPos[]{new BlockPos(129, 35, 130), new BlockPos(129, 35, 128),
-                        new BlockPos(17, 35, 154), new BlockPos(17, 35, 152)}) {
-                    var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.NORTH);
-                    if (handler == null) continue;
-                    for (int k = 0; k < 10_000 && handler.getAmountAsLong() > 0; k++) { // a cube bank only gives so much at a time
-                        try (Transaction tx = Transaction.openRoot()) {
-                            handler.extract(Integer.MAX_VALUE, tx);
-                            tx.commit();
-                        }
-                    }
-                    ResourcefulSheep.LOGGER.info("EXTEND drained {} to {}", p, handler.getAmountAsLong());
-                }
-                for (BlockPos p : new BlockPos[]{new BlockPos(101, 35, 131), new BlockPos(101, 35, 133)}) {
-                    var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, Direction.UP);
+                // The Echo Chamber (its port, from the back) and its cube bank, and the Static Generator and its cubes, from
+                // the north; the Thermal Reaction Chamber and its cubes (x = 101) from above.
+                BlockPos[] drain = {new BlockPos(129, 35, 130), new BlockPos(129, 35, 128), new BlockPos(17, 35, 154), new BlockPos(17, 35, 152),
+                        new BlockPos(101, 35, 131), new BlockPos(101, 35, 133)};
+                for (BlockPos p : drain) {
+                    Direction side = p.getX() == 101 ? Direction.UP : Direction.NORTH;
+                    var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, p, side);
                     if (handler == null) continue;
                     for (int k = 0; k < 10_000 && handler.getAmountAsLong() > 0; k++) { // a cube bank only gives so much at a time
                         try (Transaction tx = Transaction.openRoot()) {

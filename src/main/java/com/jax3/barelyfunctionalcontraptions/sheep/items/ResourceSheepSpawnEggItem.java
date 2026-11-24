@@ -55,6 +55,16 @@ public class ResourceSheepSpawnEggItem extends SpawnEggItem {
         return stack;
     }
 
+    /** A spawn egg for each resource id in {@code ids} that parses (config lists, so some may not), {@code count} each, at most 64. */
+    public static java.util.List<ItemStack> createAll(java.util.List<? extends String> ids, int count) {
+        java.util.List<ItemStack> eggs = new java.util.ArrayList<>();
+        for (String id : ids) {
+            Identifier parsed = Identifier.tryParse(id);
+            if (parsed != null) eggs.add(create(parsed, Math.min(64, count)));
+        }
+        return eggs;
+    }
+
     public static Optional<SheepResource> getResource(ItemStack stack, Level level) {
         if (!(stack.getItem() instanceof ResourceSheepSpawnEggItem)) return Optional.empty();
         return SheepResourceRegistry.get(level).byId(stack.get(ModDataComponents.SHEEP_RESOURCE.get()));

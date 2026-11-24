@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity;
@@ -93,7 +94,7 @@ public class WoolPackerScreen extends AbstractContainerScreen<WoolPackerMenu> {
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
         graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT_DIM, false);
         boolean working = menu.getStatus() == MachineStatus.PROCESSING;
-        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.wool_packer.uses", fe(menu.getEnergyPerTick())),
+        centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.wool_packer.uses", Numbers.grouped(menu.getEnergyPerTick())),
                 56, working ? USE_COLOR : TEXT_DIM);
         centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.wool_packer.time", seconds(menu.getMaxProgress())),
                 68, working ? TIME_COLOR : TEXT_DIM);
@@ -118,7 +119,7 @@ public class WoolPackerScreen extends AbstractContainerScreen<WoolPackerMenu> {
                 lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_packer.output.desc").withStyle(ChatFormatting.GRAY));
             }
         } else if (isHovering(GAUGE_X - 2, GAUGE_Y - 2, GAUGE_W + 4, GAUGE_H + 4, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", fe(menu.getEnergy()), fe(menu.getCapacity())));
+            lines.add(Component.translatable("gui.barelyfunctionalcontraptions.energy", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity())));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_packer.energy.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(PIPS_X - 2, PIPS_Y - 2, PIP_STEP * 3 + 2, PIP_STEP * 3 + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_packer.pips", litPips(), WoolBaleItem.WOOL_PER_BALE));
@@ -127,7 +128,7 @@ public class WoolPackerScreen extends AbstractContainerScreen<WoolPackerMenu> {
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_packer.progress",
                     Math.round(menu.getProgressFraction() * 100)));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_packer.progress.desc",
-                    fe((long) menu.getEnergyPerTick() * menu.getMaxProgress())).withStyle(ChatFormatting.GRAY));
+                    Numbers.grouped((long) menu.getEnergyPerTick() * menu.getMaxProgress())).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(LAMP_X, LAMP_Y - 1, 130, 10, mouseX, mouseY)) {
             lines.add(statusText().copy().withColor(menu.getStatus().color));
             lines.add(Component.translatable("gui.barelyfunctionalcontraptions.wool_packer.status." + menu.getStatus().name().toLowerCase(Locale.ROOT) + ".desc")
@@ -141,7 +142,4 @@ public class WoolPackerScreen extends AbstractContainerScreen<WoolPackerMenu> {
         return ticks % 20 == 0 ? String.valueOf(ticks / 20) : String.format(Locale.ROOT, "%.1f", ticks / 20.0);
     }
 
-    private static String fe(long value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

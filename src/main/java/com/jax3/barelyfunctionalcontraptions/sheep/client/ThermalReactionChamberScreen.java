@@ -1,5 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.client;
 
+import com.jax3.barelyfunctionalcontraptions.util.Numbers;
 import com.jax3.barelyfunctionalcontraptions.sheep.ResourcefulSheep;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity;
 import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.State;
@@ -166,10 +167,10 @@ public class ThermalReactionChamberScreen extends AbstractContainerScreen<Therma
                 lines.add(Component.translatable(key + slot + ".desc").withStyle(ChatFormatting.GRAY));
             }
         } else if (isHovering(ENERGY_X - 1, GAUGE_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
-            lines.add(Component.translatable(key + "energy", fe(menu.getEnergy()), fe(menu.getCapacity())).withColor(ENERGY_TEXT));
+            lines.add(Component.translatable(key + "energy", Numbers.grouped(menu.getEnergy()), Numbers.grouped(menu.getCapacity())).withColor(ENERGY_TEXT));
             lines.add(Component.translatable(key + "energy.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(WATER_X - 1, GAUGE_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
-            lines.add(Component.translatable(key + "water", fe(menu.getWater()), fe(menu.getTankCapacity())).withColor(WATER_TEXT));
+            lines.add(Component.translatable(key + "water", Numbers.grouped(menu.getWater()), Numbers.grouped(menu.getTankCapacity())).withColor(WATER_TEXT));
             lines.add(Component.translatable(key + "water.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(HOT_X - 1, THERMO_Y - 1, THERMO_W + 2, THERMO_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable(key + "hot", menu.getHot()).withColor(HOT_TEXT));
@@ -207,10 +208,7 @@ public class ThermalReactionChamberScreen extends AbstractContainerScreen<Therma
 
     /** Short enough for the centre panel: "8,050", then "13.1k". */
     private static String compact(int value) {
-        return value < 10_000 ? fe(value) : String.format(Locale.ROOT, "%.1fk", value / 1000.0);
+        return value < 10_000 ? Numbers.grouped(value) : String.format(Locale.ROOT, "%.1fk", value / 1000.0);
     }
 
-    private static String fe(int value) {
-        return String.format(Locale.ROOT, "%,d", value);
-    }
 }

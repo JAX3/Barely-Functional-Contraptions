@@ -26,16 +26,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -54,7 +49,7 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * Its comparator signal reads how green its area is.
  */
-public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
+public class GrassSeederBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
     public static final int AREA_COLOR = 0xFF6FCF4A;
     /** The ground map in its window covers areas up to 7x7 (radius 3), three bits a block, five blocks to a value. */
     public static final int MAP_MAX = 7, MAP_VALUES = 10, MAP_PER_VALUE = 5, MAP_BITS = 3;
@@ -67,7 +62,7 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
     /** Blocks it must tend for the players near it to earn Keep Off the Grass. */
     public static final int ADVANCEMENT_BLOCKS = 100;
     private static final int[] SLOTS = {0};
-    public static final FluidResource WATER = FluidResource.of(Fluids.WATER);
+    public static final FluidResource WATER = WaterTank.WATER;
 
     /** What it's doing, for its window, Jade and its sprinkler. */
     public enum Status {
@@ -94,8 +89,9 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
         }
     }
 
-    private final SeederEnergy energy = new SeederEnergy();
-    private final SeederTank tank = new SeederTank();
+    private final MachineEnergy energy = new MachineEnergy(
+            () -> ModConfigs.getInt(ModConfigs.SERVER.seederCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.seederMaxInput), this::setChanged);
+    private final WaterTank tank = new WaterTank(4_000, this::setChanged);
     private ItemStack boneMeal = ItemStack.EMPTY;
     /** Blocks left from the Bone Meal it last opened. */
     private int boneCharges;
@@ -371,7 +367,7 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
     /** Power and water first; then Bone Meal. True if it paid for a block. */
     private boolean useFuel() {
         if (energy.getAmountAsInt() >= energyPerBlock() && tank.getAmount() >= waterPerBlock()) {
-            energy.consume(energyPerBlock());
+            energy.drain(energyPerBlock());
             tank.drain(waterPerBlock());
             return true;
         }
@@ -455,7 +451,7 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
         return energy;
     }
 
-    public SeederTank getTank() {
+    public WaterTank getTank() {
         return tank;
     }
 
@@ -480,9 +476,7 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
 
     /** Pours a bucket's worth of water in, if it fits. */
     public boolean fillFromBucket() {
-        if (tank.capacity() - tank.getAmount() < 1000) return false;
-        tank.fill(1000);
-        return true;
+        return tank.fillFromBucket();
     }
 
     @Override
@@ -517,52 +511,18 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
     }
 
     @Override
-    public boolean isEmpty() {
-        return boneMeal.isEmpty();
-    }
-
-    @Override
     public ItemStack getItem(int slot) {
         return slot == 0 ? boneMeal : ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeItem(int slot, int count) {
-        if (slot != 0 || boneMeal.isEmpty()) return ItemStack.EMPTY;
-        ItemStack taken = boneMeal.split(count);
-        setChanged();
-        return taken;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        if (slot != 0) return ItemStack.EMPTY;
-        ItemStack taken = boneMeal;
-        boneMeal = ItemStack.EMPTY;
-        return taken;
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-        if (slot != 0) return;
-        boneMeal = stack;
-        setChanged();
+    public void putItem(int slot, ItemStack stack) {
+        if (slot == 0) boneMeal = stack;
     }
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         return stack.is(Items.BONE_MEAL);
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return net.minecraft.world.Container.stillValidBlockEntity(this, player);
-    }
-
-    @Override
-    public void clearContent() {
-        boneMeal = ItemStack.EMPTY;
-        setChanged();
     }
 
     @Override
@@ -589,82 +549,10 @@ public class GrassSeederBlockEntity extends BlockEntity implements WorldlyContai
 
     // ------------------------------------------------------------------ power and water
 
-    private final class SeederEnergy extends SimpleEnergyHandler {
-        SeederEnergy() {
-            super(20_000, 200, 0);
-        }
-
-        void refreshLimits() {
-            capacity = ModConfigs.getInt(ModConfigs.SERVER.seederCapacity);
-            maxInsert = ModConfigs.getInt(ModConfigs.SERVER.seederMaxInput);
-            if (energy > capacity) set(capacity);
-        }
-
-        void consume(int amount) {
-            set(Math.max(0, energy - amount));
-        }
-
-        /** Fills it at once (GameTests, the screenshot harness). */
-        void fill() {
-            set(capacity);
-        }
-
-        @Override
-        protected void onEnergyChanged(int previousAmount) {
-            setChanged();
-        }
-    }
-
     /** Fills its power at once (GameTests, the screenshot harness). */
     public void fillEnergy() {
         energy.refreshLimits();
         energy.fill();
-    }
-
-    /** Water only, in only: buckets, pipes and a Fluid Reservoir fill it. */
-    public final class SeederTank extends FluidStacksResourceHandler {
-        SeederTank() {
-            super(1, 4_000);
-        }
-
-        @Override
-        public boolean isValid(int index, FluidResource resource) {
-            return resource.equals(WATER);
-        }
-
-        @Override
-        public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
-            return 0;
-        }
-
-        @Override
-        protected void onContentsChanged(int index, FluidStack previousContents) {
-            setChanged();
-        }
-
-        public int getAmount() {
-            return getAmountAsInt(0);
-        }
-
-        public int capacity() {
-            return capacity;
-        }
-
-        public void fill(int amount) {
-            int added = Math.max(0, Math.min(amount, capacity - getAmount()));
-            if (added > 0) set(0, WATER, getAmount() + added);
-        }
-
-        void drain(int amount) {
-            int left = Math.max(0, getAmount() - amount);
-            set(0, left > 0 ? WATER : FluidResource.EMPTY, left);
-        }
-
-        void resize(int newCapacity) {
-            if (newCapacity == capacity) return;
-            capacity = newCapacity;
-            if (getAmount() > capacity) set(0, WATER, capacity);
-        }
     }
 
     // ------------------------------------------------------------------ persistence and sync
