@@ -1,0 +1,26 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/some_assembly_required",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:speed_upgrade"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.maximum_overdrive.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.maximum_overdrive.description"
+    },
+    "frame": "challenge",
+    "hidden": true
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -56,7 +56,18 @@ public class MachineUpgrades extends SimpleContainer {
         owner.setChanged();
         // Clients draw the working area, which a Range card changes.
         var level = owner.getLevel();
-        if (level != null && !level.isClientSide()) level.sendBlockUpdated(owner.getBlockPos(), owner.getBlockState(), owner.getBlockState(), 3);
+        if (level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(owner.getBlockPos(), owner.getBlockState(), owner.getBlockState(), 3);
+            // Cards only go in through the window, so whoever put one in is standing by it.
+            if (level instanceof net.minecraft.server.level.ServerLevel server && !isEmpty()) {
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.awardNearby(server, owner.getBlockPos(), 8,
+                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.SOME_ASSEMBLY_REQUIRED);
+                if (cards().stream().filter(c -> c.getItem() instanceof UpgradeItem card && card.type() == UpgradeType.SPEED).count() >= 2) {
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.awardNearby(server, owner.getBlockPos(), 8,
+                            com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.MAXIMUM_OVERDRIVE);
+                }
+            }
+        }
     }
 
     /** What the installed cards do: each kind's effect, a second card of a kind at {@code secondCardStrength}. */

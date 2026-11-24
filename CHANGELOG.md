@@ -173,6 +173,10 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
   separator waits until there's room for the extra, so it never jams. Only in the Mechanical Separator.
 - **Muffler Upgrade** (Woollen Helmet and Black Wool): silences a machine's own sounds; it works just the same. In
   the separator, packer, furnace, altar and chiller.
+- **JEI** information pages for each card and for each machine that takes them; **Jade** lists a machine's cards and
+  what they add up to (*Time 60%, Power 150%*).
+- **Advancements:** *Some Assembly Required* (put a card in a machine) and the hidden *Maximum Overdrive* (two Speed
+  cards in one). A new *Upgrade Cards* chapter in the Contraptions Manual (Utility).
 - Config `[upgrades]` for each card's numbers and the second card's strength.
 
 ### Processing machines about half as fast again
@@ -216,6 +220,8 @@ speed-up) move to the new ones, and anything you changed is kept.
 - **Static Generator:** six sheep at four fresh combs, making 600 FE/t into a bank of Hume Energy Cubes.
 - **Machine Status Panel:** a 3x3 screen showing 23 machines from across the platform (the crate store and the Fleece Trawler among them), with an alarm lamp.
 - **Wireless power scene:** its generator is now cabled to the separator and shears it used to power wirelessly.
+- **Upgrade cards:** cell (2, 6) has three separators on the same Iron Wool: plain, with a Speed card and with an
+  Efficiency card.
 - **Wool-Lined Crates:** a storeroom wall of fourteen crates, each lined the colour of what it holds; and a hopper
   overfilling a crate of redstone (it bursts now and then) beside a strapped one that never does.
 - **Crate Controller:** on top of the storeroom wall (all its crates join by touch) beside an empty crate, fed by a

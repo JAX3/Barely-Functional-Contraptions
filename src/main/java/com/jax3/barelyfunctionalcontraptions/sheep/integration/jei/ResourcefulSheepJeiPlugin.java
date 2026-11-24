@@ -72,6 +72,15 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         }
         registration.addRecipes(mezz.jei.api.constants.RecipeTypes.CRAFTING, unpackingRecipes(resources));
         registration.addItemStackInfo(new ItemStack(ModItems.WOOL_PACKER.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.wool_packer"));
+        // Upgrade cards: what each does and where it goes; and the machines that take them.
+        for (var card : List.of(ModItems.UPGRADE_BASE, ModItems.SPEED_UPGRADE, ModItems.EFFICIENCY_UPGRADE, ModItems.CAPACITY_UPGRADE,
+                ModItems.RANGE_UPGRADE, ModItems.YIELD_UPGRADE, ModItems.MUFFLER_UPGRADE)) {
+            registration.addItemStackInfo(new ItemStack(card.get()), Component.translatable("jei.barelyfunctionalcontraptions.info." + card.getId().getPath()));
+        }
+        for (var machine : List.of(ModItems.MECHANICAL_SEPARATOR, ModItems.WOOL_PACKER, ModItems.POWERED_FURNACE, ModItems.INFUSION_ALTAR,
+                ModItems.AUTOMATIC_SHEARS, ModItems.CHILLER)) {
+            registration.addItemStackInfo(new ItemStack(machine.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.upgrade_slots." + machine.getId().getPath()));
+        }
         registration.addItemStackInfo(new ItemStack(ModItems.MECHANICAL_SEPARATOR.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.separator"));
         registration.addItemStackInfo(new ItemStack(ModItems.CREATIVE_GENERATOR.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.creative_generator"));
         registration.addRecipes(ThermalCategory.TYPE, List.of(new ThermalDisplay()));

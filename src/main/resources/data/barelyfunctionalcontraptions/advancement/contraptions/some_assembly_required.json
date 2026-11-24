@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/root",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:upgrade_base"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.some_assembly_required.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.some_assembly_required.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -31,6 +31,13 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(WoolBurnerProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity.class);
         registration.registerBlockDataProvider(InfusionAltarProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity.class);
         registration.registerBlockDataProvider(WoolPackerProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.class);
+        // The upgrade cards in any machine that takes them.
+        registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MechanicalSeparatorBlockEntity.class);
+        registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.class);
+        registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity.class);
+        registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity.class);
+        registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.class);
+        registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.class);
         registration.registerBlockDataProvider(EnergyMeterProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity.class);
         registration.registerBlockDataProvider(ThermalReactionChamberProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.class);
         registration.registerBlockDataProvider(EchoChamberProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.class);
@@ -55,6 +62,12 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(WoolBurnerProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.class);
         registration.registerBlockComponent(InfusionAltarProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock.class);
         registration.registerBlockComponent(WoolPackerProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.class);
+        registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.MechanicalSeparatorBlock.class);
+        registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.class);
+        registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.PoweredFurnaceBlock.class);
+        registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock.class);
+        registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.class);
+        registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ChillerBlock.class);
         registration.registerBlockComponent(EnergyMeterProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.class);
         registration.registerBlockComponent(ThermalReactionChamberProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock.class);
         registration.registerBlockComponent(EchoChamberProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.class);

@@ -1631,11 +1631,10 @@ public final class DevScreenshotHarness {
     private static final Object[][] EXTRA_SCENES = {
             // Rows 0 to 5 are full: up to (1, 5) by the moved scenes, (2, 5) by the Grass Seeder, (3, 5) by the Herd
             // Counter and (4, 5) by the Machine Status Panel. Row 6, added by extendPlatform: (0, 6) the Wool-Lined Crates
-            // (built by an earlier run, as "crates"), (1, 6) the Fleece Trawler (as "fleece trawler"); (2, 6) to (4, 6)
-            // are free.
-            // Not a new scene: cables the scene that showed wireless power (cell 1, 3) now that the wrench no longer
-            // powers machines; built from the generator in (1, 6) so the platform's extension is a no-op.
-            {"cable the wireless scene", 1, 6},
+            // (built by an earlier run, as "crates"), (1, 6) the Fleece Trawler (as "fleece trawler"), (2, 6) the upgrade
+            // cards; (3, 6) and (4, 6) are free. An earlier run also cabled the old wireless-power scene ("cable the
+            // wireless scene").
+            {"upgrades", 2, 6},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -1861,6 +1860,43 @@ public final class DevScreenshotHarness {
             ResourcefulSheep.LOGGER.info("EXTEND cable: cabled the generator at {} to its separator and shears", gen);
         }
         ResourcefulSheep.LOGGER.info("EXTEND cable: {} wireless scene(s) found", found);
+    }
+
+    /**
+     * The upgrade cards' cell (2, 6): three Mechanical Separators side by side, facing the spawn, each with a Creative
+     * Generator behind it, a chest of Iron Wool feeding it through a hopper and a chest set in the floor under it taking
+     * its outputs: one plain, one with a Speed card, one with an Efficiency card. The Speed one gets through its wool
+     * first, the Efficiency one last (but on less power).
+     */
+    private static void upgradeWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        BlockPos g = origin.offset(0, 0, -3);
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(10, 8, 10),
+                e -> e instanceof net.minecraft.world.entity.Display.TextDisplay || e instanceof net.minecraft.world.entity.item.ItemEntity)) e.discard();
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-8, 0, -6), g.offset(8, 6, 5))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-8, -1, -6), g.offset(8, -1, 5))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(12, 8, 12),
+                e -> e instanceof net.minecraft.world.entity.item.ItemEntity)) e.discard();
+        Object[][] row = {{-4, null, "No cards"}, {0, ModItems.SPEED_UPGRADE.get(), "Speed Upgrade"}, {4, ModItems.EFFICIENCY_UPGRADE.get(), "Efficiency Upgrade"}};
+        for (Object[] r : row) {
+            BlockPos at = g.offset((Integer) r[0], 0, 0);
+            level.setBlock(at, ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState().setValue(MechanicalSeparatorBlock.FACING, Direction.SOUTH), 3);
+            level.setBlock(at.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+            level.setBlock(at.above(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
+            level.setBlock(at.above(2), Blocks.CHEST.defaultBlockState(), 3);
+            level.setBlock(at.below(), Blocks.CHEST.defaultBlockState().setValue(net.minecraft.world.level.block.ChestBlock.FACING, Direction.SOUTH), 3);
+            if (level.getBlockEntity(at.above(2)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity feed) {
+                for (int i = 0; i < 9; i++) feed.setItem(i, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 64));
+            }
+            if (r[1] != null && level.getBlockEntity(at) instanceof MechanicalSeparatorBlockEntity be) {
+                be.upgrades().setItem(0, new ItemStack((net.minecraft.world.item.Item) r[1]));
+            }
+            label(server, at.above(4), (String) r[2], r[1] == null ? "gray" : "aqua");
+        }
+        label(server, g.above(6).north(2), "Upgrade cards: the same Iron Wool, three ways", "gold");
+        ResourcefulSheep.LOGGER.info("EXTEND upgrades built round {}", g);
     }
 
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
@@ -3750,7 +3786,7 @@ public final class DevScreenshotHarness {
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
         // The whole square platform from above its south edge and from straight overhead, then the latest scene.
         String[] tps = {"tp @a 73.5 95 218.5 180 40", "tp @a 73.5 185 108 180 90", "tp @a 129.5 38 162.5 180 12", "tp @a 45.5 40 184.5 180 32",
-                "tp @a 95.5 39 45.5 180 30"};
+                "tp @a 73.5 39 185.5 180 22"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -3766,6 +3802,16 @@ public final class DevScreenshotHarness {
         if (tick == report) {
             server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                // The upgrade cards' separators: their output chests in the floor.
+                for (int dx : new int[]{-4, 0, 4}) {
+                    BlockPos sepPos = new BlockPos(73 + dx, 35, 177);
+                    if (level.getBlockEntity(sepPos) instanceof MechanicalSeparatorBlockEntity sep
+                            && level.getBlockEntity(sepPos.below()) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity out) {
+                        int iron = 0;
+                        for (int i = 0; i < out.getContainerSize(); i++) if (out.getItem(i).is(Items.RAW_IRON)) iron += out.getItem(i).getCount();
+                        ResourcefulSheep.LOGGER.warn("TOUR upgrades separator at {} with {}: {} Raw Iron out, status {}", sepPos, sep.upgrades().cards(), iron, sep.getStatus());
+                    }
+                }
                 // The generator cabled to a separator and shears, once wireless.
                 if (level.getBlockEntity(new BlockPos(91, 35, 38)) instanceof com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity gen
                         && level.getBlockEntity(new BlockPos(95, 35, 38)) instanceof MechanicalSeparatorBlockEntity sep
@@ -4084,6 +4130,7 @@ public final class DevScreenshotHarness {
                         case "crates" -> crateWorldScene(server);
                         case "fleece trawler" -> trawlerWorldScene(server);
                         case "cable the wireless scene" -> cableWirelessScene(server);
+                        case "upgrades" -> upgradeWorldScene(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
@@ -5002,14 +5049,27 @@ public final class DevScreenshotHarness {
                 player.getInventory().setItem(6, new ItemStack(ModItems.MUFFLER_UPGRADE.get(), 2));
                 command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", s.getX() + 0.5, s.getY(), s.getZ() + 2.5));
             });
+            case 92 -> McClient.clearChat(mc);
+            case 98 -> shot(mc, "116_upgrades_jade");
             case 100 -> server.execute(() -> {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                 if (player.level().getBlockEntity(at) instanceof MechanicalSeparatorBlockEntity be) player.openMenu(be, at);
             });
             case 105 -> server.execute(() -> {
                 if (server.overworld().getBlockEntity(at) instanceof MechanicalSeparatorBlockEntity be) be.upgrades().setItem(1, new ItemStack(ModItems.MUFFLER_UPGRADE.get()));
+                // Two Speed cards in the furnace: Maximum Overdrive for the player standing by.
+                if (server.overworld().getBlockEntity(at.east(2)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity f) {
+                    f.upgrades().setItem(0, new ItemStack(ModItems.SPEED_UPGRADE.get()));
+                    f.upgrades().setItem(1, new ItemStack(ModItems.SPEED_UPGRADE.get()));
+                }
             });
-            case 120 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 110 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ResourcefulSheep.LOGGER.warn("UPGRADES advancements: Some Assembly Required {}, Maximum Overdrive {}",
+                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.SOME_ASSEMBLY_REQUIRED),
+                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.MAXIMUM_OVERDRIVE));
+            });
+            case 120 -> { McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); McClient.clearChat(mc); } // (no player names in the shots)
             case 130 -> ResourcefulSheep.LOGGER.warn("UPGRADES client sees the separator muffled: {}",
                     mc.level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable u && u.muffled());
             case 135 -> shot(mc, "116_upgrades_gui");
@@ -5035,9 +5095,15 @@ public final class DevScreenshotHarness {
                     if (player.level().getBlockEntity(f) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity be) player.openMenu(be, f);
                 });
             }
-            case 175 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
-            case 190 -> shot(mc, "116_upgrades_furnace_empty");
-            case 195 -> {
+            case 175 -> { McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); McClient.clearChat(mc); }
+            case 190 -> shot(mc, "116_upgrades_furnace");
+            case 191 -> {
+                McClient.setScreen(mc, null);
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.show(new ItemStack(ModItems.SPEED_UPGRADE.get()), false);
+            }
+            case 194 -> { McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); McClient.clearChat(mc); }
+            case 199 -> shot(mc, "116_upgrades_jei");
+            case 201 -> {
                 McClient.setScreen(mc, null);
                 server.execute(() -> {
                     // Two Automatic Shears, their areas shown: one plain, one with a Range card (bigger, and wobbling).
@@ -5058,7 +5124,7 @@ public final class DevScreenshotHarness {
                     command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 50", at.getX() - 1.5, at.getY() + 7, at.getZ() + 15.5));
                 });
             }
-            case 200 -> { setHudHidden(mc, true); McClient.clearChat(mc); }
+            case 205 -> { setHudHidden(mc, true); McClient.clearChat(mc); }
             case 230 -> shot(mc, "116_range_upgrade_areas");
             case 240 -> shot(mc, "116_range_upgrade_areas_2");
             case 246 -> setHudHidden(mc, false);

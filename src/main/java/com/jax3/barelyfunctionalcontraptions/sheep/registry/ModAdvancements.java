@@ -52,6 +52,10 @@ public final class ModAdvancements {
     public static final String DEWEY_DECIMAL_SHEEP = "contraptions/dewey_decimal_sheep";
     public static final int DEWEY_DECIMAL_CRATES = 16;
     public static final String INFUSE_SHEEP = "contraptions/infuse_sheep";
+    /** Putting an upgrade card in a machine. */
+    public static final String SOME_ASSEMBLY_REQUIRED = "contraptions/some_assembly_required";
+    /** Putting two Speed cards in one machine (hidden). */
+    public static final String MAXIMUM_OVERDRIVE = "contraptions/maximum_overdrive";
     /** Players this close to Automatic Shears when they shear a sheep get {@link #AUTO_SHEAR}. */
     public static final double AUTO_SHEAR_RADIUS = 16;
 

@@ -151,6 +151,8 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | ⭐ **Mission Control** (goal) | Link 8 machines to one Machine Status Panel screen |
 | Bursting at the Seams | Be near a Wool-Lined Crate when it's overfilled and bursts |
 | Reel Ewe In | Be near a Fleece Trawler when it hauls up a resource on a wool lure |
+| Some Assembly Required | Put an upgrade card in a machine |
+| Maximum Overdrive (hidden) | Put two Speed Upgrades in one machine |
 | Making Waves | Infuse a sheep with Prismarine Crystals |
 | ⭐ **Dewey Decimal Sheep** (goal) | Link 16 Wool-Lined Crates into one Crate Controller's store |
 | ⭐ **Count Your Sheep** (goal) | Be near a Herd Counter counting 20 sheep at once |
@@ -929,12 +931,17 @@ Cards that go in a processing machine: to trade time for power or power for time
 - **Two cards:** one in each slot. A **second card of the same kind** does half as much (`secondCardStrength`): two Speed cards make jobs 48% as long for 187.5% of the power. A Speed and an Efficiency card multiply: 69% of the time for 112.5% of the power.
 - **Putting them in:** drag a card into a slot, or shift-click it: each shift-click puts one card in a free slot. Shift-click a card in the panel to take it back. A slot takes only one card, and only cards the machine accepts (the block tags `#barelyfunctionalcontraptions:accepts_upgrade/speed`, `/efficiency`, `/capacity`, `/range`, `/yield` and `/muffler`, so a data pack can change which machines take which). The Snow Sheep Chiller takes Range and Muffler.
 - **Kept:** the cards stay with the machine when it's broken or picked up with the wrench (its item lists them, *Upgrades: Speed Upgrade*), and come back when it's placed. Hoppers and pipes never touch the upgrade slots.
+- **JEI:** an information page for each card (what it does, where it goes) and one on each machine that takes cards (which ones). **Jade:** a machine with cards in lists them and what they add up to, *Upgrades: Speed Upgrade* / *Time 60%, Power 150%*.
+- **Advancements:** *Some Assembly Required* for putting a card in a machine; the hidden *Maximum Overdrive* for two Speed cards in one. The Contraptions Manual has an *Upgrade Cards* chapter (Utility).
+- **Test world:** cell (2, 6) has three separators on the same Iron Wool, plain, with a Speed card and with an Efficiency card, each with its own chest of wool and a chest in the floor for its outputs: `/tp @s 73.5 39 185.5 180 22`.
 - **Config:** `[upgrades]`: `speedTime` (0.6), `speedEnergy` (1.5), `efficiencyTime` (1.15), `efficiencyEnergy` (0.75), `capacityMultiplier` (4), `rangeBlocks` (1), `yieldBonus` (1), `secondCardStrength` (0.5).
 
 | The Mechanical Separator with a Speed card and a Muffler, more in the hotbar | A card's tooltip |
 |---|---|
 | ![The separator's window: two upgrade slots in a panel on its right, a Speed Upgrade and a Muffler Upgrade in them, all six cards in the hotbar; JEI's item list moved over beside it](screenshots/116_upgrades_gui.png) | ![The Speed Upgrade's tooltip: Time a job 60% in green, Power a job 150% in red, and the machines it goes in](screenshots/116_upgrade_tooltip.png) |
 | ![Two Automatic Shears with their areas shown: a plain one's 3x3, and one with a Range card's 5x5, its outline a shifting blue](screenshots/116_range_upgrade_areas.png) | ![The Snow Sheep Chiller's window with a Range Upgrade in its panel](screenshots/116_upgrades_chiller.png) |
+| ![Jade on a separator with a Speed card: Upgrades: Speed Upgrade, Time 60%, Power 150%, using 1,000 FE/t](screenshots/116_upgrades_jade.png) | ![JEI's information page for the Speed Upgrade](screenshots/116_upgrades_jei.png) |
+| ![The Powered Furnace's window with two Speed Upgrades in its panel](screenshots/116_upgrades_furnace.png) | ![The test world's upgrade cell: three separators in a row, labelled No cards, Speed Upgrade and Efficiency Upgrade, each under a hopper and chest of Iron Wool](screenshots/116_upgrades_world.png) |
 
 ### Energy Cable
 Cables carry Forge Energy from the **power generators** (Mycelial Generator, Zero Point Energy Module, Creative Generator) and the **Hume Energy Cube** to the machines that use it, so a machine no longer has to touch its power source.
