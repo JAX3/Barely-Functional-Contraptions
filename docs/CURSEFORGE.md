@@ -23,9 +23,9 @@ Everything runs on Forge Energy. You can make it from mushrooms in a network of 
 - **Resource packs:** they can retexture any wool and rewrite or translate the in-game manual.
 - **Optional mods:** JEI and Jade show every recipe and machine status, but the mod runs without them.
 
-### Woollen Steel
+### Blue Steel
 
-Every contraption is built from **Woollen Steel**: an Iron Ingot crafted with any wool. The mod's recipes take it wherever they'd take an Iron Ingot, and a Block of Woollen Steel wherever they'd take a Block of Iron, so your wool has somewhere to go from the very first machine.
+Every contraption is built from **Blue Steel**: an Iron Ingot crafted with any wool. The mod's recipes take it wherever they'd take an Iron Ingot, and a Block of Blue Steel wherever they'd take a Block of Iron, so your wool has somewhere to go from the very first machine.
 
 ## The Contraptions Manual
 

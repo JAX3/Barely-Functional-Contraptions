@@ -190,7 +190,7 @@ public final class ModGameTests {
         ECHO_TESTS.put("crate_fills_from_hoppers_and_pipes_and_reads_on_a_comparator", ModGameTests::crateAutomation);
         ECHO_TESTS.put("crate_bulges_then_bursts_unless_strapped", ModGameTests::crateBursts);
         ECHO_TESTS.put("crate_a_hopper_pushing_at_a_full_crate_strains_it", ModGameTests::crateHopperStrains);
-        ECHO_TESTS.put("woollen_steel_replaces_iron_in_every_recipe", ModGameTests::woollenSteel);
+        ECHO_TESTS.put("blue_steel_replaces_iron_in_every_recipe", ModGameTests::blueSteel);
         ECHO_TESTS.put("crate_controller_takes_in_the_crates_touching_it", ModGameTests::controllerJoins);
         ECHO_TESTS.put("crate_controller_puts_items_where_they_belong", ModGameTests::controllerRoutes);
         ECHO_TESTS.put("crate_controller_links_far_crates_with_their_neighbours", ModGameTests::controllerLinks);
@@ -1330,7 +1330,7 @@ public final class ModGameTests {
         ItemStack machine = new ItemStack(ModItems.FUNCTIONAL_MACHINE_BLOCK.get());
         ItemStack warden = com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("warden"), 1);
         ItemStack iron = com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("iron"), 1);
-        ItemStack ironBlock = new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_STEEL_BLOCK.get()), blackstone = new ItemStack(Items.BLACKSTONE);
+        ItemStack ironBlock = new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLUE_STEEL_BLOCK.get()), blackstone = new ItemStack(Items.BLACKSTONE);
         ItemStack made = craft(h, 3, 3, List.of(ironBlock, shard, ironBlock, shard, warden, shard, blackstone, machine, blackstone));
         h.assertTrue(made.is(ModItems.ECHO_CHAMBER.get()), "the recipe makes an Echo Chamber, got " + made);
         h.assertTrue(craft(h, 3, 3, List.of(ironBlock, shard, ironBlock, shard, iron, shard, blackstone, machine, blackstone)).isEmpty(), "an Iron Wool Bale won't do");
@@ -2299,14 +2299,14 @@ public final class ModGameTests {
     }
 
     /**
-     * Woollen Steel from an Iron Ingot and any wool, nine into a block and back; and no crafting recipe of the mod's
-     * takes an Iron Ingot or a Block of Iron any more (but Woollen Steel's own).
+     * Blue Steel from an Iron Ingot and any wool, nine into a block and back; and no crafting recipe of the mod's
+     * takes an Iron Ingot or a Block of Iron any more (but Blue Steel's own).
      */
-    private static void woollenSteel(GameTestHelper h) {
-        var steel = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_STEEL.get();
-        var block = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_STEEL_BLOCK.get();
+    private static void blueSteel(GameTestHelper h) {
+        var steel = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLUE_STEEL.get();
+        var block = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLUE_STEEL_BLOCK.get();
         ItemStack made = craft(h, 2, 1, List.of(new ItemStack(Items.IRON_INGOT), new ItemStack(com.jax3.barelyfunctionalcontraptions.compat.Vanilla.wool(net.minecraft.world.item.DyeColor.LIME))));
-        h.assertTrue(made.is(steel) && made.getCount() == 1, "an Iron Ingot and lime wool make Woollen Steel: " + made);
+        h.assertTrue(made.is(steel) && made.getCount() == 1, "an Iron Ingot and lime wool make Blue Steel: " + made);
         List<ItemStack> nine = new java.util.ArrayList<>();
         for (int i = 0; i < 9; i++) nine.add(new ItemStack(steel));
         ItemStack packed = craft(h, 3, 3, nine);
@@ -2315,7 +2315,7 @@ public final class ModGameTests {
         h.assertTrue(back.is(steel) && back.getCount() == 9, "and the block gives nine back: " + back);
         int checked = 0;
         for (var holder : h.getLevel().getServer().getRecipeManager().getRecipes()) {
-            if (!holder.id().identifier().getNamespace().equals(ResourcefulSheep.MOD_ID) || holder.id().identifier().getPath().startsWith("woollen_steel")) continue;
+            if (!holder.id().identifier().getNamespace().equals(ResourcefulSheep.MOD_ID) || holder.id().identifier().getPath().startsWith("blue_steel")) continue;
             if (!(holder.value() instanceof net.minecraft.world.item.crafting.CraftingRecipe crafting)) continue;
             for (var ingredient : crafting.placementInfo().ingredients()) {
                 h.assertFalse(ingredient.test(new ItemStack(Items.IRON_INGOT)) || ingredient.test(new ItemStack(Items.IRON_BLOCK)),

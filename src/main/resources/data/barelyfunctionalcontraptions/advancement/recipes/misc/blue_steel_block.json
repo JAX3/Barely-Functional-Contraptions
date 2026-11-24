@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:iron_ingot"
+            "items": "barelyfunctionalcontraptions:blue_steel"
           }
         ]
       },
@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipes": "barelyfunctionalcontraptions:woollen_steel"
+        "recipes": "barelyfunctionalcontraptions:blue_steel_block"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "barelyfunctionalcontraptions:woollen_steel"
+      "barelyfunctionalcontraptions:blue_steel_block"
     ]
   }
 }

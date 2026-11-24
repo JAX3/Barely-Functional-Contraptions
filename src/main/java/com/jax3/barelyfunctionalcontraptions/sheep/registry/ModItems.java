@@ -17,8 +17,8 @@ public final class ModItems {
 
     public static final DeferredItem<BlockItem> FUNCTIONAL_MACHINE_BLOCK = REGISTER.registerSimpleBlockItem(ModBlocks.FUNCTIONAL_MACHINE_BLOCK);
     /** An Iron Ingot worked with wool: what the mod's recipes take where they once took an Iron Ingot. */
-    public static final DeferredItem<net.minecraft.world.item.Item> WOOLLEN_STEEL = REGISTER.registerSimpleItem("woollen_steel");
-    public static final DeferredItem<BlockItem> WOOLLEN_STEEL_BLOCK = REGISTER.registerSimpleBlockItem(ModBlocks.WOOLLEN_STEEL_BLOCK);
+    public static final DeferredItem<net.minecraft.world.item.Item> BLUE_STEEL = REGISTER.registerSimpleItem("blue_steel");
+    public static final DeferredItem<BlockItem> BLUE_STEEL_BLOCK = REGISTER.registerSimpleBlockItem(ModBlocks.BLUE_STEEL_BLOCK);
 
     public static final DeferredItem<BlockItem> MECHANICAL_SEPARATOR = REGISTER.registerSimpleBlockItem(ModBlocks.MECHANICAL_SEPARATOR);
 

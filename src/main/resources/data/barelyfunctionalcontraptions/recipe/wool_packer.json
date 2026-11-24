@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "I": "barelyfunctionalcontraptions:woollen_steel",
+    "I": "barelyfunctionalcontraptions:blue_steel",
     "P": "minecraft:piston",
     "W": "#minecraft:wool",
     "M": "barelyfunctionalcontraptions:functional_machine_block",

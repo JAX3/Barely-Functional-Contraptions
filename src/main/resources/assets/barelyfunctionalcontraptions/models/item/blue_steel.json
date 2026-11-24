@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "barelyfunctionalcontraptions:item/woollen_steel"
+    "layer0": "barelyfunctionalcontraptions:item/blue_steel"
   }
 }

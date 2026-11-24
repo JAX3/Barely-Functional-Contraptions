@@ -203,8 +203,8 @@ public final class ResourcefulSheepClient {
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HERD_COUNTER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATUS_PANEL,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE,
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_STEEL,
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_STEEL_BLOCK,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLUE_STEEL,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLUE_STEEL_BLOCK,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_CONTROLLER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_STRAP)) {
             if (event.getItemStack().is(tipped.get())) {

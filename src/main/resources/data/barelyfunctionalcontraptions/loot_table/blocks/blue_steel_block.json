@@ -9,10 +9,10 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "barelyfunctionalcontraptions:woollen_steel_block"
+          "name": "barelyfunctionalcontraptions:blue_steel_block"
         }
       ]
     }
   ],
-  "random_sequence": "barelyfunctionalcontraptions:blocks/woollen_steel_block"
+  "random_sequence": "barelyfunctionalcontraptions:blocks/blue_steel_block"
 }

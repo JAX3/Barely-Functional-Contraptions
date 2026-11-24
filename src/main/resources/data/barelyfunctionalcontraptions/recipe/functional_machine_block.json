@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "I": "barelyfunctionalcontraptions:woollen_steel",
+    "I": "barelyfunctionalcontraptions:blue_steel",
     "C": "minecraft:copper_ingot",
     "R": "minecraft:redstone"
   },

@@ -88,8 +88,8 @@ public final class ContraptionsCreativeTab {
             guide("utility", 0xFF7552AE, () -> new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()), items(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CONTRAPTIONS_MANUAL,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FUNCTIONAL_MACHINE_BLOCK,
-                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_STEEL,
-                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_STEEL_BLOCK,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLUE_STEEL,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLUE_STEEL_BLOCK,
                     com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HERD_COUNTER,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATUS_PANEL,

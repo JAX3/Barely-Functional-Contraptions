@@ -4854,8 +4854,8 @@ def generate_crate():
     item.save(out("item/crate_strap.png"))
 
 
-def generate_woollen_steel():
-    """Woollen Steel in the style of Minecraft's own ingots and metal blocks, in the machines' blue steel: the ingot a
+def generate_blue_steel():
+    """Blue Steel in the style of Minecraft's own ingots and metal blocks, in the machines' blue steel: the ingot a
     bar seen corner-on (lit top face, darker front and end); the block rows of
     plates like a Block of Iron, each lit along its top edge, with wool stitched along the seams between them."""
     rnd = random.Random(311)
@@ -4898,7 +4898,7 @@ def generate_woollen_steel():
         else:
             c = edge if boundary else steel if y <= r + 2 else steel_d  # the front face
         item.putpixel((x, y), c)
-    item.save(out("item/woollen_steel.png"))
+    item.save(out("item/blue_steel.png"))
 
     # The block: rows of plates like a Block of Iron, each lit along its top, with a seam under it stitched now and then
     # with wool; a lit top-left and shaded bottom-right edge.
@@ -4918,7 +4918,7 @@ def generate_woollen_steel():
                 else:
                     c = wool_l if (x + y) % 5 == 0 else steel
             block.putpixel((x, y), c)
-    block.save(out("block/woollen_steel_block.png"))
+    block.save(out("block/blue_steel_block.png"))
 
 def generate_static_generator_gui():
     """Static Generator window: energy gauge, then a panel with the herd and output, the dome's charge bar (the shock
@@ -5008,7 +5008,7 @@ def main():
     generate_herd_counter_gui()
     generate_status_panel()
     generate_crate()
-    generate_woollen_steel()
+    generate_blue_steel()
     generate_woollen_armor()
     generate_woollen_icons()
     generate_infusion_altar_gui()

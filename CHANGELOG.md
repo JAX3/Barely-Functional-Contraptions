@@ -103,14 +103,14 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
 - **Recipe:** four Glass Panes, two Redstone, a Functional Machine Block, a Comparator and an Iron Ingot.
 - New config section `[status_panel]`, and a chapter in the Contraptions Manual (Utility).
 
-### Woollen Steel
-- A new item, **Woollen Steel**: an Iron Ingot and any wool, crafted together. Nine make a **Block of Woollen Steel**
+### Blue Steel
+- A new item, **Blue Steel**: an Iron Ingot and any wool, crafted together. Nine make a **Block of Blue Steel**
   (and it gives the nine back).
-- **Every crafting recipe in the mod now takes Woollen Steel where it took an Iron Ingot, and a Block of Woollen Steel
+- **Every crafting recipe in the mod now takes Blue Steel where it took an Iron Ingot, and a Block of Blue Steel
   where it took a Block of Iron**: the Functional Machine Block, every machine, the wrench, cables, tanks, meters,
   crates, the status panel and the rest (22 recipes). Iron Nuggets stay, and the Infusion Altar still takes a real
   Iron Ingot for an Iron sheep.
-- Woollen Steel is in `#c:ingots`, and its block in `#c:storage_blocks`.
+- Blue Steel is in `#c:ingots`, and its block in `#c:storage_blocks`.
 
 ### Sheep wear their blocks
 - An infused sheep's fleece is now **its resource's block**: Block of Redstone on a Redstone sheep, Block of Iron on an

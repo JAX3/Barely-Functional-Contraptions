@@ -4,7 +4,7 @@
   "key": {
     "E": "minecraft:echo_shard",
     "B": "minecraft:blackstone",
-    "I": "barelyfunctionalcontraptions:woollen_steel_block",
+    "I": "barelyfunctionalcontraptions:blue_steel_block",
     "M": "barelyfunctionalcontraptions:functional_machine_block",
     "W": {
       "neoforge:ingredient_type": "barelyfunctionalcontraptions:wool_bale",

@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "I": "barelyfunctionalcontraptions:woollen_steel",
+    "I": "barelyfunctionalcontraptions:blue_steel",
     "R": "minecraft:redstone_block",
     "A": "minecraft:amethyst_shard",
     "M": "barelyfunctionalcontraptions:functional_machine_block"
