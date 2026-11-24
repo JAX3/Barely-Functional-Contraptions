@@ -89,6 +89,8 @@ public final class ResourcefulSheepClient {
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.CRATE_CONTROLLER.get(), context -> new CrateControllerRenderer());
             event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.FLEECE_TRAWLER.get(), context -> new AreaOutlineRenderer<>());
+            event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.POWERED_FURNACE.get(), context -> new AreaOutlineRenderer<>());
         });
 
@@ -117,6 +119,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.PIPE_FILTER.get(), PipeFilterScreen::new);
         event.register(ModMenus.BLAZE_FURNACE.get(), BlazeFurnaceScreen::new);
         event.register(ModMenus.CHILLER.get(), ChillerScreen::new);
+        event.register(ModMenus.FLEECE_TRAWLER.get(), FleeceTrawlerScreen::new);
         event.register(ModMenus.POWERED_FURNACE.get(), PoweredFurnaceScreen::new);
         event.register(ModMenus.WOOL_BURNER.get(), WoolBurnerScreen::new);
         event.register(ModMenus.SHEEP_TREADMILL.get(), SheepTreadmillScreen::new);

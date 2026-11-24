@@ -57,7 +57,7 @@ import org.jspecify.annotations.Nullable;
  * <p>Its pool: the water source blocks in the 7x7 in front of it, from its own level to four blocks down. Its slots:
  * the lure (0) and nine for the catch (1 to 9); hoppers and pipes put lures in and take the catch out.</p>
  */
-public class FleeceTrawlerBlockEntity extends BlockEntity implements WorldlyContainer {
+public class FleeceTrawlerBlockEntity extends BlockEntity implements WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
     public static final int LURE = 0, OUTPUTS = 9, SIZE = 1 + OUTPUTS;
     /** Its pool's reach: 7 wide, 7 out from its front, 4 down. */
     public static final int POOL_HALF_WIDTH = 3, POOL_LENGTH = 7, POOL_DEPTH = 4;
@@ -65,6 +65,37 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements WorldlyCont
     public static final int FULL_POOL = (POOL_HALF_WIDTH * 2 + 1) * POOL_LENGTH * POOL_DEPTH;
 
     public enum Status { HAULING, NO_WATER, NO_SHEEP, TANGLED, OUTPUT_FULL }
+
+    /** Its pool's outline colour: sea green. */
+    public static final int AREA_COLOR = 0xFF5FE0C8;
+    public static final int DATA_COUNT = 9;
+    private boolean showArea;
+    /** What its window shows: status, sheep, most sheep, pool, haul %, lure hauls left, hauls a lure lasts, area, hauls. */
+    private final net.minecraft.world.inventory.ContainerData data = new net.minecraft.world.inventory.ContainerData() {
+        @Override
+        public int get(int index) {
+            return switch (index) {
+                case 0 -> status.ordinal();
+                case 1 -> sheep;
+                case 2 -> ModConfigs.getInt(ModConfigs.SERVER.trawlerMaxSheep);
+                case 3 -> pool;
+                case 4 -> progressPercent();
+                case 5 -> items.get(LURE).isEmpty() ? 0 : lureUsesLeft;
+                case 6 -> ModConfigs.getInt(ModConfigs.SERVER.trawlerLureUses);
+                case 7 -> showArea ? 1 : 0;
+                case 8 -> Math.min(hauls, Short.MAX_VALUE);
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int index, int value) {}
+
+        @Override
+        public int getCount() {
+            return DATA_COUNT;
+        }
+    };
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
     private Status status = Status.NO_WATER;
@@ -295,22 +326,6 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements WorldlyCont
         return Mth.clamp((int) (100 * progress / ModConfigs.getInt(ModConfigs.SERVER.trawlerHaulTicks)), 0, 100);
     }
 
-    /** Hands {@code player} everything it's caught; true if there was anything. */
-    public boolean giveCatch(Player player) {
-        boolean any = false;
-        for (int i = 1; i < SIZE; i++) {
-            ItemStack stack = items.get(i);
-            if (stack.isEmpty()) continue;
-            any = true;
-            if (!player.getInventory().add(stack) && !stack.isEmpty()) {
-                player.level().addFreshEntity(new ItemEntity(player.level(), player.getX(), player.getY() + 0.5, player.getZ(), stack.copy()));
-            }
-            items.set(i, ItemStack.EMPTY);
-        }
-        if (any) changedContents();
-        return any;
-    }
-
     /** Puts resource wool in its lure slot from {@code stack}; how many went in. */
     public int addLure(ItemStack stack) {
         if (!canPlaceItem(LURE, stack)) return 0;
@@ -335,6 +350,40 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements WorldlyCont
     private void changedContents() {
         setChanged();
         if (level instanceof ServerLevel server) look(server);
+    }
+
+    // ------------------------------------------------------------------ its pool's outline, and its window
+
+    @Override
+    public boolean showsArea() {
+        return showArea;
+    }
+
+    @Override
+    public void setShowsArea(boolean show) {
+        showArea = show;
+        setChanged();
+        if (level != null) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+    }
+
+    @Override
+    public AABB displayedArea() {
+        return poolBox();
+    }
+
+    @Override
+    public int areaColor() {
+        return AREA_COLOR;
+    }
+
+    @Override
+    public net.minecraft.network.chat.Component getDisplayName() {
+        return net.minecraft.network.chat.Component.translatable("block.barelyfunctionalcontraptions.fleece_trawler");
+    }
+
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int containerId, net.minecraft.world.entity.player.Inventory inventory, Player player) {
+        return new com.jax3.barelyfunctionalcontraptions.sheep.menu.FleeceTrawlerMenu(containerId, inventory, this, data);
     }
 
     // ------------------------------------------------------------------ container (hoppers and pipes)
@@ -428,6 +477,7 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements WorldlyCont
         status = Status.values()[Math.floorMod(input.getIntOr("status", Status.NO_WATER.ordinal()), Status.values().length)];
         pool = input.getIntOr("pool", 0);
         sheep = input.getIntOr("sheep", 0);
+        showArea = input.getBooleanOr("show_area", false);
     }
 
     @Override
@@ -441,6 +491,7 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements WorldlyCont
         output.putInt("status", status.ordinal());
         output.putInt("pool", pool);
         output.putInt("sheep", sheep);
+        output.putBoolean("show_area", showArea);
     }
 
     @Override

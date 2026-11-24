@@ -464,7 +464,7 @@
         "- Each Tide sheep swimming in the pool adds speed, up to 4. A haul takes 30 seconds with one sheep in a full pool; ocean or river water and rain make it quicker.",
         "- Hauls are fish (and now and then junk). Right-click it with resource wool for a lure: each haul then has a 30% chance of bringing up that resource instead, Raw Iron on Iron Wool, Diamonds on Diamond Wool. One wool lasts 8 resource hauls.",
         "- Now and then its net tangles and it stops: cut it free with shears. Very rarely it drags up a confused sheep.",
-        "Right-click it with an empty hand to take the catch, or take it out with a hopper or pipe. A comparator reads how full it is.",
+        "Right-click it with an empty hand to open its window: its lure, sheep, pool, winch and catch. Sneak-right-click it to show its pool. Take the catch from the window, or with a hopper or pipe. A comparator reads how full it is.",
         "## Config",
         "Its speed, pool, lures and tangles are in the [fleece_trawler] section of the server config."
       ]

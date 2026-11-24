@@ -767,6 +767,8 @@ I H I      H = Hopper
 | On its dock, Tide sheep swimming in its pool | Its net drum |
 |---|---|
 | ![A Fleece Trawler on a stone-brick dock at the edge of a pool, three teal Tide sheep with fins and gills swimming in it, prismarine growing from their fleece](screenshots/115_tide_sheep.png) | ![The Fleece Trawler from behind its dock, its pool and sheep beyond it](screenshots/115_fleece_trawler_close.png) |
+| ![Its window: an Iron Wool lure with 5 hauls left, the winch at 85% with a wave under it, 3 / 4 Tide sheep pips, the pool bar at 147 water, status Hauling, and its catch of Raw Iron and Cod](screenshots/115_fleece_trawler_gui.png) | ![Jade on it: Hauling, 3 / 4 Tide sheep, Pool: 147 water, Winch, Lure: 4 Iron Wool, hauls so far and what it holds](screenshots/115_fleece_trawler_jade.png) |
+| ![JEI's Fleece Trawler page: a Tide sheep into the trawler, fish and junk out; one sheep: a haul every 30 s; pool up to 7x7x4, min 18. Its other pages show each resource wool as a lure](screenshots/115_fleece_trawler_jei.png) | ![The test world's Fleece Trawler: a full 7x7 pool sunk in a dark prismarine basin, fenced, three Tide sheep swimming in it, the trawler on its south rim with a hopper under it into a chest in the floor](screenshots/115_fleece_trawler_world.png) |
 
 - **Placing it:** its net faces away from you, so place it standing on the bank, looking out over the water.
 - **Its pool:** the water source blocks in the **7x7 in front of it**, from its own level to **4 down**. It needs at least **18** (`minPool`: a 3x3 two deep); a bigger pool fishes faster, at full speed with all 196.
@@ -775,7 +777,9 @@ I H I      H = Hopper
 - **Lures:** right-click it with **resource wool**, or pipe it in, to put a **lure** in its lure slot. Each haul then has a **30%** chance (`lureChance`) to bring up **1–2 of that resource** instead: Raw Iron on Iron Wool, Diamonds on Diamond Wool, whatever that wool separates into. One wool lasts **8 resource hauls** (`lureUses`).
 - **Tangles:** now and then (**4%** of hauls, `tangleChance`) its net **tangles** and it stops (*Tangled*) until you **right-click it with shears**, which cuts it free and gives back a little string.
 - **Stray sheep:** very rarely (`straySheepChance`) a haul drags up a confused, dripping plain sheep onto the bank beside it.
-- **Taking the catch:** right-click it with an empty hand: you get everything it's caught, and it tells you how it's doing. **Hoppers and pipes** take the catch out of every side and put lures in. Broken, it drops its lures and catch.
+- **Its window:** right-click it with an empty hand. Its lure slot (and how many hauls the lure has left), its Tide sheep (a pip for each, lit for those swimming), its pool (a bar up to a full 196, the least it needs marked), the winch (the haul's line being wound in), its 9 catch slots and its status; hover over any of them for more. The button at the top right shows its pool's outline in the world; so does **sneak-right-clicking** it with an empty hand.
+- **Taking the catch:** from its window, or with **hoppers and pipes**, which take the catch out of every side and put lures in. Broken, it drops its lures and catch.
+- **JEI:** a page for its fishing (a Tide sheep in, fish and junk out) and one for each resource wool as a lure. **Jade:** its status, sheep, pool, winch, lure and how many hauls it's made.
 - **Comparator:** how many of its 9 catch slots hold something.
 - **Machine Status Panel:** *Hauling* (with how far through the haul), *No water*, *No sheep*, *Tangled* or *Output full*.
 - **Advancement:** *Reel Ewe In*, for being near one when it hauls up a resource on a lure.

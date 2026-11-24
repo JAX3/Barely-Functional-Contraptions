@@ -39,7 +39,8 @@ import org.jspecify.annotations.Nullable;
  * <ul>
  *     <li>right-click it with resource wool to put a lure in;</li>
  *     <li>right-click it with shears to cut a tangled net free;</li>
- *     <li>right-click it with an empty hand to take what it's caught (and hear how it's doing).</li>
+ *     <li>right-click it with an empty hand to open its window (its lure, its catch, how it's doing);</li>
+ *     <li>sneak-right-click it with an empty hand to show or hide its pool.</li>
  * </ul>
  */
 public class FleeceTrawlerBlock extends BaseEntityBlock {
@@ -119,16 +120,16 @@ public class FleeceTrawlerBlock extends BaseEntityBlock {
         return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
-    /** Hands over what it's caught, or says how it's doing. */
+    /** Opens its window; a sneak-right-click shows or hides its pool. */
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(level instanceof ServerLevel server) || !(level.getBlockEntity(pos) instanceof FleeceTrawlerBlockEntity be)) return InteractionResult.SUCCESS;
-        be.look(server);
-        if (be.giveCatch(player)) {
-            level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.4F, 1.0F);
+        if (player.isSecondaryUseActive()) {
+            be.toggleArea(player);
+            return InteractionResult.SUCCESS;
         }
-        message(player, Component.translatable("message.barelyfunctionalcontraptions.fleece_trawler.summary",
-                Component.translatable("status_panel.barelyfunctionalcontraptions.state." + be.statusKey()), be.sheepCount(), be.pool(), be.progressPercent()));
+        be.look(server);
+        player.openMenu(be, pos);
         return InteractionResult.SUCCESS;
     }
 

@@ -70,6 +70,12 @@ Links Wool-Lined Crates into one store. It needs no power.
   very rarely it drags up a confused sheep.
 - Hoppers and pipes on every side, a comparator, a Machine Status Panel line, the advancement *Reel Ewe In*, config
   `[fleece_trawler]`, and a chapter in the Contraptions Manual (Production).
+- **Its window:** its lure slot (hauls left), a pip for each Tide sheep, a pool bar, the winch winding in each haul,
+  its 9 catch slots and its status, with a button (or sneak-right-click) to show its pool's outline.
+- **JEI** pages for its fishing and for each resource wool as a lure; **Jade** shows its status, sheep, pool, winch,
+  lure and hauls.
+- **Test world:** cell (1, 6) has a full pool in a dark prismarine basin with three Tide sheep, a trawler on an Iron
+  Wool lure and a hopper into a chest; the Machine Status Panel shows it.
 - **Recipe:** Blue Steel, a Fishing Rod, two Tide Wool Bales, a Functional Machine Block and a Hopper.
 
 ### Power: the Static Generator and Copper Comb (mid-game)

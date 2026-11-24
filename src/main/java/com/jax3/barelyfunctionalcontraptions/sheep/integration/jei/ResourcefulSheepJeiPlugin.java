@@ -50,7 +50,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration registration) {
         var gui = registration.getJeiHelpers().getGuiHelper();
         registration.addRecipeCategories(new InfusionCategory(gui), new AltarCategory(gui), new SeparationCategory(gui), new ThermalCategory(gui));
-        registration.addRecipeCategories(new EchoCategory(gui), new StaticCategory(gui), new GrassSeederCategory(gui), new HerdCounterCategory(gui), new StatusPanelCategory(gui), new CrateCategory(gui), new CrateControllerCategory(gui));
+        registration.addRecipeCategories(new EchoCategory(gui), new StaticCategory(gui), new GrassSeederCategory(gui), new HerdCounterCategory(gui), new StatusPanelCategory(gui), new CrateCategory(gui), new CrateControllerCategory(gui), new FleeceTrawlerCategory(gui));
     }
 
     @Override
@@ -91,6 +91,13 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addRecipes(StatusPanelCategory.TYPE, List.of(new StatusPanelDisplay()));
         registration.addRecipes(CrateCategory.TYPE, List.of(new CrateDisplay()));
         registration.addRecipes(CrateControllerCategory.TYPE, List.of(new CrateControllerDisplay()));
+        List<FleeceTrawlerDisplay> trawler = new java.util.ArrayList<>();
+        trawler.add(new FleeceTrawlerDisplay(null));
+        resources.all().forEach(r -> trawler.add(new FleeceTrawlerDisplay(r)));
+        registration.addRecipes(FleeceTrawlerCategory.TYPE, trawler);
+        registration.addItemStackInfo(new ItemStack(ModItems.FLEECE_TRAWLER.get()),
+                Component.translatable("jei.barelyfunctionalcontraptions.info.fleece_trawler.1"),
+                Component.translatable("jei.barelyfunctionalcontraptions.info.fleece_trawler.2"));
         registration.addItemStackInfo(new ItemStack(ModItems.CRATE_CONTROLLER.get()),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.crate_controller.1"),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.crate_controller.2"));
@@ -215,6 +222,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addCraftingStation(StatusPanelCategory.TYPE, ModItems.STATUS_PANEL.get());
         registration.addCraftingStation(CrateCategory.TYPE, ModItems.CRATE.get());
         registration.addCraftingStation(CrateControllerCategory.TYPE, ModItems.CRATE_CONTROLLER.get());
+        registration.addCraftingStation(FleeceTrawlerCategory.TYPE, ModItems.FLEECE_TRAWLER.get());
         // The Powered Furnace smelts everything a Furnace does.
         registration.addCraftingStation(mezz.jei.api.constants.RecipeTypes.SMELTING, ModItems.POWERED_FURNACE.get());
     }

@@ -1696,9 +1696,9 @@ public final class DevScreenshotHarness {
      */
     private static final Object[][] EXTRA_SCENES = {
             // Rows 0 to 5 are full: up to (1, 5) by the moved scenes, (2, 5) by the Grass Seeder, (3, 5) by the Herd
-            // Counter and (4, 5) by the Machine Status Panel. Row 6, added by extendPlatform: (0, 6) the Wool-Lined Crates;
-            // (1, 6) to (4, 6) are free.
-            {"crates", 0, 6},
+            // Counter and (4, 5) by the Machine Status Panel. Row 6, added by extendPlatform: (0, 6) the Wool-Lined Crates
+            // (built by an earlier run, as "crates"), (1, 6) the Fleece Trawler; (2, 6) to (4, 6) are free.
+            {"fleece trawler", 1, 6},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -1808,6 +1808,64 @@ public final class DevScreenshotHarness {
         }
         ResourcefulSheep.LOGGER.info("EXTEND crates built round {}", g);
     }
+    /**
+     * The Fleece Trawler's cell (1, 6): a full pool (7 by 7, 4 deep, its surface level with the platform) sunk through
+     * the platform in a dark prismarine basin, fenced so its three Tide sheep stay in; the trawler on the basin's south
+     * rim facing it, with a stack of Iron Wool as its lure, and a hopper under it emptying the catch into a chest set in
+     * the floor. The Machine Status Panel (cell 4, 5) is linked to it.
+     */
+    private static void trawlerWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+        }
+        BlockPos g = origin.offset(0, 0, -3); // the trawler
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(10, 8, 10),
+                e -> e instanceof net.minecraft.world.entity.Display.TextDisplay || e instanceof net.minecraft.world.entity.item.ItemEntity || e instanceof Sheep)) e.discard();
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-8, 0, -10), g.offset(8, 6, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-8, -1, -10), g.offset(8, -1, 4))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+        // The basin: dark prismarine from a block under the platform up to its top, round a pool four deep.
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-4, -4, -8), g.offset(4, 0, 0))) {
+            boolean inside = p.getX() > g.getX() - 4 && p.getX() < g.getX() + 4 && p.getZ() > g.getZ() - 8 && p.getZ() < g.getZ() && p.getY() > g.getY() - 4;
+            level.setBlock(p, (inside ? Blocks.WATER : Blocks.DARK_PRISMARINE).defaultBlockState(), 2);
+        }
+        level.setBlock(g, ModBlocks.FLEECE_TRAWLER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.FleeceTrawlerBlock.FACING, Direction.NORTH), 3);
+        if (level.getBlockEntity(g) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity t) {
+            t.addLure(com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("iron"), 16));
+        }
+        // Under it, a hopper into a chest in the floor.
+        level.setBlock(g.below(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.SOUTH), 3);
+        level.setBlock(g.below().south(), Blocks.CHEST.defaultBlockState().setValue(net.minecraft.world.level.block.ChestBlock.FACING, Direction.SOUTH), 3);
+        // A fence round the rim (over the trawler too), so the sheep can't climb out.
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-4, 1, -8), g.offset(4, 1, 0))) {
+            if (p.getX() == g.getX() - 4 || p.getX() == g.getX() + 4 || p.getZ() == g.getZ() - 8 || p.getZ() == g.getZ()) {
+                level.setBlock(p, Blocks.SPRUCE_FENCE.defaultBlockState(), 2);
+            }
+        }
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-4, 1, -8), g.offset(4, 1, 0))) {
+            net.minecraft.world.level.block.state.BlockState fence = level.getBlockState(p);
+            if (fence.is(Blocks.SPRUCE_FENCE)) level.setBlock(p, net.minecraft.world.level.block.Block.updateFromNeighbourShapes(fence, level, p), 2);
+        }
+        for (int i = 0; i < 3; i++) {
+            Sheep sh = Vanilla.SHEEP.create(level, EntitySpawnReason.COMMAND);
+            sh.snapTo(g.getX() - 1.5 + i * 2, g.getY() - 1.5, g.getZ() - 3.5 - (i == 1 ? 2 : 0), 90, 0);
+            SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id("tide")), 9, 0));
+            sh.setPersistenceRequired();
+            level.addFreshEntity(sh);
+        }
+        label(server, g.above(4).relative(Direction.NORTH, 4), "Fleece Trawler and three Tide sheep", "aqua");
+        label(server, g.below().south().above(2), "Its catch", "gray");
+        BlockPos panelMaster = new BlockPos(128, 37, 152);
+        if (level.getBlockEntity(panelMaster) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel) {
+            var result = panel.links().contains(g) ? null : panel.toggleLink(level, g);
+            ResourcefulSheep.LOGGER.info("EXTEND trawler: linked to the status panel: {}", result);
+        }
+        ResourcefulSheep.LOGGER.info("EXTEND trawler built at {}", g);
+    }
+
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
     private static void poweredFurnaceScene(MinecraftServer server) {
         ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
@@ -3694,8 +3752,8 @@ public final class DevScreenshotHarness {
     /** Photographs each scene {@code extend_world} added (open a copy of the world: it moves the player). */
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
         // The whole square platform from above its south edge and from straight overhead, then the latest scene.
-        String[] tps = {"tp @a 73.5 95 218.5 180 40", "tp @a 73.5 185 108 180 90", "tp @a 129.5 38 162.5 180 12", "tp @a 17.5 38.5 187.5 180 18",
-                "tp @a 17.5 38.2 181.5 180 22"};
+        String[] tps = {"tp @a 73.5 95 218.5 180 40", "tp @a 73.5 185 108 180 90", "tp @a 129.5 38 162.5 180 12", "tp @a 45.5 40 184.5 180 32",
+                "tp @a 49.5 36.5 179.5 145 22"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -3711,6 +3769,14 @@ public final class DevScreenshotHarness {
         if (tick == report) {
             server.execute(() -> {
                 ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                if (level.getBlockEntity(new BlockPos(45, 35, 177)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity t) {
+                    StringBuilder chest = new StringBuilder();
+                    if (level.getBlockEntity(new BlockPos(45, 34, 178)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity c) {
+                        for (int s = 0; s < c.getContainerSize(); s++) if (!c.getItem(s).isEmpty()) chest.append(' ').append(c.getItem(s));
+                    }
+                    ResourcefulSheep.LOGGER.warn("TOUR trawler {}: pool {}, sheep {}, {}%, hauls {}, lure {}; chest{}", t.status(), t.pool(), t.sheepCount(),
+                            t.progressPercent(), t.hauls(), t.getItem(0), chest);
+                }
                 if (level.getBlockEntity(new BlockPos(128, 37, 152)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel) {
                     if (level.getBlockEntity(new BlockPos(17, 37, 173)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CrateControllerBlockEntity cc) {
                         ResourcefulSheep.LOGGER.warn("TOUR crate controller: {} crates, {} / {} ({}%), {} empty, report {}", cc.crateCount(), cc.stored(), cc.capacity(),
@@ -4019,6 +4085,7 @@ public final class DevScreenshotHarness {
                         case "herd counter" -> herdWorldScene(server);
                         case "status panel" -> panelWorldScene(server);
                         case "crates" -> crateWorldScene(server);
+                        case "fleece trawler" -> trawlerWorldScene(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
@@ -4962,7 +5029,27 @@ public final class DevScreenshotHarness {
                                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.REEL_EWE_IN));
                 }
             });
-            case 240 -> mc.stop();
+            case 232 -> {
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %d %.2f 180 40", dock.getX() + 0.5, dock.getY(), dock.getZ() + 2.2));
+            }
+            case 236 -> { setHudHidden(mc, false); McClient.clearChat(mc); }
+            case 256 -> shot(mc, "115_fleece_trawler_jade");
+            case 258 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                if (player.level().getBlockEntity(dock) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity t) {
+                    player.openMenu(t, dock);
+                }
+            });
+            case 266 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 274 -> shot(mc, "115_fleece_trawler_gui");
+            case 276 -> {
+                McClient.setScreen(mc, null);
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showFleeceTrawler();
+            }
+            case 284 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 294 -> shot(mc, "115_fleece_trawler_jei");
+            case 300 -> mc.stop();
             default -> {}
         }
     }

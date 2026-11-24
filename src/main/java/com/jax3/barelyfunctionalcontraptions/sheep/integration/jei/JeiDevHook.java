@@ -127,6 +127,14 @@ public final class JeiDevHook {
         return true;
     }
 
+    /** Opens the Fleece Trawler pages. */
+    public static boolean showFleeceTrawler() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        rt.getRecipesGui().showTypes(java.util.List.of(FleeceTrawlerCategory.TYPE));
+        return true;
+    }
+
     /** Opens the Herd Counter page. */
     public static boolean showHerdCounter() {
         IJeiRuntime rt = runtime;
