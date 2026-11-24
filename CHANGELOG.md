@@ -1,9 +1,9 @@
 # Changelog
 
-## 1.5.7: storage, the Fleece Trawler, the Static Generator and the Machine Status Panel (20–24 November 2026)
+## 1.5.7: storage, the Fleece Trawler, upgrade cards, the Static Generator and the Machine Status Panel (20–24 November 2026)
 
 New contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage (crates and a controller that links them into one store), a fishing
-machine driven by a new sea-going sheep, a mid-game generator that runs on static, and a wall screen that keeps an eye on all your machines. They come after 1.5.5,
+machine driven by a new sea-going sheep, upgrade cards for the processing machines, a mid-game generator that runs on static, and a wall screen that keeps an eye on all your machines. They come after 1.5.5,
 in 1.5.7. Numbers are the defaults; almost all of them can be changed in the synced config.
 
 ### Storage: the Wool-Lined Crate
@@ -135,6 +135,41 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
 - **Recipe:** four Glass Panes, two Redstone, a Functional Machine Block, a Comparator and an Iron Ingot.
 - New config section `[status_panel]`, and a chapter in the Contraptions Manual (Utility).
 
+### Upgrade cards
+Cards that change how a machine works: faster, cheaper, holding more power, reaching further, getting more out of each
+wool, or just quieter.
+- **Two upgrade slots** in the Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears and
+  Snow Sheep Chiller, in a small panel on the right of their window. Drag a card in or shift-click it: one card a
+  slot, and only cards that machine takes.
+- **Upgrade Base:** Blue Steel, Redstone and any wool make two blank cards. Each card is a base plus a few items:
+
+| Card | Crafted with | What it does | Goes in |
+|---|---|---|---|
+| **Speed** | Block of Redstone, Sugar, Red Wool | Jobs take 60% of the time, for 150% of the power | Separator, packer, furnace, altar, shears |
+| **Efficiency** | Block of Copper, Lime Wool | Jobs cost 75% of the power, taking 115% of the time | Separator, packer, furnace, altar, shears |
+| **Capacity** | Wool Bale, Light Blue Wool | Four times the energy buffer and the power taken in a tick | Separator, packer, furnace, altar, shears |
+| **Range** | Ender Pearl, Purple Wool | One more block of working area on every side: shears 3x3 to 5x5, altar and chiller 7x7 | Shears, altar, chiller |
+| **Yield** | Diamond, Yellow Wool | One more of each separation's resource and string (Iron Wool: 3–5 Raw Iron, 3 String) | Separator |
+| **Muffler** | Woollen Helmet, Black Wool | Silences the machine's own sounds; it works just the same | Separator, packer, furnace, altar, chiller |
+
+- **Stacking:** a second card of the same kind does half as much (two Speed cards: 48% of the time for 187.5% of the
+  power). Different kinds multiply: Speed and Efficiency together make jobs 69% as long for 112.5% of the power.
+- **Barely functional:** Speed costs power and Efficiency costs time. A Range card's area outline wobbles between
+  colours, and a chiller with one calls its sheep back only every other second, so they wander a bit more. Yield has no
+  catch: the separator waits for room for the extra, so it never jams.
+- **Kept:** cards stay with a machine that's broken or picked up with the wrench (its item lists them), and come back
+  when it's placed. The separator and shears, which keep their power when picked up, keep all of it with a Capacity
+  card. Hoppers and pipes never touch the upgrade slots.
+- **JEI:** an information page for each card and for each machine that takes them, and its item list keeps clear of
+  the panel. **Jade:** a machine's cards and what they add up to (*Time 60%, Power 150%*).
+- **Advancements:** *Some Assembly Required* for putting a card in a machine; the hidden *Maximum Overdrive* for two
+  Speed cards in one.
+- **Data packs:** the block tags `#barelyfunctionalcontraptions:accepts_upgrade/<card>` decide which machines take which
+  cards.
+- New config section `[upgrades]`: `speedTime`, `speedEnergy`, `efficiencyTime`, `efficiencyEnergy`,
+  `capacityMultiplier`, `rangeBlocks`, `yieldBonus`, `secondCardStrength`; an *Upgrade Cards* chapter in the
+  Contraptions Manual (Utility).
+
 ### Blue Steel
 - A new item, **Blue Steel**: an Iron Ingot and any wool, crafted together. Nine make a **Block of Blue Steel**
   (and it gives the nine back).
@@ -154,30 +189,6 @@ A thin wall screen that shows how your machines are doing, all in one place. It 
   and Wither Skeleton sheep (anything with extra parts, a skull, a glow, flames or sculk). Hay and Snow keep their
   hand-drawn fleeces; lambs keep a plain one in the resource's colour.
 - Client config `blockTexturedWool` (on) brings back the old plain fleece when off.
-
-### Upgrade cards
-- **Two upgrade slots** in the Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears and
-  Snow Sheep Chiller, in a small panel on the right of their window.
-- **Speed Upgrade:** jobs take 60% of the time and cost 150% of the power. **Efficiency Upgrade:** 75% of the power,
-  115% of the time. A second card of the same kind does half as much; a Speed and an Efficiency card multiply.
-- Crafted from an **Upgrade Base** (Blue Steel, Redstone and wool, two at a time): with a Block of Redstone, Sugar and
-  Red Wool for Speed, or a Block of Copper and Lime Wool for Efficiency.
-- Cards stay with a machine that's broken or picked up, and only go in machines that take them (block tags, for data
-  packs). Hoppers and pipes leave them alone. JEI's item list keeps clear of the panel.
-- **Capacity Upgrade** (Wool Bale and Light Blue Wool): four times the energy buffer and power input, in the five
-  powered machines.
-- **Range Upgrade** (Ender Pearl and Purple Wool): one more block of working area on every side, in the Automatic
-  Shears (3x3 to 5x5), Infusion Altar (7x7) and Snow Sheep Chiller (7x7), which gets upgrade slots for it. Its outline
-  wobbles between colours, and a chiller with one calls its sheep back only every other second.
-- **Yield Upgrade** (Diamond and Yellow Wool): each separation gives one more of its resource and of its string. The
-  separator waits until there's room for the extra, so it never jams. Only in the Mechanical Separator.
-- **Muffler Upgrade** (Woollen Helmet and Black Wool): silences a machine's own sounds; it works just the same. In
-  the separator, packer, furnace, altar and chiller.
-- **JEI** information pages for each card and for each machine that takes them; **Jade** lists a machine's cards and
-  what they add up to (*Time 60%, Power 150%*).
-- **Advancements:** *Some Assembly Required* (put a card in a machine) and the hidden *Maximum Overdrive* (two Speed
-  cards in one). A new *Upgrade Cards* chapter in the Contraptions Manual (Utility).
-- Config `[upgrades]` for each card's numbers and the second card's strength.
 
 ### Processing machines about half as fast again
 Each job still costs the same total FE; it just finishes sooner.
