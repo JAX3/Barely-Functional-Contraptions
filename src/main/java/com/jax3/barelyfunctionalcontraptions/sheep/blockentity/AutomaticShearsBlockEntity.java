@@ -9,12 +9,10 @@ import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModTags;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -22,7 +20,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -50,9 +47,8 @@ import org.jspecify.annotations.Nullable;
  *     Energy and the redstone mode are kept when the block is broken.</li>
  * </ul>
  */
-public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, AreaDisplay {
-    /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
-    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
+public class AutomaticShearsBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
+        implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, AreaDisplay, com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, net.minecraft.world.MenuProvider {
     public static final int AREA_COLOR = 0xFF7FD3FF;
     public static final int SIZE = 9;
     /** Number of int fields synced to the menu (split into 16-bit halves where needed). */
@@ -60,9 +56,13 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     /** Ticks the status stays on "Shearing" after a sweep that sheared something. */
     private static final int SHEARING_DISPLAY_TICKS = 12;
 
-    private NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-    private final MachineEnergy energy = new MachineEnergy(
-            () -> ModConfigs.getInt(ModConfigs.SERVER.automaticShearsEnergyCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.automaticShearsMaxEnergyInput), this::setChanged);
+    // Its modules: power in on every side but the front, two upgrade slots, nine output-only slots, and its name.
+    private final MachineEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new MachineEnergy(
+            () -> ModConfigs.getInt(ModConfigs.SERVER.automaticShearsEnergyCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.automaticShearsMaxEnergyInput), this::setChanged))
+            .onSides((state, side) -> side != state.getValue(AutomaticShearsBlock.FACING))).handler();
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = install(new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this));
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(outputSlots());
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.NameModule name = install(new com.jax3.barelyfunctionalcontraptions.sheep.machine.NameModule(Component.translatable("block.barelyfunctionalcontraptions.automatic_shears")));
     private int cooldown;
     private int interval = 20;
     private int shearingDisplay;
@@ -105,6 +105,13 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
 
     public AutomaticShearsBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.AUTOMATIC_SHEARS.get(), pos, state);
+    }
+
+    /** Output only: nothing can be put in by players, hoppers or pipes, and everything can be taken out. */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory outputSlots() {
+        var slots = com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder().savedAsList();
+        for (int i = 0; i < SIZE; i++) slots.slot(null, stack -> false, true);
+        return slots.build();
     }
 
     // ------------------------------------------------------------------ ticking
@@ -202,7 +209,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
 
     /** True while at least one more item fits somewhere. */
     public boolean hasSpace() {
-        for (ItemStack stack : items) {
+        for (ItemStack stack : inventory.stacks()) {
             if (stack.isEmpty() || stack.getCount() < getMaxStackSize(stack)) return true;
         }
         return false;
@@ -211,15 +218,15 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     /** Puts {@code stack} into the inventory, merging with matching stacks first. Returns what did not fit. */
     public ItemStack insert(ItemStack stack) {
         for (int pass = 0; pass < 2 && !stack.isEmpty(); pass++) {
-            for (int i = 0; i < items.size() && !stack.isEmpty(); i++) {
-                ItemStack target = items.get(i);
+            for (int i = 0; i < SIZE && !stack.isEmpty(); i++) {
+                ItemStack target = inventory.get(i);
                 boolean merge = pass == 0 && !target.isEmpty() && ItemStack.isSameItemSameComponents(stack, target);
                 boolean fill = pass == 1 && target.isEmpty();
                 if (!merge && !fill) continue;
                 int move = Math.min(stack.getCount(), getMaxStackSize(stack) - target.getCount());
                 if (move <= 0) continue;
                 if (fill) {
-                    items.set(i, stack.split(move));
+                    inventory.set(i, stack.split(move));
                 } else {
                     target.grow(move);
                     stack.shrink(move);
@@ -238,8 +245,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
 
     /** FE input on every face except the front. */
     public @Nullable EnergyHandler getEnergyHandler(@Nullable Direction side) {
-        if (side != null && side == getBlockState().getValue(AutomaticShearsBlock.FACING)) return null;
-        return energy;
+        return energyFor(side);
     }
 
     /** Ticks between its sweeps now, with its upgrade cards. */
@@ -289,50 +295,26 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
         return AREA_COLOR;
     }
 
+    /** Clients only need the area setting (and its cards, from the upgrade module). */
     @Override
-    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
-        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    /** Clients only need the area setting. */
-    @Override
-    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
-        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+    protected void writeClientData(net.minecraft.nbt.CompoundTag tag) {
         tag.putBoolean("show_area", showArea);
-        upgrades.writeSync(tag);
-        return tag;
     }
 
-    // ------------------------------------------------------------------ container
+    // ------------------------------------------------------------------ its slots and window
 
     @Override
-    public int getContainerSize() {
-        return SIZE;
-    }
-
-    /** Output only: nothing can be put in by players, hoppers or pipes. */
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        return false;
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
     }
 
     @Override
-    protected NonNullList<ItemStack> getItems() {
-        return items;
+    public Component getDisplayName() {
+        return name.name();
     }
 
     @Override
-    protected void setItems(NonNullList<ItemStack> items) {
-        this.items = items;
-    }
-
-    @Override
-    protected Component getDefaultName() {
-        return Component.translatable("block.barelyfunctionalcontraptions.automatic_shears");
-    }
-
-    @Override
-    protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+    public AbstractContainerMenu createMenu(int containerId, Inventory inventory, net.minecraft.world.entity.player.Player player) {
         return new AutomaticShearsMenu(containerId, inventory, this, data);
     }
 
@@ -340,12 +322,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        upgrades.load(input);
-        upgrades.readSync(input);
-        items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(input, items);
-        input.child("energy").ifPresent(energy::deserialize);
+        super.loadAdditional(input); // its modules: energy, upgrades, items, name
         cooldown = input.getIntOr("cooldown", 0);
         redstoneMode = RedstoneMode.byId(input.getIntOr("redstone_mode", redstoneMode.ordinal()));
         showArea = input.getBooleanOr("show_area", false);
@@ -353,10 +330,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        upgrades.save(output);
-        ContainerHelper.saveAllItems(output, items);
-        energy.serialize(output.child("energy"));
+        super.saveAdditional(output); // its modules
         output.putInt("cooldown", cooldown);
         output.putInt("redstone_mode", redstoneMode.ordinal());
         output.putBoolean("show_area", showArea);
@@ -365,8 +339,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     /** Broken blocks keep their stored energy and redstone mode (same component as the separator). */
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
-        super.collectImplicitComponents(components);
-        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
+        super.collectImplicitComponents(components); // its cards and name
         if (energy.getEnergy() > 0 || redstoneMode != RedstoneMode.IGNORED) {
             components.set(ModDataComponents.MACHINE_CONTENTS.get(), new MachineContents(energy.getEnergy(), redstoneMode));
         }
@@ -374,9 +347,7 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
 
     @Override
     protected void applyImplicitComponents(DataComponentGetter components) {
-        super.applyImplicitComponents(components);
-        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
-        if (cards != null) upgrades.fromComponent(cards);
+        super.applyImplicitComponents(components); // its cards and name first
         energy.refreshLimits(0, upgrades.effects().capacity()); // so the energy it kept fits a Capacity card's buffer
         MachineContents contents = components.get(ModDataComponents.MACHINE_CONTENTS.get());
         if (contents != null) {
@@ -389,7 +360,6 @@ public class AutomaticShearsBlockEntity extends BaseContainerBlockEntity impleme
     @SuppressWarnings("deprecation")
     public void removeComponentsFromTag(ValueOutput output) {
         super.removeComponentsFromTag(output);
-        output.discard("upgrades");
         output.discard("energy");
         output.discard("redstone_mode");
     }

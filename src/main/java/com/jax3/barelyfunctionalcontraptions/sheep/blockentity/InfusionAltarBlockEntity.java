@@ -13,17 +13,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,7 +28,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -57,19 +50,20 @@ import org.jspecify.annotations.Nullable;
  *     <li>Hoppers and pipes can put feeding items and catalysts in from any side, but can't take anything out.</li>
  * </ul>
  */
-public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
-    /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
-    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
+public class InfusionAltarBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
+        implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, MenuProvider, AreaDisplay {
     /** The area outline's colour: the altar's amethyst purple. */
     public static final int AREA_COLOR = 0xFFB574FF;
     public static final int FEED = 0, SIZE = 1 + AltarRitual.MAX_CATALYSTS;
     public static final int REACH = 2;
     public static final int DATA_COUNT = 11;
-    private static final int[] SLOTS = {0, 1, 2, 3, 4};
 
-    private final NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-    private final MachineEnergy energy = new MachineEnergy(
-            () -> ModConfigs.getInt(ModConfigs.SERVER.altarCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.altarMaxInput), this::setChanged);
+    // Its modules: power in on every side, two upgrade slots, and the feeding slot in the centre with four catalyst
+    // slots round it (in only: hoppers and pipes never take from it; saved as an item list).
+    private final MachineEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new MachineEnergy(
+            () -> ModConfigs.getInt(ModConfigs.SERVER.altarCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.altarMaxInput), this::setChanged))).handler();
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = install(new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this));
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(altarSlots(this));
     private int progress;
     private int maxProgress;
     private int energyPerTick;
@@ -127,7 +121,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
         var fx = upgrades.effects();
         maxProgress = fx.ticks(ModConfigs.getInt(ModConfigs.SERVER.altarTicks));
         sheepId = -1;
-        ItemStack feed = items.get(FEED);
+        ItemStack feed = inventory.get(FEED);
         Optional<SheepResource> resource = resourceFor(level, feed);
         if (feed.isEmpty()) {
             set(AltarStatus.IDLE, 0);
@@ -228,7 +222,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
      * slot is used for one catalyst at most.
      */
     public int @Nullable [] catalystSlots(AltarRitual ritual) {
-        return matchCatalysts(ritual, items);
+        return matchCatalysts(ritual, inventory.stacks());
     }
 
     public static int @Nullable [] matchCatalysts(AltarRitual ritual, List<ItemStack> slots) {
@@ -297,8 +291,8 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
     private void finish(ServerLevel level, BlockPos pos, LivingEntity sheep, SheepResource resource) {
         int[] slots = catalystSlots(resource.altar());
         if (slots == null) return;
-        for (int c = 0; c < slots.length; c++) items.get(slots[c]).shrink(resource.altar().catalysts().get(c).count());
-        items.get(FEED).shrink(resource.effectiveFeedingAmount());
+        for (int c = 0; c < slots.length; c++) inventory.get(slots[c]).shrink(resource.altar().catalysts().get(c).count());
+        inventory.get(FEED).shrink(resource.effectiveFeedingAmount());
         SheepInfusionEvents.infuseFromAltar(level, sheep, resource);
         // Whoever is nearby gets the infusion advancements, as if they had fed it.
         Player player = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 16, false);
@@ -345,30 +339,21 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
         return new InfusionAltarMenu(containerId, inventory, this, data);
     }
 
-    // ------------------------------------------------------------------ container
+    // ------------------------------------------------------------------ its slots (the inventory module)
 
-    @Override
-    public int getContainerSize() {
-        return SIZE;
+    private static com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory altarSlots(InfusionAltarBlockEntity altar) {
+        var builder = com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder().savedAsList()
+                // The centre takes feeding items; the sides take catalysts of any resource.
+                .slot(null, stack -> altar.level != null && resourceFor(altar.level, stack).isPresent(), false);
+        for (int i = 1; i < SIZE; i++) builder.slot(null, stack -> altar.level != null && isCatalyst(altar.level, stack), false);
+        return builder.onReplaced((slot, old, now) -> {
+            if (slot == FEED && !ItemStack.isSameItemSameComponents(old, now)) altar.progress = 0; // a different feed starts over
+        }).build();
     }
 
     @Override
-    public ItemStack getItem(int slot) {
-        return slot >= 0 && slot < SIZE ? items.get(slot) : ItemStack.EMPTY;
-    }
-
-    @Override
-    public void putItem(int slot, ItemStack stack) {
-        if (slot < 0 || slot >= SIZE) return;
-        if (slot == FEED && !ItemStack.isSameItemSameComponents(items.get(FEED), stack)) progress = 0;
-        items.set(slot, stack);
-    }
-
-    /** The centre takes feeding items; the sides take catalysts of any resource. */
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        if (level == null) return false;
-        return slot == FEED ? resourceFor(level, stack).isPresent() : slot < SIZE && isCatalyst(level, stack);
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
     }
 
     public static boolean isCatalyst(Level level, ItemStack stack) {
@@ -379,39 +364,11 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
         return false;
     }
 
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return SLOTS;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return canPlaceItem(slot, stack);
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return false;
-    }
-
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
-        if (level != null) Containers.dropContents(level, pos, this);
-    }
-
-    // ------------------------------------------------------------------ energy
-
     // ------------------------------------------------------------------ persistence
 
     @Override
     protected void loadAdditional(ValueInput in) {
-        super.loadAdditional(in);
-        upgrades.load(in);
-        upgrades.readSync(in);
-        items.clear();
-        ContainerHelper.loadAllItems(in, items);
-        in.child("energy").ifPresent(energy::deserialize);
+        super.loadAdditional(in); // its modules: energy, upgrades, slots
         progress = in.getIntOr("progress", 0);
         ready = in.getBooleanOr("ready", false);
         showArea = in.getBooleanOr("show_area", false);
@@ -419,10 +376,7 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
 
     @Override
     protected void saveAdditional(ValueOutput out) {
-        super.saveAdditional(out);
-        upgrades.save(out);
-        ContainerHelper.saveAllItems(out, items);
-        energy.serialize(out.child("energy"));
+        super.saveAdditional(out); // its modules
         out.putInt("progress", progress);
         out.putBoolean("ready", ready);
         out.putBoolean("show_area", showArea);
@@ -430,20 +384,13 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
 
     // ------------------------------------------------------------------ client sync (the area outline)
 
+    /** Clients only need the area setting (and what its cards do there, from the frame). */
     @Override
-    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
-        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    /** Clients only need the area setting. */
-    @Override
-    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
-        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+    protected void writeClientData(net.minecraft.nbt.CompoundTag tag) {
         tag.putBoolean("show_area", showArea);
-        upgrades.writeSync(tag);
-        return tag;
     }
 
+    /** Only the area setting and the cards' effects are read from an update: its slots and power stay as the menu sent them. */
     @Override
     public void onDataPacket(net.minecraft.network.Connection net, ValueInput input) {
         showArea = input.getBooleanOr("show_area", false);
@@ -459,24 +406,5 @@ public class InfusionAltarBlockEntity extends BlockEntity implements com.jax3.ba
     @Override
     public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
         return upgrades;
-    }
-
-    @Override
-    protected void collectImplicitComponents(net.minecraft.core.component.DataComponentMap.Builder components) {
-        super.collectImplicitComponents(components);
-        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
-    }
-
-    @Override
-    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter components) {
-        super.applyImplicitComponents(components);
-        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
-        if (cards != null) upgrades.fromComponent(cards);
-    }
-
-    @Override
-    public void removeComponentsFromTag(ValueOutput output) {
-        super.removeComponentsFromTag(output);
-        output.discard("upgrades");
     }
 }

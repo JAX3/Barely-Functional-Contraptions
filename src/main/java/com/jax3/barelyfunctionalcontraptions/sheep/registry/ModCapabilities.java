@@ -9,17 +9,10 @@ public final class ModCapabilities {
     public static void register(RegisterCapabilitiesEvent event) {
         // Machines built on the machine frame: each offers the energy, fluid and items of the modules it has switched on.
         com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame.registerCapabilities(event,
-                ModBlockEntities.POWERED_FURNACE.get(), ModBlockEntities.WOOL_PACKER.get(), ModBlockEntities.CHILLER.get());
-        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.MECHANICAL_SEPARATOR.get(), (be, side) -> be.getItemHandler(side));
-        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.MECHANICAL_SEPARATOR.get(), (be, side) -> be.getEnergyHandler(side));
-        // Automatic Shears: its vanilla Container, for pipes from other mods (vanilla hoppers use the Container directly).
-        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.AUTOMATIC_SHEARS.get(),
-                (be, side) -> net.neoforged.neoforge.transfer.item.VanillaContainerWrapper.of(be));
-        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.AUTOMATIC_SHEARS.get(), (be, side) -> be.getEnergyHandler(side));
-        // Fluid Reservoir: water out on every side; empty buckets in / water buckets out for pipes.
-        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.FLUID_RESERVOIR.get(), (be, side) -> be.getFluidHandler(side));
-        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.FLUID_RESERVOIR.get(),
-                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
+                ModBlockEntities.POWERED_FURNACE.get(), ModBlockEntities.WOOL_PACKER.get(), ModBlockEntities.CHILLER.get(),
+                ModBlockEntities.INFUSION_ALTAR.get(), ModBlockEntities.GRASS_SEEDER.get(),
+                ModBlockEntities.FLEECE_TRAWLER.get(), ModBlockEntities.AUTOMATIC_SHEARS.get(), ModBlockEntities.FLUID_RESERVOIR.get(),
+                ModBlockEntities.MECHANICAL_SEPARATOR.get());
         // Hume Energy Cube: the whole connected group, in and out, on every face.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.HUME_ENERGY_CUBE.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.CREATIVE_GENERATOR.get(), (be, side) -> be.getEnergyHandler());
@@ -47,18 +40,9 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.WOOL_BURNER.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.WOOL_BURNER.get(),
                 (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
-        // Infusion Altar: its buffer (in only), and feeding items and catalysts in (never out) for hoppers and pipes.
-        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.INFUSION_ALTAR.get(), (be, side) -> be.getEnergyHandler());
-        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.INFUSION_ALTAR.get(),
-                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Blaze Sheep Furnace: its buffer on every face, and its boost slot (in only) for hoppers and pipes.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.BLAZE_FURNACE.get(), (be, side) -> be.getEnergyHandler());
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.BLAZE_FURNACE.get(),
-                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
-        // Grass Seeder: power and water in, and Bone Meal in for hoppers and pipes, on every face.
-        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.GRASS_SEEDER.get(), (be, side) -> be.getEnergyHandler());
-        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.GRASS_SEEDER.get(), (be, side) -> be.getTank());
-        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.GRASS_SEEDER.get(),
                 (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Thermal Reaction Chamber: power out and water in on every face, and its boost slots (in only) for hoppers and pipes.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.THERMAL_REACTION_CHAMBER.get(), (be, side) -> be.getEnergyHandler());
@@ -69,9 +53,6 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntities.ENERGY_METER.get(), (be, side) -> be.getEnergyHandler(side));
         // Wool-Lined Crate: its one slot, in and out, on every face.
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.CRATE.get(), (be, side) -> be.getItemHandler());
-        // Fleece Trawler: lures in, its catch out, on every face.
-        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.FLEECE_TRAWLER.get(),
-                (be, side) -> new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(be, side));
         // Crate Controller: every crate in its store, in and out, on every face.
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.CRATE_CONTROLLER.get(), (be, side) -> be.getItemHandler());
         // Fluid Tank: the whole connected group, in and out, on every face.

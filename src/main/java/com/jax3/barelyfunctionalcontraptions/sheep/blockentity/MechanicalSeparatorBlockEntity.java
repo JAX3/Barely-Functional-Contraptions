@@ -17,7 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -25,7 +24,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -43,15 +41,17 @@ import org.jspecify.annotations.Nullable;
  * <p>Progress pauses (or resets, per config) without power, and the machine never starts or finishes an operation
  * unless every output is guaranteed to fit, so items are never voided or duplicated.</p>
  */
-public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MenuProvider {
-    /** Its two upgrade cards (see {@link com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades}). */
-    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this);
+public class MechanicalSeparatorBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame implements com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable, MenuProvider {
     /** Number of int fields synced to the menu (split into 16-bit halves where needed). */
     public static final int DATA_COUNT = 13;
 
-    private final SeparatorInventory inventory = new SeparatorInventory(this::isProcessable, this::onContentsChanged);
-    private final MachineEnergy energy = new MachineEnergy(
-            () -> ModConfigs.getInt(ModConfigs.SERVER.energyCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.maxEnergyInput), this::setChanged);
+    // Its modules: two upgrade slots, its four item slots (with sides from the config) and power in on the configured sides.
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = install(new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this));
+    private final SeparatorInventory inventory = install(new SeparatorInventory(this::isProcessable, this::onContentsChanged));
+    private final MachineEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new MachineEnergy(
+            () -> ModConfigs.getInt(ModConfigs.SERVER.energyCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.maxEnergyInput), this::setChanged))
+            .onSides((state, side) -> ModConfigs.SERVER.sides(ModConfigs.SERVER.energyInputSides)
+                    .contains(RelativeSide.of(state.getValue(MechanicalSeparatorBlock.FACING), side)))).handler();
     private final SidedItemHandler[] sidedHandlers = {
             new SidedItemHandler(inventory, false, false),
             new SidedItemHandler(inventory, true, false),
@@ -233,7 +233,8 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
     // ------------------------------------------------------------------ capabilities
 
     /** Item handler for a side, honouring the configured input/output sides. {@code null} side = full access. */
-    public @Nullable ResourceHandler<ItemResource> getItemHandler(@Nullable Direction side) {
+    @Override
+    public @Nullable ResourceHandler<ItemResource> itemsFor(@Nullable Direction side) {
         if (side == null) return sidedHandlers[3];
         RelativeSide rel = RelativeSide.of(getBlockState().getValue(MechanicalSeparatorBlock.FACING), side);
         Set<RelativeSide> inputs = ModConfigs.SERVER.sides(ModConfigs.SERVER.itemInputSides);
@@ -245,10 +246,12 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
         return sidedHandlers[(in ? 1 : 0) + (out ? 2 : 0)];
     }
 
+    public @Nullable ResourceHandler<ItemResource> getItemHandler(@Nullable Direction side) {
+        return itemsFor(side);
+    }
+
     public @Nullable EnergyHandler getEnergyHandler(@Nullable Direction side) {
-        if (side == null) return energy;
-        RelativeSide rel = RelativeSide.of(getBlockState().getValue(MechanicalSeparatorBlock.FACING), side);
-        return ModConfigs.SERVER.sides(ModConfigs.SERVER.energyInputSides).contains(rel) ? energy : null;
+        return energyFor(side);
     }
 
     // ------------------------------------------------------------------ accessors
@@ -304,38 +307,18 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
         return Math.max(1, Math.round(15.0F * input.getCount() / input.getMaxStackSize()));
     }
 
-    public void dropContents(Level level, BlockPos pos) {
-        for (int i = 0; i < SeparatorInventory.SIZE; i++) {
-            ItemStack stack = inventory.getStack(i);
-            if (!stack.isEmpty()) Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
-            inventory.setStack(i, ItemStack.EMPTY);
-        }
-    }
-
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
-        if (level != null) dropContents(level, pos);
-    }
-
     // ------------------------------------------------------------------ persistence
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        upgrades.save(output);
-        inventory.serialize(output.child("inventory"));
-        energy.serialize(output.child("energy"));
+        super.saveAdditional(output); // its modules: upgrades, inventory, energy
         output.putInt("progress", progress);
         output.putInt("redstone_mode", redstoneMode.ordinal());
     }
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        upgrades.load(input);
-        input.child("inventory").ifPresent(inventory::deserialize);
-        input.child("energy").ifPresent(energy::deserialize);
+        super.loadAdditional(input); // its modules
         progress = input.getIntOr("progress", 0);
         redstoneMode = RedstoneMode.byId(input.getIntOr("redstone_mode", redstoneMode.ordinal()));
         lastInput = inventory.getStack(SeparatorInventory.INPUT).copyWithCount(1);
@@ -343,8 +326,7 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
 
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
-        super.collectImplicitComponents(components);
-        if (!upgrades.isEmpty()) components.set(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get(), upgrades.toComponent());
+        super.collectImplicitComponents(components); // its cards
         if (energy.getEnergy() > 0 || redstoneMode != RedstoneMode.IGNORED) {
             components.set(ModDataComponents.MACHINE_CONTENTS.get(), new MachineContents(energy.getEnergy(), redstoneMode));
         }
@@ -352,9 +334,7 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
 
     @Override
     protected void applyImplicitComponents(DataComponentGetter components) {
-        super.applyImplicitComponents(components);
-        var cards = components.get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
-        if (cards != null) upgrades.fromComponent(cards);
+        super.applyImplicitComponents(components); // its cards first
         energy.refreshLimits(0, upgrades.effects().capacity()); // so the energy it kept fits a Capacity card's buffer
         MachineContents contents = components.get(ModDataComponents.MACHINE_CONTENTS.get());
         if (contents != null) {
@@ -366,7 +346,6 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
     @Override
     public void removeComponentsFromTag(ValueOutput output) {
         super.removeComponentsFromTag(output);
-        output.discard("upgrades");
         output.discard("energy");
         output.discard("redstone_mode");
     }
@@ -390,18 +369,7 @@ public class MechanicalSeparatorBlockEntity extends BlockEntity implements com.j
 
     // ------------------------------------------------------------------ client sync (its upgrade cards: Muffler)
 
-    @Override
-    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
-        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    /** Clients only need what its upgrade cards do to it there (a Muffler silences it). */
-    @Override
-    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
-        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-        upgrades.writeSync(tag);
-        return tag;
-    }
+    // Its update tag is the frame's: just what its upgrade cards do to it there (a Muffler silences it).
 
     @Override
     public void onDataPacket(net.minecraft.network.Connection net, ValueInput input) {

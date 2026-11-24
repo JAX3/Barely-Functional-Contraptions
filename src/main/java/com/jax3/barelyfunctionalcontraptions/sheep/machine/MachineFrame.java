@@ -41,7 +41,7 @@ import org.jspecify.annotations.Nullable;
 public abstract class MachineFrame extends BlockEntity {
     private final List<MachineModule> modules = new ArrayList<>();
     private @Nullable EnergyModule<?> energyModule;
-    private @Nullable FluidModule fluidModule;
+    private @Nullable FluidModule<?> fluidModule;
     private @Nullable MachineInventory inventoryModule;
 
     protected MachineFrame(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -52,7 +52,7 @@ public abstract class MachineFrame extends BlockEntity {
     protected final <M extends MachineModule> M install(M module) {
         modules.add(module);
         if (module instanceof EnergyModule<?> energy) energyModule = energy;
-        if (module instanceof FluidModule fluid) fluidModule = fluid;
+        if (module instanceof FluidModule<?> fluid) fluidModule = fluid;
         if (module instanceof MachineInventory inventory) inventoryModule = inventory;
         return module;
     }

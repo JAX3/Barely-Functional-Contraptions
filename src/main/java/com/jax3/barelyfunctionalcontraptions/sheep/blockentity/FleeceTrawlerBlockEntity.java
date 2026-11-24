@@ -14,12 +14,8 @@ import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -27,15 +23,12 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -45,7 +38,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
 
 /**
  * The Fleece Trawler: fishes the pool of water in front of it, its winch driven by Tide sheep swimming in that pool
@@ -57,7 +49,8 @@ import org.jspecify.annotations.Nullable;
  * <p>Its pool: the water source blocks in the 7x7 in front of it, from its own level to four blocks down. Its slots:
  * the lure (0) and nine for the catch (1 to 9); hoppers and pipes put lures in and take the catch out.</p>
  */
-public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
+public class FleeceTrawlerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
+        implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider {
     public static final int LURE = 0, OUTPUTS = 9, SIZE = 1 + OUTPUTS;
     /** Its pool's reach: 7 wide, 7 out from its front, 4 down. */
     public static final int POOL_HALF_WIDTH = 3, POOL_LENGTH = 7, POOL_DEPTH = 4;
@@ -80,7 +73,7 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineCont
                 case 2 -> ModConfigs.getInt(ModConfigs.SERVER.trawlerMaxSheep);
                 case 3 -> pool;
                 case 4 -> progressPercent();
-                case 5 -> items.get(LURE).isEmpty() ? 0 : lureUsesLeft;
+                case 5 -> inventory.get(LURE).isEmpty() ? 0 : lureUsesLeft;
                 case 6 -> ModConfigs.getInt(ModConfigs.SERVER.trawlerLureUses);
                 case 7 -> showArea ? 1 : 0;
                 case 8 -> Math.min(hauls, Short.MAX_VALUE);
@@ -97,7 +90,9 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineCont
         }
     };
 
-    private final NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
+    // Its one module: an inventory of a lure slot (resource wool in, never out) and nine catch slots (hoppers take from
+    // them; nothing goes in). Saved as an item list.
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(trawlerSlots(this));
     private Status status = Status.NO_WATER;
     private boolean tangled;
     private float progress;
@@ -185,7 +180,7 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineCont
     }
 
     private boolean hasRoom() {
-        for (int i = 1; i < SIZE; i++) if (items.get(i).isEmpty()) return true;
+        for (int i = 1; i < SIZE; i++) if (inventory.get(i).isEmpty()) return true;
         return false;
     }
 
@@ -227,7 +222,7 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineCont
      * {@code lureUses} resource hauls. Empty with no lure.
      */
     private List<ItemStack> lureCatch(ServerLevel level, RandomSource random) {
-        ItemStack lure = items.get(LURE);
+        ItemStack lure = inventory.get(LURE);
         Optional<SheepResource> resource = ResourceWoolItem.getResource(lure, false);
         if (resource.isEmpty()) return List.of();
         if (lureUsesLeft <= 0) {
@@ -242,9 +237,9 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineCont
 
     private void store(ServerLevel level, ItemStack stack) {
         for (int i = 1; i < SIZE && !stack.isEmpty(); i++) {
-            ItemStack in = items.get(i);
+            ItemStack in = inventory.get(i);
             if (in.isEmpty()) {
-                items.set(i, stack.copy());
+                inventory.set(i, stack.copy());
                 stack.setCount(0);
             } else if (ItemStack.isSameItemSameComponents(in, stack)) {
                 int moved = Math.min(stack.getCount(), in.getMaxStackSize() - in.getCount());
@@ -329,11 +324,11 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineCont
     /** Puts resource wool in its lure slot from {@code stack}; how many went in. */
     public int addLure(ItemStack stack) {
         if (!canPlaceItem(LURE, stack)) return 0;
-        ItemStack lure = items.get(LURE);
+        ItemStack lure = inventory.get(LURE);
         int room = lure.isEmpty() ? stack.getMaxStackSize() : lure.getMaxStackSize() - lure.getCount();
         int moved = Math.min(room, stack.getCount());
         if (moved <= 0) return 0;
-        if (lure.isEmpty()) items.set(LURE, stack.copyWithCount(moved));
+        if (lure.isEmpty()) inventory.set(LURE, stack.copyWithCount(moved));
         else lure.grow(moved);
         stack.shrink(moved);
         changedContents();
@@ -343,7 +338,7 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineCont
     /** 0 empty, then 1 to 15 with how many of its nine catch slots hold something. */
     public int comparatorSignal() {
         int used = 0;
-        for (int i = 1; i < SIZE; i++) if (!items.get(i).isEmpty()) used++;
+        for (int i = 1; i < SIZE; i++) if (!inventory.get(i).isEmpty()) used++;
         return used == 0 ? 0 : Math.min(15, 1 + used * 14 / OUTPUTS);
     }
 
@@ -386,21 +381,25 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineCont
         return new com.jax3.barelyfunctionalcontraptions.sheep.menu.FleeceTrawlerMenu(containerId, inventory, this, data);
     }
 
-    // ------------------------------------------------------------------ container (hoppers and pipes)
+    // ------------------------------------------------------------------ its slots (the inventory module)
 
-    @Override
-    public int getContainerSize() {
-        return SIZE;
+    private static com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory trawlerSlots(FleeceTrawlerBlockEntity trawler) {
+        var builder = com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder().savedAsList()
+                .slot(null, trawler::acceptsLure, false);
+        for (int i = 0; i < OUTPUTS; i++) builder.slot(null, stack -> false, true);
+        return builder.build();
+    }
+
+    /** Only resource wool goes in its lure slot, and only the same as the lure already there. */
+    private boolean acceptsLure(ItemStack stack) {
+        if (ResourceWoolItem.getResourceId(stack) == null) return false;
+        ItemStack lure = inventory.get(LURE);
+        return lure.isEmpty() || ItemStack.isSameItemSameComponents(lure, stack);
     }
 
     @Override
-    public ItemStack getItem(int slot) {
-        return items.get(slot);
-    }
-
-    @Override
-    public void putItem(int slot, ItemStack stack) {
-        items.set(slot, stack);
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
     }
 
     @Override
@@ -408,50 +407,16 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineCont
         changedContents();
     }
 
-    /** Only resource wool goes in its lure slot; nothing goes in the catch slots but its catch. */
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        if (slot != LURE || ResourceWoolItem.getResourceId(stack) == null) return false;
-        ItemStack lure = items.get(LURE);
-        return lure.isEmpty() || ItemStack.isSameItemSameComponents(lure, stack);
-    }
-
     @Override
     public void clearContent() {
-        items.clear();
-    }
-
-    private static final int[] ALL = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return ALL;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return canPlaceItem(slot, stack);
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return slot != LURE;
-    }
-
-    /** Broken, it drops its lures and catch. */
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
-        if (level != null) net.minecraft.world.Containers.dropContents(level, pos, this);
+        for (int i = 0; i < SIZE; i++) inventory.set(i, ItemStack.EMPTY);
     }
 
     // ------------------------------------------------------------------ saving and syncing
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        items.clear();
-        ContainerHelper.loadAllItems(input, items);
+        super.loadAdditional(input); // its module: the lure and catch
         tangled = input.getBooleanOr("tangled", false);
         progress = input.getFloatOr("progress", 0);
         lureUsesLeft = input.getIntOr("lure_uses_left", 0);
@@ -464,8 +429,7 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineCont
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        ContainerHelper.saveAllItems(output, items);
+        super.saveAdditional(output); // its module
         output.putBoolean("tangled", tangled);
         output.putFloat("progress", progress);
         output.putInt("lure_uses_left", lureUsesLeft);
@@ -476,11 +440,7 @@ public class FleeceTrawlerBlockEntity extends BlockEntity implements MachineCont
         output.putBoolean("show_area", showArea);
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
+    /** Clients get everything it saves (Jade and its window read it). */
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         return saveCustomOnly(registries);

@@ -75,6 +75,11 @@ public final class MachineInventory implements MachineModule {
         return slot >= 0 && slot < slots.size() && slots.get(slot).extractable();
     }
 
+    /** All its stacks, in slot order (the live ones, for the machine's own reading; the list itself can't be changed). */
+    public List<ItemStack> stacks() {
+        return java.util.Collections.unmodifiableList(items);
+    }
+
     public int[] allSlots() {
         return all;
     }

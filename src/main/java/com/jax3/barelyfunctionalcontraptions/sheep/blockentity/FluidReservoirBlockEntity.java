@@ -6,12 +6,9 @@ import com.jax3.barelyfunctionalcontraptions.sheep.menu.FluidReservoirMenu;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
@@ -19,11 +16,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
@@ -43,16 +37,20 @@ import org.jspecify.annotations.Nullable;
  *     <li>Nothing can be poured in: it is a water source, not a tank.</li>
  * </ul>
  */
-public class FluidReservoirBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer {
+public class FluidReservoirBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, net.minecraft.world.MenuProvider {
     public static final int SLOT_INPUT = 0, SLOT_OUTPUT = 1, SIZE = 2;
     public static final int DATA_COUNT = 7;
     public static final int BUCKET = 1000;
-    private static final int[] ALL_SLOTS = {SLOT_INPUT, SLOT_OUTPUT};
     /** How often (ticks) the source below is re-checked. */
     private static final int SOURCE_CHECK_INTERVAL = 10;
 
-    private NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-    private final ReservoirTank tank = new ReservoirTank(ModConfigs.getInt(ModConfigs.SERVER.reservoirCapacity), this::onTankChanged);
+    // Its modules: the tank (out on every side, nothing in), an empty-bucket slot and a water-bucket slot, and its name.
+    private final ReservoirTank tank = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.FluidModule.of(new ReservoirTank(ModConfigs.getInt(ModConfigs.SERVER.reservoirCapacity), this::onTankChanged))).tank();
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder().savedAsList()
+            .input("input", stack -> stack.is(Items.BUCKET)) // only empty buckets, and only into the input
+            .output("output") // hoppers and pipes only take the filled buckets
+            .build());
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.NameModule name = install(new com.jax3.barelyfunctionalcontraptions.sheep.machine.NameModule(Component.translatable("block.barelyfunctionalcontraptions.fluid_reservoir")));
     private ReservoirStatus status = ReservoirStatus.NO_SOURCE;
     private ReservoirStatus sourceStatus = ReservoirStatus.NO_SOURCE;
     private int tickCounter;
@@ -146,11 +144,11 @@ public class FluidReservoirBlockEntity extends BaseContainerBlockEntity implemen
 
     /** Turns one empty bucket from the input slot into a water bucket in the output slot. */
     private void fillBucket() {
-        ItemStack input = items.get(SLOT_INPUT);
-        if (!input.is(Items.BUCKET) || !items.get(SLOT_OUTPUT).isEmpty() || tank.getAmount() < BUCKET) return;
+        ItemStack input = inventory.get(SLOT_INPUT);
+        if (!input.is(Items.BUCKET) || !inventory.get(SLOT_OUTPUT).isEmpty() || tank.getAmount() < BUCKET) return;
         tank.drain(BUCKET);
         input.shrink(1);
-        items.set(SLOT_OUTPUT, new ItemStack(Items.WATER_BUCKET));
+        inventory.set(SLOT_OUTPUT, new ItemStack(Items.WATER_BUCKET));
         setChanged();
     }
 
@@ -191,69 +189,20 @@ public class FluidReservoirBlockEntity extends BaseContainerBlockEntity implemen
         return status;
     }
 
-    // ------------------------------------------------------------------ container
+    // ------------------------------------------------------------------ its slots and window
 
     @Override
-    public int getContainerSize() {
-        return SIZE;
-    }
-
-    /** Only empty buckets, and only into the input slot. */
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        return slot == SLOT_INPUT && stack.is(Items.BUCKET);
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
     }
 
     @Override
-    public int[] getSlotsForFace(Direction side) {
-        return ALL_SLOTS;
+    public Component getDisplayName() {
+        return name.name();
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return canPlaceItem(slot, stack);
-    }
-
-    /** Hoppers and pipes only take the filled buckets. */
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return slot == SLOT_OUTPUT;
-    }
-
-    @Override
-    protected NonNullList<ItemStack> getItems() {
-        return items;
-    }
-
-    @Override
-    protected void setItems(NonNullList<ItemStack> items) {
-        this.items = items;
-    }
-
-    @Override
-    protected Component getDefaultName() {
-        return Component.translatable("block.barelyfunctionalcontraptions.fluid_reservoir");
-    }
-
-    @Override
-    protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+    public AbstractContainerMenu createMenu(int containerId, Inventory inventory, net.minecraft.world.entity.player.Player player) {
         return new FluidReservoirMenu(containerId, inventory, this, data);
-    }
-
-    // ------------------------------------------------------------------ persistence
-
-    @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(input, items);
-        input.child("tank").ifPresent(tank::deserialize);
-    }
-
-    @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        ContainerHelper.saveAllItems(output, items);
-        tank.serialize(output.child("tank"));
     }
 }

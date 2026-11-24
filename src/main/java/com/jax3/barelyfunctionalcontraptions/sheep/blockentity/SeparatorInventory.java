@@ -10,8 +10,10 @@ import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
  *
  * <p>Only the input slot is "valid" for insertion, which makes hoppers, pipes and the GUI refuse to put anything into
  * the output slots. The machine itself fills outputs through {@link #addOutput}, which bypasses that check.</p>
+ *
+ * <p>It's the separator's inventory module: saved under {@code inventory}, dropped when the separator is broken.</p>
  */
-public class SeparatorInventory extends ItemStacksResourceHandler {
+public class SeparatorInventory extends ItemStacksResourceHandler implements com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineModule {
     public static final int INPUT = 0;
     public static final int PRIMARY = 1;
     public static final int SECONDARY = 2;
@@ -65,5 +67,24 @@ public class SeparatorInventory extends ItemStacksResourceHandler {
         ItemStack current = stacks.get(index);
         setStack(index, current.isEmpty() ? stack.copyWithCount(fit) : current.copyWithCount(current.getCount() + fit));
         return stack.copyWithCount(stack.getCount() - fit);
+    }
+
+    @Override
+    public void save(net.minecraft.world.level.storage.ValueOutput output) {
+        serialize(output.child("inventory"));
+    }
+
+    @Override
+    public void load(net.minecraft.world.level.storage.ValueInput input) {
+        input.child("inventory").ifPresent(this::deserialize);
+    }
+
+    @Override
+    public void dropContents(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) {
+        for (int i = 0; i < SIZE; i++) {
+            ItemStack stack = stacks.get(i);
+            if (!stack.isEmpty()) net.minecraft.world.Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+            setStack(i, ItemStack.EMPTY);
+        }
     }
 }

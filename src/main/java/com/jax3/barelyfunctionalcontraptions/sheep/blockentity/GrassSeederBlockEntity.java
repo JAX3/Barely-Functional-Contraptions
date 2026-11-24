@@ -6,17 +6,10 @@ import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.Containers;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -24,14 +17,12 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LevelEvent;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import org.jspecify.annotations.Nullable;
 
 /**
  * The Grass Seeder: keeps the ground of a sheep pen green, so sheared sheep regrow their wool sooner.
@@ -49,7 +40,8 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * Its comparator signal reads how green its area is.
  */
-public class GrassSeederBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
+public class GrassSeederBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
+        implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider {
     public static final int AREA_COLOR = 0xFF6FCF4A;
     /** The ground map in its window covers areas up to 7x7 (radius 3), three bits a block, five blocks to a value. */
     public static final int MAP_MAX = 7, MAP_VALUES = 10, MAP_PER_VALUE = 5, MAP_BITS = 3;
@@ -61,7 +53,6 @@ public class GrassSeederBlockEntity extends BlockEntity implements MachineContai
     public static final int DATA_COUNT = MAP_DATA + MAP_VALUES;
     /** Blocks it must tend for the players near it to earn Keep Off the Grass. */
     public static final int ADVANCEMENT_BLOCKS = 100;
-    private static final int[] SLOTS = {0};
     public static final FluidResource WATER = WaterTank.WATER;
 
     /** What it's doing, for its window, Jade and its sprinkler. */
@@ -89,10 +80,13 @@ public class GrassSeederBlockEntity extends BlockEntity implements MachineContai
         }
     }
 
-    private final MachineEnergy energy = new MachineEnergy(
-            () -> ModConfigs.getInt(ModConfigs.SERVER.seederCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.seederMaxInput), this::setChanged);
-    private final WaterTank tank = new WaterTank(4_000, this::setChanged);
-    private ItemStack boneMeal = ItemStack.EMPTY;
+    // Its modules: power and water in on every side, and a Bone Meal slot (in only).
+    private final MachineEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new MachineEnergy(
+            () -> ModConfigs.getInt(ModConfigs.SERVER.seederCapacity), () -> ModConfigs.getInt(ModConfigs.SERVER.seederMaxInput), this::setChanged))).handler();
+    private final WaterTank tank = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.FluidModule.of(new WaterTank(4_000, this::setChanged))).tank();
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder()
+            .input("bone_meal", stack -> stack.is(Items.BONE_MEAL))
+            .build());
     /** Blocks left from the Bone Meal it last opened. */
     private int boneCharges;
     private int cooldown;
@@ -375,6 +369,7 @@ public class GrassSeederBlockEntity extends BlockEntity implements MachineContai
             boneCharges--;
             return true;
         }
+        ItemStack boneMeal = inventory.get(0);
         if (!boneMeal.isEmpty()) {
             boneMeal.shrink(1);
             boneCharges = ModConfigs.getInt(ModConfigs.SERVER.seederBoneMealBlocks) - 1;
@@ -385,7 +380,7 @@ public class GrassSeederBlockEntity extends BlockEntity implements MachineContai
     }
 
     public boolean hasFuel() {
-        return (energy.getAmountAsInt() >= energyPerBlock() && tank.getAmount() >= waterPerBlock()) || boneCharges > 0 || !boneMeal.isEmpty();
+        return (energy.getAmountAsInt() >= energyPerBlock() && tank.getAmount() >= waterPerBlock()) || boneCharges > 0 || !inventory.get(0).isEmpty();
     }
 
     // ------------------------------------------------------------------ accessors
@@ -443,8 +438,13 @@ public class GrassSeederBlockEntity extends BlockEntity implements MachineContai
         return new com.jax3.barelyfunctionalcontraptions.sheep.menu.GrassSeederMenu(containerId, inventory, this, data);
     }
 
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
+    }
+
     public ItemStack boneMeal() {
-        return boneMeal;
+        return inventory.get(0);
     }
 
     public EnergyHandler getEnergyHandler() {
@@ -464,10 +464,11 @@ public class GrassSeederBlockEntity extends BlockEntity implements MachineContai
     /** Puts as much of {@code stack} (Bone Meal) in as fits, taking it from the stack; how many went in. */
     public int insertBoneMeal(ItemStack stack) {
         if (!stack.is(Items.BONE_MEAL)) return 0;
+        ItemStack boneMeal = inventory.get(0);
         int room = boneMeal.isEmpty() ? stack.getMaxStackSize() : boneMeal.getMaxStackSize() - boneMeal.getCount();
         int moved = Math.min(room, stack.getCount());
         if (moved <= 0) return 0;
-        if (boneMeal.isEmpty()) boneMeal = stack.copyWithCount(moved);
+        if (boneMeal.isEmpty()) inventory.set(0, stack.copyWithCount(moved));
         else boneMeal.grow(moved);
         stack.shrink(moved);
         setChanged();
@@ -503,52 +504,6 @@ public class GrassSeederBlockEntity extends BlockEntity implements MachineContai
         return AREA_COLOR;
     }
 
-    // ------------------------------------------------------------------ container (the Bone Meal, in only)
-
-    @Override
-    public int getContainerSize() {
-        return 1;
-    }
-
-    @Override
-    public ItemStack getItem(int slot) {
-        return slot == 0 ? boneMeal : ItemStack.EMPTY;
-    }
-
-    @Override
-    public void putItem(int slot, ItemStack stack) {
-        if (slot == 0) boneMeal = stack;
-    }
-
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        return stack.is(Items.BONE_MEAL);
-    }
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return SLOTS;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return stack.is(Items.BONE_MEAL);
-    }
-
-    /** Bone Meal only goes in. */
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return false;
-    }
-
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
-        if (level != null) Containers.dropContents(level, pos, this);
-    }
-
-    // ------------------------------------------------------------------ power and water
-
     /** Fills its power at once (GameTests, the screenshot harness). */
     public void fillEnergy() {
         energy.refreshLimits();
@@ -559,10 +514,7 @@ public class GrassSeederBlockEntity extends BlockEntity implements MachineContai
 
     @Override
     protected void loadAdditional(ValueInput in) {
-        super.loadAdditional(in);
-        in.child("energy").ifPresent(energy::deserialize);
-        in.child("tank").ifPresent(tank::deserialize);
-        boneMeal = in.read("bone_meal", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        super.loadAdditional(in); // its modules: energy, water, Bone Meal
         boneCharges = in.getIntOr("bone_charges", 0);
         tended = in.getLongOr("tended", 0L);
         trim = in.getBooleanOr("trim", false);
@@ -571,26 +523,16 @@ public class GrassSeederBlockEntity extends BlockEntity implements MachineContai
 
     @Override
     protected void saveAdditional(ValueOutput out) {
-        super.saveAdditional(out);
-        energy.serialize(out.child("energy"));
-        tank.serialize(out.child("tank"));
-        if (!boneMeal.isEmpty()) out.store("bone_meal", ItemStack.OPTIONAL_CODEC, boneMeal);
+        super.saveAdditional(out); // its modules
         out.putInt("bone_charges", boneCharges);
         out.putLong("tended", tended);
         out.putBoolean("trim", trim);
         out.putBoolean("show_area", showArea);
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
     /** Clients only need the area setting, for the outline. */
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = new CompoundTag();
+    protected void writeClientData(CompoundTag tag) {
         tag.putBoolean("show_area", showArea);
-        return tag;
     }
 }

@@ -2581,6 +2581,22 @@ public final class ModGameTests {
                 "the chiller offers water and items, no power");
         var modules = h.getBlockEntity(new BlockPos(4, 1, 1), com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame.class).modules();
         h.assertTrue(modules.size() == 3, "the chiller has three modules switched on (fluid, upgrades, inventory): " + modules);
+        // The shears take power on every side but their front (an energy module limited to some sides).
+        h.setBlock(new BlockPos(1, 1, 1), Blocks.AIR);
+        h.setBlock(new BlockPos(1, 1, 1), ModBlocks.AUTOMATIC_SHEARS.get());
+        Direction front = level.getBlockState(at).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING);
+        h.assertTrue(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, at, front) == null
+                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, at, front.getOpposite()) != null,
+                "the shears take no power through their front");
+        // A renamed machine (the name module) shows its name and keeps it when broken.
+        h.setBlock(new BlockPos(4, 1, 1), ModBlocks.FLUID_RESERVOIR.get());
+        var reservoir = h.getBlockEntity(new BlockPos(4, 1, 1), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FluidReservoirBlockEntity.class);
+        ItemStack named = new ItemStack(ModItems.FLUID_RESERVOIR.get());
+        named.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("Well"));
+        reservoir.applyComponentsFromItemStack(named);
+        h.assertTrue(reservoir.getDisplayName().getString().equals("Well"), "its window is titled with its name");
+        var drops = net.minecraft.world.level.block.Block.getDrops(reservoir.getBlockState(), level, chiller, reservoir);
+        h.assertTrue(drops.size() == 1 && drops.getFirst().getHoverName().getString().equals("Well"), "broken, it keeps its name: " + drops);
         h.succeed();
     }
 
