@@ -205,11 +205,25 @@ Each job still costs the same total FE; it just finishes sooner.
 Older config files are updated once, the first time they load: settings still at their old defaults (from either
 speed-up) move to the new ones, and anything you changed is kept.
 
-### Shorter command
-- The mod's command is now **`/bfc`** (short for Barely Functional Contraptions) instead of
-  `/barelyfunctionalcontraptions`: `/bfc generate`, `/bfc generate all`, `/bfc generate material <material>`,
-  `/bfc generate item <item>`, `/bfc generate hand`, `/bfc generate dedupe`, `/bfc generate remove <name>`,
-  `/bfc preview` and `/bfc list`. Command blocks and scripts using the long name need updating.
+### Shorter command: `/bfc`
+The mod's command is now **`/bfc`** (short for Barely Functional Contraptions) instead of
+`/barelyfunctionalcontraptions`. It works the same, for operators (permission level 2):
+
+| Command | What it does |
+|---|---|
+| `/bfc preview` | Lists the wool types `generate` would make, without changing anything |
+| `/bfc generate` | Makes a wool type for every material in the modpack that doesn't have one yet, saves them in the world's data pack `barelyfunctionalcontraptions_generated`, and reloads |
+| `/bfc generate all` | The same, also remaking materials that already have one |
+| `/bfc generate material <material>` | Makes one material from the storage-block tags (Tab lists them) |
+| `/bfc generate item <item>` | Makes a wool type fed with any item you choose |
+| `/bfc generate hand` | The same, with the item in your main hand |
+| `/bfc generate remove <name>` | Deletes one generated wool type (Tab lists them) |
+| `/bfc generate dedupe` | Deletes generated wool types that duplicate another, then reloads |
+| `/bfc list` | Lists every loaded wool type |
+
+- Its messages, the Contraptions Manual, the config comments and the docs all use `/bfc` now.
+- **Updating:** command blocks, functions and scripts that call `/barelyfunctionalcontraptions` need changing to
+  `/bfc`; the long name no longer works.
 
 ### Removed: wireless power to machines
 - The Barely Functional Wrench no longer links a Mycelial Generator to a Mechanical Separator, Automatic Shears or Hume
