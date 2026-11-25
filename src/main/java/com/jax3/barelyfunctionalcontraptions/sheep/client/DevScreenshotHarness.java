@@ -5365,7 +5365,16 @@ public final class DevScreenshotHarness {
             case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 3", origin.getX() + 0.0, origin.getY() - 0.6, origin.getZ() + 9.0));
             case 84 -> McClient.clearChat(mc);
             case 200 -> shot(mc, "cover_raw");
-            case 206 -> mc.stop();
+            // The profile picture: close up on the diamond sheep's face, from in front and a little to its side, the
+            // rest of the row behind it. (It faces yaw 55: towards the camera's side and the left.)
+            case 202 -> {
+                double sx = origin.getX() - 3.2, sz = origin.getZ() + 0.3;
+                double yaw = Math.toRadians(40); // a little off its own heading, so its face and side both show
+                double cx = sx - Math.sin(yaw) * 2.1, cz = sz + Math.cos(yaw) * 2.1;
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f %.1f 8", cx, origin.getY() - 0.45, cz, 40 + 180.0));
+            }
+            case 240 -> shot(mc, "pfp_raw");
+            case 246 -> mc.stop();
             default -> {}
         }
     }
