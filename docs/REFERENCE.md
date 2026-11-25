@@ -630,14 +630,14 @@ B M B      B = Blackstone, M = Functional Machine Block
 
 A late-game generator, 2x2 and three blocks tall (two and three-quarters with its emitter), built like the Echo Chamber: a steel plinth and lid on chunky corner pillars lit with Hume purple, a framed window in each wall onto its flickering core and three field coils, and an emitter on the lid. It fills the space east, south and above where it's placed, and won't place if any of that is taken. Breaking any of its twelve blocks removes the whole machine and drops one generator (a pickaxe breaks it quickly). Right-click any of its blocks for its window.
 
-- **Power:** every tick its field makes a **random** amount of FE between `[hume_field_generator] minPerTick` and `maxPerTick` (200-1,200 FE/t by default, 700 on average).
+- **Power:** every `ticksPerRoll` ticks (20, a second) its field rolls a **random** amount of FE per tick between `[hume_field_generator] minPerTick` and `maxPerTick` (200-1,200 FE/t by default, 700 on average), and makes that much each tick until the next roll.
 - **No buffer:** that tick's power goes straight into whatever touches any of its blocks (Energy Cables, Hume Energy Cubes, machines), offered to a different neighbour first each tick. Whatever they can't take is **lost**, and nothing can pull power out of it. On its own it wastes everything; a Hume Energy Cube against it catches all of it and evens out the swings.
-- **The pulse:** every `pulseInterval` ticks (100, 5 seconds) its field pulses, with a burst of purple sparks and a deep hum. Every player within `nauseaRadius` blocks of its middle (8) gets `nauseaSeconds` of **Nausea** (7); spectators are spared. A player still dizzy from the last pulse is topped up, not stacked. `pulseInterval = 0` stops it pulsing, and `nauseaRadius = 0` keeps the pulse but gives no Nausea.
-- **Window:** a field gauge with this tick's output against its range (shaded) and its one-second average (yellow marks); what it made, what was taken and what was lost; a trace of its last 28 ticks, each bar purple where taken and red where lost, with the range's ends dashed across; its average and range; a countdown to the next pulse (flashing in its last second); and a status lamp: *Delivering all it makes* (green), *Wasting some* (amber), *Nothing to take it: all lost* (red), *Field off* (grey, a range of 0). Every part has a tooltip.
-- **Jade:** its status, this tick's output and range, what was taken and lost, its average, the next pulse and that it has no buffer, whichever of its blocks you look at. **JEI:** a page with its range, average, pulse and the no-buffer rule (read from the config), and an information page.
-- **Machine Status Panel:** link it with the wrench from any of its blocks. Its line reads *Delivering* (green), *Wasting some* (amber) or *Not connected* (red, a problem the panel's comparator counts), with its average FE/t over the last second.
+- **The pulse:** every `pulseInterval` ticks (100, 5 seconds) its field pulses, with a burst of purple sparks and a deep hum. It's just for show; `pulseInterval = 0` stops it.
+- **Window:** a field gauge with what it makes now against its range (shaded) and its average over its last 10 rolls (yellow marks); what it makes, what was taken and what was lost this tick; a trace of its last 27 rolls and the one now (one bar a second at the default), each bar purple where taken and red where lost, with the range's ends dashed across; its average and range; a countdown to the next pulse (flashing in its last second); and a status lamp: *Delivering all it makes* (green), *Wasting power* (amber: some or all of it lost), *Nothing to take it: all lost* (red), *Field off* (grey, a range of 0). Every part has a tooltip. Its core flickers slowly.
+- **Jade:** its status, its output now and range, what was taken and lost, its average, the next pulse and that it has no buffer, whichever of its blocks you look at. **JEI:** a page with its range, average, how often it rolls and the no-buffer rule (read from the config), and an information page.
+- **Machine Status Panel:** link it with the wrench from any of its blocks. Its line reads *Delivering* (green), *Wasting power* (amber) or *Not connected* (red, a problem the panel's comparator counts), with its average FE/t over its last 10 rolls.
 - **Recipe:** Block of Blue Steel, Tinted Glass, Block of Blue Steel; Hume Energy Cube, Nether Star, Hume Energy Cube; Block of Blue Steel, Functional Machine Block, Block of Blue Steel. Unlocked by picking up a Nether Star.
-- **Config** `[hume_field_generator]`: `minPerTick` (200), `maxPerTick` (1,200; swapped if below the minimum), `pulseInterval` (100 ticks), `nauseaRadius` (8 blocks), `nauseaSeconds` (7).
+- **Config** `[hume_field_generator]`: `minPerTick` (200), `maxPerTick` (1,200; swapped if below the minimum), `ticksPerRoll` (20), `pulseInterval` (100 ticks).
 
 | From the front | Close up |
 |---|---|
@@ -645,11 +645,11 @@ A late-game generator, 2x2 and three blocks tall (two and three-quarters with it
 
 | A pulse | Its window |
 |---|---|
-| ![A Hume Field Generator pulsing: a burst of purple sparks from its core and emitter, a Hume Energy Cube against its side](screenshots/hume_field_pulse.png) | ![The Hume Field Generator's window: the field gauge, Taken and Lost, a trace of 28 purple bars between the dashed ends of its range, Avg and 200-1,200, Pulse 2s by the title, and a green lamp reading Delivering all it makes](screenshots/hume_field_gui.png) |
+| ![A Hume Field Generator pulsing: a burst of purple sparks from its core and emitter, a Hume Energy Cube against its side](screenshots/hume_field_pulse.png) | ![The Hume Field Generator's window: the field gauge, Taken and Lost, a trace with a purple bar for each second's roll so far between the dashed ends of its range, Avg and 200-1,200, Pulse 2s by the title, and a green lamp reading Delivering all it makes](screenshots/hume_field_gui.png) |
 
 | On the Machine Status Panel | |
 |---|---|
-| ![The test world's Machine Status Panel window, scrolled to the end: three Hume Field Generators reading Delivering in green, Wasting some in amber and Not connected in red, each with its average FE/t](screenshots/hume_field_status_panel.png) | |
+| ![The test world's Machine Status Panel window, scrolled to the end: three Hume Field Generators reading Delivering in green, Wasting power in amber and Not connected in red, each with its average FE/t](screenshots/hume_field_status_panel.png) | |
 
 | Jade | JEI |
 |---|---|

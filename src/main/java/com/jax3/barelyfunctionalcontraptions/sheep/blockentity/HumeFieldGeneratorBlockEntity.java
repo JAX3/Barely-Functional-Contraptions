@@ -17,23 +17,23 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  * The Hume Field Generator's workings, held by its bottom north-west block.
  *
  * <ul>
- *     <li>Every tick its field makes a <b>random</b> amount of FE between {@code [hume_field_generator] minPerTick} and
- *     {@code maxPerTick}.</li>
+ *     <li>Every {@code ticksPerRoll} ticks (a second) its field rolls a <b>random</b> amount of FE between
+ *     {@code [hume_field_generator] minPerTick} and {@code maxPerTick}, and makes that much every tick until the next
+ *     roll.</li>
  *     <li>It has <b>no energy buffer</b>: that tick's FE goes straight into whatever touches any of its twelve blocks
  *     (cables, cubes, machines), and whatever they don't take is lost. Nothing can be pulled from it.</li>
  *     <li>It offers the FE to its neighbours in turn, starting with a different one each tick, so no one of them always
  *     gets first pick.</li>
- *     <li>Every {@code pulseInterval} ticks its field <b>pulses</b> (a burst of purple particles and a deep hum), giving
- *     every player within {@code nauseaRadius} blocks of its middle {@code nauseaSeconds} of Nausea. Spectators are
- *     spared.</li>
+ *     <li>Every {@code pulseInterval} ticks its field <b>pulses</b>: a burst of purple particles and a deep hum (just
+ *     for show).</li>
  * </ul>
  *
  * It's on the machine frame with no modules switched on: nothing to save, store or connect.
  */
 public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
         implements net.minecraft.world.MenuProvider {
-    /** How many ticks its window's trace shows, and how many its average is over. */
-    public static final int HISTORY = 28, AVERAGE_OVER = 20;
+    /** How many rolls its window's trace shows (the last one the roll now), and how many its average is over. */
+    public static final int HISTORY = 28, AVERAGE_OVER = 10;
     /** Values synced to the window: generated, delivered, average, min and max (two shorts each), status, receivers, the trace. */
     public static final int DATA_COUNT = 13 + HISTORY;
     /** Where the trace starts in its synced values. */
@@ -76,7 +76,12 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
     private Status status = Status.NOTHING_CONNECTED;
     /** The last {@link #HISTORY} ticks, oldest first from {@link #head}: what it made and what was taken. */
     private final int[] madeHistory = new int[HISTORY], takenHistory = new int[HISTORY];
+    /** The trace's slot for the roll now; the ones before it are the rolls before. */
     private int head;
+    /** Ticks until its field rolls a new amount, and the FE taken so far during this roll (over how many ticks). */
+    private int untilRoll;
+    private long rollTaken;
+    private int rollTicks;
     /** Ticks until its field next pulses. */
     private int untilPulse = -1;
 
@@ -134,7 +139,7 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
     }
 
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, HumeFieldGeneratorBlockEntity be) {
-        be.generated = roll(level);
+        if (--be.untilRoll <= 0 || be.generated < rangeMin() || be.generated > rangeMax()) be.newRoll(level);
         be.receivers = 0;
         be.delivered = be.generated > 0 ? be.offer(level, pos, be.generated) : 0;
         if (be.generated <= 0) be.receivers = be.countReceivers(level, pos);
@@ -142,9 +147,25 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
         be.status = be.generated <= 0 ? Status.IDLE : be.receivers == 0 ? Status.NOTHING_CONNECTED
                 : be.delivered < be.generated ? Status.WASTING : Status.DELIVERING;
         be.tickPulse(level, pos);
+        // This roll's slot in the trace: what it makes, and what was taken on average over its ticks so far.
+        be.rollTaken += be.delivered;
+        be.rollTicks++;
         be.madeHistory[be.head] = be.generated;
-        be.takenHistory[be.head] = be.delivered;
-        be.head = (be.head + 1) % HISTORY;
+        be.takenHistory[be.head] = (int) (be.rollTaken / be.rollTicks);
+    }
+
+    /** Its field rolls a new amount (the trace moves on to a new slot), held for {@code ticksPerRoll} ticks. */
+    private void newRoll(ServerLevel level) {
+        if (rollTicks > 0) head = (head + 1) % HISTORY;
+        generated = roll(level);
+        untilRoll = Math.max(1, ModConfigs.getInt(ModConfigs.SERVER.humeFieldTicksPerRoll));
+        rollTaken = 0;
+        rollTicks = 0;
+    }
+
+    /** Ticks until its field rolls a new amount. */
+    public int untilRoll() {
+        return Math.max(0, untilRoll);
     }
 
     /** Counts down to its field's next pulse, and pulses when it gets there (never, with {@code pulseInterval} 0). */
@@ -166,35 +187,14 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
         return new net.minecraft.world.phys.Vec3(origin.getX() + 1.0, origin.getY() + 1.4, origin.getZ() + 1.0);
     }
 
-    /**
-     * Its field pulses: purple particles burst from its core, it hums, and every player (but spectators) within
-     * {@code nauseaRadius} blocks of its middle gets {@code nauseaSeconds} of Nausea. Returns how many players it reached.
-     */
-    public int pulse(ServerLevel level, BlockPos origin) {
+    /** Its field pulses: purple particles burst from its core and it hums. Just for show. */
+    public void pulse(ServerLevel level, BlockPos origin) {
         var centre = centre(origin);
         level.sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL, centre.x, centre.y, centre.z, 60, 0.9, 1.1, 0.9, 0.08);
         level.sendParticles(net.minecraft.core.particles.ParticleTypes.WITCH, centre.x, centre.y + 1.2, centre.z, 16, 0.6, 0.3, 0.6, 0.02);
         level.playSound(null, origin.offset(1, 1, 1), net.minecraft.sounds.SoundEvents.BEACON_POWER_SELECT, net.minecraft.sounds.SoundSource.BLOCKS,
                 1.2F, 0.55F + level.getRandom().nextFloat() * 0.1F);
         pulses++;
-        return nauseate(level.players(), centre);
-    }
-
-    /**
-     * Gives {@code nauseaSeconds} of Nausea to each of {@code players} (but spectators) within {@code nauseaRadius} blocks
-     * of {@code centre}, one pulse's worth. Returns how many it reached.
-     */
-    public static int nauseate(Iterable<? extends net.minecraft.world.entity.player.Player> players, net.minecraft.world.phys.Vec3 centre) {
-        int radius = ModConfigs.getInt(ModConfigs.SERVER.humeFieldNauseaRadius);
-        if (radius <= 0) return 0;
-        int ticks = ModConfigs.getInt(ModConfigs.SERVER.humeFieldNauseaSeconds) * 20;
-        int reached = 0;
-        for (var player : players) {
-            if (player.isSpectator() || player.distanceToSqr(centre) > (double) radius * radius) continue;
-            player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NAUSEA, ticks, 0, false, true, true));
-            reached++;
-        }
-        return reached;
     }
 
     /** The configured range's ends, the smaller first. */
@@ -221,7 +221,7 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
      * share of the range's top (0-255), the low byte the share of that its neighbours took (0-255).
      */
     private int sample(int i) {
-        int at = (head + i) % HISTORY;
+        int at = (head + 1 + i) % HISTORY; // oldest first, the roll now last
         int made = madeHistory[at], taken = takenHistory[at];
         int top = Math.max(1, rangeMax());
         int height = Math.min(255, (int) Math.round(255.0 * made / top));
@@ -229,14 +229,20 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
         return (height << 8) | share;
     }
 
-    /** FE/t it made on average over the last {@link #AVERAGE_OVER} ticks. */
+    /** FE/t it made on average over its last {@link #AVERAGE_OVER} rolls (the roll now and those before it it's had). */
     public int average() {
         long sum = 0;
-        for (int i = 0; i < AVERAGE_OVER; i++) sum += madeHistory[Math.floorMod(head - 1 - i, HISTORY)];
-        return (int) (sum / AVERAGE_OVER);
+        int count = 0;
+        for (int i = 0; i < AVERAGE_OVER; i++) {
+            int made = madeHistory[Math.floorMod(head - i, HISTORY)];
+            if (made <= 0 && i > 0) break; // not that many rolls yet
+            sum += made;
+            count++;
+        }
+        return count == 0 ? 0 : (int) (sum / count);
     }
 
-    /** This tick's FE: a random amount in the configured range (either way round). */
+    /** A roll's FE per tick: a random amount in the configured range (either way round). */
     private static int roll(ServerLevel level) {
         int a = ModConfigs.getInt(ModConfigs.SERVER.humeFieldMinPerTick), b = ModConfigs.getInt(ModConfigs.SERVER.humeFieldMaxPerTick);
         return level.getRandom().nextIntBetweenInclusive(Math.min(a, b), Math.max(a, b));

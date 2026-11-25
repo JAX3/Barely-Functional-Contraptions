@@ -103,7 +103,7 @@ A 3x3x3 generator that turns noise into power. Warden sheep in a pen in front of
 
 ### Hume Field Generator
 
-A late-game 2x2 generator three blocks tall whose field can't make up its mind: every tick it makes a random 200 to 1,200 FE/t. It has no buffer, so that power goes straight into the cables, Hume Energy Cubes and machines touching it, and whatever they can't take is lost. Every 5 seconds its field pulses, giving every player within 8 blocks Nausea, so build it away from where you work. Made from four Blocks of Blue Steel, Tinted Glass, two Hume Energy Cubes, a Nether Star and a Functional Machine Block.
+A late-game 2x2 generator three blocks tall whose field can't make up its mind: every second it makes a new, random 200 to 1,200 FE/t. It has no buffer, so that power goes straight into the cables, Hume Energy Cubes and machines touching it, and whatever they can't take is lost. Every 5 seconds its field pulses with a burst of purple sparks. Made from four Blocks of Blue Steel, Tinted Glass, two Hume Energy Cubes, a Nether Star and a Functional Machine Block.
 
 ![A Hume Field Generator pulsing purple sparks beside a Hume Energy Cube](docs/screenshots/hume_field_pulse.png)
 

@@ -173,7 +173,7 @@ public final class ModGameTests {
         TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
         TESTS.put("hume_field_generator_makes_random_power_with_no_buffer", ModGameTests::humeFieldPower);
         TESTS.put("hume_field_generator_window_recipe_and_drop", ModGameTests::humeFieldWindowRecipeDrop);
-        TESTS.put("hume_field_generator_pulse_makes_players_nearby_nauseous", ModGameTests::humeFieldPulse);
+        TESTS.put("hume_field_generator_pulses_on_its_own", ModGameTests::humeFieldPulse);
         TESTS.put("status_panel_shows_the_hume_field_generator", ModGameTests::humeFieldOnPanel);
         TESTS.put("echo_chamber_is_three_by_three", ModGameTests::echoChamber);
         ECHO_TESTS.put("echo_chamber_counts_its_warden_sheep", ModGameTests::echoCountsHerd);
@@ -1173,37 +1173,20 @@ public final class ModGameTests {
     }
 
     /**
-     * Its field pulses every {@code pulseInterval} ticks on its own (counting down in its window), and each pulse gives
-     * players within {@code nauseaRadius} of its middle {@code nauseaSeconds} of Nausea: not one further away, and not a
-     * spectator. The generator is in the creative tab, out of the work-in-progress builds.
+     * Its field pulses every {@code pulseInterval} ticks on its own (counting down in its window), just sparks and a hum.
+     * The generator is in the creative tab, out of the work-in-progress builds.
      */
     private static void humeFieldPulse(GameTestHelper h) {
         int interval = ModConfigs.getInt(ModConfigs.SERVER.humeFieldPulseInterval);
-        int radius = ModConfigs.getInt(ModConfigs.SERVER.humeFieldNauseaRadius);
-        int seconds = ModConfigs.getInt(ModConfigs.SERVER.humeFieldNauseaSeconds);
         var be = humeFieldAt(h, new BlockPos(1, 1, 1));
-        var centre = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.centre(h.absolutePos(new BlockPos(1, 1, 1)));
-        var near = h.makeMockPlayer(GameType.SURVIVAL);
-        near.setPos(centre.x + 3, centre.y - 1.4, centre.z + 2);
-        var edge = h.makeMockPlayer(GameType.SURVIVAL);
-        edge.setPos(centre.x, centre.y, centre.z - (radius - 0.5));
-        var far = h.makeMockPlayer(GameType.SURVIVAL);
-        far.setPos(centre.x + radius + 2, centre.y - 1.4, centre.z);
-        var watching = h.makeMockPlayer(GameType.SPECTATOR);
-        watching.setPos(centre.x + 1, centre.y, centre.z + 1);
-        int reached = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.nauseate(List.of(near, edge, far, watching), centre);
-        h.assertTrue(reached == 2, "a pulse reaches the two players within " + radius + " blocks, reached " + reached);
-        var nausea = near.getEffect(net.minecraft.world.effect.MobEffects.NAUSEA);
-        h.assertTrue(nausea != null && nausea.getDuration() == seconds * 20, "the near player gets " + seconds + "s of Nausea: " + nausea);
-        h.assertTrue(edge.hasEffect(net.minecraft.world.effect.MobEffects.NAUSEA), "and so does one just inside its range");
-        h.assertFalse(far.hasEffect(net.minecraft.world.effect.MobEffects.NAUSEA), "not one further out");
-        h.assertFalse(watching.hasEffect(net.minecraft.world.effect.MobEffects.NAUSEA), "nor a spectator");
+        be.pulse(h.getLevel(), h.absolutePos(new BlockPos(1, 1, 1)));
+        h.assertTrue(be.pulses() == 1, "it counted the pulse");
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.SECTIONS.getFirst().items().get().stream()
                 .anyMatch(stack -> stack.is(ModItems.HUME_FIELD_GENERATOR.get())), "it's in the creative tab's Power section");
         // On its own, it pulses every interval, counting down in between.
         h.runAfterDelay(5, () -> h.assertTrue(be.untilPulse() > 0 && be.untilPulse() <= interval, "counting down to a pulse: " + be.untilPulse()));
         h.runAfterDelay(interval + 5, () -> {
-            h.assertTrue(be.pulses() == 1, "it pulsed once in " + interval + " ticks, pulsed " + be.pulses());
+            h.assertTrue(be.pulses() == 2, "it pulsed again on its own in " + interval + " ticks, pulsed " + be.pulses());
             h.succeed();
         });
     }
@@ -1257,9 +1240,9 @@ public final class ModGameTests {
     }
 
     /**
-     * Each tick the Hume Field Generator makes a random amount in its configured range and pushes it into what touches
-     * it: a Hume Energy Cube against it gets exactly what it delivered. It has no buffer: nothing can be taken from it,
-     * and on its own what it makes is lost.
+     * Every {@code ticksPerRoll} ticks the Hume Field Generator rolls a random amount in its configured range, makes that
+     * much each tick until the next roll, and pushes it into what touches it: a Hume Energy Cube against it gets exactly
+     * what it delivered. It has no buffer: nothing can be taken from it, and on its own what it makes is lost.
      */
     private static void humeFieldPower(GameTestHelper h) {
         int min = ModConfigs.getInt(ModConfigs.SERVER.humeFieldMinPerTick), max = ModConfigs.getInt(ModConfigs.SERVER.humeFieldMaxPerTick);
@@ -1275,18 +1258,25 @@ public final class ModGameTests {
                 }
             }
         }
-        java.util.Set<Integer> rolls = new java.util.HashSet<>();
-        int[] ticks = {0};
+        int perRoll = ModConfigs.getInt(ModConfigs.SERVER.humeFieldTicksPerRoll);
+        // Each tick's amount, to see it hold steady between rolls.
+        List<Integer> seen = new java.util.ArrayList<>();
         h.onEachTick(() -> {
-            if (fed.generated() == 0 && ticks[0] == 0) return; // not ticked yet
-            ticks[0]++;
+            if (fed.generated() == 0) return; // not ticked yet
             h.assertTrue(fed.generated() >= min && fed.generated() <= max, "it made " + fed.generated() + " FE, outside " + min + "-" + max);
             h.assertTrue(alone.generated() >= min && alone.generated() <= max, "the lone one made " + alone.generated() + " FE");
             h.assertTrue(alone.delivered() == 0, "with nothing touching it, none goes anywhere (it's lost)");
-            rolls.add(fed.generated());
+            seen.add(fed.generated());
         });
-        h.runAfterDelay(40, () -> {
-            h.assertTrue(rolls.size() > 5, "the amount changes from tick to tick, saw " + rolls);
+        h.runAfterDelay(perRoll * 3 + 10, () -> {
+            // Runs of the same amount: each a whole roll long, but the first (cut by when the test started looking).
+            List<Integer> runs = new java.util.ArrayList<>();
+            for (int i = 0; i < seen.size(); i++) {
+                if (i == 0 || !seen.get(i).equals(seen.get(i - 1))) runs.add(1);
+                else runs.set(runs.size() - 1, runs.getLast() + 1);
+            }
+            h.assertTrue(runs.size() >= 3, "it rolled a new amount at least three times in " + seen.size() + " ticks: " + runs);
+            for (int r = 1; r < runs.size() - 1; r++) h.assertTrue(runs.get(r) == perRoll, "each roll holds for " + perRoll + " ticks: " + runs);
             h.assertTrue(fed.totalDelivered() > 0 && target.group().amount() == fed.totalDelivered(),
                     "the cube got exactly what it delivered: " + target.group().amount() + " vs " + fed.totalDelivered());
             h.assertTrue(alone.totalDelivered() == 0, "the lone one delivered nothing");
@@ -1322,11 +1312,17 @@ public final class ModGameTests {
                     "a cube takes everything: " + menu.getStatus());
             h.assertTrue(menu.getReceivers() == 1, "one block takes its power: " + menu.getReceivers());
             float low = menu.getRangeMin() / (float) menu.getRangeMax();
+            // 40 ticks is two or three rolls: the trace's last bars, the rest still empty.
+            int bars = 0;
             for (int i = 0; i < com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.HISTORY; i++) {
-                h.assertTrue(menu.sampleHeight(i) >= low - 0.01F && menu.sampleHeight(i) <= 1F, "trace tick " + i + " within its range: " + menu.sampleHeight(i));
-                h.assertTrue(menu.sampleTaken(i) > 0.99F, "all of it taken at tick " + i);
-                h.assertTrue(loneMenu.sampleTaken(i) == 0F && loneMenu.sampleHeight(i) > 0F, "the lone one's trace is all lost, tick " + i);
+                if (menu.sampleHeight(i) <= 0F) continue;
+                bars++;
+                h.assertTrue(menu.sampleHeight(i) >= low - 0.01F && menu.sampleHeight(i) <= 1F, "trace roll " + i + " within its range: " + menu.sampleHeight(i));
+                h.assertTrue(menu.sampleTaken(i) > 0.99F, "all of it taken in roll " + i);
+                h.assertTrue(loneMenu.sampleTaken(i) == 0F && loneMenu.sampleHeight(i) > 0F, "the lone one's trace is all lost, roll " + i);
             }
+            h.assertTrue(bars >= 2 && bars <= 3 && menu.sampleHeight(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.HISTORY - 1) > 0F,
+                    "a bar for each roll so far, the one now last: " + bars);
             h.assertTrue(loneMenu.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.Status.NOTHING_CONNECTED
                     && loneMenu.getLost() == loneMenu.getGenerated(), "on its own it loses everything: " + loneMenu.getStatus());
             // Broken from a top corner: one generator drops, not twelve.

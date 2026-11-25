@@ -20,7 +20,7 @@ import net.minecraft.util.RandomSource;
 
 /**
  * "Hume Field Generator": the generator, a Hume Energy Cube and an Energy Cable for what it powers, its random output
- * range and average, its nauseating pulse, and that it has no buffer, with a sample trace of its output. Read from the
+ * range and average, how often it rolls a new amount, and that it has no buffer, with a sample trace of its output. Read from the
  * server's config, so it matches the machine.
  */
 public class HumeFieldCategory extends AbstractRecipeCategory<HumeFieldDisplay> {
@@ -80,14 +80,12 @@ public class HumeFieldCategory extends AbstractRecipeCategory<HumeFieldDisplay> 
                 .setTooltip(Component.translatable("jei.barelyfunctionalcontraptions.hume_field.range_desc"));
         builder.addText(List.of(Component.translatable("jei.barelyfunctionalcontraptions.hume_field.average", Numbers.grouped((min + max) / 2))),
                         WIDTH - 8, 10).setPosition(4, 57).setColor(0xFFFFD27F).setTextAlignment(HorizontalAlignment.CENTER);
-        int interval = com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.humeFieldPulseInterval);
-        int radius = com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.humeFieldNauseaRadius);
-        if (interval > 0 && radius > 0) {
-            int seconds = com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.humeFieldNauseaSeconds);
-            builder.addText(List.of(Component.translatable("jei.barelyfunctionalcontraptions.hume_field.pulse", Math.max(1, Math.round(interval / 20F)), radius)),
-                            WIDTH - 8, 10).setPosition(4, 68).setColor(0xFF9A7ACF).setTextAlignment(HorizontalAlignment.CENTER)
-                    .setTooltip(Component.translatable("jei.barelyfunctionalcontraptions.hume_field.pulse_desc", seconds, radius));
-        }
+        int perRoll = com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.humeFieldTicksPerRoll);
+        builder.addText(List.of(perRoll % 20 == 0
+                                ? Component.translatable("jei.barelyfunctionalcontraptions.hume_field.roll_seconds", perRoll / 20)
+                                : Component.translatable("jei.barelyfunctionalcontraptions.hume_field.roll_ticks", perRoll)),
+                        WIDTH - 8, 10).setPosition(4, 68).setColor(0xFF9A7ACF).setTextAlignment(HorizontalAlignment.CENTER)
+                .setTooltip(Component.translatable("jei.barelyfunctionalcontraptions.hume_field.roll_desc"));
         builder.addText(List.of(Component.translatable("jei.barelyfunctionalcontraptions.hume_field.no_buffer")), WIDTH - 8, 10)
                 .setPosition(4, HEIGHT - 14).setColor(0xFFE35D5D).setTextAlignment(HorizontalAlignment.CENTER)
                 .setTooltip(Component.translatable("jei.barelyfunctionalcontraptions.hume_field.no_buffer_desc"));

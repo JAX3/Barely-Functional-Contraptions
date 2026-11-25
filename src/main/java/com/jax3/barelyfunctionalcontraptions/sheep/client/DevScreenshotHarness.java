@@ -1633,9 +1633,10 @@ public final class DevScreenshotHarness {
             // Counter and (4, 5) by the Machine Status Panel. Row 6, added by extendPlatform: (0, 6) the Wool-Lined Crates
             // (built by an earlier run, as "crates"), (1, 6) the Fleece Trawler (as "fleece trawler"), (2, 6) the upgrade
             // cards (as "upgrades"), (3, 6) the Hume Field Generator (as "hume field"); (4, 6) is free. An earlier run also
-            // cabled the old wireless-power scene ("cable the wireless scene"). Now: the Hume Field Generators onto the
-            // Machine Status Panel.
-            {"hume field on the panel", 3, 6},
+            // cabled the old wireless-power scene ("cable the wireless scene") and put the Hume Field Generators on the
+            // Machine Status Panel ("hume field on the panel"). Now: the Hume Field Generator cell rebuilt, its Nausea
+            // warning gone (its pulse no longer gives Nausea).
+            {"hume field", 3, 6},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -1906,7 +1907,7 @@ public final class DevScreenshotHarness {
     /**
      * Three Hume Field Generators showing their three states: one with two Hume Energy Cubes against it (delivering all
      * it makes), one with only a Powered Furnace against it (wasting what the furnace can't take, and everything once
-     * it's full), and one on its own (all of it lost). Its pulse nauseates players within 8 blocks, hence the warning.
+     * it's full), and one on its own (all of it lost).
      */
     private static void humeFieldWorldScene(MinecraftServer server) {
         ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
@@ -1917,6 +1918,9 @@ public final class DevScreenshotHarness {
                 e -> e instanceof net.minecraft.world.entity.Display.TextDisplay || e instanceof net.minecraft.world.entity.item.ItemEntity)) e.discard();
         for (BlockPos p : BlockPos.betweenClosed(g.offset(-9, 0, -6), g.offset(9, 6, 5))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
         for (BlockPos p : BlockPos.betweenClosed(g.offset(-9, -1, -6), g.offset(9, -1, 5))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+        // A rebuild empties the old chests and furnace onto the floor: clear that away too.
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(12, 8, 12),
+                e -> e instanceof net.minecraft.world.entity.item.ItemEntity)) e.discard();
         var block = ModBlocks.HUME_FIELD_GENERATOR.get();
         String[][] labels = {{"Delivering: cubes catch it all", "green"}, {"Wasting: the furnace uses a little", "gold"},
                 {"Alone: all of it lost", "red"}};
@@ -1947,7 +1951,7 @@ public final class DevScreenshotHarness {
             for (int i = 0; i < feed.getContainerSize(); i++) feed.setItem(i, new ItemStack(Items.COBBLESTONE, 64));
         }
         label(server, g.above(7).north(3), "Hume Field Generator: random power, no buffer", "light_purple");
-        label(server, g.above(6).north(3), "Its pulse gives Nausea within 8 blocks", "yellow");
+        label(server, g.above(6).north(3), "A new amount every second", "yellow");
         linkHumeFieldToPanel(server);
         ResourcefulSheep.LOGGER.info("EXTEND hume field built round {}", g);
     }
@@ -2953,7 +2957,7 @@ public final class DevScreenshotHarness {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                 ServerLevel level = player.level();
                 origin = player.blockPosition();
-                for (String c : new String[]{"time set noon", "weather clear", "gamemode spectator @a"}) {
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
                     server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
                 }
                 for (BlockPos p : BlockPos.betweenClosed(origin.offset(-4, 0, -6), origin.offset(4, 5, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
@@ -2995,7 +2999,7 @@ public final class DevScreenshotHarness {
                     player.openMenu(be, core);
                 }
             });
-            case 206 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 206 -> { McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); McClient.clearChat(mc); }
             case 226 -> shot(mc, "hume_field_gui");
             case 228 -> {
                 McClient.setScreen(mc, null);
@@ -3014,7 +3018,7 @@ public final class DevScreenshotHarness {
             case 272 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Hume Field Generator"); }
             case 276 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
             case 286 -> shot(mc, "hume_field_guide");
-            // A pulse, from a few blocks back in survival: its burst of sparks, then the Nausea warping the view.
+            // A pulse, from a few blocks back in survival: its burst of sparks, and no Nausea.
             case 288 -> {
                 McClient.setScreen(mc, null);
                 command(server, "gamemode survival @a");
@@ -3026,12 +3030,12 @@ public final class DevScreenshotHarness {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                 BlockPos core = origin.offset(-1, 0, -4);
                 if (player.level().getBlockEntity(core) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity be) {
-                    int reached = be.pulse(player.level(), core);
-                    ResourcefulSheep.LOGGER.warn("HUME pulse reached {} players; nausea {}", reached, player.getEffect(net.minecraft.world.effect.MobEffects.NAUSEA));
+                    be.pulse(player.level(), core);
+                    ResourcefulSheep.LOGGER.warn("HUME pulsed; the player's nausea: {}", player.getEffect(net.minecraft.world.effect.MobEffects.NAUSEA));
                 }
             });
             case 304 -> shot(mc, "hume_field_pulse");
-            case 390 -> shot(mc, "hume_field_nausea");
+            case 390 -> { /* (no Nausea to show any more) */ }
             case 396 -> mc.stop();
             default -> {}
         }

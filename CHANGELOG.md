@@ -4,7 +4,7 @@
 
 New contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage (crates and a controller that links them into one store), a fishing
 machine driven by a new sea-going sheep, upgrade cards for the processing machines, a mid-game generator that runs on static, a late-game
-generator with a random output, no buffer and a nauseating pulse, and a wall screen that keeps an eye on all your machines. They come after 1.5.5,
+generator with a random output and no buffer, and a wall screen that keeps an eye on all your machines. They come after 1.5.5,
 in 1.5.7. Numbers are the defaults; almost all of them can be changed in the synced config.
 
 ### Storage: the Wool-Lined Crate
@@ -124,41 +124,42 @@ Work in Progress tab and is now finished: in released jars, in the creative tab'
 
   It fills the space east, south and above where it's placed, and breaking any of its twelve blocks drops one
   generator.
-- **Random power, no buffer:** every tick its field makes a **random amount of FE** between `minPerTick` and
-  `maxPerTick` (200 to 1,200 FE/t by default, so 700 on average). It has **no energy buffer**: that tick's power goes
+- **Random power, no buffer:** every second its field rolls a **random amount of FE per tick** between `minPerTick`
+  and `maxPerTick` (200 to 1,200 FE/t by default, so 700 on average), and makes that much each tick until the next
+  roll (`ticksPerRoll`, 20). It has **no energy buffer**: each tick's power goes
   straight into whatever touches any of its blocks (cables, Hume Energy Cubes, machines), and whatever they don't take
   is **lost**. Nothing can pull power out of it, and on its own it wastes everything it makes. It offers each tick's
   power to a different neighbour first, so no one of them always gets first pick.
-- **A nauseating pulse:** every 5 seconds its field **pulses** with a burst of purple sparks and a deep hum, and every
-  player within 8 blocks of its middle gets **7 seconds of Nausea**. Spectators are spared, and a player still dizzy
-  from the last pulse is topped up, not stacked. Build it away from where you work.
+- **The pulse:** every 5 seconds its field **pulses** with a burst of purple sparks and a deep hum. It's just for show.
 - **Window** (right-click any of its blocks). It has no buffer, so in place of an energy gauge:
-  - a **field gauge** showing what it made this tick, against its range (shaded) and its average (yellow marks);
+  - a **field gauge** showing what it makes now, against its range (shaded) and its average (yellow marks);
   - this tick's output, how much was **taken** and how much was **lost**;
-  - a **trace** of its last 28 ticks, newest on the right, each bar purple where its neighbours took the power and red
-    where it was lost, with the ends of its range dashed across it;
-  - its average over the last second and its range;
+  - a **trace** of its last rolls, one bar a second with the roll now on the right, each bar purple where its
+    neighbours took the power and red where it was lost, with the ends of its range dashed across it;
+  - its average over its last 10 rolls and its range;
   - a **countdown to the next pulse** by its title, flashing in the last second;
-  - a status lamp: *Delivering all it makes* (green), *Wasting some* (amber: its neighbours were full or couldn't take
-    that much a tick), *Nothing to take it: all lost* (red), or *Field off* (its range is 0).
+  - a status lamp: *Delivering all it makes* (green), *Wasting power* (amber: what touches it was full or couldn't take
+    that much a tick, so some or all was lost), *Nothing to take it: all lost* (red), or *Field off* (its range is 0).
+
+  Its core flickers slowly, and the gauge's shimmer is gentle.
 
   Every part has a tooltip, and the status's says how many blocks touching it take power.
 - **Jade:** its status, this tick's output and its range, what was taken and lost, its average, the next pulse, and that
   it has no buffer, whichever of its twelve blocks you look at.
-- **JEI:** a *Hume Field Generator* page (its range, its average, its pulse, what it powers and that it has no buffer,
+- **JEI:** a *Hume Field Generator* page (its range, its average, how often it rolls, what it powers and that it has no buffer,
   read from the config), and an information page.
 - **Recipe:** Blocks of Blue Steel in the corners, Tinted Glass at the top, two Hume Energy Cubes either side of a
   Nether Star, and a Functional Machine Block at the bottom. It's unlocked by picking up a Nether Star. A pickaxe breaks
   it quickly.
 - New config section `[hume_field_generator]`: `minPerTick`, `maxPerTick` (swapped if the minimum is the larger),
-  `pulseInterval` (ticks between pulses; 0 stops them), `nauseaRadius` (0 keeps the pulse but gives no Nausea) and
-  `nauseaSeconds`.
+  `ticksPerRoll` (how long each amount lasts; 1 rolls every tick) and `pulseInterval` (ticks between pulses; 0 stops
+  them).
 - **Contraptions Manual:** its chapter moved from Work in Progress to Power. To keep the Power tab to ten chapters,
   *Energy Storage* (the Hume Energy Cube) moved to **Logistics**, next to cables and tanks.
 - **Test world:** cell (3, 6) shows it delivering, wasting and alone (see Test world below).
 - **Machine Status Panel:** link it with the wrench from any of its twelve blocks. It shows *Delivering* (green),
-  *Wasting some* (amber) or *Not connected* (red, which the panel's alarm comparator counts), with its average FE/t
-  over the last second (its output changes every tick). The test world's panel now shows its three as well.
+  *Wasting power* (amber) or *Not connected* (red, which the panel's alarm comparator counts), with its average FE/t
+  over its last 10 rolls. The test world's panel now shows its three as well.
 - **Not yet:** it takes no upgrade cards, and its planned upkeep (re-infusing sheep) isn't in.
 
 ### Utility: the Machine Status Panel
@@ -317,7 +318,7 @@ shared code path where there used to be eighteen copies, so a new machine is mos
 - **Wireless power scene:** its generator is now cabled to the separator and shears it used to power wirelessly.
 - **Hume Field Generator:** cell (3, 6) has three, one for each state: two Hume Energy Cubes against the first catch
   everything it makes (*Delivering*), a Powered Furnace smelting cobblestone against the second takes only the little
-  it uses (*Wasting*), and the third stands alone (*Nothing to take it*). Mind the Nausea within 8 blocks.
+  it uses (*Wasting*), and the third stands alone (*Nothing to take it*). All three are on the status panel.
 - **Upgrade cards:** cell (2, 6) has three separators on the same Iron Wool: plain, with a Speed card and with an
   Efficiency card.
 - **Wool-Lined Crates:** a storeroom wall of fourteen crates, each lined the colour of what it holds; and a hopper

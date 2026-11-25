@@ -19,8 +19,8 @@ import net.minecraft.world.entity.player.Inventory;
 
 /**
  * Window of the Hume Field Generator. It has no buffer, so instead of an energy gauge the left gauge shows what its
- * field made this tick, against its range (the band, with the average marked). Right, the field panel: the output,
- * what was taken and what was lost, and the trace of its last ticks, each bar what it made (purple where it was taken,
+ * field makes now, against its range (the band, with the average marked). Right, the field panel: the output,
+ * what was taken and what was lost, and the trace of its last rolls, each bar what it made (purple where it was taken,
  * red where it was lost), with the range's ends dashed across it. Top right: the countdown to its next pulse (it
  * flashes in the last second). Bottom: the status lamp and line. Art:
  * {@code textures/gui/hume_field_generator.png}, see {@code tools/sheep/generate_textures.py}.
@@ -66,7 +66,7 @@ public class HumeFieldGeneratorScreen extends AbstractContainerScreen<HumeFieldG
             int offset = GAUGE_H - height;
             graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + GAUGE_X, y + GAUGE_Y + offset, FILL_U, offset, GAUGE_W, height, TEX, TEX);
             if (height >= 2) {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + GAUGE_X, y + GAUGE_Y + offset, FILL_U, SHIMMER_V + (int) (time / 2 % 4) * 2,
+                graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + GAUGE_X, y + GAUGE_Y + offset, FILL_U, SHIMMER_V + (int) (time / 8 % 4) * 2,
                         GAUGE_W, 2, TEX, TEX);
             }
         }
@@ -118,7 +118,7 @@ public class HumeFieldGeneratorScreen extends AbstractContainerScreen<HumeFieldG
             Component pulse = Component.translatable(key + "pulse", (menu.getUntilPulse() + 19) / 20);
             long time = minecraft != null && minecraft.level != null ? minecraft.level.getGameTime() : 0;
             boolean soon = menu.getUntilPulse() <= 20;
-            graphics.text(font, pulse, imageWidth - 8 - font.width(pulse), titleLabelY, soon && time % 6 < 3 ? 0xFFFFFFFF : soon ? FIELD : 0xFF9A7ACF, false);
+            graphics.text(font, pulse, imageWidth - 8 - font.width(pulse), titleLabelY, soon && time % 20 < 10 ? 0xFFFFFFFF : soon ? FIELD : 0xFF9A7ACF, false);
         }
         Component field = Component.translatable(key + "field", Numbers.grouped(menu.getGenerated()));
         graphics.text(font, field, CENTRE - font.width(field) / 2, 20, menu.getGenerated() > 0 ? FIELD : TEXT_DIM, false);
@@ -149,7 +149,7 @@ public class HumeFieldGeneratorScreen extends AbstractContainerScreen<HumeFieldG
             if (menu.getLost() > 0) lines.add(Component.translatable(key + "lost.title", Numbers.grouped(menu.getLost())).withColor(LOST_TEXT));
             lines.add(Component.translatable(key + "buffer.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(TRACE_X - 1, TRACE_Y - 1, HumeFieldGeneratorBlockEntity.HISTORY * BAR_STEP + 1, TRACE_H + 2, mouseX, mouseY)) {
-            lines.add(Component.translatable(key + "trace", HumeFieldGeneratorBlockEntity.HISTORY).withColor(FIELD));
+            lines.add(Component.translatable(key + "trace", HumeFieldGeneratorBlockEntity.HISTORY - 1).withColor(FIELD));
             lines.add(Component.translatable(key + "trace.taken").withColor(TAKEN));
             lines.add(Component.translatable(key + "trace.lost").withColor(LOST_TEXT));
             lines.add(Component.translatable(key + "trace.range").withColor(0xFF9A7ACF));
