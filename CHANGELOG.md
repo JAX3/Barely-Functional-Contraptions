@@ -300,6 +300,10 @@ shared code path where there used to be eighteen copies, so a new machine is mos
   still links generators to generators, machines to a Machine Status Panel and crates to a Crate Controller.
 
 ### Fixes
+- **Machine Status Panel, long names:** its screen sized its text for short names, so with only a machine or two it
+  drew them large and cut long ones off (*Hume Field Generat*, *Wasting po*). It now sizes the text so every
+  machine's whole name, status and number fit. Its window shows a name or status that's a little too long slightly
+  smaller rather than cutting it off.
 - **Item Pipe on a Mechanical Separator's top:** it never took the separator's outputs, even set to pull: outputs only
   came out of the bottom, so the separator filled up and stopped (*Output Full*). Pipes now take its outputs from any
   side that has one, as they do from the Automatic Shears; it still pushes outputs only out of its bottom, so a hopper

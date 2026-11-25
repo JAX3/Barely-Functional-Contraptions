@@ -26,7 +26,7 @@ import org.jspecify.annotations.Nullable;
 public class StatusPanelRenderer implements BlockEntityRenderer<StatusPanelBlockEntity, StatusPanelRenderer.State> {
     private static final float DEPTH = -6F / 16F + 0.003F;
     private static final float SCALE = 0.0085F;
-    /** The width a column needs for a machine's name and its number, in font pixels. */
+    /** The least width a column gets, in font pixels; wider when its machines' names, statuses and numbers need it. */
     private static final float COLUMN_PX = 88;
     private static final int NAME = 0xFFDFE4F5, NUMBER = 0xFFBFE8FF, DIM = 0xFF6A7080;
 
@@ -76,11 +76,20 @@ public class StatusPanelRenderer implements BlockEntityRenderer<StatusPanelBlock
         // as fills it best: one panel's four rows at the smallest, a big screen's few rows large.
         float screenW = state.width - 4F / 16F, screenH = state.height - 4F / 16F;
         int n = Math.max(1, state.rows.size());
+        // How wide a column must be for every row to fit whole: the lamp and name, or the status, a gap and the number.
+        float columnPx = COLUMN_PX;
+        for (StatusPanelBlockEntity.Row row : state.rows) {
+            // (As drawn below: the name gets the column less 9, the status the column less the number less 4; and the
+            // column is 4 narrower than its share, plus a pixel or two of rounding.)
+            int nameLine = 9 + font.width(row.displayName().getString());
+            int statusLine = font.width(row.report().statusText().getString()) + 6 + font.width(row.report().number());
+            columnPx = Math.max(columnPx, Math.max(nameLine, statusLine) + 6);
+        }
         float scale = 0;
         int columns = 1;
         for (int c = 1; c <= state.width; c++) {
             int per = (n + c - 1) / c;
-            float s = Math.min(Math.min(screenH / (per * 21F), screenW / c / COLUMN_PX), SCALE * 3);
+            float s = Math.min(Math.min(screenH / (per * 21F), screenW / c / columnPx), SCALE * 3);
             if (s > scale) {
                 scale = s;
                 columns = c;

@@ -3043,7 +3043,32 @@ public final class DevScreenshotHarness {
                 }
             });
             case 304 -> shot(mc, "hume_field_pulse");
-            case 390 -> { /* (no Nausea to show any more) */ }
+            // A one-panel Machine Status Panel showing it: its long name and status fit on the screen and in the window.
+            case 330 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                BlockPos at = origin.offset(3, 0, -1);
+                level.setBlock(at.below(), Blocks.STONE_BRICKS.defaultBlockState(), 3);
+                level.setBlock(at, ModBlocks.STATUS_PANEL.get().defaultBlockState()
+                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.FACING, Direction.SOUTH), 3);
+                if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel) {
+                    panel.toggleLink(level, origin.offset(-1, 0, -4));
+                    panel.refresh(level, at, level.getBlockState(at));
+                }
+                command(server, "gamemode spectator @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 8", at.getX() + 0.5, at.getY() - 1.1, at.getZ() + 1.9));
+            });
+            case 360 -> shot(mc, "hume_field_on_panel");
+            case 362 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                BlockPos at = origin.offset(3, 0, -1);
+                command(server, "gamemode creative @a");
+                if (player.level().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel) {
+                    player.openMenu(panel, at);
+                }
+            });
+            case 370 -> { setHudHidden(mc, false); McClient.clearChat(mc); McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); }
+            case 384 -> shot(mc, "hume_field_on_panel_gui");
             case 396 -> mc.stop();
             default -> {}
         }

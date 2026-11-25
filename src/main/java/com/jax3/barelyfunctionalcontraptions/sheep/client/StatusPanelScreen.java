@@ -202,11 +202,13 @@ public class StatusPanelScreen extends AbstractContainerScreen<StatusPanelMenu> 
             int y = LIST_Y + slot * ROW_H;
             int colour = row.report().level().color;
             graphics.fill(LIST_X + 4, y + 4, LIST_X + 9, y + 9, colour);
-            graphics.text(font, font.plainSubstrByWidth(row.displayName().getString(), 100), LIST_X + 13, y + 2, row.custom().isEmpty() ? TEXT : 0xFFFFD27F, false);
-            graphics.text(font, font.plainSubstrByWidth(row.report().statusText().getString(), 90), LIST_X + 13, y + 11, colour, false);
             String number = row.report().number();
-            graphics.text(font, number, BUTTONS_X - 6 - font.width(number), y + 2, NUMBER, false);
             String distance = Component.translatable(key + "distance", (int) Math.round(Math.sqrt(row.pos().distSqr(menu.pos())))).getString();
+            // The name and status get the room left of the number and distance, shrunk a little to fit if they need it.
+            fitted(graphics, row.displayName().getString(), LIST_X + 13, y + 2, BUTTONS_X - 10 - font.width(number) - (LIST_X + 13),
+                    row.custom().isEmpty() ? TEXT : 0xFFFFD27F);
+            fitted(graphics, row.report().statusText().getString(), LIST_X + 13, y + 11, BUTTONS_X - 10 - font.width(distance) - (LIST_X + 13), colour);
+            graphics.text(font, number, BUTTONS_X - 6 - font.width(number), y + 2, NUMBER, false);
             graphics.text(font, distance, BUTTONS_X - 6 - font.width(distance), y + 11, DIM, false);
         }
     }
@@ -308,5 +310,21 @@ public class StatusPanelScreen extends AbstractContainerScreen<StatusPanelMenu> 
         protected void updateWidgetNarration(NarrationElementOutput output) {
             defaultButtonNarrationText(output);
         }
+    }
+
+    /** Draws {@code text} in {@code maxWidth}: as it is if it fits, else smaller (down to three-quarters), else cut short. */
+    private void fitted(GuiGraphicsExtractor graphics, String text, int x, int y, int maxWidth, int colour) {
+        int width = font.width(text);
+        if (width <= maxWidth) {
+            graphics.text(font, text, x, y, colour, false);
+            return;
+        }
+        float scale = Math.max(0.75F, maxWidth / (float) width);
+        String shown = font.plainSubstrByWidth(text, (int) (maxWidth / scale));
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(x, y + (1 - scale) * 4);
+        graphics.pose().scale(scale, scale);
+        graphics.text(font, shown, 0, 0, colour, false);
+        graphics.pose().popMatrix();
     }
 }
