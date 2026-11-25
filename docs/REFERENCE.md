@@ -68,21 +68,12 @@ The main creative tab is split into the Contraptions Manual's sections (Power, L
 ### Contraptions Manual (in-game guide)
 Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game. Its chapters are sorted into six tabs along the top of the left panel:
 
-- **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Wool Burner, Sheep Treadmill), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator) and *Late Game* (Zero Point Module, Thermal Reaction Chamber), then energy storage. A guide chapter's optional `"group"` field sets the heading it is listed under.
-- **Logistics:** cables and the Energy Meter, tanks and pipes, pipe modes and filters, and the Wool Packer.
+- **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Wool Burner, Sheep Treadmill), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator, Static Generator) and *Late Game* (Zero Point Module, Thermal Reaction Chamber, Echo Chamber, Hume Field Generator). A guide chapter's optional `"group"` field sets the heading it is listed under.
+- **Logistics:** cables and the Energy Meter, tanks and pipes, energy storage (the Hume Energy Cube, moved here from Power to make room for the Hume Field Generator), pipe modes and filters, the Wool Packer, and the crates.
 - **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Powered Furnace, the Snow Sheep Chiller, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
 - **Utility:** getting started, the wrench and its links, Woollen Armour and the Muffled effect, and data packs and commands.
 - **Recipes:** built from the game itself, so it matches any data-pack or modpack changes. *Machines* and *Parts, Tools and Armour* show every crafting recipe of the mod as a 3x3 grid; *Infusion* shows what each sheep is fed and the wool it grows; *Infusion Altar* shows the catalysts round the feeding item, with the tier and power; *Mechanical Separator* shows what every wool separates into, with the power and time; *Wool Bales* shows packing, unpacking and what every bale separates into. Ingredients that take any of several items cycle through them, and hovering over an item shows its tooltip.
-- **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned late-game generators that need upkeep: *Hume Field Generator*, *Lightning Array* and *Fleece Fusion*, and the *Quantum Sheep*, which blinks in and out of existence, changes its wool type and drops random resource wool. None of them is in the game yet. The Hume Field Generator has a first model, a 2x2 machine two and a half blocks tall, built like the Echo Chamber (a steel plinth and lid on chunky corner pillars lit with Hume purple, a framed window in each wall onto its flickering core and field coils, and an emitter on the lid): in development builds (`runClient`) it can be placed with `/give @s barelyfunctionalcontraptions:hume_field_generator` to look at. It fills the 2x2x3 space east, south and above where it's placed (and won't place if any of it is taken), breaking any part removes the whole machine. **Power (first step):** every tick its field makes a random amount of FE between `[hume_field_generator] minPerTick` and `maxPerTick` (200-1,200 FE/t by default) and pushes it straight into whatever touches any of its blocks: cables, Hume Energy Cubes, machines. It has **no energy buffer**, so whatever they don't take that tick is lost, and nothing can pull power out of it. **Window** (right-click it): a field gauge with this tick's output against its range and average, what was taken and lost, a trace of its last 28 ticks (purple where taken, red where lost), and a status lamp (*Delivering all it makes*, *Wasting some*, *Nothing to take it: all lost*, *Field off*). Jade shows the same, and JEI has a page for it and an information page. **Recipe:** Blue Steel Blocks in the corners, Tinted Glass top middle, Hume Energy Cubes either side of a Nether Star, a Functional Machine Block bottom middle (unlocked by a Nether Star); broken, it drops itself. Released jars don't include it.
-
-  | Hume Field Generator (WIP model) | Close up |
-  |---|---|
-  | ![The 2x2 Hume Field Generator beside a one-block Hume Energy Cube: a steel plinth and lid on four corner pillars with purple light strips, a framed purple-tinted window in each wall, and an emitter on top](screenshots/wip_hume_field_front.png) | ![Close up of the Hume Field Generator's front: the core and its three field coils glowing through the purple window, framed in steel trim](screenshots/wip_hume_field_close.png) |
-
-  | Its window | Jade, JEI and its recipe |
-  |---|---|
-  | ![The Hume Field Generator's window: a purple field gauge, the output, taken and lost, a trace of 28 purple bars between the dashed ends of its range, its average and range, and a green lamp reading Delivering all it makes](screenshots/hume_field_gui.png) | ![Jade on the Hume Field Generator: Delivering all it makes, Field 485 FE/t (200-1,200), Taken 485 FE/t, Average 807 FE/t, No buffer](screenshots/hume_field_jade.png) |
-  | ![JEI's Hume Field Generator page: a sample trace, the generator, a line to an Energy Cable, 200-1,200 FE/t at random, 700 FE/t on average, and No buffer: what isn't taken is lost](screenshots/hume_field_jei.png) | ![JEI's crafting recipe: Blue Steel Blocks in the corners, Tinted Glass, two Hume Energy Cubes either side of a Nether Star, and a Functional Machine Block](screenshots/hume_field_jei_recipe.png) |
+- **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned late-game generators that need upkeep, *Lightning Array* and *Fleece Fusion*, and the *Quantum Sheep*, which blinks in and out of existence, changes its wool type and drops random resource wool. None of them is in the game yet. (The *Hume Field Generator* started here and is now a finished machine in the Power tab: see [Hume Field Generator](#hume-field-generator).)
 
   A resource pack's guide file puts a chapter here with `"tab": "wip"`, and can give it a `"fallback_icon"` to show when its `"icon"` item isn't in the game.
 
@@ -634,6 +625,30 @@ B M B      B = Blackstone, M = Functional Machine Block
 | ![JEI showing its recipe: Iron Blocks either side of an Echo Shard, Echo Shards either side of a Warden Wool Bale, and Blackstone either side of a Functional Machine Block](screenshots/wip_echo_chamber_jei_recipe.png) | |
 
 <a id="sheep-attraction"></a>
+
+### Hume Field Generator
+
+A late-game generator, 2x2 and three blocks tall (two and three-quarters with its emitter), built like the Echo Chamber: a steel plinth and lid on chunky corner pillars lit with Hume purple, a framed window in each wall onto its flickering core and three field coils, and an emitter on the lid. It fills the space east, south and above where it's placed, and won't place if any of that is taken. Breaking any of its twelve blocks removes the whole machine and drops one generator (a pickaxe breaks it quickly). Right-click any of its blocks for its window.
+
+- **Power:** every tick its field makes a **random** amount of FE between `[hume_field_generator] minPerTick` and `maxPerTick` (200-1,200 FE/t by default, 700 on average).
+- **No buffer:** that tick's power goes straight into whatever touches any of its blocks (Energy Cables, Hume Energy Cubes, machines), offered to a different neighbour first each tick. Whatever they can't take is **lost**, and nothing can pull power out of it. On its own it wastes everything; a Hume Energy Cube against it catches all of it and evens out the swings.
+- **The pulse:** every `pulseInterval` ticks (100, 5 seconds) its field pulses, with a burst of purple sparks and a deep hum. Every player within `nauseaRadius` blocks of its middle (8) gets `nauseaSeconds` of **Nausea** (7); spectators are spared. A player still dizzy from the last pulse is topped up, not stacked. `pulseInterval = 0` stops it pulsing, and `nauseaRadius = 0` keeps the pulse but gives no Nausea.
+- **Window:** a field gauge with this tick's output against its range (shaded) and its one-second average (yellow marks); what it made, what was taken and what was lost; a trace of its last 28 ticks, each bar purple where taken and red where lost, with the range's ends dashed across; its average and range; a countdown to the next pulse (flashing in its last second); and a status lamp: *Delivering all it makes* (green), *Wasting some* (amber), *Nothing to take it: all lost* (red), *Field off* (grey, a range of 0). Every part has a tooltip.
+- **Jade:** its status, this tick's output and range, what was taken and lost, its average, the next pulse and that it has no buffer, whichever of its blocks you look at. **JEI:** a page with its range, average, pulse and the no-buffer rule (read from the config), and an information page.
+- **Recipe:** Block of Blue Steel, Tinted Glass, Block of Blue Steel; Hume Energy Cube, Nether Star, Hume Energy Cube; Block of Blue Steel, Functional Machine Block, Block of Blue Steel. Unlocked by picking up a Nether Star.
+- **Config** `[hume_field_generator]`: `minPerTick` (200), `maxPerTick` (1,200; swapped if below the minimum), `pulseInterval` (100 ticks), `nauseaRadius` (8 blocks), `nauseaSeconds` (7).
+
+| From the front | Close up |
+|---|---|
+| ![The 2x2 Hume Field Generator beside a Hume Energy Cube: a steel plinth and lid on four corner pillars with purple light strips, a framed purple-tinted window in each wall, and an emitter on top](screenshots/wip_hume_field_front.png) | ![Close up of the Hume Field Generator's front: the core and its three field coils glowing through the purple window, framed in steel trim](screenshots/wip_hume_field_close.png) |
+
+| A pulse | Its window |
+|---|---|
+| ![A Hume Field Generator pulsing: a burst of purple sparks from its core and emitter, a Hume Energy Cube against its side](screenshots/hume_field_pulse.png) | ![The Hume Field Generator's window: the field gauge, Taken and Lost, a trace of 28 purple bars between the dashed ends of its range, Avg and 200-1,200, Pulse 2s by the title, and a green lamp reading Delivering all it makes](screenshots/hume_field_gui.png) |
+
+| Jade | JEI |
+|---|---|
+| ![Jade on the Hume Field Generator: Delivering all it makes, its field, taken, average and No buffer](screenshots/hume_field_jade.png) | ![JEI's Hume Field Generator page: a sample trace, the generator, a line to an Energy Cable, 200-1,200 FE/t at random, 700 FE/t on average, and No buffer](screenshots/hume_field_jei.png) |
 
 ### Sheep attraction
 The Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction Chamber and Echo Chamber keep the sheep they use close by. Every half second, a sheep of the right kind that has wandered out of the working area, but is still within 4 blocks of it (`range` in `[sheep_attraction]`, one block up or down too), walks back to a spot inside it, the way sheep follow wheat.

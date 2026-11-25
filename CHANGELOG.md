@@ -225,44 +225,50 @@ The mod's command is now **`/bfc`** (short for Barely Functional Contraptions) i
 - **Updating:** command blocks, functions and scripts that call `/barelyfunctionalcontraptions` need changing to
   `/bfc`; the long name no longer works.
 
-### Hume Field Generator: a new look, and its first power (work in progress)
-The planned late-game Hume Field Generator, a 2x2 machine two and a half blocks tall, is still in development builds
-only, but it has a new model and now makes power.
-- **Redesigned to match the other big machines,** the Echo Chamber above all:
+### Late game: the Hume Field Generator
+A new late-game generator, 2x2 and three blocks tall, whose field can't make up its mind. It began in the manual's
+Work in Progress tab and is now finished: in released jars, in the creative tab's Power section, and in the manual's
+**Power** tab (Late Game).
+- **Built like the other big machines,** the Echo Chamber above all:
   - a steel plinth and lid with the same banding and rivets, their dark strip lit with Hume purple;
-  - chunky corner pillars with purple light strips, in place of the thin open cage;
+  - chunky corner pillars with purple light strips;
   - a window in each wall, framed in steel trim like the Echo Chamber's dish, with glass tinted the field's purple so
-    its flickering core and three coils glow through (you could see the sky through it before);
-  - a larger emitter on the lid, among four corner bolts.
+    its flickering core and three coils glow through;
+  - an emitter on the lid, among four corner bolts.
 
-  Every face is drawn at the same pixel size as the rest of the mod, and its hitbox follows the new outline (the
-  emitter now reaches 2.75 blocks up).
+  It fills the space east, south and above where it's placed, and breaking any of its twelve blocks drops one
+  generator.
 - **Random power, no buffer:** every tick its field makes a **random amount of FE** between `minPerTick` and
   `maxPerTick` (200 to 1,200 FE/t by default, so 700 on average). It has **no energy buffer**: that tick's power goes
-  straight into whatever touches any of its twelve blocks (cables, Hume Energy Cubes, machines), and whatever they don't
-  take is **lost**. Nothing can pull power out of it, and on its own it wastes everything it makes. It offers each
-  tick's power to a different neighbour first, so no one of them always gets first pick.
-- New config section `[hume_field_generator]`: `minPerTick`, `maxPerTick` (swapped if the minimum is the larger).
+  straight into whatever touches any of its blocks (cables, Hume Energy Cubes, machines), and whatever they don't take
+  is **lost**. Nothing can pull power out of it, and on its own it wastes everything it makes. It offers each tick's
+  power to a different neighbour first, so no one of them always gets first pick.
+- **A nauseating pulse:** every 5 seconds its field **pulses** with a burst of purple sparks and a deep hum, and every
+  player within 8 blocks of its middle gets **7 seconds of Nausea**. Spectators are spared, and a player still dizzy
+  from the last pulse is topped up, not stacked. Build it away from where you work.
 - **Window** (right-click any of its blocks). It has no buffer, so in place of an energy gauge:
   - a **field gauge** showing what it made this tick, against its range (shaded) and its average (yellow marks);
   - this tick's output, how much was **taken** and how much was **lost**;
   - a **trace** of its last 28 ticks, newest on the right, each bar purple where its neighbours took the power and red
     where it was lost, with the ends of its range dashed across it;
   - its average over the last second and its range;
+  - a **countdown to the next pulse** by its title, flashing in the last second;
   - a status lamp: *Delivering all it makes* (green), *Wasting some* (amber: its neighbours were full or couldn't take
     that much a tick), *Nothing to take it: all lost* (red), or *Field off* (its range is 0).
 
   Every part has a tooltip, and the status's says how many blocks touching it take power.
-- **Jade:** its status, this tick's output and its range, what was taken and lost, its average, and that it has no
-  buffer. It works whichever of its twelve blocks you look at.
-- **JEI:** a *Hume Field Generator* page (its range, its average, what it powers and that it has no buffer, read from
-  the config), and an information page.
-- **Recipe:** Blue Steel Blocks in the corners, Tinted Glass at the top, two Hume Energy Cubes either side of a Nether
-  Star, and a Functional Machine Block at the bottom. It's unlocked by picking up a Nether Star. Broken from any of
-  its blocks, it drops one generator (it needs a pickaxe to break quickly).
-- The recipe, its unlock, its drop and its pickaxe tag only load where the block exists, so released jars, which don't
-  have it yet, are unaffected.
-- Still to come: its upkeep, and a place in released jars.
+- **Jade:** its status, this tick's output and its range, what was taken and lost, its average, the next pulse, and that
+  it has no buffer, whichever of its twelve blocks you look at.
+- **JEI:** a *Hume Field Generator* page (its range, its average, its pulse, what it powers and that it has no buffer,
+  read from the config), and an information page.
+- **Recipe:** Blocks of Blue Steel in the corners, Tinted Glass at the top, two Hume Energy Cubes either side of a
+  Nether Star, and a Functional Machine Block at the bottom. It's unlocked by picking up a Nether Star. A pickaxe breaks
+  it quickly.
+- New config section `[hume_field_generator]`: `minPerTick`, `maxPerTick` (swapped if the minimum is the larger),
+  `pulseInterval` (ticks between pulses; 0 stops them), `nauseaRadius` (0 keeps the pulse but gives no Nausea) and
+  `nauseaSeconds`.
+- **Contraptions Manual:** its chapter moved from Work in Progress to Power. To keep the Power tab to ten chapters,
+  *Energy Storage* (the Hume Energy Cube) moved to **Logistics**, next to cables and tanks.
 
 ### Under the hood: one machine frame
 Every machine and generator is now built from a shared **machine frame** with separate **modules** switched on for

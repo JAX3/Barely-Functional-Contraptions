@@ -2944,7 +2944,30 @@ public final class DevScreenshotHarness {
             }
             case 256 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
             case 266 -> shot(mc, "hume_field_jei_recipe");
-            case 272 -> mc.stop();
+            // Its chapter in the Contraptions Manual, in the Power tab now.
+            case 268 -> McClient.setScreen(mc, new GuideScreen());
+            case 272 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Hume Field Generator"); }
+            case 276 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 286 -> shot(mc, "hume_field_guide");
+            // A pulse, from a few blocks back in survival: its burst of sparks, then the Nausea warping the view.
+            case 288 -> {
+                McClient.setScreen(mc, null);
+                command(server, "gamemode survival @a");
+                command(server, "effect clear @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 160 12", origin.getX() + 1.2, origin.getY() + 0.0, origin.getZ() + 1.5));
+            }
+            case 292 -> { setHudHidden(mc, true); McClient.clearChat(mc); }
+            case 300 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                BlockPos core = origin.offset(-1, 0, -4);
+                if (player.level().getBlockEntity(core) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity be) {
+                    int reached = be.pulse(player.level(), core);
+                    ResourcefulSheep.LOGGER.warn("HUME pulse reached {} players; nausea {}", reached, player.getEffect(net.minecraft.world.effect.MobEffects.NAUSEA));
+                }
+            });
+            case 304 -> shot(mc, "hume_field_pulse");
+            case 390 -> shot(mc, "hume_field_nausea");
+            case 396 -> mc.stop();
             default -> {}
         }
     }

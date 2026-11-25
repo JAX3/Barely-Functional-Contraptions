@@ -14,7 +14,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 /**
- * Work in progress: the Hume Field Generator's workings, held by its bottom north-west block.
+ * The Hume Field Generator's workings, held by its bottom north-west block.
  *
  * <ul>
  *     <li>Every tick its field makes a <b>random</b> amount of FE between {@code [hume_field_generator] minPerTick} and
@@ -23,6 +23,9 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  *     (cables, cubes, machines), and whatever they don't take is lost. Nothing can be pulled from it.</li>
  *     <li>It offers the FE to its neighbours in turn, starting with a different one each tick, so no one of them always
  *     gets first pick.</li>
+ *     <li>Every {@code pulseInterval} ticks its field <b>pulses</b> (a burst of purple particles and a deep hum), giving
+ *     every player within {@code nauseaRadius} blocks of its middle {@code nauseaSeconds} of Nausea. Spectators are
+ *     spared.</li>
  * </ul>
  *
  * It's on the machine frame with no modules switched on: nothing to save, store or connect.
@@ -32,7 +35,9 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
     /** How many ticks its window's trace shows, and how many its average is over. */
     public static final int HISTORY = 28, AVERAGE_OVER = 20;
     /** Values synced to the window: generated, delivered, average, min and max (two shorts each), status, receivers, the trace. */
-    public static final int DATA_COUNT = 12 + HISTORY;
+    public static final int DATA_COUNT = 13 + HISTORY;
+    /** Where the trace starts in its synced values. */
+    public static final int TRACE_DATA = 13;
 
     /** How its power is going, for the window, Jade and the status lamp. */
     public enum Status {
@@ -66,16 +71,19 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
     private int delivered;
     private long totalDelivered;
     private int start;
+    private int pulses;
     private int receivers;
     private Status status = Status.NOTHING_CONNECTED;
     /** The last {@link #HISTORY} ticks, oldest first from {@link #head}: what it made and what was taken. */
     private final int[] madeHistory = new int[HISTORY], takenHistory = new int[HISTORY];
     private int head;
+    /** Ticks until its field next pulses. */
+    private int untilPulse = -1;
 
     private final net.minecraft.world.inventory.ContainerData data = new net.minecraft.world.inventory.ContainerData() {
         @Override
         public int get(int index) {
-            if (index >= 12) return sample(index - 12);
+            if (index >= TRACE_DATA) return sample(index - TRACE_DATA);
             return switch (index) {
                 case 0 -> generated & 0xFFFF;
                 case 1 -> generated >>> 16;
@@ -89,6 +97,7 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
                 case 9 -> rangeMax() >>> 16;
                 case 10 -> status.ordinal();
                 case 11 -> receivers;
+                case 12 -> Math.min(Short.MAX_VALUE, Math.max(0, untilPulse));
                 default -> 0;
             };
         }
@@ -132,9 +141,60 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
         be.totalDelivered += be.delivered;
         be.status = be.generated <= 0 ? Status.IDLE : be.receivers == 0 ? Status.NOTHING_CONNECTED
                 : be.delivered < be.generated ? Status.WASTING : Status.DELIVERING;
+        be.tickPulse(level, pos);
         be.madeHistory[be.head] = be.generated;
         be.takenHistory[be.head] = be.delivered;
         be.head = (be.head + 1) % HISTORY;
+    }
+
+    /** Counts down to its field's next pulse, and pulses when it gets there (never, with {@code pulseInterval} 0). */
+    private void tickPulse(ServerLevel level, BlockPos origin) {
+        int interval = ModConfigs.getInt(ModConfigs.SERVER.humeFieldPulseInterval);
+        if (interval <= 0) {
+            untilPulse = 0;
+            return;
+        }
+        if (untilPulse < 0 || untilPulse > interval) untilPulse = interval;
+        if (--untilPulse <= 0) {
+            pulse(level, origin);
+            untilPulse = interval;
+        }
+    }
+
+    /** The middle of the machine, where its pulse comes from. */
+    public static net.minecraft.world.phys.Vec3 centre(BlockPos origin) {
+        return new net.minecraft.world.phys.Vec3(origin.getX() + 1.0, origin.getY() + 1.4, origin.getZ() + 1.0);
+    }
+
+    /**
+     * Its field pulses: purple particles burst from its core, it hums, and every player (but spectators) within
+     * {@code nauseaRadius} blocks of its middle gets {@code nauseaSeconds} of Nausea. Returns how many players it reached.
+     */
+    public int pulse(ServerLevel level, BlockPos origin) {
+        var centre = centre(origin);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL, centre.x, centre.y, centre.z, 60, 0.9, 1.1, 0.9, 0.08);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.WITCH, centre.x, centre.y + 1.2, centre.z, 16, 0.6, 0.3, 0.6, 0.02);
+        level.playSound(null, origin.offset(1, 1, 1), net.minecraft.sounds.SoundEvents.BEACON_POWER_SELECT, net.minecraft.sounds.SoundSource.BLOCKS,
+                1.2F, 0.55F + level.getRandom().nextFloat() * 0.1F);
+        pulses++;
+        return nauseate(level.players(), centre);
+    }
+
+    /**
+     * Gives {@code nauseaSeconds} of Nausea to each of {@code players} (but spectators) within {@code nauseaRadius} blocks
+     * of {@code centre}, one pulse's worth. Returns how many it reached.
+     */
+    public static int nauseate(Iterable<? extends net.minecraft.world.entity.player.Player> players, net.minecraft.world.phys.Vec3 centre) {
+        int radius = ModConfigs.getInt(ModConfigs.SERVER.humeFieldNauseaRadius);
+        if (radius <= 0) return 0;
+        int ticks = ModConfigs.getInt(ModConfigs.SERVER.humeFieldNauseaSeconds) * 20;
+        int reached = 0;
+        for (var player : players) {
+            if (player.isSpectator() || player.distanceToSqr(centre) > (double) radius * radius) continue;
+            player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NAUSEA, ticks, 0, false, true, true));
+            reached++;
+        }
+        return reached;
     }
 
     /** The configured range's ends, the smaller first. */
@@ -228,6 +288,16 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
 
     public Status status() {
         return status;
+    }
+
+    /** Ticks until its field next pulses (0 if it never does). */
+    public int untilPulse() {
+        return Math.max(0, untilPulse);
+    }
+
+    /** How many times its field has pulsed since it was loaded. */
+    public int pulses() {
+        return pulses;
     }
 
     @Override

@@ -125,7 +125,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.SHEEP_TREADMILL.get(), SheepTreadmillScreen::new);
         event.register(ModMenus.THERMAL_REACTION_CHAMBER.get(), ThermalReactionChamberScreen::new);
         event.register(ModMenus.ECHO_CHAMBER.get(), EchoChamberScreen::new);
-        if (ModMenus.HUME_FIELD_GENERATOR != null) event.register(ModMenus.HUME_FIELD_GENERATOR.get(), HumeFieldGeneratorScreen::new);
+        event.register(ModMenus.HUME_FIELD_GENERATOR.get(), HumeFieldGeneratorScreen::new);
         event.register(ModMenus.STATIC_GENERATOR.get(), StaticGeneratorScreen::new);
         event.register(ModMenus.GRASS_SEEDER.get(), GrassSeederScreen::new);
         event.register(ModMenus.HERD_COUNTER.get(), HerdCounterScreen::new);
@@ -196,10 +196,9 @@ public final class ResourcefulSheepClient {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.creative_generator")
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
-        if (com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_FIELD_GENERATOR != null
-                && event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_FIELD_GENERATOR.get())) {
+        if (event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_FIELD_GENERATOR.get())) {
             event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions.hume_field_generator")
-                    .withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE, net.minecraft.ChatFormatting.ITALIC));
+                    .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
         // A machine item carrying upgrade cards (broken or picked up with them in) lists them.
         var upgrades = event.getItemStack().get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());

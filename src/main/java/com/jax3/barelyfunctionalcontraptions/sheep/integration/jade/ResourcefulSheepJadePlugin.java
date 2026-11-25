@@ -41,10 +41,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(EnergyMeterProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyMeterBlockEntity.class);
         registration.registerBlockDataProvider(ThermalReactionChamberProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.class);
         registration.registerBlockDataProvider(EchoChamberProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity.class);
-        // Work in progress: development builds only, like the block.
-        if (com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.HUME_FIELD_GENERATOR != null) {
-            registration.registerBlockDataProvider(HumeFieldGeneratorProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.class);
-        }
+        registration.registerBlockDataProvider(HumeFieldGeneratorProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.class);
         registration.registerBlockDataProvider(StaticGeneratorProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.class);
         registration.registerBlockDataProvider(StatusPanelProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.class);
         registration.registerBlockDataProvider(HerdCounterProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.class);
@@ -76,10 +73,8 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(ThermalReactionChamberProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock.class);
         registration.registerBlockComponent(EchoChamberProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.class);
         EchoChamberProvider.redirect(registration);
-        if (com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.HUME_FIELD_GENERATOR != null) {
-            registration.registerBlockComponent(HumeFieldGeneratorProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.class);
-            HumeFieldGeneratorProvider.redirect(registration);
-        }
+        registration.registerBlockComponent(HumeFieldGeneratorProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.class);
+        HumeFieldGeneratorProvider.redirect(registration);
         registration.registerBlockComponent(StaticGeneratorProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.class);
         StaticGeneratorProvider.redirect(registration);
         registration.registerBlockComponent(StatusPanelProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock.class);

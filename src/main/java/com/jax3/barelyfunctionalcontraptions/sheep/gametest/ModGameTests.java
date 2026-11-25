@@ -170,9 +170,10 @@ public final class ModGameTests {
         TESTS.put("woollen_armor_takes_the_wool_colour", ModGameTests::woollenArmorColour);
         TESTS.put("wrench_dismantles_machines_into_the_inventory", ModGameTests::wrenchDismantles);
         TESTS.put("woollen_boots_muffle_the_wearer", ModGameTests::woollenBootsMuffle);
-        if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
-        if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_makes_random_power_with_no_buffer", ModGameTests::humeFieldPower);
-        if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_window_recipe_and_drop", ModGameTests::humeFieldWindowRecipeDrop);
+        TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
+        TESTS.put("hume_field_generator_makes_random_power_with_no_buffer", ModGameTests::humeFieldPower);
+        TESTS.put("hume_field_generator_window_recipe_and_drop", ModGameTests::humeFieldWindowRecipeDrop);
+        TESTS.put("hume_field_generator_pulse_makes_players_nearby_nauseous", ModGameTests::humeFieldPulse);
         TESTS.put("echo_chamber_is_three_by_three", ModGameTests::echoChamber);
         ECHO_TESTS.put("echo_chamber_counts_its_warden_sheep", ModGameTests::echoCountsHerd);
         ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
@@ -1130,7 +1131,7 @@ public final class ModGameTests {
     }
 
     /**
-     * The work-in-progress Hume Field Generator (development builds only) takes a 2x2 area three blocks high: placing it
+     * The Hume Field Generator takes a 2x2 area three blocks high: placing it
      * fills the eleven blocks east, south and above it, it won't place where one is taken, and breaking any removes all.
      */
     private static void humeField(GameTestHelper h) {
@@ -1166,6 +1167,42 @@ public final class ModGameTests {
                     h.assertTrue(h.getBlockState(at).isAir(), "corner " + p + " layer " + l + " is gone too, was " + h.getBlockState(at));
                 }
             }
+            h.succeed();
+        });
+    }
+
+    /**
+     * Its field pulses every {@code pulseInterval} ticks on its own (counting down in its window), and each pulse gives
+     * players within {@code nauseaRadius} of its middle {@code nauseaSeconds} of Nausea: not one further away, and not a
+     * spectator. The generator is in the creative tab, out of the work-in-progress builds.
+     */
+    private static void humeFieldPulse(GameTestHelper h) {
+        int interval = ModConfigs.getInt(ModConfigs.SERVER.humeFieldPulseInterval);
+        int radius = ModConfigs.getInt(ModConfigs.SERVER.humeFieldNauseaRadius);
+        int seconds = ModConfigs.getInt(ModConfigs.SERVER.humeFieldNauseaSeconds);
+        var be = humeFieldAt(h, new BlockPos(1, 1, 1));
+        var centre = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.centre(h.absolutePos(new BlockPos(1, 1, 1)));
+        var near = h.makeMockPlayer(GameType.SURVIVAL);
+        near.setPos(centre.x + 3, centre.y - 1.4, centre.z + 2);
+        var edge = h.makeMockPlayer(GameType.SURVIVAL);
+        edge.setPos(centre.x, centre.y, centre.z - (radius - 0.5));
+        var far = h.makeMockPlayer(GameType.SURVIVAL);
+        far.setPos(centre.x + radius + 2, centre.y - 1.4, centre.z);
+        var watching = h.makeMockPlayer(GameType.SPECTATOR);
+        watching.setPos(centre.x + 1, centre.y, centre.z + 1);
+        int reached = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.nauseate(List.of(near, edge, far, watching), centre);
+        h.assertTrue(reached == 2, "a pulse reaches the two players within " + radius + " blocks, reached " + reached);
+        var nausea = near.getEffect(net.minecraft.world.effect.MobEffects.NAUSEA);
+        h.assertTrue(nausea != null && nausea.getDuration() == seconds * 20, "the near player gets " + seconds + "s of Nausea: " + nausea);
+        h.assertTrue(edge.hasEffect(net.minecraft.world.effect.MobEffects.NAUSEA), "and so does one just inside its range");
+        h.assertFalse(far.hasEffect(net.minecraft.world.effect.MobEffects.NAUSEA), "not one further out");
+        h.assertFalse(watching.hasEffect(net.minecraft.world.effect.MobEffects.NAUSEA), "nor a spectator");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.registry.ContraptionsCreativeTab.SECTIONS.getFirst().items().get().stream()
+                .anyMatch(stack -> stack.is(ModItems.HUME_FIELD_GENERATOR.get())), "it's in the creative tab's Power section");
+        // On its own, it pulses every interval, counting down in between.
+        h.runAfterDelay(5, () -> h.assertTrue(be.untilPulse() > 0 && be.untilPulse() <= interval, "counting down to a pulse: " + be.untilPulse()));
+        h.runAfterDelay(interval + 5, () -> {
+            h.assertTrue(be.pulses() == 1, "it pulsed once in " + interval + " ticks, pulsed " + be.pulses());
             h.succeed();
         });
     }

@@ -60,14 +60,16 @@ public class HumeFieldGeneratorMenu extends MachineMenu {
     public Status getStatus() { return Status.byId(data.get(10)); }
     /** How many blocks touching it take power. */
     public int getReceivers() { return data.get(11); }
+    /** Ticks until its field next pulses (0 if it never does). */
+    public int getUntilPulse() { return data.get(12); }
 
     /** Tick {@code i} of the trace (0 the oldest): what it made as a share of the range's top, 0-1. */
     public float sampleHeight(int i) {
-        return ((data.get(12 + i) & 0xFFFF) >>> 8) / 255F;
+        return ((data.get(HumeFieldGeneratorBlockEntity.TRACE_DATA + i) & 0xFFFF) >>> 8) / 255F;
     }
 
     /** Tick {@code i} of the trace: the share of what it made that was taken, 0-1. */
     public float sampleTaken(int i) {
-        return (data.get(12 + i) & 0xFF) / 255F;
+        return (data.get(HumeFieldGeneratorBlockEntity.TRACE_DATA + i) & 0xFF) / 255F;
     }
 }

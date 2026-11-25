@@ -25,13 +25,14 @@ import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Work in progress: the planned Hume Field Generator, so far only its model. A 2x2 machine two and a half blocks tall,
+ * The Hume Field Generator, a late-game 2x2 machine two and a half blocks tall,
  * built like the Echo Chamber: a steel plinth and lid on four chunky corner pillars lit with Hume purple, a window in
  * each wall onto a core that flickers between "on" and "off" inside three field coils, and an emitter on the lid
- * that watches it. It's registered in development builds only while it's built.
+ * that watches it.
  *
  * <p>Its field makes a random amount of FE each tick and pushes it straight into whatever touches it, with no buffer
- * to keep what isn't taken ({@link HumeFieldGeneratorBlockEntity}, held by corner 0 of layer 0).</p>
+ * to keep what isn't taken, and its field pulses every few seconds, making players nearby nauseous
+ * ({@link HumeFieldGeneratorBlockEntity}, held by corner 0 of layer 0).</p>
  *
  * <p>It's twelve blocks, as a bed is two: {@link #PART} says which corner (0 is the north-west one that was placed, 1
  * east of it, 2 south, 3 south-east) and {@link #LAYER} how high (0-2). Corner 0 of layer 0 draws the lower two blocks

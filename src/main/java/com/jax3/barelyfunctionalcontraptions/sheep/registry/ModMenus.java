@@ -60,9 +60,8 @@ public final class ModMenus {
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.ThermalReactionChamberMenu::new));
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.StaticGeneratorMenu>> STATIC_GENERATOR =
             REGISTER.register("static_generator", () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.StaticGeneratorMenu::new));
-    /** Work in progress, development builds only, like its block (null in released jars). */
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.HumeFieldGeneratorMenu>> HUME_FIELD_GENERATOR =
-            ModBlocks.HUME_FIELD_GENERATOR == null ? null : REGISTER.register("hume_field_generator", () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.HumeFieldGeneratorMenu::new));
+            REGISTER.register("hume_field_generator", () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.HumeFieldGeneratorMenu::new));
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.EchoChamberMenu>> ECHO_CHAMBER =
             REGISTER.register("echo_chamber", () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.EchoChamberMenu::new));
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.SheepTreadmillMenu>> SHEEP_TREADMILL = REGISTER.register("sheep_treadmill",

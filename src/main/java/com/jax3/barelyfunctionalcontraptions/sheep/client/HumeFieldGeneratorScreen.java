@@ -21,7 +21,8 @@ import net.minecraft.world.entity.player.Inventory;
  * Window of the Hume Field Generator. It has no buffer, so instead of an energy gauge the left gauge shows what its
  * field made this tick, against its range (the band, with the average marked). Right, the field panel: the output,
  * what was taken and what was lost, and the trace of its last ticks, each bar what it made (purple where it was taken,
- * red where it was lost), with the range's ends dashed across it. Bottom: the status lamp and line. Art:
+ * red where it was lost), with the range's ends dashed across it. Top right: the countdown to its next pulse (it
+ * flashes in the last second). Bottom: the status lamp and line. Art:
  * {@code textures/gui/hume_field_generator.png}, see {@code tools/sheep/generate_textures.py}.
  */
 public class HumeFieldGeneratorScreen extends AbstractContainerScreen<HumeFieldGeneratorMenu> {
@@ -113,6 +114,12 @@ public class HumeFieldGeneratorScreen extends AbstractContainerScreen<HumeFieldG
     protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         String key = "gui.barelyfunctionalcontraptions.hume_field_generator.";
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT_COLOR, false);
+        if (menu.getUntilPulse() > 0) {
+            Component pulse = Component.translatable(key + "pulse", (menu.getUntilPulse() + 19) / 20);
+            long time = minecraft != null && minecraft.level != null ? minecraft.level.getGameTime() : 0;
+            boolean soon = menu.getUntilPulse() <= 20;
+            graphics.text(font, pulse, imageWidth - 8 - font.width(pulse), titleLabelY, soon && time % 6 < 3 ? 0xFFFFFFFF : soon ? FIELD : 0xFF9A7ACF, false);
+        }
         Component field = Component.translatable(key + "field", Numbers.grouped(menu.getGenerated()));
         graphics.text(font, field, CENTRE - font.width(field) / 2, 20, menu.getGenerated() > 0 ? FIELD : TEXT_DIM, false);
         graphics.text(font, Component.translatable(key + "taken", Numbers.grouped(menu.getDelivered())), PANEL_L, 30,
@@ -151,6 +158,9 @@ public class HumeFieldGeneratorScreen extends AbstractContainerScreen<HumeFieldG
             lines.add(Component.translatable(key + "gauge.range", Numbers.grouped(menu.getRangeMin()), Numbers.grouped(menu.getRangeMax()))
                     .withStyle(ChatFormatting.GRAY));
             lines.add(Component.translatable(key + "range.desc").withStyle(ChatFormatting.DARK_GRAY));
+        } else if (menu.getUntilPulse() > 0 && isHovering(imageWidth - 60, 3, 54, 12, mouseX, mouseY)) {
+            lines.add(Component.translatable(key + "pulse.title", (menu.getUntilPulse() + 19) / 20).withColor(FIELD));
+            lines.add(Component.translatable(key + "pulse.desc").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(LAMP_X, LAMP_Y - 1, 150, 10, mouseX, mouseY)) {
             lines.add(statusText().copy().withColor(menu.getStatus().color));
             lines.add(Component.translatable(key + "status." + menu.getStatus().name().toLowerCase(Locale.ROOT) + ".desc").withStyle(ChatFormatting.GRAY));

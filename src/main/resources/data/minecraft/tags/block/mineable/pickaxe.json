@@ -29,9 +29,6 @@
     "barelyfunctionalcontraptions:status_panel",
     "barelyfunctionalcontraptions:blue_steel_block",
     "barelyfunctionalcontraptions:fleece_trawler",
-    {
-      "id": "barelyfunctionalcontraptions:hume_field_generator",
-      "required": false
-    }
+    "barelyfunctionalcontraptions:hume_field_generator"
   ]
 }

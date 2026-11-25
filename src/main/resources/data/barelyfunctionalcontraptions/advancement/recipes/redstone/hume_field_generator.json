@@ -1,10 +1,4 @@
 {
-  "neoforge:conditions": [
-    {
-      "type": "neoforge:registered",
-      "value": "barelyfunctionalcontraptions:hume_field_generator"
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_nether_star": {

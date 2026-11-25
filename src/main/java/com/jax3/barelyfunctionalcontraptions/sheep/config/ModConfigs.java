@@ -162,6 +162,9 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue glowPanelOutput;
         public final ModConfigSpec.IntValue humeFieldMinPerTick;
         public final ModConfigSpec.IntValue humeFieldMaxPerTick;
+        public final ModConfigSpec.IntValue humeFieldPulseInterval;
+        public final ModConfigSpec.IntValue humeFieldNauseaRadius;
+        public final ModConfigSpec.IntValue humeFieldNauseaSeconds;
         public final ModConfigSpec.IntValue woolBurnerCapacity;
         public final ModConfigSpec.IntValue woolBurnerOutput;
         public final ModConfigSpec.BooleanValue statsEnabled;
@@ -475,12 +478,19 @@ public final class ModConfigs {
                     .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
             b.pop();
 
-            b.comment("Hume Field Generator (work in progress, development builds only). Each tick its field makes a random amount of FE",
-                    "between these two and pushes it straight into whatever touches it. It has no buffer: whatever isn't taken that tick is lost.").push("hume_field_generator");
+            b.comment("Hume Field Generator (late game, 2x2x3). Each tick its field makes a random amount of FE between minPerTick and",
+                    "maxPerTick and pushes it straight into whatever touches it. It has no buffer: whatever isn't taken that tick is lost.",
+                    "Every pulseInterval ticks its field pulses, giving Nausea to every player within nauseaRadius blocks.").push("hume_field_generator");
             humeFieldMinPerTick = b.comment("Least FE it makes in a tick.")
                     .defineInRange("minPerTick", 200, 0, 1_000_000);
             humeFieldMaxPerTick = b.comment("Most FE it makes in a tick (if it's below minPerTick, the two are swapped).")
                     .defineInRange("maxPerTick", 1_200, 0, 1_000_000);
+            humeFieldPulseInterval = b.comment("Ticks between its field's pulses (20 = a second). 0: it never pulses.")
+                    .defineInRange("pulseInterval", 100, 0, 72_000);
+            humeFieldNauseaRadius = b.comment("Blocks from its middle within which a pulse gives players Nausea. 0: a pulse gives no Nausea.")
+                    .defineInRange("nauseaRadius", 8, 0, 64);
+            humeFieldNauseaSeconds = b.comment("Seconds of Nausea each pulse gives (a player still dizzy from the last pulse is topped up, not stacked).")
+                    .defineInRange("nauseaSeconds", 7, 1, 600);
             b.pop();
 
             b.comment("Wool Burner (burns wool, string and Coal Wool for FE; fuels are data-driven, see wool_burner_fuel)").push("wool_burner");

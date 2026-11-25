@@ -243,12 +243,26 @@
       ]
     },
     {
-      "title": "Energy Storage",
-      "icon": "barelyfunctionalcontraptions:hume_energy_cube",
+      "title": "Hume Field Generator",
+      "icon": "barelyfunctionalcontraptions:hume_field_generator",
       "tab": "power",
-      "group": "Storage",
+      "group": "Late Game",
       "text": [
-        "A battery: 1,000,000 FE and 10,000 FE/t per cube. Touching cubes join into one bigger battery that pushes into the machines and cables around it."
+        "A 2x2 generator three blocks tall whose field can't make up its mind: every tick it makes a different, random amount of power.",
+        "It fills the space east, south and above where you place it (it won't place if anything's in the way). Right-click any part of it for its window. Breaking any part takes it all down and drops the generator; a pickaxe breaks it quickly.",
+        "## Power",
+        "- Every tick: a random 200 to 1,200 FE/t, so 700 on average.",
+        "- It has no buffer. Each tick's power goes straight into whatever touches any of its twelve blocks: Energy Cables, Hume Energy Cubes, machines. Whatever they can't take that tick is lost, and nothing can pull power out of it.",
+        "- On its own it wastes everything it makes. A Hume Energy Cube against it is the easy way to catch all of it and smooth out the swings.",
+        "## The pulse",
+        "- Every 5 seconds its field pulses: a burst of purple sparks and a deep hum.",
+        "- Every player within 8 blocks of its middle gets 7 seconds of Nausea, so build it where you won't be working, or wall it off at a distance.",
+        "- Its window and Jade count down to the next pulse.",
+        "## Its window",
+        "- The gauge shows this tick's power against its range, with its average marked. The trace shows its last 28 ticks: purple where its power was taken, red where it was lost.",
+        "- The lamp: green when everything is taken, amber when some is lost (its neighbours are full, or can't take that much a tick), red when nothing touching it takes power.",
+        "## Making it",
+        "- Block of Blue Steel, Tinted Glass, Block of Blue Steel on top; Hume Energy Cube, Nether Star, Hume Energy Cube in the middle; Block of Blue Steel, Functional Machine Block, Block of Blue Steel at the bottom."
       ]
     },
     {
@@ -272,6 +286,15 @@
         "## Fluid Pipe",
         "Carries fluid between anything that holds it, up to 4 buckets a tick. Machines are filled first, then tanks.",
         "Item Pipes carry items the same way, up to 16 a tick, taking only from output slots so chests and machine inputs are never drained."
+      ]
+    },
+    {
+      "title": "Energy Storage",
+      "icon": "barelyfunctionalcontraptions:hume_energy_cube",
+      "tab": "logistics",
+      "group": "Storage",
+      "text": [
+        "A battery: 1,000,000 FE and 10,000 FE/t per cube. Touching cubes join into one bigger battery that pushes into the machines and cables around it."
       ]
     },
     {
@@ -555,22 +578,7 @@
       "tab": "wip",
       "text": [
         "Features still being built are written up here as they arrive, so you can see what's coming.",
-        "Here are the planned late-game generators, which make a lot of power but need looking after, and the Quantum Sheep. None of them can be built yet, and their numbers may change. Back up your world before trying anything here once it arrives."
-      ]
-    },
-    {
-      "title": "Hume Field Generator",
-      "icon": "barelyfunctionalcontraptions:hume_field_generator",
-      "fallback_icon": "barelyfunctionalcontraptions:hume_energy_cube",
-      "tab": "wip",
-      "text": [
-        "Planned. Not in the game yet; the numbers may change.",
-        "A paired machine that isn't sure whether it makes power. Its output follows the infused sheep in its observation pen, whether they're watched or not.",
-        "## Power",
-        "- Around 10,000-60,000 FE/t on average, but it jumps around from moment to moment.",
-        "## Upkeep",
-        "- Smooth it out with a bank of Hume Energy Cubes, or the swings are hard to use.",
-        "- Re-infuse the sheep in its pen regularly, or its output averages down."
+        "Here are the planned late-game generators, which make a lot of power but need looking after, and the Quantum Sheep. None of them can be built yet, and their numbers may change. Back up your world before trying anything here once it arrives. (The Hume Field Generator has arrived: it's in the Power tab now.)"
       ]
     },
     {

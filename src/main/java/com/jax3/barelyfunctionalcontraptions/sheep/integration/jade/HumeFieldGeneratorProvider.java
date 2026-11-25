@@ -25,7 +25,7 @@ import snownee.jade.api.config.IPluginConfig;
 
 /**
  * Hume Field Generator: its status, what its field made this tick out of its range, what was taken and lost, its
- * average, and that it has no buffer. Whichever of its twelve blocks you look at, Jade is pointed at the bottom
+ * average, when it next pulses, and that it has no buffer. Whichever of its twelve blocks you look at, Jade is pointed at the bottom
  * north-west one, which holds the block entity ({@link #redirect}).
  */
 public final class HumeFieldGeneratorProvider {
@@ -34,15 +34,15 @@ public final class HumeFieldGeneratorProvider {
 
     private HumeFieldGeneratorProvider() {}
 
-    public record Data(int status, int generated, int delivered, int average, int min, int max, int receivers) {
+    public record Data(int status, int generated, int delivered, int average, int min, int max, int receivers, int untilPulse) {
         static final StreamCodec<RegistryFriendlyByteBuf, Data> CODEC = StreamCodec.of(
                 (buf, d) -> {
-                    for (int v : new int[]{d.status, d.generated, d.delivered, d.average, d.min, d.max, d.receivers}) ByteBufCodecs.VAR_INT.encode(buf, v);
+                    for (int v : new int[]{d.status, d.generated, d.delivered, d.average, d.min, d.max, d.receivers, d.untilPulse}) ByteBufCodecs.VAR_INT.encode(buf, v);
                 },
                 buf -> {
-                    int[] v = new int[7];
+                    int[] v = new int[8];
                     for (int i = 0; i < v.length; i++) v[i] = ByteBufCodecs.VAR_INT.decode(buf);
-                    return new Data(v[0], v[1], v[2], v[3], v[4], v[5], v[6]);
+                    return new Data(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
                 });
     }
 
@@ -66,7 +66,7 @@ public final class HumeFieldGeneratorProvider {
         public @Nullable Data streamData(BlockAccessor accessor) {
             if (!(accessor.getBlockEntity() instanceof HumeFieldGeneratorBlockEntity be)) return null;
             return new Data(be.status().ordinal(), be.generated(), be.delivered(), be.average(),
-                    HumeFieldGeneratorBlockEntity.rangeMin(), HumeFieldGeneratorBlockEntity.rangeMax(), be.receivers());
+                    HumeFieldGeneratorBlockEntity.rangeMin(), HumeFieldGeneratorBlockEntity.rangeMax(), be.receivers(), be.untilPulse());
         }
 
         @Override
@@ -99,6 +99,7 @@ public final class HumeFieldGeneratorProvider {
                 if (lost > 0) tooltip.add(Component.translatable(key + "lost", Numbers.grouped(lost)).withColor(LOST));
             }
             tooltip.add(Component.translatable(key + "average", Numbers.grouped(d.average())).withColor(GREY));
+            if (d.untilPulse() > 0) tooltip.add(Component.translatable(key + "pulse", (d.untilPulse() + 19) / 20).withColor(0x9A7ACF));
             tooltip.add(Component.translatable(key + "no_buffer").withColor(GREY));
         }
 
