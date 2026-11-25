@@ -1632,9 +1632,10 @@ public final class DevScreenshotHarness {
             // Rows 0 to 5 are full: up to (1, 5) by the moved scenes, (2, 5) by the Grass Seeder, (3, 5) by the Herd
             // Counter and (4, 5) by the Machine Status Panel. Row 6, added by extendPlatform: (0, 6) the Wool-Lined Crates
             // (built by an earlier run, as "crates"), (1, 6) the Fleece Trawler (as "fleece trawler"), (2, 6) the upgrade
-            // cards (as "upgrades"), (3, 6) the Hume Field Generator; (4, 6) is free. An earlier run also cabled the old
-            // wireless-power scene ("cable the wireless scene").
-            {"hume field", 3, 6},
+            // cards (as "upgrades"), (3, 6) the Hume Field Generator (as "hume field"); (4, 6) is free. An earlier run also
+            // cabled the old wireless-power scene ("cable the wireless scene"). Now: the Hume Field Generators onto the
+            // Machine Status Panel.
+            {"hume field on the panel", 3, 6},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -1947,7 +1948,20 @@ public final class DevScreenshotHarness {
         }
         label(server, g.above(7).north(3), "Hume Field Generator: random power, no buffer", "light_purple");
         label(server, g.above(6).north(3), "Its pulse gives Nausea within 8 blocks", "yellow");
+        linkHumeFieldToPanel(server);
         ResourcefulSheep.LOGGER.info("EXTEND hume field built round {}", g);
+    }
+
+    /** Links the test world's three Hume Field Generators (cell (3, 6)) to its Machine Status Panel, if they aren't yet. */
+    private static void linkHumeFieldToPanel(MinecraftServer server) {
+        ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+        BlockPos panelMaster = new BlockPos(128, 37, 152);
+        if (!(level.getBlockEntity(panelMaster) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel)) return;
+        for (int dx : HUME_WORLD_X) {
+            BlockPos core = new BlockPos(101 + dx, 35, 176);
+            var result = panel.links().contains(core) ? null : panel.toggleLink(level, core);
+            ResourcefulSheep.LOGGER.info("EXTEND hume field at {} linked to the status panel: {}", core, result);
+        }
     }
 
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
@@ -3996,7 +4010,25 @@ public final class DevScreenshotHarness {
             });
         }
         if (tick == report + 10) shot(mc, "tour_last");
-        if (tick == report + 20) mc.stop();
+        // The Machine Status Panel's window: every machine it shows, the Hume Field Generators at the end.
+        if (tick == report + 11) command(server, "tp @a 128.5 36 155.5 180 10"); // within reach of the panel, or its window closes
+        if (tick == report + 14) {
+            server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                BlockPos master = new BlockPos(128, 37, 152);
+                if (player.level().getBlockEntity(master) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel) {
+                    player.openMenu(panel, master);
+                }
+            });
+        }
+        if (tick == report + 18) { setHudHidden(mc, false); McClient.clearChat(mc); McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); }
+        if (tick == report + 30) shot(mc, "tour_panel");
+        if (tick == report + 32 && McClient.screen(mc) != null) {
+            for (int i = 0; i < 60; i++) McClient.screen(mc).mouseScrolled(mc.getWindow().getGuiScaledWidth() / 2.0, mc.getWindow().getGuiScaledHeight() / 2.0, 0, -1);
+        }
+        if (tick == report + 34) McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+        if (tick == report + 40) shot(mc, "tour_panel_end");
+        if (tick == report + 46) mc.stop();
     }
 
     /**
@@ -4245,6 +4277,7 @@ public final class DevScreenshotHarness {
                         case "cable the wireless scene" -> cableWirelessScene(server);
                         case "upgrades" -> upgradeWorldScene(server);
                         case "hume field" -> humeFieldWorldScene(server);
+                        case "hume field on the panel" -> linkHumeFieldToPanel(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);

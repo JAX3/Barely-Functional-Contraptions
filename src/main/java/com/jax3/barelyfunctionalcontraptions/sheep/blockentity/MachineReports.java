@@ -42,13 +42,13 @@ public final class MachineReports {
     /** Status names that mean a problem someone should look at. */
     private static final Set<String> PROBLEMS = Set.of("no_energy", "output_full", "invalid_input", "missing_catalysts", "no_sheep_altar",
             "not_enough_items", "no_source", "no_water", "overheated", "frozen", "too_loud", "shrieked", "needs_combs", "overcharged", "hungry",
-            "no_fuel", "no_ground", "overgrown", "missing", "crate_full", "crate_missing", "could_burst", "no_sheep", "tangled");
+            "no_fuel", "no_ground", "overgrown", "missing", "crate_full", "crate_missing", "could_burst", "no_sheep", "tangled", "nothing_connected");
     /** ... that mean it's working. */
     private static final Set<String> RUNNING = Set.of("processing", "infusing", "reacting", "listening", "charging", "walking", "tending",
-            "filling", "burning", "boosted", "running", "counting", "hauling");
+            "filling", "burning", "boosted", "running", "counting", "hauling", "delivering");
     /** ... that mean it's fine but waiting on something. */
     private static final Set<String> WAITING = Set.of("full", "energy_full", "redstone_disabled", "too_quiet", "asleep", "waking", "resting",
-            "all_green", "running_hot", "running_cold", "not_infinite", "cold", "nearly_full", "no_empty_crates", "no_crates");
+            "all_green", "running_hot", "running_cold", "not_infinite", "cold", "nearly_full", "no_empty_crates", "no_crates", "wasting");
 
     private static Report of(Enum<?> status, String number) {
         return of(status.name().toLowerCase(Locale.ROOT), number);
@@ -74,7 +74,8 @@ public final class MachineReports {
 
     /**
      * The block that holds a machine's block entity, from any of its blocks: a Static Generator's base from its dome, an
-     * Echo Chamber's core from any of its 27 blocks, a Sheep Treadmill's back from its front. Anything else: itself.
+     * Echo Chamber's core from any of its 27 blocks, a Hume Field Generator's bottom north-west block from any of its 12, a
+     * Sheep Treadmill's back from its front. Anything else: itself.
      */
     public static net.minecraft.core.BlockPos machinePos(net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos) {
         var state = level.getBlockState(pos);
@@ -84,6 +85,9 @@ public final class MachineReports {
         }
         if (block instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock) {
             return com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.core(pos, state);
+        }
+        if (block instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock) {
+            return com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.origin(pos, state);
         }
         if (block instanceof com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock) {
             return com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepTreadmillBlock.back(pos, state);
@@ -107,6 +111,8 @@ public final class MachineReports {
         if (be instanceof WoolBurnerBlockEntity b) return of(b.generating() > 0 ? "burning" : "idle", fe(b.generating()));
         if (be instanceof ThermalReactionChamberBlockEntity b) return of(b.state(), fe(b.generating()));
         if (be instanceof EchoChamberBlockEntity b) return of(b.state(), fe(b.generating()));
+        // Its output is random from tick to tick, so the panel shows its average over the last second.
+        if (be instanceof HumeFieldGeneratorBlockEntity b) return of(b.status(), fe(b.average()));
         if (be instanceof StaticGeneratorBlockEntity b) return of(b.state(), fe(b.generating()));
         if (be instanceof SheepTreadmillBlockEntity b) return of(b.state(), fe(b.generating()));
         if (be instanceof GlowPanelBlockEntity b) return of(b.generating() > 0 ? "running" : "idle", fe(b.generating()));

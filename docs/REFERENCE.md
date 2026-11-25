@@ -635,6 +635,7 @@ A late-game generator, 2x2 and three blocks tall (two and three-quarters with it
 - **The pulse:** every `pulseInterval` ticks (100, 5 seconds) its field pulses, with a burst of purple sparks and a deep hum. Every player within `nauseaRadius` blocks of its middle (8) gets `nauseaSeconds` of **Nausea** (7); spectators are spared. A player still dizzy from the last pulse is topped up, not stacked. `pulseInterval = 0` stops it pulsing, and `nauseaRadius = 0` keeps the pulse but gives no Nausea.
 - **Window:** a field gauge with this tick's output against its range (shaded) and its one-second average (yellow marks); what it made, what was taken and what was lost; a trace of its last 28 ticks, each bar purple where taken and red where lost, with the range's ends dashed across; its average and range; a countdown to the next pulse (flashing in its last second); and a status lamp: *Delivering all it makes* (green), *Wasting some* (amber), *Nothing to take it: all lost* (red), *Field off* (grey, a range of 0). Every part has a tooltip.
 - **Jade:** its status, this tick's output and range, what was taken and lost, its average, the next pulse and that it has no buffer, whichever of its blocks you look at. **JEI:** a page with its range, average, pulse and the no-buffer rule (read from the config), and an information page.
+- **Machine Status Panel:** link it with the wrench from any of its blocks. Its line reads *Delivering* (green), *Wasting some* (amber) or *Not connected* (red, a problem the panel's comparator counts), with its average FE/t over the last second.
 - **Recipe:** Block of Blue Steel, Tinted Glass, Block of Blue Steel; Hume Energy Cube, Nether Star, Hume Energy Cube; Block of Blue Steel, Functional Machine Block, Block of Blue Steel. Unlocked by picking up a Nether Star.
 - **Config** `[hume_field_generator]`: `minPerTick` (200), `maxPerTick` (1,200; swapped if below the minimum), `pulseInterval` (100 ticks), `nauseaRadius` (8 blocks), `nauseaSeconds` (7).
 
@@ -645,6 +646,10 @@ A late-game generator, 2x2 and three blocks tall (two and three-quarters with it
 | A pulse | Its window |
 |---|---|
 | ![A Hume Field Generator pulsing: a burst of purple sparks from its core and emitter, a Hume Energy Cube against its side](screenshots/hume_field_pulse.png) | ![The Hume Field Generator's window: the field gauge, Taken and Lost, a trace of 28 purple bars between the dashed ends of its range, Avg and 200-1,200, Pulse 2s by the title, and a green lamp reading Delivering all it makes](screenshots/hume_field_gui.png) |
+
+| On the Machine Status Panel | |
+|---|---|
+| ![The test world's Machine Status Panel window, scrolled to the end: three Hume Field Generators reading Delivering in green, Wasting some in amber and Not connected in red, each with its average FE/t](screenshots/hume_field_status_panel.png) | |
 
 | Jade | JEI |
 |---|---|

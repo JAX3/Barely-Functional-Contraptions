@@ -156,8 +156,10 @@ Work in Progress tab and is now finished: in released jars, in the creative tab'
 - **Contraptions Manual:** its chapter moved from Work in Progress to Power. To keep the Power tab to ten chapters,
   *Energy Storage* (the Hume Energy Cube) moved to **Logistics**, next to cables and tanks.
 - **Test world:** cell (3, 6) shows it delivering, wasting and alone (see Test world below).
-- **Not yet:** it takes no upgrade cards, and the Machine Status Panel can't show it. Its planned upkeep (re-infusing
-  sheep) isn't in.
+- **Machine Status Panel:** link it with the wrench from any of its twelve blocks. It shows *Delivering* (green),
+  *Wasting some* (amber) or *Not connected* (red, which the panel's alarm comparator counts), with its average FE/t
+  over the last second (its output changes every tick). The test world's panel now shows its three as well.
+- **Not yet:** it takes no upgrade cards, and its planned upkeep (re-infusing sheep) isn't in.
 
 ### Utility: the Machine Status Panel
 A thin wall screen that shows how your machines are doing, all in one place. It needs no power.

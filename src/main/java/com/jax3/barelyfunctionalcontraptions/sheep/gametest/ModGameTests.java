@@ -174,6 +174,7 @@ public final class ModGameTests {
         TESTS.put("hume_field_generator_makes_random_power_with_no_buffer", ModGameTests::humeFieldPower);
         TESTS.put("hume_field_generator_window_recipe_and_drop", ModGameTests::humeFieldWindowRecipeDrop);
         TESTS.put("hume_field_generator_pulse_makes_players_nearby_nauseous", ModGameTests::humeFieldPulse);
+        TESTS.put("status_panel_shows_the_hume_field_generator", ModGameTests::humeFieldOnPanel);
         TESTS.put("echo_chamber_is_three_by_three", ModGameTests::echoChamber);
         ECHO_TESTS.put("echo_chamber_counts_its_warden_sheep", ModGameTests::echoCountsHerd);
         ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
@@ -1203,6 +1204,41 @@ public final class ModGameTests {
         h.runAfterDelay(5, () -> h.assertTrue(be.untilPulse() > 0 && be.untilPulse() <= interval, "counting down to a pulse: " + be.untilPulse()));
         h.runAfterDelay(interval + 5, () -> {
             h.assertTrue(be.pulses() == 1, "it pulsed once in " + interval + " ticks, pulsed " + be.pulses());
+            h.succeed();
+        });
+    }
+
+    /**
+     * A Machine Status Panel links a Hume Field Generator from any of its twelve blocks (its core holds it: clicking the
+     * core next unlinks it). One with a cube against it reads Delivering, working, with its average FE/t; one alone
+     * reads Nothing connected, a problem the panel's comparator counts.
+     */
+    private static void humeFieldOnPanel(GameTestHelper h) {
+        var level = h.getLevel();
+        var fed = humeFieldAt(h, new BlockPos(1, 1, 1));
+        cube(h, new BlockPos(0, 2, 1));
+        var lone = humeFieldAt(h, new BlockPos(5, 1, 1));
+        BlockPos at = h.absolutePos(new BlockPos(3, 1, 5));
+        level.setBlockAndUpdate(at, ModBlocks.STATUS_PANEL.get().defaultBlockState());
+        var panel = (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity) level.getBlockEntity(at);
+        var LINKED = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.LinkResult.LINKED;
+        var UNLINKED = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.LinkResult.UNLINKED;
+        h.assertTrue(panel.toggleLink(level, h.absolutePos(new BlockPos(2, 3, 2))) == LINKED, "a top corner of the fed one links it");
+        h.assertTrue(panel.toggleLink(level, h.absolutePos(new BlockPos(6, 2, 1))) == LINKED, "the middle of the lone one links it");
+        h.assertTrue(panel.links().equals(List.of(fed.getBlockPos(), lone.getBlockPos())), "both by their cores: " + panel.links());
+        h.runAfterDelay(30, () -> {
+            panel.refresh(level, at, level.getBlockState(at));
+            var rows = panel.rows();
+            h.assertTrue(rows.size() == 2 && rows.get(0).name().equals(ModBlocks.HUME_FIELD_GENERATOR.get().getDescriptionId()), "it shows the Hume Field Generator: " + rows);
+            var delivering = rows.get(0).report();
+            h.assertTrue(delivering.status().equals("delivering") && delivering.level() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.Level.RUNNING,
+                    "the fed one is working: " + delivering);
+            h.assertTrue(delivering.number().equals(fed.average() + " FE/t"), "with its average: " + delivering.number() + " vs " + fed.average());
+            var alone = rows.get(1).report();
+            h.assertTrue(alone.status().equals("nothing_connected") && alone.level() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.Level.PROBLEM,
+                    "the lone one is a problem: " + alone);
+            h.assertTrue(panel.comparatorSignal() == 1, "which the comparator counts: " + panel.comparatorSignal());
+            h.assertTrue(panel.toggleLink(level, fed.getBlockPos()) == UNLINKED && panel.links().equals(List.of(lone.getBlockPos())), "its core is the same machine: unlinked");
             h.succeed();
         });
     }
