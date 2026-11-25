@@ -166,10 +166,11 @@ Work in Progress tab and is now finished: in released jars, in the creative tab'
 A thin wall screen that shows how your machines are doing, all in one place. It needs no power.
 - **Linking:** with the Barely Functional Wrench, click the panel (the wrench glows), then each machine within
   **200 blocks** (again to unlink one), then the panel again to finish. Any block of a bigger machine links it: the
-  Static Generator's dome, any block of the Echo Chamber, either end of the Sheep Treadmill.
+  Static Generator's dome, any block of the Echo Chamber or Hume Field Generator, either end of the Sheep Treadmill.
 - **Its screen:** two lines for each machine: its name with a status lamp, then its status and one key number (FE/t for
   generators; progress, stored energy, Ice made, wool held, grass or items stored for the rest). **Green** working,
-  **amber** waiting, **red** a problem, **grey** idle. A broken machine reads *Missing*.
+  **amber** waiting, **red** a problem, **grey** idle. A broken machine reads *Missing*. The text sizes itself so every
+  machine's whole name, status and number fit.
 - **Bigger screens:** panels facing the same way in a rectangle up to **3x3** join into one seamless screen, 4 machines
   a panel (36 on a 3x3), its rows sized to fill it. Break one and the rest regroup.
 - **Comparator:** reads how many of its machines have a problem, up to 15, for an alarm lamp or bell (or, if you
@@ -300,25 +301,30 @@ shared code path where there used to be eighteen copies, so a new machine is mos
   still links generators to generators, machines to a Machine Status Panel and crates to a Crate Controller.
 
 ### Fixes
-- **Machine Status Panel, long names:** its screen sized its text for short names, so with only a machine or two it
-  drew them large and cut long ones off (*Hume Field Generat*, *Wasting po*). It now sizes the text so every
-  machine's whole name, status and number fit. Its window shows a name or status that's a little too long slightly
-  smaller rather than cutting it off.
 - **Item Pipe on a Mechanical Separator's top:** it never took the separator's outputs, even set to pull: outputs only
   came out of the bottom, so the separator filled up and stopped (*Output Full*). Pipes now take its outputs from any
   side that has one, as they do from the Automatic Shears; it still pushes outputs only out of its bottom, so a hopper
   feeding it from above gets nothing back. `pipesTakeOutputsFromAnySide = false` in `[separator]` brings back the old
   way.
 - **Static Generator window:** the dome's charge bar no longer flashes while it's overcharged.
-- **Machine Status Panel:** clicking a Static Generator's dome with the wrench now links it (only its base did), and the
-  panel reaches 200 blocks (it was 64, too short to reach across a base). A config file from before keeps its old
-  `range`: set it to 200, or delete the line.
-- **Snow Sheep Chiller on the panel:** out of water, it reads *No water* (it read *No power*).
+- **Machine Status Panel:**
+  - **Long names fit:** its screen sized its text for a fixed width that suited short names, so with only a machine
+    or two linked it drew them up to three times as large and cut long names off: a lone Hume Field Generator read
+    *Hume Field Generat*, *Wasting po*. It now works out how wide each column must be for every machine's whole
+    name, status and number, and sizes the text to that. A screen of short names looks as before; one with a long
+    name draws its text a little smaller rather than cutting it.
+  - **In its window too:** names and statuses were cut at a fixed width (*Mechanical Separat*, *Hume Field Generat*).
+    They now get all the room left of the number and distance, and one that's still a little too long is drawn
+    slightly smaller (down to three-quarters size) instead; only a very long custom name is still shortened.
+  - Clicking a Static Generator's dome with the wrench now links it (only its base did), and the panel reaches 200
+    blocks (it was 64, too short to reach across a base). A config file from before keeps its old `range`: set it to
+    200, or delete the line.
+  - A Snow Sheep Chiller out of water reads *No water* (it read *No power*).
 
 ### Test world
 - The platform grew a **seventh row** of cells, and you now start at its new south edge.
 - **Static Generator:** six sheep at four fresh combs, making 600 FE/t into a bank of Hume Energy Cubes.
-- **Machine Status Panel:** a 3x3 screen showing 23 machines from across the platform (the crate store and the Fleece Trawler among them), with an alarm lamp.
+- **Machine Status Panel:** a 3x3 screen showing 26 machines from across the platform (the crate store, the Fleece Trawler and the three Hume Field Generators among them), with an alarm lamp.
 - **Wireless power scene:** its generator is now cabled to the separator and shears it used to power wirelessly.
 - **Hume Field Generator:** cell (3, 6) has three, one for each state: two Hume Energy Cubes against the first catch
   everything it makes (*Delivering*), a Powered Furnace smelting cobblestone against the second takes only the little
