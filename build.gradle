@@ -72,7 +72,9 @@ neoForge {
                 if (project.hasProperty('harnessWorld')) {
                     systemProperty 'barelyfunctionalcontraptions.screenshotHarness.world', project.property('harnessWorld')
                 }
-                programArguments.addAll '--width', '1280', '--height', '720'
+                // -PharnessWidth / -PharnessHeight: a bigger window (the cover banner is shot at 1920x1080)
+                programArguments.addAll '--width', (project.findProperty('harnessWidth') ?: '1280').toString(),
+                        '--height', (project.findProperty('harnessHeight') ?: '720').toString()
             }
         }
 

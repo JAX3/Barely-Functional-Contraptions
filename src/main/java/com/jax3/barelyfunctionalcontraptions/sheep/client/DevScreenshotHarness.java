@@ -301,6 +301,10 @@ public final class DevScreenshotHarness {
             upgradesTick(mc, server);
             return;
         }
+        if ("cover".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            coverTick(mc, server);
+            return;
+        }
         if ("fleece_trawler".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             fleeceTrawlerTick(mc, server);
             return;
@@ -5294,6 +5298,74 @@ public final class DevScreenshotHarness {
             case 265 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
             case 280 -> shot(mc, "116_upgrades_chiller");
             case 290 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    /** The resources of the cover banner's sheep, left to right. */
+    private static final String[] COVER_SHEEP = {"diamond", "gold", "emerald", "blaze", "lapis", "redstone", "iron", "glow_ink"};
+
+    /**
+     * Resourceful sheep in a row on a grass field, side-on and turned a little towards the camera, with a fence and trees
+     * behind: the picture for the profile cover banner, which {@code tools/make_cover.py} crops to 1920x220 and puts the
+     * logo on. Run at 1920x1080: {@code -PharnessScene=cover -PharnessWidth=1920 -PharnessHeight=1080}.
+     */
+    private static void coverTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set 1500", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false",
+                        "gamerule advance_weather false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                BlockPos o = origin;
+                // Plains, for green grass (the test world's superflat is desert-tinted).
+                // (In slices: one fillbiome may change at most 32,768 blocks.)
+                for (int z = -48; z <= 16; z += 8) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(), String.format(java.util.Locale.ROOT,
+                            "fillbiome %d %d %d %d %d %d minecraft:plains", o.getX() - 48, o.getY() - 4, o.getZ() + z, o.getX() + 48, o.getY() + 12, o.getZ() + z + 7));
+                }
+                ResourcefulSheep.LOGGER.warn("COVER biome under the sheep: {}", level.getBiome(o).getRegisteredName());
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-40, 0, -40), o.offset(40, 10, 14))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-40, -2, -40), o.offset(40, -2, 14))) level.setBlock(p, Blocks.DIRT.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-40, -1, -40), o.offset(40, -1, 14))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                var random = net.minecraft.util.RandomSource.create(1776);
+                // Tufts of grass and a few flowers, but none in front of the sheep.
+                for (BlockPos p : BlockPos.betweenClosed(o.offset(-40, 0, -40), o.offset(40, 0, 14))) {
+                    if (p.getZ() >= o.getZ() - 1 && p.getZ() <= o.getZ() + 8) continue;
+                    float r = random.nextFloat();
+                    if (r < 0.18F) level.setBlock(p, Blocks.SHORT_GRASS.defaultBlockState(), 2);
+                    else if (r < 0.2F) level.setBlock(p, Blocks.DANDELION.defaultBlockState(), 2);
+                    else if (r < 0.215F) level.setBlock(p, Blocks.POPPY.defaultBlockState(), 2);
+                    else if (r < 0.225F) level.setBlock(p, Blocks.CORNFLOWER.defaultBlockState(), 2);
+                }
+                // A fence behind them, and trees further back.
+                for (int x = -20; x <= 20; x++) level.setBlockAndUpdate(o.offset(x, 0, -3), Blocks.OAK_FENCE.defaultBlockState());
+                for (int x = -20; x <= 20; x++) level.setBlockAndUpdate(o.offset(x, 0, -3), level.getBlockState(o.offset(x, 0, -3)));
+                int[][] trees = {{-14, -16}, {-6, -22}, {3, -14}, {11, -19}, {19, -15}, {27, -24}, {-24, -20}, {7, -30}};
+                for (int[] t : trees) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                            String.format(java.util.Locale.ROOT, "place feature minecraft:oak %d %d %d", o.getX() + t[0], o.getY(), o.getZ() + t[1]));
+                }
+                for (int i = 0; i < COVER_SHEEP.length; i++) {
+                    Sheep sh = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    // Facing left (west) and a little towards the camera, alternately more and less.
+                    sh.snapTo(o.getX() - 3.2 + i * 1.85, o.getY(), o.getZ() + (i % 2 == 0 ? 0.3 : -0.3), i % 2 == 0 ? 55 : 75, 0);
+                    sh.setYHeadRot(i % 2 == 0 ? 40 : 70);
+                    sh.setYBodyRot(i % 2 == 0 ? 55 : 75);
+                    SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id(COVER_SHEEP[i])), 9, 0));
+                    sh.setNoAi(true);
+                    sh.setPersistenceRequired();
+                    level.addFreshEntity(sh);
+                }
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 3", origin.getX() + 0.0, origin.getY() - 0.6, origin.getZ() + 9.0));
+            case 84 -> McClient.clearChat(mc);
+            case 200 -> shot(mc, "cover_raw");
+            case 206 -> mc.stop();
             default -> {}
         }
     }
