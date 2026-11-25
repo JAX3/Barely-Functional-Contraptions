@@ -160,6 +160,8 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue glowPanelLightRate;
         public final ModConfigSpec.IntValue glowPanelCapacity;
         public final ModConfigSpec.IntValue glowPanelOutput;
+        public final ModConfigSpec.IntValue humeFieldMinPerTick;
+        public final ModConfigSpec.IntValue humeFieldMaxPerTick;
         public final ModConfigSpec.IntValue woolBurnerCapacity;
         public final ModConfigSpec.IntValue woolBurnerOutput;
         public final ModConfigSpec.BooleanValue statsEnabled;
@@ -471,6 +473,14 @@ public final class ModConfigs {
                     .defineInRange("capacity", 10_000, 1, Integer.MAX_VALUE);
             glowPanelOutput = b.comment("Most FE a panel pushes into the blocks beside and below it per tick, in total.")
                     .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("Hume Field Generator (work in progress, development builds only). Each tick its field makes a random amount of FE",
+                    "between these two and pushes it straight into whatever touches it. It has no buffer: whatever isn't taken that tick is lost.").push("hume_field_generator");
+            humeFieldMinPerTick = b.comment("Least FE it makes in a tick.")
+                    .defineInRange("minPerTick", 200, 0, 1_000_000);
+            humeFieldMaxPerTick = b.comment("Most FE it makes in a tick (if it's below minPerTick, the two are swapped).")
+                    .defineInRange("maxPerTick", 1_200, 0, 1_000_000);
             b.pop();
 
             b.comment("Wool Burner (burns wool, string and Coal Wool for FE; fuels are data-driven, see wool_burner_fuel)").push("wool_burner");

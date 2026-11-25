@@ -225,12 +225,25 @@ The mod's command is now **`/bfc`** (short for Barely Functional Contraptions) i
 - **Updating:** command blocks, functions and scripts that call `/barelyfunctionalcontraptions` need changing to
   `/bfc`; the long name no longer works.
 
-### Hume Field Generator model (work in progress)
-The planned Hume Field Generator's model has been redesigned to match the other big machines, the Echo Chamber above
-all: a steel plinth and lid with the same banding and rivets, chunky corner pillars lit with Hume purple, a window in
-each wall framed in steel trim, glass tinted with the field's purple so its core and coils glow through, and an
-emitter on the lid among four corner bolts. Every face is drawn at the same pixel size as the rest of the mod. It's
-still a model only, in development builds.
+### Hume Field Generator: a new look, and its first power (work in progress)
+The planned late-game Hume Field Generator, a 2x2 machine two and a half blocks tall, is still in development builds
+only, but it has a new model and now makes power.
+- **Redesigned to match the other big machines,** the Echo Chamber above all:
+  - a steel plinth and lid with the same banding and rivets, their dark strip lit with Hume purple;
+  - chunky corner pillars with purple light strips, in place of the thin open cage;
+  - a window in each wall, framed in steel trim like the Echo Chamber's dish, with glass tinted the field's purple so
+    its flickering core and three coils glow through (you could see the sky through it before);
+  - a larger emitter on the lid, among four corner bolts.
+
+  Every face is drawn at the same pixel size as the rest of the mod, and its hitbox follows the new outline (the
+  emitter now reaches 2.75 blocks up).
+- **Random power, no buffer:** every tick its field makes a **random amount of FE** between `minPerTick` and
+  `maxPerTick` (200 to 1,200 FE/t by default, so 700 on average). It has **no energy buffer**: that tick's power goes
+  straight into whatever touches any of its twelve blocks (cables, Hume Energy Cubes, machines), and whatever they don't
+  take is **lost**. Nothing can pull power out of it, and on its own it wastes everything it makes. It offers each
+  tick's power to a different neighbour first, so no one of them always gets first pick.
+- New config section `[hume_field_generator]`: `minPerTick`, `maxPerTick` (swapped if the minimum is the larger).
+- Still to come: its upkeep, a window, JEI, Jade, a recipe, and a place in released jars.
 
 ### Under the hood: one machine frame
 Every machine and generator is now built from a shared **machine frame** with separate **modules** switched on for

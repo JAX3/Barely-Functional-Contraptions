@@ -47,6 +47,10 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity>> GRASS_SEEDER =
             REGISTER.register("grass_seeder",
                     () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity::new, ModBlocks.GRASS_SEEDER.get()));
+    /** Work in progress, development builds only, like its block (null in released jars). */
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity>> HUME_FIELD_GENERATOR =
+            ModBlocks.HUME_FIELD_GENERATOR == null ? null : REGISTER.register("hume_field_generator",
+                    () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity::new, ModBlocks.HUME_FIELD_GENERATOR.get()));
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity>> ECHO_CHAMBER =
             REGISTER.register("echo_chamber",
                     () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity::new, ModBlocks.ECHO_CHAMBER.get()));

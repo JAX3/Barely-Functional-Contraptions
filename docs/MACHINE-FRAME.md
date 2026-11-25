@@ -102,6 +102,10 @@ entity's `energyFor` / `itemsFor`.
 | Wool Burner, Blaze Furnace, Sheep Treadmill | ✓ | | | ✓ (fuel / boost / food) | |
 | Thermal Reaction Chamber | ✓ | ✓ | | ✓ (hot and cold boosts) | |
 | Mycelial Generator | ✓ | ✓ | | ✓ | |
+| Hume Field Generator (work in progress) | | | | | |
+
+The Hume Field Generator switches on no modules at all: it has no buffer, so it pushes each tick's power straight
+into its neighbours from its own tick and offers nothing to cables.
 
 ## Tests
 

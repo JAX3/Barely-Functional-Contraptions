@@ -171,6 +171,7 @@ public final class ModGameTests {
         TESTS.put("wrench_dismantles_machines_into_the_inventory", ModGameTests::wrenchDismantles);
         TESTS.put("woollen_boots_muffle_the_wearer", ModGameTests::woollenBootsMuffle);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
+        if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_makes_random_power_with_no_buffer", ModGameTests::humeFieldPower);
         TESTS.put("echo_chamber_is_three_by_three", ModGameTests::echoChamber);
         ECHO_TESTS.put("echo_chamber_counts_its_warden_sheep", ModGameTests::echoCountsHerd);
         ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
@@ -1164,6 +1165,57 @@ public final class ModGameTests {
                     h.assertTrue(h.getBlockState(at).isAir(), "corner " + p + " layer " + l + " is gone too, was " + h.getBlockState(at));
                 }
             }
+            h.succeed();
+        });
+    }
+
+    /** Builds the whole 2x2x3 Hume Field Generator with its bottom north-west corner at {@code origin}. */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity humeFieldAt(GameTestHelper h, BlockPos origin) {
+        var block = ModBlocks.HUME_FIELD_GENERATOR.get();
+        for (int p = 0; p < 4; p++) {
+            for (int l = 0; l < 3; l++) {
+                h.setBlock(origin.offset(p & 1, l, p >> 1), block.defaultBlockState()
+                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.PART, p)
+                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.LAYER, l));
+            }
+        }
+        return h.getBlockEntity(origin, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.class);
+    }
+
+    /**
+     * Each tick the Hume Field Generator makes a random amount in its configured range and pushes it into what touches
+     * it: a Hume Energy Cube against it gets exactly what it delivered. It has no buffer: nothing can be taken from it,
+     * and on its own what it makes is lost.
+     */
+    private static void humeFieldPower(GameTestHelper h) {
+        int min = ModConfigs.getInt(ModConfigs.SERVER.humeFieldMinPerTick), max = ModConfigs.getInt(ModConfigs.SERVER.humeFieldMaxPerTick);
+        var fed = humeFieldAt(h, new BlockPos(1, 1, 1));
+        var target = cube(h, new BlockPos(0, 2, 1)); // against its west side, in its middle layer
+        var alone = humeFieldAt(h, new BlockPos(5, 1, 1));
+        var level = h.getLevel();
+        for (int p = 0; p < 4; p++) {
+            for (int l = 0; l < 3; l++) {
+                for (Direction side : Direction.values()) {
+                    h.assertTrue(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, h.absolutePos(new BlockPos(5 + (p & 1), 1 + l, 1 + (p >> 1))), side) == null,
+                            "it has no buffer to offer on any face");
+                }
+            }
+        }
+        java.util.Set<Integer> rolls = new java.util.HashSet<>();
+        int[] ticks = {0};
+        h.onEachTick(() -> {
+            if (fed.generated() == 0 && ticks[0] == 0) return; // not ticked yet
+            ticks[0]++;
+            h.assertTrue(fed.generated() >= min && fed.generated() <= max, "it made " + fed.generated() + " FE, outside " + min + "-" + max);
+            h.assertTrue(alone.generated() >= min && alone.generated() <= max, "the lone one made " + alone.generated() + " FE");
+            h.assertTrue(alone.delivered() == 0, "with nothing touching it, none goes anywhere (it's lost)");
+            rolls.add(fed.generated());
+        });
+        h.runAfterDelay(40, () -> {
+            h.assertTrue(rolls.size() > 5, "the amount changes from tick to tick, saw " + rolls);
+            h.assertTrue(fed.totalDelivered() > 0 && target.group().amount() == fed.totalDelivered(),
+                    "the cube got exactly what it delivered: " + target.group().amount() + " vs " + fed.totalDelivered());
+            h.assertTrue(alone.totalDelivered() == 0, "the lone one delivered nothing");
             h.succeed();
         });
     }

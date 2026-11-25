@@ -20,20 +20,25 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity;
+import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Work in progress: the planned Hume Field Generator, so far only its model. A 2x2 machine two and a half blocks tall,
  * built like the Echo Chamber: a steel plinth and lid on four chunky corner pillars lit with Hume purple, a window in
  * each wall onto a core that flickers between "on" and "off" inside three field coils, and an emitter on the lid
- * that watches it. It does nothing yet; it's registered in development builds only.
+ * that watches it. It's registered in development builds only while it's built.
+ *
+ * <p>Its field makes a random amount of FE each tick and pushes it straight into whatever touches it, with no buffer
+ * to keep what isn't taken ({@link HumeFieldGeneratorBlockEntity}, held by corner 0 of layer 0).</p>
  *
  * <p>It's twelve blocks, as a bed is two: {@link #PART} says which corner (0 is the north-west one that was placed, 1
  * east of it, 2 south, 3 south-east) and {@link #LAYER} how high (0-2). Corner 0 of layer 0 draws the lower two blocks
  * of the model and corner 0 of layer 2 the cap, since a block model can't be more than two blocks tall. Placing it
  * fills the other eleven (it won't place unless they're free), and breaking any of them removes them all.</p>
  */
-public class HumeFieldGeneratorBlock extends Block {
+public class HumeFieldGeneratorBlock extends Block implements net.minecraft.world.level.block.EntityBlock {
     public static final IntegerProperty PART = IntegerProperty.create("part", 0, 3);
     public static final IntegerProperty LAYER = IntegerProperty.create("layer", 0, 2);
     public static final int LAYERS = 3;
@@ -76,6 +81,28 @@ public class HumeFieldGeneratorBlock extends Block {
 
     private static BlockPos at(BlockPos origin, int part, int layer) {
         return origin.offset(dx(part), layer, dz(part));
+    }
+
+    /** Whether {@code state} is the block that holds the block entity: the bottom north-west corner. */
+    public static boolean isCore(BlockState state) {
+        return state.getValue(PART) == 0 && state.getValue(LAYER) == 0;
+    }
+
+    /** The machine's block entity, from any of its blocks. */
+    public static @Nullable HumeFieldGeneratorBlockEntity entity(BlockGetter level, BlockPos pos, BlockState state) {
+        return state.getBlock() instanceof HumeFieldGeneratorBlock && level.getBlockEntity(origin(pos, state)) instanceof HumeFieldGeneratorBlockEntity be ? be : null;
+    }
+
+    @Override
+    public net.minecraft.world.level.block.entity.@Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return isCore(state) ? new HumeFieldGeneratorBlockEntity(pos, state) : null;
+    }
+
+    @Override
+    public <T extends net.minecraft.world.level.block.entity.BlockEntity> net.minecraft.world.level.block.entity.@Nullable BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+        if (!(level instanceof net.minecraft.server.level.ServerLevel serverLevel) || !isCore(state) || type != ModBlockEntities.HUME_FIELD_GENERATOR.get()) return null;
+        return (l, pos, s, be) -> HumeFieldGeneratorBlockEntity.serverTick(serverLevel, pos, s, (HumeFieldGeneratorBlockEntity) be);
     }
 
     @Override
