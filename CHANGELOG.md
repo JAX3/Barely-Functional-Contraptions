@@ -225,6 +225,19 @@ The mod's command is now **`/bfc`** (short for Barely Functional Contraptions) i
 - **Updating:** command blocks, functions and scripts that call `/barelyfunctionalcontraptions` need changing to
   `/bfc`; the long name no longer works.
 
+### Under the hood: one machine frame
+Every machine and generator is now built from a shared **machine frame** with separate **modules** switched on for
+what it does: **energy**, **fluid**, **upgrade cards** and an **internal inventory** (and an anvil name for the
+Automatic Shears and Fluid Reservoir). Each machine has only the modules it needs, and the frame saves them, keeps them
+on the machine's item, syncs them, drops their contents and connects them to cables, pipes and hoppers. That's one
+shared code path where there used to be eighteen copies, so a new machine is mostly its own job.
+- **Nothing changes in game:** every machine saves under the same keys as before, so existing worlds, broken machines
+  carrying their energy or cards, and renamed machines all load as they were. Machines connect on the same sides as
+  before.
+- **For developers:** how the frame and modules work, how to build a new machine on them, and which machine has which
+  module are in [docs/MACHINE-FRAME.md](docs/MACHINE-FRAME.md). Two new GameTests check the old save keys and the
+  connections.
+
 ### Removed: wireless power to machines
 - The Barely Functional Wrench no longer links a Mycelial Generator to a Mechanical Separator, Automatic Shears or Hume
   Energy Cube to power it wirelessly. Run **Energy Cables** from the generator instead, or put the machine against it.
