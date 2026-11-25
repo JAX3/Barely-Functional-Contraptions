@@ -1,10 +1,10 @@
 # Changelog
 
-## 1.5.7: storage, the Fleece Trawler, upgrade cards, the Static Generator, the Hume Field Generator and the Machine Status Panel (20–25 November 2026)
+## 1.5.7: storage, the Fleece Trawler, upgrade cards, the Static Generator, the Hume Field Generator, the Machine Status Panel and a purple Echo Chamber (20–25 November 2026)
 
 New contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage (crates and a controller that links them into one store), a fishing
 machine driven by a new sea-going sheep, upgrade cards for the processing machines, a mid-game generator that runs on static, a late-game
-generator with a random output and no buffer, and a wall screen that keeps an eye on all your machines. They come after 1.5.5,
+generator with a random output and no buffer, and a wall screen that keeps an eye on all your machines. The Echo Chamber is recoloured to match the other machines. They come after 1.5.5,
 in 1.5.7. Numbers are the defaults; almost all of them can be changed in the synced config.
 
 ### Storage: the Wool-Lined Crate
@@ -233,12 +233,19 @@ wool, or just quieter.
 - Blue Steel is in `#c:ingots`, and its block in `#c:storage_blocks`.
 
 ### The Echo Chamber in the machines' colours
-- The Echo Chamber's glow is now the purple of the other machines' ports and the Hume blocks, not the sculk's cyan: its
-  resonator dish and its breathing heart, the fronds on its roof, the sculk creeping over its walls and the light in its
-  vents.
-- Its roof and the dome on it are its own purple sculk and a blue-steel drum with a glowing well, instead of vanilla
-  sculk and a sculk catalyst. Its foam walls are blue steel, a shade darker than the casing.
-- Its window, Jade tooltip, JEI page and working-area outline use the same purple.
+The Echo Chamber was the only machine in sculk's cyan. It now wears the blue steel and purple of every other machine,
+so it sits with the Hume Field Generator and the rest instead of standing out from them.
+- **Its glow is purple:** the resonator dish and the heart that breathes in its middle, the crown of fronds on its
+  roof, the sculk creeping over its side walls and the light inside its back vents. It's the purple of the machines'
+  ports and the Hume blocks.
+- **Its own roof and dome:** they were vanilla sculk and a sculk catalyst. The roof is now its own purple sculk, and the
+  dome is a blue-steel drum with a purple band, topped with a glowing well like the Hume Field Generator's emitter.
+- **Blue-steel foam:** the egg-crate foam on its side walls was dark navy. It's now blue steel, a shade darker than the
+  casing.
+- **The same purple everywhere else:** its window's text and strip, its Jade tooltip, its JEI page and its
+  working-area outline.
+- Only its looks changed. It works exactly as before, Echo Chambers already built just change colour, and its Warden
+  sheep and their sculk stay cyan.
 
 ### Sheep wear their blocks
 - An infused sheep's fleece is now **its resource's block**: Block of Redstone on a Redstone sheep, Block of Iron on an
@@ -406,7 +413,7 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 - **Window:** energy gauge, the herd and output, a noise meter showing the sweet spot, steadiness, and the
   drowsiness and shriek bars.
 - **Model:** blue-steel casing lined with sculk, a big resonator dish that pulses, foam walls, louvred vents, and
-  a crown of sculk fronds on its roof like the Warden sheep's ears.
+  a crown of sculk fronds on its roof like the Warden sheep's ears. (Recoloured purple in 1.5.7.)
 - **Recipe:** Iron Block, Echo Shard and Iron Block on top; Echo Shards either side of a Warden Wool Bale in the
   middle; Blackstone, a Functional Machine Block and Blackstone on the bottom.
 - **JEI:** an *Echo Chamber* page and an information page. **Jade:** status, output, herd, noise, steadiness and
