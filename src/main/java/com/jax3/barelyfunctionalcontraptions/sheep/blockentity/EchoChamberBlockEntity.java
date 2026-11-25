@@ -11,13 +11,10 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ShriekParticleOption;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -36,7 +33,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.ClipBlockStateContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.BlockPositionSource;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -80,7 +76,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
  * It pushes its power out of its power port, the middle of its back, up to {@code output} FE/t. A comparator against
  * any block of it reads the noise level. Right-clicking any block of it opens its window ({@link EchoChamberMenu}).
  */
-public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, MenuProvider, GameEventListener.Provider<EchoChamberBlockEntity.Ears> {
+public class EchoChamberBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame implements AreaDisplay, MenuProvider, GameEventListener.Provider<EchoChamberBlockEntity.Ears> {
     public static final int SCAN_INTERVAL = 10;
     public static final int BUCKETS = 5;
     public static final int MAX_LEVEL = 15;
@@ -105,7 +101,8 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
     }
 
     private final Ears ears = new Ears();
-    private final GeneratorEnergy energy = new GeneratorEnergy(2_000_000, this::setChanged);
+    // Its one module, a power buffer (out of its port only; see ModCapabilities).
+    private final GeneratorEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new GeneratorEnergy(2_000_000, this::setChanged))).handler();
     /** Vibrations heard in each fifth of the window, oldest first, and in the fifth being heard now. */
     private int[] buckets = new int[BUCKETS];
     private int hearing, bucketTicks;
@@ -569,8 +566,7 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.child("energy").ifPresent(energy::deserialize);
+        super.loadAdditional(input); // its modules
         int[] saved = input.getIntArray("heard").orElse(new int[0]);
         buckets = saved.length == BUCKETS ? saved : new int[BUCKETS];
         noise = input.getIntOr("noise", 0);
@@ -586,8 +582,7 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        energy.serialize(output.child("energy"));
+        super.saveAdditional(output); // its modules
         output.putIntArray("heard", buckets);
         output.putInt("noise", noise);
         output.putBoolean("show_area", showArea);
@@ -599,18 +594,11 @@ public class EchoChamberBlockEntity extends BlockEntity implements AreaDisplay, 
         output.putInt("cooldown", cooldown);
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
     /** Clients get the area setting, for its outline, and the state, so its ears stop popping while it sleeps or recovers. */
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = new CompoundTag();
+    protected void writeClientData(CompoundTag tag) {
         tag.putBoolean("show_area", showArea);
         tag.putInt("state", state.ordinal());
-        return tag;
     }
 
 }

@@ -161,6 +161,7 @@ public final class ModGameTests {
         TESTS.put("yield_upgrade_adds_to_each_output", ModGameTests::yieldUpgrade);
         TESTS.put("muffler_upgrade_silences_and_syncs", ModGameTests::mufflerUpgrade);
         TESTS.put("machine_frame_saves_like_before_and_offers_its_modules", ModGameTests::machineFrame);
+        TESTS.put("generators_on_the_machine_frame_save_like_before", ModGameTests::generatorFrames);
         TESTS.put("infusion_altar_pulses_when_ready", ModGameTests::altarPulse);
         TESTS.put("list_command_lists_every_sheep", ModGameTests::listCommand);
         TESTS.put("snow_sheep_leaves_snow", ModGameTests::snowSheep);
@@ -2597,6 +2598,52 @@ public final class ModGameTests {
         h.assertTrue(reservoir.getDisplayName().getString().equals("Well"), "its window is titled with its name");
         var drops = net.minecraft.world.level.block.Block.getDrops(reservoir.getBlockState(), level, chiller, reservoir);
         h.assertTrue(drops.size() == 1 && drops.getFirst().getHoverName().getString().equals("Well"), "broken, it keeps its name: " + drops);
+        h.succeed();
+    }
+
+    /** The generators on the frame still save under their old keys and offer what they did, and nothing more. */
+    private static void generatorFrames(GameTestHelper h) {
+        var level = h.getLevel();
+        var caps = new Object() {
+            boolean has(BlockPos rel, net.neoforged.neoforge.capabilities.BlockCapability<?, Direction> cap) {
+                return level.getCapability(cap, h.absolutePos(rel), Direction.UP) != null;
+            }
+
+            net.minecraft.nbt.CompoundTag saved(BlockPos rel) {
+                var out = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess());
+                h.getBlockEntity(rel, net.minecraft.world.level.block.entity.BlockEntity.class).saveWithoutMetadata(out);
+                return out.buildResult();
+            }
+        };
+        var energyCap = net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK;
+        var itemCap = net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK;
+        var fluidCap = net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK;
+        BlockPos panel = new BlockPos(0, 1, 0), burner = new BlockPos(2, 1, 0), thermal = new BlockPos(4, 1, 0), mycelial = new BlockPos(0, 1, 2);
+        h.setBlock(panel, ModBlocks.GLOW_PANEL.get());
+        h.assertTrue(caps.has(panel, energyCap) && !caps.has(panel, itemCap) && !caps.has(panel, fluidCap), "the Glow Panel offers power only");
+        h.assertTrue(caps.saved(panel).contains("energy"), "and saves its energy as before");
+
+        h.setBlock(burner, ModBlocks.WOOL_BURNER.get());
+        var wool = h.getBlockEntity(burner, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity.class);
+        h.assertFalse(wool.canPlaceItem(0, new ItemStack(Items.DIRT)), "the Wool Burner takes only fuel");
+        wool.inventory().set(0, new ItemStack(Items.STRING, 4));
+        h.assertFalse(wool.canTakeItemThroughFace(0, wool.fuel(), Direction.DOWN), "and hoppers can't take its fuel back");
+        h.assertTrue(caps.has(burner, energyCap) && caps.has(burner, itemCap) && !caps.has(burner, fluidCap), "it offers power and its fuel slot");
+        var burnerTag = caps.saved(burner);
+        h.assertTrue(burnerTag.contains("energy") && burnerTag.contains("fuel"), "and saves them as before: " + burnerTag);
+
+        h.setBlock(thermal, ModBlocks.THERMAL_REACTION_CHAMBER.get());
+        var chamber = h.getBlockEntity(thermal, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.class);
+        chamber.inventory().set(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.HOT_SLOT, new ItemStack(Items.BLAZE_ROD));
+        h.assertFalse(chamber.canPlaceItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.HOT_SLOT, new ItemStack(Items.BLUE_ICE)), "Blue Ice doesn't go in the hot slot");
+        h.assertTrue(caps.has(thermal, energyCap) && caps.has(thermal, itemCap) && caps.has(thermal, fluidCap), "the chamber offers power, boosts and water");
+        var thermalTag = caps.saved(thermal);
+        for (String key : List.of("tank", "energy", "hot_boost")) h.assertTrue(thermalTag.contains(key), "it saves " + key + " as before: " + thermalTag);
+
+        h.setBlock(mycelial, com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks.MYCELIAL_GENERATOR.get());
+        h.assertTrue(caps.has(mycelial, energyCap) && caps.has(mycelial, itemCap) && caps.has(mycelial, fluidCap), "the Mycelial Generator offers power, items and water");
+        var mycelialTag = caps.saved(mycelial);
+        for (String key : List.of("Inventory", "Tank", "Energy")) h.assertTrue(mycelialTag.contains(key), "it saves " + key + " in its own format: " + mycelialTag);
         h.succeed();
     }
 

@@ -10,10 +10,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 
 /**
@@ -29,12 +26,12 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
  * It uses whichever of the two gives more, stores up to {@code capacity} FE, and pushes it into the blocks beside and
  * below it (never upwards, where its light comes from); cables and machines can also pull from it.
  */
-public class GlowPanelBlockEntity extends BlockEntity {
+public class GlowPanelBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame {
     /** Where the panel's power is coming from, for the readouts. */
     public enum Source { NONE, SUN, GLOW }
 
-    /** Nothing can be put into the panel from outside; it only fills itself. */
-    private final GeneratorEnergy energy = new GeneratorEnergy(10_000, this::setChanged);
+    /** Its one module, a power buffer: nothing can be put into the panel from outside; it only fills itself. */
+    private final GeneratorEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new GeneratorEnergy(10_000, this::setChanged))).handler();
     private int generating;
     private Source source = Source.NONE;
 
@@ -102,17 +99,5 @@ public class GlowPanelBlockEntity extends BlockEntity {
 
     private void push(ServerLevel level, BlockPos pos) {
         energy.pushToNeighbours(level, pos, ModConfigs.getInt(ModConfigs.SERVER.glowPanelOutput), (dir, target) -> dir == Direction.UP || level.getBlockEntity(target) instanceof GlowPanelBlockEntity); // not up, and panels don't charge each other
-    }
-
-    @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.child("energy").ifPresent(energy::deserialize);
-    }
-
-    @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        energy.serialize(output.child("energy"));
     }
 }

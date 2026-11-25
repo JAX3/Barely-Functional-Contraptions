@@ -14,13 +14,10 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -34,7 +31,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -65,7 +61,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
  * It pushes its power out of every face of its base but the top, up to {@code output} FE/t. A comparator reads how
  * charged its dome is.
  */
-public class StaticGeneratorBlockEntity extends BlockEntity implements AreaDisplay, MenuProvider {
+public class StaticGeneratorBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame implements AreaDisplay, MenuProvider {
     public static final int SCAN_INTERVAL = 10, SHOCK_INTERVAL = 10;
     public static final int AREA_COLOR = 0xFF5FB8FF;
     public static final int DATA_COUNT = 20;
@@ -88,7 +84,8 @@ public class StaticGeneratorBlockEntity extends BlockEntity implements AreaDispl
         }
     }
 
-    private final GeneratorEnergy energy = new GeneratorEnergy(500_000, this::setChanged);
+    // Its one module, a power buffer (out only).
+    private final GeneratorEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new GeneratorEnergy(500_000, this::setChanged))).handler();
     /** The combs it uses, nearest first, and how long each has been worked towards its next stage of oxidation. */
     private List<BlockPos> combs = new ArrayList<>();
     private final Map<BlockPos, Integer> wear = new HashMap<>();
@@ -455,8 +452,7 @@ public class StaticGeneratorBlockEntity extends BlockEntity implements AreaDispl
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.child("energy").ifPresent(energy::deserialize);
+        super.loadAdditional(input); // its modules
         charge = input.getIntOr("charge", 0);
         showArea = input.getBooleanOr("show_area", false);
         state = State.byId(input.getIntOr("state", 0));
@@ -467,8 +463,7 @@ public class StaticGeneratorBlockEntity extends BlockEntity implements AreaDispl
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        energy.serialize(output.child("energy"));
+        super.saveAdditional(output); // its modules
         output.putInt("charge", charge);
         output.putBoolean("show_area", showArea);
         output.putInt("state", state.ordinal());
@@ -483,18 +478,11 @@ public class StaticGeneratorBlockEntity extends BlockEntity implements AreaDispl
         output.putIntArray("comb_wear", worn);
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
     /** Clients get the area setting, for its outline, and the charge, for the dome's sparks. */
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = new CompoundTag();
+    protected void writeClientData(CompoundTag tag) {
         tag.putBoolean("show_area", showArea);
         tag.putInt("charge", charge);
-        return tag;
     }
 
 }

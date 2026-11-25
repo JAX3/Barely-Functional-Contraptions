@@ -12,20 +12,16 @@ import java.util.Collections;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.player.Inventory;
@@ -37,7 +33,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -71,7 +66,7 @@ import org.jspecify.annotations.Nullable;
  * It pushes its power into every block around it, up to {@code output} FE/t. Its comparator signal shows how close it
  * is to melting down or freezing (0 = steady), for safety circuits.
  */
-public class ThermalReactionChamberBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, MenuProvider, AreaDisplay {
+public class ThermalReactionChamberBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, MenuProvider, AreaDisplay {
     public static final int SCAN_INTERVAL = 10;
     public static final int HOT_COLOR = 0xFFFF8A1F, COLD_COLOR = 0xFF7FD8FF;
     public static final int HOT_SLOT = 0, COLD_SLOT = 1;
@@ -81,7 +76,6 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Ma
     /** How long it vents steam after running dry, in ticks. */
     public static final int STEAM_TICKS = 100;
     public static final FluidResource WATER = WaterTank.WATER;
-    private static final int[] SLOTS = {HOT_SLOT, COLD_SLOT};
 
     /** What the chamber is doing, for its window and particles: the order matches the window's status keys. */
     public enum State {
@@ -103,9 +97,13 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Ma
         }
     }
 
-    private final WaterTank tank = new WaterTank(16_000, this::setChanged);
-    private final GeneratorEnergy energy = new GeneratorEnergy(2_000_000, this::setChanged);
-    private final ItemStack[] boosts = {ItemStack.EMPTY, ItemStack.EMPTY};
+    // Its modules: water in and power out on every side, and the two boost slots (in only).
+    private final WaterTank tank = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.FluidModule.of(new WaterTank(16_000, this::setChanged))).tank();
+    private final GeneratorEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new GeneratorEnergy(2_000_000, this::setChanged))).handler();
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder()
+            .input("hot_boost", stack -> stack.is(Items.BLAZE_ROD)) // Blaze Rods in the hot slot
+            .input("cold_boost", stack -> stack.is(Items.BLUE_ICE)) // Blue Ice in the cold one
+            .build());
     /** Ticks left on the Blaze Rod and Blue Ice burning now. */
     private int hotBurn, coldBurn;
     /** Ids of the sheep counted on each side (synced, for the particles). */
@@ -336,12 +334,12 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Ma
 
     /** Lights a fresh Blaze Rod or Blue Ice when the last one has burnt out, and burns down the ones alight. */
     private void burnBoosts() {
-        if (hotBurn <= 0 && boosts[HOT_SLOT].is(Items.BLAZE_ROD)) {
-            boosts[HOT_SLOT].shrink(1);
+        if (hotBurn <= 0 && inventory.get(HOT_SLOT).is(Items.BLAZE_ROD)) {
+            inventory.get(HOT_SLOT).shrink(1);
             hotBurn = boostTicks();
         }
-        if (coldBurn <= 0 && boosts[COLD_SLOT].is(Items.BLUE_ICE)) {
-            boosts[COLD_SLOT].shrink(1);
+        if (coldBurn <= 0 && inventory.get(COLD_SLOT).is(Items.BLUE_ICE)) {
+            inventory.get(COLD_SLOT).shrink(1);
             coldBurn = boostTicks();
         }
         if (hotBurn > 0) hotBurn--;
@@ -623,61 +621,18 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Ma
         return new ThermalReactionChamberMenu(containerId, inventory, this, data);
     }
 
-    // ------------------------------------------------------------------ container (the two boost slots)
+    // ------------------------------------------------------------------ the boost slots (its inventory module)
 
     @Override
-    public int getContainerSize() {
-        return 2;
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
     }
-
-    @Override
-    public ItemStack getItem(int slot) {
-        return slot >= 0 && slot < 2 ? boosts[slot] : ItemStack.EMPTY;
-    }
-
-    @Override
-    public void putItem(int slot, ItemStack stack) {
-        if (slot >= 0 && slot < 2) boosts[slot] = stack;
-    }
-
-    /** Blaze Rods in the hot slot, Blue Ice in the cold one. */
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        return slot == HOT_SLOT ? stack.is(Items.BLAZE_ROD) : slot == COLD_SLOT && stack.is(Items.BLUE_ICE);
-    }
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return SLOTS;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return canPlaceItem(slot, stack);
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return false;
-    }
-
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
-        if (level != null) Containers.dropContents(level, pos, this);
-    }
-
-    // ------------------------------------------------------------------ water and energy
 
     // ------------------------------------------------------------------ persistence and sync
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.child("tank").ifPresent(tank::deserialize);
-        input.child("energy").ifPresent(energy::deserialize);
-        boosts[HOT_SLOT] = input.read("hot_boost", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
-        boosts[COLD_SLOT] = input.read("cold_boost", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        super.loadAdditional(input); // its modules: water, energy, boosts
         hotBurn = input.getIntOr("hot_burn", 0);
         coldBurn = input.getIntOr("cold_burn", 0);
         instability = input.getIntOr("instability", 0);
@@ -691,11 +646,7 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Ma
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        tank.serialize(output.child("tank"));
-        energy.serialize(output.child("energy"));
-        if (!boosts[HOT_SLOT].isEmpty()) output.store("hot_boost", ItemStack.OPTIONAL_CODEC, boosts[HOT_SLOT]);
-        if (!boosts[COLD_SLOT].isEmpty()) output.store("cold_boost", ItemStack.OPTIONAL_CODEC, boosts[COLD_SLOT]);
+        super.saveAdditional(output); // its modules
         output.putInt("hot_burn", hotBurn);
         output.putInt("cold_burn", coldBurn);
         output.putInt("instability", instability);
@@ -704,19 +655,12 @@ public class ThermalReactionChamberBlockEntity extends BlockEntity implements Ma
         output.putBoolean("show_area", showArea);
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
     /** Clients get the area setting, the state and the counted sheep (for the particles). */
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = new CompoundTag();
+    protected void writeClientData(CompoundTag tag) {
         tag.putBoolean("show_area", showArea);
         tag.putInt("state", state.ordinal());
         tag.putIntArray("hot_sources", hotIds);
         tag.putIntArray("cold_sources", coldIds);
-        return tag;
     }
 }

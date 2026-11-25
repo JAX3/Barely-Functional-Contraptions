@@ -8,13 +8,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -40,10 +36,11 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  * {@code beamCountsAsPlayerKill} each hit also marks the mob as hurt by a fake player, so a beam kill drops experience
  * and player-only loot as if a player had killed it.</p>
  */
-public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net.minecraft.world.MenuProvider {
+public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame implements net.minecraft.world.MenuProvider {
     private static final int SCAN_INTERVAL = 5;
 
-    private final Storage energy = new Storage();
+    /** Its one module, its own buffer (saved with it); cables see the pair's ({@link #energyFor}). */
+    private final Storage energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new Storage())).handler();
     /** What neighbours see on every face: this module's buffer plus its partner's. */
     private final PairEnergy pairEnergy = new PairEnergy();
     /** Distance in blocks to the partner (2 = one block of gap), or 0 when not linked. */
@@ -388,8 +385,7 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.child("energy").ifPresent(energy::deserialize);
+        super.loadAdditional(input); // its module: its buffer
         linkDistance = Math.max(0, input.getIntOr("LinkDistance", 0));
         generating = Math.max(0, input.getIntOr("Generating", 0));
         beamSections = input.getIntArray("BeamSections").filter(a -> a.length % 2 == 0).orElse(new int[0]);
@@ -397,21 +393,22 @@ public class ZeroPointEnergyModuleBlockEntity extends BlockEntity implements net
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        energy.serialize(output.child("energy"));
+        super.saveAdditional(output); // its module
         output.putInt("LinkDistance", linkDistance);
         output.putInt("Generating", generating);
         output.putIntArray("BeamSections", beamSections);
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
+    /** Clients get everything it saves (the beam's sections, its link...). */
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         return saveCustomOnly(registries);
+    }
+
+    /** Output only, on every face: the pair's pooled buffers, not just this module's. */
+    @Override
+    public @org.jspecify.annotations.Nullable EnergyHandler energyFor(net.minecraft.core.@org.jspecify.annotations.Nullable Direction side) {
+        return pairEnergy;
     }
 
     /** Output-only buffer: neighbours may pull up to {@code maxOutput} FE/t, nothing can be inserted from outside. */

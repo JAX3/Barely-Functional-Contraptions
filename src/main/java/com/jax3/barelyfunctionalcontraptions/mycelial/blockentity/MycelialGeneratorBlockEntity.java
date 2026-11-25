@@ -70,14 +70,62 @@ import java.util.List;
  * </ol>
  * Nothing here runs on the client.
  */
-public class MycelialGeneratorBlockEntity extends BlockEntity implements MenuProvider {
+public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame implements MenuProvider {
     private static final Direction[] DIRECTIONS = Direction.values();
 
+    // Its modules (an inventory, a tank and a power buffer), saved the way the generator always saved them; pipes and
+    // cables see the sided views below (see itemsFor, fluidFor and energyFor).
     private final GeneratorItemHandler inventory = new GeneratorItemHandler(this::setChanged);
     private final AutomationItemHandler automationItems = new AutomationItemHandler(inventory);
     private final GeneratorFluidTank tank = new GeneratorFluidTank(this::setChanged);
     private final SidedFluidHandler externalFluid = new SidedFluidHandler(tank);
     private final GeneratorEnergyStorage energy = new GeneratorEnergyStorage(this::setChanged);
+    {
+        install(new com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineModule() { // the inventory
+            @Override
+            public void save(ValueOutput output) {
+                output.putChild("Inventory", inventory);
+            }
+
+            @Override
+            public void load(ValueInput input) {
+                input.readChild("Inventory", inventory);
+            }
+
+            @Override
+            public void dropContents(Level level, BlockPos pos) {
+                for (int slot = 0; slot < inventory.size(); slot++) {
+                    ItemStack stack = inventory.getStackInSlot(slot);
+                    if (!stack.isEmpty()) {
+                        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack.copy());
+                        inventory.setStackInSlot(slot, ItemStack.EMPTY);
+                    }
+                }
+            }
+        });
+        install(new com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineModule() { // the tank
+            @Override
+            public void save(ValueOutput output) {
+                output.putChild("Tank", tank);
+            }
+
+            @Override
+            public void load(ValueInput input) {
+                input.readChild("Tank", tank);
+            }
+        });
+        install(new com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineModule() { // the power buffer
+            @Override
+            public void save(ValueOutput output) {
+                output.putInt("Energy", energy.getAmountAsInt());
+            }
+
+            @Override
+            public void load(ValueInput input) {
+                energy.setEnergy(input.getIntOr("Energy", 0));
+            }
+        });
+    }
     private final EnergyAccumulator accumulator = new EnergyAccumulator();
 
     @SuppressWarnings("unchecked")
@@ -155,28 +203,14 @@ public class MycelialGeneratorBlockEntity extends BlockEntity implements MenuPro
     }
 
     /**
-     * Called once when the block is broken or replaced (never on chunk unload): drops the inventory and
-     * removes this generator's manual links from both ends.
+     * Called once when the block is broken or replaced (never on chunk unload): the frame drops the inventory, and
+     * this removes the generator's manual links from both ends.
      */
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
-        if (level != null) {
-            dropContents(level, pos);
-        }
         if (level instanceof ServerLevel serverLevel) {
             ManualLinking.onGeneratorDestroyed(serverLevel, pos);
-        }
-    }
-
-    /** Drops the inventory into the world. */
-    public void dropContents(Level level, BlockPos pos) {
-        for (int slot = 0; slot < inventory.size(); slot++) {
-            ItemStack stack = inventory.getStackInSlot(slot);
-            if (!stack.isEmpty()) {
-                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack.copy());
-                inventory.setStackInSlot(slot, ItemStack.EMPTY);
-            }
         }
     }
 
@@ -691,6 +725,23 @@ public class MycelialGeneratorBlockEntity extends BlockEntity implements MenuPro
         return attemptTimer;
     }
 
+    // ------------------------------------------------------------------ what cables and pipes see (every side)
+
+    @Override
+    public @Nullable EnergyHandler energyFor(@Nullable Direction side) {
+        return energy;
+    }
+
+    @Override
+    public @Nullable ResourceHandler<FluidResource> fluidFor(@Nullable Direction side) {
+        return externalFluid;
+    }
+
+    @Override
+    public @Nullable ResourceHandler<ItemResource> itemsFor(@Nullable Direction side) {
+        return automationItems;
+    }
+
     // ------------------------------------------------------------------ menu
 
     @Override
@@ -708,10 +759,7 @@ public class MycelialGeneratorBlockEntity extends BlockEntity implements MenuPro
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        output.putChild("Inventory", inventory);
-        output.putChild("Tank", tank);
-        output.putInt("Energy", energy.getAmountAsInt());
+        super.saveAdditional(output); // its modules: inventory, tank, energy
         output.store("EnergyRemainder", Codec.DOUBLE, accumulator.getRemainder());
 
         ValueOutput fuel = output.child("Fuel");
@@ -733,10 +781,7 @@ public class MycelialGeneratorBlockEntity extends BlockEntity implements MenuPro
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.readChild("Inventory", inventory);
-        input.readChild("Tank", tank);
-        energy.setEnergy(input.getIntOr("Energy", 0));
+        super.loadAdditional(input); // its modules
         accumulator.setRemainder(input.read("EnergyRemainder", Codec.DOUBLE).orElse(0.0D));
 
         ValueInput fuel = input.childOrEmpty("Fuel");

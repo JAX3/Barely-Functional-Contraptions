@@ -13,19 +13,12 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Containers;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -49,18 +42,19 @@ import org.jspecify.annotations.Nullable;
  * It stores {@code capacity} FE and pushes it into every block around it; cables and machines can also pull from it.
  * Its comparator signal is one level per 20 FE/t it is making.
  */
-public class BlazeFurnaceBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, AreaDisplay, net.minecraft.world.MenuProvider {
+public class BlazeFurnaceBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider {
     /** Ticks between looks for heat sources. */
     public static final int SCAN_INTERVAL = 10;
     /** FE/t per comparator level. */
     public static final int FE_PER_SIGNAL = 20;
     public static final int AREA_COLOR = 0xFFFF8A1F;
-    private static final int[] SLOTS = {0};
     /** Number of values synced to the window ({@link com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu}). */
     public static final int DATA_COUNT = 18;
 
-    private final GeneratorEnergy energy = new GeneratorEnergy(20_000, this::setChanged);
-    private ItemStack boostItems = ItemStack.EMPTY;
+    // Its modules: a power buffer (out on every side) and the boost slot (in only: hoppers and pipes can't take it back).
+    private final GeneratorEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new GeneratorEnergy(20_000, this::setChanged))).handler();
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder()
+            .input("boost_items", this::acceptsBoost).build());
     private int boostTicks;
     /** How long the boost burning now lasts in all, for the window's countdown. */
     private int boostDuration;
@@ -227,6 +221,7 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements MachineConta
     }
 
     private void startBoost() {
+        ItemStack boostItems = inventory.get(0);
         FurnaceBoostDataMap.Boost boost = FurnaceBoostDataMap.of(boostItems);
         if (boost == null) return;
         boostItems.shrink(1);
@@ -275,7 +270,7 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements MachineConta
     }
 
     public ItemStack boostItems() {
-        return boostItems;
+        return inventory.get(0);
     }
 
     public int comparatorSignal() {
@@ -288,10 +283,11 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements MachineConta
      */
     public int insertBoost(ItemStack stack, @Nullable Player player) {
         if (!canPlaceItem(0, stack)) return 0;
+        ItemStack boostItems = inventory.get(0);
         int room = boostItems.isEmpty() ? stack.getMaxStackSize() : boostItems.getMaxStackSize() - boostItems.getCount();
         int move = Math.min(room, stack.getCount());
         if (move <= 0) return 0;
-        if (boostItems.isEmpty()) boostItems = stack.copyWithCount(move);
+        if (boostItems.isEmpty()) inventory.set(0, stack.copyWithCount(move));
         else boostItems.grow(move);
         if (player == null || !player.getAbilities().instabuild) stack.shrink(move);
         setChanged();
@@ -336,61 +332,24 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements MachineConta
         return new com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu(containerId, inventory, this, data);
     }
 
-    // ------------------------------------------------------------------ container (the boost slot)
+    // ------------------------------------------------------------------ the boost slot (its inventory module)
 
     @Override
-    public int getContainerSize() {
-        return 1;
-    }
-
-    @Override
-    public ItemStack getItem(int slot) {
-        return slot == 0 ? boostItems : ItemStack.EMPTY;
-    }
-
-    @Override
-    public void putItem(int slot, ItemStack stack) {
-        if (slot == 0) boostItems = stack;
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
     }
 
     /** Only boost items go in, and only on top of the same item. */
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        return slot == 0 && FurnaceBoostDataMap.of(stack) != null
-                && (boostItems.isEmpty() || ItemStack.isSameItemSameComponents(boostItems, stack));
+    private boolean acceptsBoost(ItemStack stack) {
+        ItemStack boostItems = inventory.get(0);
+        return FurnaceBoostDataMap.of(stack) != null && (boostItems.isEmpty() || ItemStack.isSameItemSameComponents(boostItems, stack));
     }
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return SLOTS;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return canPlaceItem(slot, stack);
-    }
-
-    /** Hoppers and pipes can't take boost items back out. */
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return false;
-    }
-
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
-        if (level != null) Containers.dropContents(level, pos, this);
-    }
-
-    // ------------------------------------------------------------------ energy
 
     // ------------------------------------------------------------------ persistence and sync
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.child("energy").ifPresent(energy::deserialize);
-        boostItems = input.read("boost_items", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        super.loadAdditional(input); // its modules: energy and the boost slot
         boostTicks = input.getIntOr("boost_ticks", 0);
         boostDuration = input.getIntOr("boost_duration", boostTicks);
         boostMultiplier = input.getDoubleOr("boost_multiplier", 1.0);
@@ -400,26 +359,17 @@ public class BlazeFurnaceBlockEntity extends BlockEntity implements MachineConta
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        energy.serialize(output.child("energy"));
-        if (!boostItems.isEmpty()) output.store("boost_items", ItemStack.OPTIONAL_CODEC, boostItems);
+        super.saveAdditional(output); // its modules
         output.putInt("boost_ticks", boostTicks);
         output.putInt("boost_duration", boostDuration);
         output.putDouble("boost_multiplier", boostMultiplier);
         output.putBoolean("show_area", showArea);
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
     /** Clients get the area setting and the heaters (for the flames); entity ids only make sense while loaded. */
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = new CompoundTag();
+    protected void writeClientData(CompoundTag tag) {
         tag.putBoolean("show_area", showArea);
         tag.putIntArray("heaters", heaters);
-        return tag;
     }
 }

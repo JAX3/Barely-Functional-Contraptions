@@ -14,9 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.animal.sheep.Sheep;
@@ -27,7 +25,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -50,17 +47,18 @@ import org.jspecify.annotations.Nullable;
  * While it walks, the treadmill keeps the sheep in the middle of the belt facing the wheat. It doesn't make power, or
  * use up wheat or the sheep's stamina, while its buffer is full. It pushes its energy into every block around it.
  */
-public class SheepTreadmillBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, MenuProvider {
+public class SheepTreadmillBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, MenuProvider {
     public static final int DATA_COUNT = 9;
     /** How far the sheep is above the block's floor: the belt's top. */
     public static final double BELT_TOP = 6.0 / 16.0;
-    private static final int[] SLOTS = {0};
 
     /** What the treadmill is doing, for its window and comparator: the order matches the window's status keys. */
     public enum State { NO_SHEEP, WALKING, HUNGRY, RESTING, FULL }
 
-    private final GeneratorEnergy energy = new GeneratorEnergy(20_000, this::setChanged);
-    private ItemStack food = ItemStack.EMPTY;
+    // Its modules: a power buffer and the food slot (in only), offered from either of its blocks.
+    private final GeneratorEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new GeneratorEnergy(20_000, this::setChanged))).handler();
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder()
+            .input("food", stack -> feedValue(stack) > 0).build());
     /** Ticks of walking left on the food eaten last. */
     private int fed;
     private @Nullable UUID walkerId;
@@ -212,7 +210,7 @@ public class SheepTreadmillBlockEntity extends BlockEntity implements MachineCon
      */
     private void attract(ServerLevel level, BlockPos pos, Direction facing, long now) {
         int radius = ModConfigs.getInt(ModConfigs.SERVER.treadmillAttractRadius);
-        if (radius <= 0 || (fed <= 0 && feedValue(food) <= 0) || energy.getAmountAsInt() >= energy.getCapacityAsInt()) return;
+        if (radius <= 0 || (fed <= 0 && feedValue(inventory.get(0)) <= 0) || energy.getAmountAsInt() >= energy.getCapacityAsInt()) return;
         CALLED.values().removeIf(until -> until < now);
         Vec3 lane = lane(pos, facing);
         Sheep nearest = null;
@@ -276,6 +274,7 @@ public class SheepTreadmillBlockEntity extends BlockEntity implements MachineCon
 
     /** Eats the next Wheat or Hay Bale, if there is one. */
     private boolean eat() {
+        ItemStack food = inventory.get(0);
         int value = feedValue(food);
         if (value <= 0) return false;
         food.shrink(1);
@@ -320,7 +319,12 @@ public class SheepTreadmillBlockEntity extends BlockEntity implements MachineCon
     }
 
     public ItemStack food() {
-        return food;
+        return inventory.get(0);
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
     }
 
     @Override
@@ -333,67 +337,18 @@ public class SheepTreadmillBlockEntity extends BlockEntity implements MachineCon
         return new SheepTreadmillMenu(containerId, inventory, this, data);
     }
 
-    // ------------------------------------------------------------------ container (the food slot)
-
-    @Override
-    public int getContainerSize() {
-        return 1;
-    }
-
-    @Override
-    public ItemStack getItem(int slot) {
-        return slot == 0 ? food : ItemStack.EMPTY;
-    }
-
-    @Override
-    public void putItem(int slot, ItemStack stack) {
-        if (slot == 0) food = stack;
-    }
-
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        return slot == 0 && feedValue(stack) > 0;
-    }
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return SLOTS;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return canPlaceItem(slot, stack);
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return false;
-    }
-
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
-        if (level != null) Containers.dropContents(level, pos, this);
-    }
-
-    // ------------------------------------------------------------------ energy
-
     // ------------------------------------------------------------------ persistence
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.child("energy").ifPresent(energy::deserialize);
-        food = input.read("food", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        super.loadAdditional(input); // its modules: energy and food
         fed = input.getIntOr("fed", 0);
         walkerId = input.read("walker", UUIDUtil.CODEC).orElse(null);
     }
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        energy.serialize(output.child("energy"));
-        if (!food.isEmpty()) output.store("food", ItemStack.OPTIONAL_CODEC, food);
+        super.saveAdditional(output); // its modules
         output.putInt("fed", fed);
         if (walkerId != null) output.store("walker", UUIDUtil.CODEC, walkerId);
     }

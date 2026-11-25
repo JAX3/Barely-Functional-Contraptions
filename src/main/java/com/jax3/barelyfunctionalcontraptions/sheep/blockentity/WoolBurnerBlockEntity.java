@@ -8,24 +8,19 @@ import com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolBurnerMenu;
 import com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import org.jspecify.annotations.Nullable;
 
 /**
  * The Wool Burner: burns wool, string and Coal Wool (any {@link WoolBurnerFuel}, data-driven) from its one slot for
@@ -41,12 +36,13 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * It stores {@code [wool_burner] capacity} FE and pushes it into every block around it.
  */
-public class WoolBurnerBlockEntity extends BlockEntity implements MachineContainer, WorldlyContainer, MenuProvider {
+public class WoolBurnerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, MenuProvider {
     public static final int DATA_COUNT = 9;
-    private static final int[] SLOTS = {0};
 
-    private final GeneratorEnergy energy = new GeneratorEnergy(20_000, this::setChanged);
-    private ItemStack fuel = ItemStack.EMPTY;
+    // Its modules: a power buffer (out on every side) and a fuel slot (in only: hoppers and pipes can't take it back).
+    private final GeneratorEnergy energy = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.EnergyModule.of(new GeneratorEnergy(20_000, this::setChanged))).handler();
+    private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder()
+            .input("fuel", WoolBurnerFuels::isFuel).build());
     private int burnTime;
     private int burnTotal;
     private int power;
@@ -109,6 +105,7 @@ public class WoolBurnerBlockEntity extends BlockEntity implements MachineContain
 
     /** Lights the next fuel item, if there is one. */
     private void light() {
+        ItemStack fuel = inventory.get(0);
         Optional<WoolBurnerFuel> next = WoolBurnerFuels.of(fuel);
         if (next.isEmpty()) return;
         fuel.shrink(1);
@@ -143,7 +140,12 @@ public class WoolBurnerBlockEntity extends BlockEntity implements MachineContain
     }
 
     public ItemStack fuel() {
-        return fuel;
+        return inventory.get(0);
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory() {
+        return inventory;
     }
 
     @Override
@@ -156,60 +158,11 @@ public class WoolBurnerBlockEntity extends BlockEntity implements MachineContain
         return new WoolBurnerMenu(containerId, inventory, this, data);
     }
 
-    // ------------------------------------------------------------------ container (the fuel slot)
-
-    @Override
-    public int getContainerSize() {
-        return 1;
-    }
-
-    @Override
-    public ItemStack getItem(int slot) {
-        return slot == 0 ? fuel : ItemStack.EMPTY;
-    }
-
-    @Override
-    public void putItem(int slot, ItemStack stack) {
-        if (slot == 0) fuel = stack;
-    }
-
-    /** Only fuel goes in. */
-    @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        return slot == 0 && WoolBurnerFuels.isFuel(stack);
-    }
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return SLOTS;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return canPlaceItem(slot, stack);
-    }
-
-    /** Hoppers and pipes can't take fuel back out. */
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return false;
-    }
-
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
-        if (level != null) Containers.dropContents(level, pos, this);
-    }
-
-    // ------------------------------------------------------------------ energy
-
     // ------------------------------------------------------------------ persistence
 
     @Override
     protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.child("energy").ifPresent(energy::deserialize);
-        fuel = input.read("fuel", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        super.loadAdditional(input); // its modules: energy and fuel
         burnTime = input.getIntOr("burn_time", 0);
         burnTotal = input.getIntOr("burn_total", burnTime);
         power = input.getIntOr("power", 0);
@@ -217,9 +170,7 @@ public class WoolBurnerBlockEntity extends BlockEntity implements MachineContain
 
     @Override
     protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        energy.serialize(output.child("energy"));
-        if (!fuel.isEmpty()) output.store("fuel", ItemStack.OPTIONAL_CODEC, fuel);
+        super.saveAdditional(output); // its modules
         output.putInt("burn_time", burnTime);
         output.putInt("burn_total", burnTotal);
         output.putInt("power", power);
