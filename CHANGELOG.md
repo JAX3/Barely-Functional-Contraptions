@@ -309,6 +309,9 @@ shared code path where there used to be eighteen copies, so a new machine is mos
 - **Static Generator:** six sheep at four fresh combs, making 600 FE/t into a bank of Hume Energy Cubes.
 - **Machine Status Panel:** a 3x3 screen showing 23 machines from across the platform (the crate store and the Fleece Trawler among them), with an alarm lamp.
 - **Wireless power scene:** its generator is now cabled to the separator and shears it used to power wirelessly.
+- **Hume Field Generator:** cell (3, 6) has three, one for each state: two Hume Energy Cubes against the first catch
+  everything it makes (*Delivering*), a Powered Furnace smelting cobblestone against the second takes only the little
+  it uses (*Wasting*), and the third stands alone (*Nothing to take it*). Mind the Nausea within 8 blocks.
 - **Upgrade cards:** cell (2, 6) has three separators on the same Iron Wool: plain, with a Speed card and with an
   Efficiency card.
 - **Wool-Lined Crates:** a storeroom wall of fourteen crates, each lined the colour of what it holds; and a hopper

@@ -1632,9 +1632,9 @@ public final class DevScreenshotHarness {
             // Rows 0 to 5 are full: up to (1, 5) by the moved scenes, (2, 5) by the Grass Seeder, (3, 5) by the Herd
             // Counter and (4, 5) by the Machine Status Panel. Row 6, added by extendPlatform: (0, 6) the Wool-Lined Crates
             // (built by an earlier run, as "crates"), (1, 6) the Fleece Trawler (as "fleece trawler"), (2, 6) the upgrade
-            // cards; (3, 6) and (4, 6) are free. An earlier run also cabled the old wireless-power scene ("cable the
-            // wireless scene").
-            {"upgrades", 2, 6},
+            // cards (as "upgrades"), (3, 6) the Hume Field Generator; (4, 6) is free. An earlier run also cabled the old
+            // wireless-power scene ("cable the wireless scene").
+            {"hume field", 3, 6},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -1897,6 +1897,57 @@ public final class DevScreenshotHarness {
         }
         label(server, g.above(6).north(2), "Upgrade cards: the same Iron Wool, three ways", "gold");
         ResourcefulSheep.LOGGER.info("EXTEND upgrades built round {}", g);
+    }
+
+    /** The test world's offsets of its three Hume Field Generators' cores from the cell's middle (see {@link #humeFieldWorldScene}). */
+    private static final int[] HUME_WORLD_X = {-6, -1, 5};
+
+    /**
+     * Three Hume Field Generators showing their three states: one with two Hume Energy Cubes against it (delivering all
+     * it makes), one with only a Powered Furnace against it (wasting what the furnace can't take, and everything once
+     * it's full), and one on its own (all of it lost). Its pulse nauseates players within 8 blocks, hence the warning.
+     */
+    private static void humeFieldWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        BlockPos g = origin.offset(0, 0, -3);
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(12, 8, 12),
+                e -> e instanceof net.minecraft.world.entity.Display.TextDisplay || e instanceof net.minecraft.world.entity.item.ItemEntity)) e.discard();
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-9, 0, -6), g.offset(9, 6, 5))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-9, -1, -6), g.offset(9, -1, 5))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+        var block = ModBlocks.HUME_FIELD_GENERATOR.get();
+        String[][] labels = {{"Delivering: cubes catch it all", "green"}, {"Wasting: the furnace uses a little", "gold"},
+                {"Alone: all of it lost", "red"}};
+        for (int k = 0; k < HUME_WORLD_X.length; k++) {
+            BlockPos core = g.offset(HUME_WORLD_X[k], 0, -1);
+            for (int part = 0; part < 4; part++) {
+                for (int layer = 0; layer < 3; layer++) {
+                    level.setBlock(core.offset(part & 1, layer, part >> 1), block.defaultBlockState()
+                            .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.PART, part)
+                            .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.HumeFieldGeneratorBlock.LAYER, layer), 3);
+                }
+            }
+            label(server, core.offset(1, k == 1 ? 4 : 3, 2), labels[k][0], labels[k][1]); // the middle one higher, clear of its neighbours
+        }
+        // Delivering: two Hume Energy Cubes, joined, against the first one's west side.
+        BlockPos first = g.offset(HUME_WORLD_X[0], 0, -1);
+        level.setBlock(first.west(), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        level.setBlock(first.west().above(), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+        // Wasting: a Powered Furnace against the second one's east side, smelting cobblestone from a chest above into a
+        // chest under the floor. It takes only the little it uses each tick; the rest is lost.
+        BlockPos furnace = g.offset(HUME_WORLD_X[1], 0, -1).east(2);
+        level.setBlock(furnace, ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+        level.setBlock(furnace.above(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
+        level.setBlock(furnace.above(2), Blocks.CHEST.defaultBlockState(), 3);
+        level.setBlock(furnace.below(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
+        level.setBlock(furnace.below(2), Blocks.CHEST.defaultBlockState(), 3);
+        if (level.getBlockEntity(furnace.above(2)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity feed) {
+            for (int i = 0; i < feed.getContainerSize(); i++) feed.setItem(i, new ItemStack(Items.COBBLESTONE, 64));
+        }
+        label(server, g.above(7).north(3), "Hume Field Generator: random power, no buffer", "light_purple");
+        label(server, g.above(6).north(3), "Its pulse gives Nausea within 8 blocks", "yellow");
+        ResourcefulSheep.LOGGER.info("EXTEND hume field built round {}", g);
     }
 
     /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
@@ -3840,7 +3891,7 @@ public final class DevScreenshotHarness {
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
         // The whole square platform from above its south edge and from straight overhead, then the latest scene.
         String[] tps = {"tp @a 73.5 95 218.5 180 40", "tp @a 73.5 185 108 180 90", "tp @a 129.5 38 162.5 180 12", "tp @a 45.5 40 184.5 180 32",
-                "tp @a 73.5 39 185.5 180 22"};
+                "tp @a 101.5 39 186.5 180 22"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -3864,6 +3915,14 @@ public final class DevScreenshotHarness {
                         int iron = 0;
                         for (int i = 0; i < out.getContainerSize(); i++) if (out.getItem(i).is(Items.RAW_IRON)) iron += out.getItem(i).getCount();
                         ResourcefulSheep.LOGGER.warn("TOUR upgrades separator at {} with {}: {} Raw Iron out, status {}", sepPos, sep.upgrades().cards(), iron, sep.getStatus());
+                    }
+                }
+                // The Hume Field Generators in cell (3, 6): delivering, wasting and alone.
+                for (int dx : HUME_WORLD_X) {
+                    BlockPos core = new BlockPos(101 + dx, 35, 176);
+                    if (level.getBlockEntity(core) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity hume) {
+                        ResourcefulSheep.LOGGER.warn("TOUR hume field at {}: {}, made {} taken {} by {} blocks, average {}, {} delivered in all, {} pulses",
+                                core, hume.status(), hume.generated(), hume.delivered(), hume.receivers(), hume.average(), hume.totalDelivered(), hume.pulses());
                     }
                 }
                 // The generator cabled to a separator and shears, once wireless.
@@ -4185,6 +4244,7 @@ public final class DevScreenshotHarness {
                         case "fleece trawler" -> trawlerWorldScene(server);
                         case "cable the wireless scene" -> cableWirelessScene(server);
                         case "upgrades" -> upgradeWorldScene(server);
+                        case "hume field" -> humeFieldWorldScene(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
