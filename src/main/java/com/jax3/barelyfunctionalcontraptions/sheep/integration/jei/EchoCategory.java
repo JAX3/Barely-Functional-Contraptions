@@ -32,7 +32,7 @@ public class EchoCategory extends AbstractRecipeCategory<EchoDisplay> {
     public static final IRecipeType<EchoDisplay> TYPE = IRecipeType.create(ResourcefulSheep.id("echo_chamber"), EchoDisplay.class);
     public static final int WIDTH = 176, HEIGHT = 128;
     private static final int TABLE_Y = 56, LINE = 10;
-    private static final int PANEL = 0xFF2C2E36, EDGE = 0xFF17181C, SCULK = 0xFF29DFEB, SCULK_DIM = 0xFF0F7E8A;
+    private static final int PANEL = 0xFF2C2E36, EDGE = 0xFF17181C, SCULK = 0xFFC99BFF, SCULK_DIM = 0xFF5C2AA6;
 
     private final IDrawableStatic slot;
     private final IDrawableStatic bigSlot;
@@ -47,7 +47,7 @@ public class EchoCategory extends AbstractRecipeCategory<EchoDisplay> {
     @Override
     public void draw(EchoDisplay recipe, mezz.jei.api.gui.ingredient.IRecipeSlotsView slots,
                      net.minecraft.client.gui.GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
-        // The slate panel with a sculk-cyan edge, like the chamber's glow.
+        // The slate panel with a purple edge, like the chamber's glow.
         graphics.fill(0, 0, WIDTH, HEIGHT, EDGE);
         graphics.fill(1, 1, WIDTH - 1, HEIGHT - 1, PANEL);
         graphics.fill(1, 1, WIDTH - 1, 3, SCULK_DIM);

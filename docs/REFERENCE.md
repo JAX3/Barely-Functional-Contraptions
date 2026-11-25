@@ -615,7 +615,7 @@ B M B      B = Blackstone, M = Functional Machine Block
 
 | The machine | From the back |
 |---|---|
-| ![The 3x3x3 Echo Chamber on a sculk floor beside a Warden sheep: a blue-steel machine whose front is a big glowing resonator dish, with a crown of cyan sculk fronds and a catalyst dome on its sculk roof](screenshots/wip_echo_chamber_front.png) | ![The back of the Echo Chamber close up: a yellow power port between two louvred vents glowing faintly cyan inside, with a conduit and an exhaust grille above, and foam side walls between baffle ribs](screenshots/wip_echo_chamber_back_close.png) |
+| ![The 3x3x3 Echo Chamber on a sculk floor beside a Warden sheep: a blue-steel machine whose front is a big purple resonator dish, with a crown of purple sculk fronds and a glowing dome on its purple sculk roof](screenshots/wip_echo_chamber_front.png) | ![The back of the Echo Chamber close up: a yellow power port between two louvred vents glowing faintly purple inside, with a conduit and an exhaust grille above, and foam side walls between baffle ribs](screenshots/wip_echo_chamber_back_close.png) |
 
 | Listening | Shrieked |
 |---|---|

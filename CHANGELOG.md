@@ -232,6 +232,14 @@ wool, or just quieter.
   Iron Ingot for an Iron sheep.
 - Blue Steel is in `#c:ingots`, and its block in `#c:storage_blocks`.
 
+### The Echo Chamber in the machines' colours
+- The Echo Chamber's glow is now the purple of the other machines' ports and the Hume blocks, not the sculk's cyan: its
+  resonator dish and its breathing heart, the fronds on its roof, the sculk creeping over its walls and the light in its
+  vents.
+- Its roof and the dome on it are its own purple sculk and a blue-steel drum with a glowing well, instead of vanilla
+  sculk and a sculk catalyst. Its foam walls are blue steel, a shade darker than the casing.
+- Its window, Jade tooltip, JEI page and working-area outline use the same purple.
+
 ### Sheep wear their blocks
 - An infused sheep's fleece is now **its resource's block**: Block of Redstone on a Redstone sheep, Block of Iron on an
   Iron sheep, oak bark on a Wood sheep, mushroom blocks on the mushroom sheep. It's the block that grows out of it,

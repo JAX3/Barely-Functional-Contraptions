@@ -4150,7 +4150,10 @@ def generate_thermal_reaction_chamber_gui():
 # are its textures. Wall textures tile, one per block face.
 # ---------------------------------------------------------------------------
 SCULK = [hexc("#051a1f"), hexc("#0b2e36"), hexc("#10474f"), hexc("#0f7e8a"), hexc("#29dfeb"), hexc("#c9fbff")]
-ECHO_FOAM = [hexc("#161b29"), hexc("#222a3e"), hexc("#303b56"), hexc("#43507a"), hexc("#5a6a98")]
+# Its glow is the machines' purple, like the Hume Energy Cube's and the ports', not the sculk's cyan; the foam is the
+# blue steel of its casing, a shade darker.
+ECHO_GLOW = [hexc("#140f22"), hexc("#2a1d48"), hexc("#45287a"), hexc("#5c2aa6"), hexc("#9a52f0"), hexc("#f4e8ff")]
+ECHO_FOAM = [hexc("#231c35"), hexc("#2f3550"), hexc("#3f4766"), hexc("#4f587a"), hexc("#6b759b")]
 
 
 
@@ -4225,32 +4228,32 @@ def _echo_patch(img, seed, centre, radius):
         for x in range(img.width):
             d = math.hypot(x - cx, y - cy) + rnd.random() * 1.6
             if d < radius:
-                img.putpixel((x, y), SCULK[1] if rnd.random() < 0.6 else SCULK[2])
+                img.putpixel((x, y), ECHO_GLOW[1] if rnd.random() < 0.6 else ECHO_GLOW[2])
                 if d < radius * 0.7 and rnd.random() < 0.07:
-                    img.putpixel((x, y), SCULK[4])
+                    img.putpixel((x, y), ECHO_GLOW[4])
             elif d < radius + 0.8 and rnd.random() < 0.5:
-                img.putpixel((x, y), mix(img.getpixel((x, y)), SCULK[1], 0.6))
+                img.putpixel((x, y), mix(img.getpixel((x, y)), ECHO_GLOW[1], 0.6))
 
 
 def _echo_dish(f, frames):
     """The 32x32 resonator dish: a dark sculk well in rings, a wave running outward from the middle, one frame."""
-    img = Image.new("RGBA", (32, 32), SCULK[0])
+    img = Image.new("RGBA", (32, 32), ECHO_GLOW[0])
     phase = f / frames
     for y in range(32):
         for x in range(32):
             r = math.hypot(x - 15.5, y - 15.5)
             if r > 15.6:
-                img.putpixel((x, y), SCULK[1] if (x + y) % 2 else SCULK[2])  # the corners outside the dish
+                img.putpixel((x, y), ECHO_GLOW[1] if (x + y) % 2 else ECHO_GLOW[2])  # the corners outside the dish
                 continue
             ring = int(r / 2) % 2
-            c = SCULK[0] if ring else SCULK[1]
+            c = ECHO_GLOW[0] if ring else ECHO_GLOW[1]
             if int(r) % 4 == 3:
-                c = SCULK[2]  # the dish's ridges
+                c = ECHO_GLOW[2]  # the dish's ridges
             d = (r / 15.6 - phase) % 1.0
             if d < 0.12:
-                c = mix(c, SCULK[4], 1 - d / 0.12)
+                c = mix(c, ECHO_GLOW[4], 1 - d / 0.12)
             elif d > 0.9:
-                c = mix(c, SCULK[3], (d - 0.9) / 0.1 * 0.6)
+                c = mix(c, ECHO_GLOW[3], (d - 0.9) / 0.1 * 0.6)
             img.putpixel((x, y), c)
     # The glowing heart in the middle, breathing in and out with the wave.
     glow = 0.5 + 0.5 * math.cos(2 * math.pi * phase)
@@ -4258,9 +4261,9 @@ def _echo_dish(f, frames):
         for x in range(32):
             r = math.hypot(x - 15.5, y - 15.5)
             if r < 3.6:
-                img.putpixel((x, y), mix(SCULK[4], SCULK[5], max(0.0, 1 - r / 3.6) * (0.4 + 0.6 * glow)))
+                img.putpixel((x, y), mix(ECHO_GLOW[4], ECHO_GLOW[5], max(0.0, 1 - r / 3.6) * (0.4 + 0.6 * glow)))
             elif r < 4.6:
-                img.putpixel((x, y), mix(SCULK[2], SCULK[3], glow))
+                img.putpixel((x, y), mix(ECHO_GLOW[2], ECHO_GLOW[3], glow))
     for a in range(0, 360, 6):  # the rim
         x, y = 15.5 + 15.2 * math.cos(math.radians(a)), 15.5 + 15.2 * math.sin(math.radians(a))
         img.putpixel((int(round(x)), int(round(y))), CARTOON["S"])
@@ -4327,7 +4330,7 @@ def generate_echo_chamber():
     vent = Image.new("RGBA", (16, 16))
     for y in range(16):
         for x in range(16):
-            vent.putpixel((x, y), mix(CARTOON["K"], SCULK[3], max(0.0, (y - 6) / 10) * 0.55))
+            vent.putpixel((x, y), mix(CARTOON["K"], ECHO_GLOW[3], max(0.0, (y - 6) / 10) * 0.55))
     vent.save(out(base + "vent_back.png"))
     # The exhaust grille: dark slots between casing bars, tiling sideways; its four rows sit at the bottom.
     grille = Image.new("RGBA", (16, 16), CARTOON["M"])
@@ -4357,18 +4360,55 @@ def generate_echo_chamber():
                 if cx > half:
                     continue
                 if y <= 2 and cx < 1.6:
-                    c = mix(SCULK[4], SCULK[5], glow)
+                    c = mix(ECHO_GLOW[4], ECHO_GLOW[5], glow)
                 elif cx < 0.9:
-                    c = mix(SCULK[3], SCULK[4], 0.4 + 0.6 * glow)
+                    c = mix(ECHO_GLOW[3], ECHO_GLOW[4], 0.4 + 0.6 * glow)
                 elif cx > half - 1:
-                    c = hexc("#0A3F47")
+                    c = ECHO_GLOW[1]
                 else:
-                    c = hexc("#0E5A63") if (x + y) % 3 else hexc("#0A3F47")
+                    c = ECHO_GLOW[2] if (x + y) % 3 else ECHO_GLOW[1]
                     if (x * 7 + y * 3) % 11 == 0:
-                        c = mix(SCULK[3], SCULK[4], glow)
+                        c = mix(ECHO_GLOW[3], ECHO_GLOW[4], glow)
                 img.putpixel((x, y), c)
         return img
     _echo_animated(base, "ear", 8, 4, ear)
+
+    # The roof: the sculk that covers it, in the machine's purple. Ragged dark growth with a few glowing nodes, drawn
+    # on a torus so it tiles across the roof's nine faces.
+    roof = Image.new("RGBA", (16, 16))
+    rnd = random.Random(4242)
+    for y in range(16):
+        for x in range(16):
+            v = (math.sin(x * 0.9 + y * 0.4) + math.cos(y * 1.1 - x * 0.3) + rnd.random() * 1.2) / 3.2
+            roof.putpixel((x, y), ECHO_GLOW[0] if v < 0.05 else ECHO_GLOW[1] if v < 0.45 else ECHO_GLOW[2])
+    for x, y in ((3, 4), (11, 2), (7, 10), (13, 12), (1, 13)):
+        roof.putpixel((x, y), ECHO_GLOW[4]); roof.putpixel(((x + 1) % 16, y), ECHO_GLOW[3])
+        roof.putpixel((x, (y + 1) % 16), ECHO_GLOW[3])
+    roof.save(out(base + "roof.png"))
+
+    # The dome on the roof (where the sculk catalyst sat): a casing drum with a purple glow band round it and a
+    # glowing well on top, like the Hume Field Generator's emitter.
+    side = Image.new("RGBA", (16, 16), CARTOON["M"])
+    for y in range(16):
+        for x in range(16):
+            c = CARTOON["H"] if y == 0 else CARTOON["S"] if y == 15 else CARTOON["M"]
+            if y in (6, 7, 8, 9):
+                c = ECHO_GLOW[4] if y in (7, 8) else ECHO_GLOW[3]
+                if y in (7, 8) and x % 5 == 2:
+                    c = ECHO_GLOW[5]
+            if y in (2, 12) and x % 5 == 2:
+                c = CARTOON["B"]
+            side.putpixel((x, y), c)
+    side.save(out(base + "dome_side.png"))
+    top = Image.new("RGBA", (16, 16), CARTOON["M"])
+    for y in range(16):
+        for x in range(16):
+            r = math.hypot(x - 7.5, y - 7.5)
+            c = CARTOON["H"] if x == 0 or y == 0 else CARTOON["S"] if x == 15 or y == 15 else CARTOON["M"]
+            if r < 6.2:
+                c = CARTOON["O"] if r >= 5.4 else ECHO_GLOW[3] if r >= 4.2 else ECHO_GLOW[4] if r >= 2.4 else ECHO_GLOW[5]
+            top.putpixel((x, y), c)
+    top.save(out(base + "dome_top.png"))
 
 def generate_echo_chamber_gui():
     """Echo Chamber window: energy gauge, then a panel with the herd and output, the 16-step noise meter (too quiet,
@@ -4398,7 +4438,7 @@ def generate_echo_chamber_gui():
     inset(img, 109, 70, 164, 75, GUI["gauge"])        # shriek, fill 54x3 at (110, 71)
     # Tiny marks over the two meters: "z" for drowsy, "!" for shriek.
     for x, y in ((51, 66), (52, 66), (53, 66), (52, 67), (51, 68), (52, 68), (53, 68)):  # a little "z"
-        img.putpixel((x, y), SCULK[4])
+        img.putpixel((x, y), ECHO_GLOW[4])
     for y in (65, 66, 67):
         img.putpixel((110, y), hexc("#e35d5d"))
     img.putpixel((110, 69), hexc("#e35d5d"))
@@ -4406,7 +4446,7 @@ def generate_echo_chamber_gui():
     rnd = random.Random(41)
     for x in range(4, 172):
         if rnd.random() < 0.2:
-            img.putpixel((x, 105), rnd.choice(SCULK[2:5]))
+            img.putpixel((x, 105), rnd.choice(ECHO_GLOW[2:5]))
     # ---- sprites ----
     img.paste(trc.crop((186, 194, 256, 202)), (186, 194))           # status lamps
     shears = Image.open(out("gui/automatic_shears.png")).convert("RGBA")

@@ -16,10 +16,10 @@ ROOT = os.path.join(os.path.dirname(__file__), "..", "..", "src", "main", "resou
 NS = "barelyfunctionalcontraptions"
 TEX = {name: f"{NS}:block/echo_chamber/{name}" for name in (
     "band", "bottom", "dish", "ear", "foam", "foam_sculk_0", "foam_sculk_1", "foam_sculk_2", "grille", "pillar", "plate",
-    "port", "trim", "vent_back")}
-TEX["catalyst_side"] = "minecraft:block/sculk_catalyst_side_bloom"
-TEX["catalyst_top"] = "minecraft:block/sculk_catalyst_top_bloom"
-TEX["sculk"] = "minecraft:block/sculk"  # the whole roof
+    "port", "trim", "vent_back", "roof", "dome_side", "dome_top")}
+TEX["catalyst_side"] = TEX["dome_side"]
+TEX["catalyst_top"] = TEX["dome_top"]
+TEX["sculk"] = TEX["roof"]  # the whole roof, covered in purple sculk
 TEX["particle"] = TEX["plate"]
 
 SIDES = ("north", "south", "east", "west")

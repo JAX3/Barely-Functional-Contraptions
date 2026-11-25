@@ -80,7 +80,7 @@ public class EchoChamberBlockEntity extends com.jax3.barelyfunctionalcontraption
     public static final int SCAN_INTERVAL = 10;
     public static final int BUCKETS = 5;
     public static final int MAX_LEVEL = 15;
-    public static final int AREA_COLOR = 0xFF29DFEB;
+    public static final int AREA_COLOR = 0xFF9A52F0;
     public static final int DATA_COUNT = 16;
 
     /** What the chamber is doing, for its window's status line and lamp. */

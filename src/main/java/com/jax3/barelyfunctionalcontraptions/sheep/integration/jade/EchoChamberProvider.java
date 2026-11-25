@@ -30,7 +30,7 @@ import snownee.jade.api.config.IPluginConfig;
  */
 public final class EchoChamberProvider {
     public static final Identifier UID = ResourcefulSheep.id("echo_chamber");
-    private static final int GREY = 0xAAAAAA, SCULK = 0x29DFEB;
+    private static final int GREY = 0xAAAAAA, SCULK = 0xC99BFF;
 
     private EchoChamberProvider() {}
 

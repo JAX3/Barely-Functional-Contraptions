@@ -34,8 +34,8 @@ public class EchoChamberScreen extends AbstractContainerScreen<EchoChamberMenu> 
     private static final int CENTRE = 107;
     private static final int LAMP_X = 9, LAMP_Y = 90, LAMP_U = 186, LAMP_V = 194;
     private static final int AREA_X = 154, AREA_Y = 4, BUTTON_SIZE = 16, BUTTON_U = 176, BUTTON_V = 146;
-    private static final int TEXT_COLOR = 0xFFDFE4F5, TEXT_DIM = 0xFFAEB4C6, ENERGY_TEXT = 0xFFFFD27F, SCULK_TEXT = 0xFF29DFEB,
-            DROWSY_COLOR = 0xFF29DFEB, SHRIEK_COLOR = 0xFFE35D5D, COOLDOWN_COLOR = 0xFF8A2A30;
+    private static final int TEXT_COLOR = 0xFFDFE4F5, TEXT_DIM = 0xFFAEB4C6, ENERGY_TEXT = 0xFFFFD27F, SCULK_TEXT = 0xFFC99BFF,
+            DROWSY_COLOR = 0xFFC99BFF, SHRIEK_COLOR = 0xFFE35D5D, COOLDOWN_COLOR = 0xFF8A2A30;
 
     public EchoChamberScreen(EchoChamberMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, 108);
