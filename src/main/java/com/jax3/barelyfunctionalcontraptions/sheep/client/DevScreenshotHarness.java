@@ -302,7 +302,11 @@ public final class DevScreenshotHarness {
             return;
         }
         if ("cover".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
-            coverTick(mc, server);
+            coverTick(mc, server, false);
+            return;
+        }
+        if ("cover_sheep".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            coverTick(mc, server, true);
             return;
         }
         if ("fleece_trawler".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
@@ -5304,13 +5308,19 @@ public final class DevScreenshotHarness {
 
     /** The resources of the cover banner's sheep, left to right. */
     private static final String[] COVER_SHEEP = {"diamond", "gold", "emerald", "blaze", "lapis", "redstone", "iron", "glow_ink"};
+    /** ... and of the sheep-only banner's longer row, across the whole width. */
+    private static final String[] COVER_SHEEP_WIDE = {"copper", "diamond", "gold", "emerald", "quartz", "blaze", "lapis", "redstone", "iron",
+            "glow_ink", "coal"};
 
     /**
      * Resourceful sheep in a row on a grass field, side-on and turned a little towards the camera, with a fence and trees
      * behind: the picture for the profile cover banner, which {@code tools/make_cover.py} crops to 1920x220 and puts the
      * logo on. Run at 1920x1080: {@code -PharnessScene=cover -PharnessWidth=1920 -PharnessHeight=1080}.
      */
-    private static void coverTick(Minecraft mc, MinecraftServer server) {
+    private static void coverTick(Minecraft mc, MinecraftServer server, boolean wide) {
+        String[] row = wide ? COVER_SHEEP_WIDE : COVER_SHEEP;
+        // The logo version's row starts left of the middle, leaving room for the logo; the sheep-only one is centred.
+        double first = wide ? -(row.length - 1) * 1.92 / 2 : -3.2, spacing = wide ? 1.92 : 1.85;
         switch (tick) {
             case 60 -> server.execute(() -> {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
@@ -5349,13 +5359,13 @@ public final class DevScreenshotHarness {
                     server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
                             String.format(java.util.Locale.ROOT, "place feature minecraft:oak %d %d %d", o.getX() + t[0], o.getY(), o.getZ() + t[1]));
                 }
-                for (int i = 0; i < COVER_SHEEP.length; i++) {
+                for (int i = 0; i < row.length; i++) {
                     Sheep sh = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
                     // Facing left (west) and a little towards the camera, alternately more and less.
-                    sh.snapTo(o.getX() - 3.2 + i * 1.85, o.getY(), o.getZ() + (i % 2 == 0 ? 0.3 : -0.3), i % 2 == 0 ? 55 : 75, 0);
+                    sh.snapTo(o.getX() + first + i * spacing, o.getY(), o.getZ() + (i % 2 == 0 ? 0.3 : -0.3), i % 2 == 0 ? 55 : 75, 0);
                     sh.setYHeadRot(i % 2 == 0 ? 40 : 70);
                     sh.setYBodyRot(i % 2 == 0 ? 55 : 75);
-                    SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id(COVER_SHEEP[i])), 9, 0));
+                    SheepInfusionEvents.setInfusion(sh, new SheepInfusion(Optional.of(ResourcefulSheep.id(row[i])), 9, 0));
                     sh.setNoAi(true);
                     sh.setPersistenceRequired();
                     level.addFreshEntity(sh);
@@ -5364,7 +5374,8 @@ public final class DevScreenshotHarness {
             case 70 -> setHudHidden(mc, true);
             case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 3", origin.getX() + 0.0, origin.getY() - 0.6, origin.getZ() + 9.0));
             case 84 -> McClient.clearChat(mc);
-            case 200 -> shot(mc, "cover_raw");
+            case 200 -> shot(mc, wide ? "cover_sheep_raw" : "cover_raw");
+            case 201 -> { if (wide) mc.stop(); }
             // The profile picture: close up on the diamond sheep's face, from in front and a little to its side, the
             // rest of the row behind it. (It faces yaw 55: towards the camera's side and the left.)
             case 202 -> {
