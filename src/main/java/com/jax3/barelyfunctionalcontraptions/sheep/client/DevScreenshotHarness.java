@@ -2904,6 +2904,8 @@ public final class DevScreenshotHarness {
                     }
                 }
                 level.setBlock(origin.offset(2, 0, -3), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+                // A cube against its east side, in its middle layer, so it delivers its power.
+                level.setBlock(origin.offset(1, 1, -3), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
             });
             case 70 -> setHudHidden(mc, true);
             // Eye height is 1.62 above these, so the camera sits about level with the cap.
@@ -2913,7 +2915,36 @@ public final class DevScreenshotHarness {
             case 140 -> shot(mc, "wip_hume_field_above");
             case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 2", origin.getX() + 0.0, origin.getY() - 0.4, origin.getZ() - 0.2));
             case 170 -> shot(mc, "wip_hume_field_close");
-            case 176 -> mc.stop();
+            // Jade on it, from in front, in creative with the HUD back and the chat cleared.
+            case 172 -> {
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 20", origin.getX() + 0.0, origin.getY() + 0.0, origin.getZ() - 0.6));
+            }
+            case 176 -> { setHudHidden(mc, false); McClient.clearChat(mc); }
+            case 196 -> shot(mc, "hume_field_jade");
+            case 198 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                BlockPos core = origin.offset(-1, 0, -4);
+                if (player.level().getBlockEntity(core) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity be) {
+                    ResourcefulSheep.LOGGER.warn("HUME {}: made {}, taken {} by {} blocks, average {}", be.status(), be.generated(), be.delivered(), be.receivers(), be.average());
+                    player.openMenu(be, core);
+                }
+            });
+            case 206 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 226 -> shot(mc, "hume_field_gui");
+            case 228 -> {
+                McClient.setScreen(mc, null);
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showHumeField();
+            }
+            case 236 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 246 -> shot(mc, "hume_field_jei");
+            case 248 -> {
+                McClient.setScreen(mc, null);
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showHumeFieldCrafting();
+            }
+            case 256 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 266 -> shot(mc, "hume_field_jei_recipe");
+            case 272 -> mc.stop();
             default -> {}
         }
     }

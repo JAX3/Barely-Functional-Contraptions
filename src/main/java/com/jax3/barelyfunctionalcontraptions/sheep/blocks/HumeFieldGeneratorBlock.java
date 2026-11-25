@@ -74,7 +74,7 @@ public class HumeFieldGeneratorBlock extends Block implements net.minecraft.worl
     }
 
     /** The bottom corner placed first (part 0, layer 0), which the others hang off. */
-    private static BlockPos origin(BlockPos pos, BlockState state) {
+    public static BlockPos origin(BlockPos pos, BlockState state) {
         int part = state.getValue(PART);
         return pos.offset(-dx(part), -state.getValue(LAYER), -dz(part));
     }
@@ -103,6 +103,16 @@ public class HumeFieldGeneratorBlock extends Block implements net.minecraft.worl
             Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
         if (!(level instanceof net.minecraft.server.level.ServerLevel serverLevel) || !isCore(state) || type != ModBlockEntities.HUME_FIELD_GENERATOR.get()) return null;
         return (l, pos, s, be) -> HumeFieldGeneratorBlockEntity.serverTick(serverLevel, pos, s, (HumeFieldGeneratorBlockEntity) be);
+    }
+
+    /** Right-click any of its blocks to open its window. */
+    @Override
+    protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, net.minecraft.world.phys.BlockHitResult hit) {
+        if (level.isClientSide()) return net.minecraft.world.InteractionResult.SUCCESS;
+        HumeFieldGeneratorBlockEntity be = entity(level, pos, state);
+        if (be == null) return net.minecraft.world.InteractionResult.PASS;
+        player.openMenu(be, be.getBlockPos());
+        return net.minecraft.world.InteractionResult.SUCCESS;
     }
 
     @Override
@@ -161,6 +171,13 @@ public class HumeFieldGeneratorBlock extends Block implements net.minecraft.worl
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide()) {
             BlockPos origin = origin(pos, state);
+            // The core first, quietly (no drops, no knock-on updates), so it drops the one item whichever block broke.
+            BlockState coreState = level.getBlockState(origin);
+            if (!origin.equals(pos) && coreState.is(this)) {
+                boolean drops = !player.getAbilities().instabuild && player.hasCorrectToolForDrops(coreState);
+                if (drops) dropResources(coreState, level, origin, level.getBlockEntity(origin), player, player.getMainHandItem());
+                level.setBlock(origin, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS);
+            }
             for (int part = 0; part < 4; part++) {
                 for (int layer = 0; layer < LAYERS; layer++) {
                     BlockPos other = at(origin, part, layer);

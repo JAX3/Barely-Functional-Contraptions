@@ -1,0 +1,37 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "value": "barelyfunctionalcontraptions:hume_field_generator"
+    }
+  ],
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:all_of",
+        "terms": [
+          {
+            "type": "minecraft:survives_explosion"
+          },
+          {
+            "type": "minecraft:match_block",
+            "blocks": "barelyfunctionalcontraptions:hume_field_generator",
+            "state": {
+              "part": "0",
+              "layer": "0"
+            }
+          }
+        ]
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "barelyfunctionalcontraptions:hume_field_generator"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "barelyfunctionalcontraptions:blocks/hume_field_generator"
+}

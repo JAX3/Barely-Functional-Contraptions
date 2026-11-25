@@ -243,7 +243,26 @@ only, but it has a new model and now makes power.
   take is **lost**. Nothing can pull power out of it, and on its own it wastes everything it makes. It offers each
   tick's power to a different neighbour first, so no one of them always gets first pick.
 - New config section `[hume_field_generator]`: `minPerTick`, `maxPerTick` (swapped if the minimum is the larger).
-- Still to come: its upkeep, a window, JEI, Jade, a recipe, and a place in released jars.
+- **Window** (right-click any of its blocks). It has no buffer, so in place of an energy gauge:
+  - a **field gauge** showing what it made this tick, against its range (shaded) and its average (yellow marks);
+  - this tick's output, how much was **taken** and how much was **lost**;
+  - a **trace** of its last 28 ticks, newest on the right, each bar purple where its neighbours took the power and red
+    where it was lost, with the ends of its range dashed across it;
+  - its average over the last second and its range;
+  - a status lamp: *Delivering all it makes* (green), *Wasting some* (amber: its neighbours were full or couldn't take
+    that much a tick), *Nothing to take it: all lost* (red), or *Field off* (its range is 0).
+
+  Every part has a tooltip, and the status's says how many blocks touching it take power.
+- **Jade:** its status, this tick's output and its range, what was taken and lost, its average, and that it has no
+  buffer. It works whichever of its twelve blocks you look at.
+- **JEI:** a *Hume Field Generator* page (its range, its average, what it powers and that it has no buffer, read from
+  the config), and an information page.
+- **Recipe:** Blue Steel Blocks in the corners, Tinted Glass at the top, two Hume Energy Cubes either side of a Nether
+  Star, and a Functional Machine Block at the bottom. It's unlocked by picking up a Nether Star. Broken from any of
+  its blocks, it drops one generator (it needs a pickaxe to break quickly).
+- The recipe, its unlock, its drop and its pickaxe tag only load where the block exists, so released jars, which don't
+  have it yet, are unaffected.
+- Still to come: its upkeep, and a place in released jars.
 
 ### Under the hood: one machine frame
 Every machine and generator is now built from a shared **machine frame** with separate **modules** switched on for

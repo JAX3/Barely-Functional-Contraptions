@@ -3349,46 +3349,15 @@ def generate_powered_furnace():
 
 
 def generate_hume_field_generator():
-    """Hume Field Generator (WIP preview): a steel base and cap on four pillars, two glowing field coils, a glass
-    shell round a core that flickers between "on" (cyan) and "off" (magenta), and an observing lens on top."""
+    """Hume Field Generator (WIP): its glowing field coils, the core that flickers between "on" (cyan) and "off"
+    (magenta), and the observing lens on its emitter. The rest of it is tools/hume_field_generator_model.py's."""
     # Dark blue steel with purple trim, like the Hume Energy Cube.
     DARK, STEEL, STEEL_L, STEEL_D, STEEL_DD = hexc("#1a1528"), hexc("#3f4766"), hexc("#5d6687"), hexc("#2c324c"), hexc("#231c35")
     PURPLE, PURPLE_D, HI = hexc("#9a52f0"), hexc("#5c2aa6"), hexc("#8d97bc")
     CYAN, CYAN_L, CYAN_D, MAGENTA, MAGENTA_D = hexc("#69d6ff"), hexc("#cbf4ff"), hexc("#1b5fa8"), hexc("#ff6ae6"), hexc("#9c2f8f")
 
-    def panel(rivets=True):
-        img = Image.new("RGBA", (16, 16), STEEL)
-        for i in range(16):
-            img.putpixel((i, 0), STEEL_L); img.putpixel((0, i), STEEL_L)
-            img.putpixel((i, 15), STEEL_DD); img.putpixel((15, i), STEEL_DD)
-        if rivets:
-            for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
-                img.putpixel((x, y), HI); img.putpixel((x + 1, y + 1), STEEL_D)
-        return img
-
-    # Base: side (bottom 3 px used) with a purple trim line; top a plate with an inset ring under the coils.
-    side = panel(False)
-    for x in range(16):
-        side.putpixel((x, 13), PURPLE); side.putpixel((x, 12), PURPLE_D)
-    for x in (2, 13):
-        side.putpixel((x, 14), HI)
-    side.save(out("block/hume_field_generator/base_side.png"))
-    top = panel()
-    for i in range(4, 12):
-        for j in (4, 11):
-            top.putpixel((i, j), PURPLE_D); top.putpixel((j, i), PURPLE_D)
-    for i in range(5, 11):
-        for j in range(5, 11):
-            top.putpixel((i, j), DARK)
-    top.save(out("block/hume_field_generator/base_top.png"))
-
-    # Pillar: a steel strut with a purple groove.
-    pillar = Image.new("RGBA", (16, 16), STEEL)
-    for y in range(16):
-        pillar.putpixel((0, y), STEEL_L); pillar.putpixel((1, y), PURPLE if y % 4 else HI)
-        for x in range(2, 16):
-            pillar.putpixel((x, y), STEEL_D if x > 2 else STEEL)
-    pillar.save(out("block/hume_field_generator/pillar.png"))
+    # Its steel (plinth and lid bands, plates, pillars, trim, the window glass and the emitter collar) and its models
+    # come from tools/hume_field_generator_model.py, in the Echo Chamber's style; this makes the coils, core and lens.
 
     # Coil: glowing purple windings.
     coil = Image.new("RGBA", (16, 16), PURPLE_D)
@@ -3396,15 +3365,6 @@ def generate_hume_field_generator():
         for x in range(16):
             coil.putpixel((x, y), PURPLE if (x + y) % 3 else MAGENTA)
     coil.save(out("block/hume_field_generator/coil.png"))
-
-    # Glass shell: mostly clear, a faint tint and bright edges.
-    glass = Image.new("RGBA", (16, 16), (200, 220, 255, 16))
-    for i in range(16):
-        for c in ((i, 0), (0, i), (i, 15), (15, i)):
-            glass.putpixel(c, (223, 228, 245, 110))
-    for i in range(3, 7):
-        glass.putpixel((i, 9 - i), (255, 255, 255, 120))
-    glass.save(out("block/hume_field_generator/glass.png"))
 
     # Core: animated; each frame is a mix of "is" (cyan) and "isn't" (magenta), never settling.
     import random as _r
@@ -3431,16 +3391,6 @@ def generate_hume_field_generator():
     strip.save(out("block/hume_field_generator/core.png"))
     with open(out("block/hume_field_generator/core.png.mcmeta"), "w") as m:
         m.write('{\n  "animation": {\n    "frametime": 3,\n    "interpolate": true\n  }\n}\n')
-
-    # Cap: like the base top, with a ring of rivets; its side a slim trimmed band.
-    cap = panel()
-    for i in range(3, 13):
-        cap.putpixel((i, 3), PURPLE_D); cap.putpixel((i, 12), PURPLE_D); cap.putpixel((3, i), PURPLE_D); cap.putpixel((12, i), PURPLE_D)
-    cap.save(out("block/hume_field_generator/cap_top.png"))
-    capside = panel(False)
-    for x in range(16):
-        capside.putpixel((x, 1), PURPLE)
-    capside.save(out("block/hume_field_generator/cap_side.png"))
 
     # Lens: an eye looking up, the "observer" whose watching decides whether it makes power.
     lens = Image.new("RGBA", (16, 16), DARK)
@@ -4202,6 +4152,49 @@ def generate_thermal_reaction_chamber_gui():
 SCULK = [hexc("#051a1f"), hexc("#0b2e36"), hexc("#10474f"), hexc("#0f7e8a"), hexc("#29dfeb"), hexc("#c9fbff")]
 ECHO_FOAM = [hexc("#161b29"), hexc("#222a3e"), hexc("#303b56"), hexc("#43507a"), hexc("#5a6a98")]
 
+
+
+def generate_hume_field_generator_gui():
+    """Hume Field Generator window: the field gauge (this tick's output against its range), then a panel with the
+    output, what was delivered and lost, the trace of its last 28 ticks (each bar what it made, taken in purple and
+    lost in red, the range's ends dashed across it) and its average and range; the status lamp below."""
+    trc = Image.open(out("gui/thermal_reaction_chamber.png")).convert("RGBA")
+    purple, purple_d, purple_l = hexc("#9a52f0"), hexc("#5c2aa6"), hexc("#c99bff")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 108)
+    inset(img, 10, 18, 42, 84, GUI["gauge"])          # field gauge, fill 30x64 at (11, 19)
+    for k in range(1, 8):
+        ty = 19 + round(64 * k / 8)
+        for x in range(36, 41):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 48, 16, 166, 84, GUI["panel"])         # the field panel
+    inset(img, 50, 41, 164, 72, GUI["gauge"])         # the trace: 28 bars of 3 (+1 gap) at (51 + 4k, 42), up to 29 tall
+    for y in (49, 56, 63):                            # faint quarter lines
+        for x in range(51, 163, 2):
+            img.putpixel((x, y), GUI["tick"])
+    inset(img, 8, 89, 18, 99, GUI["gauge"])           # status lamp housing, lamp at (9, 90)
+    rnd = random.Random(1776)                         # a flicker of the field along the bottom, as the Echo's sculk
+    for x in range(4, 172):
+        if rnd.random() < 0.2:
+            img.putpixel((x, 105), rnd.choice([purple_d, purple, purple_l]))
+    # ---- sprites ----
+    img.paste(trc.crop((186, 194, 256, 202)), (186, 194))           # status lamps
+    for y in range(64):                                             # the field fill, 30x64 at (176, 0): bright at the top
+        for x in range(30):
+            c = mix(purple_l, purple_d, y / 63.0)
+            if x in (0, 29):
+                c = mix(c, hexc("#1a1528"), 0.45)
+            elif x in (1, 28):
+                c = mix(c, hexc("#1a1528"), 0.2)
+            if y % 4 == 3:
+                c = mix(c, purple_d, 0.35)
+            img.putpixel((176 + x, y), c)
+    for x in range(30):                                             # its flickering top edge, 4 frames of 2 rows at (176, 66)
+        for f in range(4):
+            on = (x + f * 3) % 7 < 4
+            img.putpixel((176 + x, 66 + f * 2), hexc("#f4e8ff") if on else purple_l)
+            img.putpixel((176 + x, 67 + f * 2), purple_l if on else purple)
+    img.save(out("gui/hume_field_generator.png"))
 
 def _echo_animated(base, name, frames, frametime, draw):
     strip = Image.new("RGBA", (draw(0).width, draw(0).height * frames))
@@ -5083,6 +5076,7 @@ def main():
     generate_thermal_reaction_chamber_gui()
     generate_echo_chamber()
     generate_echo_chamber_gui()
+    generate_hume_field_generator_gui()
     generate_static_generator()
     generate_static_generator_gui()
     generate_grass_seeder()

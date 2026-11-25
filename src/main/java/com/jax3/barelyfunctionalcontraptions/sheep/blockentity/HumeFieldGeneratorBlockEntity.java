@@ -27,7 +27,36 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  *
  * It's on the machine frame with no modules switched on: nothing to save, store or connect.
  */
-public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame {
+public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
+        implements net.minecraft.world.MenuProvider {
+    /** How many ticks its window's trace shows, and how many its average is over. */
+    public static final int HISTORY = 28, AVERAGE_OVER = 20;
+    /** Values synced to the window: generated, delivered, average, min and max (two shorts each), status, receivers, the trace. */
+    public static final int DATA_COUNT = 12 + HISTORY;
+
+    /** How its power is going, for the window, Jade and the status lamp. */
+    public enum Status {
+        /** Nothing touching it takes power: all it makes is lost. */
+        NOTHING_CONNECTED(0xFFE35D5D),
+        /** Its neighbours took some, the rest was lost (they're full, or can't take that much a tick). */
+        WASTING(0xFFE8B23A),
+        /** Its neighbours took everything it made. */
+        DELIVERING(0xFF55D66B),
+        /** Its field makes nothing (both ends of its range are 0). */
+        IDLE(0xFFAEB4C6);
+
+        public final int color;
+
+        Status(int color) {
+            this.color = color;
+        }
+
+        public static Status byId(int id) {
+            Status[] all = values();
+            return id >= 0 && id < all.length ? all[id] : NOTHING_CONNECTED;
+        }
+    }
+
     /** Each block touching the machine, relative to this block, and the face of it the machine touches. */
     private static final List<Neighbour> NEIGHBOURS = neighbours();
 
@@ -37,6 +66,43 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
     private int delivered;
     private long totalDelivered;
     private int start;
+    private int receivers;
+    private Status status = Status.NOTHING_CONNECTED;
+    /** The last {@link #HISTORY} ticks, oldest first from {@link #head}: what it made and what was taken. */
+    private final int[] madeHistory = new int[HISTORY], takenHistory = new int[HISTORY];
+    private int head;
+
+    private final net.minecraft.world.inventory.ContainerData data = new net.minecraft.world.inventory.ContainerData() {
+        @Override
+        public int get(int index) {
+            if (index >= 12) return sample(index - 12);
+            return switch (index) {
+                case 0 -> generated & 0xFFFF;
+                case 1 -> generated >>> 16;
+                case 2 -> delivered & 0xFFFF;
+                case 3 -> delivered >>> 16;
+                case 4 -> average() & 0xFFFF;
+                case 5 -> average() >>> 16;
+                case 6 -> rangeMin() & 0xFFFF;
+                case 7 -> rangeMin() >>> 16;
+                case 8 -> rangeMax() & 0xFFFF;
+                case 9 -> rangeMax() >>> 16;
+                case 10 -> status.ordinal();
+                case 11 -> receivers;
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int index, int value) {
+            // Server-authoritative; the client-side menu keeps its own SimpleContainerData copy.
+        }
+
+        @Override
+        public int getCount() {
+            return DATA_COUNT;
+        }
+    };
 
     public HumeFieldGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.HUME_FIELD_GENERATOR.get(), pos, state);
@@ -60,8 +126,54 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
 
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, HumeFieldGeneratorBlockEntity be) {
         be.generated = roll(level);
+        be.receivers = 0;
         be.delivered = be.generated > 0 ? be.offer(level, pos, be.generated) : 0;
+        if (be.generated <= 0) be.receivers = be.countReceivers(level, pos);
         be.totalDelivered += be.delivered;
+        be.status = be.generated <= 0 ? Status.IDLE : be.receivers == 0 ? Status.NOTHING_CONNECTED
+                : be.delivered < be.generated ? Status.WASTING : Status.DELIVERING;
+        be.madeHistory[be.head] = be.generated;
+        be.takenHistory[be.head] = be.delivered;
+        be.head = (be.head + 1) % HISTORY;
+    }
+
+    /** The configured range's ends, the smaller first. */
+    public static int rangeMin() {
+        return Math.min(ModConfigs.getInt(ModConfigs.SERVER.humeFieldMinPerTick), ModConfigs.getInt(ModConfigs.SERVER.humeFieldMaxPerTick));
+    }
+
+    public static int rangeMax() {
+        return Math.max(ModConfigs.getInt(ModConfigs.SERVER.humeFieldMinPerTick), ModConfigs.getInt(ModConfigs.SERVER.humeFieldMaxPerTick));
+    }
+
+    /** How many blocks touching it take power, without offering any. */
+    private int countReceivers(ServerLevel level, BlockPos origin) {
+        int found = 0;
+        for (Neighbour n : NEIGHBOURS) {
+            BlockPos at = origin.offset(n.offset());
+            if (level.isLoaded(at) && level.getCapability(Capabilities.Energy.BLOCK, at, n.side()) != null) found++;
+        }
+        return found;
+    }
+
+    /**
+     * Tick {@code i} of the trace (0 the oldest) packed in 16 bits for the window: the high byte what it made as a
+     * share of the range's top (0-255), the low byte the share of that its neighbours took (0-255).
+     */
+    private int sample(int i) {
+        int at = (head + i) % HISTORY;
+        int made = madeHistory[at], taken = takenHistory[at];
+        int top = Math.max(1, rangeMax());
+        int height = Math.min(255, (int) Math.round(255.0 * made / top));
+        int share = made <= 0 ? 0 : Math.min(255, (int) Math.round(255.0 * taken / made));
+        return (height << 8) | share;
+    }
+
+    /** FE/t it made on average over the last {@link #AVERAGE_OVER} ticks. */
+    public int average() {
+        long sum = 0;
+        for (int i = 0; i < AVERAGE_OVER; i++) sum += madeHistory[Math.floorMod(head - 1 - i, HISTORY)];
+        return (int) (sum / AVERAGE_OVER);
     }
 
     /** This tick's FE: a random amount in the configured range (either way round). */
@@ -75,12 +187,14 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
         int left = amount;
         int count = NEIGHBOURS.size();
         start = (start + 1) % count;
-        for (int i = 0; i < count && left > 0; i++) {
+        for (int i = 0; i < count; i++) {
             Neighbour n = NEIGHBOURS.get((start + i) % count);
             BlockPos at = origin.offset(n.offset());
             if (!level.isLoaded(at)) continue;
             EnergyHandler target = level.getCapability(Capabilities.Energy.BLOCK, at, n.side());
             if (target == null) continue;
+            receivers++; // counted even once it's all gone, for the window
+            if (left <= 0) continue;
             try (Transaction tx = Transaction.openRoot()) {
                 int taken = target.insert(left, tx);
                 tx.commit();
@@ -100,6 +214,31 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
     /** FE its neighbours took on the last tick (the rest of {@link #generated} was lost). */
     public int delivered() {
         return delivered;
+    }
+
+    /** FE lost on the last tick: made, but nothing took it. */
+    public int lost() {
+        return generated - delivered;
+    }
+
+    /** How many of the blocks touching it take power. */
+    public int receivers() {
+        return receivers;
+    }
+
+    public Status status() {
+        return status;
+    }
+
+    @Override
+    public net.minecraft.network.chat.Component getDisplayName() {
+        return net.minecraft.network.chat.Component.translatable("block.barelyfunctionalcontraptions.hume_field_generator");
+    }
+
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int containerId, net.minecraft.world.entity.player.Inventory inventory,
+                                                                         net.minecraft.world.entity.player.Player player) {
+        return new com.jax3.barelyfunctionalcontraptions.sheep.menu.HumeFieldGeneratorMenu(containerId, inventory, this, data);
     }
 
     /** FE its neighbours have taken since it was loaded. */

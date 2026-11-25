@@ -51,6 +51,8 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         var gui = registration.getJeiHelpers().getGuiHelper();
         registration.addRecipeCategories(new InfusionCategory(gui), new AltarCategory(gui), new SeparationCategory(gui), new ThermalCategory(gui));
         registration.addRecipeCategories(new EchoCategory(gui), new StaticCategory(gui), new GrassSeederCategory(gui), new HerdCounterCategory(gui), new StatusPanelCategory(gui), new CrateCategory(gui), new CrateControllerCategory(gui), new FleeceTrawlerCategory(gui));
+        // Work in progress: development builds only, like the block.
+        if (ModItems.HUME_FIELD_GENERATOR != null) registration.addRecipeCategories(new HumeFieldCategory(gui));
     }
 
     @Override
@@ -129,6 +131,13 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
                 Component.translatable("jei.barelyfunctionalcontraptions.info.echo_chamber.1"),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.echo_chamber.2"),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.echo_chamber.3"));
+        if (ModItems.HUME_FIELD_GENERATOR != null) {
+            registration.addRecipes(HumeFieldCategory.TYPE, List.of(new HumeFieldDisplay()));
+            registration.addItemStackInfo(new ItemStack(ModItems.HUME_FIELD_GENERATOR.get()),
+                    Component.translatable("jei.barelyfunctionalcontraptions.info.hume_field_generator.1"),
+                    Component.translatable("jei.barelyfunctionalcontraptions.info.hume_field_generator.2"),
+                    Component.translatable("jei.barelyfunctionalcontraptions.info.hume_field_generator.3"));
+        }
     }
 
     /**
@@ -238,6 +247,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addCraftingStation(AltarCategory.TYPE, ModItems.INFUSION_ALTAR.get());
         registration.addCraftingStation(ThermalCategory.TYPE, ModItems.THERMAL_REACTION_CHAMBER.get());
         registration.addCraftingStation(EchoCategory.TYPE, ModItems.ECHO_CHAMBER.get());
+        if (ModItems.HUME_FIELD_GENERATOR != null) registration.addCraftingStation(HumeFieldCategory.TYPE, ModItems.HUME_FIELD_GENERATOR.get());
         registration.addCraftingStation(StaticCategory.TYPE, ModItems.STATIC_GENERATOR.get());
         registration.addCraftingStation(GrassSeederCategory.TYPE, ModItems.GRASS_SEEDER.get());
         registration.addCraftingStation(HerdCounterCategory.TYPE, ModItems.HERD_COUNTER.get());

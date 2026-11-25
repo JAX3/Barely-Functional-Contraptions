@@ -172,6 +172,7 @@ public final class ModGameTests {
         TESTS.put("woollen_boots_muffle_the_wearer", ModGameTests::woollenBootsMuffle);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_is_two_by_two", ModGameTests::humeField);
         if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_makes_random_power_with_no_buffer", ModGameTests::humeFieldPower);
+        if (ModBlocks.HUME_FIELD_GENERATOR != null) TESTS.put("hume_field_generator_window_recipe_and_drop", ModGameTests::humeFieldWindowRecipeDrop);
         TESTS.put("echo_chamber_is_three_by_three", ModGameTests::echoChamber);
         ECHO_TESTS.put("echo_chamber_counts_its_warden_sheep", ModGameTests::echoCountsHerd);
         ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
@@ -1217,6 +1218,55 @@ public final class ModGameTests {
                     "the cube got exactly what it delivered: " + target.group().amount() + " vs " + fed.totalDelivered());
             h.assertTrue(alone.totalDelivered() == 0, "the lone one delivered nothing");
             h.succeed();
+        });
+    }
+
+    /**
+     * Its recipe (Blue Steel Blocks, Tinted Glass, two Hume Energy Cubes, a Nether Star and a Functional Machine Block)
+     * makes one, and not without the star. Its window shows what the block entity knows: the output, what was taken,
+     * the range, the status and a trace of the last ticks, lost red where nothing took it. Broken from any block, it
+     * drops one generator.
+     */
+    private static void humeFieldWindowRecipeDrop(GameTestHelper h) {
+        ItemStack steel = new ItemStack(ModItems.BLUE_STEEL_BLOCK.get()), glass = new ItemStack(Items.TINTED_GLASS);
+        ItemStack cubeItem = new ItemStack(ModItems.HUME_ENERGY_CUBE.get()), star = new ItemStack(Items.NETHER_STAR);
+        ItemStack machine = new ItemStack(ModItems.FUNCTIONAL_MACHINE_BLOCK.get());
+        ItemStack made = craft(h, 3, 3, List.of(steel, glass, steel, cubeItem, star, cubeItem, steel, machine, steel));
+        h.assertTrue(made.is(ModItems.HUME_FIELD_GENERATOR.get()), "the recipe makes a Hume Field Generator, got " + made);
+        h.assertTrue(craft(h, 3, 3, List.of(steel, glass, steel, cubeItem, ItemStack.EMPTY, cubeItem, steel, machine, steel)).isEmpty(), "not without the Nether Star");
+
+        var fed = humeFieldAt(h, new BlockPos(1, 1, 1));
+        cube(h, new BlockPos(0, 2, 1));
+        var lone = humeFieldAt(h, new BlockPos(5, 1, 1));
+        var player = McTest.mockServerPlayer(h, GameType.SURVIVAL);
+        var menu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.HumeFieldGeneratorMenu) fed.createMenu(0, player.getInventory(), player);
+        var loneMenu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.HumeFieldGeneratorMenu) lone.createMenu(1, player.getInventory(), player);
+        h.runAfterDelay(40, () -> {
+            h.assertTrue(menu.getGenerated() == fed.generated() && menu.getDelivered() == fed.delivered(), "the window shows this tick's output and what was taken");
+            h.assertTrue(menu.getRangeMin() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.rangeMin() && menu.getRangeMax() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.rangeMax(), "and its range");
+            h.assertTrue(menu.getAverage() >= menu.getRangeMin() && menu.getAverage() <= menu.getRangeMax(), "an average within its range: " + menu.getAverage());
+            h.assertTrue(menu.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.Status.DELIVERING,
+                    "a cube takes everything: " + menu.getStatus());
+            h.assertTrue(menu.getReceivers() == 1, "one block takes its power: " + menu.getReceivers());
+            float low = menu.getRangeMin() / (float) menu.getRangeMax();
+            for (int i = 0; i < com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.HISTORY; i++) {
+                h.assertTrue(menu.sampleHeight(i) >= low - 0.01F && menu.sampleHeight(i) <= 1F, "trace tick " + i + " within its range: " + menu.sampleHeight(i));
+                h.assertTrue(menu.sampleTaken(i) > 0.99F, "all of it taken at tick " + i);
+                h.assertTrue(loneMenu.sampleTaken(i) == 0F && loneMenu.sampleHeight(i) > 0F, "the lone one's trace is all lost, tick " + i);
+            }
+            h.assertTrue(loneMenu.getStatus() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.Status.NOTHING_CONNECTED
+                    && loneMenu.getLost() == loneMenu.getGenerated(), "on its own it loses everything: " + loneMenu.getStatus());
+            // Broken from a top corner: one generator drops, not twelve.
+            BlockPos origin = h.absolutePos(new BlockPos(1, 1, 1));
+            h.getLevel().destroyBlock(h.absolutePos(new BlockPos(2, 3, 2)), true, player);
+            h.runAfterDelay(3, () -> {
+                var area = new net.minecraft.world.phys.AABB(origin).inflate(6);
+                int dropped = h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, area,
+                        i -> i.getItem().is(ModItems.HUME_FIELD_GENERATOR.get())).stream().mapToInt(i -> i.getItem().getCount()).sum();
+                h.assertTrue(dropped == 1, "one Hume Field Generator drops, got " + dropped);
+                h.assertTrue(h.getLevel().getBlockState(origin).isAir(), "and the whole machine is gone");
+                h.succeed();
+            });
         });
     }
 

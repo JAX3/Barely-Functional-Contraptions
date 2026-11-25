@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "value": "barelyfunctionalcontraptions:hume_field_generator"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "I": "barelyfunctionalcontraptions:blue_steel_block",
+    "G": "minecraft:tinted_glass",
+    "H": "barelyfunctionalcontraptions:hume_energy_cube",
+    "N": "minecraft:nether_star",
+    "M": "barelyfunctionalcontraptions:functional_machine_block"
+  },
+  "pattern": [
+    "IGI",
+    "HNH",
+    "IMI"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:hume_field_generator"
+  }
+}
