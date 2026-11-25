@@ -23,9 +23,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Work in progress: the planned Hume Field Generator, so far only its model. A 2x2 machine two and a half blocks tall:
- * a steel base and cap on four pillars, three glowing field coils round a glass shell, a core that flickers between
- * "on" and "off", and a lens on top that watches it. It does nothing yet; it's registered in development builds only.
+ * Work in progress: the planned Hume Field Generator, so far only its model. A 2x2 machine two and a half blocks tall,
+ * built like the Echo Chamber: a steel plinth and lid on four chunky corner pillars lit with Hume purple, a window in
+ * each wall onto a core that flickers between "on" and "off" inside three field coils, and an emitter on the lid
+ * that watches it. It does nothing yet; it's registered in development builds only.
  *
  * <p>It's twelve blocks, as a bed is two: {@link #PART} says which corner (0 is the north-west one that was placed, 1
  * east of it, 2 south, 3 south-east) and {@link #LAYER} how high (0-2). Corner 0 of layer 0 draws the lower two blocks
@@ -37,12 +38,12 @@ public class HumeFieldGeneratorBlock extends Block {
     public static final IntegerProperty LAYER = IntegerProperty.create("layer", 0, 2);
     public static final int LAYERS = 3;
 
-    /** The whole machine in pixels across its 2x2 area (0-32), 40 tall. */
+    /** The whole machine in pixels across its 2x2 area (0-32), 44 tall. */
     private static final VoxelShape WHOLE = Shapes.or(
-            Block.box(0, 0, 0, 32, 4, 32),      // base
-            Block.box(2, 4, 2, 30, 34, 30),     // pillars, coils and shell
-            Block.box(3, 34, 3, 29, 38, 29),    // cap
-            Block.box(12, 38, 12, 20, 40, 20)); // lens
+            Block.box(0, 0, 0, 32, 4, 32),      // plinth
+            Block.box(0, 4, 0, 32, 34, 32),     // pillars and walls
+            Block.box(0, 34, 0, 32, 38, 32),    // lid
+            Block.box(10, 38, 10, 22, 44, 22)); // emitter
     private static final VoxelShape[][] SHAPES = new VoxelShape[4][LAYERS];
 
     static {
