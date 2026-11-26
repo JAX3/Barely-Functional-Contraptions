@@ -280,6 +280,7 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue implosionBatch;
         public final ModConfigSpec.IntValue implosionCapacity;
         public final ModConfigSpec.IntValue implosionMaxInput;
+        public final ModConfigSpec.IntValue explosiveRegrowSeconds;
         public final ModConfigSpec.IntValue crateControllerRange;
         public final ModConfigSpec.IntValue crateControllerMaxCrates;
         public final ModConfigSpec.DoubleValue speedUpgradeTime;
@@ -777,6 +778,8 @@ public final class ModConfigs {
                     .defineInRange("capacity", 20_000, 0, 10_000_000);
             implosionMaxInput = b.comment("Most FE it takes in a tick.")
                     .defineInRange("maxInput", 1_000, 0, 1_000_000);
+            explosiveRegrowSeconds = b.comment("About how many seconds a popped (or sheared) Explosive sheep takes to regrow its wool on its own, without grass. 0 = only by grazing, like any sheep.")
+                    .defineInRange("explosiveRegrowSeconds", 20, 0, 3_600);
             b.pop();
 
             b.comment("Crate Controller (links Wool-Lined Crates into one store: crates touching it join by themselves, others with the wrench)").push("crate_controller");

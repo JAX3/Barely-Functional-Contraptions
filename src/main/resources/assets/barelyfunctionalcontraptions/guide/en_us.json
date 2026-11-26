@@ -491,9 +491,26 @@
       ]
     },
     {
+      "title": "Implosion Chamber",
+      "icon": "barelyfunctionalcontraptions:implosion_chamber",
+      "tab": "production",
+      "text": [
+        "Cracks Cobblestone into Gravel, and Gravel into Sand, with the blasts of Explosive sheep. Infuse a sheep with TNT at the altar (2 Gunpowder and a Fire Charge round it) for an Explosive sheep.",
+        "- Keep Explosive sheep in the 5x5 round it. Every 5 seconds, if it has stone to crack, room for what it makes and 1,000 FE, it lights the fuse of the nearest one that has its fleece on.",
+        "- The sheep hisses and pops, breaking nothing: its fleece comes off as Explosive Wool, and the chamber catches the blast. Each blast cracks up to 8 items a step: first the Gravel it cracked last time into Sand, then 8 Cobblestone into Gravel. So Cobblestone takes two blasts to become Sand.",
+        "- A popped sheep can't blast again until its wool grows back. Explosive sheep regrow their wool on their own, in about 20 seconds; a Grass Seeder in the pen helps the rest.",
+        "- A sheep lit any other way in its pen (fire, or your flint and steel) counts too.",
+        "Load it by right-clicking it with Cobblestone or Gravel, or with a hopper or pipe; take Sand and Gravel out the same way. Power comes in on every side. Right-click it with an empty hand to see how it's doing, and sneak-right-click to show its pen. A comparator reads how full its output is.",
+        "## Making it",
+        "- Blue Steel, Obsidian, Blue Steel on top; Explosive Wool, a Functional Machine Block, Explosive Wool in the middle; Blue Steel, a Piston, Blue Steel at the bottom.",
+        "## Config",
+        "Its pen, sparks, power and batch size, and how fast Explosive sheep regrow their wool, are in the [implosion_chamber] section of the server config."
+      ]
+    },
+    {
       "title": "Grass Seeder",
       "icon": "barelyfunctionalcontraptions:grass_seeder",
-      "tab": "production",
+      "tab": "utility",
       "text": [
         "Keeps a sheep pen green. Sheep eat grass down to dirt, and a sheared sheep only grows its wool back when it eats, so a bare pen is a slow pen. Place the Seeder in the middle of one.",
         "- Every 2 seconds it tends one block of the 5x5 ground around it: dirt that's been eaten bare goes back to grass. Once it's all grass, it grows short grass on up to 40% of it, for the sheep to eat instead.",

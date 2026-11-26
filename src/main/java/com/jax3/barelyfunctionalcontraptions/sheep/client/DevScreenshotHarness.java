@@ -2248,7 +2248,27 @@ public final class DevScreenshotHarness {
             case 110 -> shot(mc, "117_implosion_chamber_after");
             case 112 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 20", origin.getX() + 0.5, origin.getY() + 1.2, origin.getZ() - 1.6));
             case 140 -> shot(mc, "117_implosion_chamber");
-            case 146 -> mc.stop();
+            // Jade on it, in creative with the HUD back and the chat cleared; then JEI and its chapter.
+            case 142 -> {
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 30", origin.getX() + 0.5, origin.getY() + 0.0, origin.getZ() - 2.6));
+            }
+            case 146 -> { setHudHidden(mc, false); McClient.clearChat(mc); }
+            case 166 -> shot(mc, "117_implosion_chamber_jade");
+            case 168 -> { if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showImplosion(); }
+            case 176 -> { McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); McClient.clearChat(mc); }
+            case 186 -> shot(mc, "117_implosion_chamber_jei");
+            case 188 -> {
+                McClient.setScreen(mc, null);
+                if (net.neoforged.fml.ModList.get().isLoaded("jei")) com.jax3.barelyfunctionalcontraptions.sheep.integration.jei.JeiDevHook.showImplosionCrafting();
+            }
+            case 196 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 206 -> shot(mc, "117_implosion_chamber_jei_recipe");
+            case 208 -> McClient.setScreen(mc, new GuideScreen());
+            case 212 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Implosion Chamber"); }
+            case 216 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
+            case 226 -> shot(mc, "117_implosion_chamber_guide");
+            case 232 -> mc.stop();
             default -> {}
         }
     }

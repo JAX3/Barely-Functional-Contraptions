@@ -46,6 +46,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(StatusPanelProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity.class);
         registration.registerBlockDataProvider(HerdCounterProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity.class);
         registration.registerBlockDataProvider(GrassSeederProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.class);
+        registration.registerBlockDataProvider(ImplosionChamberProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity.class);
         registration.registerEntityDataProvider(ThermalFatigueProvider.Server.INSTANCE, net.minecraft.world.entity.animal.sheep.Sheep.class);
     }
 
@@ -83,6 +84,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(CrateControllerProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.CrateControllerBlock.class);
         registration.registerBlockComponent(HerdCounterProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.HerdCounterBlock.class);
         registration.registerBlockComponent(GrassSeederProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.GrassSeederBlock.class);
+        registration.registerBlockComponent(ImplosionChamberProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ImplosionChamberBlock.class);
         registration.registerEntityComponent(ThermalFatigueProvider.Client.INSTANCE, net.minecraft.world.entity.animal.sheep.Sheep.class);
     }
 }

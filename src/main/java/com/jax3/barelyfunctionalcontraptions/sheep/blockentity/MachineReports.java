@@ -1,6 +1,7 @@
 package com.jax3.barelyfunctionalcontraptions.sheep.blockentity;
 
 import java.util.Locale;
+import net.minecraft.world.item.ItemStack;
 import java.util.Set;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -45,10 +46,10 @@ public final class MachineReports {
             "no_fuel", "no_ground", "overgrown", "missing", "crate_full", "crate_missing", "could_burst", "no_sheep", "tangled", "nothing_connected");
     /** ... that mean it's working. */
     private static final Set<String> RUNNING = Set.of("processing", "infusing", "reacting", "listening", "charging", "walking", "tending",
-            "filling", "burning", "boosted", "running", "counting", "hauling", "delivering");
+            "filling", "burning", "boosted", "running", "counting", "hauling", "delivering", "cracking");
     /** ... that mean it's fine but waiting on something. */
     private static final Set<String> WAITING = Set.of("full", "energy_full", "redstone_disabled", "too_quiet", "asleep", "waking", "resting",
-            "all_green", "running_hot", "running_cold", "not_infinite", "cold", "nearly_full", "no_empty_crates", "no_crates", "wasting");
+            "all_green", "running_hot", "running_cold", "not_infinite", "cold", "nearly_full", "no_empty_crates", "no_crates", "wasting", "regrowing");
 
     private static Report of(Enum<?> status, String number) {
         return of(status.name().toLowerCase(Locale.ROOT), number);
@@ -139,6 +140,18 @@ public final class MachineReports {
         }
         if (be instanceof FluidReservoirBlockEntity b) return of(b.getStatus(), b.getTank().getAmountAsInt(0) + " mB");
         if (be instanceof GrassSeederBlockEntity b) return of(b.status(), b.grass() + "/" + (b.grass() + b.dirt()));
+        if (be instanceof ImplosionChamberBlockEntity b) {
+            String status = switch (b.status()) {
+                case CRACKING -> "cracking";
+                case WAITING -> "regrowing";
+                case NO_SHEEP -> "no_sheep";
+                case IDLE -> "idle";
+                case FULL -> "output_full";
+                case NO_POWER -> "no_energy";
+            };
+            ItemStack out = b.inventory().get(ImplosionChamberBlockEntity.OUTPUT);
+            return of(status, out.isEmpty() ? "0" : out.getCount() + " " + out.getHoverName().getString());
+        }
         if (be instanceof HerdCounterBlockEntity b) {
             return of("counting", b.mode() == HerdCounterBlockEntity.Mode.FULL ? b.value() + "/" + b.target() : Integer.toString(b.value()));
         }

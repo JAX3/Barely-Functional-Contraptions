@@ -180,6 +180,8 @@ public final class ModGameTests {
         ECHO_TESTS.put("implosion_chamber_cracks_cobble_to_gravel_to_sand", ModGameTests::implosionCracks);
         ECHO_TESTS.put("implosion_chamber_can_stop_at_gravel", ModGameTests::implosionGravel);
         ECHO_TESTS.put("implosion_chamber_needs_sheep_power_and_stone", ModGameTests::implosionNeeds);
+        ECHO_TESTS.put("implosion_chamber_on_the_status_panel", ModGameTests::implosionReport);
+        ECHO_TESTS.put("explosive_sheep_regrow_their_wool_quickly", ModGameTests::explosiveRegrows);
         ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
         ECHO_TESTS.put("echo_chamber_hears_vibrations_but_not_through_wool", ModGameTests::echoHearing);
         ECHO_TESTS.put("echo_chamber_pushes_power_out_of_its_port", ModGameTests::echoPort);
@@ -3190,6 +3192,48 @@ public final class ModGameTests {
             h.assertTrue(!com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.isLit(waiting), "so its sheep isn't lit");
             h.assertTrue(idle.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity.Status.IDLE, "nothing to crack: " + idle.status());
             h.assertTrue(!com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.isLit(spare), "and it lights no one");
+            h.succeed();
+        });
+    }
+
+    /** Its Machine Status Panel line: its status in the panel's words, and what its output holds. */
+    private static void implosionReport(GameTestHelper h) {
+        BlockPos at = new BlockPos(4, 2, 4);
+        var be = implosionAt(h, at);
+        var report = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.report(be);
+        h.assertTrue(report != null && report.number().equals("0"), "an empty chamber reports, with nothing out: " + report);
+        be.insertInput(new ItemStack(Items.COBBLESTONE, 16));
+        be.setTarget(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity.Target.GRAVEL);
+        h.runAfterDelay(5, () -> {
+            var noSheep = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.report(be);
+            h.assertTrue(noSheep.status().equals("no_sheep") && noSheep.level() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.Level.PROBLEM,
+                    "no Explosive sheep is a problem: " + noSheep);
+            be.catchBlast(h.getLevel());
+            var after = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.report(be);
+            h.assertTrue(after.status().equals("cracking") && after.level() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.Level.RUNNING,
+                    "after a blast it's cracking: " + after);
+            h.assertTrue(after.number().equals("8 Gravel"), "and shows its output: " + after.number());
+            h.succeed();
+        });
+    }
+
+    /**
+     * A sheared Explosive sheep grows its wool back on its own, without grass (about every explosiveRegrowSeconds; set
+     * to 1 here so the test is quick); a sheared Iron sheep on stone doesn't.
+     */
+    private static void explosiveRegrows(GameTestHelper h) {
+        var setting = ModConfigs.SERVER.explosiveRegrowSeconds;
+        int old = setting.get();
+        setting.set(1);
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 1, 0), new BlockPos(6, 1, 6))) h.setBlock(p, Blocks.STONE);
+        Sheep explosive = sheepAt(h, new BlockPos(2, 2, 2), ResourcefulSheep.id("explosive"));
+        Sheep iron = sheepAt(h, new BlockPos(4, 2, 4), IRON);
+        explosive.setSheared(true);
+        iron.setSheared(true);
+        h.runAfterDelay(100, () -> {
+            setting.set(old);
+            h.assertTrue(!explosive.isSheared(), "the Explosive sheep regrew its wool on its own");
+            h.assertTrue(iron.isSheared(), "an Iron sheep on stone didn't");
             h.succeed();
         });
     }

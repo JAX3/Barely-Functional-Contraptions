@@ -167,6 +167,26 @@ public final class JeiDevHook {
         return true;
     }
 
+    /** Opens the Implosion Chamber's pages. */
+    public static boolean showImplosion() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        rt.getRecipesGui().showTypes(java.util.List.of(ImplosionCategory.TYPE));
+        return true;
+    }
+
+    /** Opens the Implosion Chamber's crafting recipe. */
+    public static boolean showImplosionCrafting() {
+        IJeiRuntime rt = runtime;
+        if (rt == null) return false;
+        var focus = rt.getJeiHelpers().getFocusFactory().createFocus(RecipeIngredientRole.OUTPUT, VanillaTypes.ITEM_STACK,
+                new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.IMPLOSION_CHAMBER.get()));
+        var type = mezz.jei.api.constants.RecipeTypes.CRAFTING;
+        var pages = rt.getRecipeManager().createRecipeLookup(type).limitFocus(java.util.List.of(focus)).get().toList();
+        rt.getRecipesGui().showRecipes(rt.getRecipeManager().getRecipeCategory(type), pages, java.util.List.of(focus));
+        return true;
+    }
+
     /** Opens the Hume Field Generator's crafting recipe. */
     public static boolean showHumeFieldCrafting() {
         IJeiRuntime rt = runtime;

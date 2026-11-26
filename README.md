@@ -197,6 +197,12 @@ A dockside winch that fishes the pool in front of it, powered by **Tide sheep** 
 
 ![A Fleece Trawler on its dock, Tide sheep swimming in its pool](docs/screenshots/115_tide_sheep.png)
 
+### Implosion Chamber
+
+Cracks **Cobblestone into Gravel, and Gravel into Sand**, with the blasts of **Explosive sheep** in the pen round it. Every 5 seconds it lights one sheep's fuse with a little power; the sheep pops its fleece off (breaking nothing) and the blast cracks 8 items a step. Explosive sheep regrow their wool on their own in about 20 seconds, ready for the next one.
+
+![An Implosion Chamber in a fenced pen of Explosive sheep](docs/screenshots/117_implosion_chamber.png)
+
 ### Herd Counter
 
 A little screen that counts the sheep in the pen in front of it (all of them, the ones ready to shear, the sheared ones, lambs, or ones low on infusion, of every resource or just one) and puts the count on a comparator. Use it to run shears, seeders or breeders only when they're needed.

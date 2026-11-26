@@ -50,7 +50,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration registration) {
         var gui = registration.getJeiHelpers().getGuiHelper();
         registration.addRecipeCategories(new InfusionCategory(gui), new AltarCategory(gui), new SeparationCategory(gui), new ThermalCategory(gui));
-        registration.addRecipeCategories(new EchoCategory(gui), new StaticCategory(gui), new GrassSeederCategory(gui), new HerdCounterCategory(gui), new StatusPanelCategory(gui), new CrateCategory(gui), new CrateControllerCategory(gui), new FleeceTrawlerCategory(gui));
+        registration.addRecipeCategories(new EchoCategory(gui), new StaticCategory(gui), new GrassSeederCategory(gui), new HerdCounterCategory(gui), new StatusPanelCategory(gui), new CrateCategory(gui), new CrateControllerCategory(gui), new FleeceTrawlerCategory(gui), new ImplosionCategory(gui));
         registration.addRecipeCategories(new HumeFieldCategory(gui));
     }
 
@@ -97,6 +97,9 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
                 Component.translatable("jei.barelyfunctionalcontraptions.info.static_generator.3"));
         registration.addItemStackInfo(new ItemStack(ModItems.COPPER_COMB.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.copper_comb"));
         registration.addRecipes(GrassSeederCategory.TYPE, List.of(new GrassSeederDisplay()));
+        registration.addRecipes(ImplosionCategory.TYPE, List.of(
+                new ImplosionDisplay(new ItemStack(net.minecraft.world.item.Items.COBBLESTONE), new ItemStack(net.minecraft.world.item.Items.GRAVEL)),
+                new ImplosionDisplay(new ItemStack(net.minecraft.world.item.Items.GRAVEL), new ItemStack(net.minecraft.world.item.Items.SAND))));
         registration.addRecipes(HerdCounterCategory.TYPE, List.of(new HerdCounterDisplay()));
         registration.addRecipes(StatusPanelCategory.TYPE, List.of(new StatusPanelDisplay()));
         registration.addRecipes(CrateCategory.TYPE, List.of(new CrateDisplay()));
@@ -122,6 +125,9 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addItemStackInfo(new ItemStack(ModItems.HERD_COUNTER.get()),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.herd_counter.1"),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.herd_counter.2"));
+        registration.addItemStackInfo(new ItemStack(ModItems.IMPLOSION_CHAMBER.get()),
+                Component.translatable("jei.barelyfunctionalcontraptions.info.implosion_chamber.1"),
+                Component.translatable("jei.barelyfunctionalcontraptions.info.implosion_chamber.2"));
         registration.addItemStackInfo(new ItemStack(ModItems.GRASS_SEEDER.get()),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.grass_seeder.1"),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.grass_seeder.2"));
@@ -248,6 +254,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addCraftingStation(HumeFieldCategory.TYPE, ModItems.HUME_FIELD_GENERATOR.get());
         registration.addCraftingStation(StaticCategory.TYPE, ModItems.STATIC_GENERATOR.get());
         registration.addCraftingStation(GrassSeederCategory.TYPE, ModItems.GRASS_SEEDER.get());
+        registration.addCraftingStation(ImplosionCategory.TYPE, ModItems.IMPLOSION_CHAMBER.get());
         registration.addCraftingStation(HerdCounterCategory.TYPE, ModItems.HERD_COUNTER.get());
         registration.addCraftingStation(StatusPanelCategory.TYPE, ModItems.STATUS_PANEL.get());
         registration.addCraftingStation(CrateCategory.TYPE, ModItems.CRATE.get());

@@ -75,7 +75,15 @@ pen round it.
   and a blast vent on top.
 - **Recipe:** Blue Steel and Obsidian along the top, Explosive Wool either side of a Functional Machine Block, and Blue
   Steel either side of a Piston along the bottom.
-- Its window, JEI page, Jade lines, manual chapter and a test-world scene are still to come.
+- **Its sheep regrow quickly:** Explosive sheep grow their wool back **on their own in about 20 seconds**, without
+  grass (`explosiveRegrowSeconds`), so they're soon ready to blast again.
+- **Machine Status Panel:** *Cracking* (with what its output holds), *Regrowing*, *No sheep*, *Nothing to crack*,
+  *Output full* or *No power*.
+- **JEI:** a page for each step, Cobblestone to Gravel and Gravel to Sand, with an Explosive sheep, and an information
+  page. **Jade:** its status, what it's making, the Gravel waiting to crack again, and its blasts and items cracked.
+- **Manual:** its own chapter in the Production tab. The Grass Seeder's chapter moved to the Utility tab, beside the
+  Herd Counter, to make room.
+- Its window (with the Sand/Gravel switch) and a test-world scene are still to come.
 
 ### The Explosive sheep
 A new themed sheep, infused with **TNT** at the altar (with 2 Gunpowder and a Fire Charge).
