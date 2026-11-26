@@ -111,18 +111,27 @@ Cobblestone into Gravel, and Gravel into Sand**, with the blasts of the Explosiv
 - **Test world:** cell (4, 6) (see below).
 
 ### Power: the Energy sheep, a wireless charger
-A new themed sheep, infused with a **Hume Energy Cube** (2 Lightning Rods round it at the altar). Its fleece is made of
-Hume Energy Cube, with little cubes on its back, and it crackles with sparks while it holds charge.
+A new themed sheep that carries power from your cube bank to the machines and tools round it, with no cables.
+- **Infusion:** a **Hume Energy Cube** at the altar, with 2 Lightning Rods round it.
+- **Looks:** a fleece made of Hume Energy Cube, little cubes on its back, and sparks crackling over it while it holds
+  charge.
 - **Drains cubes:** every half second it draws up to **2,000 FE a tick** from the Hume Energy Cubes within **3 blocks**
   of it into its fleece, which holds **100,000 FE**. Pen it beside a cube bank.
-- **Charges everything round it, wirelessly:** it shares up to **2,000 FE a tick** between every block that takes FE
-  (machines; not Hume Energy Cubes or cables) and every powered item (tools, armour, anything that holds FE, from other
-  mods too) in the inventories of players within **8 blocks**, a fair share each. Sparks arc to what it charges.
-- Only a grown sheep with its fleece on works; a sheared one keeps its charge until its wool grows back.
-- **Jade** shows its charge. Its wool separates into Redstone and Copper, with a chance of Glowstone. **Advancement:**
-  *Static Cling*; Energy Wool joins the *Fleece of Every Colour* challenge (now 28 wools).
-- **Config:** a new `[energy_sheep]` section: `capacity`, `drainRadius`, `drainPerTick`, `chargeRadius`,
-  `chargePerTick`. For data packs: a new `charged` appearance feature.
+- **Charges everything round it, wirelessly:** it shares up to **2,000 FE a tick** between:
+  - every block within **8 blocks** that takes FE (machines and the like; never Hume Energy Cubes or cables, so it
+    can't just shuffle power from cube to cube);
+  - every powered item (tools, armour, anything that holds FE, from other mods too) in the inventories of players
+    within 8 blocks.
+
+  Each gets a fair share, and what one can't take goes to the others. Sparks arc from the sheep to what it charges.
+- **Its fleece is the battery:** only a grown sheep with its fleece on drains or charges. Sheared, it keeps its charge
+  until its wool grows back.
+- **Jade** shows its charge, as *Charge: 98,000 / 100,000 FE*.
+- **Its wool** separates into Redstone (2–4) and Copper, with a chance of Glowstone.
+- **Advancement:** *Static Cling*. Energy Wool joins the *Fleece of Every Colour* challenge (now 28 wools).
+- **Config:** a new `[energy_sheep]` section: `capacity` (100,000), `drainRadius` (3), `drainPerTick` (2,000),
+  `chargeRadius` (8), `chargePerTick` (2,000). For data packs: a new `charged` appearance feature.
+- **Test world:** beside the first Hume Field Generator's cubes in cell (3, 6) (see below).
 
 ### Production: the Fleece Trawler and the Tide sheep
 A dockside winch that **fishes the pool in front of it**. It needs no power: **Tide sheep swimming in the pool drive
@@ -409,6 +418,7 @@ shared code path where there used to be eighteen copies, so a new machine is mos
   opens it as usual.
 - **Existing worlds:** wireless links already made are ignored (machines that ran on them stop until cabled). The wrench
   still links generators to generators, machines to a Machine Status Panel and crates to a Crate Controller.
+- For power without cables now, pen an **Energy sheep** by a Hume Energy Cube bank (see *Power: the Energy sheep*).
 
 ### Fixes
 - **Item Pipe on a Mechanical Separator's top:** it never took the separator's outputs, even set to pull: outputs only
@@ -441,6 +451,9 @@ shared code path where there used to be eighteen copies, so a new machine is mos
   it uses (*Wasting*), and the third stands alone (*Nothing to take it*). All three are on the status panel.
 - **Energy sheep:** in a little pen beside the first Hume Field Generator's two cubes in cell (3, 6): it drains them and
   powers a Powered Furnace a few blocks south of it, wirelessly, so the cell runs generator, cubes, sheep, furnace.
+- **The seventh row repaired:** rebuilding the test world laid that row's floor again each time, wiping what its cells
+  had set into it (the upgrade separators' output chests, the trawler's chest, the Implosion Chamber's grass and
+  hopper). It no longer does, and the whole row was rebuilt.
 - **Upgrade cards:** cell (2, 6) has three separators on the same Iron Wool: plain, with a Speed card and with an
   Efficiency card.
 - **Wool-Lined Crates:** a storeroom wall of fourteen crates, each lined the colour of what it holds; and a hopper
