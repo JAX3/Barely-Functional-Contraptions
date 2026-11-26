@@ -1,39 +1,29 @@
 
-Logistics
-2. Pipe tiers: copper, then iron, then netherite pipes that move more per tick, made with upgrade items or by crafting.
-3.[Done] Wool Barrel or drawer: a block that stores large amounts of one item, for resource wool, which builds up fast.
-4. Sheep transport: a Sheep Crate or catching net that picks up an infused sheep and keeps its infusion, skin and stats until you place it again.
-Power
-5. [DONE] The rest of the themed generators:
-Wool Burner: burns plain or spare wool for power. (Done, along with the Blaze Sheep Furnace.)
-
-6. Energy tiers or a capacitor item that charges tools, plus a wireless charger.
-Resource generation
-8. [DONE] Sheep stats from breeding: yield, growth speed and how long an infusion lasts go up as you breed good sheep together, like the Chickens mod.
-9. Resource mutations: breeding two resources makes a new one (for example Iron + Gold gives Copper), so rare resources become things to work towards.
-10. [DONE] Tiers of infusion: the Wither, Dragon and Sculk sheep need a better feeding station or a ritual, not just one item.
-11. Sheep Feeder block: infuses and re-feeds sheep in range on its own, so a pen runs without you.
-12. Auto-breeder and lamb sorter: like Industrial Foregoing’s rancher and baby separator.
-13. [DONE] Machine upgrade cards: two upgrade slots in the Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears and Snow Sheep Chiller. Step 1 done: the slots, the shared helper, the Upgrade Base and the Speed and Efficiency cards, with tests. Step 2 done: Capacity and Range cards (the chiller got slots for Range); no cog-throwing. Step 3 done: Yield (adds output, no jamming downside) and Muffler. Step 4 done: JEI, Jade, the manual, a test-world scene (cell 2, 6) and advancements (Some Assembly Required; the hidden Maximum Overdrive is for two Speed cards). Maybe later: coloured plates on a machine for its cards, and its cards on the Machine Status Panel. Maybe later: a better processing step (for example wool into fibre, giving 4–6 resource instead of 2–4).
-14. Fluid sheep: themed sheep that give buckets of lava, water or honey, which can go into the Fluid Tank. (Now in Next goal, 18.)
-
 Next goal
-15. Explosive Sheep Implosion Chamber.
-16. [Done] Thermal Reaction Chamber: late-game power from Blaze sheep and Snow sheep together. Built and working (pairs, water, boosts, balance with meltdown and freezing, fleece fatigue, window, model, manual chapter). Jade info and a JEI page done. Still to do: a test-world scene.
+15. [STARTED] Explosive Sheep and the Implosion Chamber.
 17. Explosive Rock Cracker: cobblestone to gravel to sand.
-18. Fluid sheep: lava, water and honey (maybe).
-From the manual's WIP tab:
-19. Hume Field Generator: a 2x2 machine whose power jumps around, smoothed by Hume Energy Cubes. (Model done, development builds only.)
-20. [DONE] Echo Chamber: Warden sheep in front of its dish turn steady noise into power; sleep in silence, shriek when too loud; window, JEI, Jade, recipe, the Good Vibrations advancement and a test-world scene. (Moved out of WIP into the Power tab.) Still to do: catalysts, Echo Shard boost, fatigue.
-25. [DONE] Static Generator (mid-game): sheep rubbing against Copper Combs build static, its dome arcs it into power; combs oxidise (axe, honeycomb); overcharged it knocks things back (Woollen Armour insulates). Window, recipes, guide chapter, JEI, Jade, the Shocking! advancement and a test-world scene (x 462) done. 100 FE/t a sheep, 600 from six.
+18. Fluid sheep: themed sheep that give buckets of lava, water or honey (maybe), which can go into the Fluid Tank.
 21. Lightning Array: a copper mast that catches lightning into Hume Energy Cubes; scrape or wax it as it oxidises.
 22. Fleece Fusion: fuses two resource wools into power; clear the lint with shears.
 23. Quantum Sheep: blinks in and out of existence, changes its wool type and drops random resource wool.
-31. [DONE] Fleece Trawler (production) and the Tide sheep: a dockside winch fishing the pool in front of it, driven by Tide sheep swimming there (no power); vanilla fishing loot, resource-wool lures (used up), tangles cut free with shears, stray sheep; the Tide sheep (fins, gills, breathes underwater). Core, advancements, manual chapter and tests done. Its window, JEI and Jade, and a test-world scene (cell 1, 6) done too.
-30. [STARTED] Crate Controller (storage): links crates into one store (touching crates join, others with the wrench, brass tags, one store per crate), pipes and hoppers through it with smart routing, front readout, comparator, a status-panel line, Dewey Decimal Sheep, manual chapter and tests done. JEI, Jade and a test-world scene (on top of the storeroom wall in cell 0, 6) done too. Next: its window (the storage screen). No crafting, crates only.
-29. [DONE] Wool-Lined Crate (storage): holds lots of one item and shows it on its front; lock, wool lining, Wool Bale packing, bulges then bursts unless strapped; pipes, comparator, keeps its items; the Bursting at the Seams advancement, manual chapter and tests done. JEI, Jade and a test-world scene (cell 0, 6, in a new seventh row) done too. Next: maybe its window. Maybe later: the Wool Index terminal.
-28. [DONE] Machine Status Panel: a wall screen showing how up to 4 machines linked with the wrench are doing (name, status colour, key number); comparator = machines with a problem. Panel, linking, reports for every machine, screen, joined screens up to 3x3, a window (rename, reorder, unlink, alerts, sort, theme, comparator mode), Jade and JEI, manual chapter and tests done. The Mission Control advancement and a test-world scene (cell 4, 5) done too. Maybe later: burn-in and a Degauss button.
-27. [DONE] Herd Counter: counts the sheep in a pen and puts the count on a comparator (every sheep, ready, sheared, lambs, low infusion, Full), filtered by resource. Block, screen, modes, filter, window (herd list, Full target), JEI, Jade, advancement, manual chapter and tests done. The recount glitch with a Steady toggle and a test-world scene (cell 3, 5) done too. Maybe later: falling asleep in an empty pen.
-26. [DONE] Grass Seeder: keeps a pen green (regrasses eaten dirt, grows short grass) so sheared sheep graze 4x as often; Bone Meal or FE and water. Window, JEI, Jade, overgrowth with a Trim toggle (tall grass hides sheep from Automatic Shears), the Keep Off the Grass advancement, manual chapter, tests and a test-world scene.
-24. [DONE] Sheep Treadmill: a sheep walks a belt for wheat to make power. (Moved out of WIP into the Power tab.)
-25. BackPack Sheep
+25. BackPack Sheep.
+30. [STARTED] Crate Controller: its window (the storage screen). Everything else is done. No crafting, crates only.
+
+Logistics
+2. Pipe tiers: copper, then iron, then netherite pipes that move more per tick, made with upgrade items or by crafting.
+4. Sheep transport: a Sheep Crate or catching net that picks up an infused sheep and keeps its infusion, skin and stats until you place it again.
+
+Power
+6. Energy tiers or a capacitor item that charges tools, plus a wireless charger.
+
+Resource generation
+9. Resource mutations: breeding two resources makes a new one (for example Iron + Gold gives Copper), so rare resources become things to work towards.
+11. Sheep Feeder block: infuses and re-feeds sheep in range on its own, so a pen runs without you.
+12. Auto-breeder and lamb sorter: like Industrial Foregoing's rancher and baby separator.
+
+Maybe later (extras on finished machines)
+- Echo Chamber: catalysts, an Echo Shard boost, fatigue.
+- Upgrade cards: coloured plates on a machine for its cards, and its cards on the Machine Status Panel; a better processing step (wool into fibre, giving 4-6 resource instead of 2-4).
+- Wool-Lined Crate: its window; the Wool Index terminal.
+- Machine Status Panel: burn-in and a Degauss button.
+- Herd Counter: falling asleep in an empty pen.
