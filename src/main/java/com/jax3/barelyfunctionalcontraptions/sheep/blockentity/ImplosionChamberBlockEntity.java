@@ -49,11 +49,13 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
  * Its comparator signal reads how full its output is.
  */
 public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
-        implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay {
+        implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider {
     public static final int AREA_COLOR = 0xFFE3533A;
     public static final int INPUT = 0, CRACKED = 1, OUTPUT = 2;
     /** Ticks its porthole glows after a blast. */
     public static final int FLASH_TICKS = 20;
+    /** Values synced to its window ({@link com.jax3.barelyfunctionalcontraptions.sheep.menu.ImplosionChamberMenu}). */
+    public static final int DATA_COUNT = 16;
 
     /** What it's doing, for its window, Jade and the status panel. */
     public enum Status {
@@ -115,6 +117,42 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
     private long blasts;
     private long cracked;
     private int lastSignal = -1;
+    /** Explosive sheep in its pen at the last spark: ready (fleece on) and regrowing their wool. */
+    private int readySheep, regrowingSheep;
+
+    private final net.minecraft.world.inventory.ContainerData data = new net.minecraft.world.inventory.ContainerData() {
+        @Override
+        public int get(int index) {
+            long blastsCapped = Math.min(Integer.MAX_VALUE, blasts), crackedCapped = Math.min(Integer.MAX_VALUE, cracked);
+            return switch (index) {
+                case 0 -> energy.getAmountAsInt() & 0xFFFF;
+                case 1 -> energy.getAmountAsInt() >>> 16;
+                case 2 -> energy.getCapacityAsInt() & 0xFFFF;
+                case 3 -> energy.getCapacityAsInt() >>> 16;
+                case 4 -> status.ordinal();
+                case 5 -> showArea ? 1 : 0;
+                case 6 -> target.ordinal();
+                case 7 -> Math.max(0, cooldown);
+                case 8 -> sparkInterval();
+                case 9 -> readySheep;
+                case 10 -> regrowingSheep;
+                case 11 -> (int) (blastsCapped & 0xFFFF);
+                case 12 -> (int) (blastsCapped >>> 16);
+                case 13 -> (int) (crackedCapped & 0xFFFF);
+                case 14 -> (int) (crackedCapped >>> 16);
+                case 15 -> flash;
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int index, int value) {}
+
+        @Override
+        public int getCount() {
+            return DATA_COUNT;
+        }
+    };
 
     public ImplosionChamberBlockEntity(BlockPos pos, BlockState state) {
         super(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.IMPLOSION_CHAMBER.get(), pos, state);
@@ -186,6 +224,8 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
                 && com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.getInfusedResource(s)
                         .map(r -> r.appearance().has(com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Feature.FUSE)).orElse(false));
         Status was = status;
+        readySheep = (int) explosive.stream().filter(s -> !s.isSheared()).count();
+        regrowingSheep = explosive.size() - readySheep;
         if (!hasWork()) {
             status = Status.IDLE;
         } else if (!hasRoom()) {
@@ -341,6 +381,25 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
     @Override
     public MachineInventory inventory() {
         return inventory;
+    }
+
+    public int readySheep() {
+        return readySheep;
+    }
+
+    public int regrowingSheep() {
+        return regrowingSheep;
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("block.barelyfunctionalcontraptions.implosion_chamber");
+    }
+
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int containerId, net.minecraft.world.entity.player.Inventory inventory,
+                                                                       net.minecraft.world.entity.player.Player player) {
+        return new com.jax3.barelyfunctionalcontraptions.sheep.menu.ImplosionChamberMenu(containerId, inventory, this, data);
     }
 
     public EnergyHandler getEnergyHandler() {

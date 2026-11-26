@@ -51,6 +51,9 @@ public final class ModMenus {
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.HerdCounterMenu>> HERD_COUNTER = REGISTER.register("herd_counter",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.HerdCounterMenu::new));
 
+    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.ImplosionChamberMenu>> IMPLOSION_CHAMBER = REGISTER.register("implosion_chamber",
+            () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.ImplosionChamberMenu::new));
+
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.GrassSeederMenu>> GRASS_SEEDER = REGISTER.register("grass_seeder",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.GrassSeederMenu::new));
 

@@ -807,7 +807,8 @@ I P I      P = Piston
 - **Sparks:** every **5 seconds** (`sparkInterval`), while it has stone to crack, room for what it makes and **1,000 FE** (`sparkEnergy`), it lights the fuse of the nearest Explosive sheep in its pen that has its fleece on. A sheep lit any other way in its pen (fire, your flint and steel) counts too.
 - **Blasts:** the sheep pops (breaking nothing, its fleece coming off as Explosive Wool) and the chamber catches the blast. Each blast cracks up to **8** items a step (`batch`): first the Gravel it cracked last time into Sand, then 8 Cobblestone from its input into Gravel. Cobblestone takes two blasts to become Sand. It can be set to stop at Gravel, sending its Gravel straight out.
 - **Its sheep:** Explosive sheep regrow their wool **on their own in about 20 seconds** (`explosiveRegrowSeconds`), without grass, so they're soon ready to blast again.
-- **Slots:** an input (Cobblestone, or Gravel to make Sand) and an output; hoppers and pipes fill one and empty the other. Power comes in on every side. Right-click it with Cobblestone or Gravel to load it, or with an empty hand to see how it's doing.
+- **Slots:** an input (Cobblestone, or Gravel to make Sand) and an output; hoppers and pipes fill one and empty the other. Power comes in on every side. Right-click it with Cobblestone or Gravel to load it.
+- **Window:** right-click it with an empty hand. Its energy gauge; its input, the Gravel it holds to crack again and its output in a row, with arrows that flare orange after a blast; a fuse burning down to its next spark; its Explosive sheep (ready and regrowing); its blasts and items cracked; and its status lamp and line. Top right, the **Sand/Gravel switch** (the Gravel button: lit, it stops at Gravel) and the spyglass that shows its pen. Hovering anything explains it.
 - **Comparator:** how full its output is.
 - **Machine Status Panel:** *Cracking* (with what its output holds), *Regrowing*, *No sheep*, *Nothing to crack*, *Output full* or *No power*.
 - **JEI:** a page for each step (Cobblestone to Gravel, Gravel to Sand) with an Explosive sheep, and an information page. **Jade:** its status, what it's making, the Gravel waiting to crack again, and its blasts and items cracked.
@@ -817,6 +818,7 @@ I P I      P = Piston
 |---|---|
 | ![An Implosion Chamber in a fenced 5x5 grass pen, Explosive sheep in TNT fleeces round it, one sheared after its blast](screenshots/117_implosion_chamber.png) | ![Jade on an Implosion Chamber: Cracking, Making Sand, 8 Gravel waiting to crack again, its blasts, its Cobblestone and Gravel and its FE](screenshots/117_implosion_chamber_jade.png) |
 | ![JEI's Implosion Chamber page: Cobblestone and an Explosive sheep, the chamber, 8 Gravel and Explosive Wool](screenshots/117_implosion_chamber_jei.png) | ![Its chapter in the Contraptions Manual's Production tab](screenshots/117_implosion_chamber_guide.png) |
+| ![Its window: the energy gauge, Cobblestone, 8 Gravel held and 8 Sand in a row with a burning fuse under them, Sheep: 3 ready, 0 regrowing, its blasts, and Cracking](screenshots/117_implosion_chamber_gui.png) | |
 
 ### Grass Seeder
 Keeps a sheep pen **green**, so sheared sheep regrow their wool sooner. Sheep eat grass down to dirt, and a sheared sheep only grows its wool back when it eats, so a bare pen is a slow one. A squat machine on four legs with a window full of seeds, a seed hopper on top and a brass sprinkler that drips while it works.

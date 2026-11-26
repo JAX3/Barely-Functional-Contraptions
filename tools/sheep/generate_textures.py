@@ -4726,6 +4726,39 @@ def generate_grass_seeder_gui():
     img.save(out("gui/grass_seeder.png"))
 
 
+
+def generate_implosion_chamber_gui():
+    """Implosion Chamber window: the energy gauge, a panel with the input, the Gravel it holds to crack again and the
+    output in a row (arrows drawn between them), a fuse to its next spark under them, its sheep and blasts; the status
+    lamp and the player inventory below. A scorched fringe along the bottom."""
+    seeder = Image.open(out("gui/grass_seeder.png")).convert("RGBA")
+    img = Image.new("RGBA", (256, 256), CLEAR)
+    panel(img, 0, 0, 176, 193)
+    inset(img, 8, 18, 24, 84, GUI["gauge"])           # energy, fill 14x64 at (9, 19)
+    for k in range(1, 4):
+        ty = 19 + round(64 * k / 4)
+        for x in range(19, 23):
+            img.putpixel((x, ty), GUI["tick"])
+    inset(img, 30, 12, 168, 84, GUI["panel"])         # the blast panel
+    for x0 in (50, 88, 126):
+        slot(img, x0, 26)
+    inset(img, 49, 49, 143, 55, GUI["gauge"])         # the fuse, 92x4 at (50, 50)
+    inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing
+    for row in range(3):
+        for col in range(9):
+            slot(img, 8 + col * 18, 111 + row * 18)
+    for col in range(9):
+        slot(img, 8 + col * 18, 169)
+    rnd = random.Random(1945)
+    for x in range(4, 172):                           # scorch marks along the bottom edge
+        if rnd.random() < 0.3:
+            img.putpixel((x, 190), rnd.choice([hexc("#3a3530"), hexc("#5a1a0c"), hexc("#a8321a")]))
+    # ---- sprites: the status lamps, the button background and the energy fill, as the Grass Seeder's ----
+    img.paste(seeder.crop((186, 194, 256, 202)), (186, 194))
+    img.paste(seeder.crop((176, 146, 208, 162)), (176, 146))
+    img.paste(seeder.crop((176, 0, 190, 64)), (176, 0))
+    img.save(out("gui/implosion_chamber.png"))
+
 def generate_herd_counter():
     """Herd Counter: a slim blue-steel panel with a green-on-black screen on its front (the count is drawn over it) and a
     tally wheel on its side."""
@@ -5207,6 +5240,7 @@ def main():
     generate_static_generator_gui()
     generate_grass_seeder()
     generate_grass_seeder_gui()
+    generate_implosion_chamber_gui()
     generate_herd_counter()
     generate_herd_counter_gui()
     generate_status_panel()

@@ -35,7 +35,7 @@ import org.jspecify.annotations.Nullable;
  *
  * <ul>
  *     <li>right-click it with Cobblestone or Gravel to load it;</li>
- *     <li>right-click it with an empty hand to see how it's doing;</li>
+ *     <li>right-click it with an empty hand to open its window;</li>
  *     <li>sneak-right-click it with an empty hand to show or hide its pen.</li>
  * </ul>
  */
@@ -93,12 +93,12 @@ public class ImplosionChamberBlock extends FacingMachineBlock {
         return InteractionResult.SUCCESS;
     }
 
-    /** Says how it's doing; a sneak-right-click shows or hides its pen. */
+    /** Opens its window; a sneak-right-click shows or hides its pen. */
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof ImplosionChamberBlockEntity be)) return InteractionResult.SUCCESS;
         if (player.isSecondaryUseActive()) be.toggleArea(player);
-        else player.sendOverlayMessage(be.summary().copy().withStyle(ChatFormatting.GRAY));
+        else player.openMenu(be, pos);
         return InteractionResult.SUCCESS;
     }
 

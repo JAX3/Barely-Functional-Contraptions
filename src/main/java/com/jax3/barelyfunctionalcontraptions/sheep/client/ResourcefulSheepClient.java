@@ -130,6 +130,7 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.HUME_FIELD_GENERATOR.get(), HumeFieldGeneratorScreen::new);
         event.register(ModMenus.STATIC_GENERATOR.get(), StaticGeneratorScreen::new);
         event.register(ModMenus.GRASS_SEEDER.get(), GrassSeederScreen::new);
+        event.register(ModMenus.IMPLOSION_CHAMBER.get(), ImplosionChamberScreen::new);
         event.register(ModMenus.HERD_COUNTER.get(), HerdCounterScreen::new);
         event.register(ModMenus.STATUS_PANEL.get(), StatusPanelScreen::new);
         event.register(ModMenus.WOOL_PACKER.get(), WoolPackerScreen::new);

@@ -1658,11 +1658,10 @@ public final class DevScreenshotHarness {
             // Rows 0 to 5 are full: up to (1, 5) by the moved scenes, (2, 5) by the Grass Seeder, (3, 5) by the Herd
             // Counter and (4, 5) by the Machine Status Panel. Row 6, added by extendPlatform: (0, 6) the Wool-Lined Crates
             // (built by an earlier run, as "crates"), (1, 6) the Fleece Trawler (as "fleece trawler"), (2, 6) the upgrade
-            // cards (as "upgrades"), (3, 6) the Hume Field Generator (as "hume field"); (4, 6) is free. An earlier run also
-            // cabled the old wireless-power scene ("cable the wireless scene") and put the Hume Field Generators on the
-            // Machine Status Panel ("hume field on the panel"). Now: the Hume Field Generator cell rebuilt, its Nausea
-            // warning gone (its pulse no longer gives Nausea).
-            {"hume field", 3, 6},
+            // cards (as "upgrades"), (3, 6) the Hume Field Generator (as "hume field"). An earlier run also cabled the old
+            // wireless-power scene ("cable the wireless scene") and put the Hume Field Generators on the Machine Status
+            // Panel ("hume field on the panel"). Now: (4, 6) the Implosion Chamber, with its Explosive sheep.
+            {"implosion chamber", 4, 6},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -1982,6 +1981,70 @@ public final class DevScreenshotHarness {
         ResourcefulSheep.LOGGER.info("EXTEND hume field built round {}", g);
     }
 
+    /**
+     * The Implosion Chamber in a fenced 5x5 grass pen with three Explosive sheep, cracking Cobblestone from a chest above
+     * it (through a hopper) into Sand in a chest under the floor (through a hopper below it), powered by a Creative
+     * Generator beside it; on the Machine Status Panel. And two Explosive sheep on their own outside it, to light by hand.
+     */
+    private static void implosionWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        BlockPos g = origin.offset(0, 0, -3);
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(12, 8, 12),
+                e -> e instanceof net.minecraft.world.entity.Display.TextDisplay || e instanceof net.minecraft.world.entity.item.ItemEntity
+                        || e instanceof net.minecraft.world.entity.animal.sheep.Sheep)) e.discard();
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-9, 0, -6), g.offset(9, 6, 5))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(g.offset(-9, -1, -6), g.offset(9, -1, 5))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+        BlockPos chamber = g.offset(-3, 0, -1);
+        // Its pen: grass, fenced at 3 out, so the 5x5 inside is exactly its pen.
+        for (BlockPos p : BlockPos.betweenClosed(chamber.offset(-3, -1, -3), chamber.offset(3, -1, 3))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        for (int i = -3; i <= 3; i++) {
+            for (BlockPos f : new BlockPos[]{chamber.offset(i, 0, -3), chamber.offset(i, 0, 3), chamber.offset(-3, 0, i), chamber.offset(3, 0, i)}) {
+                level.setBlock(f, Blocks.OAK_FENCE.defaultBlockState(), 3);
+            }
+        }
+        level.setBlock(chamber, ModBlocks.IMPLOSION_CHAMBER.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ImplosionChamberBlock.FACING, Direction.SOUTH), 3);
+        level.setBlock(chamber.east(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
+        // Cobblestone in from a chest above; Sand out through a hopper below into a chest under the floor.
+        level.setBlock(chamber.above(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
+        level.setBlock(chamber.above(2), Blocks.CHEST.defaultBlockState(), 3);
+        level.setBlock(chamber.below(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
+        level.setBlock(chamber.below(2), Blocks.CHEST.defaultBlockState(), 3);
+        if (level.getBlockEntity(chamber.above(2)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity feed) {
+            for (int i = 0; i < feed.getContainerSize(); i++) feed.setItem(i, new ItemStack(Items.COBBLESTONE, 64));
+        }
+        var explosive = ResourcefulSheep.id("explosive");
+        int uses = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(explosive).orElseThrow().effectiveInfusionUses();
+        double[][] spots = {{-2.0, -1.5}, {1.5, 1.5}, {-1.5, 2.0}, {7.5, 0.5}, {9.5, 0.5}};
+        for (double[] sp : spots) {
+            var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            sheep.snapTo(chamber.getX() + 0.5 + sp[0], chamber.getY(), chamber.getZ() + 0.5 + sp[1], level.getRandom().nextFloat() * 360, 0);
+            sheep.setPersistenceRequired();
+            if (sp[0] > 5) sheep.setNoAi(true); // the two outside the pen stand still, to be lit by hand
+            level.addFreshEntity(sheep);
+            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
+                    com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(explosive, uses));
+        }
+        // A flint and steel on a pedestal for lighting the two outside by hand.
+        BlockPos pedestal = chamber.offset(8, 0, 3);
+        level.setBlock(pedestal, Blocks.SMOOTH_STONE_SLAB.defaultBlockState(), 3);
+        var frame = new net.minecraft.world.entity.decoration.ItemFrame(level, pedestal.above(), Direction.UP);
+        frame.setItem(new ItemStack(Items.FLINT_AND_STEEL));
+        level.addFreshEntity(frame);
+        label(server, chamber.above(4), "Implosion Chamber: Cobblestone to Gravel to Sand", "gold");
+        label(server, chamber.above(3), "Its Explosive sheep's blasts do the cracking", "yellow");
+        label(server, chamber.offset(8, 2, 1), "Explosive sheep: light one with flint and steel", "red");
+        label(server, chamber.offset(8, 1, 1), "It pops its fleece off, breaking nothing", "gray");
+        BlockPos panelMaster = new BlockPos(128, 37, 152);
+        if (level.getBlockEntity(panelMaster) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel
+                && !panel.links().contains(chamber)) {
+            ResourcefulSheep.LOGGER.info("EXTEND implosion chamber at {} linked to the status panel: {}", chamber, panel.toggleLink(level, chamber));
+        }
+        ResourcefulSheep.LOGGER.info("EXTEND implosion chamber built at {}", chamber);
+    }
+
     /** Links the test world's three Hume Field Generators (cell (3, 6)) to its Machine Status Panel, if they aren't yet. */
     private static void linkHumeFieldToPanel(MinecraftServer server) {
         ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
@@ -2268,7 +2331,18 @@ public final class DevScreenshotHarness {
             case 212 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Implosion Chamber"); }
             case 216 -> McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
             case 226 -> shot(mc, "117_implosion_chamber_guide");
-            case 232 -> mc.stop();
+            // Its window.
+            case 228 -> McClient.setScreen(mc, null);
+            case 230 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                BlockPos chamber = origin.offset(0, 0, -5);
+                if (player.level().getBlockEntity(chamber) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity be) {
+                    player.openMenu(be, chamber);
+                }
+            });
+            case 236 -> { McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); McClient.clearChat(mc); }
+            case 246 -> shot(mc, "117_implosion_chamber_gui");
+            case 250 -> mc.stop();
             default -> {}
         }
     }
@@ -4074,7 +4148,7 @@ public final class DevScreenshotHarness {
     private static void worldTourTick(Minecraft mc, MinecraftServer server) {
         // The whole square platform from above its south edge and from straight overhead, then the latest scene.
         String[] tps = {"tp @a 73.5 95 218.5 180 40", "tp @a 73.5 185 108 180 90", "tp @a 129.5 38 162.5 180 12", "tp @a 45.5 40 184.5 180 32",
-                "tp @a 101.5 39 186.5 180 22"};
+                "tp @a 101.5 39 186.5 180 22", "tp @a 126.5 39 185.5 180 24"};
         if (tick == 30) {
             setHudHidden(mc, true);
             command(server, "gamemode spectator @a");
@@ -4099,6 +4173,16 @@ public final class DevScreenshotHarness {
                         for (int i = 0; i < out.getContainerSize(); i++) if (out.getItem(i).is(Items.RAW_IRON)) iron += out.getItem(i).getCount();
                         ResourcefulSheep.LOGGER.warn("TOUR upgrades separator at {} with {}: {} Raw Iron out, status {}", sepPos, sep.upgrades().cards(), iron, sep.getStatus());
                     }
+                }
+                // The Implosion Chamber in cell (4, 6): its blasts and the Sand in its chest under the floor.
+                BlockPos implosion = new BlockPos(126, 35, 176);
+                if (level.getBlockEntity(implosion) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity ic) {
+                    int sand = 0;
+                    if (level.getBlockEntity(implosion.below(2)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity c) {
+                        for (int k = 0; k < c.getContainerSize(); k++) if (c.getItem(k).is(Items.SAND)) sand += c.getItem(k).getCount();
+                    }
+                    ResourcefulSheep.LOGGER.warn("TOUR implosion chamber {}: {} blasts, {} cracked, {} ready / {} regrowing sheep, {} Sand in its chest, slots {}",
+                            ic.status(), ic.blasts(), ic.crackedTotal(), ic.readySheep(), ic.regrowingSheep(), sand, ic.inventory().stacks());
                 }
                 // The Hume Field Generators in cell (3, 6): delivering, wasting and alone.
                 for (int dx : HUME_WORLD_X) {
@@ -4447,6 +4531,7 @@ public final class DevScreenshotHarness {
                         case "upgrades" -> upgradeWorldScene(server);
                         case "hume field" -> humeFieldWorldScene(server);
                         case "hume field on the panel" -> linkHumeFieldToPanel(server);
+                        case "implosion chamber" -> implosionWorldScene(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);

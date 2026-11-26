@@ -69,7 +69,7 @@ pen round it.
 - It can **stop at Gravel** instead, sending its Gravel straight out.
 - **Slots:** an input (Cobblestone, or Gravel to make Sand) that hoppers and pipes fill, and an output they empty. Power
   comes in on every side. Its comparator reads how full its output is.
-- **Using it:** right-click it with Cobblestone or Gravel to load it, with an empty hand to see how it's doing, and
+- **Using it:** right-click it with Cobblestone or Gravel to load it, with an empty hand to open its window, and
   sneak-right-click to show its pen.
 - **Model:** a riveted blue-steel blast vessel with a round blast door, its porthole glowing orange after each blast,
   and a blast vent on top.
@@ -83,7 +83,11 @@ pen round it.
   page. **Jade:** its status, what it's making, the Gravel waiting to crack again, and its blasts and items cracked.
 - **Manual:** its own chapter in the Production tab. The Grass Seeder's chapter moved to the Utility tab, beside the
   Herd Counter, to make room.
-- Its window (with the Sand/Gravel switch) and a test-world scene are still to come.
+- **Window:** right-click it with an empty hand. Its power, its input, the Gravel it's holding to crack again and its
+  output in a row (the arrows between them flare orange after a blast), a fuse burning down to its next spark, its
+  Explosive sheep (ready and regrowing) and its blasts and items cracked, and its status. The **Sand/Gravel switch**
+  (the Gravel button, top right) makes it stop at Gravel; the spyglass beside it shows its pen.
+- **Test world:** cell (4, 6) (see below).
 
 ### The Explosive sheep
 A new themed sheep, infused with **TNT** at the altar (with 2 Gunpowder and a Fire Charge).
@@ -409,7 +413,7 @@ shared code path where there used to be eighteen copies, so a new machine is mos
 ### Test world
 - The platform grew a **seventh row** of cells, and you now start at its new south edge.
 - **Static Generator:** six sheep at four fresh combs, making 600 FE/t into a bank of Hume Energy Cubes.
-- **Machine Status Panel:** a 3x3 screen showing 26 machines from across the platform (the crate store, the Fleece Trawler and the three Hume Field Generators among them), with an alarm lamp.
+- **Machine Status Panel:** a 3x3 screen showing 27 machines from across the platform (the crate store, the Fleece Trawler, the three Hume Field Generators and the Implosion Chamber among them), with an alarm lamp.
 - **Wireless power scene:** its generator is now cabled to the separator and shears it used to power wirelessly.
 - **Hume Field Generator:** cell (3, 6) has three, one for each state: two Hume Energy Cubes against the first catch
   everything it makes (*Delivering*), a Powered Furnace smelting cobblestone against the second takes only the little
@@ -423,6 +427,9 @@ shared code path where there used to be eighteen copies, so a new machine is mos
   the whole store as one line.
 - **Fleece Trawler:** a full 7x7 pool, four deep, sunk into a fenced dark prismarine basin, with three Tide sheep
   swimming in it; the trawler on its rim with an Iron Wool lure, and a hopper under it into a chest in the floor.
+- **Implosion Chamber:** cell (4, 6), in a fenced 5x5 grass pen with three Explosive sheep, cracking Cobblestone from a
+  chest above it into Sand in a chest in the floor, powered by a Creative Generator. Two more Explosive sheep stand
+  outside it beside a flint and steel, to light by hand. It's on the status panel.
 
 ## 1.5.5 (17–19 November 2026)
 
