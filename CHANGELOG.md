@@ -439,6 +439,8 @@ shared code path where there used to be eighteen copies, so a new machine is mos
 - **Hume Field Generator:** cell (3, 6) has three, one for each state: two Hume Energy Cubes against the first catch
   everything it makes (*Delivering*), a Powered Furnace smelting cobblestone against the second takes only the little
   it uses (*Wasting*), and the third stands alone (*Nothing to take it*). All three are on the status panel.
+- **Energy sheep:** in a little pen beside the first Hume Field Generator's two cubes in cell (3, 6): it drains them and
+  powers a Powered Furnace a few blocks south of it, wirelessly, so the cell runs generator, cubes, sheep, furnace.
 - **Upgrade cards:** cell (2, 6) has three separators on the same Iron Wool: plain, with a Speed card and with an
   Efficiency card.
 - **Wool-Lined Crates:** a storeroom wall of fourteen crates, each lined the colour of what it holds; and a hopper

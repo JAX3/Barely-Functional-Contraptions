@@ -1664,8 +1664,16 @@ public final class DevScreenshotHarness {
             // (built by an earlier run, as "crates"), (1, 6) the Fleece Trawler (as "fleece trawler"), (2, 6) the upgrade
             // cards (as "upgrades"), (3, 6) the Hume Field Generator (as "hume field"). An earlier run also cabled the old
             // wireless-power scene ("cable the wireless scene") and put the Hume Field Generators on the Machine Status
-            // Panel ("hume field on the panel"). Now: (4, 6) the Implosion Chamber, with its Explosive sheep.
+            // Panel ("hume field on the panel"), and built (4, 6), the Implosion Chamber ("implosion chamber"), and an
+            // Energy sheep beside the Hume Field Generator's cubes in (3, 6) ("energy sheep"), the platform being full.
+            // Each of those runs also laid the seventh row's floor again (extendPlatform didn't check it was done),
+            // wiping what its scenes had set into the floor; it checks now. Now: the whole seventh row rebuilt.
+            {"crates", 0, 6},
+            {"fleece trawler", 1, 6},
+            {"upgrades", 2, 6},
+            {"hume field", 3, 6},
             {"implosion chamber", 4, 6},
+            {"energy sheep", 3, 6},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -1678,7 +1686,10 @@ public final class DevScreenshotHarness {
     private static void extendPlatform(MinecraftServer server) {
         ServerLevel level = server.overworld();
         int south = SQUARE_Z + GRID_Z + PLATFORM_ROWS * CELL_D + 3; // the new rim: three blocks past the last cell line, as before
-        for (int x = SQUARE_X; x < SQUARE_X + SQUARE_SIDE; x++) {
+        // Already extended (its new rim is there): leave the floor alone. Laying it again would wipe out everything the
+        // seventh row's scenes set into the floor (chests, hoppers, the Implosion Chamber's grass...).
+        boolean done = level.getBlockState(new BlockPos(SQUARE_X + SQUARE_SIDE / 2, 34, south)).is(Blocks.POLISHED_DEEPSLATE);
+        for (int x = SQUARE_X; x < SQUARE_X + SQUARE_SIDE && !done; x++) {
             for (int z = SQUARE_Z + SQUARE_SIDE - 4; z <= south; z++) {
                 boolean rim = x == SQUARE_X || x == SQUARE_X + SQUARE_SIDE - 1 || z == south;
                 int gx = x - SQUARE_X - GRID_X, gz = z - SQUARE_Z - GRID_Z;
@@ -2047,6 +2058,55 @@ public final class DevScreenshotHarness {
             ResourcefulSheep.LOGGER.info("EXTEND implosion chamber at {} linked to the status panel: {}", chamber, panel.toggleLink(level, chamber));
         }
         ResourcefulSheep.LOGGER.info("EXTEND implosion chamber built at {}", chamber);
+    }
+
+    /**
+     * An Energy sheep in a little fenced pen beside the first Hume Field Generator's two cubes (cell (3, 6), west end),
+     * so the generator fills the cubes, the sheep drains them, and it powers a Powered Furnace a few blocks south of it,
+     * wirelessly, smelting Cobblestone from a chest above into a chest in the floor. Added to the cell without
+     * rebuilding it; the furnace is more than 8 blocks from the other generators' blocks, so their states don't change.
+     */
+    private static void energySheepWorldScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        BlockPos g = origin.offset(0, 0, -3);
+        BlockPos cubes = g.offset(HUME_WORLD_X[0], 0, -1).west(); // the lower of its two cubes
+        BlockPos pen = cubes.offset(-2, 0, 0);                    // the middle of the pen, two west of the cubes
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(pen).inflate(3, 4, 8),
+                e -> e instanceof net.minecraft.world.entity.animal.sheep.Sheep || e instanceof net.minecraft.world.entity.item.ItemEntity)) e.discard();
+        // A 1x3 pen (north-south) between fences, and the furnace's spot south of it.
+        for (BlockPos p : BlockPos.betweenClosed(pen.offset(-1, 0, -2), pen.offset(1, 3, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (int dz = -2; dz <= 2; dz++) {
+            for (int dx : new int[]{-1, 1}) level.setBlock(pen.offset(dx, 0, dz), Blocks.OAK_FENCE.defaultBlockState(), 3);
+        }
+        level.setBlock(pen.north(2), Blocks.OAK_FENCE.defaultBlockState(), 3);
+        level.setBlock(pen.south(2), Blocks.OAK_FENCE.defaultBlockState(), 3);
+        for (BlockPos p : BlockPos.betweenClosed(pen.offset(-1, 0, -2), pen.offset(1, 0, 2))) {
+            level.setBlock(p, level.getBlockState(p).getBlock().defaultBlockState(), 3); // let the fences join up
+        }
+        var energy = ResourcefulSheep.id("energy");
+        int uses = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(energy).orElseThrow().effectiveInfusionUses();
+        var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        sheep.snapTo(pen.getX() + 0.5, pen.getY(), pen.getZ() + 0.5, 90, 0);
+        sheep.setPersistenceRequired();
+        level.addFreshEntity(sheep);
+        com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
+                com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(energy, uses));
+        // Its furnace: four south of the pen, fed Cobblestone from a chest above, smelting into a chest in the floor.
+        BlockPos furnace = pen.south(5);
+        for (BlockPos p : BlockPos.betweenClosed(furnace.offset(-1, 0, -1), furnace.offset(1, 3, 1))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        level.setBlock(furnace, ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+        level.setBlock(furnace.above(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
+        level.setBlock(furnace.above(2), Blocks.CHEST.defaultBlockState(), 3);
+        level.setBlock(furnace.below(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
+        level.setBlock(furnace.below(2), Blocks.CHEST.defaultBlockState(), 3);
+        if (level.getBlockEntity(furnace.above(2)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity feed) {
+            for (int i = 0; i < feed.getContainerSize(); i++) feed.setItem(i, new ItemStack(Items.COBBLESTONE, 64));
+        }
+        label(server, furnace.above(4), "Energy sheep: drains the cubes,", "yellow");
+        label(server, furnace.above(3), "powers this furnace wirelessly", "yellow");
+        ResourcefulSheep.LOGGER.info("EXTEND energy sheep at {} by the cubes at {}, its furnace at {}", pen, cubes, furnace);
     }
 
     /** Links the test world's three Hume Field Generators (cell (3, 6)) to its Machine Status Panel, if they aren't yet. */
@@ -4238,6 +4298,14 @@ public final class DevScreenshotHarness {
                     ResourcefulSheep.LOGGER.warn("TOUR implosion chamber {}: {} blasts, {} cracked, {} ready / {} regrowing sheep, {} Sand in its chest, slots {}",
                             ic.status(), ic.blasts(), ic.crackedTotal(), ic.readySheep(), ic.regrowingSheep(), sand, ic.inventory().stacks());
                 }
+                // The Energy sheep in cell (3, 6) and its furnace.
+                for (var sh : level.getEntitiesOfClass(net.minecraft.world.entity.animal.sheep.Sheep.class, new net.minecraft.world.phys.AABB(new BlockPos(92, 35, 176)).inflate(3),
+                        com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep::isEnergySheep)) {
+                    String furnaceInfo = level.getBlockEntity(new BlockPos(92, 35, 181)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity f
+                            ? f.status() + " " + f.getEnergyHandler().getAmountAsLong() + " FE" : "missing";
+                    ResourcefulSheep.LOGGER.warn("TOUR energy sheep at {}: charge {}; its furnace {}", sh.blockPosition(),
+                            com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.charge(sh), furnaceInfo);
+                }
                 // The Hume Field Generators in cell (3, 6): delivering, wasting and alone.
                 for (int dx : HUME_WORLD_X) {
                     BlockPos core = new BlockPos(101 + dx, 35, 176);
@@ -4586,6 +4654,7 @@ public final class DevScreenshotHarness {
                         case "hume field" -> humeFieldWorldScene(server);
                         case "hume field on the panel" -> linkHumeFieldToPanel(server);
                         case "implosion chamber" -> implosionWorldScene(server);
+                        case "energy sheep" -> energySheepWorldScene(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
