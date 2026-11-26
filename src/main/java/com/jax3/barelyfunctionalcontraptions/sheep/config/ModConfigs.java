@@ -274,6 +274,12 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue trawlerStraySheepChance;
         public final ModConfigSpec.DoubleValue trawlerWaterBonus;
         public final ModConfigSpec.DoubleValue trawlerRainBonus;
+        public final ModConfigSpec.IntValue implosionRadius;
+        public final ModConfigSpec.IntValue implosionSparkInterval;
+        public final ModConfigSpec.IntValue implosionSparkEnergy;
+        public final ModConfigSpec.IntValue implosionBatch;
+        public final ModConfigSpec.IntValue implosionCapacity;
+        public final ModConfigSpec.IntValue implosionMaxInput;
         public final ModConfigSpec.IntValue crateControllerRange;
         public final ModConfigSpec.IntValue crateControllerMaxCrates;
         public final ModConfigSpec.DoubleValue speedUpgradeTime;
@@ -756,6 +762,21 @@ public final class ModConfigs {
                     .defineInRange("waterBonus", 1.25, 1.0, 10.0);
             trawlerRainBonus = b.comment("Speed while it's raining on it.")
                     .defineInRange("rainBonus", 1.25, 1.0, 10.0);
+            b.pop();
+
+            b.comment("Implosion Chamber (cracks cobblestone into gravel and gravel into sand with the blasts of Explosive sheep in its pen)").push("implosion_chamber");
+            implosionRadius = b.comment("How far its pen reaches out from it on each side (2 = 5x5, centred on it).")
+                    .defineInRange("radius", 2, 1, 4);
+            implosionSparkInterval = b.comment("Ticks between the sparks it lights an Explosive sheep's fuse with (100 = 5 seconds).")
+                    .defineInRange("sparkInterval", 100, 20, 12_000);
+            implosionSparkEnergy = b.comment("FE each spark takes. 0 = runs without power.")
+                    .defineInRange("sparkEnergy", 1_000, 0, 1_000_000);
+            implosionBatch = b.comment("Items one blast cracks a step: cobblestone into gravel, and gravel into sand.")
+                    .defineInRange("batch", 8, 1, 64);
+            implosionCapacity = b.comment("Its energy buffer, in FE.")
+                    .defineInRange("capacity", 20_000, 0, 10_000_000);
+            implosionMaxInput = b.comment("Most FE it takes in a tick.")
+                    .defineInRange("maxInput", 1_000, 0, 1_000_000);
             b.pop();
 
             b.comment("Crate Controller (links Wool-Lined Crates into one store: crates touching it join by themselves, others with the wrench)").push("crate_controller");
