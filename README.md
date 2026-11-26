@@ -107,6 +107,12 @@ A late-game 2x2 generator three blocks tall whose field can't make up its mind: 
 
 ![A Hume Field Generator pulsing purple sparks beside a Hume Energy Cube](docs/screenshots/hume_field_pulse.png)
 
+### Energy Sheep
+
+A wireless charger on legs. Infuse a sheep with a Hume Energy Cube (2 Lightning Rods at the altar) and it wears a fleece of cube, crackling with sparks. Pen it within 3 blocks of a Hume Energy Cube bank: it drains up to 2,000 FE/t into its 100,000 FE fleece and shares it out, wirelessly, to every machine and every powered tool or armour piece in nearby players' inventories within 8 blocks. Sparks arc to whatever it charges, and Jade shows how much it holds.
+
+![An Energy sheep in a fleece of Hume Energy Cube beside a cube bank](docs/screenshots/118_energy_sheep.png)
+
 ### Energy Storage
 
 Each Hume Energy Cube holds 1,000,000 FE and moves 10,000 FE/t. Touching cubes join into one bigger battery, and a broken cube keeps its charge.
