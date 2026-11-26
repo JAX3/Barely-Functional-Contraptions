@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.5.7: storage, the Fleece Trawler, upgrade cards, the Static Generator, the Hume Field Generator, the Machine Status Panel and a purple Echo Chamber (20–25 November 2026)
+## 1.5.7: storage, the Fleece Trawler, upgrade cards, the Static Generator, the Hume Field Generator, the Machine Status Panel, the Explosive sheep and the Implosion Chamber, and a purple Echo Chamber (20–26 November 2026)
 
 New contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage (crates and a controller that links them into one store), a fishing
 machine driven by a new sea-going sheep, upgrade cards for the processing machines, a mid-game generator that runs on static, a late-game
@@ -58,50 +58,57 @@ Links Wool-Lined Crates into one store. It needs no power.
 - **Recipe:** a Wool-Lined Crate, a Hopper, two Comparators, two Iron Ingots and a Functional Machine Block.
 - New config section `[crate_controller]`: `range`, `maxCrates`; a chapter in the Contraptions Manual (Logistics).
 
-### Production: the Implosion Chamber
-A machine that **cracks Cobblestone into Gravel, and Gravel into Sand**, with the blasts of **Explosive sheep** in the
-pen round it.
+### Production: the Explosive sheep and the Implosion Chamber
+A new themed sheep that blows its own fleece off, and a machine that puts the blast to work cracking stone.
+
+#### The Explosive sheep
+- **Infusion:** **TNT** at the altar, with 2 Gunpowder and a Fire Charge.
+- **Looks:** a TNT fleece, laid out face by face so the red stripes run along its body and the white band reads
+  "TNT" down each flank, little TNT blocks on its back, and a fuse sticking up out of them.
+- **Short fuse:** fire, lava, lightning, or flint and steel (or a Fire Charge) on it lights the fuse. It hisses like
+  a creeper for a second and a half, then **pops**: a small blast that **breaks no blocks and hurts no one**, but
+  shoves things nearby and **blows its fleece off as Explosive Wool**, exactly as shearing would (one infusion use).
+  The pop puts out any fire on it. Only a sheep with its fleece on has a fuse.
+- **Quick regrowth:** it grows its wool back **on its own in about 20 seconds**, without grass
+  (`explosiveRegrowSeconds`), so it's soon ready to go off again.
+- **Its wool** separates into **Gunpowder** (2–4), with a small chance of a block of TNT.
+- **Advancement:** *Short Fuse*, and Explosive Wool joins the *Fleece of Every Colour* challenge (now 27 wools).
+- **For data packs:** a new `fuse` appearance feature, and `"block_wool": true`, which lets a themed sheep still wear
+  the fleece made of its resource's block.
+
+#### The Implosion Chamber
+A riveted blue-steel blast vessel with a round blast door, whose porthole glows orange after each blast. It **cracks
+Cobblestone into Gravel, and Gravel into Sand**, with the blasts of the Explosive sheep in the pen round it.
 - **Its pen** is the 5x5 round it. Every **5 seconds**, while it has stone to crack, room for what it makes and
-  **1,000 FE**, it lights the fuse of the nearest Explosive sheep in its pen that has its fleece on.
-- **Each blast** cracks up to **8** items a step: Gravel it cracked last time into Sand first, then 8 Cobblestone from
-  its input into Gravel. So Cobblestone takes two blasts to become Sand. A sheep lit any other way (fire, your flint and
-  steel) counts too. Its sheep can't blast again until their wool grows back, so a Grass Seeder in the pen keeps it busy.
-- It can **stop at Gravel** instead, sending its Gravel straight out.
-- **Slots:** an input (Cobblestone, or Gravel to make Sand) that hoppers and pipes fill, and an output they empty. Power
-  comes in on every side. Its comparator reads how full its output is.
-- **Using it:** right-click it with Cobblestone or Gravel to load it, with an empty hand to open its window, and
-  sneak-right-click to show its pen.
-- **Model:** a riveted blue-steel blast vessel with a round blast door, its porthole glowing orange after each blast,
-  and a blast vent on top.
-- **Recipe:** Blue Steel and Obsidian along the top, Explosive Wool either side of a Functional Machine Block, and Blue
-  Steel either side of a Piston along the bottom.
-- **Its sheep regrow quickly:** Explosive sheep grow their wool back **on their own in about 20 seconds**, without
-  grass (`explosiveRegrowSeconds`), so they're soon ready to blast again.
+  **1,000 FE**, it lights the fuse of the nearest Explosive sheep in its pen that has its fleece on. A sheep lit any
+  other way in its pen (fire, your flint and steel) counts too.
+- **Each blast** cracks up to **8** items a step: the Gravel it cracked last time into Sand first, then 8 Cobblestone
+  from its input into Gravel, so Cobblestone takes two blasts to become Sand. Or it can **stop at Gravel**, sending its
+  Gravel straight out.
+- **Slots and power:** an input (Cobblestone, or Gravel to make Sand) that hoppers and pipes fill, and an output they
+  empty. Power comes in on every side. A comparator reads how full its output is.
+- **Using it:** right-click it with Cobblestone or Gravel to load it, or with an empty hand to open its window;
+  sneak-right-click it to show its pen.
+- **Window:** its power, its input, the Gravel it's holding to crack again and its output in a row (the arrows between
+  them flare orange after a blast), a fuse burning down to its next spark, its Explosive sheep (ready and regrowing),
+  its blasts and items cracked, and its status. The **Gravel button** (top right) switches between making Sand and
+  stopping at Gravel; the spyglass beside it shows its pen.
 - **Machine Status Panel:** *Cracking* (with what its output holds), *Regrowing*, *No sheep*, *Nothing to crack*,
   *Output full* or *No power*.
 - **JEI:** a page for each step, Cobblestone to Gravel and Gravel to Sand, with an Explosive sheep, and an information
   page. **Jade:** its status, what it's making, the Gravel waiting to crack again, and its blasts and items cracked.
 - **Manual:** its own chapter in the Production tab. The Grass Seeder's chapter moved to the Utility tab, beside the
   Herd Counter, to make room.
-- **Window:** right-click it with an empty hand. Its power, its input, the Gravel it's holding to crack again and its
-  output in a row (the arrows between them flare orange after a blast), a fuse burning down to its next spark, its
-  Explosive sheep (ready and regrowing) and its blasts and items cracked, and its status. The **Sand/Gravel switch**
-  (the Gravel button, top right) makes it stop at Gravel; the spyglass beside it shows its pen.
-- **Test world:** cell (4, 6) (see below).
+- **Recipe:**
 
-### The Explosive sheep
-A new themed sheep, infused with **TNT** at the altar (with 2 Gunpowder and a Fire Charge).
-- **Looks:** a TNT fleece, laid out face by face so the red stripes run along its body and the white band reads
-  "TNT" down each flank, little TNT blocks on its back, and a fuse sticking up out of them.
-- **Short fuse:** fire, lava, lightning, or flint and steel (or a Fire Charge) on it lights the fuse. It hisses like
-  a creeper for a second and a half, then **pops**: a small blast that **breaks no blocks and hurts no one**, but
-  shoves things nearby and **blows its fleece off as Explosive Wool**, exactly as shearing would (one infusion use).
-  The pop puts out any fire on it. Only a sheep with its fleece on has a fuse, so it won't go off again until its
-  wool grows back.
-- **Its wool** separates into **Gunpowder** (2–4), with a small chance of a block of TNT.
-- **Advancement:** *Short Fuse*, and Explosive Wool joins the *Fleece of Every Colour* challenge (now 27 wools).
-- For data packs: a new `fuse` appearance feature, and `"block_wool": true`, which lets a themed sheep still wear the
-  fleece made of its resource's block.
+  ```
+  I O I      I = Blue Steel, O = Obsidian
+  W M W      W = Explosive Wool, M = Functional Machine Block
+  I P I      P = Piston
+  ```
+- **Config:** `[implosion_chamber]`: `radius` (2), `sparkInterval` (100), `sparkEnergy` (1,000), `batch` (8),
+  `capacity` (20,000), `maxInput` (1,000), `explosiveRegrowSeconds` (20).
+- **Test world:** cell (4, 6) (see below).
 
 ### Production: the Fleece Trawler and the Tide sheep
 A dockside winch that **fishes the pool in front of it**. It needs no power: **Tide sheep swimming in the pool drive
