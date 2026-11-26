@@ -3,7 +3,6 @@
   "category": "redstone",
   "key": {
     "E": "minecraft:echo_shard",
-    "B": "minecraft:blackstone",
     "I": "barelyfunctionalcontraptions:blue_steel_block",
     "M": "barelyfunctionalcontraptions:functional_machine_block",
     "W": {
@@ -14,7 +13,7 @@
   "pattern": [
     "IWI",
     "WEW",
-    "BMB"
+    "IMI"
   ],
   "result": {
     "id": "barelyfunctionalcontraptions:echo_chamber"

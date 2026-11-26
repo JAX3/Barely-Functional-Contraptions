@@ -246,15 +246,17 @@ so it sits with the Hume Field Generator and the rest instead of standing out fr
   casing.
 - **The same purple everywhere else:** its window's text and strip, its Jade tooltip, its JEI page and its
   working-area outline.
-- **Recipe: the Echo Shards and the Sculk Wool swap places.** Sculk Wool Bales (from Warden sheep) now sit where the
-  three Echo Shards were, and a single Echo Shard sits in the middle where the bale was:
+- **A new recipe, in sculk and blue steel:**
+  - the Echo Shards and the Sculk Wool swap places: Sculk Wool Bales (from Warden sheep) now sit where the three Echo
+    Shards were, and a single Echo Shard sits in the middle where the bale was;
+  - the two Blackstone at the bottom are now Blocks of Blue Steel, so there's one in each corner.
 
   ```
   I W I      I = Block of Blue Steel, W = Sculk Wool Bale
   W E W      E = Echo Shard
-  B M B      B = Blackstone, M = Functional Machine Block
+  I M I      M = Functional Machine Block
   ```
-- Only its looks changed. It works exactly as before, Echo Chambers already built just change colour, and its Warden
+- Otherwise it works exactly as before, Echo Chambers already built just change colour, and its Warden
   sheep and their sculk stay cyan.
 
 ### Sheep wear their blocks

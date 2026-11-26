@@ -97,7 +97,7 @@ Makes power from the difference between hot and cold: Blaze sheep in a pen again
 
 ### Echo Chamber
 
-A 3x3x3 generator that turns noise into power. Warden sheep in a pen in front of its dish listen for vibrations, the way a sculk sensor does: one makes 8,000 FE/t, up to 20,000 FE/t from four. Keep the noise steady and in its sweet spot. A note block on a redstone clock works well, and wool walls keep stray noise out. Too quiet for 30 seconds and the sheep fall asleep; too loud for 10 and the room shrieks, giving players nearby Darkness and stopping for a minute. Made from three Sculk Wool Bales (from Warden sheep), an Echo Shard, a Functional Machine Block, two Blocks of Blue Steel and two Blackstone.
+A 3x3x3 generator that turns noise into power. Warden sheep in a pen in front of its dish listen for vibrations, the way a sculk sensor does: one makes 8,000 FE/t, up to 20,000 FE/t from four. Keep the noise steady and in its sweet spot. A note block on a redstone clock works well, and wool walls keep stray noise out. Too quiet for 30 seconds and the sheep fall asleep; too loud for 10 and the room shrieks, giving players nearby Darkness and stopping for a minute. Made from three Sculk Wool Bales (from Warden sheep), an Echo Shard, a Functional Machine Block and four Blocks of Blue Steel.
 
 ![The Echo Chamber listening: three Warden sheep in its outlined pen and a note block beside it](docs/screenshots/wip_echo_chamber_listening.png)
 
