@@ -63,8 +63,9 @@ public final class EnergySheep {
     public static void onEntityTick(EntityTickEvent.Post event) {
         if (!(event.getEntity() instanceof Sheep sheep)) return;
         if (sheep.level().isClientSide()) {
-            // It crackles while it holds charge.
-            if (charge(sheep) > 0 && isEnergySheep(sheep) && sheep.getRandom().nextInt(4) == 0) {
+            // It crackles while it holds charge: hardly at all nearly empty, every tick or two when full.
+            int charge = charge(sheep);
+            if (charge > 0 && isEnergySheep(sheep) && sheep.getRandom().nextFloat() < 0.05F + 0.55F * Math.min(1F, charge / (float) capacity())) {
                 sheep.level().addParticle(ParticleTypes.ELECTRIC_SPARK, sheep.getRandomX(0.6),
                         sheep.getY() + sheep.getBbHeight() * (0.5 + sheep.getRandom().nextDouble() * 0.6), sheep.getRandomZ(0.6), 0, 0.05, 0);
             }

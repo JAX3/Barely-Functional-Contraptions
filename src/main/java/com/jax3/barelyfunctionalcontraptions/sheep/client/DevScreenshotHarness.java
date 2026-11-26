@@ -321,6 +321,10 @@ public final class DevScreenshotHarness {
             blockWoolTick(mc, server);
             return;
         }
+        if ("energy_glow".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            energyGlowTick(mc, server);
+            return;
+        }
         if ("energy_sheep".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             energySheepTick(mc, server);
             return;
@@ -2328,6 +2332,43 @@ public final class DevScreenshotHarness {
     }
 
     private static final java.util.List<net.minecraft.world.entity.animal.sheep.Sheep> explosiveSheep = new java.util.ArrayList<>();
+
+    /**
+     * Three Energy sheep at night, empty, half charged and full, to show their fleece glowing brighter the fuller it is:
+     * {@code -PharnessScene=energy_glow}.
+     */
+    private static void energyGlowTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set midnight", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, 0, -10), origin.offset(8, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, -1, -10), origin.offset(8, -1, 2))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+                var energy = ResourcefulSheep.id("energy");
+                int uses = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(energy).orElseThrow().effectiveInfusionUses();
+                int capacity = com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.capacity();
+                float[] charges = {0F, 0.5F, 1F};
+                for (int i = 0; i < 3; i++) {
+                    var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    sheep.snapTo(origin.getX() - 3.0 + i * 3.5, origin.getY(), origin.getZ() - 5.5, 90, 0);
+                    sheep.setNoAi(true);
+                    level.addFreshEntity(sheep);
+                    com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
+                            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(energy, uses));
+                    com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.setCharge(sheep, Math.round(capacity * charges[i]));
+                }
+            });
+            case 62 -> setHudHidden(mc, true);
+            case 64 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 20", origin.getX() + 0.5, origin.getY() + 1.2, origin.getZ() + 0.5));
+            case 110 -> shot(mc, "118_energy_sheep_glow");
+            case 114 -> mc.stop();
+            default -> {}
+        }
+    }
 
     /**
      * An Energy sheep beside a charged bank of Hume Energy Cubes, sparks arcing from it to two Powered Furnaces a few

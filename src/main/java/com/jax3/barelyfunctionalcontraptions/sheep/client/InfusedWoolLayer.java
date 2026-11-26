@@ -95,7 +95,12 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
      * What to draw: wool colours ({@code accent} is 0 when the sparkle overlay is disabled), the resource block that
      * sprouts from the fleece, and how many of them are showing.
      */
-    public record Colors(int wool, int accent, ItemStackRenderState growth, int growthCount, SheepAppearance appearance) {}
+    /** {@code charge}: how full an Energy sheep's fleece is, 0 to 1 (it glows brighter the fuller it is); 0 for others. */
+    public record Colors(int wool, int accent, ItemStackRenderState growth, int growthCount, SheepAppearance appearance, float charge) {
+        public Colors(int wool, int accent, ItemStackRenderState growth, int growthCount, SheepAppearance appearance) {
+            this(wool, accent, growth, growthCount, appearance, 0F);
+        }
+    }
 
     // ---------------------------------------------------------------- blocks: small blocks clustered in the fleece
 
@@ -177,7 +182,12 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
         }
         // Burning sheep use the vanilla on-fire flames; they never actually burn.
         if (appearance.has(Feature.ON_FIRE)) state.displayFireAnimation = true;
-        state.setRenderData(INFUSED_WOOL, new Colors(wool, accent, growth, count, appearance));
+        float charge = 0F;
+        if (appearance.has(Feature.CHARGED)) {
+            int capacity = com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.capacity();
+            charge = capacity <= 0 ? 0F : Mth.clamp(com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.charge(sheep) / (float) capacity, 0F, 1F);
+        }
+        state.setRenderData(INFUSED_WOOL, new Colors(wool, accent, growth, count, appearance, charge));
         state.isSheared = true; // hides the vanilla wool layer; the undercoat layer is unaffected
     }
 
@@ -193,6 +203,11 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
         // Glowing fleece is drawn at full brightness; sculk only lights up its strands.
         int woolLight = appearance.has(Feature.GLOWING) ? LightCoordsUtil.FULL_BRIGHT : lightCoords;
         int accentLight = appearance.has(Feature.GLOWING) || appearance.has(Feature.SCULK) ? LightCoordsUtil.FULL_BRIGHT : lightCoords;
+        // An Energy sheep glows with its charge: as lit as the world round it when empty, full bright when full.
+        if (appearance.has(Feature.CHARGED) && colors.charge() > 0) {
+            woolLight = charged(lightCoords, colors.charge());
+            accentLight = woolLight;
+        }
         coloredCutoutModelCopyLayerRender(model, appearance.woolTexture().orElse(WOOL_TEXTURE), poseStack, collector, woolLight, state, colors.wool(), 1);
         if (colors.accent() != 0) {
             coloredCutoutModelCopyLayerRender(model, ACCENT_TEXTURE, poseStack, collector, accentLight, state, colors.accent(), 2);
@@ -200,6 +215,13 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
         submitFeatures(poseStack, collector, lightCoords, state, colors);
         if (state.isInvisible || colors.growthCount() <= 0 || colors.growth().isEmpty()) return;
         submitBlocks(poseStack, collector, woolLight, state, colors);
+    }
+
+    /** {@code light} with its block light raised towards 15 as {@code charge} goes from 0 to 1 (and the sky's with it). */
+    static int charged(int light, float charge) {
+        int glow = Math.round(15 * charge);
+        int lit = LightCoordsUtil.withBlock(light, Math.max(glow, LightCoordsUtil.block(light)));
+        return charge >= 0.999F ? LightCoordsUtil.FULL_BRIGHT : lit;
     }
 
     /** The extra body parts, bones and glowing eyes a resource's {@code appearance} asks for. */

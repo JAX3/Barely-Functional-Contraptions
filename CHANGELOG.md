@@ -22,7 +22,7 @@ For Minecraft 26.3, 26.2 and 26.1 on NeoForge.
 - **Hume Field Generator (late game):** makes a random 200–1,200 FE/t each second, with no buffer: what its neighbours
   can't take is lost.
 - **Energy sheep:** infused with a Hume Energy Cube. Drains cubes within 3 blocks and charges machines and players'
-  powered items within 8, wirelessly.
+  powered items within 8, wirelessly. Its fleece glows brighter the more charge it holds.
 - **Machine Status Panel:** a wall screen (up to 3x3) showing up to 36 linked machines' status, with a comparator for
   problems.
 - **Upgrade cards:** Speed, Efficiency, Capacity, Range, Yield and Muffler, in two slots on the processing machines.
