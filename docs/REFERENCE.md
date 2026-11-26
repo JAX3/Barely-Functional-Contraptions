@@ -801,14 +801,14 @@ A themed sheep infused with a **Hume Energy Cube** (2 Lightning Rods round it at
 - **Drains:** every half second it draws up to **2,000 FE a tick** (`drainPerTick`) from the Hume Energy Cubes within **3 blocks** of it (`drainRadius`) into its fleece, which holds **100,000 FE** (`capacity`).
 - **Charges:** it shares up to **2,000 FE a tick** (`chargePerTick`) between everything within **8 blocks** (`chargeRadius`): every block that takes FE (machines, generators' buffers; not Hume Energy Cubes or cables) and every powered item (tools, armour, anything that holds FE) in nearby players' inventories. Each gets a fair share, and sparks arc to what it charges.
 - Only a grown sheep with its fleece on does either; sheared, it keeps its charge until its wool grows back.
-- **It glows with its charge:** its fleece is lit as brightly as the charge it holds, from as dark as its surroundings when empty to full bright when full, and it sparks more often the fuller it is.
+- **It glows with its charge:** like a Glow Ink sheep it lights the block it stands in, at a light level that follows its charge (15 when full, fading as it empties, none when empty), and its fleece is drawn as brightly. It sparks more often the fuller it is.
 - **Jade** shows its charge. Its wool separates into Redstone and Copper, with a chance of Glowstone. **Advancement:** *Static Cling*.
 - **Config:** `[energy_sheep]`: `capacity` (100,000), `drainRadius` (3), `drainPerTick` (2,000), `chargeRadius` (8), `chargePerTick` (2,000).
 
 | An Energy sheep beside its cube bank | Jade |
 |---|---|
 | ![An Energy sheep in a fleece of Hume Energy Cube, little cubes on its back, beside a bank of Hume Energy Cubes](screenshots/118_energy_sheep.png) | ![Jade on an Energy sheep: Infused Energy, 100 shearings left, Charge 98,000 / 100,000 FE](screenshots/118_energy_sheep_jade.png) |
-| ![Three Energy sheep at night, empty, half charged and full: dark, glowing softly and lit up bright](screenshots/118_energy_sheep_glow.png) | |
+| ![Three Energy sheep at night, empty, half charged and full: the empty one dark, the half-charged one casting a soft pool of light, the full one lighting a wide circle of ground](screenshots/118_energy_sheep_glow.png) | |
 
 ### Implosion Chamber
 A riveted blue-steel blast vessel with a round blast door on its front. It **cracks Cobblestone into Gravel, and Gravel into Sand**, with the blasts of **Explosive sheep** (infused with TNT) in the pen round it.

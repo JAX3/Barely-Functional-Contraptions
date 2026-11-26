@@ -2346,15 +2346,15 @@ public final class DevScreenshotHarness {
                 for (String c : new String[]{"time set midnight", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
                     server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
                 }
-                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, 0, -10), origin.offset(8, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
-                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, -1, -10), origin.offset(8, -1, 2))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-16, 0, -14), origin.offset(16, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-16, -1, -14), origin.offset(16, -1, 2))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
                 var energy = ResourcefulSheep.id("energy");
                 int uses = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(energy).orElseThrow().effectiveInfusionUses();
                 int capacity = com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.capacity();
                 float[] charges = {0F, 0.5F, 1F};
                 for (int i = 0; i < 3; i++) {
                     var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-                    sheep.snapTo(origin.getX() - 3.0 + i * 3.5, origin.getY(), origin.getZ() - 5.5, 90, 0);
+                    sheep.snapTo(origin.getX() - 8.5 + i * 9.0, origin.getY(), origin.getZ() - 8.5, 90, 0);
                     sheep.setNoAi(true);
                     level.addFreshEntity(sheep);
                     com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
@@ -2363,7 +2363,7 @@ public final class DevScreenshotHarness {
                 }
             });
             case 62 -> setHudHidden(mc, true);
-            case 64 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 20", origin.getX() + 0.5, origin.getY() + 1.2, origin.getZ() + 0.5));
+            case 64 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 30", origin.getX() + 0.5, origin.getY() + 4.0, origin.getZ() + 2.5));
             case 110 -> shot(mc, "118_energy_sheep_glow");
             case 114 -> mc.stop();
             default -> {}

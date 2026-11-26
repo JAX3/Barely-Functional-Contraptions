@@ -17,7 +17,9 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * The invisible light a glowing sheep leaves in the block it stands in (see {@link SheepAppearance.Feature#GLOWING}).
+ * The invisible light a glowing sheep leaves in the block it stands in (see {@link SheepAppearance.Feature#GLOWING}),
+ * at {@link #LIGHT_LEVEL}; and the light an Energy sheep ({@link SheepAppearance.Feature#CHARGED}) gives off, at a
+ * {@link #LEVEL} that follows its charge.
  *
  * <p>It can't be seen, touched or targeted, drops nothing and is replaced by anything placed there. It checks itself
  * every {@link #CHECK_TICKS} ticks and turns back into air as soon as no glowing sheep is standing in it, so it never
@@ -26,9 +28,23 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class SheepGlowBlock extends Block {
     public static final int LIGHT_LEVEL = 12;
     public static final int CHECK_TICKS = 10;
+    /** How bright it is. */
+    public static final net.minecraft.world.level.block.state.properties.IntegerProperty LEVEL =
+            net.minecraft.world.level.block.state.properties.IntegerProperty.create("level", 1, 15);
 
     public SheepGlowBlock(Properties properties) {
         super(properties);
+        registerDefaultState(stateDefinition.any().setValue(LEVEL, LIGHT_LEVEL));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(LEVEL);
+    }
+
+    /** The light for a sheep at {@code level}. */
+    public BlockState at(int level) {
+        return defaultBlockState().setValue(LEVEL, Math.max(1, Math.min(15, level)));
     }
 
     @Override
@@ -39,7 +55,9 @@ public class SheepGlowBlock extends Block {
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         boolean lit = !level.getEntitiesOfClass(Sheep.class, new AABB(pos),
-                sheep -> sheep.blockPosition().equals(pos) && SheepFeatureEvents.has(sheep, SheepAppearance.Feature.GLOWING)).isEmpty();
+                sheep -> sheep.blockPosition().equals(pos) && (SheepFeatureEvents.has(sheep, SheepAppearance.Feature.GLOWING)
+                        || (SheepFeatureEvents.has(sheep, SheepAppearance.Feature.CHARGED)
+                                && com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.charge(sheep) > 0))).isEmpty();
         if (lit) level.scheduleTick(pos, this, CHECK_TICKS);
         else level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
     }

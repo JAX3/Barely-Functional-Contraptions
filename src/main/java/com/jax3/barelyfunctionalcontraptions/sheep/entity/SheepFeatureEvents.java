@@ -92,6 +92,11 @@ public final class SheepFeatureEvents {
         Level level = sheep.level();
         if (!level.isClientSide()) {
             if (appearance.get().has(Feature.GLOWING)) placeGlow(level, sheep.blockPosition());
+            // An Energy sheep lights its surroundings as brightly as its charge: 15 full, fading to nothing empty.
+            if (appearance.get().has(Feature.CHARGED)) {
+                int charge = EnergySheep.charge(sheep), capacity = EnergySheep.capacity();
+                if (charge > 0 && capacity > 0) placeGlow(level, sheep.blockPosition(), (int) Math.ceil(15.0 * charge / capacity));
+            }
             // Gills: it never runs out of air.
             if (appearance.get().has(Feature.FINS)) sheep.setAirSupply(sheep.getMaxAirSupply());
             return;
@@ -115,9 +120,17 @@ public final class SheepFeatureEvents {
 
     /** Lights the block the sheep stands in, unless something other than air (or an older glow) is there. */
     public static void placeGlow(Level level, BlockPos pos) {
+        placeGlow(level, pos, com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.LIGHT_LEVEL);
+    }
+
+    /** As {@link #placeGlow(Level, BlockPos)}, at light {@code brightness} (1-15); a glow already there is set to it. */
+    public static void placeGlow(Level level, BlockPos pos, int brightness) {
         BlockState there = level.getBlockState(pos);
-        if (there.isAir() && level.getFluidState(pos).isEmpty()) {
-            level.setBlock(pos, ModBlocks.SHEEP_GLOW.get().defaultBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
+        BlockState glow = ModBlocks.SHEEP_GLOW.get().at(brightness);
+        if (there.is(ModBlocks.SHEEP_GLOW.get())) {
+            if (there != glow) level.setBlock(pos, glow, net.minecraft.world.level.block.Block.UPDATE_ALL);
+        } else if (there.isAir() && level.getFluidState(pos).isEmpty()) {
+            level.setBlock(pos, glow, net.minecraft.world.level.block.Block.UPDATE_ALL);
         }
     }
 

@@ -109,7 +109,7 @@ A late-game 2x2 generator three blocks tall whose field can't make up its mind: 
 
 ### Energy Sheep
 
-A wireless charger on legs. Infuse a sheep with a Hume Energy Cube (2 Lightning Rods at the altar) and it wears a fleece of cube, crackling with sparks. Pen it within 3 blocks of a Hume Energy Cube bank: it drains up to 2,000 FE/t into its 100,000 FE fleece and shares it out, wirelessly, to every machine and every powered tool or armour piece in nearby players' inventories within 8 blocks. Its fleece glows brighter the more charge it holds (dark when empty, lit up when full), sparks arc to whatever it charges, and Jade shows how much it holds.
+A wireless charger on legs. Infuse a sheep with a Hume Energy Cube (2 Lightning Rods at the altar) and it wears a fleece of cube, crackling with sparks. Pen it within 3 blocks of a Hume Energy Cube bank: it drains up to 2,000 FE/t into its 100,000 FE fleece and shares it out, wirelessly, to every machine and every powered tool or armour piece in nearby players' inventories within 8 blocks. Like a Glow Ink sheep it lights up the ground round it, as brightly as the charge it holds (dark when empty, light level 15 when full), sparks arc to whatever it charges, and Jade shows how much it holds.
 
 ![An Energy sheep in a fleece of Hume Energy Cube beside a cube bank](docs/screenshots/118_energy_sheep.png)
 

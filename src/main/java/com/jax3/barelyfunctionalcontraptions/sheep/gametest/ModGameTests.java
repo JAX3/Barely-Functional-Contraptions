@@ -184,6 +184,7 @@ public final class ModGameTests {
         ECHO_TESTS.put("explosive_sheep_regrow_their_wool_quickly", ModGameTests::explosiveRegrows);
         ECHO_TESTS.put("energy_sheep_drains_cubes_and_charges_machines", ModGameTests::energySheepCharges);
         ECHO_TESTS.put("energy_sheep_does_nothing_sheared", ModGameTests::energySheepSheared);
+        ECHO_TESTS.put("energy_sheep_glows_with_its_charge", ModGameTests::energySheepGlows);
         ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
         ECHO_TESTS.put("echo_chamber_hears_vibrations_but_not_through_wool", ModGameTests::echoHearing);
         ECHO_TESTS.put("echo_chamber_pushes_power_out_of_its_port", ModGameTests::echoPort);
@@ -3266,6 +3267,27 @@ public final class ModGameTests {
             h.assertTrue(near.getEnergyHandler().getAmountAsLong() > 0, "it charged the furnace 5 blocks away");
             h.assertTrue(far.getEnergyHandler().getAmountAsLong() == 0, "not the one 12 blocks away");
             h.assertTrue(other.storage().getAmountAsLong() == 0, "and it never charges a cube");
+        });
+    }
+
+    /** Like a Glow Ink sheep it lights the block it stands in, as brightly as its charge: 15 full, 8 half, none empty. */
+    private static void energySheepGlows(GameTestHelper h) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 1, 0), new BlockPos(12, 1, 4))) h.setBlock(p, Blocks.STONE);
+        int capacity = com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.capacity();
+        int[][] cases = {{2, capacity, 15}, {6, capacity / 2, 8}, {10, 0, 0}};
+        for (int[] c : cases) {
+            Sheep sheep = sheepAt(h, new BlockPos(c[0], 2, 2), ResourcefulSheep.id("energy"));
+            com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.setCharge(sheep, c[1]);
+        }
+        h.succeedWhen(() -> {
+            for (int[] c : cases) {
+                // The light it places in its own block (its neighbours' light spills over, so not the block's brightness).
+                var state = h.getBlockState(new BlockPos(c[0], 2, 2));
+                int level = state.is(ModBlocks.SHEEP_GLOW.get()) ? state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.LEVEL) : 0;
+                h.assertTrue(level == c[2], "an Energy sheep holding " + c[1] + " FE lights its block at " + c[2] + ", got " + level);
+            }
+            // And it really is light: the full one's block is at 15.
+            h.assertTrue(h.getLevel().getBrightness(net.minecraft.world.level.LightLayer.BLOCK, h.absolutePos(new BlockPos(2, 2, 2))) == 15, "the full one's block is lit at 15");
         });
     }
 

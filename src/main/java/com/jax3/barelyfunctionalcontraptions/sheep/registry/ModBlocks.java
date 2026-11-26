@@ -292,7 +292,7 @@ public final class ModBlocks {
                     .instabreak()
                     .pushReaction(com.jax3.barelyfunctionalcontraptions.compat.Mc.PUSH_BREAKS)
                     .mapColor(MapColor.NONE)
-                    .lightLevel(state -> com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.LIGHT_LEVEL));
+                    .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepGlowBlock.LEVEL)));
 
     private ModBlocks() {}
 }
