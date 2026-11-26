@@ -1,10 +1,10 @@
 # Changelog
 
-## 1.5.7: storage, the Fleece Trawler, upgrade cards, the Static Generator, the Hume Field Generator, the Machine Status Panel, the Explosive sheep and the Implosion Chamber, and a purple Echo Chamber (20–26 November 2026)
+## 1.5.7: storage, the Fleece Trawler, upgrade cards, the Static Generator, the Hume Field Generator, the Machine Status Panel, the Explosive sheep and the Implosion Chamber, the Energy sheep, and a purple Echo Chamber (20–26 November 2026)
 
 New contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage (crates and a controller that links them into one store), a fishing
 machine driven by a new sea-going sheep, upgrade cards for the processing machines, a mid-game generator that runs on static, a late-game
-generator with a random output and no buffer, a sheep that blows its own fleece off and a chamber that uses it to crack stone, and a wall screen that keeps an eye on all your machines. The Echo Chamber is recoloured to match the other machines, and machine recipes take Copper Wool from your
+generator with a random output and no buffer, a sheep that blows its own fleece off and a chamber that uses it to crack stone, a sheep that charges machines and tools wirelessly, and a wall screen that keeps an eye on all your machines. The Echo Chamber is recoloured to match the other machines, and machine recipes take Copper Wool from your
 sheep where they took Copper Ingots. They come after 1.5.5,
 in 1.5.7. Numbers are the defaults; almost all of them can be changed in the synced config.
 
@@ -109,6 +109,20 @@ Cobblestone into Gravel, and Gravel into Sand**, with the blasts of the Explosiv
 - **Config:** `[implosion_chamber]`: `radius` (2), `sparkInterval` (100), `sparkEnergy` (1,000), `batch` (8),
   `capacity` (20,000), `maxInput` (1,000), `explosiveRegrowSeconds` (20).
 - **Test world:** cell (4, 6) (see below).
+
+### Power: the Energy sheep, a wireless charger
+A new themed sheep, infused with a **Hume Energy Cube** (2 Lightning Rods round it at the altar). Its fleece is made of
+Hume Energy Cube, with little cubes on its back, and it crackles with sparks while it holds charge.
+- **Drains cubes:** every half second it draws up to **2,000 FE a tick** from the Hume Energy Cubes within **3 blocks**
+  of it into its fleece, which holds **100,000 FE**. Pen it beside a cube bank.
+- **Charges everything round it, wirelessly:** it shares up to **2,000 FE a tick** between every block that takes FE
+  (machines; not Hume Energy Cubes or cables) and every powered item (tools, armour, anything that holds FE, from other
+  mods too) in the inventories of players within **8 blocks**, a fair share each. Sparks arc to what it charges.
+- Only a grown sheep with its fleece on works; a sheared one keeps its charge until its wool grows back.
+- **Jade** shows its charge. Its wool separates into Redstone and Copper, with a chance of Glowstone. **Advancement:**
+  *Static Cling*; Energy Wool joins the *Fleece of Every Colour* challenge (now 28 wools).
+- **Config:** a new `[energy_sheep]` section: `capacity`, `drainRadius`, `drainPerTick`, `chargeRadius`,
+  `chargePerTick`. For data packs: a new `charged` appearance feature.
 
 ### Production: the Fleece Trawler and the Tide sheep
 A dockside winch that **fishes the pool in front of it**. It needs no power: **Tide sheep swimming in the pool drive

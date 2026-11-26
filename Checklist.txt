@@ -29,7 +29,7 @@ Logistics
 Power
 -----
 [ ] 9. Energy tiers or a capacitor
-        A capacitor item that charges tools, plus a wireless charger.
+        A capacitor item that charges tools. (The wireless charger is done: the Energy sheep.)
 
 Resource generation
 -------------------

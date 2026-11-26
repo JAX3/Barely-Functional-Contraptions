@@ -1,0 +1,41 @@
+{
+  "feeding_item": "barelyfunctionalcontraptions:hume_energy_cube",
+  "feeding_amount": 1,
+  "wool_color": "#9A52F0",
+  "accent_color": "#FFE14A",
+  "category": "material",
+  "wool_drop_count": 1,
+  "infusion_uses": 1,
+  "separator": {
+    "primary_output": "minecraft:redstone",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "secondary_output": "minecraft:copper_ingot",
+    "secondary_count": 1,
+    "bonus_output": {
+      "item": "minecraft:glowstone_dust",
+      "chance": 0.1
+    },
+    "energy_cost": 20000,
+    "processing_ticks": 100
+  },
+  "growth_item": "barelyfunctionalcontraptions:hume_energy_cube",
+  "appearance": {
+    "features": [
+      "charged"
+    ],
+    "feature_color": "#FFE14A",
+    "block_wool": true
+  },
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:lightning_rod",
+        "count": 2
+      }
+    ]
+  }
+}

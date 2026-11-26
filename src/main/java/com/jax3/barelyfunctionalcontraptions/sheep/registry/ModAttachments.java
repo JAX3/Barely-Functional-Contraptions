@@ -45,5 +45,12 @@ public final class ModAttachments {
                             fatigue -> fatigue.ticks() > 0)
                     .build());
 
+    /** FE an Energy sheep holds in its fleece. Persisted while it holds any, and synced (its sparks, Jade). */
+    public static final Supplier<AttachmentType<Integer>> SHEEP_CHARGE = REGISTER.register("sheep_charge",
+            () -> AttachmentType.builder(() -> 0)
+                    .serialize(com.mojang.serialization.Codec.INT.fieldOf("fe"), charge -> charge > 0)
+                    .sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT)
+                    .build());
+
     private ModAttachments() {}
 }

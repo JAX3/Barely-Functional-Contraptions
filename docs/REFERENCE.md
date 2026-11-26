@@ -299,6 +299,7 @@ The **Infusion Altar** is a powered pedestal. Put the feeding item in its **cent
 | Warden | Echo Shard | 4 Sculk, 4 Amethyst Shards, 1 Sculk Catalyst | 200,000 FE |
 | Tide | Prismarine Crystals | 2 Prismarine, 1 Nautilus Shell | 20,000 FE |
 | Explosive | TNT | 2 Gunpowder, 1 Fire Charge | 20,000 FE |
+| Energy | Hume Energy Cube | 2 Lightning Rods | 20,000 FE |
 | Common: Stone, Wood, Coal, Copper, Hay, Snow, Red and Brown Mushroom | the resource | 2 of its blocks (Stone, logs, Block of Coal, Block of Copper, Hay Bales, Snow Blocks, mushroom blocks), 1 Wheat | 20,000 FE |
 | Uncommon: Iron, Gold, Redstone, Lapis, Quartz, Glow Ink, Spider, Skeleton | the resource | 2 of its blocks (Blocks of Iron, Gold, Redstone, Lapis, Quartz; Glowstone; Cobwebs; Bone Blocks), 1 Golden Carrot | 20,000 FE |
 | Rare: Diamond, Emerald, Blaze, Ghast | the resource | 2 of its blocks (Blocks of Diamond, Emerald; Magma Blocks; Soul Sand), 1 Golden Apple | 20,000 FE |
@@ -793,6 +794,19 @@ I H I      H = Hopper
 - **Machine Status Panel:** *Hauling* (with how far through the haul), *No water*, *No sheep*, *Tangled* or *Output full*.
 - **Advancement:** *Reel Ewe In*, for being near one when it hauls up a resource on a lure.
 - Mine it with a pickaxe. **Config:** `[fleece_trawler]`: `haulTicks` (600), `maxSheep` (4), `minPool` (18), `lureChance` (0.3), `lureUses` (8), `tangleChance` (0.04), `straySheepChance` (0.005), `waterBonus` and `rainBonus` (1.25).
+
+### Energy sheep
+A themed sheep infused with a **Hume Energy Cube** (2 Lightning Rods round it at the altar). Its fleece is made of Hume Energy Cube, with little cubes on its back, and it crackles with sparks while it holds charge. It's a **wireless charger on legs**:
+
+- **Drains:** every half second it draws up to **2,000 FE a tick** (`drainPerTick`) from the Hume Energy Cubes within **3 blocks** of it (`drainRadius`) into its fleece, which holds **100,000 FE** (`capacity`).
+- **Charges:** it shares up to **2,000 FE a tick** (`chargePerTick`) between everything within **8 blocks** (`chargeRadius`): every block that takes FE (machines, generators' buffers; not Hume Energy Cubes or cables) and every powered item (tools, armour, anything that holds FE) in nearby players' inventories. Each gets a fair share, and sparks arc to what it charges.
+- Only a grown sheep with its fleece on does either; sheared, it keeps its charge until its wool grows back.
+- **Jade** shows its charge. Its wool separates into Redstone and Copper, with a chance of Glowstone. **Advancement:** *Static Cling*.
+- **Config:** `[energy_sheep]`: `capacity` (100,000), `drainRadius` (3), `drainPerTick` (2,000), `chargeRadius` (8), `chargePerTick` (2,000).
+
+| An Energy sheep beside its cube bank | Jade |
+|---|---|
+| ![An Energy sheep in a fleece of Hume Energy Cube, little cubes on its back, beside a bank of Hume Energy Cubes](screenshots/118_energy_sheep.png) | ![Jade on an Energy sheep: Infused Energy, 100 shearings left, Charge 98,000 / 100,000 FE](screenshots/118_energy_sheep_jade.png) |
 
 ### Implosion Chamber
 A riveted blue-steel blast vessel with a round blast door on its front. It **cracks Cobblestone into Gravel, and Gravel into Sand**, with the blasts of **Explosive sheep** (infused with TNT) in the pen round it.

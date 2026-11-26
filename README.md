@@ -149,7 +149,7 @@ Put a resource in the Infusion Altar, such as an Iron Ingot, a Diamond or a Red 
 
 ### Themed Sheep
 
-Thirteen resources turn sheep into little versions of their mob: dragon wings, Wither skulls, a giant screaming Ghast, a burning Blaze, a glowing Glow Ink sheep, a Snow sheep that leaves snow where it walks, an Explosive sheep in a TNT fleece that pops its wool off when you light its fuse, and more. Each has its own advancement.
+Fourteen resources turn sheep into little versions of their mob: dragon wings, Wither skulls, a giant screaming Ghast, a burning Blaze, a glowing Glow Ink sheep, a Snow sheep that leaves snow where it walks, an Explosive sheep in a TNT fleece that pops its wool off when you light its fuse, an Energy sheep that drains Hume Energy Cubes and charges the machines and tools round it wirelessly, and more. Each has its own advancement.
 
 ![Three Explosive sheep in TNT fleeces, little TNT blocks and a fuse on each back](docs/screenshots/116_explosive_sheep.png)
 

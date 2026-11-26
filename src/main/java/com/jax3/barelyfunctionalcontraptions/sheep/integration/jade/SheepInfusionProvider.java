@@ -48,6 +48,12 @@ public enum SheepInfusionProvider implements IEntityComponentProvider {
         } else {
             tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.uses_left", infusion.usesRemaining()).withStyle(ChatFormatting.GRAY));
         }
+        // An Energy sheep: the charge in its fleece.
+        if (resource.map(r -> r.appearance().has(com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Feature.CHARGED)).orElse(false)) {
+            tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.sheep_charge",
+                    String.format(java.util.Locale.ROOT, "%,d", com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.charge(entity)),
+                    String.format(java.util.Locale.ROOT, "%,d", com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.capacity())).withColor(0xFFE14A));
+        }
     }
 
     @Override

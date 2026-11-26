@@ -115,7 +115,12 @@ public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> fe
          * A TNT fuse on its back. Fire, lava, lightning or flint and steel light it: it hisses like a creeper and pops,
          * a small blast that breaks no blocks and hurts no one but blows its fleece off as wool (see ExplosiveSheep).
          */
-        FUSE;
+        FUSE,
+        /**
+         * It drains Hume Energy Cubes near it into its fleece and shares the charge out, wirelessly, to the machines and
+         * the powered tools of players round it; it crackles with sparks while it holds charge (see EnergySheep).
+         */
+        CHARGED;
 
         public static final Codec<Feature> CODEC = StringRepresentable.fromEnum(Feature::values);
 

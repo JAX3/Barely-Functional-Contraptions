@@ -74,6 +74,7 @@ public final class ResourcefulSheep {
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.armor.MuffledEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.class);
+        NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.class);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.sheep.command.ResourcefulSheepCommand.class);
     }
 

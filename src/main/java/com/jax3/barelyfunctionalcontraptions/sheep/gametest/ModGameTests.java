@@ -182,6 +182,8 @@ public final class ModGameTests {
         ECHO_TESTS.put("implosion_chamber_needs_sheep_power_and_stone", ModGameTests::implosionNeeds);
         ECHO_TESTS.put("implosion_chamber_on_the_status_panel", ModGameTests::implosionReport);
         ECHO_TESTS.put("explosive_sheep_regrow_their_wool_quickly", ModGameTests::explosiveRegrows);
+        ECHO_TESTS.put("energy_sheep_drains_cubes_and_charges_machines", ModGameTests::energySheepCharges);
+        ECHO_TESTS.put("energy_sheep_does_nothing_sheared", ModGameTests::energySheepSheared);
         ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
         ECHO_TESTS.put("echo_chamber_hears_vibrations_but_not_through_wool", ModGameTests::echoHearing);
         ECHO_TESTS.put("echo_chamber_pushes_power_out_of_its_port", ModGameTests::echoPort);
@@ -738,6 +740,7 @@ public final class ModGameTests {
         expected.put("ghast", List.of(Feature.TENTACLES));
         expected.put("tide", List.of(Feature.FINS));
         expected.put("explosive", List.of(Feature.FUSE));
+        expected.put("energy", List.of(Feature.CHARGED));
         expected.forEach((name, features) -> {
             SheepResource resource = registry.byId(ResourcefulSheep.id(name)).orElseThrow(() -> new AssertionError("missing themed sheep " + name));
             for (var feature : features) {
@@ -820,13 +823,13 @@ public final class ModGameTests {
 
     private static void themedAdvancements(GameTestHelper h) {
         var server = h.getLevel().getServer();
-        for (String name : List.of("hay", "snow", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast", "tide", "explosive")) {
+        for (String name : List.of("hay", "snow", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast", "tide", "explosive", "energy")) {
             var adv = server.getAdvancements().get(ResourcefulSheep.id("contraptions/sheep/" + name));
             h.assertTrue(adv != null && adv.value().parent().map(ResourcefulSheep.id("contraptions/infuse_sheep")::equals).orElse(false),
                     "themed advancement " + name + " is loaded under Infuse a Sheep");
         }
         var every = server.getAdvancements().get(ResourcefulSheep.id("contraptions/every_wool"));
-        h.assertTrue(every != null && every.value().criteria().size() == 27, "the every-wool challenge has one criterion per built-in wool");
+        h.assertTrue(every != null && every.value().criteria().size() == 28, "the every-wool challenge has one criterion per built-in wool");
         h.assertTrue(every.value().criteria().keySet().containsAll(SheepResourceRegistry.server().all().stream()
                 .filter(r -> r.id().getNamespace().equals(ResourcefulSheep.MOD_ID)).map(r -> r.id().getPath()).toList()), "every built-in resource is in the challenge");
 
@@ -3234,6 +3237,54 @@ public final class ModGameTests {
             setting.set(old);
             h.assertTrue(!explosive.isSheared(), "the Explosive sheep regrew its wool on its own");
             h.assertTrue(iron.isSheared(), "an Iron sheep on stone didn't");
+            h.succeed();
+        });
+    }
+
+    // ------------------------------------------------------------------ energy sheep
+
+    /**
+     * An Energy sheep drains the charged Hume Energy Cube next to it and charges, wirelessly, a Powered Furnace 5 blocks
+     * away; not one 12 blocks away, and never another cube (in charge range, but cubes are what it drains).
+     */
+    private static void energySheepCharges(GameTestHelper h) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 1, 0), new BlockPos(20, 1, 6))) h.setBlock(p, Blocks.STONE);
+        h.setBlock(new BlockPos(3, 2, 3), ModBlocks.HUME_ENERGY_CUBE.get());
+        var cube = h.getBlockEntity(new BlockPos(3, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
+        cube.storage().set((int) cube.storage().getCapacityAsLong());
+        long full = cube.storage().getAmountAsLong();
+        h.setBlock(new BlockPos(8, 2, 3), ModBlocks.HUME_ENERGY_CUBE.get());
+        var other = h.getBlockEntity(new BlockPos(8, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
+        h.setBlock(new BlockPos(9, 2, 1), ModBlocks.POWERED_FURNACE.get());
+        h.setBlock(new BlockPos(16, 2, 3), ModBlocks.POWERED_FURNACE.get());
+        var near = h.getBlockEntity(new BlockPos(9, 2, 1), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity.class);
+        var far = h.getBlockEntity(new BlockPos(16, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity.class);
+        Sheep sheep = sheepAt(h, new BlockPos(4, 2, 3), ResourcefulSheep.id("energy"));
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.isEnergySheep(sheep), "a Hume Energy Cube makes an Energy sheep");
+        h.succeedWhen(() -> {
+            h.assertTrue(cube.storage().getAmountAsLong() < full, "it drained the cube next to it");
+            h.assertTrue(near.getEnergyHandler().getAmountAsLong() > 0, "it charged the furnace 5 blocks away");
+            h.assertTrue(far.getEnergyHandler().getAmountAsLong() == 0, "not the one 12 blocks away");
+            h.assertTrue(other.storage().getAmountAsLong() == 0, "and it never charges a cube");
+        });
+    }
+
+    /** Sheared, it neither drains nor charges, and keeps what it holds until its wool grows back. */
+    private static void energySheepSheared(GameTestHelper h) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 1, 0), new BlockPos(10, 1, 6))) h.setBlock(p, Blocks.STONE);
+        h.setBlock(new BlockPos(3, 2, 3), ModBlocks.HUME_ENERGY_CUBE.get());
+        var cube = h.getBlockEntity(new BlockPos(3, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
+        cube.storage().set((int) cube.storage().getCapacityAsLong());
+        long full = cube.storage().getAmountAsLong();
+        h.setBlock(new BlockPos(6, 2, 3), ModBlocks.POWERED_FURNACE.get());
+        var furnace = h.getBlockEntity(new BlockPos(6, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity.class);
+        Sheep sheep = sheepAt(h, new BlockPos(4, 2, 3), ResourcefulSheep.id("energy"));
+        sheep.setSheared(true);
+        com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.setCharge(sheep, 5_000);
+        h.runAfterDelay(40, () -> {
+            h.assertTrue(cube.storage().getAmountAsLong() == full, "a sheared Energy sheep drains nothing");
+            h.assertTrue(furnace.getEnergyHandler().getAmountAsLong() == 0, "or charges anything");
+            h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.charge(sheep) == 5_000, "and keeps its charge");
             h.succeed();
         });
     }

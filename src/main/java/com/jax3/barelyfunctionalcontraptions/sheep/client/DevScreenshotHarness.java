@@ -321,6 +321,10 @@ public final class DevScreenshotHarness {
             blockWoolTick(mc, server);
             return;
         }
+        if ("energy_sheep".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            energySheepTick(mc, server);
+            return;
+        }
         if ("implosion_chamber".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             implosionChamberTick(mc, server);
             return;
@@ -2264,6 +2268,56 @@ public final class DevScreenshotHarness {
     }
 
     private static final java.util.List<net.minecraft.world.entity.animal.sheep.Sheep> explosiveSheep = new java.util.ArrayList<>();
+
+    /**
+     * An Energy sheep beside a charged bank of Hume Energy Cubes, sparks arcing from it to two Powered Furnaces a few
+     * blocks off; then Jade on the sheep and on a furnace: {@code -PharnessScene=energy_sheep}.
+     */
+    private static void energySheepTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, 0, -12), origin.offset(8, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-8, -1, -12), origin.offset(8, -1, 2))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+                BlockPos bank = origin.offset(-4, 0, -6);
+                for (BlockPos p : new BlockPos[]{bank, bank.above(), bank.north(), bank.north().above()}) {
+                    level.setBlock(p, ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
+                    if (level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity cube) {
+                        cube.storage().set((int) cube.storage().getCapacityAsLong());
+                    }
+                }
+                for (BlockPos p : new BlockPos[]{origin.offset(3, 0, -9), origin.offset(4, 0, -4)}) {
+                    level.setBlock(p, ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+                }
+                var energy = ResourcefulSheep.id("energy");
+                int uses = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(energy).orElseThrow().effectiveInfusionUses();
+                var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                sheep.snapTo(bank.getX() + 2.0, origin.getY(), bank.getZ() + 0.0, 250, 0);
+                sheep.setNoAi(true);
+                level.addFreshEntity(sheep);
+                com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
+                        com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(energy, uses));
+            });
+            case 62 -> setHudHidden(mc, true);
+            case 64 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 30", origin.getX() + 0.5, origin.getY() + 3.0, origin.getZ() + 1.5));
+            case 110 -> shot(mc, "118_energy_sheep");
+            case 112 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 130 18", origin.getX() + 1.0, origin.getY() + 0.2, origin.getZ() - 3.5));
+            case 140 -> shot(mc, "118_energy_sheep_close");
+            case 142 -> {
+                command(server, "gamemode creative @a");
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 135 38", origin.getX() - 0.5, origin.getY() + 0.0, origin.getZ() - 4.5));
+            }
+            case 146 -> { setHudHidden(mc, false); McClient.clearChat(mc); }
+            case 170 -> shot(mc, "118_energy_sheep_jade");
+            case 176 -> mc.stop();
+            default -> {}
+        }
+    }
 
     /**
      * An Implosion Chamber loaded with Cobblestone in a grass pen with three Explosive sheep: the chamber, a sheep lit by

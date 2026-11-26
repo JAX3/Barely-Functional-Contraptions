@@ -1,0 +1,25 @@
+{
+  "parent": "barelyfunctionalcontraptions:contraptions/infuse_sheep",
+  "display": {
+    "icon": {
+      "id": "barelyfunctionalcontraptions:hume_energy_cube"
+    },
+    "title": {
+      "translate": "advancements.barelyfunctionalcontraptions.sheep.energy.title"
+    },
+    "description": {
+      "translate": "advancements.barelyfunctionalcontraptions.sheep.energy.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}
