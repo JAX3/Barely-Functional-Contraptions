@@ -234,7 +234,7 @@ wool, or just quieter.
   Iron Ingot for an Iron sheep.
 - Blue Steel is in `#c:ingots`, and its block in `#c:storage_blocks`.
 
-### The Echo Chamber in the machines' colours
+### The Echo Chamber: the machines' colours and a sculk recipe
 The Echo Chamber was the only machine in sculk's cyan. It now wears the blue steel and purple of every other machine,
 so it sits with the Hume Field Generator and the rest instead of standing out from them.
 - **Its glow is purple:** the resonator dish and the heart that breathes in its middle, the crown of fronds on its
@@ -246,6 +246,14 @@ so it sits with the Hume Field Generator and the rest instead of standing out fr
   casing.
 - **The same purple everywhere else:** its window's text and strip, its Jade tooltip, its JEI page and its
   working-area outline.
+- **Recipe: the Echo Shards and the Sculk Wool swap places.** Sculk Wool Bales (from Warden sheep) now sit where the
+  three Echo Shards were, and a single Echo Shard sits in the middle where the bale was:
+
+  ```
+  I W I      I = Block of Blue Steel, W = Sculk Wool Bale
+  W E W      E = Echo Shard
+  B M B      B = Blackstone, M = Functional Machine Block
+  ```
 - Only its looks changed. It works exactly as before, Echo Chambers already built just change colour, and its Warden
   sheep and their sculk stay cyan.
 
@@ -417,7 +425,7 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 - **Model:** blue-steel casing lined with sculk, a big resonator dish that pulses, foam walls, louvred vents, and
   a crown of sculk fronds on its roof like the Warden sheep's ears. (Recoloured purple in 1.5.7.)
 - **Recipe:** Iron Block, Echo Shard and Iron Block on top; Echo Shards either side of a Warden Wool Bale in the
-  middle; Blackstone, a Functional Machine Block and Blackstone on the bottom.
+  middle; Blackstone, a Functional Machine Block and Blackstone on the bottom. (Changed in 1.5.7.)
 - **JEI:** an *Echo Chamber* page and an information page. **Jade:** status, output, herd, noise, steadiness and
   energy, from any of its blocks.
 - New recipe ingredient `barelyfunctionalcontraptions:wool_bale` for data packs, like `resource_wool`.

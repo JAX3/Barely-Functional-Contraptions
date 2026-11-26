@@ -591,8 +591,8 @@ C T C      C = Copper Block, T = Fluid Tank
 A late-game generator, **3x3x3**, that turns **noise** into power. Warden sheep stand in a pen in front of its dish and listen for vibrations; keep the noise around it steady and in its sweet spot. Its casing is the machines' blue steel lined with sculk: a big resonator dish on the front whose rings pulse outward from a glowing heart, egg-crate foam walls between baffle ribs, a power port between louvred vents at the back, and a sculk roof with a catalyst dome in a crown of sculk fronds, the biggest two like the Warden sheep's ears.
 
 ```
-I E I      I = Block of Blue Steel, E = Echo Shard
-E W E      W = Warden Wool Bale
+I W I      I = Block of Blue Steel, E = Echo Shard
+W E W      W = Sculk Wool Bale (from Warden sheep)
 B M B      B = Blackstone, M = Functional Machine Block
 ```
 
@@ -607,7 +607,7 @@ B M B      B = Blackstone, M = Functional Machine Block
 - **Shriek:** too loud for 10 seconds and the room shrieks like a sculk shrieker: shriek rings rise off its roof, players in survival within 16 blocks of its dish get Darkness for 10 seconds, and it stops for a minute. Out of the loud end, the shriek meter drains again.
 - **Window:** right-click any block of it. Left, its energy gauge. In the panel: the herd and output, the **noise meter** (16 segments from silence to 15: amber is too quiet, green the sweet spot, red too loud, lit up to the noise level now), the steadiness bar, and two small bars under it: drowsiness (towards its sheep falling asleep) and the shriek meter (towards a shriek; after one, the cooldown draining). Bottom: a status lamp and line. Every part has a tooltip, and the button top right shows or hides its listening pen (so does sneak-right-click).
 - **Comparator:** against any block of it, reads the noise level, 0-15, for circuits that turn the noise up or down.
-- **Recipe:** see above: three Echo Shards, two Blocks of Blue Steel, a Warden Wool Bale, two Blackstone and a Functional Machine Block. It needs a pickaxe; breaking any block of it drops the one machine.
+- **Recipe:** see above: three Sculk Wool Bales, an Echo Shard, two Blocks of Blue Steel, two Blackstone and a Functional Machine Block. It needs a pickaxe; breaking any block of it drops the one machine.
 - **JEI:** an *Echo Chamber* page (the Warden sheep, a note block for the noise, the sweet spot, and the power for one to four sheep with a steady noise and an erratic one) and an information page. **Jade:** its status, output, herd, noise level and steadiness, how drowsy or close to shrieking it is, and its stored energy, whichever of its blocks you look at.
 - **Advancement:** ⭐ **Good Vibrations** (challenge), for being within 16 blocks when one starts listening with its noise in the sweet spot.
 - Still to come: sculk catalysts that wear out, Echo Shard boosts and fleece fatigue.
@@ -622,7 +622,7 @@ B M B      B = Blackstone, M = Functional Machine Block
 | ![The Echo Chamber listening: three Warden sheep in its outlined pen and a note block beside it](screenshots/wip_echo_chamber_listening.png) | ![The Echo Chamber after a shriek: the sky gone dark with Darkness and shriek rings rising off its roof](screenshots/wip_echo_chamber_shriek.png) |
 | ![Its window while listening: 3 / 4 Warden sheep, 18,000 FE/t, the noise meter lit to 5 at the start of the green sweet spot, fully steady](screenshots/wip_echo_chamber_gui.png) | ![Its window after a shriek: 0 FE/t, the noise meter lit into the red, the cooldown bar full, and Shrieked: back in 57s](screenshots/wip_echo_chamber_gui_shriek.png) |
 | ![Jade on its dish: Echo Chamber, its status, herd, noise level and steadiness, and energy](screenshots/wip_echo_chamber_jade.png) | ![JEI's Echo Chamber page: Warden sheep, the chamber and a note block, the sweet spot 5-10, and the power for one to four sheep](screenshots/wip_echo_chamber_jei.png) |
-| ![JEI showing its recipe: Iron Blocks either side of an Echo Shard, Echo Shards either side of a Warden Wool Bale, and Blackstone either side of a Functional Machine Block](screenshots/wip_echo_chamber_jei_recipe.png) | |
+| ![JEI showing its recipe: Blocks of Blue Steel either side of a Sculk Wool Bale, Sculk Wool Bales either side of an Echo Shard, and Blackstone either side of a Functional Machine Block](screenshots/wip_echo_chamber_jei_recipe.png) | |
 
 <a id="sheep-attraction"></a>
 
