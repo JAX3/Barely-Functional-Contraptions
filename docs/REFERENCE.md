@@ -628,7 +628,7 @@ B M B      B = Blackstone, M = Functional Machine Block
 
 ### Hume Field Generator
 
-A late-game generator, 2x2 and three blocks tall (two and three-quarters with its emitter), built like the Echo Chamber: a steel plinth and lid on chunky corner pillars lit with Hume purple, a framed window in each wall onto its flickering core and three field coils, and an emitter on the lid. It fills the space east, south and above where it's placed, and won't place if any of that is taken. Breaking any of its twelve blocks removes the whole machine and drops one generator (a pickaxe breaks it quickly). Right-click any of its blocks for its window.
+A late-game generator, 2x2 and three blocks tall (two and three-quarters with its emitter), built in the Echo Chamber's casing: its bolted plinth and lid, steel corner pillars, and on each side a plate wall with a window sunk in a trim bezel onto its flickering core and three field coils, a power port below it, and an emitter on the lid. It fills the space east, south and above where it's placed, and won't place if any of that is taken. Breaking any of its twelve blocks removes the whole machine and drops one generator (a pickaxe breaks it quickly). Right-click any of its blocks for its window.
 
 - **Power:** every `ticksPerRoll` ticks (20, a second) its field rolls a **random** amount of FE per tick between `[hume_field_generator] minPerTick` and `maxPerTick` (200-1,200 FE/t by default, 700 on average), and makes that much each tick until the next roll.
 - **No buffer:** that tick's power goes straight into whatever touches any of its blocks (Energy Cables, Hume Energy Cubes, machines), offered to a different neighbour first each tick. Whatever they can't take is **lost**, and nothing can pull power out of it. On its own it wastes everything; a Hume Energy Cube against it catches all of it and evens out the swings.
@@ -641,7 +641,7 @@ A late-game generator, 2x2 and three blocks tall (two and three-quarters with it
 
 | From the front | Close up |
 |---|---|
-| ![The 2x2 Hume Field Generator beside a Hume Energy Cube: a steel plinth and lid on four corner pillars with purple light strips, a framed purple-tinted window in each wall, and an emitter on top](screenshots/wip_hume_field_front.png) | ![Close up of the Hume Field Generator's front: the core and its three field coils glowing through the purple window, framed in steel trim](screenshots/wip_hume_field_close.png) |
+| ![The 2x2 Hume Field Generator beside a Hume Energy Cube: a steel plinth and lid with bolted bands on four steel corner pillars, a purple-tinted window sunk in a trim bezel on each wall with a power port below it, and an emitter on top](screenshots/wip_hume_field_front.png) | ![Close up of the Hume Field Generator's front: the core and its three field coils glowing through the purple window in its trim bezel, and the yellow power port below](screenshots/wip_hume_field_close.png) |
 
 | A pulse | Its window |
 |---|---|

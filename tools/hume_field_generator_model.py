@@ -23,24 +23,9 @@ def paint(rows, key):
     return im
 
 # ---------------------------------------------------------------- textures
-for name in ['plate', 'trim', 'bottom']:
+# The casing is the Echo Chamber's, unchanged: its plates, trim, bolted band, pillars and power port.
+for name in ['plate', 'trim', 'bottom', 'band', 'pillar', 'port']:
     shutil.copy(os.path.join(ECHO, name + '.png'), os.path.join(TEX, name + '.png'))
-
-# The plinth's and lid's sides: the Echo Chamber's band, its dark strip lit with Hume purple.
-band = Image.open(os.path.join(ECHO, 'band.png')).convert('RGBA')
-for x in range(16):
-    if 5 <= x <= 9 or x <= 1 or x >= 13:
-        band.putpixel((x, 13), rgb(PU))
-        band.putpixel((x, 14), rgb(PD))
-band.save(os.path.join(TEX, 'band.png'))
-
-# Corner pillars are 5 pixels wide, drawn from the texture's first five columns: an outline, a highlight, a purple
-# glow strip with a rivet every 8 pixels, steel and shadow.
-pillar = []
-for y in range(16):
-    glow = 'r' if y % 8 == 3 else ('p' if y % 8 in (0, 7) else 'g')
-    pillar.append('oh' + glow + 'sd' + 's' * 11)
-paint(pillar, {'o': O, 'h': HI, 'g': PU, 'p': PD, 'r': RV, 's': ST, 'd': SH}).save(os.path.join(TEX, 'pillar.png'))
 
 # The emitter's collar seen from above: a steel ring round a purple well.
 collar = [
@@ -93,53 +78,59 @@ def all6(side, top=None, bottom=None):
 
 # Plinth and lid, the full footprint, like the Echo Chamber's.
 box([0, 0, 0], [32, 4, 32], all6('#band', '#plate', '#bottom'))
-box([0, 34, 0], [32, 38, 32], all6('#band', '#plate', '#plate'))
+box([0, 34, 0], [32, 38, 32], all6('#band', '#plate', '#plate'), v=(12, 16))  # the band's bolted rail, as the Echo's roof band
 # Chunky corner pillars, full height between them.
 for x in (0, 27):
     for z in (0, 27):
-        box([x, 4, z], [x + 5, 34, z + 5], {s: '#pillar' for s in SIDES}, u=(0, 5))
-# The four walls, each a steel frame round a big window onto the field core.
+        box([x, 4, z], [x + 5, 34, z + 5], {s: '#pillar' for s in SIDES})
+# The four walls, all alike (it has no front): a plate wall like the Echo Chamber's, with a window onto the field core
+# sunk in a trim bezel as the Echo's dish is, and under it a power port in a trim housing, as on the Echo's back,
+# since it pushes power out of every side.
 def wall(axis, plane, outward):
-    """One wall in the plane {axis} = plane (2 or 30): steel round a window, a trim frame standing out from it."""
-    def b(a1, a2, y1, y2, d1, d2, faces):
+    """One wall in the plane {axis} = plane (2 or 30)."""
+    def b(a1, a2, y1, y2, d1, d2, faces, **kw):
         if axis == 'z':
-            box([a1, y1, d1], [a2, y2, d2], faces)
+            box([a1, y1, d1], [a2, y2, d2], faces, **kw)
         else:
-            box([d1, y1, a1], [d2, y2, a2], faces)
+            box([d1, y1, a1], [d2, y2, a2], faces, **kw)
     out, inn = ('north', 'south') if axis == 'z' else ('west', 'east')
     if outward > 0: out, inn = inn, out
     thin = (plane, plane + 1) if outward < 0 else (plane - 1, plane)
-    across = ['east', 'west'] if axis == 'z' else ['north', 'south']
-    steel = {out: '#plate', inn: '#plate'}
-    b(5, 27, 4, 9, *thin, dict(steel, up='#plate'))
-    b(5, 27, 29, 34, *thin, dict(steel, down='#plate'))
-    b(5, 9, 9, 29, *thin, dict(steel, **{across[1]: '#plate'}) if axis == 'z' else dict(steel, **{across[0]: '#plate'}))
-    b(23, 27, 9, 29, *thin, dict(steel, **{across[0]: '#plate'}) if axis == 'z' else dict(steel, **{across[1]: '#plate'}))
-    # The window's trim frame, two pixels wide and one proud of the wall, like the Echo Chamber's round its dish.
     proud = (plane - 1, plane) if outward < 0 else (plane, plane + 1)
-    trim = dict({out: '#trim', inn: '#trim', 'up': '#trim', 'down': '#trim', across[0]: '#trim', across[1]: '#trim'})
-    b(7, 25, 7, 9, *proud, trim)
-    b(7, 25, 29, 31, *proud, trim)
-    b(7, 9, 9, 29, *proud, trim)
-    b(23, 25, 9, 29, *proud, trim)
-    # The glass itself, tinted with the field, both ways round.
+    lo_side, hi_side = (['west', 'east'] if axis == 'z' else ['north', 'south'])
+    steel = {out: '#plate', inn: '#plate'}
+    # The plate round the window's opening (x 9-23, y 15-31).
+    b(5, 27, 4, 15, *thin, dict(steel, up='#plate'))
+    b(5, 27, 31, 34, *thin, dict(steel, down='#plate'))
+    b(5, 9, 15, 31, *thin, dict(steel, **{hi_side: '#plate'}))
+    b(23, 27, 15, 31, *thin, dict(steel, **{lo_side: '#plate'}))
+    # The bezel: trim two pixels wide, one proud of the wall, round the window.
+    trim = {f: '#trim' for f in (out, 'up', 'down', lo_side, hi_side)}
+    b(7, 25, 13, 15, *proud, trim)
+    b(7, 25, 31, 33, *proud, trim)
+    b(7, 9, 15, 31, *proud, trim)
+    b(23, 25, 15, 31, *proud, trim)
     mid = plane + 0.5 * (1 if outward < 0 else -1)
-    b(9, 23, 9, 29, mid, mid, {out: '#glass', inn: '#glass'})
+    b(9, 23, 15, 31, mid, mid, {out: '#glass', inn: '#glass'})
+    # The power port below it, in a trim housing standing out from the wall.
+    # It straddles the seam between the two blocks, so it's kept whole with the port's texture across all of it.
+    b(12, 20, 4.5, 12.5, *proud, {out: '#port', 'up': '#trim', 'down': '#trim', lo_side: '#trim', hi_side: '#trim'},
+      whole=True, uv={out: [0, 0, 16, 16], 'up': [0, 0, 8, 1], 'down': [0, 15, 8, 16], lo_side: [0, 0, 1, 8], hi_side: [0, 0, 1, 8]})
 wall('z', 2, -1)
 wall('z', 30, +1)
 wall('x', 2, -1)
 wall('x', 30, +1)
 # Inside: the core, flickering, with three field coils round it.
 box([12, 6, 12], [20, 32, 20], all6('#core'))
-for y in (10, 18, 26):
+for y in (16, 22, 28):
     box([9, y, 9], [23, y + 2, 10], all6('#coil'))
     box([9, y, 22], [23, y + 2, 23], all6('#coil'))
     box([9, y, 10], [10, y + 2, 22], {'east': '#coil', 'west': '#coil', 'up': '#coil', 'down': '#coil'})
     box([22, y, 10], [23, y + 2, 22], {'east': '#coil', 'west': '#coil', 'up': '#coil', 'down': '#coil'})
 # On the lid: the field emitter (a collar and a lens housing), and a bolt at each corner like the Echo Chamber's.
 box([10, 38, 10], [22, 40, 22], dict({s: '#trim' for s in SIDES}, up='#collar'), uv={'up': [0, 0, 16, 16]}, whole=True)
-box([11, 40, 11], [21, 44, 21], dict({s: '#pillar' for s in SIDES}, up='#lens'),
-    uv=dict({s: [0, 0, 5, 4] for s in SIDES}, up=[0, 0, 16, 16]), whole=True)
+box([11, 40, 11], [21, 44, 21], dict({s: '#trim' for s in SIDES}, up='#lens'),
+    uv=dict({s: [0, 0, 10, 4] for s in SIDES}, up=[0, 0, 16, 16]), whole=True)
 for x in (3, 26):
     for z in (3, 26):
         box([x, 38, z], [x + 3, 39.5, z + 3], dict({s: '#trim' for s in SIDES}, up='#trim'))
@@ -186,6 +177,8 @@ for bx in boxes:
                     uv = uv_for(face, lo, hi)
                     if 'u' in bx and face in SIDES:
                         uv[0], uv[2] = bx['u']
+                    if 'v' in bx and face in SIDES:
+                        uv[1], uv[3] = bx['v']
                     faces[face] = {'uv': [r(v) for v in uv], 'texture': tex}
                 if faces:
                     pieces.append(([x1, y1, z1], [x2, y2, z2], faces))
@@ -194,7 +187,7 @@ def element(f, t, faces, dy=0, scale=1.0):
     return {'from': [r(f[0] * scale), r((f[1] + dy) * scale), r(f[2] * scale)],
             'to': [r(t[0] * scale), r((t[1] + dy) * scale), r(t[2] * scale)], 'faces': faces}
 
-textures = {n: NS + n for n in ['band', 'plate', 'bottom', 'pillar', 'trim', 'glass', 'core', 'coil', 'collar', 'lens']}
+textures = {n: NS + n for n in ['band', 'plate', 'bottom', 'pillar', 'trim', 'glass', 'core', 'coil', 'collar', 'lens', 'port']}
 textures['particle'] = NS + 'plate'
 
 def model(elements, extra=None):

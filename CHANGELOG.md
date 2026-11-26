@@ -116,10 +116,12 @@ A new late-game generator, 2x2 and three blocks tall, whose field can't make up 
 Work in Progress tab and is now finished: in released jars, in the creative tab's Power section, and in the manual's
 **Power** tab (Late Game).
 - **Built like the other big machines,** the Echo Chamber above all:
-  - a steel plinth and lid with the same banding and rivets, their dark strip lit with Hume purple;
-  - chunky corner pillars with purple light strips;
-  - a window in each wall, framed in steel trim like the Echo Chamber's dish, with glass tinted the field's purple so
-    its flickering core and three coils glow through;
+  - the Echo Chamber's own casing: the same plates, the same dark bolted band round its plinth and lid, and the same
+    steel corner pillars;
+  - a plate wall on each side with a window sunk in a trim bezel, as the Echo Chamber's dish is, its glass tinted the
+    field's purple so its flickering core and three coils glow through;
+  - a power port under each window in a trim housing, like the one on the Echo Chamber's back, since it pushes power
+    out of every side;
   - an emitter on the lid, among four corner bolts.
 
   It fills the space east, south and above where it's placed, and breaking any of its twelve blocks drops one
