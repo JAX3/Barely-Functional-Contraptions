@@ -4,7 +4,8 @@
 
 New contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage (crates and a controller that links them into one store), a fishing
 machine driven by a new sea-going sheep, upgrade cards for the processing machines, a mid-game generator that runs on static, a late-game
-generator with a random output and no buffer, and a wall screen that keeps an eye on all your machines. The Echo Chamber is recoloured to match the other machines. They come after 1.5.5,
+generator with a random output and no buffer, and a wall screen that keeps an eye on all your machines. The Echo Chamber is recoloured to match the other machines, and machine recipes take Copper Wool from your
+sheep where they took Copper Ingots. They come after 1.5.5,
 in 1.5.7. Numbers are the defaults; almost all of them can be changed in the synced config.
 
 ### Storage: the Wool-Lined Crate
@@ -108,7 +109,7 @@ and its copper dome arcs the charge into power.
   information pages for the generator and the comb. **Jade:** status, output, herd, dome charge, combs and energy.
 - **Advancement:** *Shocking!* (goal), for being knocked back by an overcharged Static Generator.
 - **Recipes:** a Lightning Rod, two Copper Blocks, Redstone, two wool and a Functional Machine Block; a Copper Comb from
-  three Copper Ingots and a Brush.
+  three Copper Wool and a Brush.
 - New config section `[static_generator]`, and a chapter in the Contraptions Manual (Power → Mid Game).
 
 ### Power: the Hume Field Generator (late game)
@@ -246,6 +247,9 @@ take a **Copper Wool Bale** instead:
   running, a Copper sheep gives you everything else.
 - Copper Wool is any wool from a Copper sheep, and a bale is nine of it pressed in a Wool Packer. Blue Steel and
   copper blocks are unchanged.
+- In JEI, the manual and `docs/REFERENCE.md`, the recipes show the Copper Wool and bales. A new GameTest checks them:
+  Copper Wool makes Item Pipes and a Copper Ingot or another resource's wool doesn't, the Zero Point Energy Module
+  needs bales rather than single wool, and the Functional Machine Block still takes Copper Ingots.
 
 ### The Echo Chamber: the machines' colours and a sculk recipe
 The Echo Chamber was the only machine in sculk's cyan. It now wears the blue steel and purple of every other machine,
@@ -483,7 +487,8 @@ and 26.1 on NeoForge. Numbers are the defaults; almost all of them can be change
 - While it has food and no sheep, it calls the nearest sheep within 8 blocks, which hops onto the belt.
 - Its model has the machines' blue-steel casing, a metal gantry and an animated belt, and the sheep's legs move as it
   walks.
-- **Recipe:** two Iron Ingots, three wool, two Copper Ingots and a Functional Machine Block.
+- **Recipe:** two Iron Ingots, three wool, two Copper Ingots and a Functional Machine Block. (Changed in 1.5.7: Blue
+  Steel and Copper Wool.)
 - **Advancement:** ⭐ *Running Ewe Ragged* (goal).
 
 ### New items
