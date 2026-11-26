@@ -3,7 +3,10 @@
   "category": "redstone",
   "key": {
     "I": "barelyfunctionalcontraptions:blue_steel",
-    "C": "minecraft:copper_ingot",
+    "C": {
+      "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool",
+      "resource": "barelyfunctionalcontraptions:copper"
+    },
     "H": "minecraft:hopper",
     "P": "minecraft:piston",
     "M": "barelyfunctionalcontraptions:functional_machine_block",

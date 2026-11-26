@@ -2,7 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "C": "minecraft:copper_ingot",
+    "C": {
+      "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool",
+      "resource": "barelyfunctionalcontraptions:copper"
+    },
     "G": "#c:glass_blocks",
     "B": "minecraft:bucket"
   },

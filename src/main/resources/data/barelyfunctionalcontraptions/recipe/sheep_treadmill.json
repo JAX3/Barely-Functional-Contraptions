@@ -4,7 +4,10 @@
   "key": {
     "I": "barelyfunctionalcontraptions:blue_steel",
     "W": "#minecraft:wool",
-    "C": "minecraft:copper_ingot",
+    "C": {
+      "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool",
+      "resource": "barelyfunctionalcontraptions:copper"
+    },
     "M": "barelyfunctionalcontraptions:functional_machine_block"
   },
   "pattern": [

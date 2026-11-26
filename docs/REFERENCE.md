@@ -170,7 +170,7 @@ The crafting advancements are earned by getting the item into your inventory how
 
 ### Crafting
 
-![Mycelial Generator recipe: iron ingots top left and right, a red mushroom top middle, brown mushrooms left and right, a Functional Machine Block in the centre, copper ingots bottom left and right, a cauldron bottom middle](screenshots/recipe_mycelial_generator.png)
+![Mycelial Generator recipe: iron ingots top left and right, a red mushroom top middle, brown mushrooms left and right, a Functional Machine Block in the centre, Copper Wool Bales bottom left and right, a cauldron bottom middle](screenshots/recipe_mycelial_generator.png)
 
 The generator is mined with any pickaxe and drops itself. Its inventory is dropped when it is broken.
 
@@ -338,7 +338,7 @@ Put the wool into a **Mechanical Separator** and supply Forge Energy (FE).
 **Balance:** every wool separates into **2–4** of its resource (3 on average). With the default of 100 shearings per feeding, one Iron Ingot yields about 300 Raw Iron and one Diamond about 300 Diamonds, so infused sheep **multiply** resources a lot. (With `infusionUsesOverride = -1`, one Iron Ingot gives about 27 Raw Iron and one Diamond about 3 Diamonds.) The cost is the shearing time and the machine's energy. To tone it down, lower `primaryOutputMultiplier` (e.g. `0.34` brings it back to about 1 per wool), lower `infusionUsesOverride` (or set it to `-1`) or `infusionUsesMultiplier`, or set `primary_count` per resource.
 
 ### Crafting the separator
-![Mechanical Separator recipe: iron ingots and a hopper on top, pistons either side of a Functional Machine Block in the middle, copper ingots either side of shears along the bottom](screenshots/recipe_mechanical_separator.png)
+![Mechanical Separator recipe: iron ingots and a hopper on top, pistons either side of a Functional Machine Block in the middle, Copper Wool either side of shears along the bottom](screenshots/recipe_mechanical_separator.png)
 - Requires a stone pickaxe or better.
 - Hardness 3.5, blast resistance 6.
 - When broken, it keeps its stored energy and redstone mode.
@@ -360,7 +360,7 @@ An FE-powered machine that shears sheep for you and keeps the wool.
 - **Which mobs:** only those in the entity tag `#barelyfunctionalcontraptions:auto_shearable`, which is sheep by default. It never turns a mooshroom into a cow or takes a snow golem's pumpkin.
 - Its shears never wear out. Mine it with a stone pickaxe or better. When broken it keeps its stored energy and redstone mode, like the separator, and its wool drops on the ground.
 
-![Automatic Shears recipe: copper ingots top left and right, redstone top middle, shears left and right, a Functional Machine Block in the centre, iron ingots bottom left and right, a chest bottom middle](screenshots/recipe_automatic_shears.png)
+![Automatic Shears recipe: Copper Wool top left and right, redstone top middle, shears left and right, a Functional Machine Block in the centre, iron ingots bottom left and right, a chest bottom middle](screenshots/recipe_automatic_shears.png)
 
 | GUI | Area shown (spyglass button framed in blue) |
 |---|---|
@@ -487,7 +487,7 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 - **Jade** shows whether a module is linked, the gap to its partner and how much it and the pair make. If it isn't linked, it tells you it needs a module facing it in the same column.
 - The recipe makes **two** modules, one pair. Mine them with a stone pickaxe or better.
 
-![Zero Point Energy Module recipe: iron ingots top left and right, a beacon top middle, amethyst shards on the sides, a Functional Machine Block in the centre, copper ingots bottom left and right and a block of redstone bottom middle, making 2](screenshots/recipe_zero_point_energy_module.png)
+![Zero Point Energy Module recipe: iron ingots top left and right, a beacon top middle, amethyst shards on the sides, a Functional Machine Block in the centre, Copper Wool Bales bottom left and right and a block of redstone bottom middle, making 2](screenshots/recipe_zero_point_energy_module.png)
 
 ### New blocks at a glance
 
@@ -524,7 +524,7 @@ A mid-game generator, **two blocks tall**, that turns **friction** into power, l
 C R C      C = Copper Block, R = Redstone
 W M W      W = any wool, M = Functional Machine Block
 
-I I I      Copper Comb: I = Copper Ingot
+I I I      Copper Comb: I = Copper Wool
   B        B = Brush
 ```
 
@@ -744,7 +744,7 @@ When several files match, the most specific one wins: `sheep`, then `entity`, th
 - **Area:** its spyglass button, or a sneak-right-click with an empty hand, outlines the Blaze sheep's area in orange.
 - **Keeping its sheep close:** a Blaze sheep that wanders up to 4 blocks outside the area is called back in while it has room for more (fewer than 4). The attraction area shows as a faint dashed box. See [Sheep attraction](#sheep-attraction).
 - **JEI:** it's listed as a station for every smelting recipe.
-- **Recipe:** iron ingots in the corners and a redstone dust top middle, Furnaces either side of a Functional Machine Block, and a copper ingot bottom middle.
+- **Recipe:** iron ingots in the corners and a redstone dust top middle, Furnaces either side of a Functional Machine Block, and a Copper Wool bottom middle.
 
 ### Snow Sheep Chiller
 The Blaze Sheep Furnace's icy opposite: it **freezes water into Ice with the cold of Snow sheep** standing around it, and needs no power.
@@ -822,12 +822,12 @@ I H I      I = Blue Steel, H = Hopper
 - **Goes well with:** **Automatic Shears** on the same pen (the shears take the wool, the Seeder grows it back), and a **Static Generator**, whose sheep only count with their fleece on. Mine it with a pickaxe. **Config:** `[grass_seeder]` (see below).
 
 ### Sheep Treadmill
-A generator a sheep runs: a belt one block wide and two long in the machines' blue-steel casing, with a bundle of wheat hanging from a gantry at the front and the generator housing at the back. Crafted from two Blue Steel, three wool (the belt), two Copper Ingots and a Functional Machine Block:
+A generator a sheep runs: a belt one block wide and two long in the machines' blue-steel casing, with a bundle of wheat hanging from a gantry at the front and the generator housing at the back. Crafted from two Blue Steel, three wool (the belt), two Copper Wool and a Functional Machine Block:
 
 ```
 I . I      I = Blue Steel
 W W W      W = any wool
-C M C      C = Copper Ingot, M = Functional Machine Block
+C M C      C = Copper Wool, M = Functional Machine Block
 ```
 
 | A sheep walking, a sheared one, and an empty treadmill | Its window |
@@ -1018,9 +1018,9 @@ The Energy Cable's twin for fluids, in **blue** instead of purple. Pipes carry w
 - **Jade** on a pipe shows the network's size, how many blocks are plugged in and how much it is moving.
 
   ![Jade on a Fluid Pipe: Network: 9 pipes, 3 blocks plugged in; Moving 50 / 4,000 mB/t](screenshots/40_fluid_pipe_jade.png)
-- The recipe makes **8** pipes: copper ingots across the top and bottom, glass, a bucket and glass across the middle. Pipes break quickly and always drop themselves.
+- The recipe makes **8** pipes: Copper Wool across the top and bottom, glass, a bucket and glass across the middle. Pipes break quickly and always drop themselves.
 
-![Fluid Pipe recipe: copper ingots across the top and bottom rows, glass, a bucket and glass across the middle, making 8](screenshots/recipe_fluid_pipe.png)
+![Fluid Pipe recipe: Copper Wool across the top and bottom rows, glass, a bucket and glass across the middle, making 8](screenshots/recipe_fluid_pipe.png)
 
 ### Item Pipe
 The third of the set: the same pipe for **items**, in **yellow**. It moves wool, separator outputs and anything else between inventories.
@@ -1039,9 +1039,9 @@ The third of the set: the same pipe for **items**, in **yellow**. It moves wool,
 - **Jade** on a pipe shows the network size, how many blocks are plugged in and how many items a tick it is moving.
 
   ![Jade on an Item Pipe: Network: 3 pipes, 2 blocks plugged in; Moving 0 / 16 items/t](screenshots/42_item_pipe_jade.png)
-- The recipe makes **8** pipes: copper ingots across the top and bottom, glass, a hopper and glass across the middle.
+- The recipe makes **8** pipes: Copper Wool across the top and bottom, glass, a hopper and glass across the middle.
 
-![Item Pipe recipe: copper ingots across the top and bottom rows, glass, a hopper and glass across the middle, making 8](screenshots/recipe_item_pipe.png)
+![Item Pipe recipe: Copper Wool across the top and bottom rows, glass, a hopper and glass across the middle, making 8](screenshots/recipe_item_pipe.png)
 
 ### Pipe sides: modes and filters
 Each side where a Fluid or Item Pipe meets a block can be set up on its own, with the **Barely Functional Wrench**.

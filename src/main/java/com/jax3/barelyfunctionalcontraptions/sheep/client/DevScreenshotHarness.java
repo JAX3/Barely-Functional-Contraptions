@@ -829,9 +829,19 @@ public final class DevScreenshotHarness {
             for (int col = 0; col < recipe.getWidth(); col++) {
                 var ingredient = ingredients.get(row * recipe.getWidth() + col);
                 if (ingredient.isEmpty()) continue;
+                int slot = 1 + row * 3 + col; // slot 0 is the result
+                // A resource's wool or bale is one item with the resource in a component, so it's made, not looked up.
+                var custom = ingredient.get().getCustomIngredient();
+                if (custom instanceof com.jax3.barelyfunctionalcontraptions.sheep.recipe.ResourceWoolIngredient wool && wool.resource().isPresent()) {
+                    menu.getSlot(slot).set(com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(wool.resource().get(), 1));
+                    continue;
+                }
+                if (custom instanceof com.jax3.barelyfunctionalcontraptions.sheep.recipe.WoolBaleIngredient bale && bale.resource().isPresent()) {
+                    menu.getSlot(slot).set(com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(bale.resource().get(), 1));
+                    continue;
+                }
                 @SuppressWarnings("deprecation")
                 var item = ingredient.get().items().findFirst();
-                int slot = 1 + row * 3 + col; // slot 0 is the result
                 item.ifPresent(holderItem -> menu.getSlot(slot).set(new ItemStack(holderItem)));
             }
         }

@@ -3,7 +3,10 @@
   "category": "redstone",
   "key": {
     "I": "barelyfunctionalcontraptions:blue_steel",
-    "C": "minecraft:copper_ingot",
+    "C": {
+      "neoforge:ingredient_type": "barelyfunctionalcontraptions:wool_bale",
+      "resource": "barelyfunctionalcontraptions:copper"
+    },
     "B": "minecraft:beacon",
     "A": "minecraft:amethyst_shard",
     "M": "barelyfunctionalcontraptions:functional_machine_block",

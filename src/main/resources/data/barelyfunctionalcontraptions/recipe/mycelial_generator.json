@@ -7,7 +7,10 @@
     "I": "barelyfunctionalcontraptions:blue_steel",
     "M": "barelyfunctionalcontraptions:functional_machine_block",
     "R": "minecraft:red_mushroom",
-    "T": "minecraft:copper_ingot"
+    "T": {
+      "neoforge:ingredient_type": "barelyfunctionalcontraptions:wool_bale",
+      "resource": "barelyfunctionalcontraptions:copper"
+    }
   },
   "pattern": [
     "IRI",

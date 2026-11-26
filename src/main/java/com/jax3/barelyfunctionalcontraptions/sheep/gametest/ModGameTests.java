@@ -183,6 +183,7 @@ public final class ModGameTests {
         ECHO_TESTS.put("echo_chamber_falls_asleep_in_silence", ModGameTests::echoSleep);
         ECHO_TESTS.put("echo_chamber_shrieks_when_too_loud", ModGameTests::echoShriek);
         TESTS.put("echo_chamber_recipe_and_drop", ModGameTests::echoRecipeAndDrop);
+        TESTS.put("copper_wool_replaces_copper_ingots", ModGameTests::copperWoolRecipes);
         ECHO_TESTS.put("static_generator_counts_sheep_at_its_combs", ModGameTests::staticCountsSheep);
         ECHO_TESTS.put("static_generator_combs_oxidise_and_wax", ModGameTests::staticCombs);
         ECHO_TESTS.put("static_generator_arcs_into_its_buffer", ModGameTests::staticArcs);
@@ -3035,6 +3036,32 @@ public final class ModGameTests {
         var be = trawler(h, true);
         for (int i = 0; i < 4; i++) sheepAt(h, new BlockPos(3 + (i % 2) * 2, 2, 2 + (i / 2) * 2), ResourcefulSheep.id("tide"));
         h.succeedWhen(() -> h.assertTrue(be.hauls() > 0 || be.tangled(), "a haul: " + be.status() + " " + be.progressPercent() + "%"));
+    }
+
+    /**
+     * Recipes that took a Copper Ingot take Copper Wool now (a Copper Wool Bale for the mid- and late-game machines),
+     * and the Copper Ingot no longer does; the Functional Machine Block keeps its Copper Ingots, so a new world can
+     * still build the Infusion Altar that makes its first Copper sheep.
+     */
+    private static void copperWoolRecipes(GameTestHelper h) {
+        ItemStack wool = com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("copper"), 1);
+        ItemStack ironWool = com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("iron"), 1);
+        ItemStack bale = com.jax3.barelyfunctionalcontraptions.sheep.items.WoolBaleItem.create(ResourcefulSheep.id("copper"), 1);
+        ItemStack ingot = new ItemStack(Items.COPPER_INGOT), glass = new ItemStack(Items.GLASS), hopper = new ItemStack(Items.HOPPER);
+        ItemStack steel = new ItemStack(ModItems.BLUE_STEEL.get()), redstone = new ItemStack(Items.REDSTONE);
+        java.util.function.Function<ItemStack, List<ItemStack>> pipe = c -> List.of(c, c, c, glass, hopper, glass, c, c, c);
+        ItemStack pipes = craft(h, 3, 3, pipe.apply(wool));
+        h.assertTrue(pipes.is(ModItems.ITEM_PIPE.get()) && pipes.getCount() == 8, "Copper Wool makes 8 Item Pipes, got " + pipes);
+        h.assertTrue(craft(h, 3, 3, pipe.apply(ingot)).isEmpty(), "a Copper Ingot no longer makes them");
+        h.assertTrue(craft(h, 3, 3, pipe.apply(ironWool)).isEmpty(), "nor does Iron Wool");
+        ItemStack machine = new ItemStack(ModItems.FUNCTIONAL_MACHINE_BLOCK.get());
+        java.util.function.Function<ItemStack, List<ItemStack>> zpm = c -> List.of(steel, new ItemStack(Items.BEACON), steel,
+                new ItemStack(Items.AMETHYST_SHARD), machine, new ItemStack(Items.AMETHYST_SHARD), c, new ItemStack(Items.REDSTONE_BLOCK), c);
+        h.assertTrue(craft(h, 3, 3, zpm.apply(bale)).is(ModItems.ZERO_POINT_ENERGY_MODULE.get()), "a late-game machine takes Copper Wool Bales");
+        h.assertTrue(craft(h, 3, 3, zpm.apply(wool)).isEmpty(), "single Copper Wool won't do for it");
+        h.assertTrue(craft(h, 3, 3, List.of(steel, ingot, steel, ingot, redstone, ingot, steel, ingot, steel)).is(ModItems.FUNCTIONAL_MACHINE_BLOCK.get()),
+                "the Functional Machine Block still takes Copper Ingots");
+        h.succeed();
     }
 
     /** Crafts with whatever crafting recipe matches the grid, or EMPTY. */

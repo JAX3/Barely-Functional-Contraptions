@@ -7,7 +7,10 @@
     "M": "barelyfunctionalcontraptions:functional_machine_block",
     "C": "minecraft:chest",
     "R": "minecraft:redstone",
-    "T": "minecraft:copper_ingot"
+    "T": {
+      "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool",
+      "resource": "barelyfunctionalcontraptions:copper"
+    }
   },
   "pattern": [
     "TRT",

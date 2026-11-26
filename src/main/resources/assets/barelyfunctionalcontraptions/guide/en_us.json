@@ -174,7 +174,7 @@
         "- A comparator reads how charged its dome is (0-15).",
         "## Making it",
         "- Static Generator: a Lightning Rod on top; Copper Block, Redstone, Copper Block in the middle; wool, a Functional Machine Block and wool at the bottom.",
-        "- Copper Comb: three Copper Ingots over a Brush."
+        "- Copper Comb: three Copper Wool over a Brush."
       ]
     },
     {

@@ -234,6 +234,19 @@ wool, or just quieter.
   Iron Ingot for an Iron sheep.
 - Blue Steel is in `#c:ingots`, and its block in `#c:storage_blocks`.
 
+### Copper Wool in place of Copper Ingots
+Recipes that took a **Copper Ingot** now take **Copper Wool** from a Copper sheep, and the mid- and late-game machines
+take a **Copper Wool Bale** instead:
+- **Copper Wool:** the Mechanical Separator, Automatic Shears, Powered Furnace, Sheep Treadmill, Fluid Pipe, Item Pipe
+  and Copper Comb.
+- **Copper Wool Bale:** the Mycelial Generator and the Zero Point Energy Module.
+- **Still a Copper Ingot**, so a new world can get started: every sheep is infused at the Infusion Altar, which is built
+  on a Functional Machine Block and needs power to run. So the **Functional Machine Block**, the **Energy Cable** and
+  the **Wool Burner** keep their Copper Ingots, and the **Infusion Altar** keeps its Gold Ingots. Once the altar is
+  running, a Copper sheep gives you everything else.
+- Copper Wool is any wool from a Copper sheep, and a bale is nine of it pressed in a Wool Packer. Blue Steel and
+  copper blocks are unchanged.
+
 ### The Echo Chamber: the machines' colours and a sculk recipe
 The Echo Chamber was the only machine in sculk's cyan. It now wears the blue steel and purple of every other machine,
 so it sits with the Hume Field Generator and the rest instead of standing out from them.
