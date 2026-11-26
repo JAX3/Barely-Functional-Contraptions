@@ -81,6 +81,8 @@ public final class ResourcefulSheepClient {
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.GRASS_SEEDER.get(), context -> new AreaOutlineRenderer<>());
             event.registerBlockEntityRenderer(
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.IMPLOSION_CHAMBER.get(), context -> new AreaOutlineRenderer<>());
+            event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.HERD_COUNTER.get(), context -> new HerdCounterRenderer());
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.STATUS_PANEL.get(), context -> new StatusPanelRenderer());
@@ -212,6 +214,7 @@ public final class ResourcefulSheepClient {
         for (var tipped : java.util.List.of(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATIC_GENERATOR,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.COPPER_COMB,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GRASS_SEEDER,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.IMPLOSION_CHAMBER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HERD_COUNTER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATUS_PANEL,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE,

@@ -44,6 +44,9 @@ public final class ModBlockEntities {
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity>> HERD_COUNTER =
             REGISTER.register("herd_counter",
                     () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HerdCounterBlockEntity::new, ModBlocks.HERD_COUNTER.get()));
+    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity>> IMPLOSION_CHAMBER =
+            REGISTER.register("implosion_chamber",
+                    () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity::new, ModBlocks.IMPLOSION_CHAMBER.get()));
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity>> GRASS_SEEDER =
             REGISTER.register("grass_seeder",
                     () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity::new, ModBlocks.GRASS_SEEDER.get()));

@@ -321,6 +321,10 @@ public final class DevScreenshotHarness {
             blockWoolTick(mc, server);
             return;
         }
+        if ("implosion_chamber".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            implosionChamberTick(mc, server);
+            return;
+        }
         if ("explosive_sheep".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             explosiveSheepTick(mc, server);
             return;
@@ -2197,6 +2201,57 @@ public final class DevScreenshotHarness {
     }
 
     private static final java.util.List<net.minecraft.world.entity.animal.sheep.Sheep> explosiveSheep = new java.util.ArrayList<>();
+
+    /**
+     * An Implosion Chamber loaded with Cobblestone in a grass pen with three Explosive sheep: the chamber, a sheep lit by
+     * it, the blast with its porthole glowing, and later the Sand and Gravel it made: {@code -PharnessScene=implosion_chamber}.
+     */
+    private static void implosionChamberTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-7, 0, -10), origin.offset(7, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-7, -1, -10), origin.offset(7, -1, 2))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                BlockPos chamber = origin.offset(0, 0, -5);
+                for (int i = -3; i <= 3; i++) {   // a fence round its 5x5 pen
+                    for (BlockPos f : new BlockPos[]{chamber.offset(i, 0, -3), chamber.offset(i, 0, 3), chamber.offset(-3, 0, i), chamber.offset(3, 0, i)}) {
+                        level.setBlock(f, Blocks.OAK_FENCE.defaultBlockState(), 3);
+                    }
+                }
+                level.setBlock(chamber, ModBlocks.IMPLOSION_CHAMBER.get().defaultBlockState()
+                        .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ImplosionChamberBlock.FACING, Direction.SOUTH), 3);
+                if (level.getBlockEntity(chamber) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity be) {
+                    be.fillEnergy();
+                    be.insertInput(new ItemStack(Items.COBBLESTONE, 64));
+                }
+                var explosive = ResourcefulSheep.id("explosive");
+                int uses = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(explosive).orElseThrow().effectiveInfusionUses();
+                double[][] spots = {{-1.5, -1.0}, {2.0, 0.5}, {-1.0, 2.0}};
+                for (double[] sp : spots) {
+                    var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    sheep.snapTo(chamber.getX() + 0.5 + sp[0], chamber.getY(), chamber.getZ() + 0.5 + sp[1], level.getRandom().nextFloat() * 360, 0);
+                    sheep.setNoAi(true);
+                    level.addFreshEntity(sheep);
+                    com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
+                            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(explosive, uses));
+                }
+            });
+            case 62 -> setHudHidden(mc, true);
+            case 64 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 35", origin.getX() + 0.5, origin.getY() + 3.6, origin.getZ() + 1.5));
+            case 80 -> shot(mc, "117_implosion_chamber_lit");
+            case 93 -> shot(mc, "117_implosion_chamber_blast");
+            case 110 -> shot(mc, "117_implosion_chamber_after");
+            case 112 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 20", origin.getX() + 0.5, origin.getY() + 1.2, origin.getZ() - 1.6));
+            case 140 -> shot(mc, "117_implosion_chamber");
+            case 146 -> mc.stop();
+            default -> {}
+        }
+    }
 
     /**
      * Three Explosive sheep in a little pen: side on, close up, then the middle one lit with flint and steel, hissing,

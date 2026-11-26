@@ -177,6 +177,9 @@ public final class ModGameTests {
         TESTS.put("status_panel_shows_the_hume_field_generator", ModGameTests::humeFieldOnPanel);
         TESTS.put("echo_chamber_is_three_by_three", ModGameTests::echoChamber);
         ECHO_TESTS.put("echo_chamber_counts_its_warden_sheep", ModGameTests::echoCountsHerd);
+        ECHO_TESTS.put("implosion_chamber_cracks_cobble_to_gravel_to_sand", ModGameTests::implosionCracks);
+        ECHO_TESTS.put("implosion_chamber_can_stop_at_gravel", ModGameTests::implosionGravel);
+        ECHO_TESTS.put("implosion_chamber_needs_sheep_power_and_stone", ModGameTests::implosionNeeds);
         ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
         ECHO_TESTS.put("echo_chamber_hears_vibrations_but_not_through_wool", ModGameTests::echoHearing);
         ECHO_TESTS.put("echo_chamber_pushes_power_out_of_its_port", ModGameTests::echoPort);
@@ -3115,6 +3118,79 @@ public final class ModGameTests {
         h.succeedWhen(() -> {
             h.assertTrue(burning.isSheared(), "it popped");
             h.assertTrue(!burning.isOnFire(), "and the pop put its fire out");
+        });
+    }
+
+    // ------------------------------------------------------------------ implosion chamber
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity implosionAt(GameTestHelper h, BlockPos pos) {
+        var be = implosionAt(h, pos, true);
+        return be;
+    }
+
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity implosionAt(GameTestHelper h, BlockPos pos, boolean powered) {
+        for (BlockPos p : BlockPos.betweenClosed(pos.offset(-3, -1, -3), pos.offset(3, -1, 3))) h.setBlock(p, Blocks.STONE);
+        h.setBlock(pos, ModBlocks.IMPLOSION_CHAMBER.get());
+        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity.class);
+        if (powered) be.fillEnergy();
+        return be;
+    }
+
+    /**
+     * It lights an Explosive sheep in its pen, and the blast cracks 8 Cobblestone into Gravel; the next sheep's blast
+     * cracks that Gravel into Sand (and 8 more Cobblestone into Gravel). Each spark costs its power.
+     */
+    private static void implosionCracks(GameTestHelper h) {
+        BlockPos at = new BlockPos(4, 2, 4);
+        var be = implosionAt(h, at);
+        be.insertInput(new ItemStack(Items.COBBLESTONE, 32));
+        int full = be.getEnergyHandler().getAmountAsInt();
+        sheepAt(h, at.offset(-2, 0, 0), ResourcefulSheep.id("explosive"));
+        sheepAt(h, at.offset(2, 0, 0), ResourcefulSheep.id("explosive"));
+        h.runAfterDelay(5, () -> h.assertTrue(be.getEnergyHandler().getAmountAsInt() == full - ModConfigs.getInt(ModConfigs.SERVER.implosionSparkEnergy),
+                "a spark costs " + ModConfigs.getInt(ModConfigs.SERVER.implosionSparkEnergy) + " FE"));
+        h.succeedWhen(() -> {
+            h.assertTrue(be.blasts() >= 2, "two blasts, got " + be.blasts());
+            h.assertTrue(be.inventory().get(2).is(Items.SAND) && be.inventory().get(2).getCount() == 8, "8 Sand out, got " + be.inventory().get(2));
+            h.assertTrue(be.inventory().get(1).is(Items.GRAVEL) && be.inventory().get(1).getCount() == 8, "8 more Gravel waiting, got " + be.inventory().get(1));
+            h.assertTrue(be.inventory().get(0).getCount() == 16, "16 Cobblestone left, got " + be.inventory().get(0));
+            h.assertTrue(be.crackedTotal() == 24, "24 items cracked a step, got " + be.crackedTotal());
+        });
+    }
+
+    /** Set to stop at Gravel, one blast sends 8 Gravel straight out, and it won't take Gravel in. */
+    private static void implosionGravel(GameTestHelper h) {
+        BlockPos at = new BlockPos(4, 2, 4);
+        var be = implosionAt(h, at);
+        be.setTarget(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity.Target.GRAVEL);
+        h.assertTrue(be.insertInput(new ItemStack(Items.GRAVEL, 4)) == 0, "it won't take Gravel when it stops at Gravel");
+        be.insertInput(new ItemStack(Items.COBBLESTONE, 10));
+        sheepAt(h, at.offset(0, 0, 2), ResourcefulSheep.id("explosive"));
+        h.succeedWhen(() -> {
+            h.assertTrue(be.inventory().get(2).is(Items.GRAVEL) && be.inventory().get(2).getCount() == 8, "8 Gravel out, got " + be.inventory().get(2));
+            h.assertTrue(be.inventory().get(1).isEmpty(), "nothing held back to crack again");
+            h.assertTrue(be.comparatorSignal() > 0, "its comparator reads its output");
+        });
+    }
+
+    /** No Explosive sheep, no power or nothing to crack: no spark, and its status says why. Other sheep don't count. */
+    private static void implosionNeeds(GameTestHelper h) {
+        BlockPos a = new BlockPos(3, 2, 3), b = new BlockPos(11, 2, 3), c = new BlockPos(3, 2, 11);
+        var noSheep = implosionAt(h, a);
+        noSheep.insertInput(new ItemStack(Items.COBBLESTONE, 8));
+        sheepAt(h, a.offset(1, 0, 1), IRON); // an Iron sheep has no fuse
+        var noPower = implosionAt(h, b, false);
+        noPower.insertInput(new ItemStack(Items.COBBLESTONE, 8));
+        Sheep waiting = sheepAt(h, b.offset(1, 0, 1), ResourcefulSheep.id("explosive"));
+        var idle = implosionAt(h, c);
+        Sheep spare = sheepAt(h, c.offset(1, 0, 1), ResourcefulSheep.id("explosive"));
+        h.runAfterDelay(10, () -> {
+            h.assertTrue(noSheep.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity.Status.NO_SHEEP, "no Explosive sheep: " + noSheep.status());
+            h.assertTrue(noPower.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity.Status.NO_POWER, "no power: " + noPower.status());
+            h.assertTrue(!com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.isLit(waiting), "so its sheep isn't lit");
+            h.assertTrue(idle.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity.Status.IDLE, "nothing to crack: " + idle.status());
+            h.assertTrue(!com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.isLit(spare), "and it lights no one");
+            h.succeed();
         });
     }
 

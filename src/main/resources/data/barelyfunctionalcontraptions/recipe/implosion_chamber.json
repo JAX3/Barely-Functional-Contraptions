@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "I": "barelyfunctionalcontraptions:blue_steel",
+    "O": "minecraft:obsidian",
+    "P": "minecraft:piston",
+    "M": "barelyfunctionalcontraptions:functional_machine_block",
+    "W": {
+      "neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool",
+      "resource": "barelyfunctionalcontraptions:explosive"
+    }
+  },
+  "pattern": [
+    "IOI",
+    "WMW",
+    "IPI"
+  ],
+  "result": {
+    "id": "barelyfunctionalcontraptions:implosion_chamber"
+  }
+}

@@ -241,6 +241,12 @@ public final class ModBlocks {
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.GrassSeederBlock::new,
                     p -> p.mapColor(MapColor.COLOR_GREEN).strength(3.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion());
 
+    /** Cracks Cobblestone into Gravel and Gravel into Sand with the blasts of the Explosive sheep in its pen. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.ImplosionChamberBlock> IMPLOSION_CHAMBER =
+            REGISTER.registerBlock("implosion_chamber",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.ImplosionChamberBlock::new,
+                    p -> p.mapColor(MapColor.COLOR_BLUE).strength(3.5F, 1200.0F).requiresCorrectToolForDrops().sound(SoundType.IRON));
+
     /** Late-game generator, 3x3x3: Warden sheep in front of its dish turn the vibrations they hear into power. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock> ECHO_CHAMBER =
             REGISTER.registerBlock("echo_chamber",

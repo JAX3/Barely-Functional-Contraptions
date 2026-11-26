@@ -10,7 +10,7 @@ public final class ModCapabilities {
         // Machines built on the machine frame: each offers the energy, fluid and items of the modules it has switched on.
         com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame.registerCapabilities(event,
                 ModBlockEntities.POWERED_FURNACE.get(), ModBlockEntities.WOOL_PACKER.get(), ModBlockEntities.CHILLER.get(),
-                ModBlockEntities.INFUSION_ALTAR.get(), ModBlockEntities.GRASS_SEEDER.get(),
+                ModBlockEntities.INFUSION_ALTAR.get(), ModBlockEntities.GRASS_SEEDER.get(), ModBlockEntities.IMPLOSION_CHAMBER.get(),
                 ModBlockEntities.FLEECE_TRAWLER.get(), ModBlockEntities.AUTOMATIC_SHEARS.get(), ModBlockEntities.FLUID_RESERVOIR.get(),
                 ModBlockEntities.MECHANICAL_SEPARATOR.get(),
                 // the generators

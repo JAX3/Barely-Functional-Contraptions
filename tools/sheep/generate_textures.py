@@ -4162,6 +4162,86 @@ ECHO_FOAM = [hexc("#231c35"), hexc("#2f3550"), hexc("#3f4766"), hexc("#4f587a"),
 
 
 
+
+def generate_implosion_chamber():
+    """Implosion Chamber: a squat blast vessel in the blue-steel casing. Riveted plate sides with a heavy strap round
+    them, a round blast door on the front with a thick porthole (dark, or glowing orange just after a blast), and a
+    blast vent on top."""
+    base = "block/implosion_chamber/"
+    os.makedirs(out(base), exist_ok=True)
+    C = CARTOON
+    ember = [hexc("#5a1a0c"), hexc("#a8321a"), hexc("#f07a2a"), hexc("#ffd27a"), hexc("#fff4d6")]
+
+    def frame(img):
+        for i in range(16):
+            img.putpixel((i, 0), C["O"]); img.putpixel((i, 15), C["O"])
+            img.putpixel((0, i), C["O"]); img.putpixel((15, i), C["O"])
+        for i in range(1, 15):
+            img.putpixel((i, 1), C["H"]); img.putpixel((1, i), C["H"])
+            img.putpixel((i, 14), C["S"]); img.putpixel((14, i), C["S"])
+
+    def rivet(img, x, y):
+        img.putpixel((x, y), C["B"]); img.putpixel((x + 1, y + 1), C["b"])
+
+    # Sides: a plate with a heavy dark strap round the middle, riveted.
+    side = Image.new("RGBA", (16, 16), C["M"])
+    frame(side)
+    for x in range(1, 15):
+        for y in (6, 7, 8, 9):
+            side.putpixel((x, y), C["k"] if y in (7, 8) else C["S"])
+    for x in (3, 7, 11):
+        side.putpixel((x, 7), C["B"]); side.putpixel((x + 1, 8), C["b"])
+    for x, y in ((3, 3), (11, 3), (3, 11), (11, 11)):
+        rivet(side, x, y)
+    side.save(out(base + "side.png"))
+
+    # Front: the round blast door, its hinge on the left, a wheel of bolts round it and the porthole in the middle.
+    def front(lit):
+        img = side.copy()
+        for y in range(16):
+            for x in range(16):
+                r = math.hypot(x - 7.5, y - 7.5)
+                if r < 6.9:
+                    c = C["O"] if r >= 6.1 else C["H"] if (r >= 5.2 and x + y < 15) else C["S"] if r >= 5.2 else C["M"]
+                    if 3.0 <= r < 5.2 and (x + y) % 2 == 0 and r > 4.4:
+                        c = C["H"]
+                    if r < 3.0:
+                        c = C["O"] if r >= 2.4 else (ember[min(4, int((2.4 - r) * 1.8) + 1)] if lit else C["K"])
+                    img.putpixel((x, y), c)
+        for a in range(0, 360, 45):  # the bolts round the door
+            bx, by = 7.5 + 4.6 * math.cos(math.radians(a)), 7.5 + 4.6 * math.sin(math.radians(a))
+            img.putpixel((int(round(bx)), int(round(by))), C["B"])
+        if not lit:
+            img.putpixel((6, 6), C["H"])  # a glint on the porthole glass
+        for y in (5, 10):  # the hinge
+            img.putpixel((1, y), C["k"]); img.putpixel((2, y), C["b"])
+        return img
+    front(False).save(out(base + "front.png"))
+    front(True).save(out(base + "front_blasting.png"))
+
+    # Top: a plate with the blast vent: a ring of slots round a domed cap.
+    top = Image.new("RGBA", (16, 16), C["M"])
+    frame(top)
+    for y in range(16):
+        for x in range(16):
+            r = math.hypot(x - 7.5, y - 7.5)
+            if r < 5.6:
+                if r >= 4.8:
+                    c = C["O"]
+                elif r >= 3.2:
+                    ang = math.degrees(math.atan2(y - 7.5, x - 7.5)) % 60
+                    c = C["K"] if ang < 30 else C["S"]
+                else:
+                    c = C["H"] if x + y < 15 else C["M"]
+                    if r >= 2.5:
+                        c = C["O"]
+                top.putpixel((x, y), c)
+    for x, y in ((2, 2), (12, 2), (2, 12), (12, 12)):
+        rivet(top, x, y)
+    top.save(out(base + "top.png"))
+
+    grid(MACHINE_BLOCK, CARTOON).save(out(base + "bottom.png"))
+
 def generate_hume_field_generator_gui():
     """Hume Field Generator window: the field gauge (this tick's output against its range), then a panel with the
     output, what was delivered and lost, the trace of its last 28 ticks (each bar what it made, taken in purple and
@@ -5120,6 +5200,7 @@ def main():
     generate_thermal_reaction_chamber()
     generate_thermal_reaction_chamber_gui()
     generate_echo_chamber()
+    generate_implosion_chamber()
     generate_echo_chamber_gui()
     generate_hume_field_generator_gui()
     generate_static_generator()

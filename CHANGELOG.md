@@ -4,7 +4,7 @@
 
 New contraptions for Minecraft 26.3, 26.2 and 26.1 on NeoForge: the mod's first item storage (crates and a controller that links them into one store), a fishing
 machine driven by a new sea-going sheep, upgrade cards for the processing machines, a mid-game generator that runs on static, a late-game
-generator with a random output and no buffer, and a wall screen that keeps an eye on all your machines. The Echo Chamber is recoloured to match the other machines, and machine recipes take Copper Wool from your
+generator with a random output and no buffer, a sheep that blows its own fleece off and a chamber that uses it to crack stone, and a wall screen that keeps an eye on all your machines. The Echo Chamber is recoloured to match the other machines, and machine recipes take Copper Wool from your
 sheep where they took Copper Ingots. They come after 1.5.5,
 in 1.5.7. Numbers are the defaults; almost all of them can be changed in the synced config.
 
@@ -57,6 +57,25 @@ Links Wool-Lined Crates into one store. It needs no power.
 - **Advancement:** *Dewey Decimal Sheep* (goal), for 16 crates in one store.
 - **Recipe:** a Wool-Lined Crate, a Hopper, two Comparators, two Iron Ingots and a Functional Machine Block.
 - New config section `[crate_controller]`: `range`, `maxCrates`; a chapter in the Contraptions Manual (Logistics).
+
+### Production: the Implosion Chamber
+A machine that **cracks Cobblestone into Gravel, and Gravel into Sand**, with the blasts of **Explosive sheep** in the
+pen round it.
+- **Its pen** is the 5x5 round it. Every **5 seconds**, while it has stone to crack, room for what it makes and
+  **1,000 FE**, it lights the fuse of the nearest Explosive sheep in its pen that has its fleece on.
+- **Each blast** cracks up to **8** items a step: Gravel it cracked last time into Sand first, then 8 Cobblestone from
+  its input into Gravel. So Cobblestone takes two blasts to become Sand. A sheep lit any other way (fire, your flint and
+  steel) counts too. Its sheep can't blast again until their wool grows back, so a Grass Seeder in the pen keeps it busy.
+- It can **stop at Gravel** instead, sending its Gravel straight out.
+- **Slots:** an input (Cobblestone, or Gravel to make Sand) that hoppers and pipes fill, and an output they empty. Power
+  comes in on every side. Its comparator reads how full its output is.
+- **Using it:** right-click it with Cobblestone or Gravel to load it, with an empty hand to see how it's doing, and
+  sneak-right-click to show its pen.
+- **Model:** a riveted blue-steel blast vessel with a round blast door, its porthole glowing orange after each blast,
+  and a blast vent on top.
+- **Recipe:** Blue Steel and Obsidian along the top, Explosive Wool either side of a Functional Machine Block, and Blue
+  Steel either side of a Piston along the bottom.
+- Its window, JEI page, Jade lines, manual chapter and a test-world scene are still to come.
 
 ### The Explosive sheep
 A new themed sheep, infused with **TNT** at the altar (with 2 Gunpowder and a Fire Charge).

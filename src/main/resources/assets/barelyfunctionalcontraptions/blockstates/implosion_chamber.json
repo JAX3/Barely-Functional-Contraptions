@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "blasting=false,facing=north": {
+      "model": "barelyfunctionalcontraptions:block/implosion_chamber"
+    },
+    "blasting=true,facing=north": {
+      "model": "barelyfunctionalcontraptions:block/implosion_chamber_blasting"
+    },
+    "blasting=false,facing=east": {
+      "model": "barelyfunctionalcontraptions:block/implosion_chamber",
+      "y": 90
+    },
+    "blasting=true,facing=east": {
+      "model": "barelyfunctionalcontraptions:block/implosion_chamber_blasting",
+      "y": 90
+    },
+    "blasting=false,facing=south": {
+      "model": "barelyfunctionalcontraptions:block/implosion_chamber",
+      "y": 180
+    },
+    "blasting=true,facing=south": {
+      "model": "barelyfunctionalcontraptions:block/implosion_chamber_blasting",
+      "y": 180
+    },
+    "blasting=false,facing=west": {
+      "model": "barelyfunctionalcontraptions:block/implosion_chamber",
+      "y": 270
+    },
+    "blasting=true,facing=west": {
+      "model": "barelyfunctionalcontraptions:block/implosion_chamber_blasting",
+      "y": 270
+    }
+  }
+}
