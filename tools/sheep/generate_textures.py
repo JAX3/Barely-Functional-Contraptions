@@ -3392,7 +3392,7 @@ def generate_hume_field_generator():
     with open(out("block/hume_field_generator/core.png.mcmeta"), "w") as m:
         m.write('{\n  "animation": {\n    "frametime": 8,\n    "interpolate": true\n  }\n}\n')
 
-    # Lens: an eye looking up, the "observer" whose watching decides whether it makes power.
+    # Lens: an eye looking up, the "observer" whose watching decides whether it makes power, in the machines' purple.
     lens = Image.new("RGBA", (16, 16), DARK)
     for y in range(16):
         for x in range(16):
@@ -3400,12 +3400,12 @@ def generate_hume_field_generator():
             if d < 2.2:
                 lens.putpixel((x, y), DARK)
             elif d < 4.5:
-                lens.putpixel((x, y), CYAN)
+                lens.putpixel((x, y), PURPLE)
             elif d < 6.5:
-                lens.putpixel((x, y), CYAN_D)
+                lens.putpixel((x, y), PURPLE_D)
             elif d < 8:
                 lens.putpixel((x, y), STEEL_D)
-    lens.putpixel((6, 6), HI); lens.putpixel((5, 5), CYAN_L)
+    lens.putpixel((6, 6), HI); lens.putpixel((5, 5), hexc("#f4e8ff"))
     lens.save(out("block/hume_field_generator/lens.png"))
 
 

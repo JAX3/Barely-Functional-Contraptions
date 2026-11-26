@@ -122,7 +122,7 @@ Work in Progress tab and is now finished: in released jars, in the creative tab'
     field's purple so its flickering core and three coils glow through;
   - a power port under each window in a trim housing, like the one on the Echo Chamber's back, since it pushes power
     out of every side;
-  - an emitter on the lid, among four corner bolts.
+  - an emitter on the lid, among four corner bolts, its lens the same purple as the Echo Chamber's dome.
 
   It fills the space east, south and above where it's placed, and breaking any of its twelve blocks drops one
   generator.
