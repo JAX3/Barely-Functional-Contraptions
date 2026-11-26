@@ -119,7 +119,7 @@ Work in Progress tab and is now finished: in released jars, in the creative tab'
   - the Echo Chamber's own casing: the same plates, the same dark bolted band round its plinth and lid, and the same
     steel corner pillars;
   - a plate wall on each side with a window sunk in a trim bezel, as the Echo Chamber's dish is, its glass tinted the
-    field's purple so its flickering core and three coils glow through;
+    field's purple so its core, flickering between purple and magenta, and its three coils glow through;
   - a power port under each window in a trim housing, like the one on the Echo Chamber's back, since it pushes power
     out of every side;
   - an emitter on the lid, among four corner bolts, its lens the same purple as the Echo Chamber's dome.

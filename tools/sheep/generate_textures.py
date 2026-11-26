@@ -3349,12 +3349,12 @@ def generate_powered_furnace():
 
 
 def generate_hume_field_generator():
-    """Hume Field Generator (WIP): its glowing field coils, the core that flickers between "on" (cyan) and "off"
+    """Hume Field Generator (WIP): its glowing field coils, the core that flickers between "on" (purple) and "off"
     (magenta), and the observing lens on its emitter. The rest of it is tools/hume_field_generator_model.py's."""
     # Dark blue steel with purple trim, like the Hume Energy Cube.
     DARK, STEEL, STEEL_L, STEEL_D, STEEL_DD = hexc("#1a1528"), hexc("#3f4766"), hexc("#5d6687"), hexc("#2c324c"), hexc("#231c35")
     PURPLE, PURPLE_D, HI = hexc("#9a52f0"), hexc("#5c2aa6"), hexc("#8d97bc")
-    CYAN, CYAN_L, CYAN_D, MAGENTA, MAGENTA_D = hexc("#69d6ff"), hexc("#cbf4ff"), hexc("#1b5fa8"), hexc("#ff6ae6"), hexc("#9c2f8f")
+    MAGENTA, MAGENTA_D = hexc("#ff6ae6"), hexc("#9c2f8f")
 
     # Its steel (plinth and lid bands, plates, pillars, trim, the window glass and the emitter collar) and its models
     # come from tools/hume_field_generator_model.py, in the Echo Chamber's style; this makes the coils, core and lens.
@@ -3366,7 +3366,7 @@ def generate_hume_field_generator():
             coil.putpixel((x, y), PURPLE if (x + y) % 3 else MAGENTA)
     coil.save(out("block/hume_field_generator/coil.png"))
 
-    # Core: animated; each frame is a mix of "is" (cyan) and "isn't" (magenta), never settling.
+    # Core: animated; each frame is a mix of "is" (purple) and "isn't" (magenta), never settling.
     import random as _r
     rnd = _r.Random(1776)
     frames = []
@@ -3378,11 +3378,11 @@ def generate_hume_field_generator():
                 on = rnd.random() < t
                 d = abs(x - 7.5) + abs(y - 7.5)
                 if d < 4:
-                    c = CYAN_L if on else hexc("#ffc2f4")
+                    c = hexc("#d9b8ff") if on else hexc("#ffc2f4")
                 elif d < 7:
-                    c = CYAN if on else MAGENTA
+                    c = PURPLE if on else MAGENTA
                 else:
-                    c = CYAN_D if on else MAGENTA_D
+                    c = PURPLE_D if on else MAGENTA_D
                 f.putpixel((x, y), c)
         frames.append(f)
     strip = Image.new("RGBA", (16, 16 * len(frames)))
