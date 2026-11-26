@@ -184,6 +184,8 @@ public final class ModGameTests {
         ECHO_TESTS.put("echo_chamber_shrieks_when_too_loud", ModGameTests::echoShriek);
         TESTS.put("echo_chamber_recipe_and_drop", ModGameTests::echoRecipeAndDrop);
         TESTS.put("copper_wool_replaces_copper_ingots", ModGameTests::copperWoolRecipes);
+        TESTS.put("explosive_sheep_pops_its_fleece_off", ModGameTests::explosiveSheepPops);
+        TESTS.put("explosive_sheep_lit_by_fire_not_when_sheared", ModGameTests::explosiveSheepFire);
         ECHO_TESTS.put("static_generator_counts_sheep_at_its_combs", ModGameTests::staticCountsSheep);
         ECHO_TESTS.put("static_generator_combs_oxidise_and_wax", ModGameTests::staticCombs);
         ECHO_TESTS.put("static_generator_arcs_into_its_buffer", ModGameTests::staticArcs);
@@ -730,6 +732,7 @@ public final class ModGameTests {
         expected.put("blaze", List.of(Feature.ON_FIRE));
         expected.put("ghast", List.of(Feature.TENTACLES));
         expected.put("tide", List.of(Feature.FINS));
+        expected.put("explosive", List.of(Feature.FUSE));
         expected.forEach((name, features) -> {
             SheepResource resource = registry.byId(ResourcefulSheep.id(name)).orElseThrow(() -> new AssertionError("missing themed sheep " + name));
             for (var feature : features) {
@@ -812,13 +815,13 @@ public final class ModGameTests {
 
     private static void themedAdvancements(GameTestHelper h) {
         var server = h.getLevel().getServer();
-        for (String name : List.of("hay", "snow", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast", "tide")) {
+        for (String name : List.of("hay", "snow", "wither", "dragon", "glow_ink", "skeleton", "wither_skeleton", "spider", "warden", "blaze", "ghast", "tide", "explosive")) {
             var adv = server.getAdvancements().get(ResourcefulSheep.id("contraptions/sheep/" + name));
             h.assertTrue(adv != null && adv.value().parent().map(ResourcefulSheep.id("contraptions/infuse_sheep")::equals).orElse(false),
                     "themed advancement " + name + " is loaded under Infuse a Sheep");
         }
         var every = server.getAdvancements().get(ResourcefulSheep.id("contraptions/every_wool"));
-        h.assertTrue(every != null && every.value().criteria().size() == 26, "the every-wool challenge has one criterion per built-in wool");
+        h.assertTrue(every != null && every.value().criteria().size() == 27, "the every-wool challenge has one criterion per built-in wool");
         h.assertTrue(every.value().criteria().keySet().containsAll(SheepResourceRegistry.server().all().stream()
                 .filter(r -> r.id().getNamespace().equals(ResourcefulSheep.MOD_ID)).map(r -> r.id().getPath()).toList()), "every built-in resource is in the challenge");
 
@@ -884,7 +887,7 @@ public final class ModGameTests {
         h.assertTrue(play.apply(ghast, net.minecraft.sounds.SoundEvents.SHEEP_AMBIENT).equals(net.minecraft.sounds.SoundEvents.GHAST_SCREAM.location()), "a sheared Ghast sheep still screams");
         // The "screaming" feature on its own gives the screaming goat's sounds; listed sounds win over it.
         var screaming = new com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance(Optional.empty(), List.of(Feature.SCREAMING), 0xFFFFFF, 1.0, Optional.empty(),
-                com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Sounds.NONE);
+                com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Sounds.NONE, false);
         var replaced = com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.replacement(screaming, net.minecraft.sounds.SoundEvents.SHEEP_HURT);
         h.assertTrue(replaced.isPresent() && replaced.get().value() == net.minecraft.sounds.SoundEvents.GOAT_SCREAMING_HURT, "screaming = screaming goat, got " + replaced);
         h.succeed();
@@ -1277,7 +1280,8 @@ public final class ModGameTests {
                 else runs.set(runs.size() - 1, runs.getLast() + 1);
             }
             h.assertTrue(runs.size() >= 3, "it rolled a new amount at least three times in " + seen.size() + " ticks: " + runs);
-            for (int r = 1; r < runs.size() - 1; r++) h.assertTrue(runs.get(r) == perRoll, "each roll holds for " + perRoll + " ticks: " + runs);
+            // A run can be two rolls or more if a roll happens to land on the same amount as the one before it.
+            for (int r = 1; r < runs.size() - 1; r++) h.assertTrue(runs.get(r) % perRoll == 0, "each roll holds for " + perRoll + " ticks: " + runs);
             h.assertTrue(fed.totalDelivered() > 0 && target.group().amount() == fed.totalDelivered(),
                     "the cube got exactly what it delivered: " + target.group().amount() + " vs " + fed.totalDelivered());
             h.assertTrue(alone.totalDelivered() == 0, "the lone one delivered nothing");
@@ -3062,6 +3066,56 @@ public final class ModGameTests {
         h.assertTrue(craft(h, 3, 3, List.of(steel, ingot, steel, ingot, redstone, ingot, steel, ingot, steel)).is(ModItems.FUNCTIONAL_MACHINE_BLOCK.get()),
                 "the Functional Machine Block still takes Copper Ingots");
         h.succeed();
+    }
+
+    /**
+     * Flint and steel lights an Explosive sheep's fuse: it hisses for FUSE_TICKS, then pops. The pop blows its fleece
+     * off as Explosive Wool (using up an infusion use, as shearing does), breaks no blocks and doesn't hurt it.
+     */
+    private static void explosiveSheepPops(GameTestHelper h) {
+        var explosive = ResourcefulSheep.id("explosive");
+        h.assertTrue(SheepResourceRegistry.server().byFeedingItem(new ItemStack(Items.TNT)).map(r -> r.id().equals(explosive)).orElse(false), "TNT makes an Explosive sheep");
+        h.assertTrue(SheepResourceRegistry.server().byId(explosive).orElseThrow().separation().primary().create().is(Items.GUNPOWDER), "its wool separates into Gunpowder");
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(4, 0, 4))) h.setBlock(p, Blocks.STONE);
+        h.setBlock(new BlockPos(3, 1, 2), Blocks.GLASS);
+        Sheep sheep = sheepAt(h, new BlockPos(2, 1, 2), explosive);
+        int uses = SheepInfusionEvents.getInfusion(sheep).usesRemaining();
+        float health = sheep.getHealth();
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.hasFuse(sheep), "a grown, unsheared Explosive sheep has a fuse");
+        Player player = playerHolding(h, new ItemStack(Items.FLINT_AND_STEEL));
+        player.interactOn(sheep, InteractionHand.MAIN_HAND, sheep.position());
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.isLit(sheep), "flint and steel lights it");
+        h.assertTrue(player.getMainHandItem().getDamageValue() == 1, "and wears the flint and steel");
+        h.assertTrue(!sheep.isSheared(), "it doesn't go off at once");
+        h.runAfterDelay(com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.FUSE_TICKS + 5, () -> {
+            h.assertTrue(sheep.isSheared(), "it popped its fleece off");
+            h.assertTrue(!com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.isLit(sheep), "its fuse is spent");
+            var wool = h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(h.absolutePos(new BlockPos(2, 1, 2))).inflate(4),
+                    e -> e.getItem().is(ModItems.RESOURCE_WOOL.get()));
+            h.assertTrue(!wool.isEmpty() && wool.stream().allMatch(e -> explosive.equals(com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.getResourceId(e.getItem()))),
+                    "it dropped Explosive Wool");
+            h.assertTrue(SheepInfusionEvents.getInfusion(sheep).usesRemaining() == uses - 1, "and used up one infusion use, as shearing does");
+            h.assertBlockPresent(Blocks.GLASS, new BlockPos(3, 1, 2));
+            h.assertTrue(sheep.isAlive() && sheep.getHealth() == health, "it isn't hurt");
+            h.succeed();
+        });
+    }
+
+    /** Fire lights it, and the pop puts the fire out; a sheared Explosive sheep has no fuse to light. */
+    private static void explosiveSheepFire(GameTestHelper h) {
+        var explosive = ResourcefulSheep.id("explosive");
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(4, 0, 4))) h.setBlock(p, Blocks.STONE);
+        Sheep burning = sheepAt(h, new BlockPos(1, 1, 1), explosive);
+        burning.igniteForSeconds(10);
+        Sheep sheared = sheepAt(h, new BlockPos(3, 1, 3), explosive);
+        sheared.setSheared(true);
+        h.assertTrue(!com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.light(sheared), "a sheared one can't be lit");
+        h.runAfterDelay(10, () -> h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.isLit(burning)
+                || burning.isSheared(), "fire lit it"));
+        h.succeedWhen(() -> {
+            h.assertTrue(burning.isSheared(), "it popped");
+            h.assertTrue(!burning.isOnFire(), "and the pop put its fire out");
+        });
     }
 
     /** Crafts with whatever crafting recipe matches the grid, or EMPTY. */

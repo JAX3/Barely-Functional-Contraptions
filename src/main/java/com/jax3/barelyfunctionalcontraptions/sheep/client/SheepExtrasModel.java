@@ -53,6 +53,7 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
     private final ModelPart dorsalFin;
     private final ModelPart leftGill;
     private final ModelPart rightGill;
+    private final ModelPart fuse;
 
     private SheepExtrasModel(ModelPart root, boolean eyesOnly) {
         super(root, eyesOnly ? RenderTypes::eyes : RenderTypes::entityCutout);
@@ -71,6 +72,7 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
         this.dorsalFin = root.getChild("dorsal_fin");
         this.leftGill = head.getChild("left_gill");
         this.rightGill = head.getChild("right_gill");
+        this.fuse = root.getChild("fuse");
     }
 
     /** The body parts, drawn in the resource's {@code feature_color}. */
@@ -123,6 +125,9 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
         }
         // A fish's fin standing up along the middle of the back (out of the fleece), and gill flaps either side of
         // the neck.
+        // The Explosive sheep's fuse: a short wick sticking up out of the fleece over its rump, leaning back.
+        root.addOrReplaceChild("fuse", CubeListBuilder.create().texOffs(48, 20).addBox(-0.5F, -8.0F, -0.5F, 1.0F, 8.0F, 1.0F),
+                PartPose.offsetAndRotation(0.0F, 4.75F, 4.0F, 0.35F, 0.0F, 0.0F));
         root.addOrReplaceChild("dorsal_fin", CubeListBuilder.create().texOffs(0, 46).addBox(0.0F, -6.0F, -6.0F, 0.0F, 6.0F, 12.0F),
                 PartPose.offset(0.0F, 4.5F, 1.0F));
         head.addOrReplaceChild("left_gill", CubeListBuilder.create().texOffs(28, 46).addBox(0.0F, -1.5F, 0.0F, 0.0F, 3.0F, 2.0F),
@@ -177,6 +182,9 @@ public class SheepExtrasModel extends EntityModel<SheepRenderState> {
             right.yRot = -SPIDER_LEGS[i][1] - swing;
         }
 
+        boolean fuse = parts && appearance.has(Feature.FUSE);
+        this.fuse.visible = fuse;
+        this.fuse.zRot = Mth.sin(t * 0.2F) * 0.08F; // it wobbles a little
         boolean fins = parts && appearance.has(Feature.FINS);
         dorsalFin.visible = fins;
         leftGill.visible = fins;

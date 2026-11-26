@@ -31,14 +31,16 @@ import net.minecraft.util.StringRepresentable;
  *                     height grow with it.
  * @param skullTexture a mob-head texture (the 64x32 layout skulls use, e.g. the skeleton's) drawn untinted over the
  *                     sheep's head, so its face is that mob's skull
+ * @param blockWool    whether a themed sheep (one with features) still wears the fleece made of its resource's block,
+ *                     as plain resource sheep do: the Explosive sheep's fleece is TNT. Default false.
  * @param sounds       sounds played instead of the sheep's bleat, hurt and death sounds while it is infused (even when
  *                     sheared)
  */
 public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> features, int featureColor, double scale,
-                              Optional<Identifier> skullTexture, Sounds sounds) {
+                              Optional<Identifier> skullTexture, Sounds sounds, boolean blockWool) {
     public static final double MIN_SCALE = 0.25;
     public static final double MAX_SCALE = 4.0;
-    public static final SheepAppearance NONE = new SheepAppearance(Optional.empty(), List.of(), 0xFFFFFF, 1.0, Optional.empty(), Sounds.NONE);
+    public static final SheepAppearance NONE = new SheepAppearance(Optional.empty(), List.of(), 0xFFFFFF, 1.0, Optional.empty(), Sounds.NONE, false);
 
     public static final Codec<SheepAppearance> CODEC = RecordCodecBuilder.create(i -> i.group(
             Identifier.CODEC.optionalFieldOf("wool_texture").forGetter(SheepAppearance::woolTexture),
@@ -46,12 +48,13 @@ public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> fe
             SheepResource.COLOR_CODEC.optionalFieldOf("feature_color", 0xFFFFFF).forGetter(SheepAppearance::featureColor),
             Codec.doubleRange(MIN_SCALE, MAX_SCALE).optionalFieldOf("scale", 1.0).forGetter(SheepAppearance::scale),
             Identifier.CODEC.optionalFieldOf("skull_texture").forGetter(SheepAppearance::skullTexture),
-            Sounds.CODEC.optionalFieldOf("sounds", Sounds.NONE).forGetter(SheepAppearance::sounds)
+            Sounds.CODEC.optionalFieldOf("sounds", Sounds.NONE).forGetter(SheepAppearance::sounds),
+            Codec.BOOL.optionalFieldOf("block_wool", false).forGetter(SheepAppearance::blockWool)
     ).apply(i, SheepAppearance::new));
 
     /** The same appearance with another fleece texture. */
     public SheepAppearance withWoolTexture(Identifier texture) {
-        return new SheepAppearance(Optional.of(texture), features, featureColor, scale, skullTexture, sounds);
+        return new SheepAppearance(Optional.of(texture), features, featureColor, scale, skullTexture, sounds, blockWool);
     }
 
     public boolean has(Feature feature) {
@@ -107,7 +110,12 @@ public record SheepAppearance(Optional<Identifier> woolTexture, List<Feature> fe
         /** Looks like it is on fire, without burning or taking damage. */
         ON_FIRE,
         /** Bleats, hurts and dies with a screaming goat's sounds (while infused, even when sheared). */
-        SCREAMING;
+        SCREAMING,
+        /**
+         * A TNT fuse on its back. Fire, lava, lightning or flint and steel light it: it hisses like a creeper and pops,
+         * a small blast that breaks no blocks and hurts no one but blows its fleece off as wool (see ExplosiveSheep).
+         */
+        FUSE;
 
         public static final Codec<Feature> CODEC = StringRepresentable.fromEnum(Feature::values);
 

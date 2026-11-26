@@ -1,0 +1,43 @@
+{
+  "feeding_item": "minecraft:tnt",
+  "feeding_amount": 1,
+  "wool_color": "#DB2F1F",
+  "accent_color": "#F2F2F2",
+  "category": "material",
+  "wool_drop_count": 1,
+  "infusion_uses": 1,
+  "separator": {
+    "primary_output": "minecraft:gunpowder",
+    "primary_count": {
+      "min": 2,
+      "max": 4
+    },
+    "bonus_output": {
+      "item": "minecraft:tnt",
+      "chance": 0.05
+    },
+    "energy_cost": 20000,
+    "processing_ticks": 100
+  },
+  "growth_item": "minecraft:tnt",
+  "appearance": {
+    "features": [
+      "fuse"
+    ],
+    "feature_color": "#D8CBB0",
+    "block_wool": true
+  },
+  "altar": {
+    "tier": 1,
+    "catalysts": [
+      {
+        "ingredient": "minecraft:gunpowder",
+        "count": 2
+      },
+      {
+        "ingredient": "minecraft:fire_charge",
+        "count": 1
+      }
+    ]
+  }
+}

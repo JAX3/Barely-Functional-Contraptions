@@ -392,7 +392,7 @@
       "title": "Themed Sheep",
       "icon": "minecraft:nether_star",
       "text": [
-        "Twelve resources turn sheep into little versions of the mob (or place) they come from:",
+        "Thirteen resources turn sheep into little versions of the mob (or place) they come from:",
         "- Hay Bale: a hay fleece (wheat).",
         "- Snow Block: a snowy fleece, and it leaves snow wherever it walks, like a Snow Golem (snowballs).",
         "- Nether Star: two Wither Skeleton Skulls beside its head (nether stars).",
@@ -404,6 +404,7 @@
         "- Blaze Rod: always on fire, but never hurt (blaze rods).",
         "- Ghast Tear: twice the size, tentacles, and it screams like a ghast (ghast tears).",
         "- Prismarine Crystals: a fin and gills; it breathes underwater and drives the Fleece Trawler (prismarine shards).",
+        "- TNT: a TNT fleece with a fuse on its back. Fire, lava, lightning or flint and steel light it: it hisses and pops its fleece off as wool, breaking nothing (gunpowder).",
         "Each one has its own advancement, and collecting every wool is a challenge."
       ],
       "tab": "production"
@@ -419,6 +420,7 @@
         "- Common, a Wheat: Stone, Wood, Coal, Copper, Hay, Snow, Red and Brown Mushroom.",
         "- Uncommon, a Golden Carrot: Iron, Gold, Redstone, Lapis, Quartz, Glow Ink, Spider, Skeleton.",
         "- Rare, a Golden Apple: Diamond, Emerald, Blaze, Ghast.",
+        "- Explosive: TNT, with 2 Gunpowder and a Fire Charge.",
         "- Epic, an Eye of Ender: Netherite (with Ancient Debris), Wither Skeleton (with Nether Bricks).",
         "For example, Iron is an Iron Ingot in the centre with 2 Blocks of Iron and a Golden Carrot. They take 20,000 FE over 2.5 seconds.",
         "## Tier 2: legendary sheep",

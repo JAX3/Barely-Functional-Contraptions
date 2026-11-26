@@ -298,6 +298,7 @@ The **Infusion Altar** is a powered pedestal. Put the feeding item in its **cent
 | Dragon | Dragon's Breath | 4 End Stone, 4 Popped Chorus Fruit, 2 Eyes of Ender | 200,000 FE |
 | Warden | Echo Shard | 4 Sculk, 4 Amethyst Shards, 1 Sculk Catalyst | 200,000 FE |
 | Tide | Prismarine Crystals | 2 Prismarine, 1 Nautilus Shell | 20,000 FE |
+| Explosive | TNT | 2 Gunpowder, 1 Fire Charge | 20,000 FE |
 | Common: Stone, Wood, Coal, Copper, Hay, Snow, Red and Brown Mushroom | the resource | 2 of its blocks (Stone, logs, Block of Coal, Block of Copper, Hay Bales, Snow Blocks, mushroom blocks), 1 Wheat | 20,000 FE |
 | Uncommon: Iron, Gold, Redstone, Lapis, Quartz, Glow Ink, Spider, Skeleton | the resource | 2 of its blocks (Blocks of Iron, Gold, Redstone, Lapis, Quartz; Glowstone; Cobwebs; Bone Blocks), 1 Golden Carrot | 20,000 FE |
 | Rare: Diamond, Emerald, Blaze, Ghast | the resource | 2 of its blocks (Blocks of Diamond, Emerald; Magma Blocks; Soul Sand), 1 Golden Apple | 20,000 FE |

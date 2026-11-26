@@ -157,8 +157,10 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
         SheepAppearance appearance = resource.get().appearance();
         // A fleece made of its resource's block (a Redstone sheep wears Block of Redstone), drawn untinted and without
         // the sparkle (the block has its own pattern). Only for plain resource sheep: themed sheep (extra parts, a skull,
-        // glowing, burning, sculk) and ones with a hand-drawn fleece keep their own design.
-        if (!melon && appearance.woolTexture().isEmpty() && appearance.features().isEmpty() && appearance.skullTexture().isEmpty()
+        // glowing, burning, sculk) and ones with a hand-drawn fleece keep their own design, unless they ask for it
+        // ("block_wool": the Explosive sheep wears TNT round its fuse).
+        if (!melon && appearance.woolTexture().isEmpty()
+                && ((appearance.features().isEmpty() && appearance.skullTexture().isEmpty()) || appearance.blockWool())
                 && ModConfigs.getBool(ModConfigs.CLIENT.blockTexturedWool)) {
             Optional<Identifier> blockWool = BlockWoolTextures.textureFor(resource.get());
             if (blockWool.isPresent()) {
@@ -217,7 +219,8 @@ public class InfusedWoolLayer extends RenderLayer<SheepRenderState, SheepModel> 
             coloredCutoutModelCopyLayerRender(skulls, SheepSkullsModel.TEXTURE, poseStack, collector, lightCoords, state, -1, 1);
         }
         if (appearance.has(Feature.WINGS) || appearance.has(Feature.EXTRA_LEGS)
-                || appearance.has(Feature.TENTACLES) || appearance.has(Feature.SCULK) || appearance.has(Feature.FINS)) {
+                || appearance.has(Feature.TENTACLES) || appearance.has(Feature.SCULK) || appearance.has(Feature.FINS)
+                || appearance.has(Feature.FUSE)) {
             int light = appearance.has(Feature.GLOWING) ? LightCoordsUtil.FULL_BRIGHT : lightCoords;
             coloredCutoutModelCopyLayerRender(extras, EXTRAS_TEXTURE, poseStack, collector, light, state, tint, 1);
         }

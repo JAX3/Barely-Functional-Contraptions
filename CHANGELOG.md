@@ -58,6 +58,20 @@ Links Wool-Lined Crates into one store. It needs no power.
 - **Recipe:** a Wool-Lined Crate, a Hopper, two Comparators, two Iron Ingots and a Functional Machine Block.
 - New config section `[crate_controller]`: `range`, `maxCrates`; a chapter in the Contraptions Manual (Logistics).
 
+### The Explosive sheep
+A new themed sheep, infused with **TNT** at the altar (with 2 Gunpowder and a Fire Charge).
+- **Looks:** a TNT fleece, laid out face by face so the red stripes run along its body and the white band reads
+  "TNT" down each flank, little TNT blocks on its back, and a fuse sticking up out of them.
+- **Short fuse:** fire, lava, lightning, or flint and steel (or a Fire Charge) on it lights the fuse. It hisses like
+  a creeper for a second and a half, then **pops**: a small blast that **breaks no blocks and hurts no one**, but
+  shoves things nearby and **blows its fleece off as Explosive Wool**, exactly as shearing would (one infusion use).
+  The pop puts out any fire on it. Only a sheep with its fleece on has a fuse, so it won't go off again until its
+  wool grows back.
+- **Its wool** separates into **Gunpowder** (2–4), with a small chance of a block of TNT.
+- **Advancement:** *Short Fuse*, and Explosive Wool joins the *Fleece of Every Colour* challenge (now 27 wools).
+- For data packs: a new `fuse` appearance feature, and `"block_wool": true`, which lets a themed sheep still wear the
+  fleece made of its resource's block.
+
 ### Production: the Fleece Trawler and the Tide sheep
 A dockside winch that **fishes the pool in front of it**. It needs no power: **Tide sheep swimming in the pool drive
 it**.

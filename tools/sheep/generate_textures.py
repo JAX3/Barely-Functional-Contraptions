@@ -2564,6 +2564,11 @@ def generate_sheep_extras():
     # Its gill flaps (texOffs 28,46; 0x3x2 planes: sides 2x3 at (28,48) and (30,48)): slits.
     fill((28, 48, 32, 51), lambda x, y, w, h: grey(120 if y == 1 else 196))
 
+    # The Explosive sheep's fuse (texOffs 48,20; a 1x8x1 wick, tall enough to stick up out of its TNT: top at (49,20),
+    # sides at (48..51, 21..28)): twisted hemp in light greys (tinted with feature_color), its top end charred black.
+    fill((49, 20, 51, 21), lambda x, y, w, h: grey(40))
+    fill((48, 21, 52, 29), lambda x, y, w, h: grey(60) if y == 0 else grey(232 if (x + y) % 2 else 186))
+
     # Glowing eyes (texOffs 40,8; 6x6 plane on the face): the vanilla sheep's eye pixels, white so the accent tints them.
     for x, y in ((0, 2), (1, 2), (4, 2), (5, 2)):
         img.putpixel((40 + x, 8 + y), (255, 255, 255, 255))

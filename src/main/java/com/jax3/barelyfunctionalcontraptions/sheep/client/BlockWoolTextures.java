@@ -62,6 +62,9 @@ public final class BlockWoolTextures {
             NativeImage source = contents.getOriginalImage();
             int bw = contents.width(), bh = contents.height(); // the first frame of an animated texture
             int base = ARGB.opaque(resource.woolColor());
+            // A themed sheep that asked for its block ("block_wool", the Explosive sheep's TNT) gets the block laid
+            // out face by face, so each side shows the whole block face the right way up; the others tile it.
+            int[][] fitted = resource.appearance().blockWool() ? fittedMap(wool.getWidth(), wool.getHeight(), bw, bh) : null;
             NativeImage out = new NativeImage(wool.getWidth(), wool.getHeight(), true);
             for (int y = 0; y < wool.getHeight(); y++) {
                 for (int x = 0; x < wool.getWidth(); x++) {
@@ -72,7 +75,12 @@ public final class BlockWoolTextures {
                         continue;
                     }
                     int grey = ARGB.red(fluff);
-                    int pixel = source.getPixel(x % bw, y % bh);
+                    int sx = x % bw, sy = y % bh;
+                    if (fitted != null && fitted[y * wool.getWidth() + x] != null) {
+                        sx = fitted[y * wool.getWidth() + x][0];
+                        sy = fitted[y * wool.getWidth() + x][1];
+                    }
+                    int pixel = source.getPixel(sx, sy);
                     // A see-through bit of the block (a cobweb's gaps): plain wool in the resource's colour.
                     int colour = ARGB.alpha(pixel) < 128 ? ARGB.multiply(base, ARGB.opaque(ARGB.color(grey, grey, grey)))
                             : shade(pixel, grey);
@@ -86,6 +94,68 @@ public final class BlockWoolTextures {
         } catch (Exception e) {
             ResourcefulSheep.LOGGER.warn("Couldn't make a block fleece for {}: {}", resource.id(), e.toString());
             return null;
+        }
+    }
+
+    /**
+     * For each pixel of the fleece texture (the vanilla sheep wool layout), where on the block's texture it shows when
+     * the block is fitted to each face of the fleece: the head and legs show the block upright on each face; the body,
+     * which the model lies along its length, shows it turned so it runs along the sheep (on a TNT fleece, the white
+     * band runs down each flank and along its back). Null for pixels outside every face.
+     */
+    private static int[][] fittedMap(int width, int height, int bw, int bh) {
+        int[][] map = new int[width * height][];
+        // Head (texOffs 0,0; 6x6x6) and legs (texOffs 0,16; 4x6x4): every face upright.
+        fitBox(map, width, height, bw, bh, 0, 0, 6, 6, 6, false);
+        fitBox(map, width, height, bw, bh, 0, 16, 4, 6, 4, false);
+        // Body (texOffs 28,8; 8x16x6, turned to lie along the sheep): its long faces run along the sheep.
+        fitBox(map, width, height, bw, bh, 28, 8, 8, 16, 6, true);
+        return map;
+    }
+
+    /**
+     * Where pixel {@code i} of a face {@code size} pixels across lands on a block texture {@code texture} pixels
+     * across: pixel for pixel from the block's middle where the face is smaller (so a TNT flank shows the white band and
+     * its letters whole, not squashed), stretched where it's bigger.
+     */
+    private static int fit(int i, int size, int texture) {
+        return size <= texture ? (texture - size) / 2 + i : i * texture / size;
+    }
+
+    /** Like {@link #fit}, but the face shows a {@code slice} of the texture's middle, squashed or stretched to fit. */
+    private static int span(int i, int size, int texture, int slice) {
+        return (texture - slice) / 2 + i * slice / size;
+    }
+
+    /** Fits the block's texture to each face of a model cube at {@code (u, v)}, {@code w x h x d}. */
+    private static void fitBox(int[][] map, int width, int height, int bw, int bh, int u, int v, int w, int h, int d, boolean lying) {
+        // {x0, y0, x1, y1, turned}: top, bottom, then the four sides (east, north, west, south).
+        int[][] faces = {
+                {u + d, v, u + d + w, v + d, 0}, {u + d + w, v, u + d + 2 * w, v + d, 0},
+                {u, v + d, u + d, v + d + h, lying ? 1 : 0}, {u + d, v + d, u + d + w, v + d + h, lying ? 1 : 0},
+                {u + d + w, v + d, u + 2 * d + w, v + d + h, lying ? 1 : 0}, {u + 2 * d + w, v + d, u + 2 * d + 2 * w, v + d + h, lying ? 1 : 0}};
+        for (int fi = 0; fi < faces.length; fi++) {
+            int[] f = faces[fi];
+            int fw = f[2] - f[0], fh = f[3] - f[1];
+            // The west flank is drawn mirrored on the model, so it's flipped back to read the right way round.
+            boolean flip = lying && fi == 4;
+            for (int y = f[1]; y < f[3] && y < height; y++) {
+                for (int x = f[0]; x < f[2] && x < width; x++) {
+                    int lx = x - f[0], ly = y - f[1];
+                    int sx, sy;
+                    if (f[4] == 1) {
+                        // Turned: the face's length (down the texture) is across the block, its depth up the block.
+                        sx = fit(flip ? fh - 1 - ly : ly, fh, bw);
+                        // Across the sheep, a slice a little taller than the face (10 of 16 rows on a TNT flank): the
+                        // band and its letters with some of the red either side, only slightly squashed.
+                        sy = span(lx, fw, bh, Math.min(bh, fw * 5 / 3));
+                    } else {
+                        sx = fit(lx, fw, bw);
+                        sy = fit(ly, fh, bh);
+                    }
+                    map[y * width + x] = new int[]{Math.min(bw - 1, sx), Math.min(bh - 1, sy)};
+                }
+            }
         }
     }
 

@@ -321,6 +321,10 @@ public final class DevScreenshotHarness {
             blockWoolTick(mc, server);
             return;
         }
+        if ("explosive_sheep".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            explosiveSheepTick(mc, server);
+            return;
+        }
         if ("themed_sheep".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             themedSheepTick(mc, server);
             return;
@@ -2188,6 +2192,49 @@ public final class DevScreenshotHarness {
             case 190 -> openAt(server, chiller);
             case 215 -> shot(mc, "100_chiller_gui");
             case 220 -> mc.stop();
+            default -> {}
+        }
+    }
+
+    private static final java.util.List<net.minecraft.world.entity.animal.sheep.Sheep> explosiveSheep = new java.util.ArrayList<>();
+
+    /**
+     * Three Explosive sheep in a little pen: side on, close up, then the middle one lit with flint and steel, hissing,
+     * and just after it pops its fleece off: {@code -PharnessScene=explosive_sheep}.
+     */
+    private static void explosiveSheepTick(Minecraft mc, MinecraftServer server) {
+        switch (tick) {
+            case 60 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                ServerLevel level = player.level();
+                origin = player.blockPosition();
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
+                }
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, 0, -8), origin.offset(6, 4, 2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, -1, -8), origin.offset(6, -1, 2))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                var explosive = ResourcefulSheep.id("explosive");
+                int uses = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(explosive).orElseThrow().effectiveInfusionUses();
+                for (int i = 0; i < 3; i++) {
+                    var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    sheep.snapTo(origin.getX() - 2.5 + i * 3, origin.getY(), origin.getZ() - 5.5 + (i == 1 ? 0.6 : 0), 90, 0);
+                    sheep.setNoAi(true);
+                    level.addFreshEntity(sheep);
+                    com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
+                            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(explosive, uses));
+                    explosiveSheep.add(sheep);
+                }
+            });
+            case 70 -> setHudHidden(mc, true);
+            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 22", origin.getX() + 1.0, origin.getY() + 1.6, origin.getZ() + 0.5));
+            case 110 -> shot(mc, "116_explosive_sheep");
+            case 112 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 18", origin.getX() + 1.0, origin.getY() + 1.0, origin.getZ() - 2.6));
+            case 140 -> shot(mc, "116_explosive_sheep_close");
+            case 142 -> server.execute(() -> com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.light(explosiveSheep.get(1)));
+            case 162 -> shot(mc, "116_explosive_sheep_hissing");
+            case 173 -> shot(mc, "116_explosive_sheep_pop");
+            case 190 -> shot(mc, "116_explosive_sheep_after");
+            case 196 -> mc.stop();
             default -> {}
         }
     }
