@@ -135,6 +135,10 @@ public final class DevScreenshotHarness {
             woolBurnerTick(mc, server);
             return;
         }
+        if ("perf".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            perfTick(mc, server);
+            return;
+        }
         if ("world_tour".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             worldTourTick(mc, server);
             return;
@@ -4697,6 +4701,60 @@ public final class DevScreenshotHarness {
             ResourcefulSheep.LOGGER.warn("SURVEY x {}..{} y {}..{} z {}..{} blocks {} entities {}", minX + x0, maxX + x0, minY + y0, maxY + y0, minZ + z0, maxZ + z0, count, kinds);
         }
         ResourcefulSheep.LOGGER.warn("SURVEY links {}", com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData.get(server));
+    }
+
+    /**
+     * A basic performance check on the test world (open it with -PharnessWorld): stands over the middle of the platform,
+     * so every cell runs, warms up for 10 s, then logs the server's tick times every 5 s for a minute, with how many of the
+     * mod's block entities and infused sheep are loaded: {@code -PharnessScene=perf}. Add -PharnessJfr=<file> to profile.
+     */
+    private static void perfTick(Minecraft mc, MinecraftServer server) {
+        if (tick == 30) {
+            setHudHidden(mc, true);
+            command(server, "gamemode spectator @a");
+            command(server, "tp @a 73.5 70 108.5 180 90");
+        }
+        if (tick >= 240 && tick <= 1440 && tick % 100 == 40) {
+            server.execute(() -> {
+                long[] times = server.getTickTimesNanos();
+                double mean = 0, max = 0;
+                int n = 0;
+                for (long t : times) {
+                    if (t <= 0) continue;
+                    mean += t / 1e6;
+                    max = Math.max(max, t / 1e6);
+                    n++;
+                }
+                ServerLevel level = server.overworld();
+                int ours = 0;
+                java.util.Map<String, Integer> kinds = new java.util.TreeMap<>();
+                var chunkSource = level.getChunkSource();
+                for (int cx = -1; cx <= 10; cx++) {
+                    for (int cz = 0; cz <= 13; cz++) {
+                        var chunk = chunkSource.getChunkNow(cx, cz);
+                        if (chunk == null) continue;
+                        for (var be : chunk.getBlockEntities().values()) {
+                            var id = net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(be.getType());
+                            if (id != null && id.getNamespace().equals(ResourcefulSheep.MOD_ID)) {
+                                ours++;
+                                kinds.merge(id.getPath(), 1, Integer::sum);
+                            }
+                        }
+                    }
+                }
+                int sheep = 0, infused = 0;
+                for (var e : level.getAllEntities()) {
+                    if (e instanceof net.minecraft.world.entity.animal.sheep.Sheep sh) {
+                        sheep++;
+                        if (com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.getInfusion(sh).isInfused()) infused++;
+                    }
+                }
+                ResourcefulSheep.LOGGER.warn("PERF tick {}: last {} ticks mean {} ms, max {} ms; {} mod block entities, {} sheep ({} infused)",
+                        tick, n, String.format(java.util.Locale.ROOT, "%.2f", n == 0 ? 0 : mean / n), String.format(java.util.Locale.ROOT, "%.2f", max), ours, sheep, infused);
+                if (tick == 240) ResourcefulSheep.LOGGER.warn("PERF block entities: {}", kinds);
+            });
+        }
+        if (tick == 1460) mc.stop();
     }
 
     private static net.minecraft.world.phys.Vec3 extendReturn = net.minecraft.world.phys.Vec3.ZERO;

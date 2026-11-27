@@ -72,6 +72,10 @@ neoForge {
                 if (project.hasProperty('harnessWorld')) {
                     systemProperty 'barelyfunctionalcontraptions.screenshotHarness.world', project.property('harnessWorld')
                 }
+                // -PharnessJfr=<file>: record a Java Flight Recorder profile of the run (scene perf)
+                if (project.hasProperty('harnessJfr')) {
+                    jvmArgument "-XX:StartFlightRecording=filename=${project.property('harnessJfr')},settings=profile"
+                }
                 // -PharnessWidth / -PharnessHeight: a bigger window (the cover banner is shot at 1920x1080)
                 programArguments.addAll '--width', (project.findProperty('harnessWidth') ?: '1280').toString(),
                         '--height', (project.findProperty('harnessHeight') ?: '720').toString()
