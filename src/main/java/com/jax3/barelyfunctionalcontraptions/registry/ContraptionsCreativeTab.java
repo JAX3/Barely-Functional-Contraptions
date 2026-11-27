@@ -100,6 +100,7 @@ public final class ContraptionsCreativeTab {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLUE_STEEL_BLOCK,
                     com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HERD_COUNTER,
+                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_ATTRACTOR,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATUS_PANEL,
                     // Woollen Boots (white; craft or dye them for other colours)
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_BOOTS)));

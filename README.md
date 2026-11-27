@@ -197,6 +197,10 @@ Cracks **Cobblestone into Gravel, and Gravel into Sand**, with the blasts of **E
 
 ![An Implosion Chamber in a fenced pen of Explosive sheep](docs/screenshots/117_implosion_chamber.png)
 
+### Sheep Attractor
+
+A half-slab lure that clips onto any face of a Blaze Sheep Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction Chamber or Echo Chamber. While it's fitted, the machine calls the sheep it uses back when they wander a few blocks out of its area; without one, they're left to roam.
+
 ### Herd Counter
 
 A little screen that counts the sheep in the pen in front of it (all of them, the ones ready to shear, the sheared ones, lambs, or ones low on infusion, of every resource or just one) and puts the count on a comparator. Use it to run shears, seeders or breeders only when they're needed.

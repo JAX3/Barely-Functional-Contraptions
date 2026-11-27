@@ -242,6 +242,7 @@ public final class ResourcefulSheepClient {
         for (var item : java.util.List.of(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLAZE_FURNACE, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CHILLER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_TREADMILL,
+                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_ATTRACTOR,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.THERMAL_REACTION_CHAMBER)) {
             if (event.getItemStack().is(item.get())) {
                 event.getToolTip().add(1, net.minecraft.network.chat.Component.translatable("tooltip.barelyfunctionalcontraptions." + item.getId().getPath())

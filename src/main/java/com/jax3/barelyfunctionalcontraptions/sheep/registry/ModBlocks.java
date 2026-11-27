@@ -179,6 +179,12 @@ public final class ModBlocks {
                     com.jax3.barelyfunctionalcontraptions.sheep.blocks.CopperCombBlock::new,
                     p -> p.mapColor(MapColor.COLOR_ORANGE).strength(2.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion());
 
+    /** A half-slab lure that, clipped onto a sheep machine, makes it call its sheep back into its area. */
+    public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock> SHEEP_ATTRACTOR =
+            REGISTER.registerBlock("sheep_attractor",
+                    com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock::new,
+                    p -> p.mapColor(MapColor.METAL).strength(2.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.IRON).noOcclusion());
+
     /** A wall screen showing how the machines linked to it are doing. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.StatusPanelBlock> STATUS_PANEL =
             REGISTER.registerBlock("status_panel",

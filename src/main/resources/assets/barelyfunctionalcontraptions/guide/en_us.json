@@ -107,7 +107,7 @@
         "- Only a sheep showing its blazing fleece counts. A sheared sheep or a lamb gives nothing until its wool grows back.",
         "- In rain or water a sheep gives half.",
         "- Right-click with a Blaze Rod to load it, or put rods in the boost slot in its window: each rod doubles the output for 30 seconds. Hoppers and pipes can fill it too.",
-        "- Its Blaze sheep stay close: one that wanders up to 4 blocks out of the area walks back in while the furnace has room for more. The outline shows this as a faint dashed box.",
+        "- With a Sheep Attractor fitted, its Blaze sheep stay close: one that wanders up to 4 blocks out of the area walks back in while the furnace has room for more. The outline shows this as a faint dashed box.",
         "Shear the sheep for Blaze Rods, or leave the fleece on for power: that's the trade-off.",
         "It pushes its energy into every block around it, and a comparator reads one level per 20 FE/t.",
         "Right-click it with an empty hand to open its window. The fire in the middle column rises with the heat; each line is one more heat source, and its pip lights while that source is in use.",
@@ -190,7 +190,7 @@
         "- Running cold for 30 seconds freezes it solid. It encases itself in Packed Ice and won't restart until you mine every block of it away.",
         "- Running balanced counts the danger back down. The danger bar under the needle shows how close it is, and a comparator reads it (0 is steady, 15 is about to go), so you can wire up a safety cut-off.",
         "- With its buffer full it makes no power and uses no water, boosts or fleece, but its herds still heat and chill it: uneven herds still melt it down or freeze it.",
-        "- It keeps its herds close without upsetting them: a side with fewer sheep calls a stray back from up to 4 blocks away, and it only calls a new pair when a Blaze sheep and a Snow sheep are both waiting nearby.",
+        "- With a Sheep Attractor fitted, it keeps its herds close without upsetting them: a side with fewer sheep calls a stray back from up to 4 blocks away, and it only calls a new pair when a Blaze sheep and a Snow sheep are both waiting nearby.",
         "## Upkeep",
         "- Water: 250 mB a tick while it reacts, what five Fluid Reservoirs make. If it runs dry it stops and blasts scalding steam out of its front for a few seconds.",
         "- Fatigue: after an hour of reacting, a sheep's fleece is spent and it stops counting. Infuse it again, at the Infusion Altar or by hand, to renew it.",
@@ -441,7 +441,7 @@
         "- Only a grown sheep with its snowy fleece on counts; a sheared one or a lamb gives nothing until its wool grows back.",
         "- Each Ice takes a bucket of water. Pour Water Buckets in, pipe water in, or place a Fluid Reservoir beside it. It holds 8 buckets.",
         "- The Ice goes in its slot; a hopper or pipe can take it out of any side, and a comparator reads how full the slot is.",
-        "- Its Snow sheep stay close: one that wanders up to 4 blocks out of the area walks back in while it has room for more.",
+        "- With a Sheep Attractor fitted, its Snow sheep stay close: one that wanders up to 4 blocks out of the area walks back in while it has room for more.",
         "Right-click it with an empty hand to open its window: the water gauge, the cold column with a pip for each Snow sheep, the freezing arrow and how long each Ice takes. Its spyglass button, or a sneak-right-click with an empty hand, outlines the area."
       ]
     },
@@ -502,6 +502,20 @@
         "- Each machine gets two lines: its name with a lamp, then its status and one number that suits it (FE/t for a generator, progress or stored energy for the rest). Green is working, amber waiting, red a problem, grey idle. A machine that's been broken reads Missing.",
         "- A comparator reads how many of its machines have a problem, up to 15: put a lamp or a bell on it for an alarm.",
         "Right-click it with an empty hand for its window: name machines, move them up or down, unlink them, switch which ones' problems set off the alarm, sort the screen, change its colours, or make its comparator count working machines instead."
+      ]
+    },
+    {
+      "title": "Sheep Attractor",
+      "icon": "barelyfunctionalcontraptions:sheep_attractor",
+      "tab": "utility",
+      "text": [
+        "A half-slab lure, a sheaf of wheat on a steel plate, that clips onto a sheep machine.",
+        "- Place it against any face of a Blaze Sheep Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction Chamber or Echo Chamber (any of its blocks).",
+        "- While it's fitted, the machine calls the sheep it uses back into its area when one wanders up to 4 blocks out, as sheep follow wheat. It only calls as many as it has room for, and two machines never pull the same sheep.",
+        "- Without one, a machine leaves its sheep to wander. One attractor is enough; more do nothing extra.",
+        "- The faint dashed box round a machine's area shows how far it calls, while an attractor is fitted.",
+        "## Making it",
+        "- A Hay Bale above Blue Steel between two wool makes two."
       ]
     },
     {

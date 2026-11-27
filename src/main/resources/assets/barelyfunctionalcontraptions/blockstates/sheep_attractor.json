@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "barelyfunctionalcontraptions:block/sheep_attractor"
+    },
+    "facing=down": {
+      "model": "barelyfunctionalcontraptions:block/sheep_attractor",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "barelyfunctionalcontraptions:block/sheep_attractor",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "barelyfunctionalcontraptions:block/sheep_attractor",
+      "x": 90,
+      "y": 180
+    },
+    "facing=west": {
+      "model": "barelyfunctionalcontraptions:block/sheep_attractor",
+      "x": 90,
+      "y": 270
+    },
+    "facing=east": {
+      "model": "barelyfunctionalcontraptions:block/sheep_attractor",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

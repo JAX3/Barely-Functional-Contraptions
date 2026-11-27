@@ -1692,6 +1692,8 @@ public final class DevScreenshotHarness {
             {"hume field", 3, 6},
             {"energy sheep", 3, 6},
             {"hume field sculk", 3, 6},
+            // Then attraction moved into the Sheep Attractor: fit one to every machine that used to call its sheep.
+            {"fit sheep attractors", 2, 3},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -2302,6 +2304,46 @@ public final class DevScreenshotHarness {
         }
     }
 
+    /**
+     * Fits a Sheep Attractor to every machine on the platform that calls its sheep back (they used to do it on their
+     * own): on its top if that's free, else on the first free side.
+     */
+    private static void fitSheepAttractors(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        var block = ModBlocks.SHEEP_ATTRACTOR.get();
+        int fitted = 0;
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 33, 24), new BlockPos(146, 40, 192))) {
+            var be = level.getBlockEntity(p);
+            if (!(be instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity || be instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity
+                    || be instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity
+                    || be instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity
+                    || be instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity)) continue;
+            BlockPos machine = p.immutable();
+            if (com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock.fitted(level, machine)) continue;
+            // Every block of the machine (the Echo Chamber has 27), the top ones first.
+            var kind = level.getBlockState(machine).getBlock();
+            java.util.List<BlockPos> parts = new java.util.ArrayList<>();
+            for (BlockPos q : BlockPos.betweenClosed(machine.offset(-2, 0, -2), machine.offset(2, 2, 2))) if (level.getBlockState(q).is(kind)) parts.add(q.immutable());
+            parts.sort(java.util.Comparator.comparingInt((BlockPos q) -> -q.getY()));
+            fit:
+            for (Direction face : new Direction[]{Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
+                for (BlockPos part : parts) {
+                    if (!level.getBlockState(part.relative(face)).isAir()) continue;
+                    level.setBlock(part.relative(face), block.defaultBlockState()
+                            .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock.FACING, face), 3);
+                    if (!com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock.fitted(level, machine)) {
+                        level.setBlock(part.relative(face), Blocks.AIR.defaultBlockState(), 3); // another machine's block of the same kind
+                        continue;
+                    }
+                    fitted++;
+                    ResourcefulSheep.LOGGER.info("EXTEND sheep attractor on the {} at {} ({} of {})", kind.getName().getString(), machine, face, part);
+                    break fit;
+                }
+            }
+        }
+        ResourcefulSheep.LOGGER.info("EXTEND fitted {} sheep attractors", fitted);
+    }
+
     /** Clears the loose items (the Explosive Wool its sheep's blasts left before it caught it) from the Implosion Chamber's cell. */
     private static void sweepImplosionWool(MinecraftServer server) {
         ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
@@ -2532,7 +2574,11 @@ public final class DevScreenshotHarness {
                 }
             });
             case 345 -> shot(mc, "check_glow_ink_panel_night");
-            case 350 -> mc.stop();
+            case 347 -> { command(server, "time set noon"); command(server, "tp @a 103.5 37.5 109.5 135 35"); }
+            case 390 -> shot(mc, "check_sheep_attractor_chiller");
+            case 392 -> command(server, "tp @a 19.5 38.5 157.5 135 30");
+            case 430 -> shot(mc, "check_sheep_attractor_static");
+            case 435 -> mc.stop();
             default -> {}
         }
     }
@@ -4973,6 +5019,7 @@ public final class DevScreenshotHarness {
                         case "forceload the platform" -> command(server, "forceload add 0 24 146 192"); // its entities load before the next step
                         case "glow ink for lamps" -> glowInkForLamps(server);
                         case "after the cuts" -> afterTheCuts(server);
+                        case "fit sheep attractors" -> fitSheepAttractors(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);

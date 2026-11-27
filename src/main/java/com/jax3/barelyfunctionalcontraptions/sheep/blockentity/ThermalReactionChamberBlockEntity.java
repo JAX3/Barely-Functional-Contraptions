@@ -378,7 +378,7 @@ public class ThermalReactionChamberBlockEntity extends com.jax3.barelyfunctional
         }
         spent = worn;
         pairs = Math.min(max, Math.min(ids[0].length, ids[1].length));
-        callHerds(level, hotPen, coldPen, hot, cold, ids[0].length, ids[1].length, max);
+        callHerds(level, hotPen, coldPen, hot, cold, ids[0].length, ids[1].length, max, attractsSheep());
         if (!Arrays.equals(ids[0], hotIds) || !Arrays.equals(ids[1], coldIds)) {
             hotIds = ids[0];
             coldIds = ids[1];
@@ -392,11 +392,11 @@ public class ThermalReactionChamberBlockEntity extends com.jax3.barelyfunctional
      * stray that wandered out comes home), and when both sides are even and below the most pairs, it calls a sheep to
      * each side only when there is one waiting nearby for both. It never calls a sheep that would leave a side ahead.
      */
-    private static void callHerds(ServerLevel level, AABB hotPen, AABB coldPen, List<Sheep> hot, List<Sheep> cold, int hotCount, int coldCount, int max) {
+    private static void callHerds(ServerLevel level, AABB hotPen, AABB coldPen, List<Sheep> hot, List<Sheep> cold, int hotCount, int coldCount, int max, boolean attractor) {
         long now = level.getGameTime();
         SheepAttraction.claim(hot, now);
         SheepAttraction.claim(cold, now);
-        if (!SheepAttraction.enabled()) return;
+        if (!SheepAttraction.enabled() || !attractor) return; // no Sheep Attractor fitted: they're left to wander
         java.util.function.Predicate<Sheep> hotOk = s -> isHotSource(s) && !isSpent(s);
         java.util.function.Predicate<Sheep> coldOk = s -> isColdSource(s) && !isSpent(s);
         if (hotCount < coldCount) {
@@ -567,10 +567,10 @@ public class ThermalReactionChamberBlockEntity extends com.jax3.barelyfunctional
         return tank.fillFromBucket();
     }
 
-    /** It calls its sheep back from just outside its area. */
+    /** It calls its sheep back only while a Sheep Attractor is fitted to it. */
     @Override
     public boolean attractsSheep() {
-        return true;
+        return level != null && com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock.fitted(level, worldPosition);
     }
 
     @Override

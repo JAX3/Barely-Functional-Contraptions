@@ -45,6 +45,7 @@ off), so nothing gathers in the platform's shadow.
 | Wool Packers fed by hoppers, a separator working a bale, and placed Wool Bales of every wool | `/tp @s 45.5 37 115.5 180 30` |
 | Infusion Altar that has made a Wither sheep (powered by a Creative Generator), and a bred sheep with high stats | `/tp @s 72.5 37 112.5 180 25` |
 | Snow Sheep Chiller with three Snow sheep, a hopper and chest under it, and its area shown | `/tp @s 101.5 37 114.5 180 30` |
+| Sheep Attractors: one on each machine that calls its sheep back (the Blaze Sheep Furnace, the Snow Sheep Chiller, the Thermal Reaction Chamber and the Echo Chamber on their tops, the Static Generator on its dome) | (on those machines) |
 | Woollen Boots on armour stands, in white, red, light blue and brown | `/tp @s 17.5 35.6 134 180 12` |
 | Sheep Treadmills in a fenced pen: a sheep walking one, a sheared sheep another, one empty and one turned east, all fed Hay Bales | `/tp @s 43.5 36.2 134.5 205 28` |
 | Ore processing line: six Iron sheep in the Automatic Shears' pen, pipes over the top to a Mechanical Separator, a pipe trench under the row to a chest (filtered to ingots, nuggets and String; with the furnaces that smelted its Raw Iron cut, the Raw Iron now backs up in the separator), powered by a Mycelial Generator on a Fluid Reservoir | `/tp @s 73.5 40 139 180 34` |

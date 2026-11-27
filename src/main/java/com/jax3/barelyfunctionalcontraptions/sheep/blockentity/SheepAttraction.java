@@ -15,8 +15,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Keeps a machine's sheep close: the Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller and Thermal Reaction
- * Chamber each call the sheep they use back into their working area when one wanders a little way out of it.
+ * Keeps a machine's sheep close: a sheep machine with a {@link com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock
+ * Sheep Attractor} fitted (the Blaze Sheep Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction Chamber and
+ * Echo Chamber) calls the sheep it uses back into its working area when one wanders a little way out of it.
  *
  * <ul>
  *     <li>The <b>attraction area</b> is the working area grown by {@code [sheep_attraction] range} blocks on every

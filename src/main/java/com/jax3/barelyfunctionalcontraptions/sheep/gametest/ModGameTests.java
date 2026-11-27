@@ -247,6 +247,7 @@ public final class ModGameTests {
         TESTS.put("thermal_reaction_chamber_spent_fleece_stops_counting", ModGameTests::thermalFatigue);
         TESTS.put("thermal_reaction_chamber_keeps_its_balance_when_full", ModGameTests::thermalFull);
         TESTS.put("chiller_calls_a_stray_snow_sheep_back", ModGameTests::chillerAttracts);
+        TESTS.put("sheep_attractor_turns_attraction_on", ModGameTests::sheepAttractor);
         TESTS.put("wrench_has_its_common_tags", ModGameTests::wrenchTags);
         TESTS.put("thermal_reaction_chamber_calls_a_stray_back_to_even_its_herds", ModGameTests::thermalAttracts);
         SOLO_TESTS.put("thermal_reaction_chamber_melts_down_when_hot", ModGameTests::thermalMeltdown);
@@ -3656,12 +3657,56 @@ public final class ModGameTests {
         h.succeed();
     }
 
-    /** A Snow sheep a few blocks outside a chiller's area walks back into it and is counted. */
+    /** A Sheep Attractor fitted to {@code machine}'s face {@code face}. */
+    private static void fitAttractor(GameTestHelper h, BlockPos machine, Direction face) {
+        h.setBlock(machine.relative(face), ModBlocks.SHEEP_ATTRACTOR.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock.FACING, face));
+    }
+
+    /**
+     * Attraction is the Sheep Attractor's: a chiller without one leaves a stray Snow sheep where it is. One fitted to
+     * the upper half of a Static Generator counts for the whole machine; one on stone fits nothing; one facing away
+     * from a machine (fitted to the block beside it) doesn't count for it.
+     */
+    private static void sheepAttractor(GameTestHelper h) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(7, 0, 7))) h.setBlock(p, Blocks.STONE);
+        BlockPos pos = new BlockPos(1, 1, 1);
+        h.setBlock(pos, ModBlocks.CHILLER.get());
+        var chiller = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.class);
+        Sheep stray = sheepAt(h, new BlockPos(5, 1, 5), ResourcefulSheep.id("snow"));
+        stray.setNoAi(false);
+        stray.goalSelector.removeAllGoals(goal -> true);
+        h.assertFalse(chiller.attractsSheep(), "without an attractor it doesn't call sheep");
+        // An attractor beside the chiller but fitted to the stone under it (facing up) isn't on the chiller.
+        h.setBlock(pos.east().below(), Blocks.STONE);
+        fitAttractor(h, pos.east().below(), Direction.UP);
+        h.assertFalse(chiller.attractsSheep(), "one fitted to the next block doesn't count");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock.machine(h.getLevel(), h.absolutePos(pos.east())) == null,
+                "and it knows it isn't on a sheep machine");
+        // A Static Generator, with one fitted to the side of its upper half.
+        BlockPos gen = new BlockPos(5, 1, 1);
+        h.setBlock(gen, ModBlocks.STATIC_GENERATOR.get().defaultBlockState());
+        h.setBlock(gen.above(), ModBlocks.STATIC_GENERATOR.get().defaultBlockState()
+                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.StaticGeneratorBlock.HALF, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+        var generator = h.getBlockEntity(gen, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.class);
+        h.assertFalse(generator.attractsSheep(), "nor does the generator yet");
+        fitAttractor(h, gen.above(), Direction.EAST);
+        h.assertTrue(generator.attractsSheep(), "one on its upper half counts for the whole machine");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock.machine(h.getLevel(), h.absolutePos(gen.above().east())) == generator,
+                "and knows which machine it's on");
+        h.runAfterDelay(60, () -> {
+            h.assertTrue(chiller.coldSourceCount() == 0, "the stray was left where it was");
+            h.succeed();
+        });
+    }
+
+    /** With a Sheep Attractor fitted, a Snow sheep a few blocks outside a chiller's area walks back into it and is counted. */
     private static void chillerAttracts(GameTestHelper h) {
         for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.STONE);
         BlockPos pos = new BlockPos(1, 1, 1);
         h.setBlock(pos, ModBlocks.CHILLER.get());
         var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.class);
+        fitAttractor(h, pos, Direction.WEST);
         Sheep stray = sheepAt(h, new BlockPos(5, 1, 5), ResourcefulSheep.id("snow"));
         stray.setNoAi(false);
         stray.goalSelector.removeAllGoals(goal -> true); // no wandering off the platform: only the chiller moves it
@@ -3672,12 +3717,13 @@ public final class ModGameTests {
     }
 
     /**
-     * Two Blaze sheep against one Snow sheep: the chamber calls the Snow sheep standing just outside its cold pen in,
+     * Two Blaze sheep against one Snow sheep, and a Sheep Attractor on the chamber: it calls the Snow sheep standing just outside its cold pen in,
      * evening the herds.
      */
     private static void thermalAttracts(GameTestHelper h) {
         for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(6, 0, 6))) h.setBlock(p, Blocks.STONE);
         var be = chamber(h, 2, 1, 16);
+        fitAttractor(h, TRC, Direction.UP);
         Sheep stray = sheepAt(h, new BlockPos(1, 1, 0), ResourcefulSheep.id("snow"));
         stray.setNoAi(false);
         stray.goalSelector.removeAllGoals(goal -> true); // only the chamber moves it

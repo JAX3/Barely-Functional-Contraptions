@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " H ",
+    "WSW"
+  ],
+  "key": {
+    "H": "minecraft:hay_block",
+    "W": "#minecraft:wool",
+    "S": "barelyfunctionalcontraptions:blue_steel"
+  },
+  "result": {
+    "id": "barelyfunctionalcontraptions:sheep_attractor",
+    "count": 2
+  }
+}

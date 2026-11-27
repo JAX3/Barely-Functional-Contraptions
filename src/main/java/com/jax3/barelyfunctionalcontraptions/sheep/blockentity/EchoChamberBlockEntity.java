@@ -430,7 +430,7 @@ public class EchoChamberBlockEntity extends com.jax3.barelyfunctionalcontraption
         int[] ids = herd.stream().limit(maxSheep()).mapToInt(Sheep::getId).toArray();
         long now = level.getGameTime();
         SheepAttraction.claim(herd, now);
-        SheepAttraction.attract(level, pen, EchoChamberBlockEntity::isListener, maxSheep() - ids.length, now);
+        if (attractsSheep()) SheepAttraction.attract(level, pen, EchoChamberBlockEntity::isListener, maxSheep() - ids.length, now);
         if (!Arrays.equals(ids, sheepIds)) {
             sheepIds = ids;
             setChanged();
@@ -535,9 +535,10 @@ public class EchoChamberBlockEntity extends com.jax3.barelyfunctionalcontraption
 
     // ------------------------------------------------------------------ area
 
+    /** It calls its sheep back only while a Sheep Attractor is fitted to it. */
     @Override
     public boolean attractsSheep() {
-        return true;
+        return level != null && com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock.fitted(level, worldPosition);
     }
 
     @Override

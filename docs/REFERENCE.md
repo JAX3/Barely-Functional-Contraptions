@@ -556,7 +556,7 @@ C T C      C = Copper Block, T = Fluid Tank
 | ![A Thermal Reaction Chamber encased in Packed Ice between a Blaze sheep and two Snow sheep](screenshots/105_thermal_reaction_chamber_frozen.png) | ![The crater and fires left where a Thermal Reaction Chamber melted down](screenshots/105_thermal_reaction_chamber_meltdown.png) |
 
 - **Sides:** it faces you when placed. Looking at its front, the **hot side is on the left** and the **cold side on the right**. Each pen is 5x5 (`radius`), starting one block out from that face, at its level and the one above. Its spyglass button, or a sneak-right-click with an empty hand, outlines the hot pen in orange and the cold pen in light blue, each with its attraction area as a faint dashed box.
-- **Keeping its herds close:** it calls sheep back from up to 4 blocks outside its pens, but only in a way that keeps the herds even. A side with fewer sheep calls one of its own back, so a stray comes home. When both sides are even and below 6 pairs, it calls a new pair only if a Blaze sheep and a Snow sheep are both waiting nearby. It never calls a sheep that would leave one side ahead, and never one whose fleece is spent. See [Sheep attraction](#sheep-attraction).
+- **Keeping its herds close:** with a [Sheep Attractor](#sheep-attraction) fitted, it calls sheep back from up to 4 blocks outside its pens, but only in a way that keeps the herds even. A side with fewer sheep calls one of its own back, so a stray comes home. When both sides are even and below 6 pairs, it calls a new pair only if a Blaze sheep and a Snow sheep are both waiting nearby. It never calls a sheep that would leave one side ahead, and never one whose fleece is spent. See [Sheep attraction](#sheep-attraction).
 - **Sheep:** every half second it counts the grown sheep with their fleece on: Blaze sheep (`hotSources`) in the hot pen and Snow sheep (`coldSources`) in the cold pen. Sheared sheep and lambs don't count.
 - **Power:** a Blaze sheep matched by a Snow sheep is a **pair**. The first pair makes 2,500 FE/t and each one after it adds less (`falloff` 0.13): about 4,700 FE/t for two, 6,500 for three, 8,100 for four and 10,100 for six, the most it counts (`maxPairs`). It stores 2,000,000 FE and pushes up to 40,000 FE/t into every block around it; cables and machines can also pull from any face.
 - **Boosts:** a Blaze Rod in the hot slot and Blue Ice in the cold slot each burn 30 seconds while it reacts. While **both** burn the output is doubled (`boostMultiplier`). One burning alone tips the balance one step towards its side instead. Hoppers and pipes can fill both slots from any face, and can't take them out.
@@ -647,14 +647,16 @@ A late-game generator, 2x2 and three blocks tall (two and three-quarters with it
 |---|---|
 | ![Jade on the Hume Field Generator: Delivering all it makes, its field, taken, average and No buffer](screenshots/hume_field_jade.png) | ![JEI's Hume Field Generator page: a sample trace, the generator, a line to an Energy Cable, 200-1,200 FE/t at random, 700 FE/t on average, and No buffer](screenshots/hume_field_jei.png) |
 
-### Sheep attraction
-The Blaze Sheep Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction Chamber and Echo Chamber keep the sheep they use close by. Every half second, a sheep of the right kind that has wandered out of the working area, but is still within 4 blocks of it (`range` in `[sheep_attraction]`, one block up or down too), walks back to a spot inside it, the way sheep follow wheat.
+### Sheep attraction and the Sheep Attractor
+A **Sheep Attractor** is a half-slab lure, a sheaf of wheat on a riveted steel plate, that clips onto a sheep machine: place it against **any face of any of the machine's blocks** (the top of a Blaze Sheep Furnace, the side of a Static Generator's upper half, anywhere on an Echo Chamber's 27). It fits flat against the face you clicked. A Hay Bale above Blue Steel between two wool makes two; mine it with a pickaxe.
+
+While one is fitted, the Blaze Sheep Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction Chamber or Echo Chamber keeps the sheep it uses close by. **Without one, the machine leaves its sheep to wander** (before 1.5.8 every one of these did this on its own). One attractor is enough; more do nothing extra. Jade on an attractor says which machine it's calling sheep for, or that it isn't on a sheep machine. Every half second, a sheep of the right kind that has wandered out of the working area, but is still within 4 blocks of it (`range` in `[sheep_attraction]`, one block up or down too), walks back to a spot inside it, the way sheep follow wheat.
 
 - Each machine calls only as many as it still has room for, so it never takes sheep it wouldn't use. The chamber also keeps its herds even (see above).
 - A sheep standing in one of these machines' areas belongs to that machine for a couple of seconds, so two machines side by side don't pull the same sheep back and forth.
 - Sheep on a lead, riding something, and lambs are left alone, so you can still lead a sheep away.
-- With the area shown (spyglass button or sneak-right-click), the attraction area is the faint dashed box round the working area.
-- `[sheep_attraction] enabled = false` turns it off; `range = 0` does too.
+- With the area shown (spyglass button or sneak-right-click), the attraction area is the faint dashed box round the working area, drawn only while an attractor is fitted.
+- `[sheep_attraction] enabled = false` turns every attractor off; `range = 0` does too.
 
 ### Blaze Sheep Furnace
 A generator that makes Forge Energy from the **heat of Blaze sheep** standing around it. Their fleece is always on fire, so the sheep themselves are the fuel.
@@ -664,7 +666,7 @@ A generator that makes Forge Energy from the **heat of Blaze sheep** standing ar
 | ![A Blaze Sheep Furnace with four burning Blaze sheep around and on top of it inside an orange outline, and Automatic Shears with a blue 3x3 outline](screenshots/70_blaze_furnace.png) | ![Close-up of the furnace's lit front with Blaze sheep beside and on top of it](screenshots/71_blaze_furnace_close.png) |
 
 - **Where the sheep go:** the **5×5 columns centred on the furnace** (two blocks out each way), at its own level and the block above. Sheep standing next to it, a block further out, or on top of it all count. A sheep counts when its feet are in that area. To make the area bigger or smaller, change `radius` in `[blaze_furnace]` in the synced config: `1` is 3×3, `2` is 5×5 (the default), up to `8`. The area outline always matches it.
-- **Keeping its sheep close:** a Blaze sheep that wanders up to 4 blocks outside the area is called back in, as sheep follow wheat, while the furnace has room for more heat (fewer than 4). The outline shows this attraction area as a faint dashed box round the working area. See [Sheep attraction](#sheep-attraction).
+- **Keeping its sheep close:** with a [Sheep Attractor](#sheep-attraction) fitted, a Blaze sheep that wanders up to 4 blocks outside the area is called back in, as sheep follow wheat, while the furnace has room for more heat (fewer than 4). The outline shows this attraction area as a faint dashed box round the working area. See [Sheep attraction](#sheep-attraction).
 - **How much power:** one Blaze sheep gives **80 FE/t**. Each extra one adds a little less (the `falloff`, 12.5%), and the hottest four count (`maxHeatSources`):
 
   | Blaze sheep | Power |
@@ -736,7 +738,7 @@ The Blaze Sheep Furnace's icy opposite: it **freezes water into Ice with the col
 - **Frosting over:** left full for **a minute** (`frostSeconds`) while its Snow sheep keep chilling it, it **frosts over**: it stops with snowflakes drifting off it, and its status reads *Frosted over*. Once there's room for Ice it thaws in **30 seconds** (`thawSeconds`), or at once if a Blaze sheep stands in its area. A hopper under it keeps it from ever frosting.
 - **Window:** right-click with an empty hand. The water gauge, the **cold column** (frost rising with the cold, a mark and pip for each Snow sheep), the speed, the freezing arrow into the Ice slot, how long each Ice takes, and the status (*Too warm*, *Freezing*, *No water*, *Ice slot full*).
 - **Area:** its spyglass button, or a sneak-right-click with an empty hand, outlines the area in light blue.
-- **Keeping its sheep close:** a Snow sheep that wanders up to 4 blocks outside the area is called back in while it has room for more (fewer than 4). The attraction area shows as a faint dashed box. See [Sheep attraction](#sheep-attraction).
+- **Keeping its sheep close:** with a [Sheep Attractor](#sheep-attraction) fitted, a Snow sheep that wanders up to 4 blocks outside the area is called back in while it has room for more (fewer than 4). The attraction area shows as a faint dashed box. See [Sheep attraction](#sheep-attraction).
 - **Recipe:** iron ingots in the four corners, a Snow Block above a Functional Machine Block, Packed Ice either side of it, and a Cauldron below. Mine it with a pickaxe.
 - **Config:** `[chiller]` sets the radius, the most Snow sheep counted, the falloff, the time and water per Ice, the tank, and which sheep resources give cold (`coldSources`, the Snow sheep by default).
 
@@ -1422,7 +1424,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 
 | Key | Default | Meaning |
 |---|---|---|
-| `enabled` | true | Whether the furnaces, chiller, Static Generator, Thermal Reaction Chamber and Echo Chamber call their sheep back |
+| `enabled` | true | Whether Sheep Attractors work: a machine with one fitted calls its sheep back |
 | `range` | 4 | How far outside the working area, in blocks, a sheep is still called back |
 
 **`[woollen_armor]`**

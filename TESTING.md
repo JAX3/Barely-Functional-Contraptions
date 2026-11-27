@@ -505,6 +505,7 @@ These run on a **dedicated-server** game test server, which also confirms the mo
 | `separator_never_overfills_output` | With 63 string already in the slot, the machine reports OUTPUT_FULL and uses no energy or input. |
 | `separator_state_survives_save_and_load` | Energy, progress and inventory round-trip through block entity save/load. |
 | `separator_jams_when_the_wool_changes` | With its jam odds at 1, two Iron Wool in a row never jam it, but Gold Wool after them does (status *Jammed*, no progress); shears clear it, wearing by one, and it then separates the gold |
+| `sheep_attractor_turns_attraction_on` | Without a Sheep Attractor a chiller leaves a stray Snow sheep where it is; one fitted to the next block (facing away) doesn't count; one on a Static Generator's upper half counts for the whole machine, and Jade-side lookup finds the machine it's on. `chiller_calls_a_stray_snow_sheep_back` and `thermal_reaction_chamber_calls_a_stray_back_to_even_its_herds` now fit one first |
 | `chiller_frosts_over_when_left_full` | Left full for 1 s (its frost time set low) with a Snow sheep chilling it, it frosts over; emptied, it still waits to thaw, until a Blaze sheep in its area thaws it at once; then it freezes Ice again |
 | `blaze_furnace_sparks_light_fires` | With its fire odds at 1 and a Blaze sheep heating it, it lights a fire beside the oak planks near it |
 

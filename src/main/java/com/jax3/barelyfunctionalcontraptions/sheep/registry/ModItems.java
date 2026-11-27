@@ -62,6 +62,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> ECHO_CHAMBER = REGISTER.registerSimpleBlockItem(ModBlocks.ECHO_CHAMBER);
     public static final DeferredItem<BlockItem> STATIC_GENERATOR = REGISTER.registerSimpleBlockItem(ModBlocks.STATIC_GENERATOR);
     public static final DeferredItem<BlockItem> COPPER_COMB = REGISTER.registerSimpleBlockItem(ModBlocks.COPPER_COMB);
+    public static final DeferredItem<BlockItem> SHEEP_ATTRACTOR = REGISTER.registerSimpleBlockItem(ModBlocks.SHEEP_ATTRACTOR);
     public static final DeferredItem<BlockItem> GRASS_SEEDER = REGISTER.registerSimpleBlockItem(ModBlocks.GRASS_SEEDER);
     public static final DeferredItem<BlockItem> IMPLOSION_CHAMBER = REGISTER.registerSimpleBlockItem(ModBlocks.IMPLOSION_CHAMBER);
     public static final DeferredItem<BlockItem> HERD_COUNTER = REGISTER.registerSimpleBlockItem(ModBlocks.HERD_COUNTER);

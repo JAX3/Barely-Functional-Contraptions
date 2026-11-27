@@ -233,7 +233,7 @@ public class ChillerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sh
         SheepAttraction.claim(found, level.getGameTime());
         // With a Range card it calls them back only every other second, so they wander a bit more.
         if (rangeBonus() == 0 || level.getGameTime() / 20 % 2 == 0) {
-            SheepAttraction.attract(level, area, ChillerBlockEntity::isColdSource, maxSources() - found.size(), level.getGameTime());
+            if (attractsSheep()) SheepAttraction.attract(level, area, ChillerBlockEntity::isColdSource, maxSources() - found.size(), level.getGameTime());
         }
         cold = coldFrom(ids.length);
         if (!Arrays.equals(ids, chillers)) {
@@ -285,10 +285,10 @@ public class ChillerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sh
         return tank.fillFromBucket();
     }
 
-    /** It calls its sheep back from just outside its area. */
+    /** It calls its sheep back only while a Sheep Attractor is fitted to it. */
     @Override
     public boolean attractsSheep() {
-        return true;
+        return level != null && com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock.fitted(level, worldPosition);
     }
 
     @Override

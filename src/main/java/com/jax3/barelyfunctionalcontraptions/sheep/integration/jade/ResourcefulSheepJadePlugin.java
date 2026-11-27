@@ -67,6 +67,7 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.class);
         registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ChillerBlock.class);
         registration.registerBlockComponent(EnergyMeterProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.EnergyMeterBlock.class);
+        registration.registerBlockComponent(SheepAttractorProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock.class);
         registration.registerBlockComponent(ThermalReactionChamberProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ThermalReactionChamberBlock.class);
         registration.registerBlockComponent(EchoChamberProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.EchoChamberBlock.class);
         EchoChamberProvider.redirect(registration);

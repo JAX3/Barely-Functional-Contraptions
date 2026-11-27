@@ -616,9 +616,9 @@
 	# Range: 0 ~ 100
 	timingRevision = 2
 
-#Sheep attraction: the Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Thermal Reaction Chamber, Echo Chamber and Static Generator call their sheep back into their working area when one wanders a little way out
+#Sheep attraction: a Blaze Sheep Furnace, Snow Sheep Chiller, Thermal Reaction Chamber, Echo Chamber or Static Generator with a Sheep Attractor fitted calls its sheep back into its working area when one wanders a little way out
 [sheep_attraction]
-	#Whether these machines call their sheep back.
+	#Whether Sheep Attractors work at all.
 	enabled = true
 	#How far outside the working area, in blocks, a sheep is still called back. The area outline shows it faintly.
 	# Default: 4

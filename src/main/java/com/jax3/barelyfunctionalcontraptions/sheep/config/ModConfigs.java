@@ -423,8 +423,8 @@ public final class ModConfigs {
                     .defineInRange("timingRevision", 0, 0, 100);
             b.pop();
 
-            b.comment("Sheep attraction: the Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Thermal Reaction Chamber, Echo Chamber and Static Generator call their sheep back into their working area when one wanders a little way out").push("sheep_attraction");
-            attractionEnabled = b.comment("Whether these machines call their sheep back.")
+            b.comment("Sheep attraction: a Blaze Sheep Furnace, Snow Sheep Chiller, Thermal Reaction Chamber, Echo Chamber or Static Generator with a Sheep Attractor fitted calls its sheep back into its working area when one wanders a little way out").push("sheep_attraction");
+            attractionEnabled = b.comment("Whether Sheep Attractors work at all.")
                     .define("enabled", true);
             attractionRange = b.comment("How far outside the working area, in blocks, a sheep is still called back. The area outline shows it faintly.")
                     .defineInRange("range", 4, 0, 16);

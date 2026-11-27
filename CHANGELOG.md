@@ -41,6 +41,8 @@ For Minecraft 26.3, 26.2 and 26.1 on NeoForge.
   blocks near it.
 - **The Glow Lamp is gone:** a Glow Ink sheep standing on Glow Panels gives them full glow power instead. Placed lamps
   disappear from worlds.
+- **Sheep Attractor:** calling sheep back is now a half-slab you clip onto a machine. The Blaze Sheep Furnace, Snow
+  Sheep Chiller, Static Generator, Thermal Reaction Chamber and Echo Chamber only call their sheep back with one fitted.
 - **Cut to keep the mod focused** (see `docs/DESIGN-RULES.md`): the **Wool Burner**, the **Powered Furnace**, and
   the Woollen Beanie, Jumper and Leggings (**Woollen Boots** stay, and now halve a Static Generator's shock). Placed
   blocks and held items disappear from worlds.

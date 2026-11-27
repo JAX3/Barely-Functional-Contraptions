@@ -11,9 +11,9 @@ them before it is built. The aim is a mod where every feature matters, not a mod
 If an idea doesn't fit that sentence, it doesn't belong in this mod, however good it is.
 
 ### Support blocks are exempt
-Storage, transport and display blocks support the sheep machines rather than being machines themselves: the Hume
-Energy Cube, Fluid Tank, Fluid Reservoir, Wool-Lined Crate, Crate Controller, Machine Status Panel, Energy Cable,
-Energy Meter, and Item and Fluid Pipes. They don't need sheep (rule 1) or a quirk (rule 3). Instead they must pass one
+Storage, transport, display and helper blocks support the sheep machines rather than being machines themselves: the
+Hume Energy Cube, Fluid Tank, Fluid Reservoir, Wool-Lined Crate, Crate Controller, Machine Status Panel, Energy Cable,
+Energy Meter, Item and Fluid Pipes, and the Sheep Attractor. They don't need sheep (rule 1) or a quirk (rule 3). Instead they must pass one
 test: **does it make a sheep machine easier to run?** A support block that only helps other mods' machines doesn't
 belong. Rules 2 and 4 to 10 still apply to them.
 
@@ -96,6 +96,9 @@ Stop adding features and polish what's there when you notice any of these:
 **Theme:** finishing and polish.
 - Crate Controller window (started).
 - Polish and fixes only otherwise.
+- Rework, not a new feature: sheep attraction moved out of five machines into the **Sheep Attractor** support block
+  (it passes rules 1 and 2: it makes the Blaze Sheep Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction
+  Chamber and Echo Chamber easier to run, and turns a hidden behaviour into one the player chooses).
 
 ## Parked ideas
 

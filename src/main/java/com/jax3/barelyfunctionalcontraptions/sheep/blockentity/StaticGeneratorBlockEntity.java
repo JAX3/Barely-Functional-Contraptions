@@ -289,7 +289,7 @@ public class StaticGeneratorBlockEntity extends com.jax3.barelyfunctionalcontrap
         working = worked;
         long now = level.getGameTime();
         SheepAttraction.claim(sheep, now);
-        if (!combs.isEmpty()) SheepAttraction.attract(level, pen, StaticGeneratorBlockEntity::rubbable, maxSheep() - herd, now);
+        if (!combs.isEmpty() && attractsSheep()) SheepAttraction.attract(level, pen, StaticGeneratorBlockEntity::rubbable, maxSheep() - herd, now);
         setChanged();
     }
 
@@ -416,9 +416,10 @@ public class StaticGeneratorBlockEntity extends com.jax3.barelyfunctionalcontrap
         return new StaticGeneratorMenu(containerId, inventory, this, data);
     }
 
+    /** It calls its sheep back only while a Sheep Attractor is fitted to it. */
     @Override
     public boolean attractsSheep() {
-        return true;
+        return level != null && com.jax3.barelyfunctionalcontraptions.sheep.blocks.SheepAttractorBlock.fitted(level, worldPosition);
     }
 
     @Override

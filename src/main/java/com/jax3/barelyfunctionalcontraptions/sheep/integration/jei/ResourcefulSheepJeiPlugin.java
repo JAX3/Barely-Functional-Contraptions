@@ -122,6 +122,8 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addItemStackInfo(new ItemStack(ModItems.STATUS_PANEL.get()),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.status_panel.1"),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.status_panel.2"));
+        registration.addItemStackInfo(new ItemStack(ModItems.SHEEP_ATTRACTOR.get()),
+                Component.translatable("jei.barelyfunctionalcontraptions.info.sheep_attractor"));
         registration.addItemStackInfo(new ItemStack(ModItems.HERD_COUNTER.get()),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.herd_counter.1"),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.herd_counter.2"));

@@ -5186,6 +5186,7 @@ def main():
     generate_energy_cable()
     generate_energy_meter()
     generate_glow_panel()
+    generate_sheep_attractor()
     generate_blaze_furnace()
     generate_wool_burner()
     generate_manual()
@@ -5232,6 +5233,52 @@ def main():
     generate_logo()
     print("Textures written to", os.path.abspath(ROOT))
 
+
+
+SHEEP_ATTRACTOR_TOP = [  # Sheep Attractor face: a riveted steel plate with a sheaf of wheat on a purple lure ring
+    "OOOOOOOOOOOOOOOO",
+    "OBHHHHHHHHHHHHbO",
+    "OHMMMMMMMMMMMMSO",
+    "OHMMppppppppMMSO",
+    "OHMpPYYCYCYCPpSO",
+    "OHMpPCYYCYYCPpSO",
+    "OHMpPYCYYCYYPpSO",
+    "OHMpPcCYCYCcPpSO",
+    "OHMpPPcCYCcPPpSO",
+    "OHMpPPPcCcPPPpSO",
+    "OHMpPPPcCcPPPpSO",
+    "OHMpPPcCYCcPPpSO",
+    "OHMMppppppppMMSO",
+    "OHMMMMMMMMMMMMSO",
+    "ObSSSSSSSSSSSSbO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+SHEEP_ATTRACTOR_SIDE = [  # its edge, half a block thick (the top half of the texture is unused)
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "OOOOOOOOOOOOOOOO",
+    "OHHHHHHHHHHHHHHO",
+    "OMbMMMMCYMMMMbMO",
+    "OMMMMMYCCYMMMMMO",
+    "OMMMMMMCYMMMMMMO",
+    "OSSSSSSSSSSSSSSO",
+    "OSSSSSSSSSSSSSSO",
+    "OOOOOOOOOOOOOOOO",
+]
+
+
+def generate_sheep_attractor():
+    """Sheep Attractor: its face (wheat on a lure ring) and its half-thick edge."""
+    pal = dict(CARTOON)
+    grid(SHEEP_ATTRACTOR_TOP, pal).save(out("block/sheep_attractor_top.png"))
+    grid(SHEEP_ATTRACTOR_SIDE, pal).save(out("block/sheep_attractor_side.png"))
 
 if __name__ == "__main__":
     main()
