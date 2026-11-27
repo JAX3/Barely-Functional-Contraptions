@@ -55,8 +55,6 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> GLOW_PANEL = REGISTER.registerSimpleBlockItem(ModBlocks.GLOW_PANEL);
     public static final DeferredItem<BlockItem> BLAZE_FURNACE = REGISTER.registerSimpleBlockItem(ModBlocks.BLAZE_FURNACE);
     public static final DeferredItem<BlockItem> CHILLER = REGISTER.registerSimpleBlockItem(ModBlocks.CHILLER);
-    public static final DeferredItem<BlockItem> POWERED_FURNACE = REGISTER.registerSimpleBlockItem(ModBlocks.POWERED_FURNACE);
-    public static final DeferredItem<BlockItem> WOOL_BURNER = REGISTER.registerSimpleBlockItem(ModBlocks.WOOL_BURNER);
 
     public static final DeferredItem<BlockItem> WOOL_PACKER = REGISTER.registerSimpleBlockItem(ModBlocks.WOOL_PACKER);
     public static final DeferredItem<BlockItem> INFUSION_ALTAR = REGISTER.registerSimpleBlockItem(ModBlocks.INFUSION_ALTAR);
@@ -88,10 +86,7 @@ public final class ModItems {
     public static final DeferredItem<com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem> CONTRAPTIONS_MANUAL = REGISTER.registerItem("contraptions_manual",
             com.jax3.barelyfunctionalcontraptions.sheep.items.GuideBookItem::new, p -> p.stacksTo(1));
 
-    /** Woollen Armour, in the colour of the wool it's crafted from; the boots muffle the wearer. */
-    public static final DeferredItem<net.minecraft.world.item.Item> WOOLLEN_HELMET = woollen("woollen_helmet", net.minecraft.world.item.equipment.ArmorType.HELMET);
-    public static final DeferredItem<net.minecraft.world.item.Item> WOOLLEN_CHESTPLATE = woollen("woollen_chestplate", net.minecraft.world.item.equipment.ArmorType.CHESTPLATE);
-    public static final DeferredItem<net.minecraft.world.item.Item> WOOLLEN_LEGGINGS = woollen("woollen_leggings", net.minecraft.world.item.equipment.ArmorType.LEGGINGS);
+    /** Woollen Boots, in the colour of the wool they're crafted from: they muffle the wearer. */
     public static final DeferredItem<net.minecraft.world.item.Item> WOOLLEN_BOOTS = woollen("woollen_boots", net.minecraft.world.item.equipment.ArmorType.BOOTS);
 
     private static DeferredItem<net.minecraft.world.item.Item> woollen(String name, net.minecraft.world.item.equipment.ArmorType type) {

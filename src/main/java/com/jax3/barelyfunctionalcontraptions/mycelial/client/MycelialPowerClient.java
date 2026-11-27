@@ -14,7 +14,6 @@ public final class MycelialPowerClient {
 
     public static void init(IEventBus modBus, ModContainer container) {
         modBus.addListener(MycelialPowerClient::registerScreens);
-        NeoForge.EVENT_BUS.addListener(WrenchClientEffects::onClientTick);
     }
 
     private static void registerScreens(RegisterMenuScreensEvent event) {

@@ -140,7 +140,6 @@ public final class ModGameTests {
         TESTS.put("all_blocks_use_iron_block_sounds", ModGameTests::ironSounds);
         TESTS.put("zero_point_modules_generate_across_a_gap", ModGameTests::zeroPointModules);
         TESTS.put("zero_point_beam_burns_what_touches_it", ModGameTests::zeroPointBeamBurns);
-        TESTS.put("zero_point_beam_kills_have_looting", ModGameTests::zeroPointBeamLooting);
         TESTS.put("zero_point_modules_link_sideways", ModGameTests::zeroPointSideways);
         TESTS.put("zero_point_beam_is_boosted_by_dragon_sheep", ModGameTests::zeroPointDragons);
         TESTS.put("bred_lambs_keep_the_infusion", ModGameTests::breedingKeepsInfusion);
@@ -171,7 +170,6 @@ public final class ModGameTests {
         TESTS.put("list_command_lists_every_sheep", ModGameTests::listCommand);
         TESTS.put("snow_sheep_leaves_snow", ModGameTests::snowSheep);
         TESTS.put("chiller_freezes_water_with_snow_sheep", ModGameTests::chiller);
-        TESTS.put("powered_furnace_smelts_faster_with_blaze_sheep", ModGameTests::poweredFurnace);
         TESTS.put("woollen_armor_takes_the_wool_colour", ModGameTests::woollenArmorColour);
         TESTS.put("wrench_dismantles_machines_into_the_inventory", ModGameTests::wrenchDismantles);
         TESTS.put("woollen_boots_muffle_the_wearer", ModGameTests::woollenBootsMuffle);
@@ -281,8 +279,6 @@ public final class ModGameTests {
         TESTS.put("blaze_furnace_blaze_rod_boost", ModGameTests::blazeFurnaceBoost);
         TESTS.put("blaze_furnace_heat_sources_are_data", ModGameTests::blazeFurnaceData);
         TESTS.put("machines_show_their_working_area", ModGameTests::machineAreaToggle);
-        TESTS.put("wool_burner_burns_wool_string_and_coal_wool", ModGameTests::woolBurnerFuels);
-        TESTS.put("wool_burner_waits_while_full_and_takes_only_fuel", ModGameTests::woolBurnerFullAndHoppers);
         TESTS.put("wool_packer_presses_nine_wool_into_a_bale", ModGameTests::woolPackerPresses);
         TESTS.put("wool_packer_pauses_and_works_with_hoppers", ModGameTests::woolPackerPausesAndHoppers);
         TESTS.put("wool_bale_separates_for_more", ModGameTests::woolBaleSeparationNumbers);
@@ -1943,7 +1939,7 @@ public final class ModGameTests {
         level.setBlockAndUpdate(panelPos, ModBlocks.STATUS_PANEL.get().defaultBlockState());
         var panel = (com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity) level.getBlockEntity(panelPos);
         BlockPos furnace = base.offset(2, 0, 0), seeder = base.offset(4, 0, 3), cube = base.offset(2, 0, 3), stone = base.offset(0, 0, 4);
-        level.setBlockAndUpdate(furnace, ModBlocks.POWERED_FURNACE.get().defaultBlockState());
+        level.setBlockAndUpdate(furnace, ModBlocks.WOOL_PACKER.get().defaultBlockState());
         level.setBlockAndUpdate(seeder, ModBlocks.GRASS_SEEDER.get().defaultBlockState());
         level.setBlockAndUpdate(cube, ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState());
         level.setBlockAndUpdate(stone, Blocks.STONE.defaultBlockState());
@@ -1955,8 +1951,8 @@ public final class ModGameTests {
                 "stone isn't a machine");
         var rows = panel.rows();
         h.assertTrue(rows.size() == 3, "three rows, got " + rows.size());
-        h.assertTrue(rows.get(0).name().equals(ModBlocks.POWERED_FURNACE.get().getDescriptionId()) && rows.get(0).report().status().equals("idle"),
-                "the furnace, idle: got " + rows.get(0));
+        h.assertTrue(rows.get(0).name().equals(ModBlocks.WOOL_PACKER.get().getDescriptionId()) && rows.get(0).report().status().equals("idle"),
+                "the packer, idle: got " + rows.get(0));
         h.assertTrue(rows.get(1).report().status().equals("no_fuel")
                         && rows.get(1).report().level() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.Level.PROBLEM,
                 "the seeder, out of fuel (a problem): got " + rows.get(1).report());
@@ -2041,9 +2037,9 @@ public final class ModGameTests {
         BlockPos cube = base.offset(2, 0, 0), seeder = base.offset(4, 0, 3), furnace = base.offset(2, 0, 3);
         level.setBlockAndUpdate(cube, ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState());
         level.setBlockAndUpdate(seeder, ModBlocks.GRASS_SEEDER.get().defaultBlockState());
-        level.setBlockAndUpdate(furnace, ModBlocks.POWERED_FURNACE.get().defaultBlockState());
+        level.setBlockAndUpdate(furnace, ModBlocks.WOOL_PACKER.get().defaultBlockState());
         level.setBlockAndUpdate(furnace.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState());
-        ((com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity) level.getBlockEntity(furnace)).setItem(0, new ItemStack(Items.RAW_IRON, 64));
+        ((com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity) level.getBlockEntity(furnace)).setItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.INPUT, ResourceWoolItem.create(IRON, 64));
         ((com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity) level.getBlockEntity(seeder)).work(level, seeder); // no fuel: a problem
         panel.toggleLink(level, cube);
         panel.toggleLink(level, seeder);
@@ -2052,7 +2048,7 @@ public final class ModGameTests {
             panel.refresh(level, panelPos, level.getBlockState(panelPos));
             h.assertTrue(panel.comparatorSignal() == 1, "one problem, got " + panel.comparatorSignal());
             panel.move(level, 2, -1);
-            h.assertTrue(panel.links().get(1).equals(furnace) && panel.links().get(2).equals(seeder), "the furnace moved up: " + panel.links());
+            h.assertTrue(panel.links().get(1).equals(furnace) && panel.links().get(2).equals(seeder), "the packer moved up: " + panel.links());
             panel.rename(level, 0, "  Main bank  ");
             h.assertTrue(panel.rows().get(0).custom().equals("Main bank") && panel.rows().get(0).displayName().getString().equals("Main bank"), "renamed");
             panel.toggleAlert(level, 2);
@@ -2491,21 +2487,19 @@ public final class ModGameTests {
         var wrapped = Vanilla.ARMOR_STAND.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         bare.snapTo(at.getX() + 1.5, at.getY(), at.getZ() + 0.5, 0, 0);
         wrapped.snapTo(at.getX() - 0.5, at.getY(), at.getZ() + 0.5, 0, 0);
-        wrapped.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, new ItemStack(ModItems.WOOLLEN_HELMET.get()));
-        wrapped.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(ModItems.WOOLLEN_CHESTPLATE.get()));
-        wrapped.setItemSlot(net.minecraft.world.entity.EquipmentSlot.LEGS, new ItemStack(ModItems.WOOLLEN_LEGGINGS.get()));
         wrapped.setItemSlot(net.minecraft.world.entity.EquipmentSlot.FEET, new ItemStack(ModItems.WOOLLEN_BOOTS.get()));
         level.addFreshEntity(bare);
         level.addFreshEntity(wrapped);
         Sheep sheep = echoSheep(h, at.south(2), "iron");
         double sheepStart = sheep.getZ();
-        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.insulation(wrapped) == 4, "a full set of Woollen Armour");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.insulation(wrapped) == 2, "Woollen Boots take half off");
         double bareStart = bare.getX(), wrappedStart = wrapped.getX();
         h.runAfterDelay(14, () -> {
             h.assertTrue(be.state() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.State.OVERCHARGED
                     || be.charge() < com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StaticGeneratorBlockEntity.domeCapacity(), "it's overcharged and shocking");
             h.assertTrue(bare.getX() - bareStart > 1.0, "the bare stand is knocked away from the dome, moved " + (bare.getX() - bareStart));
-            h.assertTrue(Math.abs(wrapped.getX() - wrappedStart) < 0.6, "the insulated one isn't, moved " + (wrapped.getX() - wrappedStart));
+            h.assertTrue(Math.abs(wrapped.getX() - wrappedStart) < 0.75 * (bare.getX() - bareStart), "the one in Woollen Boots is pushed less, moved "
+                    + (wrapped.getX() - wrappedStart) + " against " + (bare.getX() - bareStart));
             h.assertTrue(Math.abs(sheep.getZ() - sheepStart) < 0.1, "and the sheep is left alone");
             h.succeed();
         });
@@ -2528,15 +2522,9 @@ public final class ModGameTests {
         });
     }
 
-    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity poweredFurnace(GameTestHelper h, BlockPos pos, boolean powered, ItemStack input) {
-        h.setBlock(pos, ModBlocks.POWERED_FURNACE.get());
-        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity.class);
-        be.setItem(0, input);
-        if (powered) {
-            var energy = (net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler) be.getEnergyHandler();
-            energy.set(energy.getCapacityAsInt());
-        }
-        return be;
+    /** A Wool Packer, the stand-in processing machine for the upgrade and machine-frame tests. */
+    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity cardMachine(GameTestHelper h, BlockPos pos, boolean powered, ItemStack input) {
+        return packer(h, pos, input, powered);
     }
 
     private static ItemStack card(boolean speed) {
@@ -2613,12 +2601,12 @@ public final class ModGameTests {
      * clicking a card out sends it back. Pipes and hoppers still see only the machine's own slots.
      */
     private static void upgradeWindow(GameTestHelper h) {
-        var furnace = poweredFurnace(h, new BlockPos(1, 1, 1), false, ItemStack.EMPTY);
+        var furnace = cardMachine(h, new BlockPos(1, 1, 1), false, ItemStack.EMPTY);
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
         player.getInventory().setItem(0, new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE.get(), 3));
         player.getInventory().setItem(1, new ItemStack(Items.DIRT, 8));
         var menu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.MachineMenu) furnace.createMenu(0, player.getInventory(), player);
-        h.assertTrue(menu.hasUpgradeSlots(), "the furnace's window has upgrade slots");
+        h.assertTrue(menu.hasUpgradeSlots(), "the packer's window has upgrade slots");
         int cardsAt = -1, dirtAt = -1;
         for (var slot : menu.slots) {
             if (slot.container == player.getInventory() && slot.getContainerSlot() == 0) cardsAt = slot.index;
@@ -2638,7 +2626,7 @@ public final class ModGameTests {
         menu.quickMoveStack(player, upgradeSlot.index);
         h.assertTrue(furnace.upgrades().cards().size() == 1, "shift-clicking a card takes it back out");
         h.assertFalse(upgradeSlot.mayPlace(new ItemStack(Items.DIRT)), "the slot refuses dirt");
-        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(furnace.getBlockState(), card(false)), "the furnace takes Efficiency");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(furnace.getBlockState(), card(false)), "the packer takes Efficiency");
         h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(ModBlocks.CHILLER.get().defaultBlockState(), card(true)), "the Snow Sheep Chiller takes no cards");
         h.assertTrue(furnace.getContainerSize() == 2, "pipes and hoppers still see 2 slots, not the upgrades");
         h.succeed();
@@ -2751,13 +2739,13 @@ public final class ModGameTests {
     }
 
     /**
-     * Muffler: silences a machine (its own sounds, on each player's client): the separator, packer, furnace, altar and
+     * Muffler: silences a machine (its own sounds, on each player's client): the separator, packer, altar and
      * chiller take it, the shears (whose only sound is the sheep's) don't. The server tells clients it's in.
      */
     private static void mufflerUpgrade(GameTestHelper h) {
         var card = new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MUFFLER_UPGRADE.get());
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of(card)).muffled() && !com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.effectsOf(List.of()).muffled(), "it mutes");
-        for (var block : List.of(ModBlocks.MECHANICAL_SEPARATOR.get(), ModBlocks.WOOL_PACKER.get(), ModBlocks.POWERED_FURNACE.get(),
+        for (var block : List.of(ModBlocks.MECHANICAL_SEPARATOR.get(), ModBlocks.WOOL_PACKER.get(),
                 ModBlocks.INFUSION_ALTAR.get(), ModBlocks.CHILLER.get())) {
             h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(block.defaultBlockState(), card), block + " takes a Muffler");
         }
@@ -2773,12 +2761,12 @@ public final class ModGameTests {
 
     /**
      * The machine frame: a machine saves its modules under the keys it always used (so old worlds load), loads them back
-     * the same, and offers cables, pipes and hoppers only what its modules provide: the furnace power and items but no
+     * the same, and offers cables, pipes and hoppers only what its modules provide: the packer power and items but no
      * fluid, the chiller water and items but no power.
      */
     private static void machineFrame(GameTestHelper h) {
-        var furnace = poweredFurnace(h, new BlockPos(1, 1, 1), true, new ItemStack(Items.RAW_IRON, 5));
-        furnace.setItem(1, new ItemStack(Items.IRON_INGOT, 3));
+        var furnace = cardMachine(h, new BlockPos(1, 1, 1), true, ResourceWoolItem.create(IRON, 5));
+        furnace.inventory().set(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.OUTPUT, new ItemStack(Items.IRON_INGOT, 3));
         furnace.upgrades().setItem(0, new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE.get()));
         int energy = furnace.getEnergyHandler().getAmountAsInt();
         var saved = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess());
@@ -2786,9 +2774,9 @@ public final class ModGameTests {
         var tag = saved.buildResult();
         for (String key : List.of("energy", "input", "output", "upgrades", "progress")) h.assertTrue(tag.contains(key), "it saves " + key + " as before: " + tag);
         h.setBlock(new BlockPos(1, 1, 1), Blocks.AIR);
-        var copy = poweredFurnace(h, new BlockPos(1, 1, 1), false, ItemStack.EMPTY);
+        var copy = cardMachine(h, new BlockPos(1, 1, 1), false, ItemStack.EMPTY);
         copy.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, h.getLevel().registryAccess(), tag));
-        h.assertTrue(copy.input().is(Items.RAW_IRON) && copy.input().getCount() == 5 && copy.output().getCount() == 3, "its items load back");
+        h.assertTrue(IRON.equals(ResourceWoolItem.getResourceId(copy.input())) && copy.input().getCount() == 5 && copy.output().getCount() == 3, "its items load back");
         h.assertTrue(copy.getEnergyHandler().getAmountAsInt() == energy, "its energy loads back");
         h.assertTrue(copy.upgrades().getItem(0).is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE.get()), "its card loads back");
         var level = h.getLevel();
@@ -2796,7 +2784,7 @@ public final class ModGameTests {
         h.assertTrue(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, at, Direction.UP) != null
                 && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK, at, Direction.UP) != null
                 && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, at, Direction.UP) == null,
-                "the furnace offers power and items, no fluid");
+                "the packer offers power and items, no fluid");
         h.setBlock(new BlockPos(4, 1, 1), ModBlocks.CHILLER.get());
         BlockPos chiller = h.absolutePos(new BlockPos(4, 1, 1));
         h.assertTrue(level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, chiller, Direction.UP) != null
@@ -2841,19 +2829,10 @@ public final class ModGameTests {
         var energyCap = net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK;
         var itemCap = net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK;
         var fluidCap = net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK;
-        BlockPos panel = new BlockPos(0, 1, 0), burner = new BlockPos(2, 1, 0), thermal = new BlockPos(4, 1, 0), mycelial = new BlockPos(0, 1, 2);
+        BlockPos panel = new BlockPos(0, 1, 0), thermal = new BlockPos(4, 1, 0), mycelial = new BlockPos(0, 1, 2);
         h.setBlock(panel, ModBlocks.GLOW_PANEL.get());
         h.assertTrue(caps.has(panel, energyCap) && !caps.has(panel, itemCap) && !caps.has(panel, fluidCap), "the Glow Panel offers power only");
         h.assertTrue(caps.saved(panel).contains("energy"), "and saves its energy as before");
-
-        h.setBlock(burner, ModBlocks.WOOL_BURNER.get());
-        var wool = h.getBlockEntity(burner, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity.class);
-        h.assertFalse(wool.canPlaceItem(0, new ItemStack(Items.DIRT)), "the Wool Burner takes only fuel");
-        wool.inventory().set(0, new ItemStack(Items.STRING, 4));
-        h.assertFalse(wool.canTakeItemThroughFace(0, wool.fuel(), Direction.DOWN), "and hoppers can't take its fuel back");
-        h.assertTrue(caps.has(burner, energyCap) && caps.has(burner, itemCap) && !caps.has(burner, fluidCap), "it offers power and its fuel slot");
-        var burnerTag = caps.saved(burner);
-        h.assertTrue(burnerTag.contains("energy") && burnerTag.contains("fuel"), "and saves them as before: " + burnerTag);
 
         h.setBlock(thermal, ModBlocks.THERMAL_REACTION_CHAMBER.get());
         var chamber = h.getBlockEntity(thermal, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity.class);
@@ -2870,18 +2849,18 @@ public final class ModGameTests {
         h.succeed();
     }
 
-    /** A Powered Furnace broken with cards in drops itself with them on its item; placed again, it has them back. */
+    /** A Wool Packer broken with cards in drops itself with them on its item; placed again, it has them back. */
     private static void upgradesKept(GameTestHelper h) {
         BlockPos pos = new BlockPos(1, 1, 1);
-        var furnace = poweredFurnace(h, pos, false, ItemStack.EMPTY);
+        var furnace = cardMachine(h, pos, false, ItemStack.EMPTY);
         furnace.upgrades().setItem(0, card(true));
         furnace.upgrades().setItem(1, card(false));
         var drops = net.minecraft.world.level.block.Block.getDrops(furnace.getBlockState(), h.getLevel(), h.absolutePos(pos), furnace);
-        h.assertTrue(drops.size() == 1 && drops.getFirst().is(ModItems.POWERED_FURNACE.get()), "it drops itself, got " + drops);
+        h.assertTrue(drops.size() == 1 && drops.getFirst().is(ModItems.WOOL_PACKER.get()), "it drops itself, got " + drops);
         var kept = drops.getFirst().get(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModDataComponents.MACHINE_UPGRADES.get());
         h.assertTrue(kept != null && kept.nonEmptyItemCopyStream().count() == 2, "with both cards on it, got " + kept);
         h.setBlock(pos, Blocks.AIR);
-        var placed = poweredFurnace(h, pos, false, ItemStack.EMPTY);
+        var placed = cardMachine(h, pos, false, ItemStack.EMPTY);
         placed.applyComponentsFromItemStack(drops.getFirst());
         h.assertTrue(placed.upgrades().getItem(0).is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SPEED_UPGRADE.get()) && placed.upgrades().getItem(1).is(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.EFFICIENCY_UPGRADE.get()),
                 "placed again, it has them back: " + placed.upgrades().cards());
@@ -2905,13 +2884,10 @@ public final class ModGameTests {
             c.processingSpeedMultiplier.set(1.35);
             c.woolPackerTicksPerBale.set(30);
             c.altarTicks.set(75);
-            c.poweredFurnaceCookTime.set(0.55);
-            c.poweredFurnaceEnergyPerTick.set(20);
             c.chillerTicksPerIce.set(150);
             c.automaticShearsInterval.set(12); // the player's own
             ModConfigs.applyTimingPasses();
-            h.assertTrue(c.processingSpeedMultiplier.get() == 2.0 && c.woolPackerTicksPerBale.get() == 20 && c.altarTicks.get() == 50
-                            && c.poweredFurnaceCookTime.get() == 0.35 && c.poweredFurnaceEnergyPerTick.get() == 31 && c.chillerTicksPerIce.get() == 100,
+            h.assertTrue(c.processingSpeedMultiplier.get() == 2.0 && c.woolPackerTicksPerBale.get() == 20 && c.altarTicks.get() == 50 && c.chillerTicksPerIce.get() == 100,
                     "old defaults move to the new ones");
             h.assertTrue(c.automaticShearsInterval.get() == 12, "a changed setting is kept, was " + c.automaticShearsInterval.get());
             h.assertTrue(c.timingRevision.get() == 2, "and the file is marked done");
@@ -2926,42 +2902,11 @@ public final class ModGameTests {
             c.processingSpeedMultiplier.set(2.0);
             c.woolPackerTicksPerBale.set(20);
             c.altarTicks.set(50);
-            c.poweredFurnaceCookTime.set(0.35);
-            c.poweredFurnaceEnergyPerTick.set(31);
             c.chillerTicksPerIce.set(100);
             c.automaticShearsInterval.set(10);
             c.timingRevision.set(Math.max(revision, 2));
         }
         h.succeed();
-    }
-
-    /**
-     * The Powered Furnace smelts in 0.35 of a Furnace's time (Raw Iron: 70 ticks instead of 200), faster with Blaze
-     * sheep around it (two: x1.47, about 48 ticks), not at all without power, and only what a Furnace can smelt.
-     */
-    private static void poweredFurnace(GameTestHelper h) {
-        var alone = poweredFurnace(h, new BlockPos(1, 1, 1), true, new ItemStack(Items.RAW_IRON, 4));
-        var blazing = poweredFurnace(h, new BlockPos(6, 1, 1), true, new ItemStack(Items.RAW_IRON, 4));
-        sheepAt(h, new BlockPos(5, 1, 1), ResourcefulSheep.id("blaze"));
-        sheepAt(h, new BlockPos(6, 1, 2), ResourcefulSheep.id("blaze"));
-        var unpowered = poweredFurnace(h, new BlockPos(1, 1, 6), false, new ItemStack(Items.RAW_IRON, 4));
-        h.assertFalse(alone.canPlaceItem(0, new ItemStack(Items.DIRT)), "dirt can't be smelted, so it doesn't go in");
-        h.assertTrue(alone.canPlaceItem(0, new ItemStack(Items.RAW_IRON)), "raw iron can");
-        int start = alone.getEnergyHandler().getAmountAsInt();
-        h.runAfterDelay(60, () -> {
-            h.assertTrue(blazing.heaterCount() == 2 && blazing.speed() > 140, "two Blaze sheep speed it up, speed " + blazing.speed() + " from " + blazing.heaterCount());
-            h.assertTrue(blazing.output().is(Items.IRON_INGOT), "with Blaze sheep the first ingot is out by 60 ticks, got " + blazing.output());
-            h.assertTrue(alone.output().isEmpty(), "alone it's not done yet (70 ticks), got " + alone.output());
-        });
-        h.runAfterDelay(85, () -> {
-            h.assertTrue(alone.output().is(Items.IRON_INGOT) && alone.output().getCount() == 1, "alone, one ingot by 85 ticks (a Furnace takes 200), got " + alone.output());
-            h.assertTrue(alone.storedExperience() > 0, "and it keeps the experience for whoever takes it");
-            int used = start - alone.getEnergyHandler().getAmountAsInt();
-            h.assertTrue(used >= 70 * 31 && used <= 85 * 31, "31 FE/t while smelting, used " + used);
-            h.assertTrue(unpowered.output().isEmpty() && unpowered.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus.NO_ENERGY,
-                    "nothing without power, status " + unpowered.status());
-            h.succeed();
-        });
     }
 
     /**
@@ -3322,7 +3267,7 @@ public final class ModGameTests {
     // ------------------------------------------------------------------ energy sheep
 
     /**
-     * An Energy sheep drains the charged Hume Energy Cube next to it and charges, wirelessly, a Powered Furnace 5 blocks
+     * An Energy sheep drains the charged Hume Energy Cube next to it and charges, wirelessly, a Wool Packer 5 blocks
      * away; not one 12 blocks away, and never another cube (in charge range, but cubes are what it drains).
      */
     private static void energySheepCharges(GameTestHelper h) {
@@ -3333,15 +3278,15 @@ public final class ModGameTests {
         long full = cube.storage().getAmountAsLong();
         h.setBlock(new BlockPos(8, 2, 3), ModBlocks.HUME_ENERGY_CUBE.get());
         var other = h.getBlockEntity(new BlockPos(8, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
-        h.setBlock(new BlockPos(9, 2, 1), ModBlocks.POWERED_FURNACE.get());
-        h.setBlock(new BlockPos(16, 2, 3), ModBlocks.POWERED_FURNACE.get());
-        var near = h.getBlockEntity(new BlockPos(9, 2, 1), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity.class);
-        var far = h.getBlockEntity(new BlockPos(16, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity.class);
+        h.setBlock(new BlockPos(9, 2, 1), ModBlocks.WOOL_PACKER.get());
+        h.setBlock(new BlockPos(16, 2, 3), ModBlocks.WOOL_PACKER.get());
+        var near = h.getBlockEntity(new BlockPos(9, 2, 1), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.class);
+        var far = h.getBlockEntity(new BlockPos(16, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.class);
         Sheep sheep = sheepAt(h, new BlockPos(4, 2, 3), ResourcefulSheep.id("energy"));
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.isEnergySheep(sheep), "a Hume Energy Cube makes an Energy sheep");
         h.succeedWhen(() -> {
             h.assertTrue(cube.storage().getAmountAsLong() < full, "it drained the cube next to it");
-            h.assertTrue(near.getEnergyHandler().getAmountAsLong() > 0, "it charged the furnace 5 blocks away");
+            h.assertTrue(near.getEnergyHandler().getAmountAsLong() > 0, "it charged the packer 5 blocks away");
             h.assertTrue(far.getEnergyHandler().getAmountAsLong() == 0, "not the one 12 blocks away");
             h.assertTrue(other.storage().getAmountAsLong() == 0, "and it never charges a cube");
         });
@@ -3394,8 +3339,8 @@ public final class ModGameTests {
         var cube = h.getBlockEntity(new BlockPos(3, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
         cube.storage().set((int) cube.storage().getCapacityAsLong());
         long full = cube.storage().getAmountAsLong();
-        h.setBlock(new BlockPos(6, 2, 3), ModBlocks.POWERED_FURNACE.get());
-        var furnace = h.getBlockEntity(new BlockPos(6, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity.class);
+        h.setBlock(new BlockPos(6, 2, 3), ModBlocks.WOOL_PACKER.get());
+        var furnace = h.getBlockEntity(new BlockPos(6, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.class);
         Sheep sheep = sheepAt(h, new BlockPos(4, 2, 3), ResourcefulSheep.id("energy"));
         sheep.setSheared(true);
         com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.setCharge(sheep, 5_000);
@@ -3423,16 +3368,14 @@ public final class ModGameTests {
         player.getInventory().clearContent();
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()));
         BlockPos burnerPos = new BlockPos(2, 1, 2);
-        h.setBlock(burnerPos, ModBlocks.WOOL_BURNER.get());
-        var burner = h.getBlockEntity(burnerPos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity.class);
-        burner.setItem(0, new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.WHITE), 5));
+        var burner = packer(h, burnerPos, ResourceWoolItem.create(IRON, 5), false);
         var state = h.getBlockState(burnerPos);
         h.assertTrue(player.getDestroySpeed(state) >= state.getDestroySpeed(h.getLevel(), h.absolutePos(burnerPos)) * 30, "the wrench breaks it in one hit");
         h.assertTrue(player.getDestroySpeed(Blocks.STONE.defaultBlockState()) <= 1.0F, "but doesn't speed up breaking stone");
         h.assertTrue(player.gameMode.destroyBlock(h.absolutePos(burnerPos)), "it breaks");
-        h.assertTrue(h.getBlockState(burnerPos).isAir(), "the Wool Burner is gone");
-        h.assertTrue(player.getInventory().contains(new ItemStack(ModItems.WOOL_BURNER.get())), "and in the player's inventory");
-        h.assertTrue(player.getInventory().countItem(Vanilla.wool(net.minecraft.world.item.DyeColor.WHITE).asItem()) == 5, "with the wool that was in it");
+        h.assertTrue(h.getBlockState(burnerPos).isAir(), "the Wool Packer is gone");
+        h.assertTrue(player.getInventory().contains(new ItemStack(ModItems.WOOL_PACKER.get())), "and in the player's inventory");
+        h.assertTrue(countIn(player.getInventory(), st -> IRON.equals(ResourceWoolItem.getResourceId(st))) == 5, "with the wool that was in it");
         var around = new net.minecraft.world.phys.AABB(h.absolutePos(burnerPos)).inflate(2);
         h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, around).isEmpty(), "nothing is left on the ground");
         h.succeed();
@@ -3538,35 +3481,26 @@ public final class ModGameTests {
     }
 
     /**
-     * Woollen Armour takes the colour of its wool: all red gives red, red and blue blend, and every piece crafts from
-     * its leather shape. Dyeing it afterwards works like leather.
+     * Woollen Boots take the colour of their wool: all red gives red, red and blue blend. Dyeing them afterwards works
+     * like leather.
      */
     private static void woollenArmorColour(GameTestHelper h) {
         ItemStack red = new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.RED)), blue = new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.BLUE)), e = ItemStack.EMPTY;
-        ItemStack helmet = craft(h, 3, 2, List.of(red, red, red, red, e, red));
-        h.assertTrue(helmet.is(ModItems.WOOLLEN_HELMET.get()), "five wool make a Woollen Beanie, got " + helmet);
+        ItemStack boots = craft(h, 3, 2, List.of(red, e, red, red, e, red));
+        h.assertTrue(boots.is(ModItems.WOOLLEN_BOOTS.get()), "four wool make Woollen Boots, got " + boots);
         int allRed = net.minecraft.world.item.component.DyedItemColor.applyDyes((net.minecraft.world.item.component.DyedItemColor) null,
-                java.util.Collections.nCopies(5, net.minecraft.world.item.DyeColor.RED)).rgb();
-        var colour = helmet.get(net.minecraft.core.component.DataComponents.DYED_COLOR);
-        h.assertTrue(colour != null && colour.rgb() == allRed, "red wool gives a red beanie, got " + colour);
-        ItemStack mixed = craft(h, 3, 2, List.of(red, blue, red, blue, e, red));
+                java.util.Collections.nCopies(4, net.minecraft.world.item.DyeColor.RED)).rgb();
+        var colour = boots.get(net.minecraft.core.component.DataComponents.DYED_COLOR);
+        h.assertTrue(colour != null && colour.rgb() == allRed, "red wool gives red boots, got " + colour);
+        ItemStack mixed = craft(h, 3, 2, List.of(red, e, blue, blue, e, red));
         var mixedColour = mixed.get(net.minecraft.core.component.DataComponents.DYED_COLOR);
         h.assertTrue(mixedColour != null && mixedColour.rgb() != allRed, "red and blue wool blend, got " + mixedColour);
-        ItemStack w = new ItemStack(Vanilla.wool(net.minecraft.world.item.DyeColor.WHITE));
-        h.assertTrue(craft(h, 3, 3, List.of(w, e, w, w, w, w, w, w, w)).is(ModItems.WOOLLEN_CHESTPLATE.get()), "eight wool make a jumper");
-        h.assertTrue(craft(h, 3, 3, List.of(w, w, w, w, e, w, w, e, w)).is(ModItems.WOOLLEN_LEGGINGS.get()), "seven wool make leggings");
-        h.assertTrue(craft(h, 3, 2, List.of(w, e, w, w, e, w)).is(ModItems.WOOLLEN_BOOTS.get()), "four wool make boots");
-        ItemStack dyed = craft(h, 2, 1, List.of(helmet, new ItemStack(Vanilla.dye(net.minecraft.world.item.DyeColor.YELLOW))));
+        ItemStack dyed = craft(h, 2, 1, List.of(boots, new ItemStack(Vanilla.dye(net.minecraft.world.item.DyeColor.YELLOW))));
         var dyedColour = dyed.get(net.minecraft.core.component.DataComponents.DYED_COLOR);
-        h.assertTrue(dyed.is(ModItems.WOOLLEN_HELMET.get()) && dyedColour != null && dyedColour.rgb() != allRed, "it can be dyed like leather, got " + dyedColour);
-        h.assertTrue(helmet.is(net.minecraft.tags.ItemTags.HEAD_ARMOR) && ModItems.WOOLLEN_BOOTS.get().getDefaultInstance().is(net.minecraft.tags.ItemTags.FREEZE_IMMUNE_WEARABLES),
-                "it's armour, and wool keeps you warm in powder snow");
-        // A little better than leather: more armour on the jumper and leggings, and more durability.
-        java.util.function.ToDoubleFunction<net.minecraft.world.item.Item> armour = item -> item.getDefaultInstance()
-                .getOrDefault(net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS, net.minecraft.world.item.component.ItemAttributeModifiers.EMPTY)
-                .compute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR, 0, net.minecraft.world.entity.EquipmentSlot.CHEST);
-        h.assertTrue(armour.applyAsDouble(ModItems.WOOLLEN_CHESTPLATE.get()) > armour.applyAsDouble(Items.LEATHER_CHESTPLATE), "the jumper protects more than a leather tunic");
-        h.assertTrue(ModItems.WOOLLEN_BOOTS.get().getDefaultInstance().getMaxDamage() > Items.LEATHER_BOOTS.getDefaultInstance().getMaxDamage(), "and it lasts longer");
+        h.assertTrue(dyed.is(ModItems.WOOLLEN_BOOTS.get()) && dyedColour != null && dyedColour.rgb() != allRed, "they can be dyed like leather, got " + dyedColour);
+        h.assertTrue(boots.is(net.minecraft.tags.ItemTags.FOOT_ARMOR) && boots.is(net.minecraft.tags.ItemTags.FREEZE_IMMUNE_WEARABLES),
+                "they're boots, and wool keeps you warm in powder snow");
+        h.assertTrue(ModItems.WOOLLEN_BOOTS.get().getDefaultInstance().getMaxDamage() > Items.LEATHER_BOOTS.getDefaultInstance().getMaxDamage(), "and they outlast leather");
         h.succeed();
     }
 
@@ -4374,7 +4308,7 @@ public final class ModGameTests {
                 "the Functional Machine Block has a shaped recipe");
         h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlocks.FUNCTIONAL_MACHINE_BLOCK.get().defaultBlockState()
                 .is(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE), "mined with a pickaxe");
-        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "fluid_tank", "zero_point_energy_module", "blaze_furnace", "wool_burner", "wool_packer", "infusion_altar")) {
+        for (String machine : List.of("mycelial_generator", "mechanical_separator", "automatic_shears", "fluid_reservoir", "hume_energy_cube", "fluid_tank", "zero_point_energy_module", "blaze_furnace", "wool_packer", "infusion_altar")) {
             var holder = recipes.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
                     ResourcefulSheep.id(machine))).orElse(null);
             h.assertTrue(holder != null && holder.value() instanceof net.minecraft.world.item.crafting.ShapedRecipe, "missing recipe " + machine);
@@ -5249,86 +5183,23 @@ public final class ModGameTests {
         var golem = h.spawnWithNoFreeWill(Vanilla.IRON_GOLEM, new BlockPos(3, 2, 3));
         var pig = h.spawnWithNoFreeWill(Vanilla.PIG, new BlockPos(5, 1, 3));
         var beamKey = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_DAMAGE;
-        String beamPlayer = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_PLAYER_NAME;
 
-        // A second beam with a cow in it: the cow burns to death and, as a player kill, drops experience.
+        // A second beam with a cow in it: the cow burns to death.
         BlockPos cowFloor = new BlockPos(1, 1, 1), cowCeiling = new BlockPos(1, 4, 1);
         h.setBlock(cowFloor, zpe(Direction.UP));
         h.setBlock(cowCeiling, zpe(Direction.DOWN));
         zpeAt(h, cowFloor);
         zpeAt(h, cowCeiling);
         var cow = h.spawnWithNoFreeWill(Vanilla.COW, new BlockPos(1, 2, 1));
-        var cowArea = new net.minecraft.world.phys.AABB(h.absolutePos(cowFloor)).inflate(2, 3, 2);
-
-        // Player-only loot: blaze rods only drop for player kills. Credited to the beam's fake player, they do.
-        var blaze = h.spawnWithNoFreeWill(Vanilla.BLAZE, new BlockPos(5, 2, 5));
-        var beamSource = h.getLevel().damageSources().source(beamKey);
-        blaze.setLastHurtByPlayer(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity
-                .beamPlayer(h.getLevel(), h.absolutePos(cowFloor)), 100);
-        int rods = 0, rodsWithoutPlayer = 0;
-        for (int i = 0; i < 40; i++) {
-            List<ItemStack> asPlayerKill = new java.util.ArrayList<>(), notPlayerKill = new java.util.ArrayList<>();
-            blaze.dropFromLootTable(h.getLevel(), beamSource, true, blaze.getLootTable().orElseThrow(), asPlayerKill::add);
-            blaze.dropFromLootTable(h.getLevel(), beamSource, false, blaze.getLootTable().orElseThrow(), notPlayerKill::add);
-            rods += count(asPlayerKill, st -> st.is(Items.BLAZE_ROD));
-            rodsWithoutPlayer += count(notPlayerKill, st -> st.is(Items.BLAZE_ROD));
-        }
-        blaze.discard();
-        h.assertTrue(rods > 0 && rodsWithoutPlayer == 0, "blaze rods drop only as a player kill: " + rods + " vs " + rodsWithoutPlayer);
 
         h.succeedWhen(() -> {
-            var lastPlayer = golem.getLastHurtByPlayer();
-            h.assertTrue(lastPlayer != null && lastPlayer.getGameProfile().name().equals(beamPlayer),
-                    "the golem was last hurt by the beam's fake player, got " + lastPlayer);
             h.assertFalse(cow.isAlive(), "the cow in the beam dies");
-            h.assertFalse(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.ExperienceOrb.class, cowArea).isEmpty(),
-                    "the beam kill drops experience");
             h.assertTrue(golem.getHealth() < golem.getMaxHealth(), "the golem in the beam is hurt, health " + golem.getHealth());
             h.assertTrue(golem.getLastDamageSource() != null && golem.getLastDamageSource().is(beamKey),
                     "hurt by the beam's own damage type, got " + golem.getLastDamageSource());
             h.assertTrue(golem.getRemainingFireTicks() > 0, "the golem is set on fire");
             h.assertTrue(pig.getHealth() == pig.getMaxHealth() && pig.getRemainingFireTicks() <= 0, "the pig beside the beam is untouched");
         });
-    }
-
-    /**
-     * Mobs the beam kills drop as if killed with Looting {@code beamLooting}. A pig's death loot (1-3 porkchops) is
-     * rolled 300 times with the beam as the cause and 300 times with plain fire: with the beam the most porkchops go up
-     * by the looting level and the total goes up; with fire it stays at most 3.
-     */
-    private static void zeroPointBeamLooting(GameTestHelper h) {
-        int looting = ModConfigs.getInt(ModConfigs.SERVER.zpeBeamLooting);
-        h.assertTrue(looting >= 1, "default beamLooting is at least 1, got " + looting);
-        var pig = h.spawnWithNoFreeWill(Vanilla.PIG, new BlockPos(3, 1, 3));
-        var level = h.getLevel();
-        var beam = level.damageSources().source(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_DAMAGE);
-        var fire = level.damageSources().inFire();
-        int beamTotal = 0, fireTotal = 0, beamMax = 0, fireMax = 0;
-        for (int i = 0; i < 300; i++) {
-            List<ItemStack> withBeam = new java.util.ArrayList<>(), withFire = new java.util.ArrayList<>();
-            pig.dropFromLootTable(level, beam, false, pig.getLootTable().orElseThrow(), withBeam::add);
-            pig.dropFromLootTable(level, fire, false, pig.getLootTable().orElseThrow(), withFire::add);
-            int b = count(withBeam, st -> st.is(Items.PORKCHOP)), f = count(withFire, st -> st.is(Items.PORKCHOP));
-            beamTotal += b;
-            fireTotal += f;
-            beamMax = Math.max(beamMax, b);
-            fireMax = Math.max(fireMax, f);
-        }
-        h.assertTrue(fireMax <= 3, "normal pig drops are at most 3 porkchops, got " + fireMax);
-        h.assertTrue(beamMax == 3 + looting, "beam kills drop up to " + (3 + looting) + " porkchops, got " + beamMax);
-        h.assertTrue(beamTotal > fireTotal, "beam kills drop more in total: " + beamTotal + " vs " + fireTotal);
-
-        // The looting helper itself: level 0 changes nothing, and overflowing stacks are split.
-        var random = net.minecraft.util.RandomSource.create(1);
-        var one = it.unimi.dsi.fastutil.objects.ObjectArrayList.of(new ItemStack(Items.BEEF, 2));
-        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.ZeroPointBeamLootingModifier.applyLooting(one, 0, random)
-                .getFirst().getCount() == 2, "looting 0 adds nothing");
-        var full = it.unimi.dsi.fastutil.objects.ObjectArrayList.of(new ItemStack(Items.BEEF, 64));
-        var split = com.jax3.barelyfunctionalcontraptions.sheep.entity.ZeroPointBeamLootingModifier.applyLooting(full, 10, random);
-        h.assertTrue(split.stream().mapToInt(ItemStack::getCount).sum() >= 64 && split.stream().allMatch(st -> st.getCount() <= 64),
-                "extra items over a full stack go into a new stack");
-        pig.discard();
-        h.succeed();
     }
 
     private static void creativeGeneratorPowers(GameTestHelper h) {
@@ -6078,74 +5949,6 @@ public final class ModGameTests {
     }
 
     // ------------------------------------------------------------------ Wool Burner
-
-    private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity burner(GameTestHelper h, BlockPos pos, ItemStack fuel) {
-        h.setBlock(pos, ModBlocks.WOOL_BURNER.get());
-        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity.class);
-        be.setItem(0, fuel);
-        return be;
-    }
-
-    private static void woolBurnerFuels(GameTestHelper h) {
-        var wool = burner(h, new BlockPos(1, 1, 1), new ItemStack(Vanilla.wool(DyeColor.RED), 2));
-        var string = burner(h, new BlockPos(3, 1, 1), new ItemStack(Items.STRING, 4));
-        var coal = burner(h, new BlockPos(5, 1, 1), com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("coal"), 1));
-        var iron = burner(h, new BlockPos(1, 1, 4), com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(IRON, 1));
-        var cube = cube(h, new BlockPos(1, 1, 2));
-        h.runAfterDelay(5, () -> {
-            h.assertTrue(wool.generating() == 30 && wool.burnTotal() == 200 && wool.fuel().getCount() == 1,
-                    "plain wool: 30 FE/t for 200 ticks, one used, got " + wool.generating() + " / " + wool.burnTotal() + " / " + wool.fuel());
-            h.assertTrue(string.generating() == 30 && string.burnTotal() == 50 && string.fuel().getCount() == 3,
-                    "string: 30 FE/t for 50 ticks, got " + string.generating() + " / " + string.burnTotal());
-            h.assertTrue(coal.generating() == 120 && coal.burnTotal() == 400 && coal.fuel().isEmpty(),
-                    "Coal Wool: 120 FE/t for 400 ticks, got " + coal.generating() + " / " + coal.burnTotal());
-            h.assertTrue(iron.generating() == 0 && iron.fuel().getCount() == 1, "Iron Wool isn't a fuel");
-            h.assertTrue(h.getBlockState(new BlockPos(1, 1, 1)).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.LIT), "it lights up");
-            h.assertTrue(cube.getEnergyHandler().getAmountAsLong() > 0, "it charges the cube beside it");
-            // String burns out after 50 ticks and the next one is lit straight away.
-            h.runAfterDelay(50, () -> {
-                h.assertTrue(string.fuel().getCount() == 2 && string.generating() == 30, "the next string is lit, left " + string.fuel());
-                h.succeed();
-            });
-        });
-    }
-
-    private static void woolBurnerFullAndHoppers(GameTestHelper h) {
-        // Full buffer, nothing taking power: the wool waits.
-        var full = burner(h, new BlockPos(1, 1, 1), new ItemStack(Vanilla.wool(DyeColor.WHITE), 3));
-        var buffer = (net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler) full.getEnergyHandler();
-        buffer.set(buffer.getCapacityAsInt());
-        // Right-click with wool loads it; cobblestone doesn't go in.
-        BlockPos pos = new BlockPos(4, 1, 4);
-        var burner = burner(h, pos, ItemStack.EMPTY);
-        Player player = playerHolding(h, new ItemStack(Vanilla.wool(DyeColor.BLUE), 5));
-        h.getBlockState(pos).useItemOn(player.getMainHandItem(), h.getLevel(), player, InteractionHand.MAIN_HAND, hitTop(h, pos));
-        h.assertTrue(burner.fuel().is(Vanilla.wool(DyeColor.BLUE)) && burner.fuel().getCount() == 5 && player.getMainHandItem().isEmpty(), "right-clicking with wool loads it");
-        h.assertFalse(burner.canPlaceItem(0, new ItemStack(Items.COBBLESTONE)), "cobblestone isn't fuel");
-        // A hopper pointing in adds string and keeps dirt; a hopper under it can't pull fuel out.
-        BlockPos fedPos = new BlockPos(1, 1, 4);
-        var fed = burner(h, fedPos, ItemStack.EMPTY);
-        h.setBlock(fedPos.north(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.SOUTH));
-        var hopper = h.getBlockEntity(fedPos.north(), net.minecraft.world.level.block.entity.HopperBlockEntity.class);
-        hopper.setItem(0, new ItemStack(Items.STRING, 2));
-        hopper.setItem(1, new ItemStack(Items.DIRT, 1));
-        h.setBlock(new BlockPos(4, 0, 4), Blocks.HOPPER);
-        h.runAfterDelay(30, () -> {
-            h.assertTrue(full.burnTime() == 0 && full.fuel().getCount() == 3, "with a full buffer it doesn't light more wool, left " + full.fuel());
-            h.assertTrue(hopper.getItem(1).is(Items.DIRT) && hopper.getItem(0).isEmpty(), "the hopper puts string in and keeps the dirt");
-            h.assertTrue(fed.burnTime() > 0 || fed.generating() > 0 || fed.fuel().getCount() < 2, "the string burns");
-            h.assertTrue(h.getBlockEntity(new BlockPos(4, 0, 4), net.minecraft.world.level.block.entity.HopperBlockEntity.class).isEmpty(),
-                    "the hopper under it can't pull wool out");
-            // Emptying the buffer lets it light again.
-            buffer.set(0);
-            h.runAfterDelay(3, () -> {
-                h.assertTrue(full.burnTime() > 0 && full.fuel().getCount() == 2, "once there's room it lights the next wool");
-                h.succeed();
-            });
-        });
-    }
-
-    // ------------------------------------------------------------------ Wool Packer and Wool Bales
 
     private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity packer(GameTestHelper h, BlockPos pos, ItemStack wool, boolean powered) {
         h.setBlock(pos, ModBlocks.WOOL_PACKER.get());

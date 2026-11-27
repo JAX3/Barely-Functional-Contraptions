@@ -48,13 +48,7 @@ class MyceliumChanceTest {
     }
 
     @Test
-    void growthFactorAndExtraConversions() {
-        assertEquals(1.0D, MyceliumChance.networkGrowthFactor(1, 0.1D));
-        assertEquals(1.4D, MyceliumChance.networkGrowthFactor(5, 0.1D), 1e-9);
+    void fuelGrowthFactor() {
         assertEquals(0.02D, MyceliumChance.afterFailure(0.01D, 0.005D, 2.0D, 1.0D), 1e-12);
-        assertEquals(1, MyceliumChance.conversionsPerAttempt(1, 3, true, 4, 4));
-        assertEquals(3, MyceliumChance.conversionsPerAttempt(1, 8, true, 4, 4));
-        assertEquals(5, MyceliumChance.conversionsPerAttempt(1, 64, true, 4, 4));
-        assertEquals(1, MyceliumChance.conversionsPerAttempt(1, 64, false, 4, 4));
     }
 }

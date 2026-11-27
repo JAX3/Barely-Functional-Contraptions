@@ -1,9 +1,6 @@
 package com.jax3.barelyfunctionalcontraptions.mycelial.item;
 
 import com.jax3.barelyfunctionalcontraptions.mycelial.config.ServerConfig;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.LinkRules;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinking;
 import com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks;
 import com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModDataComponents;
 import net.minecraft.ChatFormatting;
@@ -29,20 +26,11 @@ import net.minecraft.world.level.Level;
 import java.util.function.Consumer;
 
 /**
- * Links Mycelial Generators that are not touching.
- * <ul>
- *     <li>Right-click a generator: select it (first end).</li>
- *     <li>Right-click another generator: link the two, merging their networks.</li>
- *     <li>Shift + right-click a generator: remove all of its manual links.</li>
- *     <li>Shift + right-click air: clear the selection.</li>
- * </ul>
- * Everything is decided on the server; the selection is stored on the item stack and synced to the client
- * for the tooltip and the selection highlight.
+ * The Barely Functional Wrench: links machines to a Machine Status Panel and crates to a Crate Controller, flips
+ * Energy Meters, sets pipe sides, and (see {@link WrenchDismantling}) dismantles the mod's blocks. Everything is
+ * decided on the server; what it's linking is stored on the item stack.
  */
 public class MyceliumWrenchItem extends Item {
-    /** How long the wrench glints after a successful link (2 seconds). */
-    private static final int LINK_GLOW_TICKS = 40;
-
     public MyceliumWrenchItem(Properties properties) {
         super(properties);
     }
@@ -181,108 +169,6 @@ public class MyceliumWrenchItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    @Override
-    public InteractionResult useOn(UseOnContext context) {
-        if (!context.getLevel().getBlockState(context.getClickedPos()).is(ModBlocks.MYCELIAL_GENERATOR.get())) {
-            return InteractionResult.PASS;
-        }
-        return handle(context);
-    }
-
-    private InteractionResult handle(UseOnContext context) {
-        Level level = context.getLevel();
-        BlockPos pos = context.getClickedPos();
-        Player player = context.getPlayer();
-        if (level.isClientSide() || player == null || !(level instanceof ServerLevel serverLevel)) {
-            return InteractionResult.SUCCESS;
-        }
-        ItemStack stack = context.getItemInHand();
-        GlobalPos clicked = GlobalPos.of(level.dimension(), pos);
-
-        if (!ServerConfig.get(ServerConfig.WRENCH_ENABLED)) {
-            fail(player, Component.translatable(LinkRules.Result.DISABLED.translationKey()));
-            return InteractionResult.CONSUME;
-        }
-
-        if (player.isSecondaryUseActive()) {
-            int removed = ManualLinking.unlinkAll(serverLevel.getServer(), clicked);
-            if (clicked.equals(stack.get(ModDataComponents.SELECTED_GENERATOR.get()))) {
-                stack.remove(ModDataComponents.SELECTED_GENERATOR.get());
-            }
-            if (removed > 0) {
-                ok(player, Component.translatable("message.barelyfunctionalcontraptions.unlinked", removed));
-                level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.BLOCKS, 0.8F, 0.7F);
-            } else {
-                fail(player, Component.translatable("message.barelyfunctionalcontraptions.no_links"));
-            }
-            return InteractionResult.CONSUME;
-        }
-
-        GlobalPos selected = stack.get(ModDataComponents.SELECTED_GENERATOR.get());
-        if (selected == null) {
-            stack.set(ModDataComponents.SELECTED_GENERATOR.get(), clicked);
-            ok(player, Component.translatable("message.barelyfunctionalcontraptions.selected", formatPos(clicked),
-                    ManualLinkData.get(serverLevel.getServer()).count(clicked),
-                    ServerConfig.get(ServerConfig.MAX_MANUAL_CONNECTIONS)));
-            level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.BLOCKS, 0.8F, 1.2F);
-            return InteractionResult.CONSUME;
-        }
-
-        LinkRules.Result result = ManualLinking.tryLink(serverLevel.getServer(), selected, clicked);
-        if (result.success()) {
-            stack.remove(ModDataComponents.SELECTED_GENERATOR.get());
-            stack.set(ModDataComponents.LINK_GLOW_UNTIL.get(), level.getGameTime() + LINK_GLOW_TICKS);
-            ok(player, Component.translatable(result.translationKey(), formatPos(selected), formatPos(clicked)));
-            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.award(serverPlayer,
-                        com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.LINK_GENERATORS);
-            }
-            consumeUse(stack, player, context.getHand());
-        } else {
-            if (result == LinkRules.Result.SAME_GENERATOR) {
-                // Clicking the selected generator again simply keeps it selected.
-                fail(player, Component.translatable(result.translationKey()));
-            } else {
-                fail(player, Component.translatable(result.translationKey(),
-                        ServerConfig.get(ServerConfig.MAX_LINK_DISTANCE),
-                        ServerConfig.get(ServerConfig.MAX_MANUAL_CONNECTIONS)));
-            }
-            level.playSound(null, pos, SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 0.5F, 1.4F);
-            if (result == LinkRules.Result.NOT_LOADED || result == LinkRules.Result.NOT_A_GENERATOR) {
-                stack.remove(ModDataComponents.SELECTED_GENERATOR.get());
-            }
-        }
-        return InteractionResult.CONSUME;
-    }
-
-    @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
-        if (player.isSecondaryUseActive() && stack.has(ModDataComponents.SELECTED_GENERATOR.get())) {
-            if (!level.isClientSide()) {
-                stack.remove(ModDataComponents.SELECTED_GENERATOR.get());
-                ok(player, Component.translatable("message.barelyfunctionalcontraptions.selection_cleared"));
-            }
-            return InteractionResult.SUCCESS;
-        }
-        return InteractionResult.PASS;
-    }
-
-    private static void consumeUse(ItemStack stack, Player player, InteractionHand hand) {
-        int durability = ServerConfig.get(ServerConfig.WRENCH_DURABILITY);
-        if (durability <= 0 || player.getAbilities().instabuild) {
-            return;
-        }
-        int used = stack.getOrDefault(ModDataComponents.WRENCH_USES.get(), 0) + 1;
-        if (LinkRules.remainingUses(durability, used) <= 0) {
-            player.level().playSound(null, player.blockPosition(), SoundEvents.ITEM_BREAK.value(), SoundSource.PLAYERS, 0.8F, 1.0F);
-            stack.shrink(1);
-            player.sendOverlayMessage(Component.translatable("message.barelyfunctionalcontraptions.wrench_broke").withStyle(ChatFormatting.RED));
-        } else {
-            stack.set(ModDataComponents.WRENCH_USES.get(), used);
-        }
-    }
-
     private static void ok(Player player, Component message) {
         player.sendOverlayMessage(message.copy().withStyle(ChatFormatting.GREEN));
     }
@@ -291,79 +177,22 @@ public class MyceliumWrenchItem extends Item {
         player.sendOverlayMessage(message.copy().withStyle(ChatFormatting.RED));
     }
 
-    public static Component formatPos(GlobalPos pos) {
-        return Component.translatable("message.barelyfunctionalcontraptions.position", pos.pos().getX(), pos.pos().getY(), pos.pos().getZ(),
-                pos.dimension().identifier().toString());
-    }
-
     // ------------------------------------------------------------------ appearance
 
-    /**
-     * The enchantment glint shows while a generator is selected (linking in progress) and for a moment after
-     * a successful link.
-     */
+    /** The enchantment glint shows while it's linking machines to a Machine Status Panel or crates to a Crate Controller. */
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.has(ModDataComponents.SELECTED_GENERATOR.get()) || stack.has(ModDataComponents.LINK_GLOW_UNTIL.get())
-                || stack.has(ModDataComponents.LINKING_PANEL.get()) || stack.has(ModDataComponents.LINKING_CONTROLLER.get());
-    }
-
-    /** Ends the post-link glint once its time is up (server side; the change syncs to the client). */
-    @Override
-    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, EquipmentSlot slot) {
-        Long glowUntil = stack.get(ModDataComponents.LINK_GLOW_UNTIL.get());
-        if (glowUntil != null && level.getGameTime() >= glowUntil) {
-            stack.remove(ModDataComponents.LINK_GLOW_UNTIL.get());
-        }
-    }
-
-    @Override
-    public boolean isBarVisible(ItemStack stack) {
-        return ServerConfig.get(ServerConfig.WRENCH_DURABILITY) > 0 && stack.getOrDefault(ModDataComponents.WRENCH_USES.get(), 0) > 0;
-    }
-
-    @Override
-    public int getBarWidth(ItemStack stack) {
-        int durability = Math.max(1, ServerConfig.get(ServerConfig.WRENCH_DURABILITY));
-        int remaining = LinkRules.remainingUses(durability, stack.getOrDefault(ModDataComponents.WRENCH_USES.get(), 0));
-        return Math.round(13.0F * remaining / durability);
-    }
-
-    @Override
-    public int getBarColor(ItemStack stack) {
-        int durability = Math.max(1, ServerConfig.get(ServerConfig.WRENCH_DURABILITY));
-        int remaining = LinkRules.remainingUses(durability, stack.getOrDefault(ModDataComponents.WRENCH_USES.get(), 0));
-        float fraction = remaining / (float) durability;
-        return Mth.hsvToRgb(0.75F + 0.1F * (1 - fraction), 0.7F, 1.0F);
+        return stack.has(ModDataComponents.LINKING_PANEL.get()) || stack.has(ModDataComponents.LINKING_CONTROLLER.get());
     }
 
     @Override
     @SuppressWarnings("deprecation") // the TooltipDisplay overload is the current (deprecated-for-components) item hook
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
         tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.desc").withStyle(ChatFormatting.GRAY));
-        GlobalPos selected = stack.get(ModDataComponents.SELECTED_GENERATOR.get());
-        if (selected != null) {
-            tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.selected", formatPos(selected))
-                    .withStyle(ChatFormatting.LIGHT_PURPLE));
-            tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.status.waiting").withStyle(ChatFormatting.GREEN));
-        } else {
-            tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.status.none").withStyle(ChatFormatting.DARK_GRAY));
-        }
-        int durability = ServerConfig.get(ServerConfig.WRENCH_DURABILITY);
-        if (durability > 0) {
-            int remaining = LinkRules.remainingUses(durability, stack.getOrDefault(ModDataComponents.WRENCH_USES.get(), 0));
-            tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.uses", remaining, durability).withStyle(ChatFormatting.GRAY));
-        }
         tooltip.accept(Component.empty());
-        tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.select").withStyle(ChatFormatting.WHITE));
-        tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.link").withStyle(ChatFormatting.WHITE));
-        tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.unlink").withStyle(ChatFormatting.WHITE));
         if (ServerConfig.get(ServerConfig.WRENCH_DISMANTLE)) {
             tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.dismantle").withStyle(ChatFormatting.WHITE));
         }
-        tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.help.limits",
-                ServerConfig.get(ServerConfig.MAX_LINK_DISTANCE), ServerConfig.get(ServerConfig.MAX_MANUAL_CONNECTIONS))
-                .withStyle(ChatFormatting.DARK_GRAY));
         tooltip.accept(Component.translatable("item.barelyfunctionalcontraptions.mycelium_wrench.flavor").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
     }
 }

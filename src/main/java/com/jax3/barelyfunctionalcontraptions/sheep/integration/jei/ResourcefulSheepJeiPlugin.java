@@ -78,7 +78,7 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
                 ModItems.RANGE_UPGRADE, ModItems.YIELD_UPGRADE, ModItems.MUFFLER_UPGRADE)) {
             registration.addItemStackInfo(new ItemStack(card.get()), Component.translatable("jei.barelyfunctionalcontraptions.info." + card.getId().getPath()));
         }
-        for (var machine : List.of(ModItems.MECHANICAL_SEPARATOR, ModItems.WOOL_PACKER, ModItems.POWERED_FURNACE, ModItems.INFUSION_ALTAR,
+        for (var machine : List.of(ModItems.MECHANICAL_SEPARATOR, ModItems.WOOL_PACKER, ModItems.INFUSION_ALTAR,
                 ModItems.AUTOMATIC_SHEARS, ModItems.CHILLER)) {
             registration.addItemStackInfo(new ItemStack(machine.get()), Component.translatable("jei.barelyfunctionalcontraptions.info.upgrade_slots." + machine.getId().getPath()));
         }
@@ -260,7 +260,5 @@ public class ResourcefulSheepJeiPlugin implements IModPlugin {
         registration.addCraftingStation(CrateCategory.TYPE, ModItems.CRATE.get());
         registration.addCraftingStation(CrateControllerCategory.TYPE, ModItems.CRATE_CONTROLLER.get());
         registration.addCraftingStation(FleeceTrawlerCategory.TYPE, ModItems.FLEECE_TRAWLER.get());
-        // The Powered Furnace smelts everything a Furnace does.
-        registration.addCraftingStation(mezz.jei.api.constants.RecipeTypes.SMELTING, ModItems.POWERED_FURNACE.get());
     }
 }

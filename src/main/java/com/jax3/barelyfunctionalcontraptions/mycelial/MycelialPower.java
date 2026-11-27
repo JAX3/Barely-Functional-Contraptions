@@ -44,15 +44,12 @@ public final class MycelialPower {
         modBus.addListener(CommonEvents::onConfigLoading);
         modBus.addListener(CommonEvents::onConfigReloading);
 
-        NeoForge.EVENT_BUS.addListener(CommonEvents::onServerStopped);
         NeoForge.EVENT_BUS.register(com.jax3.barelyfunctionalcontraptions.mycelial.item.WrenchDismantling.class);
-        NeoForge.EVENT_BUS.addListener(CommonEvents::onLevelUnload);
         NeoForge.EVENT_BUS.addListener(CommonEvents::onTagsUpdated);
         modBus.addListener((net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent event) ->
                 event.register(com.jax3.barelyfunctionalcontraptions.mycelial.fuel.MycelialFuelDataMap.TYPE));
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.registries.datamaps.DataMapsUpdatedEvent event) ->
                 com.jax3.barelyfunctionalcontraptions.mycelial.fuel.FuelRegistry.invalidate());
-        NeoForge.EVENT_BUS.addListener(CommonEvents::onServerTickPost);
     }
 
     public static Identifier id(String path) {

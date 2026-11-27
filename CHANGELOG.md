@@ -30,7 +30,7 @@ For Minecraft 26.3, 26.2 and 26.1 on NeoForge.
 
 ### Changed
 - Recipes take **Copper Wool** (or bales, for later machines) instead of Copper Ingots; the Functional Machine Block,
-  Energy Cable, Wool Burner and Infusion Altar keep their ingots so a new world can start.
+  Energy Cable and Infusion Altar keep their ingots so a new world can start.
 - The **Echo Chamber** is recoloured to the machines' blue steel and purple, with a new recipe.
 - Infused sheep wear their **resource's block** as fleece (client config `blockTexturedWool`).
 - Processing machines are **about half as fast again** for the same power.
@@ -41,6 +41,12 @@ For Minecraft 26.3, 26.2 and 26.1 on NeoForge.
   blocks near it.
 - **The Glow Lamp is gone:** a Glow Ink sheep standing on Glow Panels gives them full glow power instead. Placed lamps
   disappear from worlds.
+- **Cut to keep the mod focused** (see `docs/DESIGN-RULES.md`): the **Wool Burner**, the **Powered Furnace**, and
+  the Woollen Beanie, Jumper and Leggings (**Woollen Boots** stay, and now halve a Static Generator's shock). Placed
+  blocks and held items disappear from worlds.
+- **Mycelial Generators work alone:** no more networks, exponential boost or wrench links; each makes 200–250 FE/t.
+  The wrench keeps its other jobs.
+- **Zero Point beam** kills no longer get Looting or count as player kills.
 - **Sheep in every generator:** Dragon sheep standing in a Zero Point beam don't burn and add +25% each (up to 4).
   Sculk sheep near a Hume Field Generator steady its random output towards the average.
 - Every machine now runs on one shared machine frame; worlds load as before.
@@ -56,7 +62,7 @@ For Minecraft 26.3, 26.2 and 26.1 on NeoForge.
 - The Static Generator's charge bar no longer flashes while overcharged.
 
 ### Test world
-- A seventh row of cells with the new machines and sheep; the status panel shows 27 machines.
+- A seventh row of cells with the new machines and sheep; the status panel shows 25 machines.
 - Rebuilding the world no longer wipes the seventh row's floor.
 
 ## 1.5.5 (17–19 November 2026)

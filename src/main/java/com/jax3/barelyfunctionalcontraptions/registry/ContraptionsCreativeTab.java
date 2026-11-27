@@ -55,7 +55,6 @@ public final class ContraptionsCreativeTab {
     public static final List<Section> SECTIONS = List.of(
             guide("power", 0xFFB8792A, () -> new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get()), items(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL,
-                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BURNER,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_TREADMILL,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLAZE_FURNACE,
                     com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIAL_GENERATOR,
@@ -79,7 +78,6 @@ public final class ContraptionsCreativeTab {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CRATE_STRAP)),
             guide("production", 0xFF468F46, () -> new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.MECHANICAL_SEPARATOR.get()), items(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.INFUSION_ALTAR,
-                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.POWERED_FURNACE,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CHILLER,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GRASS_SEEDER,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.FLEECE_TRAWLER,
@@ -103,10 +101,7 @@ public final class ContraptionsCreativeTab {
                     com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HERD_COUNTER,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.STATUS_PANEL,
-                    // Woollen Armour (white; craft or dye it for other colours)
-                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_HELMET,
-                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_CHESTPLATE,
-                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_LEGGINGS,
+                    // Woollen Boots (white; craft or dye them for other colours)
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_BOOTS)));
 
     /** The loaded sheep resources, or the built-in ones before a world (and its data packs) is loaded. */

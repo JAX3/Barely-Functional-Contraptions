@@ -10,14 +10,14 @@ A NeoForge mod for **Minecraft 26.1, 26.2 and 26.3** about sheep and slightly qu
 
 **Infuse a sheep with an ingot, a gem or a block at the Infusion Altar and its wool takes on that resource.** Shear it for resource wool, and turn the wool back into the resource in a **Mechanical Separator**. Breed your best sheep to raise their Yield, Growth and Endurance. Every sheep is infused at a powered **Infusion Altar**: the resource, two of its blocks and an item for its rarity. The legendary Wither, Dragon and Warden sheep take more.
 
-Everything runs on Forge Energy. You can make it from mushrooms in a network of **Mycelial Generators**, from sunlight on **Glow Panels**, from Blaze sheep warming a **Blaze Sheep Furnace**, or from burning spare wool. Store it in **Hume Energy Cubes** and move it, along with fluids and items, through cables and pipes. **Automatic Shears**, **Wool Packers** and hoppers can run a whole farm without you.
+Everything runs on Forge Energy. You can make it from mushrooms in **Mycelial Generators**, from sunlight on **Glow Panels**, from Blaze sheep warming a **Blaze Sheep Furnace**, or from sheep walking a treadmill. Store it in **Hume Energy Cubes** and move it, along with fluids and items, through cables and pipes. **Automatic Shears**, **Wool Packers** and hoppers can run a whole farm without you.
 
 ### Make it your own
 
 - **Config:** four config files, editable in game from *Mods → Barely Functional Contraptions → Config*. Every power rate, buffer, time and chance can be changed, and a world can have its own copy.
 - **Data packs:**
   - **Add sheep:** a new sheep needs only a JSON file. It sets the feeding item, the colours, the separator's outputs, its tier and altar catalysts, and extra looks such as wings, extra heads, glowing or a bigger size.
-  - **More data:** Wool Burner fuels, furnace heat sources and boost items, and separator recipes are data too.
+  - **More data:** furnace heat sources and boost items, and separator recipes are data too.
   - **For other mods:** the `resource_wool` ingredient lets KubeJS, Create and other mods' recipes use resource wool.
 - **Modpacks:** `/bfc generate` makes a sheep for every ore and material in the modpack.
 - **Resource packs:** they can retexture any wool and rewrite or translate the in-game manual.
@@ -33,13 +33,13 @@ Craft a book with a Functional Machine Block to get the in-game guide. Its chapt
 
 **Power**
 
-![The Contraptions Manual on its Power tab, with the Wool Burner chapter open](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/83_guide_power_tab.png)
+![The Contraptions Manual on its Power tab, with the Glow Panels chapter open](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/83_guide_power_tab.png)
 
 **Production**
 
 ![The Production tab: Infusing Sheep, Themed Sheep, Infusion Altar, Breeding Sheep, Wool Machines and Fluid Reservoir](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/84_guide_production_tab.png)
 
-![Every block in the mod on stepped rows, each with its name: the Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar and a Wool Bale in front; the Mycelial Generator, Zero Point Energy Module, Glow Panel and Blaze Sheep Furnace; the Wool Burner, Hume Energy Cube, Fluid Tank, Fluid Reservoir and Creative Generator; and the Energy Cable, Fluid Pipe, Item Pipe, Energy Meter and Functional Machine Block at the back](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/showcase_blocks.png)
+![Every block in the mod on stepped rows, each with its name: the Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar and a Wool Bale in front; the Mycelial Generator, Zero Point Energy Module, Glow Panel and Blaze Sheep Furnace; the Hume Energy Cube, Fluid Tank, Fluid Reservoir and Creative Generator; and the Energy Cable, Fluid Pipe, Item Pipe, Energy Meter and Functional Machine Block at the back](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/showcase_blocks.png)
 
 ![The Recipes tab's Mechanical Separator chapter: Blaze, Brown Mushroom and Coal wool with their outputs, power and time](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/99_guide_recipes_separator.png)
 
@@ -47,7 +47,7 @@ Craft a book with a Functional Machine Block to get the in-game guide. Its chapt
 
 The manual sorts the generators into tiers.
 
-**Early game:** Glow Panel, Wool Burner and Sheep Treadmill. Cheap to build, but weak.
+**Early game:** Glow Panel and Sheep Treadmill. Cheap to build, but weak.
 
 ### Glow Panels
 
@@ -55,19 +55,13 @@ Make up to 60 FE/t from sunlight and up to 40 FE/t from block light; a Glow Ink 
 
 ![Glow Panels in the sun](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/55_glow_panels.png)
 
-### Wool Burner
-
-Burns spare wool for power, one item at a time: plain wool and string give 30 FE/t, Coal Wool 120 FE/t. It waits while its buffer is full, so nothing is wasted.
-
-![A row of Wool Burners, one fed by a hopper](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/80_wool_burners.png)
-
 ### Sheep Treadmill
 
 A sheep walks its belt for the wheat hanging at the front and makes 20 FE/t, more with Speed or while it's sheared. With food in it, it calls the nearest sheep over to hop on. Keep Wheat or Hay Bales in it, and swap in a fresh sheep when one gets tired: after 2 minutes it rests for 30 seconds, longer walks for sheep bred for Endurance.
 
 ![Three Sheep Treadmills: a sheep walking the left one, a sheared sheep the middle one, and the right one empty, each with wheat hanging at the front](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/103_sheep_treadmill.png)
 
-**Mid game:** Blaze Furnace, Mycelial Generator and Static Generator. They need the Nether, a mushroom farm or some copper, and Mycelial networks grow fast.
+**Mid game:** Blaze Furnace, Mycelial Generator and Static Generator. They need the Nether, a mushroom farm or some copper.
 
 ### Blaze Furnace
 
@@ -77,13 +71,13 @@ Makes power from the heat of Blaze sheep standing round it: 80 FE/t for one, up 
 
 ### Mycelial Generator
 
-Burns red or brown mushrooms and water for 200–250 FE/t. Generators that touch form a network, and each running one boosts the whole network's output. Running generators slowly turn nearby dirt into mycelium and sometimes grow huge mushrooms, so they make more of their own fuel.
+Burns red or brown mushrooms and water for 200–250 FE/t. Each one works on its own. Running generators slowly turn nearby dirt into mycelium and sometimes grow huge mushrooms, so they make more of their own fuel.
 
 ![Machine fronts, idle and running](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/14_machine_fronts.png)
 
 ### Static Generator
 
-Two blocks tall, like a Van de Graaff generator. Sheep rubbing against Copper Combs in its pen build up static, and its copper dome arcs it into power: 100 FE/t a sheep, 150 for Copper sheep: 600 FE/t from six plain sheep, 900 from six Copper sheep. The combs oxidise as they're worked, so scrape them with an axe or wax them. If nothing takes its power the dome overcharges and shocks anything in its pen, knocking it back; Woollen Armour insulates.
+Two blocks tall, like a Van de Graaff generator. Sheep rubbing against Copper Combs in its pen build up static, and its copper dome arcs it into power: 100 FE/t a sheep, 150 for Copper sheep: 600 FE/t from six plain sheep, 900 from six Copper sheep. The combs oxidise as they're worked, so scrape them with an axe or wax them. If nothing takes its power the dome overcharges and shocks anything in its pen, knocking it back; Woollen Boots halve it.
 
 ![A Static Generator with four Copper Combs and five sheep in its outlined pen](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/107_static_generator.png)
 
@@ -171,12 +165,6 @@ Every sheep has Yield, Growth and Endurance from 1 to 10. A lamb gets its parent
 
 ![A Gold sheep's Yield 7, Growth 4 and Endurance 9](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/95_sheep_stats.png)
 
-### Powered Furnace
-
-Smelts anything a Furnace can, on power instead of fuel, in a little over half the time. Blaze sheep standing round it speed it up further: about x1.5 with two, x1.8 with four.
-
-![Two Powered Furnaces fed by hoppers, the one on the right with two burning Blaze sheep beside it inside its orange area outline](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/101_powered_furnace.png)
-
 ### Snow Sheep Chiller
 
 The Blaze Furnace's icy opposite: Snow sheep standing round it freeze water into Ice, one every 5 seconds with one sheep and about every 1.5 with four. It needs no power, just a bucket of water per Ice, and hoppers can take the Ice out.
@@ -217,7 +205,7 @@ Links your Wool-Lined Crates into one store: crates touching it join by themselv
 
 A wall screen that shows how your machines are doing, all in one place: link them with the Barely Functional Wrench and each gets its name, its status (green, amber, red or grey) and a key number. A comparator reads how many have a problem, for an alarm.
 
-![A Machine Status Panel showing a Powered Furnace working, a Grass Seeder out of fuel in red, a Hume Energy Cube and a Herd Counter](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/110_status_panel_close.png)
+![A Machine Status Panel showing a Wool Packer working, a Grass Seeder out of fuel in red, a Hume Energy Cube and a Herd Counter](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/110_status_panel_close.png)
 
 ### Wool Machines
 
@@ -243,21 +231,19 @@ The mod's creative tab is split into the same sections as the manual, and the Re
 
 ### Wrench and Links
 
-The Barely Functional Wrench links Mycelial Generators into one network up to 64 blocks apart, and links machines to a Machine Status Panel and crates to a Crate Controller. It also sets the sides of pipes, and hitting any contraption with it picks it up at once, straight into your inventory with whatever was inside.
+The Barely Functional Wrench links machines to a Machine Status Panel and crates to a Crate Controller. It also sets the sides of pipes, and hitting any contraption with it picks it up at once, straight into your inventory with whatever was inside.
 
 ![A Crate Controller in a wall of crates, a crate across the room linked to it with the wrench, brass tags on every crate in its store](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/112_crate_controller_linked.png)
 
-### Woollen Armour
+### Woollen Boots
 
-Knit a full set from any coloured wool, in the leather armour shapes: a Beanie, a Jumper, Leggings and Boots. Each piece takes the colour of the wool it's made from, and mixed wool blends the colours. It can be dyed like leather afterwards, is a little tougher and longer lasting than leather, mends with wool, and keeps you from freezing in powder snow.
+Knit from 4 wool of any colour in the leather boots shape, they take the colour of the wool (mixed wool blends) and can be dyed like leather. They're a little tougher than leather, mend with wool, keep you from freezing in powder snow, and take half the knock off a Static Generator's shock.
 
-While you wear the **Woollen Boots** you're **Muffled**: you make no sound, from footsteps and landing to eating and getting hurt, and sculk sensors, shriekers and Wardens can't hear you. It wears off 2 seconds after you take them off.
-
-![Four armour stands in Woollen Armour: a white set, a red set, a light blue set, and a mixed set with a yellow beanie, green jumper, blue leggings and brown boots](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/102_woollen_armor.png)
+While you wear them you're **Muffled**: you make no sound, from footsteps and landing to eating and getting hurt, and sculk sensors, shriekers and Wardens can't hear you. It wears off 2 seconds after you take them off.
 
 ### Data Packs
 
-Sheep, Wool Burner fuels, furnace heat sources and separator recipes are all data. `/bfc generate` makes a sheep for every material in the modpack, and every number can be changed in the config (see *Make it your own* above).
+Sheep, furnace heat sources and separator recipes are all data. `/bfc generate` makes a sheep for every material in the modpack, and every number can be changed in the config (see *Make it your own* above).
 
 ![The Resource Wool creative tab in sections: Resource Wool, a wool for every built-in sheep, then the Wool Bales banner](https://raw.githubusercontent.com/JAX3/Barely-Functional-Contraptions/main/docs/screenshots/showcase_tab_wool.png)
 

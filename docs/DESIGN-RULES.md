@@ -70,7 +70,8 @@ isn't settled. Rethink it before building it.
 
 ### 8. Cut something on purpose
 Every release, ask "what would nobody miss?" and remove, merge or simplify at least one thing. Removing the wireless
-power links was the right call; do it again when something stops earning its place.
+power links was the right call, and so was cutting the Wool Burner, the Powered Furnace and the Mycelial networks; do
+it again when something stops earning its place.
 
 ### 9. Ideas wait two weeks
 New ideas go in **Parked ideas** below, with the date. Nothing is started until it has waited at least two weeks and
@@ -120,15 +121,14 @@ Small ways to deepen what's already there (rule 5). These don't need the two-wee
 
 ### Needs a quirk (rule 3)
 These machines work, but nothing about them is barely functional yet. Each needs one small quirk, not a rework.
-- **Wool Burner:** no downside yet.
-- **Powered Furnace:** a plain fast furnace; Blaze sheep are only a bonus.
 - **Infusion Altar:** no quirk.
 - **Wool Packer:** no quirk.
 - **Glow Panel:** no quirk (making nothing at night is how all solar power works). Glow Ink sheep now light it in place
   of the removed Glow Lamp.
 
 Done: the Mechanical Separator jams, the Automatic Shears nick, the Snow Sheep Chiller frosts over and the Blaze Sheep
-Furnace throws sparks.
+Furnace throws sparks. Cut instead (rule 8): the Wool Burner, the Powered Furnace and the Woollen Beanie, Jumper and
+Leggings; the Mycelial Generator's networks and wrench links, and the Zero Point beam's looting and player kills.
 
 ### Other extras
 - **Echo Chamber:** catalysts, an Echo Shard boost, fatigue.

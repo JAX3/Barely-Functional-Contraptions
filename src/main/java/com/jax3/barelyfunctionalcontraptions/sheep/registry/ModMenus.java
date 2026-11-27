@@ -36,9 +36,6 @@ public final class ModMenus {
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu>> BLAZE_FURNACE = REGISTER.register("blaze_furnace",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.BlazeFurnaceMenu::new));
 
-    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.PoweredFurnaceMenu>> POWERED_FURNACE = REGISTER.register("powered_furnace",
-            () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.PoweredFurnaceMenu::new));
-
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.FleeceTrawlerMenu>> FLEECE_TRAWLER = REGISTER.register("fleece_trawler",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.FleeceTrawlerMenu::new));
 
@@ -57,8 +54,6 @@ public final class ModMenus {
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.GrassSeederMenu>> GRASS_SEEDER = REGISTER.register("grass_seeder",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.GrassSeederMenu::new));
 
-    public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolBurnerMenu>> WOOL_BURNER = REGISTER.register("wool_burner",
-            () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.WoolBurnerMenu::new));
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.ThermalReactionChamberMenu>> THERMAL_REACTION_CHAMBER = REGISTER.register("thermal_reaction_chamber",
             () -> IMenuTypeExtension.create(com.jax3.barelyfunctionalcontraptions.sheep.menu.ThermalReactionChamberMenu::new));
     public static final Supplier<MenuType<com.jax3.barelyfunctionalcontraptions.sheep.menu.StaticGeneratorMenu>> STATIC_GENERATOR =

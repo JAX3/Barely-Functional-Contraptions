@@ -4,8 +4,6 @@ import com.jax3.barelyfunctionalcontraptions.mycelial.MycelialPower;
 import com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.GeneratorState;
 import com.jax3.barelyfunctionalcontraptions.mycelial.menu.GeneratorStatus;
 import com.jax3.barelyfunctionalcontraptions.mycelial.menu.MycelialGeneratorMenu;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.ConnectionType;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.NetworkStatus;
 import com.jax3.barelyfunctionalcontraptions.mycelial.util.NumberFormatting;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -194,36 +192,6 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
                         Component.translatable("gui.barelyfunctionalcontraptions.tooltip.energy.extraction", NumberFormatting.decimal(s.extraction()))
                                 .withStyle(ChatFormatting.GRAY)));
 
-        // Network
-        ConnectionType connection = ConnectionType.byOrdinal(s.connectionType());
-        List<Component> networkTooltip = List.of(
-                Component.translatable("gui.barelyfunctionalcontraptions.section.network").withStyle(ChatFormatting.GREEN),
-                Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.formula").withStyle(ChatFormatting.GRAY),
-                Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.members", s.networkSize(), s.maxNetworkSize())
-                        .withStyle(ChatFormatting.GRAY),
-                Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.total", NumberFormatting.decimal(s.networkTotal()))
-                        .withStyle(ChatFormatting.GRAY),
-                Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.connection", Component.translatable(connection.translationKey()))
-                        .withStyle(ChatFormatting.GRAY),
-                Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.links", s.manualLinks(), s.maxManualLinks(),
-                        s.activeManualLinks()).withStyle(ChatFormatting.GRAY),
-                Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.wrench").withStyle(ChatFormatting.DARK_GRAY));
-        row(graphics, 4, "gui.barelyfunctionalcontraptions.section.network",
-                Component.translatable("gui.barelyfunctionalcontraptions.network.line", s.networkSize(), s.networkActive()), networkTooltip);
-        row(graphics, 5, null, Component.translatable("gui.barelyfunctionalcontraptions.network.multiplier",
-                NumberFormatting.decimal(s.networkScale()), NumberFormatting.compact(Math.round(s.networkTotal()))), networkTooltip);
-        NetworkStatus networkStatus = NetworkStatus.values()[Math.floorMod(s.networkStatus(), NetworkStatus.values().length)];
-        row(graphics, 6, null, Component.translatable("gui.barelyfunctionalcontraptions.network.status_links",
-                        Component.translatable(networkStatus.translationKey()), Component.translatable(connection.translationKey()),
-                        s.manualLinks(), s.maxManualLinks()),
-                List.of(Component.translatable(networkStatus.translationKey()).withStyle(ChatFormatting.GREEN),
-                        Component.translatable(networkStatus.translationKey() + ".desc").withStyle(ChatFormatting.GRAY),
-                        Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.connection", Component.translatable(connection.translationKey()))
-                                .withStyle(ChatFormatting.GRAY),
-                        Component.translatable(connection.translationKey() + ".desc").withStyle(ChatFormatting.DARK_GRAY),
-                        Component.translatable("gui.barelyfunctionalcontraptions.tooltip.network.links", s.manualLinks(), s.maxManualLinks(),
-                                s.activeManualLinks()).withStyle(ChatFormatting.GRAY)));
-
         // Mycelium
         List<Component> myceliumTooltip = List.of(
                 Component.translatable("gui.barelyfunctionalcontraptions.section.mycelium").withStyle(ChatFormatting.DARK_GREEN),
@@ -236,15 +204,15 @@ public class MycelialGeneratorScreen extends AbstractContainerScreen<MycelialGen
                 Component.translatable("gui.barelyfunctionalcontraptions.tooltip.mycelium.rule").withStyle(ChatFormatting.DARK_GRAY),
                 Component.translatable("gui.barelyfunctionalcontraptions.tooltip.mycelium.huge").withStyle(ChatFormatting.DARK_GRAY));
         if (s.myceliumEnabled()) {
-            row(graphics, 7, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.line",
+            row(graphics, 4, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.line",
                     NumberFormatting.percent(s.chance()), NumberFormatting.percent(s.chanceIncrease())), myceliumTooltip);
-            row(graphics, 8, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.next"), myceliumTooltip);
+            row(graphics, 5, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.next"), myceliumTooltip);
             if (s.trackConversions()) {
-                row(graphics, 9, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.converted_huge",
+                row(graphics, 6, null, Component.translatable("gui.barelyfunctionalcontraptions.mycelium.converted_huge",
                         NumberFormatting.grouped(s.converted()), NumberFormatting.grouped(s.hugeMushrooms())), myceliumTooltip);
             }
         } else {
-            row(graphics, 7, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.disabled"),
+            row(graphics, 4, "gui.barelyfunctionalcontraptions.section.mycelium", Component.translatable("gui.barelyfunctionalcontraptions.mycelium.disabled"),
                     myceliumTooltip);
         }
     }

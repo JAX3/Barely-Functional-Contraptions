@@ -3,7 +3,6 @@ package com.jax3.barelyfunctionalcontraptions.mycelial.compat.jei;
 import com.jax3.barelyfunctionalcontraptions.mycelial.config.ServerConfig;
 import com.jax3.barelyfunctionalcontraptions.mycelial.fuel.FuelDefinition;
 import com.jax3.barelyfunctionalcontraptions.mycelial.fuel.FuelRegistry;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.NetworkMath;
 import com.jax3.barelyfunctionalcontraptions.mycelial.util.Matchers;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -22,8 +21,6 @@ public final class MycelialFuelRecipeFactory {
     public static List<MycelialFuelRecipe> create() {
         List<Fluid> fluids = acceptedFluids();
         double base = ServerConfig.get(ServerConfig.BASE_GENERATION);
-        double cap = ServerConfig.get(ServerConfig.MAX_NETWORK_OUTPUT);
-        double multiplier = ServerConfig.get(ServerConfig.SCALING_MULTIPLIER);
         int waterAmount = ServerConfig.get(ServerConfig.WATER_PER_INTERVAL);
         int waterInterval = ServerConfig.get(ServerConfig.WATER_INTERVAL);
 
@@ -33,9 +30,8 @@ public final class MycelialFuelRecipeFactory {
             if (items.isEmpty()) {
                 continue;
             }
-            double perTick = NetworkMath.generatorOutput(base, definition.energyMultiplier(),
-                    multiplier + definition.scalingBonus(), 1, cap);
-            double total = NetworkMath.safeMultiply(perTick, definition.burnTicks());
+            double perTick = base * definition.energyMultiplier();
+            double total = perTick * definition.burnTicks();
             double perInterval = waterAmount * definition.waterMultiplier();
             long waterPerItem = (long) Math.floor(perInterval * (definition.burnTicks() / (double) waterInterval));
             recipes.add(new MycelialFuelRecipe(definition, items, fluids, perTick, total,

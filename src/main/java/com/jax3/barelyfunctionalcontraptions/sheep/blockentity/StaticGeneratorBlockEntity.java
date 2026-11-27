@@ -56,7 +56,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
  *     <li><b>Dome:</b> the charge builds in its dome, which arcs into its buffer every {@code arcTicks} (3 seconds).
  *     With the buffer full the dome keeps charging, up to {@code domeCapacity}.</li>
  *     <li><b>Shocks:</b> with the dome more than {@code shockAt} (half) full, it shocks any player or mob in its pen
- *     (not sheep), knocking them back. Each piece of Woollen Armour takes a quarter off; a full set stops it.</li>
+ *     (not sheep), knocking them back. Woollen Boots take half off.</li>
  * </ul>
  * It pushes its power out of every face of its base but the top, up to {@code output} FE/t. A comparator reads how
  * charged its dome is.
@@ -189,14 +189,9 @@ public class StaticGeneratorBlockEntity extends com.jax3.barelyfunctionalcontrap
         return BlazeFurnaceBlockEntity.combine(charges, maxSheep(), ModConfigs.getDouble(ModConfigs.SERVER.staticFalloff));
     }
 
-    /** Pieces of Woollen Armour {@code entity} wears, 0-4: each takes a quarter off a shock. */
+    /** How much of a shock {@code entity}'s Woollen Boots take off, in quarters: 2 (half) with them on, else 0. */
     public static int insulation(LivingEntity entity) {
-        int pieces = 0;
-        if (entity.getItemBySlot(EquipmentSlot.HEAD).is(ModItems.WOOLLEN_HELMET.get())) pieces++;
-        if (entity.getItemBySlot(EquipmentSlot.CHEST).is(ModItems.WOOLLEN_CHESTPLATE.get())) pieces++;
-        if (entity.getItemBySlot(EquipmentSlot.LEGS).is(ModItems.WOOLLEN_LEGGINGS.get())) pieces++;
-        if (entity.getItemBySlot(EquipmentSlot.FEET).is(ModItems.WOOLLEN_BOOTS.get())) pieces++;
-        return pieces;
+        return entity.getItemBySlot(EquipmentSlot.FEET).is(ModItems.WOOLLEN_BOOTS.get()) ? 2 : 0;
     }
 
     // ------------------------------------------------------------------ ticking
@@ -327,7 +322,7 @@ public class StaticGeneratorBlockEntity extends com.jax3.barelyfunctionalcontrap
         }
     }
 
-    /** Knocks back every player and mob in the pen (not sheep), away from the dome, less for each piece of Woollen Armour. */
+    /** Knocks back every player and mob in the pen (not sheep), away from the dome, less with Woollen Boots on. */
     private void shock(ServerLevel level, BlockPos pos) {
         AABB area = pen(pos).expandTowards(0, 2, 0);
         Vec3 dome = Vec3.atBottomCenterOf(pos.above()).add(0, 0.65, 0);

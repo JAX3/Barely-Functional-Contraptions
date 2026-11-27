@@ -15,17 +15,9 @@ import com.jax3.barelyfunctionalcontraptions.mycelial.menu.GeneratorStatus;
 import com.jax3.barelyfunctionalcontraptions.mycelial.menu.MycelialGeneratorMenu;
 import com.jax3.barelyfunctionalcontraptions.mycelial.mycelium.MyceliumChance;
 import com.jax3.barelyfunctionalcontraptions.mycelial.mycelium.MyceliumSpreadManager;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.ConnectionType;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.GeneratorNetwork;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.GeneratorNetworkManager;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinking;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.NetworkMath;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.NetworkStatus;
 import com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.GlobalPos;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -62,9 +54,8 @@ import java.util.List;
  * <p>
  * Each server tick the generator:
  * <ol>
- *     <li>looks up its (cached) network and refreshes the network statistics once per tick;</li>
  *     <li>starts a new mushroom when the previous one is exhausted and it can run;</li>
- *     <li>produces {@code base x fuel x (multiplier + fuelBonus) ^ (n - 1)} FE/t, consumes water on its interval
+ *     <li>produces {@code base x fuel} FE/t (each generator stands alone), consumes water on its interval
  *     and advances the mycelium attempt timer;</li>
  *     <li>pushes energy to neighbouring receivers.</li>
  * </ol>
@@ -138,7 +129,6 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
     private double fuelEnergyMultiplier = 1.0D;
     private double fuelWaterMultiplier = 1.0D;
     private double fuelMyceliumBonus = 1.0D;
-    private double fuelScalingBonus;
 
     // Water
     private int waterTimer;
@@ -150,9 +140,6 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
     private int convertedThisSession;
     private int hugeMushroomsThisSession;
 
-    // Network
-    private long networkId;
-
     // Runtime (not persisted except 'active')
     private boolean active;
     private GeneratorState state = GeneratorState.NO_FUEL;
@@ -162,56 +149,10 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
     private double extractionRate;
     private int outputTimer;
     private int containerTimer;
-    private boolean registered;
-    private boolean linksChecked;
-    @Nullable
-    private GlobalPos globalPos;
     private int lastComparatorSignal = -1;
 
     public MycelialGeneratorBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.MYCELIAL_GENERATOR.get(), pos, blockState);
-    }
-
-    // ------------------------------------------------------------------ lifecycle
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        if (level instanceof ServerLevel serverLevel) {
-            GeneratorNetworkManager.get(serverLevel).add(this);
-            registered = true;
-        }
-    }
-
-    @Override
-    public void onChunkUnloaded() {
-        super.onChunkUnloaded();
-        unregister();
-    }
-
-    @Override
-    public void setRemoved() {
-        super.setRemoved();
-        unregister();
-    }
-
-    private void unregister() {
-        if (registered && level instanceof ServerLevel serverLevel) {
-            GeneratorNetworkManager.get(serverLevel).remove(this);
-        }
-        registered = false;
-    }
-
-    /**
-     * Called once when the block is broken or replaced (never on chunk unload): the frame drops the inventory, and
-     * this removes the generator's manual links from both ends.
-     */
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
-        if (level instanceof ServerLevel serverLevel) {
-            ManualLinking.onGeneratorDestroyed(serverLevel, pos);
-        }
     }
 
     // ------------------------------------------------------------------ ticking
@@ -223,19 +164,6 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
     }
 
     private void tickServer(ServerLevel level, BlockState blockState) {
-        GeneratorNetworkManager manager = GeneratorNetworkManager.get(level);
-        if (!registered || !manager.isTracked(this)) {
-            manager.add(this);
-            registered = true;
-        }
-        if (!linksChecked) {
-            linksChecked = true;
-            ManualLinking.pruneStaleLinks(level, worldPosition);
-        }
-        GeneratorNetwork network = manager.getNetwork(this);
-        // Server tick count (not level game time) so members in different dimensions share one refresh clock.
-        network.refresh(level.getServer().getTickCount());
-
         tank.syncCapacity();
         energy.clampToCapacity();
         if (chance < 0) {
@@ -248,13 +176,12 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
         }
 
         boolean wasActive = active;
-        boolean shareResources = ServerConfig.get(ServerConfig.SHARE_RESOURCES);
 
         // While no fuel is burning, check water against the fuel waiting in the slot.
         FuelDefinition pending = burnRemaining <= 0 ? FuelRegistry.get(inventory.getStackInSlot(GeneratorItemHandler.FUEL_SLOT)) : null;
         double waterMultiplier = pending != null ? pending.waterMultiplier() : fuelWaterMultiplier;
-        boolean waterOk = hasWaterFor(nextWaterDrain(network, waterMultiplier), network, shareResources);
-        boolean energyOk = !ServerConfig.get(ServerConfig.PAUSE_WHEN_ENERGY_FULL) || hasEnergySpace(network, shareResources);
+        boolean waterOk = hasWaterFor(nextWaterDrain(waterMultiplier));
+        boolean energyOk = !ServerConfig.get(ServerConfig.PAUSE_WHEN_ENERGY_FULL) || energy.space() > 0;
 
         if (burnRemaining <= 0 && pending != null && waterOk && energyOk) {
             startNextFuel();
@@ -275,13 +202,13 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
         }
 
         if (active) {
-            runGeneration(network, shareResources);
-            tickWater(network, shareResources);
-            tickMycelium(level, network);
+            runGeneration();
+            tickWater();
+            tickMycelium(level);
         } else {
             lastExactOutput = 0.0D;
             if (wasActive && ServerConfig.get(ServerConfig.RESET_ON_STOP)) {
-                resetChance(network);
+                resetChance();
             }
         }
 
@@ -310,7 +237,6 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
         fuelEnergyMultiplier = definition.energyMultiplier();
         fuelWaterMultiplier = definition.waterMultiplier();
         fuelMyceliumBonus = definition.myceliumBonus();
-        fuelScalingBonus = definition.scalingBonus();
         burnTotal = definition.burnTicks();
         burnRemaining = burnTotal;
         inventory.shrink(GeneratorItemHandler.FUEL_SLOT);
@@ -319,50 +245,20 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
 
     // ------------------------------------------------------------------ energy
 
-    /** Exact FE/t this generator produces with the given network state. */
-    public double computeOutput(GeneratorNetwork network) {
-        double base = ServerConfig.get(ServerConfig.BASE_GENERATION);
-        boolean scaling = ServerConfig.get(ServerConfig.SCALING_ENABLED);
-        int count = scaling ? network.scalingCount() : 1;
-        double multiplier = ServerConfig.get(ServerConfig.SCALING_MULTIPLIER) + (scaling ? fuelScalingBonus : 0.0D);
-        return NetworkMath.generatorOutput(base, fuelEnergyMultiplier, multiplier, count, ServerConfig.get(ServerConfig.MAX_NETWORK_OUTPUT));
+    /** Exact FE/t this generator produces burning its current fuel: the base rate times the fuel's multiplier. */
+    public double computeOutput() {
+        return Math.max(0.0D, ServerConfig.get(ServerConfig.BASE_GENERATION) * fuelEnergyMultiplier);
     }
 
-    private void runGeneration(GeneratorNetwork network, boolean shareResources) {
-        double exact = computeOutput(network);
+    private void runGeneration() {
+        double exact = computeOutput();
         lastExactOutput = exact;
         EnergyRounding rounding = ServerConfig.get(ServerConfig.ROUNDING);
         int produced = accumulator.produce(exact, rounding);
-        int stored = energy.receiveInternal(produced);
-        int leftover = produced - stored;
-        if (leftover > 0 && shareResources) {
-            for (MycelialGeneratorBlockEntity member : network.members()) {
-                if (member == this || member.isRemoved()) {
-                    continue;
-                }
-                leftover -= member.energy.receiveInternal(leftover);
-                if (leftover <= 0) {
-                    break;
-                }
-            }
-        }
-        // Any leftover here is discarded (only possible when pauseWhenEnergyFull = false).
+        energy.receiveInternal(produced);
+        // Anything that doesn't fit is discarded (only possible when pauseWhenEnergyFull = false).
         burnRemaining--;
         setChanged();
-    }
-
-    private boolean hasEnergySpace(GeneratorNetwork network, boolean shareResources) {
-        if (energy.space() > 0) {
-            return true;
-        }
-        if (shareResources) {
-            for (MycelialGeneratorBlockEntity member : network.members()) {
-                if (member != this && !member.isRemoved() && member.energy.space() > 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private void outputEnergy(ServerLevel level) {
@@ -424,66 +320,33 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
     // ------------------------------------------------------------------ water
 
     /** mB the next consumption will drain (exact, before carrying the remainder). */
-    private double waterPerInterval(GeneratorNetwork network) {
-        return waterPerInterval(network, fuelWaterMultiplier);
+    private double waterPerInterval() {
+        return waterPerInterval(fuelWaterMultiplier);
     }
 
-    private double waterPerInterval(GeneratorNetwork network, double waterMultiplier) {
-        double amount = ServerConfig.get(ServerConfig.WATER_PER_INTERVAL) * waterMultiplier;
-        if (ServerConfig.get(ServerConfig.WATER_SCALES_WITH_NETWORK) && ServerConfig.get(ServerConfig.SCALING_ENABLED)) {
-            amount = NetworkMath.safeMultiply(amount, network.scaleFactor());
-        }
-        return Math.min(amount, Integer.MAX_VALUE);
+    private double waterPerInterval(double waterMultiplier) {
+        return Math.min(ServerConfig.get(ServerConfig.WATER_PER_INTERVAL) * waterMultiplier, Integer.MAX_VALUE);
     }
 
-    private int nextWaterDrain(GeneratorNetwork network, double waterMultiplier) {
-        double exact = waterPerInterval(network, waterMultiplier) + waterRemainder;
+    private int nextWaterDrain(double waterMultiplier) {
+        double exact = waterPerInterval(waterMultiplier) + waterRemainder;
         return (int) Math.min(Integer.MAX_VALUE, Math.floor(exact));
     }
 
-    private boolean hasWaterFor(int amount, GeneratorNetwork network, boolean shareResources) {
-        if (!ServerConfig.get(ServerConfig.REQUIRE_WATER) || amount <= 0) {
-            return true;
-        }
-        long available = tank.getFluidAmount();
-        if (available >= amount) {
-            return true;
-        }
-        if (shareResources) {
-            for (MycelialGeneratorBlockEntity member : network.members()) {
-                if (member != this && !member.isRemoved()) {
-                    available += member.tank.getFluidAmount();
-                    if (available >= amount) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+    private boolean hasWaterFor(int amount) {
+        return !ServerConfig.get(ServerConfig.REQUIRE_WATER) || amount <= 0 || tank.getFluidAmount() >= amount;
     }
 
-    private void tickWater(GeneratorNetwork network, boolean shareResources) {
+    private void tickWater() {
         if (++waterTimer < ServerConfig.get(ServerConfig.WATER_INTERVAL)) {
             return;
         }
         waterTimer = 0;
-        double exact = waterPerInterval(network) + waterRemainder;
+        double exact = waterPerInterval() + waterRemainder;
         int drain = (int) Math.min(Integer.MAX_VALUE, Math.floor(exact));
         waterRemainder = Math.max(0.0D, Math.min(0.999999D, exact - drain));
-        if (drain <= 0) {
-            return;
-        }
-        int remaining = drain - tank.drainInternal(drain);
-        if (remaining > 0 && shareResources) {
-            for (MycelialGeneratorBlockEntity member : network.members()) {
-                if (member == this || member.isRemoved()) {
-                    continue;
-                }
-                remaining -= member.tank.drainInternal(remaining);
-                if (remaining <= 0) {
-                    break;
-                }
-            }
+        if (drain > 0) {
+            tank.drainInternal(drain);
         }
     }
 
@@ -520,7 +383,7 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
 
     // ------------------------------------------------------------------ mycelium
 
-    private void tickMycelium(ServerLevel level, GeneratorNetwork network) {
+    private void tickMycelium(ServerLevel level) {
         if (!ServerConfig.get(ServerConfig.MYCELIUM_ENABLED)) {
             attemptTimer = 0;
             return;
@@ -533,53 +396,28 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
         if (targets.isEmpty()) {
             return; // not an eligible attempt: the chance is unchanged
         }
-        boolean shared = ServerConfig.get(ServerConfig.SHARE_CHANCE);
-        double current = shared ? network.sharedChance() : chance;
+        double current = getOwnChance();
         double max = ServerConfig.maxChance();
         if (MyceliumChance.succeeds(current, level.getRandom().nextDouble())) {
-            int conversions = MyceliumChance.conversionsPerAttempt(
-                    ServerConfig.get(ServerConfig.MAX_CONVERSIONS),
-                    network.activeCount(),
-                    ServerConfig.get(ServerConfig.NETWORK_EXTRA_CONVERSIONS),
-                    ServerConfig.get(ServerConfig.GENERATORS_PER_EXTRA),
-                    ServerConfig.get(ServerConfig.MAX_EXTRA_CONVERSIONS));
+            int conversions = ServerConfig.get(ServerConfig.MAX_CONVERSIONS);
             MyceliumSpreadManager.ConversionResult outcome = MyceliumSpreadManager.convert(level, worldPosition, targets, conversions, level.getRandom());
             int converted = outcome.converted();
             hugeMushroomsThisSession += outcome.hugeMushrooms();
             if (converted > 0) {
                 convertedThisSession += converted;
                 if (ServerConfig.get(ServerConfig.RESET_ON_SUCCESS)) {
-                    resetChance(network);
+                    resetChance();
                 }
             }
             // If every target was protected nothing changed, so the chance is left as is.
         } else {
-            double next = MyceliumChance.afterFailure(current, ServerConfig.get(ServerConfig.CHANCE_INCREASE), growthFactor(network), max);
-            if (shared) {
-                network.setSharedChance(next);
-            } else {
-                chance = next;
-            }
+            chance = MyceliumChance.afterFailure(current, ServerConfig.get(ServerConfig.CHANCE_INCREASE), fuelMyceliumBonus, max);
         }
         setChanged();
     }
 
-    /** Multiplier applied to the chance increase: fuel bonus x optional network bonus. */
-    public double growthFactor(GeneratorNetwork network) {
-        double factor = fuelMyceliumBonus;
-        if (ServerConfig.get(ServerConfig.NETWORK_GROWTH_BONUS)) {
-            factor *= MyceliumChance.networkGrowthFactor(network.activeCount(), ServerConfig.get(ServerConfig.GROWTH_BONUS_PER_GENERATOR));
-        }
-        return factor;
-    }
-
-    private void resetChance(GeneratorNetwork network) {
-        double initial = ServerConfig.initialChance();
-        if (ServerConfig.get(ServerConfig.SHARE_CHANCE)) {
-            network.setSharedChance(initial);
-        } else {
-            chance = initial;
-        }
+    private void resetChance() {
+        chance = ServerConfig.initialChance();
         setChanged();
     }
 
@@ -620,52 +458,17 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
 
     /** Builds the snapshot sent to players viewing this generator. */
     public GeneratorStatus createStatus() {
-        GeneratorNetworkManager manager = level instanceof ServerLevel serverLevel ? GeneratorNetworkManager.get(serverLevel) : null;
-        GeneratorNetwork network = manager != null ? manager.getNetwork(this) : null;
-        ConnectionType connection = manager != null ? manager.connectionType(this) : ConnectionType.NONE;
-        int activeLinks = manager != null ? manager.activeManualLinks(this) : 0;
-        int size = network == null ? 1 : network.size();
-        int activeMembers = network == null ? (active ? 1 : 0) : network.activeCount();
-        double scale = network == null ? 1.0D : network.scaleFactor();
-        double total = network == null ? lastExactOutput : network.totalOutput();
-        NetworkStatus networkStatus = network == null ? NetworkStatus.IDLE : network.status();
-        boolean shared = ServerConfig.get(ServerConfig.SHARE_CHANCE);
-        double shownChance = shared && network != null ? network.sharedChance() : getOwnChance();
-        double growth = network == null ? fuelMyceliumBonus : growthFactor(network);
-        double increase = Math.max(0.0D, ServerConfig.get(ServerConfig.CHANCE_INCREASE)) * growth;
+        double increase = Math.max(0.0D, ServerConfig.get(ServerConfig.CHANCE_INCREASE)) * fuelMyceliumBonus;
         FluidStack fluid = tank.getFluid();
         String fluidId = fluid.isEmpty() ? "" : BuiltInRegistries.FLUID.getKey(fluid.getFluid()).toString();
-        double waterRate = network == null ? ServerConfig.get(ServerConfig.WATER_PER_INTERVAL) : waterPerInterval(network);
-        double perTick = active ? lastExactOutput : (network == null ? 0.0D : previewOutput(network));
+        double perTick = active ? lastExactOutput : (burnRemaining > 0 ? computeOutput() : 0.0D);
         return new GeneratorStatus(
                 energy.getAmountAsInt(), energy.getCapacityAsInt(), perTick, active, extractionRate,
-                fluidId, tank.getFluidAmount(), tank.getCapacity(), waterRate, ServerConfig.get(ServerConfig.WATER_INTERVAL),
+                fluidId, tank.getFluidAmount(), tank.getCapacity(), waterPerInterval(), ServerConfig.get(ServerConfig.WATER_INTERVAL),
                 burnRemaining > 0 ? fuelItemId : "", burnRemaining, burnTotal,
-                size, activeMembers, scale, total, networkStatus.ordinal(), ServerConfig.get(ServerConfig.MAX_NETWORK_SIZE),
-                ServerConfig.get(ServerConfig.MYCELIUM_ENABLED), shownChance, increase, attemptTimer,
+                ServerConfig.get(ServerConfig.MYCELIUM_ENABLED), getOwnChance(), increase, attemptTimer,
                 ServerConfig.get(ServerConfig.ATTEMPT_INTERVAL), convertedThisSession, ServerConfig.get(ServerConfig.TRACK_CONVERSIONS),
-                state.ordinal(),
-                manualLinkCount(), activeLinks, ServerConfig.get(ServerConfig.MAX_MANUAL_CONNECTIONS), connection.ordinal(),
-                hugeMushroomsThisSession);
-    }
-
-    private int manualLinkCount() {
-        return level instanceof ServerLevel serverLevel ? ManualLinkData.get(serverLevel.getServer()).count(getGlobalPos()) : 0;
-    }
-
-    /** This generator's position including its dimension; the key used by the network manager and link data. */
-    public GlobalPos getGlobalPos() {
-        GlobalPos pos = globalPos;
-        if (pos == null || level != null && !pos.dimension().equals(level.dimension())) {
-            pos = GlobalPos.of(level == null ? Level.OVERWORLD : level.dimension(), worldPosition);
-            globalPos = pos;
-        }
-        return pos;
-    }
-
-    /** Output this generator would have if it were running now (for the idle GUI). */
-    private double previewOutput(GeneratorNetwork network) {
-        return burnRemaining > 0 ? computeOutput(network) : 0.0D;
+                state.ordinal(), hugeMushroomsThisSession);
     }
 
     // ------------------------------------------------------------------ accessors
@@ -680,17 +483,6 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
 
     public GeneratorState getState() {
         return state;
-    }
-
-    public long getNetworkId() {
-        return networkId;
-    }
-
-    public void setNetworkId(long networkId) {
-        if (this.networkId != networkId) {
-            this.networkId = networkId;
-            setChanged();
-        }
     }
 
     public GeneratorItemHandler getInventory() {
@@ -769,13 +561,11 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
         fuel.store("EnergyMultiplier", Codec.DOUBLE, fuelEnergyMultiplier);
         fuel.store("WaterMultiplier", Codec.DOUBLE, fuelWaterMultiplier);
         fuel.store("MyceliumBonus", Codec.DOUBLE, fuelMyceliumBonus);
-        fuel.store("ScalingBonus", Codec.DOUBLE, fuelScalingBonus);
 
         output.putInt("WaterTimer", waterTimer);
         output.store("WaterRemainder", Codec.DOUBLE, waterRemainder);
         output.store("MyceliumChance", Codec.DOUBLE, getOwnChance());
         output.putInt("MyceliumTimer", attemptTimer);
-        output.putLong("NetworkId", networkId);
         output.putBoolean("Active", active);
     }
 
@@ -791,13 +581,11 @@ public class MycelialGeneratorBlockEntity extends com.jax3.barelyfunctionalcontr
         fuelEnergyMultiplier = clampNonNegative(fuel.read("EnergyMultiplier", Codec.DOUBLE).orElse(1.0D));
         fuelWaterMultiplier = clampNonNegative(fuel.read("WaterMultiplier", Codec.DOUBLE).orElse(1.0D));
         fuelMyceliumBonus = clampNonNegative(fuel.read("MyceliumBonus", Codec.DOUBLE).orElse(1.0D));
-        fuelScalingBonus = clampNonNegative(fuel.read("ScalingBonus", Codec.DOUBLE).orElse(0.0D));
 
         waterTimer = Math.max(0, input.getIntOr("WaterTimer", 0));
         waterRemainder = Math.max(0.0D, Math.min(0.999999D, input.read("WaterRemainder", Codec.DOUBLE).orElse(0.0D)));
         chance = input.read("MyceliumChance", Codec.DOUBLE).map(value -> MyceliumChance.clamp(value, 1.0D)).orElse(-1.0D);
         attemptTimer = Math.max(0, input.getIntOr("MyceliumTimer", 0));
-        networkId = input.getLongOr("NetworkId", 0L);
         active = input.getBooleanOr("Active", false);
     }
 

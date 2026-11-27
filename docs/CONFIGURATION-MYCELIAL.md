@@ -17,7 +17,6 @@ NeoForge watches the server file while the world runs and reloads it when it is 
 |---|---|
 | Energy, water, mycelium, performance and compatibility values | Next tick |
 | `tankCapacity`, `maxEnergyStorage` | Next tick. Lowering them discards water or FE above the new limit. |
-| `maxNetworkSize`, `mergeNetworks`, `scalingEnabled`, all `[network.wrench]` values | All networks are rebuilt on the next tick |
 | `fuels`, `acceptedFluids`, `convertibleBlocks`, `resultBlock` | Next lookup (cache rebuilt). A mushroom that is already burning keeps the values it started with. |
 | `activeLightLevel` | The next time each generator changes state |
 | JEI display | **Rejoin the world.** JEI builds its recipe list when you join. |
@@ -42,50 +41,22 @@ Invalid values are corrected by NeoForge to the default (with a warning in the l
 | `maxEnergyStorage` | `100000` | 1–2,147,483,647 | Internal buffer in FE. |
 | `outputTransferRate` | `4000` | 0–2,147,483,647 | Max FE/t pushed to or pulled by neighbours. |
 | `autoOutput` | `true` | | Push energy into adjacent receivers automatically. |
-| `maxNetworkOutput` | `0.0` | 0–1e12 | Optional cap on a network's total FE/t (0 = none). Members are scaled down proportionally. |
 | `rounding` | `ACCUMULATE` | `ACCUMULATE`, `NEAREST`, `FLOOR`, `CEILING` | How fractional FE/t becomes whole FE. `ACCUMULATE` carries the fraction, so long-run output equals the exact formula. |
 
-## `[network]`
+## `[wrench]`
 
-```
-Network FE/t = baseGeneration × N × scalingMultiplier^(N − 1)
-```
-
-Each generator produces `baseGeneration × fuelEnergy × (scalingMultiplier + fuelScaling)^(N − 1)`. With identical fuel, the network total is exactly the formula above. With the defaults: 1 → 200, 2 → 480, 3 → 864, 4 → 1,382, 5 → 2,074, 10 → 10,320 FE/t.
-
-| Key | Default | Range | Description |
+| Key | Default | Range | Meaning |
 |---|---|---|---|
-| `scalingEnabled` | `true` | | If `false`, N is always 1. |
-| `scalingMultiplier` | `1.2` | 0.1–10 | Exponential multiplier per extra generator. |
-| `maxNetworkSize` | `64` | 1–1024 | Members per network. Extra touching generators form a separate network. |
-| `countInactiveGenerators` | `false` | | If `true`, idle members also count towards N. |
-| `mergeNetworks` | `true` | | If `false`, a new generator joins only the largest touching network, and touching networks never merge. Membership is stored per generator, so it survives reloads. Wrench links are a deliberate choice and always connect; use `allow_network_merging` to control them. |
-| `shareResources` | `false` | | Members share water (drink from neighbours' tanks) and energy (overflow goes into members with space). |
+| `dismantle_blocks` | `true` | | Hitting any of the mod's blocks with the Barely Functional Wrench breaks it at once and puts it, with what spills out of it, in the player's inventory. Dismantling doesn't use up the wrench. |
 
-## `[network.wrench]`
-
-Settings for the **Barely Functional Wrench**, which links generators that are not touching. A manual link counts exactly like a touching face: both generators join one network and count towards `N` in the exponential formula. Each generator still keeps its own mushrooms, water and energy unless `shareResources = true`.
-
-| Key | Default | Range | Description |
-|---|---|---|---|
-| `enabled` | `true` | | Enable the wrench. When `false`, it cannot create links and existing links stop counting. They are kept, and count again when re-enabled. |
-| `max_link_distance` | `64` | 1–4096 | Maximum straight-line distance (in blocks) between two linked generators. If you lower it, longer existing links stop counting until you raise it again. |
-| `max_manual_connections_per_generator` | `8` | 1–64 | Manual links per generator. Touching neighbours don't count. |
-| `allow_cross_dimension_links` | `false` | | Allow links between dimensions (distance is ignored for these). Only works when `require_same_dimension = false`. |
-| `require_same_dimension` | `true` | | Keep links within one dimension. **Overrides** `allow_cross_dimension_links`. |
-| `wrench_durability` | `0` | 0–1,000,000 | Successful links per wrench before it breaks. `0` = unlimited. Creative-mode players never use it up. |
-| `dismantle_blocks` | `true` | | Hitting any of the mod's blocks with the wrench breaks it at once and puts it, with what spills out of it, in the player's inventory. Dismantling doesn't use up the wrench. |
-| `allow_network_merging` | `true` | | If `false`, a link that would join two different multi-generator networks is refused. A lone generator can still be linked into a network. |
-| `show_link_particles` | `true` | | Red and white particles along new links, and a purple outline on the selected generator. |
-
-Where links are stored: in the world's `data/barelyfunctionalcontraptions_generator_links.dat`, not in the generators. That's why breaking a generator removes its links from both ends without loading the other generator's chunk. A link to a generator in an unloaded chunk is kept, and counts again once both chunks are loaded.
+Generators no longer form networks: each one makes `baseGeneration × fuel energy` on its own, and the wrench no longer links them. The old `[network]` and `[network.wrench]` settings are gone.
 
 ## `[fuel]`
 
 `fuels` is a list of strings:
 
 ```
-"<item id or #item tag>;burn=<ticks>;energy=<x>;water=<x>;mycelium=<x>;scaling=<x>"
+"<item id or #item tag>;burn=<ticks>;energy=<x>;water=<x>;mycelium=<x>"
 ```
 
 | Field | Required | Default | Range | Meaning |
@@ -95,14 +66,14 @@ Where links are stored: in the world's `data/barelyfunctionalcontraptions_genera
 | `energy` | no | `1.0` | 0–1000 | Multiplier on `baseGeneration`. |
 | `water` | no | `1.0` | 0–1000 | Multiplier on water use. |
 | `mycelium` | no | `1.0` | 0–100 | Multiplier on the mycelium chance growth per miss. |
-| `scaling` | no | `0.0` | 0–10 | Added to `scalingMultiplier` for this generator's own output. |
+| `scaling` | no | `0.0` | 0–10 | No longer used (generators don't form networks); accepted and ignored so older files still load. |
 
 Defaults:
 
 ```toml
 fuels = [
-  "minecraft:brown_mushroom;burn=400;energy=1.0;water=1.0;mycelium=1.0;scaling=0.0",
-  "minecraft:red_mushroom;burn=600;energy=1.25;water=1.0;mycelium=1.0;scaling=0.0"
+  "minecraft:brown_mushroom;burn=400;energy=1.0;water=1.0;mycelium=1.0",
+  "minecraft:red_mushroom;burn=600;energy=1.25;water=1.0;mycelium=1.0"
 ]
 ```
 
@@ -115,7 +86,7 @@ fuels = [
   "minecraft:crimson_fungus;burn=800;energy=1.5;water=2.0",
   "minecraft:warped_fungus;burn=800;energy=1.5;mycelium=2.0",
   "#c:mushrooms;burn=400",
-  "somemod:glowshroom;burn=1200;energy=2.0;scaling=0.05"
+  "somemod:glowshroom;burn=1200;energy=2.0"
 ]
 ```
 
@@ -128,7 +99,6 @@ Exact item entries win over tag entries. If the same item appears twice, the fir
 | `tankCapacity` | `8000` | 1000–1,000,000 | mB per generator. |
 | `consumptionAmount` | `10` | 0–100,000 | mB used every `consumptionInterval` ticks (× fuel `water`). |
 | `consumptionInterval` | `20` | 1–72,000 | Ticks between consumptions. |
-| `scaleConsumptionWithNetwork` | `false` | | Multiply each generator's water use by `scalingMultiplier^(N−1)`. Without it, total network water use is still `amount × active generators`. |
 | `acceptedFluids` | `["minecraft:water"]` | | Fluid ids or `#tags`. |
 | `allowFluidExtraction` | `false` | | Allow pipes or buckets to drain the tank. |
 
@@ -136,8 +106,8 @@ Exact item entries win over tag entries. If the same item appears twice, the fir
 
 While running, every `attemptInterval` ticks the generator collects every **eligible target** within `searchRadius`. An attempt is eligible only if at least one target exists. A target is a convertible block in a loaded chunk, with air above (if `requireAirAbove`) and enough light (if `requireLight`). Then:
 
-* **Success** (`random < chance`, or the chance is 100%): convert up to `maxConversionsPerAttempt` (+ network bonus) random targets, then reset the chance if `resetChanceOnSuccess`.
-* **Failure:** `chance += chanceIncrease × fuel.mycelium × networkFactor`, capped at `maxChance`.
+* **Success** (`random < chance`, or the chance is 100%): convert up to `maxConversionsPerAttempt` random targets, then reset the chance if `resetChanceOnSuccess`.
+* **Failure:** `chance += chanceIncrease × fuel.mycelium`, capped at `maxChance`.
 
 With the defaults, attempt *k* has chance `1% + (k − 1) × 0.5%`: 1 → 1.0%, 2 → 1.5%, 10 → 5.5%, 20 → 10.5%, 100 → 50.5%, 198 → 99.5%, 199 → 100% (guaranteed).
 
@@ -158,12 +128,6 @@ With the defaults, attempt *k* has chance `1% + (k − 1) × 0.5%`: 1 → 1.0%, 
 | `minimumLightLevel` | `9` | 0–15 | See above. |
 | `resetChanceOnSuccess` | `true` | | Reset after converting. |
 | `resetChanceOnStop` | `false` | | Reset whenever the generator stops. |
-| `shareChanceAcrossNetwork` | `false` | | One chance per network, raised by every member's misses. |
-| `networkIncreasesGrowthRate` | `false` | | `networkFactor = 1 + growthBonusPerGenerator × (active − 1)`. |
-| `growthBonusPerGenerator` | `0.1` | 0–10 | See above. |
-| `networkExtraConversions` | `false` | | Extra conversions per success for large networks. |
-| `generatorsPerExtraConversion` | `4` | 1–1024 | One extra per this many active members. |
-| `maxExtraConversions` | `4` | 0–64 | Cap on extra conversions. |
 | `trackConversions` | `true` | | Show "converted this session" (and huge mushrooms grown) in the GUI. |
 | `hugeMushroomEnabled` | `true` | | Converted blocks may sprout a huge mushroom. |
 | `hugeMushroomChance` | `0.05` | 0–1 | Chance per converted block (0.05 = 5%). |
@@ -189,7 +153,6 @@ The chance and the attempt timer are saved with each generator.
 | `firePlaceEvents` | `true` | Each conversion fires `BlockEvent.EntityPlaceEvent` as a fake player. If a protection mod cancels it, the original block is restored. |
 | `respectSpawnProtection` | `true` | No conversions inside spawn protection or outside the world border. |
 | `fakePlayerName` | `[MycelialPower]` | Fake player name (max 16 characters) used for permission checks. |
-| `jeiExampleNetworkSize` | `10` | Rows in the JEI scaling tooltip. |
 
 ## Client file (`barelyfunctionalcontraptions-mycelial-client.toml`)
 

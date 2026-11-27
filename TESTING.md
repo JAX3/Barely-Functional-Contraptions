@@ -38,20 +38,20 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | GameTest `implosion_chamber_can_stop_at_gravel` | ✅ Set to stop at Gravel, one blast sends 8 Gravel out and it won't take Gravel in |
 | GameTest `implosion_chamber_needs_sheep_power_and_stone` | ✅ No Explosive sheep, no power, or nothing to crack: no spark, and its status says why |
 | GameTest `implosion_chamber_on_the_status_panel` | ✅ Its status panel line: No sheep as a problem, then Cracking with "8 Gravel" |
-| GameTest `energy_sheep_drains_cubes_and_charges_machines` | ✅ An Energy sheep drains the cube beside it and charges a Powered Furnace 5 blocks away, not one 12 away, and never another cube |
+| GameTest `energy_sheep_drains_cubes_and_charges_machines` | ✅ An Energy sheep drains the cube beside it and charges a Wool Packer 5 blocks away, not one 12 away, and never another cube |
 | GameTest `energy_sheep_does_nothing_sheared` | ✅ Sheared, it neither drains nor charges, and keeps its charge |
 | Echo Chamber in the real client | `./gradlew runClient -PscreenshotHarness -PharnessScene=echo_chamber` | ✅ With three Warden sheep and a note block struck once a second beside it, it hears noise level 5-6 and makes about 15,000-18,000 FE/t; its window shows the herd, output, noise meter and steadiness, and its pen outline shows. Made far too loud, it shrieks: shriek rings rise off its roof, the survival player nearby gets Darkness, and its window reads *Shrieked: back in 57s*. Jade shows it from its front block (redirected to the middle one), and JEI shows its page and its recipe |
 | GameTest `static_generator_counts_sheep_at_its_combs` | ✅ It counts grown sheep with their fleece on next to a comb in its pen (a Copper sheep at 150, a plain one at 100, so 250 FE/t), and not a sheared sheep or one nowhere near a comb |
 | GameTest `static_generator_combs_oxidise_and_wax` | ✅ Comb stages give 100/75/50/25%, waxed 85%; Honeycomb waxes a comb, an axe takes the wax off and then scrapes a stage back; a worked comb wears and a waxed one beside it doesn't |
 | GameTest `static_generator_arcs_into_its_buffer` | ✅ A Copper sheep at a comb makes 150 FE/t, and its dome's arcs fill a Hume Energy Cube beside its base |
-| GameTest `static_generator_shocks_knock_back_unless_insulated` | ✅ Overcharged, it knocks an armor stand in its pen away from the dome; one in a full set of Woollen Armour stays put, and the sheep is left alone |
+| GameTest `static_generator_shocks_knock_back_unless_insulated` | ✅ Overcharged, it knocks an armor stand in its pen away from the dome; one in Woollen Boots is pushed less (they take half off) |
 | Test world on one square platform | `square_world` then `extend_world` on *BFC Test World*, then `survey_world` and `world_tour` on copies | ✅ All 26 scenes moved off their separate platforms onto one 146x146 platform at y = 34, in a 5x6 grid, with their 63 sheep, labels, armour stands and item frame, and both wireless power links re-pointed. Nothing is left in the old row, no hostile mobs remain, and after the move the Static Generator still makes 600 FE/t into its cubes and the Echo Chamber's clock still keeps its noise in the sweet spot. The world is saved with those generators, the Thermal Reaction Chamber and their cube banks empty |
 | GameTests `grass_seeder_*` (4) | ✅ With no fuel it leaves eaten dirt bare; one Bone Meal regrasses three patches with 5 of its 8 blocks left. With FE and water it uses 800 FE and 10 mB a block and keeps its Bone Meal. On all-grass ground it grows short grass on 10 of 24 blocks, then rests. A sheared sheep in its area grazes and regrows its wool; one with its fleece on is left alone |
 | GameTests `grass_seeder_overgrows_unless_trimmed`, `automatic_shears_cant_see_sheep_in_tall_grass` | ✅ Left green with Trim off, it overgrows (more than 10 tall grass, both halves in the world, status *Overgrown*); with Trim on it cuts it all back and reads *All green*. Automatic Shears don't shear a sheep standing in tall grass, and do once it's cut |
 | Grass Seeder overgrown, and Keep Off the Grass, in the real client | `-PharnessScene=grass_seeder` | ✅ The pen overgrows to 24 tall grass (its window shows the map all tall, *Overgrown*); with Trim on and the pen eaten bare twice it cuts and regrasses to 132 blocks tended, and the player nearby gets ⭐ *Keep Off the Grass* |
 | GameTests `herd_counter_*` (2) | ✅ Of a pen of 5 (two Iron, one sheared Iron, a plain lamb, a Gold sheep with one shearing left) and a sheep behind its screen, it counts 5: 1 lamb, 1 sheared, 3 ready, 1 low on infusion, Iron the most. Count reads 5; filtered to Iron 3; Ready Iron 2; Sheared Iron 1; Lambs 1 (plain only too); Low 1. Full with a target of 3 reads 0 at 2 sheep and 15 at 3, and so does a comparator |
 | GameTest `herd_counter_double_counts_dashing_sheep_unless_steady` | ✅ Over 60 counts a dashing sheep reads 1 and now and then 2; standing still, 1; with Steady on, between 1 and 2 while it dashes and exactly 1 once it stops |
-| GameTest `status_panel_shows_its_linked_machines` | ✅ A Powered Furnace, a Grass Seeder on bare dirt with no fuel and a Hume Energy Cube link; stone doesn't. Rows: the furnace *Idle*, the seeder *No fuel* (a problem), the cube *0%*; the comparator reads 1. Broken, the furnace reads *Missing* (2). A second click unlinks it, and the panel holds 4 |
+| GameTest `status_panel_shows_its_linked_machines` | ✅ A Wool Packer, a Grass Seeder on bare dirt with no fuel and a Hume Energy Cube link; stone doesn't. Rows: the packer *Idle*, the seeder *No fuel* (a problem), the cube *0%*; the comparator reads 1. Broken, the furnace reads *Missing* (2). A second click unlinks it, and the panel holds 4 |
 | GameTest `status_panels_join_into_one_screen_up_to_3x3` | ✅ Nine panels in a 3x3 join (the middle one joined on every side); its top-left panel holds the screen, shows 36 and takes a link another panel had (6 links, 6 rows; the others draw nothing); every panel gives the screen's comparator reading. Broken, the top-left panel's links go next door and the L left stops joining; 3x3 again joins; four across don't |
 | GameTest `status_panel_window_names_orders_and_alerts` | ✅ Moving a machine reorders its links; a name (trimmed) shows instead of its block's; its alert off takes the seeder's problem off the comparator (1 to 0); Problems first puts the seeder on top (still link 2); Working counts the running furnace (1); names, order and settings survive a save and load; an empty name goes back to the block's |
 | Mission Control in the real client | `-PharnessScene=status_panel` | ✅ Linking the tenth machine with the wrench's own clicks: *Clown95x has reached the goal [Mission Control]* |
@@ -85,7 +85,6 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | GameTest `item_pipe_side_modes_and_destination_filters` | ✅ Wool from Automatic Shears skips a chest whose side only lets diamonds in; a Push side is never pulled from; an Off side has no plug and no connection; clicks on a plug and on the core map to the right sides |
 | Real client, pipe modes (`58_pipe_modes.png`) | ✅ Orange Pull and green Push plugs, visible from above as well as head-on |
 | Unit tests (`./gradlew test`) | ✅ The guide's `en_us.json` parses, has 10-12 chapters (what fits the screen) and every chapter has a title, an icon id and text; pipe filters toggle, fill up at 9 and the modes cycle; the Energy Meter's signal scale |
-| Real client, guide tabs (`79_guide_*.png`, `-PharnessScene=wool_burner`) | ✅ The manual opens on the Power tab when asked for the Wool Burner chapter, and real left clicks on the Logistics, Production (then called Productive) and Utility tab buttons switch the list to that tab's chapters, with the open tab framed and named and its first chapter open. Every chapter title fits its button. A tab's name shows only while the mouse is over it |
 | GameTest `recipe_support_wool_ingredient_and_fuel_data_map` | ✅ The `resource_wool` ingredient matches only Iron Wool by resource, every gem wool by category, any resource wool (not plain wool) with no filter, and works inside a separating recipe; Crimson and Warped Fungus are fuels from the data map with its numbers, the config's Red Mushroom is unchanged and data map fuels are listed for JEI |
 | Not tested | The KubeJS script and the Create crushing example pack in `examples/` (neither mod was installed); they are examples, not loaded by default |
 | GameTest `wrench_sets_pipe_modes_and_filters` | ✅ Wrench clicks cycle a side Normal → Pull (orange plug) → Push → Off, also through the wrench item's own right-click; an item in the other hand is added to and removed from the filter without changing the mode; the filter grid (sneak + wrench) shows the filter and mode, takes a carried item into the clicked slot without using it up, lists an item only once, adds a shift-clicked inventory item (which stays put), removes an entry when clicked with nothing, and its mode and Clear buttons work and update the plug; an empty hand or a held item no longer changes anything; a side with nothing to plug into is left alone |
@@ -93,7 +92,6 @@ Environment for the results below: Minecraft 26.3, NeoForge 26.3.0.101, JEI 31.1
 | GameTest `energy_meter_faces_the_right_way_when_placed` | ✅ Placed on the floor between a generator and a cube it points at the cube; between a charged and an empty cube it takes from the charged one; placed against a cube it takes from that cube; the wrench flips it and sneak-wrench turns it; the screen faces the placing player (south, north, or the nearer side when standing at a port's end), stays put when flipped, and never ends up on a port |
 | Real client, real clicks (`-PharnessScene=interactions`) | ✅ Placing a meter by clicking the floor between a running Mycelial Generator and a cube: it faces east, reads 250 FE/t and the cube charges (before the fix it faced where the player looked and read 0). Sneak-clicking the middle of an Item Pipe with the wrench opens the filter grid (before the fix, a click on a side with nothing to plug into only showed a message) |
 | Real client, Blaze Sheep Furnace (`-PharnessScene=blaze_furnace`) | ✅ Four Blaze sheep (beside, behind and on top) plus a plain one: the log reads `generating=520 heat=260 heaters=4`, boosted x2 by a loaded Blaze Rod with 4 rods waiting, lit. Its front is lit with animated fire and flames drift from the sheep into it; the orange 3x3 outline and the shears' blue outline (with its grid drawn on the ground, since the shears' area starts a block underground) both show. The shears' window shows the spyglass area button framed in blue while the area is shown, and the guide's new Blaze Furnace chapter fits its button. The furnace's window (`67_blaze_furnace_gui.png`) shows a full heat column with four pips at 520 FE/t; with one sheep sheared (`68_...`) the column drops to three pips at 420 FE/t. Real left clicks on the area button in each window log `shown=false` then `shown=true` on both the server and the client, and after closing the furnace's window its orange box is gone while the shears' blue box stays (`69_furnace_area_hidden_by_button.png`). A real left click on the shears' redstone button cycles it to *Active with Signal*. (In 26.3 the left mouse button is numbered 1, not 0: the hand-drawn buttons checked for 0, so real clicks missed them while the harness's fake button-0 clicks passed. The harness now clicks with `MOUSE_BUTTON_LEFT`.) |
-| Real client, Wool Burner (`-PharnessScene=wool_burner`) | ✅ Four burners each charging a cube: white wool `generating=30 burn=140/200`, string `30, 40/50`, Coal Wool `120, 340/400`, and one fed red wool by a hopper from a chest (`30`). All lit, with fire in the front. The window shows the flame burning down, +120 FE/t and the time left, and hovering the flame lists the three fuels. The guide's Wool Burner chapter fits the list (14 chapters) |
 | GameTest `wool_packer_presses_nine_wool_into_a_bale` | ✅ 20 Iron Wool make two Iron Wool Bales, one every 40 ticks, using exactly 1,000 FE each (18,000 of 20,000 left), and 2 wool wait with the status *Waiting for wool*; 8 Gold Wool make nothing; plain wool can't go in and nothing goes into the bale slot; the press runs while pressing and stops after |
 | GameTest `wool_packer_pauses_and_works_with_hoppers` | ✅ Without power it waits (*No energy*); with 64 bales, or a bale of another wool, in the bale slot it stops (*Output full*) with its 9 wool kept; a hopper above feeds it 12 Iron Wool and keeps a dirt; the hopper below takes the bale but never the wool, and the 3 left over wait in the packer |
 | GameTest `wool_bale_separates_for_more` | ✅ An Iron Wool Bale separates into 24-48 raw iron, 24 string and a 10% chance of 36 nuggets, for 300,600 FE (334 FE/t, rounded up) over 900 ticks; a bale with no wool doesn't separate; a bale of a wool whose outputs stack to 16 gives at most 16 |
@@ -150,8 +148,8 @@ Every machine and generator now extends `MachineFrame` with energy, fluid, upgra
 
 | Test | Checks |
 |---|---|
-| `machine_frame_saves_like_before_and_offers_its_modules` | A Powered Furnace saves `energy`, `input`, `output`, `upgrades` and `progress` as before, and a copy loaded from that tag has the same items, energy and card; the furnace offers power and items but no fluid, the chiller water and items but no power, and the chiller has three modules; the Automatic Shears take no power through their front but do at the back; a Fluid Reservoir given a named item is titled with the name and drops itself with it |
-| `generators_on_the_machine_frame_save_like_before` | The Glow Panel offers only power and saves `energy`; the Wool Burner takes only fuel, won't give it back to hoppers, offers power and items and saves `energy` and `fuel`; the Thermal Reaction Chamber refuses Blue Ice in its hot slot, offers power, boosts and water and saves `tank`, `energy` and `hot_boost`; the Mycelial Generator offers all three and keeps its own `Inventory`, `Tank` and `Energy` keys |
+| `machine_frame_saves_like_before_and_offers_its_modules` | A Wool Packer saves `energy`, `input`, `output`, `upgrades` and `progress` as before, and a copy loaded from that tag has the same items, energy and card; the furnace offers power and items but no fluid, the chiller water and items but no power, and the chiller has three modules; the Automatic Shears take no power through their front but do at the back; a Fluid Reservoir given a named item is titled with the name and drops itself with it |
+| `generators_on_the_machine_frame_save_like_before` | The Glow Panel offers only power and saves `energy`; the Thermal Reaction Chamber refuses Blue Ice in its hot slot, offers power, boosts and water and saves `tank`, `energy` and `hot_boost`; the Mycelial Generator offers all three and keeps its own `Inventory`, `Tank` and `Energy` keys |
 
 In the real client, the test world from before the frame (a fresh copy of `BFC-Test-World.zip`, toured with `-PharnessScene=world_tour`) loaded with every machine as it was. After half a minute, the three upgrade separators had put out 67 (plain), 118 (Speed) and 53 (Efficiency) Raw Iron. The cabled Mycelial Generator was full at 100,000 FE, its separator at 100,000 FE and the shears at 50,000 FE holding 16 wool. The Fluid Reservoir was full at 10,000 mB, and the Fleece Trawler was hauling with its lure. The status panel read all 23 machines. The `upgrades` scene's windows, cards, Jade, JEI, advancements and Muffler sync all worked as before. 213 pass on 26.1, 26.2 and 26.3.
 
@@ -164,7 +162,7 @@ Adding the test changed which tests ran side by side, and `energy_cable_respects
 
 ### Faster processing machines (`old_config_gets_faster_machine_timings`)
 
-The separator, Wool Packer, Infusion Altar, Powered Furnace, Snow Sheep Chiller and Automatic Shears got new, faster defaults (timing revision 2). The test makes a config like a file from revision 1: every setting at its old default except the shears' interval, set to 12 by hand. After `migrate()` the old defaults have moved to the new ones (speed 2.0, 20, 50, 0.35 with 31 FE/t, 100), the hand-set 12 is kept, and the file reads revision 2; a file from before revision 1 gets both passes (speed 1.0 to 2.0, interval 20 to 10). The machine tests were retimed to match: iron wool 50 ticks, 12 ticks of progress on 5,000 FE, an Iron Wool Bale 450 ticks, a bale pressed in 20 ticks, Raw Iron smelted in 70 ticks (about 48 with two Blaze sheep) at 31 FE/t. All 201 pass on 26.1, 26.2 and 26.3.
+The separator, Wool Packer, Infusion Altar, Snow Sheep Chiller and Automatic Shears got new, faster defaults (timing revision 2). The test makes a config like a file from revision 1: every setting at its old default except the shears' interval, set to 12 by hand. After `migrate()` the old defaults have moved to the new ones (speed 2.0, 20, 50, 0.35 with 31 FE/t, 100), the hand-set 12 is kept, and the file reads revision 2; a file from before revision 1 gets both passes (speed 1.0 to 2.0, interval 20 to 10). The machine tests were retimed to match: iron wool 50 ticks, 12 ticks of progress on 5,000 FE, an Iron Wool Bale 450 ticks, a bale pressed in 20 ticks, Raw Iron smelted in 70 ticks (about 48 with two Blaze sheep) at 31 FE/t. All 201 pass on 26.1, 26.2 and 26.3.
 
 `infusion_altar_waits_for_what_it_needs` had failed now and then: its hand-fed sheep stood two blocks from the altar meant to have *No sheep*, inside its reach, so that altar could infuse it. The faster altar made that more likely; the sheep now stands out of reach of every altar that could infuse it.
 
@@ -213,7 +211,6 @@ Wireless power to machines was removed: the wrench now only links generators to 
 
 | Test | What it checks |
 |---|---|
-| `integration_wrench_leaves_machines_alone` | Clicking a Mechanical Separator with the wrench passes the click on (it opens as usual) and selects nothing; with a generator selected, clicking the separator leaves the generator selected and makes no link. The generator's status round-trips through its network codec unchanged, with nothing left unread. |
 
 In the test world, the scene that showed wireless power (cell 3, 0) now has Energy Cable from its generator to the separator and shears (`17_cabled_generator_world.png`). During the tour the separator was full (100,000 FE) and had turned its wool into 46 Raw Iron, and the shears were charged (50,000 FE). The generator's window (`11_generator_gui.png`) no longer has the wireless button under its *Running* lamp.
 
@@ -243,7 +240,6 @@ In the real client (`29_zero_point_modules.png`, `30_zero_point_jade.png`, `reci
 ### Advancements (`integration_advancements`)
 
 All 15 advancements in the *Barely Functional Contraptions* tab load, each shows in the tab, and each has the right parent (the root has none). The three special ones are earned through the real code paths, with a server player that never logs in (so it sends no network traffic):
-- **Fungal Network:** the player clicks two Mycelial Generators with a Barely Functional Wrench (`useOn`), which links them and grants it.
 - **Don't Cross the Streams:** a death by ordinary fire doesn't grant it; a death by the Zero Point beam's damage type does.
 - **Shear Genius:** powered Automatic Shears shear a sheep while the player stands next to them (the player is added to the level's player list just for that shearing run), which grants it. Another player 40 blocks away who watches a second sheep being sheared doesn't get it.
 
@@ -348,10 +344,6 @@ The block state property changed from `vertical_direction` (up/down) to `facing`
 
 An iron golem with no AI stands on the floor module of a linked pair, inside the beam, and a pig stands two blocks away. The golem's health drops, its last damage is the beam's own `barelyfunctionalcontraptions:zero_point_beam` damage type, and it is set on fire. The pig keeps full health and isn't burning. The golem's last attacking player is the beam's fake player, *[Zero Point Beam]*. A cow in a second beam burns to death and drops experience orbs, which only player kills do. A blaze credited to the beam's fake player drops blaze rods, which are player-only loot, over 40 rolls of its loot, and none without the player credit. In the real client (`35_zero_point_beam_burns.png`), a pig placed in the beam is on fire and flashing red a few ticks later.
 
-### Zero Point beam looting (`zero_point_beam_kills_have_looting`)
-
-A pig's death loot table is rolled 300 times through the real loot pipeline with the beam as the cause of death, and 300 times with plain fire. With fire it never drops more than 3 porkchops. With the beam (default `beamLooting` = 1) the most it drops is 4 and the total is higher. The looting helper adds nothing at level 0, and splits extra items over a full stack into a new stack.
-
 ### Block sounds (`all_blocks_use_iron_block_sounds`)
 
 Every block in the mod (the Functional Machine Block, all six machines and the Creative Generator) uses the vanilla Iron Block's sound type, so placing, breaking, stepping on and hitting them sound like an Iron Block. The test checks every registered block in the mod's namespace against `Blocks.IRON_BLOCK`.
@@ -426,7 +418,7 @@ There are three layers of tests. Run them in this order after any change.
 ./gradlew test
 ```
 
-These cover the pure logic: the network formula and its overflow guards, energy rounding, the mycelium chance table, the fuel config parser, number formatting, and the Barely Functional Wrench link rules (distance, dimension rules, link limits, durability). That's 31 tests in `src/test/java`.
+These cover the pure logic: energy rounding, the mycelium chance table, the fuel config parser, number formatting. That's 31 tests in `src/test/java`.
 
 ### 2. Automated in-game tests (GameTests)
 
@@ -441,20 +433,11 @@ The GameTests, their test structures and the screenshot harness only exist in de
 | GameTest | Checks |
 |---|---|
 | `singleGeneratorProducesEnergy` | A generator burns one mushroom, uses water and produces 250 FE/t on red mushrooms |
-| `adjacentGeneratorsFormOneNetwork` | Touching generators share a network in every direction; a detached one doesn't |
-| `threeGeneratorsScaleExponentially` | 3 running generators give 288 FE/t each (864 total) |
-| `networkSplitsWhenGeneratorRemoved` | Breaking the middle of a line splits the network |
+| `touchingGeneratorsStandAlone` | Three touching generators on brown mushrooms each make the base 200 FE/t: they don't boost each other |
 | `generatorWithoutWaterStops` | No water: state NO_WATER, no FE, the mushroom is kept |
 | `myceliumConvertsDirt` | A 100% chance converts dirt with air above into mycelium |
 | `convertedBlockSproutsHugeMushroom` | With a 100% chance, dirt 4 blocks away turns into mycelium and grows a huge mushroom (uses the taller `tall_empty` structure) |
 | `stateSurvivesSaveAndLoad` | Energy, burn progress, water, chance and inventory survive a save/load |
-| `hugeMultiplierDoesNotOverflow` | Extreme values stay within int range |
-| `manualLinkJoinsDistantGenerators` | Two generators 5 blocks apart, linked by wrench: one network, 240 FE/t each, connection MANUAL |
-| `unlinkingSplitsNetwork` | Removing a generator's links splits a link-only network |
-| `destroyedGeneratorLosesLinks` | Breaking a linked generator removes the link from its partner too |
-| `duplicateLinksRejectedAndChainsMerge` | Reverse duplicates and self links are refused; A–B plus B–C makes one network of 3 |
-| `physicalAndManualConnectionsCombine` | Touching plus linked generators form one network; connection types are PHYSICAL, BOTH and MANUAL |
-| `linkDataSurvivesSaveAndLoad` | Saved link data, including a cross-dimension link, survives NBT save and load |
 
 ### 3. Manual checks in the dev client
 
@@ -463,7 +446,7 @@ Run `./gradlew runClient` and create a **creative, superflat** world with cheats
 #### Generator basics
 1. Place a generator, right-click it with a water bucket, and put red mushrooms in the top slot. The lamp turns green and the GUI shows **+250 FE/t**.
 2. Connect a Mekanism cable or machine. Energy flows out, and the GUI's *out* value rises to match.
-3. Place 3 touching generators, all fed. Each GUI shows **3 linked, 3 active**, **x1.44** and a total of about **864 FE/t** (on brown mushrooms; red ones run 1.25× higher).
+3. Place 3 touching generators, all fed. Each GUI shows **+200 FE/t** on brown mushrooms (250 on red): touching generators don't boost each other.
 4. Fill a generator's energy buffer (no cable attached), then connect a slow consumer. The front window and light stay on steadily, with no flicker, while the lamp switches between green (running) and yellow (energy full). The glow only goes out with no fuel or no water.
 5. Hover the orange burn box. You should see one clean tooltip. With JEI installed, clicking it opens the fuel list.
 
@@ -475,35 +458,7 @@ Run `./gradlew runClient` and create a **creative, superflat** world with cheats
 5. Put a stone ceiling 3 blocks above some dirt. Those blocks convert, but no mushroom grows (no room).
 
 #### Barely Functional Wrench
-| # | Action | Expected |
-|---|---|---|
-| W1 | Right-click generator A with the wrench | Action bar: *Selected generator at …*. A has a purple outline while you hold the wrench, and the wrench glints. Its tooltip shows the selected position. |
-| W2 | Right-click generator B, **20 blocks** away | Action bar: *Linked …*. Red and white particles run from A to B, with a chime. Both GUIs show *Manual, 1/8 links* and **2 linked**. The selection is cleared, and the wrench keeps glinting for about 2 seconds, then stops. |
-| W3 | Feed both A and B | Each produces **240 FE/t** (200 × 1.2): they scale as one network. |
-| W4 | Link A to B again | *These generators are already linked*. |
-| W5 | Select A, then right-click A again | *That generator is already selected…* |
-| W6 | Select A, right-click C **70 blocks** away | *Too far apart (maximum 64 blocks)*. |
-| W7 | Place D touching B, then open B's GUI | B: *Physical + manual*. D: *Physical*. Network shows 3 linked. |
-| W8 | Shift + right-click A | *Removed 1 manual link(s)*. A shows *Standalone*. B and D stay together. |
-| W9 | Link A and B again, then break A | B shows *0/8 links*. Its network drops to the touching generators only. |
-| W10 | Link 9 generators to one generator | The 9th link is refused: *…maximum of 8 links*. |
-| W11 | Shift + right-click air while a generator is selected | *Selection cleared*. The glint disappears. |
-| W12 | Set `wrench_durability = 3` in survival mode | A durability bar appears. After 3 links the wrench breaks with a message. |
-| W13 | Set `allow_network_merging = false`. Build two separate pairs of touching generators, then link one generator from each pair | *…merging is disabled*. Linking a single, unconnected generator into a pair still works. |
-| W14 | Set `enabled = false` | Wrench clicks show *disabled*. Existing links stop counting; GUIs show the networks split. Set it back to true and they rejoin. |
-
-#### Saving, reloading and unloaded chunks
-| # | Action | Expected |
-|---|---|---|
-| S1 | Link A and B, then save and quit to the title screen, and reload | Links remain: *Manual, 1/8 links*, same network, same FE/t. |
-| S2 | Link A to B **300+ blocks** away (raise `max_link_distance` first), then fly far enough from B that its chunk unloads | A shows the link but *0 loaded and active*, and drops back to single-generator output. Nothing loads B's chunk (check with F3: its chunk is not loaded). |
-| S3 | Return to B | The network rejoins automatically, with no further clicks. |
-| S4 | Stand near B with A's chunk unloaded, and run `/setblock` to replace B with stone | B's links are removed from both ends immediately, without loading A's chunk. When you return to A, it shows 0 links. |
-
-#### Multiplayer
-1. Run `./gradlew runServer`, set `online-mode=false` in `run/server.properties`, and connect a client.
-2. Repeat W1–W3 and S1. All messages and particles appear for the player who used the wrench, and nearby players see the particles too.
-3. Open the same generator GUI on two clients. Both show the same link counts and FE/t.
+The wrench no longer links generators. Its other uses (status panel and crate linking, pipe sides, meters, Energy sheep, dismantling) are covered in the Resourceful Sheep module's checks below.
 
 #### Without JEI
 Run `./gradlew runClient -Puse_jei_runtime=false`. The game loads, and the generator and wrench work. Only JEI's recipe pages are missing.

@@ -62,14 +62,14 @@ public final class ModConfigs {
      * default and its new one. Revision 1 made the machines about a quarter faster, revision 2 about half as fast again.
      */
     private static final double[][][] TIMING_PASSES = {
-            // separator speed, packer ticks, altar ticks, furnace cook time, chiller ticks, shears interval, furnace FE/t
-            {{1.0, 1.35}, {40, 30}, {100, 75}, {0.75, 0.55}, {200, 150}, {20, 15}, {20, 20}},
-            {{1.35, 2.0}, {30, 20}, {75, 50}, {0.55, 0.35}, {150, 100}, {15, 10}, {20, 31}},
+            // separator speed, packer ticks, altar ticks, chiller ticks, shears interval (the Powered Furnace's two are gone)
+            {{1.0, 1.35}, {40, 30}, {100, 75}, {200, 150}, {20, 15}},
+            {{1.35, 2.0}, {30, 20}, {75, 50}, {150, 100}, {15, 10}},
     };
 
     private static List<ModConfigSpec.ConfigValue<? extends Number>> timedValues() {
-        return List.of(SERVER.processingSpeedMultiplier, SERVER.woolPackerTicksPerBale, SERVER.altarTicks, SERVER.poweredFurnaceCookTime,
-                SERVER.chillerTicksPerIce, SERVER.automaticShearsInterval, SERVER.poweredFurnaceEnergyPerTick);
+        return List.of(SERVER.processingSpeedMultiplier, SERVER.woolPackerTicksPerBale, SERVER.altarTicks,
+                SERVER.chillerTicksPerIce, SERVER.automaticShearsInterval);
     }
 
     /**
@@ -169,8 +169,6 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue humeFieldSculkRadius;
         public final ModConfigSpec.IntValue humeFieldMaxSculk;
         public final ModConfigSpec.DoubleValue humeFieldSculkSteady;
-        public final ModConfigSpec.IntValue woolBurnerCapacity;
-        public final ModConfigSpec.IntValue woolBurnerOutput;
         public final ModConfigSpec.BooleanValue statsEnabled;
         public final ModConfigSpec.IntValue statsMax;
         public final ModConfigSpec.DoubleValue statsIncreaseChance;
@@ -192,12 +190,6 @@ public final class ModConfigs {
         public final ModConfigSpec.DoubleValue baleYield;
         public final ModConfigSpec.DoubleValue baleEnergy;
         public final ModConfigSpec.DoubleValue baleTime;
-        public final ModConfigSpec.DoubleValue poweredFurnaceCookTime;
-        public final ModConfigSpec.IntValue poweredFurnaceEnergyPerTick;
-        public final ModConfigSpec.DoubleValue poweredFurnaceBlazeBonus;
-        public final ModConfigSpec.IntValue poweredFurnaceMaxHeaters;
-        public final ModConfigSpec.IntValue poweredFurnaceCapacity;
-        public final ModConfigSpec.IntValue poweredFurnaceMaxInput;
         public final ModConfigSpec.BooleanValue woollenBootsMuffle;
         public final ModConfigSpec.IntValue treadmillPower;
         public final ModConfigSpec.IntValue treadmillAttractRadius;
@@ -355,8 +347,6 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue zpeMaxOutput;
         public final ModConfigSpec.DoubleValue zpeBeamDamage;
         public final ModConfigSpec.IntValue zpeBeamBurnSeconds;
-        public final ModConfigSpec.IntValue zpeBeamLooting;
-        public final ModConfigSpec.BooleanValue zpeBeamPlayerKill;
         public final ModConfigSpec.IntValue zpeMaxDragons;
         public final ModConfigSpec.DoubleValue zpeDragonBonus;
         public final ModConfigSpec.IntValue cableTransferRate;
@@ -525,13 +515,6 @@ public final class ModConfigs {
                     .defineInRange("sculkSteadyPerSheep", 0.2, 0.0, 1.0);
             b.pop();
 
-            b.comment("Wool Burner (burns wool, string and Coal Wool for FE; fuels are data-driven, see wool_burner_fuel)").push("wool_burner");
-            woolBurnerCapacity = b.comment("FE each Wool Burner stores. It stops burning while this is full, so no fuel is wasted.")
-                    .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
-            woolBurnerOutput = b.comment("Most FE a Wool Burner pushes into the blocks around it per tick, in total.")
-                    .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
-            b.pop();
-
             b.comment("Sheep stats from breeding: Yield, Growth and Endurance, each 1 (wild) to maxStat. A lamb gets its parents' average, with a chance of one more.").push("sheep_stats");
             statsEnabled = b.comment("Whether bred stats are passed on and have any effect. Off: every sheep acts like a wild one (stats already bred are kept).")
                     .define("enabled", true);
@@ -599,21 +582,6 @@ public final class ModConfigs {
                     .defineInRange("fireChance", 0.02, 0.0, 1.0);
             blazeFurnaceOutput = b.comment("Most FE a furnace pushes into the blocks around it per tick, in total.")
                     .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
-            b.pop();
-
-            b.comment("Powered Furnace (smelts anything a Furnace can, on FE; Blaze sheep around it speed it up)").push("powered_furnace");
-            poweredFurnaceCookTime = b.comment("Its smelting time as a share of a Furnace's: 0.35 = about a third of the time (a 10 s smelt takes 3.5 s).")
-                    .defineInRange("cookTimeMultiplier", 0.35, 0.01, 10.0);
-            poweredFurnaceEnergyPerTick = b.comment("FE it uses per tick while smelting (31: about 2,200 FE a 10 s smelt).")
-                    .defineInRange("energyPerTick", 31, 0, 1_000_000);
-            poweredFurnaceBlazeBonus = b.comment("Extra speed from each Blaze sheep (heat source) in the area around it: 0.25 = 25% faster for the first; each one after it adds less, with the Blaze Sheep Furnace's falloff. The area is the furnace's ([blaze_furnace] radius).")
-                    .defineInRange("blazeBonus", 0.25, 0.0, 10.0);
-            poweredFurnaceMaxHeaters = b.comment("Most Blaze sheep it counts.")
-                    .defineInRange("maxBlazeSheep", 4, 0, 64);
-            poweredFurnaceCapacity = b.comment("FE it stores.")
-                    .defineInRange("energyCapacity", 20_000, 1, Integer.MAX_VALUE);
-            poweredFurnaceMaxInput = b.comment("Most FE it accepts per tick.")
-                    .defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
             b.pop();
 
             b.comment("Sheep Treadmill (a sheep walks its belt for wheat and makes FE)").push("sheep_treadmill");
@@ -1000,12 +968,6 @@ public final class ModConfigs {
                     .defineInRange("beamDamage", 4.0, 0.0, 1_000.0);
             zpeBeamBurnSeconds = b.comment("Seconds the beam sets things on fire for. 0 = no fire, only the beam's own damage.")
                     .defineInRange("beamBurnSeconds", 5, 0, 600);
-            zpeBeamLooting = b.comment("Looting level for mobs the beam kills: each stack they drop gets 0 to this many extra items,",
-                            "like a Looting sword. 0 = normal drops.")
-                    .defineInRange("beamLooting", 1, 0, 10);
-            zpeBeamPlayerKill = b.comment("Mobs the beam kills count as killed by a player: they drop experience and player-only loot",
-                            "(like a zombie's rare iron ingot). The kill is credited to a fake player called [Zero Point Beam].")
-                    .define("beamCountsAsPlayerKill", true);
             zpeMaxDragons = b.comment("Most Dragon sheep standing in the beam that boost it. 0: sheep don't boost it.")
                     .defineInRange("maxDragonSheep", 4, 0, 16);
             zpeDragonBonus = b.comment("Extra output for each Dragon sheep standing in the beam (0.25 = +25%). The beam doesn't burn them.")

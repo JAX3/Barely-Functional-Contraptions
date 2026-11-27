@@ -19,28 +19,29 @@
       "tab": "utility"
     },
     {
-      "title": "Wrench and Links",
+      "title": "Barely Functional Wrench",
       "icon": "barelyfunctionalcontraptions:mycelium_wrench",
       "text": [
-        "The Barely Functional Wrench links blocks without touching.",
-        "- Right-click a generator, then another generator, to link them into one network (up to 64 blocks apart).",
-        "- Sneak and right-click a block to remove its links. Sneak and right-click the air to clear your selection.",
-        "The generator's screen shows how it is connected.",
-        "The wrench also sets each side of a Fluid or Item Pipe: see Pipe Sides.",
+        "The Barely Functional Wrench is the tool for the mod's blocks.",
+        "- Link machines to a Machine Status Panel, and crates to a Crate Controller: see those chapters.",
+        "- Set each side of a Fluid or Item Pipe: see Pipe Sides.",
+        "- Turn an Energy Meter (sneak to turn it the other way).",
+        "- Right-click an Energy sheep to pause it; sneak and right-click it to see its reach.",
+        "- Hold it to see every nearby machine's working area.",
         "## Dismantling",
         "Hit any contraption with the wrench to pick it up at once. It goes straight into your inventory with whatever was inside it, such as fuel, wool or what it made. What doesn't fit drops on the ground."
       ],
       "tab": "utility"
     },
     {
-      "title": "Woollen Armour",
+      "title": "Woollen Boots",
       "icon": "barelyfunctionalcontraptions:woollen_boots",
       "tab": "utility",
       "text": [
-        "## Woollen Armour",
-        "Knit a full set from wool, in the same shapes as leather armour: a Beanie (5 wool), a Jumper (8), Leggings (7) and Boots (4).",
-        "Each piece takes the colour of the wool it's made from. One colour gives that colour; mixed wool blends the colours, as dyes do on leather. You can dye it afterwards like leather, or wash it in a water cauldron to make it white again.",
-        "It's a little better than leather: more armour on the jumper and leggings, it lasts longer and takes enchantments better. It mends with any wool on an anvil, and keeps you from freezing in powder snow.",
+        "## Woollen Boots",
+        "Knit them from 4 wool, in the shape of leather boots.",
+        "They take the colour of the wool they're made from. One colour gives that colour; mixed wool blends the colours, as dyes do on leather. You can dye them afterwards like leather, or wash them in a water cauldron to make them white again.",
+        "They're a little better than leather boots: they last longer and take enchantments better. They mend with any wool on an anvil, keep you from freezing in powder snow, and take half the knock off a Static Generator's shock.",
         "## Muffled",
         "While you wear Woollen Boots you're Muffled: you make no sound. No footsteps, landings, eating or hurt sounds, and sculk sensors, shriekers and Wardens can't hear you.",
         "Take the boots off and it wears off 2 seconds later."
@@ -54,7 +55,6 @@
         "Sheep resources are data: data/<namespace>/barelyfunctionalcontraptions/sheep_resources/<name>.json. They reload with /reload.",
         "An appearance block gives any resource wings, extra heads, glowing, a bigger size, its own sounds and more.",
         "Furnace heat sources are data too: data/<namespace>/barelyfunctionalcontraptions/furnace_heat/<name>.json names a sheep, an entity or a look such as on_fire, and its power. Boost items are the blaze_furnace_boost data map.",
-        "Wool Burner fuels are data too: data/<namespace>/barelyfunctionalcontraptions/wool_burner_fuel/<name>.json, each with an ingredient, a burn_time and a power.",
         "A separating recipe whose ingredient matches a Wool Bale (barelyfunctionalcontraptions:wool_bale with its sheep_resource component) gives that bale its own outputs instead of the scaled-up wool ones.",
         "## Commands",
         "- /bfc list: every loaded resource.",
@@ -75,23 +75,6 @@
         "- A Glow Ink sheep standing on it, or on the panels around it (up to two blocks above), gives the full 40 FE/t, day or night, even underground. Fence one in over a row of panels.",
         "Its cells glow brighter the more it makes: dim at dawn, dusk or in rain, half lit under a Glow Ink sheep at night, fully lit in the midday sun, and dark when it makes nothing.",
         "It pushes its energy into blocks beside and below it."
-      ]
-    },
-    {
-      "title": "Wool Burner",
-      "icon": "barelyfunctionalcontraptions:wool_burner",
-      "tab": "power",
-      "group": "Early Game",
-      "text": [
-        "The Wool Burner burns spare wool for power, one item at a time.",
-        "- Plain wool (any colour): 30 FE/t for 10 seconds.",
-        "- String: 30 FE/t for 2.5 seconds.",
-        "- Coal Wool: 120 FE/t for 20 seconds.",
-        "Right-click it with fuel to load it, put fuel in the slot in its window, or feed it with a hopper or pipe. Hoppers and pipes can't take fuel back out.",
-        "It stores 20,000 FE and pushes it into every block around it. While its buffer is full it waits before lighting the next item, so nothing is wasted.",
-        "A comparator reads how full its fuel slot is.",
-        "## Data packs",
-        "Fuels are data: data/<namespace>/barelyfunctionalcontraptions/wool_burner_fuel/<name>.json, each with an ingredient, a burn_time in ticks and a power in FE/t."
       ]
     },
     {
@@ -143,8 +126,7 @@
         "- Give it water with a bucket, a bucket in its slot, a pipe, or a Fluid Reservoir placed next to it.",
         "- Put mushrooms in the top slot. Hoppers and pipes can insert from any side.",
         "- It pushes energy into cables and machines next to it.",
-        "## Networks",
-        "Generators that touch form a network, and every running member boosts the whole network's output exponentially.",
+        "Each generator works on its own: touching generators don't boost each other.",
         "## Mycelium",
         "Running generators slowly turn nearby dirt into mycelium and sometimes sprout huge mushrooms, which gives you more fuel."
       ]
@@ -168,7 +150,7 @@
         "- A broken comb keeps its stage and its wax.",
         "## Shocks",
         "- If nothing takes its power, its buffer fills and the charge builds up in the dome. Past half full it shocks players and mobs in its pen, knocking them back.",
-        "- Each piece of Woollen Armour takes a quarter off a shock, and a full set stops it. Its sheep are never shocked.",
+        "- Woollen Boots take half off a shock. Its sheep are never shocked.",
         "- A comparator reads how charged its dome is (0-15).",
         "## Making it",
         "- Static Generator: a Lightning Rod on top; Copper Block, Redstone, Copper Block in the middle; wool, a Functional Machine Block and wool at the bottom.",
@@ -186,7 +168,7 @@
         "- Dragon sheep standing in the beam don't burn: each one adds a quarter more power, up to four (double).",
         "- Take the energy from either end.",
         "- Stained glass in the gap colours the beam.",
-        "- The beam burns anything that walks into it, and mobs it kills drop loot as if you had killed them."
+        "- The beam burns anything that walks into it."
       ]
     },
     {
@@ -450,20 +432,6 @@
       ]
     },
     {
-      "title": "Powered Furnace",
-      "icon": "barelyfunctionalcontraptions:powered_furnace",
-      "tab": "production",
-      "text": [
-        "Smelts anything a Furnace can, on power instead of fuel, in about a third of the time: Raw Iron takes 3.5 seconds instead of 10.",
-        "- It uses 20 FE/t while smelting, from any side.",
-        "- Blaze sheep with their fleece on, standing in the 5x5 area around it or on top, speed it up: x1.25 with one, about x1.47, x1.66 and x1.81 with two, three and four. They don't use any more power, so they save power too.",
-        "- Hoppers and pipes put items in and take results out from any side. A comparator reads the input.",
-        "- Take the results out of its window to get the smelting experience, as from a Furnace.",
-        "- Its Blaze sheep stay close: one that wanders up to 4 blocks out of the area walks back in while it has room for more.",
-        "Its spyglass button, or a sneak-right-click with an empty hand, outlines the Blaze sheep's area. JEI shows it as a station for every smelting recipe."
-      ]
-    },
-    {
       "title": "Snow Sheep Chiller",
       "icon": "barelyfunctionalcontraptions:chiller",
       "tab": "production",
@@ -576,14 +544,14 @@
       "icon": "barelyfunctionalcontraptions:speed_upgrade",
       "tab": "utility",
       "text": [
-        "Cards that change how a machine works. The Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears, Snow Sheep Chiller, Grass Seeder, Fleece Trawler and Implosion Chamber each have two upgrade slots, on the right of their window. Drag a card in, or shift-click it; one card a slot.",
+        "Cards that change how a machine works. The Mechanical Separator, Wool Packer, Infusion Altar, Automatic Shears, Snow Sheep Chiller, Grass Seeder, Fleece Trawler and Implosion Chamber each have two upgrade slots, on the right of their window. Drag a card in, or shift-click it; one card a slot.",
         "Craft an Upgrade Base (two at a time) from Blue Steel, Redstone and wool, then add:",
         "- Block of Redstone, Sugar and Red Wool: Speed. Jobs take 60% of the time, for 150% of the power. The Fleece Trawler hauls and the Implosion Chamber sparks sooner.",
         "- Block of Copper and Lime Wool: Efficiency. Jobs cost 75% of the power, taking 115% of the time.",
         "- Wool Bale and Light Blue Wool: Capacity. It holds and takes in four times the power.",
         "- Ender Pearl and Purple Wool: Range. One more block of working area on every side (shears, altar, chiller, Grass Seeder, Implosion Chamber). Its outline wobbles, and a chiller's sheep wander a bit more.",
         "- Diamond and Yellow Wool: Yield. Each separation gives one more resource and string (separator only).",
-        "- Woollen Helmet and Black Wool: Muffler. The machine goes quiet (in the Implosion Chamber, its sheep's pops too).",
+        "- Woollen Boots and Black Wool: Muffler. The machine goes quiet (in the Implosion Chamber, its sheep's pops too).",
         "A second card of the same kind does half as much. Different kinds add up: Speed and Efficiency together make jobs 69% as long for 112.5% of the power.",
         "Cards stay with a machine when you break it or pick it up with the wrench. Hoppers and pipes never touch them.",
         "## Config",
@@ -623,10 +591,10 @@
         "Fuses two different resource wools into power, such as Iron and Gold, or Coal and Netherite.",
         "## Power",
         "- Set by the pair: from about 5,000 FE/t for common pairs up to 50,000 FE/t for Dragon and Warden.",
-        "- The pairs and their power will be data, like Wool Burner fuels.",
+        "- The pairs and their power will be data, like the Blaze Sheep Furnace's heat sources.",
         "## Upkeep",
         "- A steady flow of resource wool or Wool Bales, so it keeps a sheep farm busy.",
-        "- Lint builds up in its chamber. Clear it out with shears every so often; it comes out as plain wool for the Wool Burner."
+        "- Lint builds up in its chamber. Clear it out with shears every so often; it comes out as plain wool."
       ]
     },
     {

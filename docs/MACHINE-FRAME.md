@@ -91,7 +91,6 @@ entity's `energyFor` / `itemsFor`.
 |---|---|---|---|---|---|
 | Mechanical Separator | ✓ (configured sides) | | ✓ | ✓ (its own, configured sides) | |
 | Automatic Shears | ✓ (not the front) | | ✓ | ✓ (9 outputs) | ✓ |
-| Powered Furnace | ✓ | | ✓ | ✓ | |
 | Wool Packer | ✓ | | ✓ | ✓ | |
 | Infusion Altar | ✓ | | ✓ | ✓ (resource + 4 catalysts) | |
 | Snow Sheep Chiller | | ✓ | ✓ | ✓ | |
@@ -99,7 +98,7 @@ entity's `energyFor` / `itemsFor`.
 | Fleece Trawler | | | | ✓ (lure + 9 outputs) | |
 | Fluid Reservoir | | ✓ | | ✓ (buckets) | ✓ |
 | Glow Panel, Static Generator, Echo Chamber, Zero Point Module | ✓ | | | | |
-| Wool Burner, Blaze Furnace, Sheep Treadmill | ✓ | | | ✓ (fuel / boost / food) | |
+| Blaze Furnace, Sheep Treadmill | ✓ | | | ✓ (fuel / boost / food) | |
 | Thermal Reaction Chamber | ✓ | ✓ | | ✓ (hot and cold boosts) | |
 | Mycelial Generator | ✓ | ✓ | | ✓ | |
 | Hume Field Generator | | | | | |

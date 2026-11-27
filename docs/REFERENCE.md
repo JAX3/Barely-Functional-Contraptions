@@ -6,7 +6,7 @@ The complete guide to every machine, item, setting and data-pack format. The sho
 
 A NeoForge mod for **Minecraft 26.1, 26.2 and 26.3** (Java 25) that combines two systems, **Mycelial Power** and **Resourceful Sheep**, into one mod. They share one mod id (`barelyfunctionalcontraptions`), one jar, one config screen and two creative tabs (machines and tools, and resource wool), and they are built to work together:
 
-* **Mycelial Power:** the **Mycelial Generator** burns mushrooms and water to make **Forge Energy (FE)**. Generators that touch, or are linked with the **Barely Functional Wrench**, form networks whose output grows **exponentially**. Running generators slowly spread **mycelium** and sprout **huge mushrooms**.
+* **Mycelial Power:** the **Mycelial Generator** burns mushrooms and water to make **Forge Energy (FE)**. Each generator works on its own. Running generators slowly spread **mycelium** and sprout **huge mushrooms**.
 * **Resourceful Sheep:** feed sheep blocks, ingots and gems to **infuse** their wool, shear them for **resource wool**, and turn the wool back into resources in the FE-powered **Mechanical Separator**. The **Fluid Reservoir** draws water from an infinite source to keep generators supplied.
 
 ![Infused sheep](screenshots/01_world_sheep.png)
@@ -68,10 +68,10 @@ The main creative tab is split into the Contraptions Manual's sections (Power, L
 ### Contraptions Manual (in-game guide)
 Craft a **Contraptions Manual** (a book and a Functional Machine Block) and right-click it to read about everything in the mod in game. Its chapters are sorted into six tabs along the top of the left panel:
 
-- **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Wool Burner, Sheep Treadmill), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator, Static Generator) and *Late Game* (Zero Point Module, Thermal Reaction Chamber, Echo Chamber, Hume Field Generator). A guide chapter's optional `"group"` field sets the heading it is listed under.
+- **Power:** the generators, listed in tiers: *Early Game* (Glow Panels, Sheep Treadmill), *Mid Game* (Blaze Sheep Furnace, Mycelial Generator, Static Generator) and *Late Game* (Zero Point Module, Thermal Reaction Chamber, Echo Chamber, Hume Field Generator). A guide chapter's optional `"group"` field sets the heading it is listed under.
 - **Logistics:** cables and the Energy Meter, tanks and pipes, energy storage (the Hume Energy Cube, moved here from Power to make room for the Hume Field Generator), pipe modes and filters, the Wool Packer, and the crates.
-- **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Powered Furnace, the Snow Sheep Chiller, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
-- **Utility:** getting started, the wrench and its links, Woollen Armour and the Muffled effect, and data packs and commands.
+- **Production:** infusing sheep, the themed sheep, the Infusion Altar, breeding stats, the Snow Sheep Chiller, the Mechanical Separator and Automatic Shears, and the Fluid Reservoir.
+- **Utility:** getting started, the wrench, Woollen Boots and the Muffled effect, and data packs and commands.
 - **Recipes:** built from the game itself, so it matches any data-pack or modpack changes. *Machines* and *Parts, Tools and Armour* show every crafting recipe of the mod as a 3x3 grid; *Infusion* shows what each sheep is fed and the wool it grows; *Infusion Altar* shows the catalysts round the feeding item, with the tier and power; *Mechanical Separator* shows what every wool separates into, with the power and time; *Wool Bales* shows packing, unpacking and what every bale separates into. Ingredients that take any of several items cycle through them, and hovering over an item shows its tooltip.
 - **WIP:** work-in-progress features, written up here as they arrive. For now it holds the planned late-game generators that need upkeep, *Lightning Array* and *Fleece Fusion*, and the *Quantum Sheep*, which blinks in and out of existence, changes its wool type and drops random resource wool. None of them is in the game yet. (The *Hume Field Generator* started here and is now a finished machine in the Power tab: see [Hume Field Generator](#hume-field-generator).)
 
@@ -81,7 +81,7 @@ Hover over a tab to see its name. A resource pack's guide file can still use the
 
 | Power tab | Production tab |
 |---|---|
-| ![The Contraptions Manual on its Power tab: six tab icons along the top with Power framed, its chapters below under Early Game, Mid Game, Late Game and Storage headings, and the Wool Burner chapter open](screenshots/83_guide_power_tab.png) | ![The Production tab: Infusing Sheep, Themed Sheep, Infusion Altar, Breeding Sheep, Wool Machines and Fluid Reservoir, with Infusing Sheep open](screenshots/84_guide_production_tab.png) |
+| ![The Contraptions Manual on its Power tab: six tab icons along the top with Power framed, its chapters below under Early Game, Mid Game, Late Game and Storage headings, and the Glow Panels chapter open](screenshots/83_guide_power_tab.png) | ![The Production tab: Infusing Sheep, Themed Sheep, Infusion Altar, Breeding Sheep, Wool Machines and Fluid Reservoir, with Infusing Sheep open](screenshots/84_guide_production_tab.png) |
 
 | Recipes: Machines | Recipes: Mechanical Separator |
 |---|---|
@@ -124,7 +124,6 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | **Barely Functional Contraptions** | Make a Functional Machine Block (opens the tab) |
 | It's Alive... Ish | Craft a Mycelial Generator |
 | Some Assembly Required | Craft a Barely Functional Wrench |
-| ⭐ **Fungal Network** (goal) | Link two Mycelial Generators together with the Barely Functional Wrench |
 | Separation Anxiety | Craft a Mechanical Separator |
 | Hands-Free Haircut | Craft Automatic Shears |
 | ⭐ **Shear Genius** (goal) | Be within 16 blocks of Automatic Shears when they shear a sheep |
@@ -138,7 +137,6 @@ The mod has its own advancement tab, **Barely Functional Contraptions**, with on
 | Special Delivery | Craft some Item Pipes |
 | Watt's Going On | Craft an Energy Meter |
 | Let There Be Glow | Craft a Glow Panel |
-| Fleece Navidad | Craft a Wool Burner |
 | Bale Out | Press a Wool Bale in a Wool Packer |
 | Altar-ed States | Craft an Infusion Altar |
 | ⭐ **Sheepish Combustion** (goal) | Be within 16 blocks of a Blaze Sheep Furnace when it starts making power from a Blaze sheep |
@@ -188,24 +186,14 @@ The generator is mined with any pickaxe and drops itself. Its inventory is dropp
 
 A generator stops when it runs out of fuel or water. When its buffer is full it pauses and keeps its fuel progress (configurable).
 
-### Networks
-
-Generators connect automatically in all six directions. By default only **running** generators count towards `N`, so a network grows as more members are fed. Networks update instantly when generators are placed, broken, loaded or unloaded. Generators in unloaded chunks simply stop counting, and **no chunk is ever loaded by the mod**. Networks are capped at 64 members by default.
-
-### Barely Functional Wrench (generator links)
+### Barely Functional Wrench
 
 A stylized crowbar, in the same art style as the blocks: purple-painted shaft, steel claw and chisel tip.
 
 ![Barely Functional Wrench recipe: an amethyst shard top right, iron ingots beside and below it, redstone in the centre, an iron ingot bottom left](screenshots/recipe_mycelium_wrench.png)
 
-* **Right-click** a generator to select it. It gets a purple outline while you hold the wrench, and the wrench glints.
-* **Right-click another generator** to link them. Red and white particles run between the two, the action bar confirms the link, and the wrench flashes with the enchantment glint for 2 seconds.
-* **Shift + right-click** a generator to remove all of its manual links. Shift + right-click the air to clear the selection.
-* Linked generators form **one network**, exactly like touching ones, and every running member counts towards the exponential boost. Touching and linked generators can be mixed freely. Each generator keeps its own mushrooms, water and energy (unless the server enables resource sharing).
-* By default, links reach **64 blocks**, each generator can have **8** links, links stay in one dimension, and wrenches never wear out. All of this is configurable in `[network.wrench]`.
-* Links are saved with the world. Breaking a generator removes its links. A link to a generator in an unloaded chunk is kept, and only counts while both chunks are loaded; the mod never loads chunks to keep a link working.
-* The generator GUI's status line shows how it is connected (*Physical*, *Manual*, *Physical + manual* or *Standalone*) and its link count.
-* **Dismantling:** hit (left-click) any of the mod's blocks with the wrench and it breaks at once. The block, with anything that spills out of it (a machine's fuel, wool, input or output), goes straight into your inventory; what doesn't fit drops as usual. It works on every block of the mod, needs no pickaxe, doesn't wear the wrench out, and leaves other mods' blocks alone. Blocks that can't be broken in survival (the Creative Generator) still can't be. Turn it off with `dismantle_blocks = false` in `[network.wrench]`.
+* **What it does:** links machines to a [Machine Status Panel](#machine-status-panel) and crates to a [Crate Controller](#crate-controller), sets [pipe sides](#pipe-sides-modes-and-filters), turns Energy Meters, pauses an Energy sheep (sneak: shows its reach), and while held shows every nearby machine's working area. It no longer links generators: each Mycelial Generator works on its own (earlier versions joined them into networks whose output grew exponentially; see the changelog).
+* **Dismantling:** hit (left-click) any of the mod's blocks with the wrench and it breaks at once. The block, with anything that spills out of it (a machine's fuel, wool, input or output), goes straight into your inventory; what doesn't fit drops as usual. It works on every block of the mod, needs no pickaxe, doesn't wear the wrench out, and leaves other mods' blocks alone. Blocks that can't be broken in survival (the Creative Generator) still can't be. Turn it off with `dismantle_blocks = false` in `[wrench]`.
 * **Tags:** the wrench is in `#c:tools` and `#c:tools/wrench`, so mods that accept any wrench (for rotating or picking up their machines) treat it as one, and in `#c:storable_item`. Those mods' wrench actions are their own; the linking, pipe sides and dismantling only work on this mod's blocks.
 
 #### Powering machines
@@ -220,7 +208,7 @@ Every 100 running ticks a generator tries to convert a dirt block with air above
 ### GUI
 
 * Bars: **energy** (left) and **water tank** (right). The orange box is the remaining burn time of the current mushroom.
-* The info panel shows fuel and time left, water and consumption rate, stored, generated and extracted FE, network size, active count, multiplier, total FE/t and status, and the mycelium chance, increase, next-attempt progress, conversions and huge mushrooms grown this session.
+* The info panel shows fuel and time left, water and consumption rate, stored, generated and extracted FE, and the mycelium chance, increase, next-attempt progress, conversions and huge mushrooms grown this session.
 * Hover over any bar or line for exact numbers and explanations. The lamp shows the machine state.
 * All values are computed on the server and sent to the viewing player.
 
@@ -230,7 +218,6 @@ Every 100 running ticks a generator tries to convert a dirt block with air above
 With [Jade](https://www.curseforge.com/minecraft/mc-mods/jade) installed (26.3.x for NeoForge), looking at a Mycelial Generator shows:
 - **State** (Running, No fuel, No water, Energy full) and the **FE/t** it is generating.
 - The **mushroom burning** and how long it has left, with a fuel progress bar.
-- **Network** size, active generators and scaling, and the network's total FE/t when several generators are linked.
 - Stored **energy**, the **water tank** and the **fuel slots**. These come from Jade's built-in support for NeoForge's energy, fluid and item capabilities.
 
 ![Jade on a Mycelial Generator](screenshots/jade_generator.png)
@@ -473,8 +460,6 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 - **Sound:** linked modules give off a deep, low **energy hum** (built on 55 Hz) with a faint electric shimmer. It fades in when the beam connects and winds down when it breaks, and bigger gaps hum a little higher. Its subtitle is *Zero Point Energy Module hums*, and it follows the *Blocks* volume slider.
 - **Emitters turn:** while a pair is linked, each module's glowing emitter slowly turns the opposite way to the beam (one turn every 8 seconds). An unlinked module's emitter stands still.
 - **The beam burns:** anything living that touches the beam (mobs, animals and players) takes **4 damage** (2 hearts, `beamDamage`) and is **set on fire for 5 seconds** (`beamBurnSeconds`). It keeps hurting them twice a second while they stay in it, and its death message is *"was vaporised by a Zero Point beam"*. Players in creative or spectator mode are safe, and fire-immune mobs like blazes take the damage but don't burn. Set `beamDamage` to 0 for a harmless beam. Dropped items are left alone.
-- **Built-in Looting:** mobs the beam kills drop as if killed with a **Looting I** sword (`beamLooting`, up to 10): every stack in their normal drops gets up to one extra item, so a pig drops 1-4 porkchops instead of 1-3. Since they burn to death, meat comes out cooked. Only the mob's own drops get the bonus, not armour or weapons it was holding.
-- **Counts as a player kill:** mobs the beam kills **drop experience** and **player-only loot** (blaze rods, a zombie's rare iron ingot, a wither skeleton's skull), just as if you had killed them yourself (`beamCountsAsPlayerKill`). The kill is credited to a fake player called *[Zero Point Beam]*, so it works even when nobody is nearby. A beam-and-hopper mob farm needs no player.
 
   ![A pig standing in a Zero Point beam, on fire and flashing red](screenshots/35_zero_point_beam_burns.png)
 - **Coloured beams:** stained glass colours the beam. Put a stained glass block or pane anywhere in the gap and the **whole beam**, from one module to the other, takes its colour. Several colours mix the way a beacon beam's do (each different colour blends with the colour so far), so red and then yellow make an orange beam. Glass of the same colour in a row changes nothing. The colour is only for looks: the power is the same.
@@ -538,7 +523,7 @@ I I I      Copper Comb: I = Copper Wool
 - **Herd:** every half second it counts the grown sheep with their fleece on next to a comb. Each gives 100 FE/t (`powerPerSheep`); Copper sheep give 150 and Redstone sheep 125 (`sheepPower`). Up to six count (`maxSheep`), each in full: 600 FE/t from plain sheep, 900 from Copper sheep. (`falloff`, 0 by default, can make each one after the best add a little less.) Sheared sheep and lambs don't count, so give the pen grass to regrow their wool. It calls back sheep that wander just out of its pen.
 - **Combs:** a comb passes on 100% of a sheep's charge fresh, then 75, 50 and 25% as it oxidises (exposed, weathered, oxidised). Each comb a sheep is rubbing against wears, and after 20 minutes of it (`wearTicks`) it oxidises a stage. An axe takes it back a stage; Honeycomb waxes it, which stops it ageing for good but insulates it a little (85%, `waxedEfficiency`). The axe takes wax off first, as on vanilla copper. Combs only age while they're worked, and a broken comb keeps its stage and wax.
 - **Dome and power:** the charge builds in its dome, which arcs into its buffer every 3 seconds (`arcTicks`), with a crackle of sparks down to a comb. It stores 500,000 FE and pushes up to 2,000 FE/t out of every face of its base but the top.
-- **Shocks:** with nothing taking its power, its buffer fills and the dome keeps charging (up to 100,000 FE, `domeCapacity`). Past half full (`shockAt`) it's *Overcharged*: it shocks every player and mob in its pen (not sheep, not creative players), knocking them back away from the dome (`shockStrength`). Each piece of **Woollen Armour** takes a quarter off a shock, and a full set stops it. Each shock bleeds a little charge off.
+- **Shocks:** with nothing taking its power, its buffer fills and the dome keeps charging (up to 100,000 FE, `domeCapacity`). Past half full (`shockAt`) it's *Overcharged*: it shocks every player and mob in its pen (not sheep, not creative players), knocking them back away from the dome (`shockStrength`). **Woollen Boots** take half off a shock. Each shock bleeds a little charge off.
 - **Window:** the energy gauge, the herd and output, the dome's charge bar with the shock line marked in red, a chip for each comb (coloured by its stage, with a sheen when waxed), and the status. Every part has a tooltip.
 - **Comparator:** reads how charged its dome is, 0-15, for a circuit that keeps people out or switches on a load.
 - **JEI:** a *Static Generator* page (the sheep, the combs, the generator, an axe and Honeycomb, the power for one to six plain or Copper sheep, what each comb stage passes on, and the shock warning), information pages for the generator and the Copper Comb, and its recipes. **Jade:** its status, output, herd, dome charge, its combs (how many, the most worn, how many waxed) and its stored energy, on either half.
@@ -663,7 +648,7 @@ A late-game generator, 2x2 and three blocks tall (two and three-quarters with it
 | ![Jade on the Hume Field Generator: Delivering all it makes, its field, taken, average and No buffer](screenshots/hume_field_jade.png) | ![JEI's Hume Field Generator page: a sample trace, the generator, a line to an Energy Cable, 200-1,200 FE/t at random, 700 FE/t on average, and No buffer](screenshots/hume_field_jei.png) |
 
 ### Sheep attraction
-The Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction Chamber and Echo Chamber keep the sheep they use close by. Every half second, a sheep of the right kind that has wandered out of the working area, but is still within 4 blocks of it (`range` in `[sheep_attraction]`, one block up or down too), walks back to a spot inside it, the way sheep follow wheat.
+The Blaze Sheep Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction Chamber and Echo Chamber keep the sheep they use close by. Every half second, a sheep of the right kind that has wandered out of the working area, but is still within 4 blocks of it (`range` in `[sheep_attraction]`, one block up or down too), walks back to a spot inside it, the way sheep follow wheat.
 
 - Each machine calls only as many as it still has room for, so it never takes sheep it wouldn't use. The chamber also keeps its herds even (see above).
 - A sheep standing in one of these machines' areas belongs to that machine for a couple of seconds, so two machines side by side don't pull the same sheep back and forth.
@@ -736,23 +721,6 @@ When several files match, the most specific one wins: `sheep`, then `entity`, th
 ```
 
 `duration` is in ticks. Only the Blaze Rod is a boost item by default.
-
-### Powered Furnace
-**Smelts anything a Furnace can, on Forge Energy instead of fuel, in a little over half the time**, and faster still with Blaze sheep around it.
-
-| In the world | Its window |
-|---|---|
-| ![Two Powered Furnaces fed by hoppers, the one on the right with two burning Blaze sheep beside it inside its orange area outline](screenshots/101_powered_furnace.png) | ![The Powered Furnace's window: the energy gauge, Raw Iron in the input with a lit flame under it, the smelting arrow, an Iron Ingot out, Speed x1.47 and Blaze sheep 2 / 4, status Smelting](screenshots/101_powered_furnace_gui.png) |
-
-- **Speed:** each item takes **0.35 of its Furnace time** (`cookTimeMultiplier`): Raw Iron 3.5 s instead of 10. It uses 31 FE/t while smelting (`energyPerTick`), about 2,200 FE a Furnace-length smelt.
-- **Blaze sheep:** heat sources (the Blaze Sheep Furnace's: Blaze sheep with their fleece on, by default) with their feet in the furnace's area (`[blaze_furnace] radius`, 5x5 by default, on its level and the block above) speed it up by **25%** for the first (`blazeBonus`), each one after it adding a little less (the Blaze Furnace's falloff), up to four (`maxBlazeSheep`): x1.25, about x1.47, x1.66 and x1.81. The flame under its input slot lights while they do. They don't add to its power use, so they save power too.
-- **Power:** **20 FE/t while smelting** (`energyPerTick`), from any face; it stores 20,000 FE and accepts 1,000 FE/t. It pauses without power.
-- **Items:** hoppers and pipes put smeltable items in on any side and take only the results out. A comparator reads the input. Only items a Furnace can smelt go in.
-- **Experience:** kept until a player takes the results from its window, like a Furnace's (and dropped if it's broken).
-- **Area:** its spyglass button, or a sneak-right-click with an empty hand, outlines the Blaze sheep's area in orange.
-- **Keeping its sheep close:** a Blaze sheep that wanders up to 4 blocks outside the area is called back in while it has room for more (fewer than 4). The attraction area shows as a faint dashed box. See [Sheep attraction](#sheep-attraction).
-- **JEI:** it's listed as a station for every smelting recipe.
-- **Recipe:** iron ingots in the corners and a redstone dust top middle, Furnaces either side of a Functional Machine Block, and a Copper Wool bottom middle.
 
 ### Snow Sheep Chiller
 The Blaze Sheep Furnace's icy opposite: it **freezes water into Ice with the cold of Snow sheep** standing around it, and needs no power.
@@ -894,46 +862,6 @@ C M C      C = Copper Wool, M = Functional Machine Block
 - **Window:** the energy gauge, the wheat (golden while a sheep walks) over the food slot, the walking sheep's stamina bar, the FE stored and made, and the sheep's stamina or rest. The status line reads *Walking*, *No sheep*, *Hungry: needs Wheat*, *Resting* or *Buffer full*.
 - **Config:** `[sheep_treadmill]` (see below).
 
-### Wool Burner
-A simple generator that **burns spare wool** for Forge Energy: plain wool, string, and Coal Wool from coal-infused sheep.
-
-![Four Wool Burners: one burning white wool, one string, one Coal Wool, and one fed red and blue wool and string by a hopper from a chest above it](screenshots/80_wool_burners.png)
-
-| Fuel | Power | Burns for | Energy per item |
-|---|---|---|---|
-| Plain wool (any colour) | 30 FE/t | 10 s | 6,000 FE |
-| String | 30 FE/t | 2.5 s | 1,500 FE |
-| Coal Wool | 120 FE/t | 20 s | 48,000 FE |
-
-- **Loading it:**
-  - right-click it with fuel;
-  - put fuel in the slot in its window (shift-click works);
-  - feed it with a hopper or pipe from any side.
-
-  The slot takes fuel only, and hoppers and pipes can't take it back out.
-- **Burning:** one item burns at a time, and the next is lit as soon as the last burns out. While its buffer is full it **waits** before lighting the next item, so no fuel is wasted.
-- **Output:** it stores 20,000 FE and pushes up to 1,000 FE/t into **every block around it** (`[wool_burner]` in the synced config). Cables and machines can also pull from it.
-- **Window:** right-click with an empty hand. It shows the energy buffer, a flame that burns down as the item burns, the FE/t and the time left, with a status lamp (*Burning*, *Out of fuel*, *Paused: buffer full*). Hover over the flame for the list of fuels. Jade shows the same, and a comparator reads how full the fuel slot is.
-- **Looks:** its front glows and crackles while it burns, and smoke rises from the chimney on top.
-- **Recipe:** iron ingots either side of a wool block, furnaces either side of a Functional Machine Block, and copper ingots either side of redstone. Mine it with a pickaxe; its fuel drops.
-
-| Window | Hover over the flame: the fuels |
-|---|---|
-| ![The Wool Burner window burning Coal Wool: +120 FE/t, 14s left, 15 Coal Wool in the slot](screenshots/81_wool_burner_gui.png) | ![The same window with the fuel tooltip: Coal Wool 120 FE/t for 20s, String 30 FE/t for 2.5s, White Wool and 15 more 30 FE/t for 10s](screenshots/82_wool_burner_gui_fuels.png) |
-
-#### Fuels in data packs
-Each file in `data/<namespace>/barelyfunctionalcontraptions/wool_burner_fuel/<name>.json` is one fuel:
-
-```json
-{ "ingredient": "#minecraft:wool", "burn_time": 200, "power": 30 }
-```
-
-- `ingredient`: any recipe ingredient. It can be an item, a tag, or the mod's `resource_wool` ingredient for one kind of resource wool. The built-in `coal_wool.json` uses `{"neoforge:ingredient_type": "barelyfunctionalcontraptions:resource_wool", "resource": "barelyfunctionalcontraptions:coal"}`.
-- `burn_time`: ticks one item burns for.
-- `power`: FE/t while it burns.
-
-When several fuels match an item, the one that gives the most energy in all is used. To change a built-in fuel, use the same file path in your own data pack. Files may use NeoForge load conditions, and they reload with `/reload`.
-
 ### Wool Packer and Wool Bales
 The **Wool Packer** presses 9 of the same resource wool into one **Wool Bale**. A whole bale goes through the Mechanical Separator in one go: it costs **more power** than its 9 wool, but gives **more resources**.
 
@@ -984,7 +912,7 @@ A bale can be placed like a hay bale, standing up or lying down, in the colour o
 | ![The Mechanical Separator window with 3 Iron Wool Bales in its input slot and the tooltip: Iron Wool Bale, 9 x Iron Wool, pressed together](screenshots/88_separator_bale_gui.png) | ![The Contraptions Manual's Logistics tab with the new Wool Packer chapter open](screenshots/89_guide_wool_packer.png) |
 
 ### Upgrade cards
-Cards that go in a processing machine: to trade time for power or power for time, to hold more power, to reach further, to get more out of each wool, or to quieten it. The **Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears, Snow Sheep Chiller, Grass Seeder, Fleece Trawler and Implosion Chamber** each have **two upgrade slots**, in a small panel on the right of their window. The Grass Seeder takes Range, the Fleece Trawler Speed (quicker hauls), and the Implosion Chamber Speed (sparks sooner), Range (a wider pen) and Muffler (silences it and the pops of the sheep it lights).
+Cards that go in a processing machine: to trade time for power or power for time, to hold more power, to reach further, to get more out of each wool, or to quieten it. The **Mechanical Separator, Wool Packer, Infusion Altar, Automatic Shears, Snow Sheep Chiller, Grass Seeder, Fleece Trawler and Implosion Chamber** each have **two upgrade slots**, in a small panel on the right of their window. The Grass Seeder takes Range, the Fleece Trawler Speed (quicker hauls), and the Implosion Chamber Speed (sparks sooner), Range (a wider pen) and Muffler (silences it and the pops of the sheep it lights).
 
 ![The blank Upgrade Base, the Speed Upgrade (a red strip and a lightning bolt), the Efficiency Upgrade (a lime strip and a copper coil), the Capacity Upgrade (a light blue strip and a battery), the Range Upgrade (a purple strip and a target), the Yield Upgrade (a yellow strip and a green plus) and the Muffler Upgrade (a black strip and a wool tuft over a speaker): Blue Steel circuit cards with gold contacts](screenshots/116_upgrade_cards.png)
 
@@ -996,14 +924,14 @@ Cards that go in a processing machine: to trade time for power or power for time
 | **Capacity Upgrade** | Upgrade Base, Wool Bale (any), Light Blue Wool (shapeless) | – | – |
 | **Range Upgrade** | Upgrade Base, Ender Pearl, Purple Wool (shapeless) | – | – |
 | **Yield Upgrade** | Upgrade Base, Diamond, Yellow Wool (shapeless) | – | – |
-| **Muffler Upgrade** | Upgrade Base, Woollen Helmet (any colour), Black Wool (shapeless) | – | – |
+| **Muffler Upgrade** | Upgrade Base, Woollen Boots (any colour), Black Wool (shapeless) | – | – |
 
 - **Capacity:** **four times** the energy buffer and the most FE it takes in a tick (`capacityMultiplier`); ten times with two. A separator holds 400,000 FE and takes 4,000 a tick. Taking the card out loses any FE over the usual buffer. A machine picked up with its energy and the card keeps all of it. In the five powered machines.
 - **Yield:** each separation gives **one more** of its resource and of its string (`yieldBonus`): Iron Wool gives 3–5 Raw Iron and 3 String. With two cards, one more and a 50% chance of another. The separator only starts a job when there's room for the most it could give, extra included, so nothing ever jams or spills. Only in the Mechanical Separator; it has no catch.
 - **Muffler:** silences the machine's own sounds: the separator's wool tearing, the packer's thumps, the furnace's crackle, the altar's hum and the chiller's clink of Ice. It works just the same, and its particles still show; sounds you make (putting wool in) still play. In the separator, packer, furnace, altar and chiller (the shears' only sound is the sheep's). A second Muffler does nothing more.
 - **Range:** the working area grows by **one block on every side** (`rangeBlocks`; two with two cards). The Automatic Shears' 3x3 becomes 5x5 (still starting a block in front of them), the Infusion Altar reaches 7x7, the Snow Sheep Chiller's 5x5 becomes 7x7. In those three only. Its catch: the area outline **wobbles between colours** and never quite settles, and a chiller with one calls its sheep back only every other second, so they wander a bit more.
 
-- **What they change:** a job's time and its total FE. Separator: Iron Wool in 1.5 s for 30,000 FE with a Speed card (2.5 s, 20,000 FE without). Wool Packer: a bale for 750 FE in 1.15 s with an Efficiency card. Powered Furnace: shorter smelts at more FE/t, so a smelt costs what the card says. Infusion Altar: the infusion's time and FE. Automatic Shears: the time between sweeps, and the FE each sheep costs.
+- **What they change:** a job's time and its total FE. Separator: Iron Wool in 1.5 s for 30,000 FE with a Speed card (2.5 s, 20,000 FE without). Wool Packer: a bale for 750 FE in 1.15 s with an Efficiency card. Infusion Altar: the infusion's time and FE. Automatic Shears: the time between sweeps, and the FE each sheep costs.
 - **Two cards:** one in each slot. A **second card of the same kind** does half as much (`secondCardStrength`): two Speed cards make jobs 48% as long for 187.5% of the power. A Speed and an Efficiency card multiply: 69% of the time for 112.5% of the power.
 - **Putting them in:** drag a card into a slot, or shift-click it: each shift-click puts one card in a free slot. Shift-click a card in the panel to take it back. A slot takes only one card, and only cards the machine accepts (the block tags `#barelyfunctionalcontraptions:accepts_upgrade/speed`, `/efficiency`, `/capacity`, `/range`, `/yield` and `/muffler`, so a data pack can change which machines take which). The Snow Sheep Chiller takes Range and Muffler.
 - **Kept:** the cards stay with the machine when it's broken or picked up with the wrench (its item lists them, *Upgrades: Speed Upgrade*), and come back when it's placed. Hoppers and pipes never touch the upgrade slots.
@@ -1238,19 +1166,15 @@ G C I      C = Comparator, I = Blue Steel
 - **Comparator:** reads how many of its machines have a **problem** (with their alert on), up to 15, for an alarm lamp or bell; or, set to *Signal: working*, how many are working.
 - **JEI:** a *Machine Status Panel* page (the wrench and machines into the panel, a comparator out, and what each colour means) and an information page. **Jade:** on any panel of a screen, how many machines it shows out of how many, its size, how many have a problem and the first two, and its signal.
 - **Advancement:** ⭐ *Mission Control* (goal), for linking 8 machines to one screen (so a screen of 2 panels or more).
-- **Machines it shows:** every generator (Blaze Sheep Furnace, Wool Burner, Thermal Reaction Chamber, Echo Chamber, Static Generator, Sheep Treadmill, Glow Panel, Mycelial Generator), the Powered Furnace, Snow Sheep Chiller, Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Fleece Trawler, Herd Counter, Wool-Lined Crates, Crate Controllers, Hume Energy Cubes, Energy Meter and Zero Point Energy Module.
+- **Machines it shows:** every generator (Blaze Sheep Furnace, Thermal Reaction Chamber, Echo Chamber, Static Generator, Sheep Treadmill, Glow Panel, Mycelial Generator), the Snow Sheep Chiller, Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar, Fluid Reservoir, Grass Seeder, Fleece Trawler, Herd Counter, Wool-Lined Crates, Crate Controllers, Hume Energy Cubes, Energy Meter and Zero Point Energy Module.
 - Mine it with a pickaxe. **Config:** `[status_panel]`: `rowsPerPanel` (4), `range` (200), `refreshTicks` (20), `maxWidth` and `maxHeight` (3).
 
-### Woollen Armour and Muffled
-A full armour set knitted from wool: the **Woollen Beanie** (helmet), **Woollen Jumper** (chestplate), **Woollen Leggings** and **Woollen Boots**.
+### Woollen Boots and Muffled
+**Woollen Boots**, knitted from wool. (The Beanie, Jumper and Leggings that once made a full set are gone; see the changelog.)
 
-| | | |
-|---|---|---|
-| ![Four armour stands in Woollen Armour: a white set, a red set, a light blue set, and a mixed set with a yellow beanie, green jumper, blue leggings and brown boots](screenshots/102_woollen_armor.png) | ![A crafting grid of alternating red and blue wool in the jumper shape, making a purple Woollen Jumper](screenshots/102_woollen_armor_crafting.png) | ![The inventory of a player in a purple Woollen Armour set, with the Muffled effect icon (a woollen bootie) beside it](screenshots/102_muffled.png) |
-
-- **Crafting:** any wool (`#minecraft:wool`) in the leather armour shapes: 5 for the beanie, 8 for the jumper, 7 for the leggings and 4 for the boots. The recipe type is `barelyfunctionalcontraptions:woollen_armor`, an ordinary shaped recipe whose result takes the wool's colour: one colour gives that colour, and mixed colours blend the way dyes do on leather (red and blue make purple). Wool from other mods counts as white.
-- **Colour:** stored as the vanilla `minecraft:dyed_color` component, so the pieces can be dyed in a crafting grid like leather and washed back to white in a water cauldron.
-- **Protection:** a little better than leather: 1 / 4 / 3 / 1 armour for the beanie, jumper, leggings and boots (9 for the set; leather gives 7), a 7x durability multiplier (leather's is 5x, so the boots last 91 uses instead of 65), and enchantability 17 (leather's is 15), repaired with any wool on an anvil. The pieces are in the vanilla armour tags, so they take armour enchantments and trims, and in `minecraft:freeze_immune_wearables`, so they keep you from freezing in powder snow.
+- **Crafting:** 4 wool (`#minecraft:wool`) in the leather boots shape. The recipe type is `barelyfunctionalcontraptions:woollen_armor`, an ordinary shaped recipe whose result takes the wool's colour: one colour gives that colour, mixed wool blends them as dyes do on leather.
+- **Colour:** stored as the vanilla `minecraft:dyed_color` component, so they can be dyed in a crafting grid like leather and washed back to white in a water cauldron.
+- **Protection:** a little better than leather: 1 armour, a 7x durability multiplier (91 uses instead of leather's 65) and enchantability 17. They mend with any wool on an anvil, keep you from freezing in powder snow, and take half the knock off a Static Generator's shock.
 - **Muffled:** worn **Woollen Boots** give the *Muffled* effect, topped up every half second and lasting 2 seconds, so it wears off soon after they come off. A muffled entity makes no sound: sounds it plays (footsteps, landing, swimming, eating, hurt and death sounds) are cancelled on the server and on its own client. Its vibrations don't reach sculk sensors, shriekers or Wardens either. Mobs wearing the boots are muffled too. Sounds from blocks it breaks or places still play.
 - **Config:** `[woollen_armor] bootsMuffle` turns the boots' effect off; `muffleVibrations` lets muffled entities set off sculk again.
 
@@ -1357,7 +1281,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 #### Global config (per world, synced to clients)
 `config/barelyfunctionalcontraptions-sheep-synced.toml`, synced to every client. A copy placed in `<world>/syncedconfig/` overrides it for that world only. You can also edit it in-game from *Mods → Barely Functional Contraptions → Config*.
 
-**Faster machines (timing revisions 1 and 2):** the processing machines have been sped up twice: first by about a quarter, then by about half again. Now: the Mechanical Separator (`processingSpeedMultiplier` 2.0, was 1.35, first 1.0), Wool Packer (`ticksPerBale` 20, was 30), Infusion Altar (`ticks` 50, was 75), Powered Furnace (`cookTimeMultiplier` 0.35, was 0.55, with `energyPerTick` 31, was 20, so a smelt costs about the same), Snow Sheep Chiller (`ticksPerIce` 100, was 150) and Automatic Shears (`shearInterval` 10, was 15). Each job still costs the same FE. An older config file is brought up to date the first time it loads: any of these settings still at an old default moves to the new one, while one you changed is left as it was. `[revision] timingRevision = 2` records that this has been done.
+**Faster machines (timing revisions 1 and 2):** the processing machines have been sped up twice: first by about a quarter, then by about half again. Now: the Mechanical Separator (`processingSpeedMultiplier` 2.0, was 1.35, first 1.0), Wool Packer (`ticksPerBale` 20, was 30), Infusion Altar (`ticks` 50, was 75), Snow Sheep Chiller (`ticksPerIce` 100, was 150) and Automatic Shears (`shearInterval` 10, was 15). Each job still costs the same FE. An older config file is brought up to date the first time it loads: any of these settings still at an old default moves to the new one, while one you changed is left as it was. `[revision] timingRevision = 2` records that this has been done.
 
 **`[sheep]`**
 
@@ -1439,15 +1363,6 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `ticks` | 50 | Ticks one infusion takes |
 | `energyCapacity` / `maxEnergyInput` | 250000 / 5000 | The altar's buffer and input rate |
 | `sheepSlowness` | 5 | Slowness level on the sheep while it is infused, taken off when it ends (0 = off) |
-
-**`[powered_furnace]`**
-
-| Key | Default | Meaning |
-|---|---|---|
-| `cookTimeMultiplier` | 0.35 | Its smelting time as a share of a Furnace's |
-| `energyPerTick` | 31 | FE/t while smelting |
-| `blazeBonus` / `maxBlazeSheep` | 0.25 / 4 | Extra speed from the first Blaze sheep (each one after adds less), and the most counted |
-| `energyCapacity` / `maxEnergyInput` | 20000 / 1000 | Its buffer and input rate |
 
 **`[sheep_treadmill]`**
 
@@ -1598,10 +1513,8 @@ Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already 
 | `energyCapacity` | 50000 | FE each module adds to the pair's shared buffer (a linked pair holds twice this) |
 | `beamDamage` | 4.0 | Damage the beam does to anything living touching it (2 = one heart), at most twice a second. 0 = harmless, no fire |
 | `beamBurnSeconds` | 5 | Seconds the beam sets things on fire for. 0 = no fire |
-| `beamCountsAsPlayerKill` | true | Mobs the beam kills drop experience and player-only loot, credited to a fake player called [Zero Point Beam] |
 | `maxDragonSheep` | 4 | Most Dragon sheep standing in the beam that boost it. 0 = sheep don't boost it |
 | `dragonBonus` | 0.25 | Extra output for each Dragon sheep in the beam (0.25 = +25%). The beam doesn't burn them |
-| `beamLooting` | 1 | Looting level for mobs the beam kills: each stack they drop gets 0 to this many extra items. 0 = normal drops |
 | `maxOutput` | 100000 | Most FE/t each module pushes into, or lets be pulled by, its neighbours. A linked module can always give out at least its pair's whole output, even when that is more than this |
 
 **`[energy_cable]`**
@@ -1833,7 +1746,7 @@ your `saves` folder. Every scene stands on one square platform, in a grid of cel
 
 | File | Contents |
 |---|---|
-| `config/barelyfunctionalcontraptions-mycelial-synced.toml` | Mycelial Generator, networks, wrench, water, fuels and mycelium spread. Synced to clients; a copy in `<world>/syncedconfig/` overrides it per world. |
+| `config/barelyfunctionalcontraptions-mycelial-synced.toml` | Mycelial Generator, wrench, water, fuels and mycelium spread. Synced to clients; a copy in `<world>/syncedconfig/` overrides it per world. |
 | `config/barelyfunctionalcontraptions-mycelial-client.toml` | Generator particles and sounds. |
 | `config/barelyfunctionalcontraptions-sheep-synced.toml` | Sheep infusion, the Mechanical Separator, Automatic Shears, Fluid Reservoir, Hume Energy Cube, Zero Point Energy Module, Energy Cable, Fluid and Item Pipes, the Creative Generator and the `generate` command. Synced to clients; a copy in `<world>/syncedconfig/` overrides it per world. |
 | `config/barelyfunctionalcontraptions-sheep-client.toml` | Sheep particles, tinting, overlays and tooltips. |
@@ -1902,7 +1815,7 @@ src/main/java/com/jax3/barelyfunctionalcontraptions/
 ├── client/BarelyFunctionalContraptionsClient the single client entry point (config screen + both modules' client code)
 ├── registry/ContraptionsCreativeTab the two creative tabs (machines and tools, resource wool)
 ├── gametest/IntegrationGameTests   tests for the parts where the modules meet
-├── mycelial/                       Mycelial Power module (generator, wrench, networks, mycelium, JEI/Jade)
+├── mycelial/                       Mycelial Power module (generator, wrench, mycelium, JEI/Jade)
 └── sheep/                          Resourceful Sheep module (infusion, wool, separator, commands, JEI/Jade)
 
 src/main/resources/

@@ -1,6 +1,6 @@
 {
   "type": "minecraft:function",
-  "function": "barelyfunctionalcontraptions:network_splits_when_generator_removed",
+  "function": "barelyfunctionalcontraptions:touching_generators_stand_alone",
   "environment": "barelyfunctionalcontraptions:default",
   "structure": "barelyfunctionalcontraptions:empty",
   "max_ticks": 100,

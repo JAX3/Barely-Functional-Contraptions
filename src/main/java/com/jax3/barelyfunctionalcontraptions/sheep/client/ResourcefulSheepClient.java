@@ -92,8 +92,6 @@ public final class ResourcefulSheepClient {
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.CRATE_CONTROLLER.get(), context -> new CrateControllerRenderer());
             event.registerBlockEntityRenderer(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.FLEECE_TRAWLER.get(), context -> new AreaOutlineRenderer<>());
-            event.registerBlockEntityRenderer(
-                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModBlockEntities.POWERED_FURNACE.get(), context -> new AreaOutlineRenderer<>());
         });
 
         NeoForge.EVENT_BUS.addListener(ResourcefulSheepClient::onRecipesReceived);
@@ -122,8 +120,6 @@ public final class ResourcefulSheepClient {
         event.register(ModMenus.BLAZE_FURNACE.get(), BlazeFurnaceScreen::new);
         event.register(ModMenus.CHILLER.get(), ChillerScreen::new);
         event.register(ModMenus.FLEECE_TRAWLER.get(), FleeceTrawlerScreen::new);
-        event.register(ModMenus.POWERED_FURNACE.get(), PoweredFurnaceScreen::new);
-        event.register(ModMenus.WOOL_BURNER.get(), WoolBurnerScreen::new);
         event.register(ModMenus.SHEEP_TREADMILL.get(), SheepTreadmillScreen::new);
         event.register(ModMenus.THERMAL_REACTION_CHAMBER.get(), ThermalReactionChamberScreen::new);
         event.register(ModMenus.ECHO_CHAMBER.get(), EchoChamberScreen::new);
@@ -245,8 +241,6 @@ public final class ResourcefulSheepClient {
         }
         for (var item : java.util.List.of(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLAZE_FURNACE, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CHILLER,
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.POWERED_FURNACE,
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BURNER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_TREADMILL,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.THERMAL_REACTION_CHAMBER)) {
             if (event.getItemStack().is(item.get())) {

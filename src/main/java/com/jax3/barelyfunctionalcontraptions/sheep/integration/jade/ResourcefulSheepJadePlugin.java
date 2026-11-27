@@ -28,13 +28,11 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(PipeDataProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PipeBlockEntity.class);
         registration.registerBlockDataProvider(GlowPanelProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity.class);
         registration.registerBlockDataProvider(BlazeFurnaceProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity.class);
-        registration.registerBlockDataProvider(WoolBurnerProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity.class);
         registration.registerBlockDataProvider(InfusionAltarProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity.class);
         registration.registerBlockDataProvider(WoolPackerProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.class);
         // The upgrade cards in any machine that takes them.
         registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MechanicalSeparatorBlockEntity.class);
         registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.class);
-        registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity.class);
         registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.InfusionAltarBlockEntity.class);
         registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.class);
         registration.registerBlockDataProvider(UpgradesProvider.Server.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.class);
@@ -61,12 +59,10 @@ public class ResourcefulSheepJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(PipeProvider.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ItemPipeBlock.class);
         registration.registerBlockComponent(GlowPanelProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock.class);
         registration.registerBlockComponent(BlazeFurnaceProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.BlazeFurnaceBlock.class);
-        registration.registerBlockComponent(WoolBurnerProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.class);
         registration.registerBlockComponent(InfusionAltarProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock.class);
         registration.registerBlockComponent(WoolPackerProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.class);
         registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.MechanicalSeparatorBlock.class);
         registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.class);
-        registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.PoweredFurnaceBlock.class);
         registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.InfusionAltarBlock.class);
         registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.class);
         registration.registerBlockComponent(UpgradesProvider.Client.INSTANCE, com.jax3.barelyfunctionalcontraptions.sheep.blocks.ChillerBlock.class);

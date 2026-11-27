@@ -67,7 +67,7 @@ public class StatusPanelCategory extends AbstractRecipeCategory<StatusPanelDispl
                 .addRichTooltipCallback((view, tooltip) -> tooltip.add(
                         Component.translatable("jei.barelyfunctionalcontraptions.status_panel.wrench", StatusPanelBlockEntity.range()).withStyle(ChatFormatting.GRAY)));
         List<ItemStack> machines = new ArrayList<>();
-        for (var item : List.of(ModItems.POWERED_FURNACE, ModItems.STATIC_GENERATOR, ModItems.GRASS_SEEDER, ModItems.AUTOMATIC_SHEARS,
+        for (var item : List.of(ModItems.STATIC_GENERATOR, ModItems.GRASS_SEEDER, ModItems.AUTOMATIC_SHEARS,
                 ModItems.ECHO_CHAMBER, ModItems.HUME_FIELD_GENERATOR, ModItems.IMPLOSION_CHAMBER, ModItems.HUME_ENERGY_CUBE, ModItems.HERD_COUNTER, ModItems.BLAZE_FURNACE)) {
             machines.add(new ItemStack(item.get()));
         }

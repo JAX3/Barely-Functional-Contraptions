@@ -3,7 +3,6 @@ package com.jax3.barelyfunctionalcontraptions.mycelial.compat.jei;
 import com.jax3.barelyfunctionalcontraptions.mycelial.MycelialPower;
 import com.jax3.barelyfunctionalcontraptions.mycelial.client.screen.MycelialGeneratorScreen;
 import com.jax3.barelyfunctionalcontraptions.mycelial.config.ServerConfig;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinking;
 import com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems;
 import com.jax3.barelyfunctionalcontraptions.mycelial.util.NumberFormatting;
 import mezz.jei.api.IModPlugin;
@@ -51,9 +50,7 @@ public class MycelialPowerJeiPlugin implements IModPlugin {
         ItemStack generator = new ItemStack(ModItems.MYCELIAL_GENERATOR.get());
         registration.addIngredientInfo(generator, VanillaTypes.ITEM_STACK,
                 Component.translatable("jei.barelyfunctionalcontraptions.info.generator",
-                        NumberFormatting.decimal(ServerConfig.get(ServerConfig.BASE_GENERATION)),
-                        NumberFormatting.decimal(ServerConfig.get(ServerConfig.SCALING_MULTIPLIER)),
-                        ServerConfig.get(ServerConfig.MAX_NETWORK_SIZE)),
+                        NumberFormatting.decimal(ServerConfig.get(ServerConfig.BASE_GENERATION))),
                 Component.translatable("jei.barelyfunctionalcontraptions.info.water",
                         ServerConfig.get(ServerConfig.WATER_PER_INTERVAL),
                         NumberFormatting.ticksToTime(ServerConfig.get(ServerConfig.WATER_INTERVAL)),
@@ -63,28 +60,10 @@ public class MycelialPowerJeiPlugin implements IModPlugin {
         registerWrenchInfo(registration);
     }
 
-    /** Wrench info page: how to link/unlink, how links affect scaling, and the server's limits. */
+    /** Wrench info page: what the wrench does. */
     private static void registerWrenchInfo(IRecipeRegistration registration) {
-        ItemStack wrench = new ItemStack(ModItems.MYCELIUM_WRENCH.get());
-        if (!ServerConfig.get(ServerConfig.WRENCH_ENABLED)) {
-            registration.addIngredientInfo(wrench, VanillaTypes.ITEM_STACK, Component.translatable("jei.barelyfunctionalcontraptions.info.wrench_disabled"));
-            return;
-        }
-        int durability = ServerConfig.get(ServerConfig.WRENCH_DURABILITY);
-        boolean crossDimension = ManualLinking.crossDimensionAllowed();
-        registration.addIngredientInfo(wrench, VanillaTypes.ITEM_STACK,
-                Component.translatable("jei.barelyfunctionalcontraptions.info.wrench_usage"),
-                Component.translatable("jei.barelyfunctionalcontraptions.info.wrench_scaling",
-                        NumberFormatting.decimal(ServerConfig.get(ServerConfig.SCALING_MULTIPLIER))),
-                Component.translatable("jei.barelyfunctionalcontraptions.info.wrench_limits",
-                        ServerConfig.get(ServerConfig.MAX_LINK_DISTANCE),
-                        ServerConfig.get(ServerConfig.MAX_MANUAL_CONNECTIONS),
-                        Component.translatable(crossDimension ? "jei.barelyfunctionalcontraptions.info.wrench_cross_yes" : "jei.barelyfunctionalcontraptions.info.wrench_cross_no"),
-                        durability > 0 ? Component.translatable("jei.barelyfunctionalcontraptions.info.wrench_uses", durability)
-                                : Component.translatable("jei.barelyfunctionalcontraptions.info.wrench_unlimited"),
-                        Component.translatable(ServerConfig.get(ServerConfig.ALLOW_LINK_MERGING)
-                                ? "jei.barelyfunctionalcontraptions.info.wrench_merge_yes" : "jei.barelyfunctionalcontraptions.info.wrench_merge_no")),
-                Component.translatable("jei.barelyfunctionalcontraptions.info.wrench_resources"));
+        registration.addIngredientInfo(new ItemStack(ModItems.MYCELIUM_WRENCH.get()), VanillaTypes.ITEM_STACK,
+                Component.translatable("jei.barelyfunctionalcontraptions.info.wrench_usage"));
     }
 
     private static Component hugeMushroomInfo() {

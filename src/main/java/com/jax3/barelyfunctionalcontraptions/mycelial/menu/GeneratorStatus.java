@@ -11,14 +11,12 @@ public record GeneratorStatus(
         int energy, int energyCapacity, double generation, boolean running, double extraction,
         String fluidId, int fluidAmount, int tankCapacity, double waterPerInterval, int waterInterval,
         String fuelItem, int burnRemaining, int burnTotal,
-        int networkSize, int networkActive, double networkScale, double networkTotal, int networkStatus, int maxNetworkSize,
         boolean myceliumEnabled, double chance, double chanceIncrease, int attemptProgress, int attemptInterval,
         int converted, boolean trackConversions,
-        int state, int manualLinks, int activeManualLinks, int maxManualLinks, int connectionType,
-        int hugeMushrooms) {
+        int state, int hugeMushrooms) {
 
     public static final GeneratorStatus EMPTY = new GeneratorStatus(0, 1, 0, false, 0, "", 0, 1, 0, 20, "", 0, 0,
-            1, 0, 1, 0, 1, 64, false, 0, 0, 0, 100, 0, false, 1, 0, 0, 8, 0, 0);
+            false, 0, 0, 0, 100, 0, false, 1, 0);
 
     public static final StreamCodec<FriendlyByteBuf, GeneratorStatus> STREAM_CODEC = StreamCodec.of(
             (buf, s) -> s.write(buf), GeneratorStatus::read);
@@ -37,12 +35,6 @@ public record GeneratorStatus(
         buf.writeUtf(fuelItem, 256);
         buf.writeVarInt(burnRemaining);
         buf.writeVarInt(burnTotal);
-        buf.writeVarInt(networkSize);
-        buf.writeVarInt(networkActive);
-        buf.writeDouble(networkScale);
-        buf.writeDouble(networkTotal);
-        buf.writeVarInt(networkStatus);
-        buf.writeVarInt(maxNetworkSize);
         buf.writeBoolean(myceliumEnabled);
         buf.writeDouble(chance);
         buf.writeDouble(chanceIncrease);
@@ -51,10 +43,6 @@ public record GeneratorStatus(
         buf.writeVarInt(converted);
         buf.writeBoolean(trackConversions);
         buf.writeVarInt(state);
-        buf.writeVarInt(manualLinks);
-        buf.writeVarInt(activeManualLinks);
-        buf.writeVarInt(maxManualLinks);
-        buf.writeVarInt(connectionType);
         buf.writeVarInt(hugeMushrooms);
     }
 
@@ -64,10 +52,8 @@ public record GeneratorStatus(
                 buf.readVarInt(), buf.readVarInt(), buf.readDouble(), buf.readBoolean(), buf.readDouble(),
                 buf.readUtf(256), buf.readVarInt(), buf.readVarInt(), buf.readDouble(), buf.readVarInt(),
                 buf.readUtf(256), buf.readVarInt(), buf.readVarInt(),
-                buf.readVarInt(), buf.readVarInt(), buf.readDouble(), buf.readDouble(), buf.readVarInt(), buf.readVarInt(),
                 buf.readBoolean(), buf.readDouble(), buf.readDouble(), buf.readVarInt(), buf.readVarInt(),
                 buf.readVarInt(), buf.readBoolean(),
-                buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
-                buf.readVarInt());
+                buf.readVarInt(), buf.readVarInt());
     }
 }

@@ -8,6 +8,11 @@
 	feedingAmountOverride = -1
 	#Allow lambs to be infused (their wool is only dropped once grown).
 	allowBabies = false
+	#Lambs bred from infused sheep are born infused with a parent's resource, with a full set of
+	#shearings. Two parents with different resources pass on one of the two at random.
+	breedingKeepsInfusion = true
+	#Only pass the infusion on when both parents are infused (otherwise one infused parent is enough).
+	breedingNeedsBothParents = false
 	#Allow infusing a sheep that is currently sheared; its wool regrows infused.
 	allowFeedingShearedSheep = true
 	#Allow feeding a different resource to an already-infused sheep, replacing the old infusion (the old one is lost).
@@ -17,6 +22,11 @@
 	#If true, each shearing uses up one 'use' of the infusion; when none remain the sheep returns to normal.
 	#If false, infusions are PERMANENT (turns sheep into an unlimited generator - not recommended for survival packs).
 	infusionConsumedByShearing = true
+	#Shearings every infusion lasts, for every wool type (built-in, generated and data-pack ones).
+	#-1 uses each resource definition's own 'infusion_uses' (9 for blocks, 1 for gems...). The multiplier below still applies.
+	# Default: 100
+	# Range: -1 ~ 1000000
+	infusionUsesOverride = 100
 	#Multiplier applied to each resource's 'infusion_uses' (number of shearings an infusion lasts). Result is rounded, minimum 1.
 	# Default: 1.0
 	# Range: 0.01 ~ 100.0
@@ -33,6 +43,14 @@
 	# Default: 1
 	# Range: 0 ~ 64
 	shearingBonusAmount = 1
+	#Killing an infused sheep that still has its wool drops its resource wool and the resource itself, a little more than shearing it.
+	killDropsEnabled = true
+	#Extra resource wool a killed infused sheep drops on top of what one shearing gives.
+	# Default: 1
+	# Range: 0 ~ 64
+	killWoolBonus = 1
+	#Whether a killed infused sheep also drops the resource itself (one Mechanical Separator roll of its primary output, e.g. 2-4 Raw Gold).
+	killDropsResource = true
 	#If true an infused sheep's wool keeps a hint of its dye colour; if false it shows only the resource colour.
 	preserveWoolColour = true
 	#Show resource-coloured particles and play a sound when a sheep is infused.
@@ -47,11 +65,6 @@
 	creativeIgnoresCooldown = true
 	#Sneak + right-click a sheep with an empty hand to see its infusion in the action bar.
 	sneakToInspect = true
-	#Shearings every infusion lasts, for every wool type (built-in, generated and data-pack ones).
-	#-1 uses each resource definition's own 'infusion_uses' (9 for blocks, 1 for gems...). The multiplier below still applies.
-	# Default: 100
-	# Range: -1 ~ 1000000
-	infusionUsesOverride = 100
 
 #Mechanical Separator machine
 [separator]
@@ -92,10 +105,10 @@
 	# Default: 1.0
 	# Range: 0.0 ~ 100.0
 	energyCostMultiplier = 1.0
-	#Speed multiplier. 2.0 = operations take half as many ticks (total energy is unchanged).
-	# Default: 1.0
+	#Speed multiplier. 2.0 = operations take half as many ticks as each wool's processing_ticks (total energy is unchanged).
+	# Default: 2.0
 	# Range: 0.01 ~ 100.0
-	processingSpeedMultiplier = 1.0
+	processingSpeedMultiplier = 2.0
 	#If true, progress resets when the machine runs out of energy instead of pausing.
 	resetProgressWhenUnpowered = false
 	#Sides that accept FE.
@@ -118,6 +131,18 @@
 	#Redstone mode for newly placed machines.
 	#Allowed Values: IGNORED, HIGH, LOW, DISABLED
 	defaultRedstoneMode = "IGNORED"
+	#Whether pipes (and other mods' item handlers) may take outputs from every side that has one, input sides
+	#included, like the Automatic Shears. Off: only from itemOutputSides. Automatic pushing always uses itemOutputSides.
+	pipesTakeOutputsFromAnySide = true
+	#Chance (0-1) that the separator jams when it starts on a different wool from the last one: lint from
+	#the old wool clogs it. 0 = it never jams.
+	# Default: 0.1
+	# Range: 0.0 ~ 1.0
+	jamChance = 0.1
+	#Seconds a jam lasts before it shakes itself clear. Shears on the separator clear it at once.
+	# Default: 10
+	# Range: 1 ~ 3600
+	jamSeconds = 10
 
 #Creative Generator (creative-only infinite FE source for testing)
 [creative_generator]
@@ -126,21 +151,59 @@
 	# Range: > 0
 	creativeGeneratorOutput = 1000000
 
-#Which items /bfc generate may turn into wool types (feeding items and separator outputs).
-#Applies to generate, generate all, preview, material, item and hand. Existing definitions are not touched.
-[generator]
-	#Creative tabs an item must appear in. Default: Building Blocks, Ingredients and Food & Drinks.
-	#Modded items count when their mod adds them to one of these tabs. Empty = any creative tab.
-	allowedCreativeTabs = ["minecraft:building_blocks", "minecraft:ingredients", "minecraft:food_and_drinks"]
-	#Blacklist every item that does not stack (max stack size 1): tools, armour, buckets, potions, stews...
-	requireStackable = true
+#Glow Panel (makes FE from sunlight, or from block light or a Glow Ink sheep over it)
+[glow_panel]
+	#FE/t in full sunlight. Scales down with the sky light (time of day, weather, shade).
+	# Default: 60
+	# Range: 0 ~ 1000000
+	sunRate = 60
+	#FE/t under block light 15 (glowstone, or a Glow Ink sheep over it). Scales with the light level; the panel uses whichever of sun or block light gives more.
+	# Default: 40
+	# Range: 0 ~ 1000000
+	lightRate = 40
+	#FE each panel stores.
+	# Default: 10000
+	# Range: > 1
+	capacity = 10000
+	#Most FE a panel pushes into the blocks beside and below it per tick, in total.
+	# Default: 1000
+	# Range: > 0
+	outputPerTick = 1000
+
+#Blaze Sheep Furnace (makes FE from the heat of Blaze sheep in the area around and above it; heat sources are data-driven, see furnace_heat)
+[blaze_furnace]
+	#How far out the heating area reaches from the furnace, in blocks: 1 = the 3x3 columns around it, 2 = 5x5 (default), and so on. It always covers the furnace's own level and the block above. The area outline follows it.
+	# Default: 2
+	# Range: 0 ~ 8
+	radius = 1
+	#Most heat sources (sheep) one furnace counts; the hottest are used.
+	# Default: 4
+	# Range: 1 ~ 64
+	maxHeatSources = 4
+	#How much less each extra heat source adds: the 2nd gives (1 - falloff) of its power, the 3rd (1 - 2 x falloff) and so on. 0 = no falloff.
+	# Default: 0.125
+	# Range: 0.0 ~ 1.0
+	falloff = 0.125
+	#FE each furnace stores.
+	# Default: 20000
+	# Range: > 1
+	capacity = 20000
+	#Most FE a furnace pushes into the blocks around it per tick, in total.
+	# Default: 1000
+	# Range: > 0
+	outputPerTick = 1000
+	#Chance (0-1), every half second while Blaze sheep heat it, that a spark lights a fire beside a
+	#flammable block (wood, wool, leaves...) near it. 0 = it never does. Keep it in stone.
+	# Default: 0.02
+	# Range: 0.0 ~ 1.0
+	fireChance = 0.02
 
 #Automatic Shears (FE-powered; shears sheep in the 3x3 area in front of it into its inventory)
 [automatic_shears]
-	#Ticks between shearing sweeps (20 = once a second). Each sweep shears every ready sheep in the area.
-	# Default: 20
+	#Ticks between shearing sweeps (10 = half a second). Each sweep shears every ready sheep in the area.
+	# Default: 10
 	# Range: 1 ~ 72000
-	shearInterval = 20
+	shearInterval = 10
 	#FE used for each sheep sheared. 0 = runs without power.
 	# Default: 2000
 	# Range: > 0
@@ -153,3 +216,842 @@
 	# Default: 1000
 	# Range: > 1
 	maxEnergyInput = 1000
+	#Chance (0-1) that the blades nick a sheep as they shear it: half a heart, never enough to kill it.
+	#0 = they never slip.
+	# Default: 0.05
+	# Range: 0.0 ~ 1.0
+	nickChance = 0.05
+
+#Fluid Reservoir (makes water while placed directly on top of an infinite water source)
+[fluid_reservoir]
+	#mB of water made per second (1000 = one bucket a second).
+	# Default: 1000
+	# Range: 1 ~ 1000000
+	waterPerSecond = 1000
+	#Internal tank size in mB (10000 = 10 buckets).
+	# Default: 10000
+	# Range: 1000 ~ 1000000
+	capacity = 10000
+	#Only make water over an infinite source: a water source with at least two neighbouring
+	#water sources and something solid (or more water) under it, i.e. one that refills itself. false = any water source works.
+	requireInfiniteSource = true
+	#mB pushed each tick into neighbouring tanks (sides and top), e.g. a Mycelial Generator. 0 = no pushing.
+	# Default: 1000
+	# Range: 0 ~ 1000000
+	outputPerTick = 1000
+
+#Hume Energy Cube (FE storage; touching cubes join into one battery)
+[energy_cube]
+	#FE each cube adds to its group's buffer.
+	# Default: 1000000
+	# Range: > 1000
+	capacityPerCube = 1000000
+	#FE/t each cube adds to its group's transfer rate (in, out and pushing).
+	# Default: 10000
+	# Range: > 1
+	transferPerCube = 10000
+	#Most cubes that join one group. Cubes beyond this form another group.
+	# Default: 64
+	# Range: 1 ~ 4096
+	maxGroupSize = 64
+	#Push energy into machines and cables touching the group every tick. false = they must pull it.
+	autoOutput = true
+
+#Fluid Tank (stores one fluid; touching tanks join into one tank)
+[fluid_tank]
+	#mB each tank adds to its group's capacity (16000 = 16 buckets).
+	# Default: 16000
+	# Range: 1000 ~ 100000000
+	capacityPerTank = 16000
+	#mB/t each tank adds to its group's transfer rate (in, out and pushing). 1000 = a bucket a tick.
+	# Default: 1000
+	# Range: 1 ~ 1000000
+	transferPerTank = 1000
+	#Most tanks that join one group. Tanks beyond this form another group.
+	# Default: 64
+	# Range: 1 ~ 4096
+	maxGroupSize = 64
+	#Push fluid into machines and pipes touching the group every tick (never into other tanks).
+	#false = they must pull it.
+	autoOutput = true
+
+#Zero Point Energy Module (two modules in one column, facing each other, generate FE across the gap)
+[zero_point_energy_module]
+	#FE/t a linked pair makes for every block of open space between the modules.
+	#The two modules share one pool, so all of it can be taken from either module.
+	#Default: a 10-block gap makes 10,000 FE/t.
+	# Default: 1000
+	# Range: 0 ~ 1000000
+	energyPerBlock = 1000
+	#Fewest blocks of open space needed between the two modules before they link.
+	# Default: 1
+	# Range: 1 ~ 256
+	minGap = 1
+	#Furthest apart (in blocks) two modules can be and still link.
+	# Default: 64
+	# Range: 2 ~ 384
+	maxRange = 64
+	#FE each module adds to the pair's shared buffer (a linked pair holds twice this).
+	# Default: 50000
+	# Range: > 1
+	energyCapacity = 50000
+	#Most FE/t each module pushes into the machines and cables touching it (and that they can pull).
+	#A linked module can always give out at least its pair's whole output, even when that is more than this,
+	#so all of the pair's power can be taken from either module.
+	# Default: 100000
+	# Range: > 1
+	maxOutput = 100000
+	#Damage the beam does to anything living that touches it (2 = one heart), at most twice a second
+	#while it stays in the beam (the usual hurt cooldown). 0 = the beam is harmless and doesn't burn.
+	# Default: 4.0
+	# Range: 0.0 ~ 1000.0
+	beamDamage = 4.0
+	#Seconds the beam sets things on fire for. 0 = no fire, only the beam's own damage.
+	# Default: 5
+	# Range: 0 ~ 600
+	beamBurnSeconds = 5
+	#Most Dragon sheep standing in the beam that boost it. 0: sheep don't boost it.
+	# Default: 4
+	# Range: 0 ~ 16
+	maxDragonSheep = 4
+	#Extra output for each Dragon sheep standing in the beam (0.25 = +25%). The beam doesn't burn them.
+	# Default: 0.25
+	# Range: 0.0 ~ 10.0
+	dragonBonus = 0.25
+
+#Energy Cable (touching cables form one network that carries FE between generators, cubes and machines)
+[energy_cable]
+	#Most FE/t one cable network carries in total, however many cables and blocks are on it.
+	# Default: 100000
+	# Range: > 1
+	transferRate = 100000
+	#Most cables in one network. Longer runs split into separate networks, which still pass
+	#energy along only through the blocks plugged into both.
+	# Default: 4096
+	# Range: 1 ~ 1000000
+	maxNetworkSize = 4096
+
+#Fluid Pipe (touching pipes form one network that carries fluids between tanks)
+[fluid_pipe]
+	#Most mB per tick one pipe network carries in total, however many pipes and blocks are on it.
+	# Default: 4000
+	# Range: > 1
+	transferRate = 4000
+	#Most pipes in one network. Longer runs split into separate networks, which only pass
+	#fluid along through the blocks plugged into both.
+	# Default: 4096
+	# Range: 1 ~ 1000000
+	maxNetworkSize = 4096
+
+#Item Pipe (touching pipes form one network that carries items between inventories)
+[item_pipe]
+	#Most items per tick one pipe network carries in total, however many pipes and blocks are on it.
+	# Default: 16
+	# Range: > 1
+	transferRate = 16
+	#Most pipes in one network. Longer runs split into separate networks, which only pass
+	#items along through the blocks plugged into both.
+	# Default: 4096
+	# Range: 1 ~ 1000000
+	maxNetworkSize = 4096
+
+#Which items /bfc generate may turn into wool types (feeding items and separator outputs).
+#Applies to generate, generate all, preview, material, item and hand. Existing definitions are not touched.
+[generator]
+	#Creative tabs an item must appear in. Default: Building Blocks, Ingredients and Food & Drinks.
+	#Modded items count when their mod adds them to one of these tabs. Empty = any creative tab.
+	allowedCreativeTabs = ["minecraft:building_blocks", "minecraft:ingredients", "minecraft:food_and_drinks"]
+	#Blacklist every item that does not stack (max stack size 1): tools, armour, buckets, potions, stews...
+	requireStackable = true
+
+#Wool Packer (FE-powered; presses 9 of the same resource wool into a Wool Bale) and Wool Bales in the Mechanical Separator
+[wool_packer]
+	#FE each Wool Packer stores.
+	# Default: 20000
+	# Range: > 1
+	energyCapacity = 20000
+	#Most FE a Wool Packer accepts per tick.
+	# Default: 1000
+	# Range: > 1
+	maxEnergyInput = 1000
+	#FE to press one bale. 0 = the packer needs no power.
+	# Default: 1000
+	# Range: > 0
+	energyPerBale = 1000
+	#Ticks to press one bale (20 = one second).
+	# Default: 20
+	# Range: 1 ~ 72000
+	ticksPerBale = 20
+	#What separating one bale gives, in pieces of wool's worth of outputs. One bale holds 9 wool, so above 9 is the reward for baling: 12 = a third more of every output. Counts are capped at a stack so a bale never jams the separator.
+	# Default: 12.0
+	# Range: 1.0 ~ 64.0
+	baleYield = 12.0
+	#FE to separate one bale, in pieces of wool's worth: 15 = 15 times the wool's energy cost, more than its 9 wool would take.
+	# Default: 15.0
+	# Range: 0.0 ~ 1000.0
+	baleEnergy = 15.0
+	#Time to separate one bale, in pieces of wool's worth: 9 = as long as its 9 wool one at a time.
+	# Default: 9.0
+	# Range: 0.05 ~ 1000.0
+	baleTime = 9.0
+
+#Sheep stats from breeding: Yield, Growth and Endurance, each 1 (wild) to maxStat. A lamb gets its parents' average, with a chance of one more.
+[sheep_stats]
+	#Whether bred stats are passed on and have any effect. Off: every sheep acts like a wild one (stats already bred are kept).
+	enabled = true
+	#Highest a stat can reach.
+	# Default: 10
+	# Range: 1 ~ 100
+	maxStat = 10
+	#Chance (0-1) that each of a lamb's stats comes out one higher than its parents' average.
+	# Default: 0.25
+	# Range: 0.0 ~ 1.0
+	increaseChance = 0.25
+	#Chance (0-1) that each of a lamb's stats comes out one lower than its parents' average.
+	# Default: 0.05
+	# Range: 0.0 ~ 1.0
+	decreaseChance = 0.05
+	#Yield: extra wool per shearing for each point above 1, as a share of the normal amount. 0.15 = Yield 10 shears 2.35 times as much (fractions are a chance of one more).
+	# Default: 0.15
+	# Range: 0.0 ~ 10.0
+	yieldPerPoint = 0.15
+	#Growth: chance per second, for each point above 1, that a sheared sheep regrows its wool on its own without eating grass. 0.01 = Growth 10 regrows in about 11 seconds on average.
+	# Default: 0.01
+	# Range: 0.0 ~ 1.0
+	growthPerPoint = 0.01
+	#Endurance: extra shearings an infusion lasts for each point above 1, as a share of its normal uses. 0.1 = Endurance 10 lasts 1.9 times as long.
+	# Default: 0.1
+	# Range: 0.0 ~ 10.0
+	endurancePerPoint = 0.1
+
+#Infusion Altar (FE-powered; infuses the sheep beside it, with catalysts for the higher tiers; each resource's tier and catalysts are in its definition's 'altar' block)
+[infusion_altar]
+	#FE a tier 1 infusion takes at the altar, when its definition doesn't say.
+	# Default: 20000
+	# Range: > 0
+	baseEnergy = 20000
+	#FE a tier 2 or 3 infusion takes, when its definition doesn't say.
+	# Default: 200000
+	# Range: > 0
+	highTierEnergy = 200000
+	#Ticks one infusion takes at the altar (the energy is spread over them).
+	# Default: 50
+	# Range: 1 ~ 72000
+	ticks = 50
+	#FE the altar stores.
+	# Default: 250000
+	# Range: > 1
+	energyCapacity = 250000
+	#Most FE the altar accepts per tick.
+	# Default: 5000
+	# Range: > 1
+	maxEnergyInput = 5000
+	#Level of Slowness on the sheep while the altar infuses it, so it doesn't wander off; taken off when the infusion ends. Only the sheep is slowed. 5 = nearly still, 0 = off.
+	# Default: 5
+	# Range: 0 ~ 10
+	sheepSlowness = 5
+	#The highest tier of sheep that can still be fed by hand; everything above it is infused at an Infusion Altar. Most sheep are tier 1; the Wither, Dragon and Warden sheep are tier 2.
+	#0 = every sheep needs the altar (the default). 1 = tier 1 sheep can be fed by hand again, as before. 3 = every sheep can be fed by hand.
+	# Default: 0
+	# Range: 0 ~ 3
+	handFeedingMaxTier = 0
+
+#Snow Sheep Chiller (freezes water into Ice with the cold of Snow sheep in the area around and above it; needs no power)
+[chiller]
+	#How far out the chilling area reaches, in blocks: 2 = the 5x5 columns around it (default). It covers the chiller's own level and the block above.
+	# Default: 2
+	# Range: 0 ~ 8
+	radius = 2
+	#Most Snow sheep one chiller counts.
+	# Default: 4
+	# Range: 1 ~ 64
+	maxColdSources = 4
+	#How much less each extra Snow sheep adds to the speed: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on. 0 = no falloff.
+	# Default: 0.125
+	# Range: 0.0 ~ 1.0
+	falloff = 0.125
+	#Ticks to freeze one Ice with one Snow sheep (100 = 5 seconds). More sheep freeze faster.
+	# Default: 100
+	# Range: 1 ~ 72000
+	ticksPerIce = 100
+	#mB of water each Ice takes (1000 = a bucket).
+	# Default: 1000
+	# Range: 0 ~ 1000000
+	waterPerIce = 1000
+	#mB of water a chiller holds.
+	# Default: 8000
+	# Range: 1000 ~ 1000000
+	tankCapacity = 8000
+	#Sheep resources whose sheep chill it (with their fleece on).
+	coldSources = ["barelyfunctionalcontraptions:snow"]
+	#Seconds its Snow sheep can keep chilling it with the Ice slot full before it frosts over. 0 = it never does.
+	# Default: 60
+	# Range: 0 ~ 72000
+	frostSeconds = 60
+	#Seconds a frosted-over chiller takes to thaw once its Ice slot has room again. A Blaze sheep in its
+	#area thaws it at once.
+	# Default: 30
+	# Range: 1 ~ 72000
+	thawSeconds = 30
+
+#Woollen Armour (crafted from wool, in the wool's colour)
+[woollen_armor]
+	#Whether Woollen Boots give the Muffled effect while worn (no sounds from the wearer).
+	bootsMuffle = true
+	#Whether Muffled also hides the wearer's vibrations from sculk sensors, shriekers and Wardens.
+	muffleVibrations = true
+
+#Sheep Treadmill (a sheep walks its belt for wheat and makes FE)
+[sheep_treadmill]
+	#FE/t while a sheep walks it, before the bonuses below.
+	# Default: 20
+	# Range: 0 ~ 1000000
+	power = 20
+	#Ticks of walking one Wheat feeds (600 = 30 seconds). A Hay Bale feeds nine times as long.
+	# Default: 600
+	# Range: 1 ~ 72000
+	ticksPerWheat = 600
+	#Ticks a sheep walks before it's worn out and needs a rest (2400 = 2 minutes), for a sheep with 1 Endurance.
+	# Default: 2400
+	# Range: 1 ~ 720000
+	walkTicks = 2400
+	#Ticks a worn-out sheep rests before it will walk again (600 = 30 seconds).
+	# Default: 600
+	# Range: 0 ~ 720000
+	restTicks = 600
+	#How much longer a sheep walks for each Endurance point above 1: 0.25 = 25% longer per point.
+	# Default: 0.25
+	# Range: 0.0 ~ 10.0
+	enduranceBonus = 0.25
+	#Extra power for each level of Speed the sheep has: 0.2 = 20% more per level. Slowness takes as much off.
+	# Default: 0.2
+	# Range: 0.0 ~ 10.0
+	speedBonus = 0.2
+	#Extra power while the sheep is sheared and running light: 0.25 = 25% more.
+	# Default: 0.25
+	# Range: 0.0 ~ 10.0
+	shearedBonus = 0.25
+	#FE it stores.
+	# Default: 20000
+	# Range: > 1
+	capacity = 20000
+	#Most FE it pushes into the blocks around it per tick.
+	# Default: 200
+	# Range: > 0
+	output = 200
+	#How far away, in blocks, a treadmill with food in it calls a grown sheep over to its belt. 0 = it doesn't.
+	# Default: 8
+	# Range: 0 ~ 32
+	attractRadius = 8
+
+#Thermal Reaction Chamber (late-game generator: Blaze sheep against its hot side, Snow sheep against its cold side, water through the middle)
+[thermal_reaction_chamber]
+	#FE/t from the first pair (a Blaze sheep matched by a Snow sheep). Each pair after it adds less, see falloff.
+	# Default: 2500
+	# Range: 0 ~ 1000000
+	powerPerPair = 2500
+	#How much less each extra pair adds: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on. 0 = no falloff.
+	# Default: 0.13
+	# Range: 0.0 ~ 1.0
+	falloff = 0.13
+	#Most pairs one chamber counts.
+	# Default: 6
+	# Range: 1 ~ 64
+	maxPairs = 6
+	#Size of each pen beside it: 2 = 5x5 (default), 1 = 3x3. A pen sits against its side face and covers the chamber's level and the block above.
+	# Default: 2
+	# Range: 0 ~ 8
+	radius = 2
+	#mB of water it uses each tick while it reacts. Without water it stops and vents scalding steam out of its front.
+	# Default: 250
+	# Range: 0 ~ 100000
+	waterPerTick = 250
+	#mB of water it holds.
+	# Default: 16000
+	# Range: 1000 ~ 1000000
+	tankCapacity = 16000
+	#Ticks one Blaze Rod (hot slot) or Blue Ice (cold slot) burns (600 = 30 seconds).
+	# Default: 600
+	# Range: 1 ~ 72000
+	boostTicks = 600
+	#Output multiplier while both boosts burn. One boost alone tips the balance instead, like an extra sheep on that side.
+	# Default: 2.0
+	# Range: 1.0 ~ 100.0
+	boostMultiplier = 2.0
+	#Output lost for each step the balance is off: 0.25 = a quarter less for each unpaired sheep (or lone boost).
+	# Default: 0.25
+	# Range: 0.0 ~ 1.0
+	imbalancePenalty = 0.25
+	#Ticks it can run hot or cold before it melts down or freezes solid (600 = 30 seconds). Running balanced counts it back down.
+	# Default: 600
+	# Range: 20 ~ 72000
+	unstableTicks = 600
+	#Whether a meltdown explodes. If false it only singes the hot side's sheep and shuts down until it cools.
+	meltdownExplodes = true
+	#Size of the meltdown explosion (TNT is 4).
+	# Default: 4.0
+	# Range: 0.0 ~ 16.0
+	meltdownPower = 4.0
+	#Ticks a sheep can react before its fleece is spent and it must be re-infused (72000 = an hour). 0 = never.
+	# Default: 72000
+	# Range: > 0
+	fatigueTicks = 72000
+	#FE it stores.
+	# Default: 2000000
+	# Range: > 1
+	capacity = 2000000
+	#Most FE it pushes into the blocks around it per tick, in total.
+	# Default: 40000
+	# Range: > 0
+	output = 40000
+	#Sheep resources whose sheep heat its hot side (with their fleece on).
+	hotSources = ["barelyfunctionalcontraptions:blaze"]
+	#Sheep resources whose sheep chill its cold side (with their fleece on).
+	coldSources = ["barelyfunctionalcontraptions:snow"]
+
+#Bookkeeping: which machine-speed pass this file has had. Leave it alone.
+[revision]
+	#How many of the machines' speed-ups have been applied (2 = both): settings still at their old defaults were moved to the new ones; anything you had changed was left as it was.
+	# Default: 0
+	# Range: 0 ~ 100
+	timingRevision = 2
+
+#Sheep attraction: the Blaze Sheep Furnace, Powered Furnace, Snow Sheep Chiller, Thermal Reaction Chamber, Echo Chamber and Static Generator call their sheep back into their working area when one wanders a little way out
+[sheep_attraction]
+	#Whether these machines call their sheep back.
+	enabled = true
+	#How far outside the working area, in blocks, a sheep is still called back. The area outline shows it faintly.
+	# Default: 4
+	# Range: 0 ~ 16
+	range = 4
+
+#Echo Chamber (late-game generator, 3x3x3: Warden sheep in front of its dish turn the vibrations they hear into power)
+[echo_chamber]
+	#FE/t from the first Warden sheep, with the noise in the sweet spot and perfectly steady. Each sheep after it adds less, see falloff.
+	# Default: 8000
+	# Range: 0 ~ 1000000
+	powerPerSheep = 8000
+	#How much less each extra sheep adds: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on. 0.25 with 4 sheep = 20,000 FE/t.
+	# Default: 0.25
+	# Range: 0.0 ~ 1.0
+	falloff = 0.25
+	#Most Warden sheep one chamber counts.
+	# Default: 4
+	# Range: 1 ~ 64
+	maxSheep = 4
+	#Size of the listening pen in front of its dish: 2 = 5x5 (default), 1 = 3x3. It covers the chamber's bottom level and the block above.
+	# Default: 2
+	# Range: 0 ~ 8
+	radius = 2
+	#How far it hears vibrations from, in blocks, measured from the middle of its dish (a sculk sensor hears 8).
+	# Default: 8
+	# Range: 1 ~ 32
+	listenRadius = 8
+	#Ticks of noise the noise level averages over (200 = 10 seconds). The level is vibrations per 5 seconds; steadiness compares the five fifths of this window.
+	# Default: 200
+	# Range: 20 ~ 6000
+	windowTicks = 200
+	#Noise levels below this are too quiet: the output falls away towards nothing in silence.
+	# Default: 5
+	# Range: 1 ~ 15
+	quietBelow = 5
+	#Noise levels above this are too loud: the output falls by a fifth for each level over, to nothing five levels above.
+	# Default: 10
+	# Range: 1 ~ 15
+	loudAbove = 10
+	#FE it stores.
+	# Default: 2000000
+	# Range: > 1
+	capacity = 2000000
+	#Most FE it pushes out of its power port (the middle of its back) per tick.
+	# Default: 40000
+	# Range: > 0
+	output = 40000
+	#Sheep resources whose sheep listen for it (with their fleece on).
+	sources = ["barelyfunctionalcontraptions:warden"]
+	#Ticks of noise below the sweet spot before its Warden sheep fall asleep and it stops (600 = 30 seconds). Back in the sweet spot, the drowsiness wears off twice as fast.
+	# Default: 600
+	# Range: 20 ~ 72000
+	sleepTicks = 600
+	#Ticks the Warden sheep take to settle after the noise wakes them, making nothing (100 = 5 seconds).
+	# Default: 100
+	# Range: 0 ~ 6000
+	wakeTicks = 100
+	#Ticks of noise above the sweet spot before the room shrieks (200 = 10 seconds). Below it, the shriek meter drains again.
+	# Default: 200
+	# Range: 20 ~ 72000
+	shriekTicks = 200
+	#Ticks it stops for after it shrieks (1200 = a minute).
+	# Default: 1200
+	# Range: 0 ~ 72000
+	shriekCooldown = 1200
+	#How far from its dish players get Darkness when it shrieks, in blocks. 0 = no Darkness.
+	# Default: 16
+	# Range: 0 ~ 64
+	shriekRadius = 16
+	#How long that Darkness lasts (200 = 10 seconds).
+	# Default: 200
+	# Range: 1 ~ 6000
+	darknessTicks = 200
+
+#Static Generator (mid-game generator: sheep rubbing against Copper Combs in its pen build static, which its dome arcs into power)
+[static_generator]
+	#FE/t of charge from a sheep against a fresh comb, unless sheepPower lists its resource: six plain sheep make 600 FE/t.
+	# Default: 100
+	# Range: 0 ~ 1000000
+	powerPerSheep = 100
+	#How much less each extra sheep adds: the 2nd gives (1 - falloff), the 3rd (1 - 2 x falloff) and so on. 0 (default): every sheep counts in full.
+	# Default: 0.0
+	# Range: 0.0 ~ 1.0
+	falloff = 0.0
+	#Most sheep one generator counts.
+	# Default: 6
+	# Range: 1 ~ 64
+	maxSheep = 6
+	#Size of its pen, centred on it: 2 = 5x5 (default). Combs and sheep count anywhere in it, at its level and the one above.
+	# Default: 2
+	# Range: 1 ~ 8
+	radius = 2
+	#Most Copper Combs one generator uses (the nearest).
+	# Default: 4
+	# Range: 1 ~ 16
+	maxCombs = 4
+	#How close a sheep must stand to a comb to be rubbed by it, in blocks from the comb's centre.
+	# Default: 1.5
+	# Range: 0.5 ~ 4.0
+	combReach = 1.5
+	#FE/t of charge from sheep of particular resources, as "resource=power".
+	sheepPower = ["barelyfunctionalcontraptions:copper=150", "barelyfunctionalcontraptions:redstone=125"]
+	#Ticks between arcs, when its dome discharges into its buffer (60 = 3 seconds).
+	# Default: 60
+	# Range: 1 ~ 6000
+	arcTicks = 60
+	#FE of charge its dome holds. With its buffer full the dome keeps charging, up to this.
+	# Default: 100000
+	# Range: > 1
+	domeCapacity = 100000
+	#How full its dome is (0-1) before it starts shocking anything in its pen: players and mobs get knocked back. Sheep don't.
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	shockAt = 0.5
+	#How hard a shock knocks things back. Each piece of Woollen Armour takes a quarter off; a full set stops it.
+	# Default: 1.2
+	# Range: 0.0 ~ 10.0
+	shockStrength = 1.2
+	#Ticks a comb can be worked before it oxidises a stage (24000 = 20 minutes). Waxed combs don't age.
+	# Default: 24000
+	# Range: > 1
+	wearTicks = 24000
+	#How much charge a waxed comb gives, against a fresh one: the wax insulates a little.
+	# Default: 0.85
+	# Range: 0.0 ~ 1.0
+	waxedEfficiency = 0.85
+	#FE it stores.
+	# Default: 500000
+	# Range: > 1
+	capacity = 500000
+	#Most FE it pushes into the blocks around its base per tick, in total.
+	# Default: 2000
+	# Range: > 0
+	output = 2000
+
+#Grass Seeder (turns the dirt its sheep have eaten back to grass, grows short grass, and gets sheared sheep grazing sooner)
+[grass_seeder]
+	#How far out its area reaches: 2 = the 5x5 around it (default). It tends the ground it stands on.
+	# Default: 2
+	# Range: 1 ~ 8
+	radius = 2
+	#Ticks between the blocks it tends (40 = 2 seconds): one block each time.
+	# Default: 40
+	# Range: 1 ~ 72000
+	tickInterval = 40
+	#Blocks one Bone Meal tends.
+	# Default: 8
+	# Range: 1 ~ 64
+	boneMealBlocks = 8
+	#FE a tick while it tends, instead of Bone Meal (with water): taken for each block it tends, so 20 x 40 = 800 FE a block.
+	# Default: 20
+	# Range: 0 ~ 1000000
+	energyPerTick = 20
+	#mB of water each block takes when it runs on FE.
+	# Default: 10
+	# Range: 0 ~ 1000000
+	waterPerBlock = 10
+	#How much sooner sheared sheep in its area graze (and so regrow their wool) than on plain grass: 4 = four times as often. 1 = no boost.
+	# Default: 4.0
+	# Range: 1.0 ~ 100.0
+	grazeMultiplier = 4.0
+	#Share of the grass in its area it keeps short grass growing on, for the sheep to eat (0.4 = 40%). 0 = none.
+	# Default: 0.4
+	# Range: 0.0 ~ 1.0
+	shortGrass = 0.4
+	#FE it stores.
+	# Default: 20000
+	# Range: > 1
+	capacity = 20000
+	#FE it takes in per tick.
+	# Default: 200
+	# Range: > 1
+	maxInput = 200
+	#mB of water it holds.
+	# Default: 4000
+	# Range: 100 ~ 1000000
+	tankCapacity = 4000
+	#Whether it overgrows: with nothing to tend and Trim off, its short grass shoots up into tall grass, which sheep can't eat and Automatic Shears can't see them in. Trim, in its window, keeps it short.
+	overgrowth = true
+	#Chance on each turn with nothing else to do that a tuft of short grass grows tall (0.25 = about every 8 seconds).
+	# Default: 0.25
+	# Range: 0.0 ~ 1.0
+	overgrowthChance = 0.25
+
+#Herd Counter (counts the sheep in a pen in front of its screen, and puts any count on a comparator; needs no power)
+[herd_counter]
+	#How far its area reaches: 3 = the 7x7 in front of its screen (default).
+	# Default: 3
+	# Range: 1 ~ 8
+	radius = 3
+	#Ticks between counts (20 = every second).
+	# Default: 20
+	# Range: 1 ~ 1200
+	interval = 20
+	#Comparator strength each sheep counted adds (up to 15), in every mode but Full.
+	# Default: 1
+	# Range: 1 ~ 15
+	signalPerSheep = 1
+	#A sheep counts as low on infusion below this share of its infusion's uses (0.25 = a quarter).
+	# Default: 0.25
+	# Range: 0.0 ~ 1.0
+	lowInfusion = 0.25
+	#How many sheep a new Herd Counter's Full mode waits for.
+	# Default: 6
+	# Range: 1 ~ 64
+	fullTarget = 6
+	#Whether it's barely functional: a sheep dashing past its screen (running, or knocked back) is now and then counted twice for a moment. Steady, in its window, smooths it out.
+	doubleCount = true
+	#With Steady on, how many seconds of counts it averages: steadier, but slower to follow the pen.
+	# Default: 5
+	# Range: 1 ~ 60
+	steadySeconds = 5
+
+#Machine Status Panel (a wall screen showing how the machines linked to it with the Barely Functional Wrench are doing)
+[status_panel]
+	#Machines one panel shows.
+	# Default: 4
+	# Range: 1 ~ 4
+	rowsPerPanel = 4
+	#How far from the panel a machine can be, in blocks.
+	# Default: 200
+	# Range: 1 ~ 356
+	range = 200
+	#Ticks between reads of its machines (20 = every second).
+	# Default: 20
+	# Range: 1 ~ 1200
+	refreshTicks = 20
+	#Most panels across that join into one screen.
+	# Default: 3
+	# Range: 1 ~ 3
+	maxWidth = 3
+	#Most panels high that join into one screen.
+	# Default: 3
+	# Range: 1 ~ 3
+	maxHeight = 3
+
+#Wool-Lined Crate (holds lots of one kind of item and shows it on its front; bulges when nearly full, and may burst)
+[crate]
+	#Stacks of its item a crate holds (32 = 2,048 of an item that stacks to 64).
+	# Default: 32
+	# Range: 1 ~ 1024
+	stacks = 32
+	#Stacks each Wool Bale packed into it adds.
+	# Default: 32
+	# Range: 0 ~ 1024
+	stacksPerBale = 32
+	#Most Wool Bales one crate takes.
+	# Default: 4
+	# Range: 0 ~ 16
+	maxBales = 4
+	#Whether a full crate pushed for more can burst.
+	bursting = true
+	#Chance a full crate bursts each time a player pushes more at it, or each second a pipe or hopper does.
+	# Default: 0.02
+	# Range: 0.0 ~ 1.0
+	burstChance = 0.02
+	#Items a bursting crate scatters.
+	# Default: 8
+	# Range: 0 ~ 64
+	burstItems = 8
+
+#Crate Controller (links Wool-Lined Crates into one store: crates touching it join by themselves, others with the wrench)
+[crate_controller]
+	#How far from the controller a crate linked with the wrench can be, in blocks.
+	# Default: 200
+	# Range: 1 ~ 356
+	range = 200
+	#Most crates one controller's store holds.
+	# Default: 64
+	# Range: 1 ~ 1024
+	maxCrates = 64
+
+#Fleece Trawler (fishes the pool in front of it, powered by Tide sheep swimming in it)
+[fleece_trawler]
+	#Ticks one haul takes with one Tide sheep in a full-size pool (600 = 30 seconds); more sheep, a bigger pool, ocean or river water and rain make it quicker.
+	# Default: 600
+	# Range: 20 ~ 72000
+	haulTicks = 600
+	#Most Tide sheep that count.
+	# Default: 4
+	# Range: 1 ~ 16
+	maxSheep = 4
+	#Fewest water source blocks its pool needs (18 = 3x3, 2 deep).
+	# Default: 18
+	# Range: 1 ~ 196
+	minPool = 18
+	#Chance a haul with resource wool in its lure slot brings up that resource instead of fish.
+	# Default: 0.3
+	# Range: 0.0 ~ 1.0
+	lureChance = 0.3
+	#Resource hauls one resource wool lure lasts.
+	# Default: 8
+	# Range: 1 ~ 1000
+	lureUses = 8
+	#Chance a haul tangles its net (it stops until it's cut free with shears).
+	# Default: 0.04
+	# Range: 0.0 ~ 1.0
+	tangleChance = 0.04
+	#Chance a haul drags up a confused sheep.
+	# Default: 0.005
+	# Range: 0.0 ~ 1.0
+	straySheepChance = 0.005
+	#Speed in ocean or river biomes.
+	# Default: 1.25
+	# Range: 1.0 ~ 10.0
+	waterBonus = 1.25
+	#Speed while it's raining on it.
+	# Default: 1.25
+	# Range: 1.0 ~ 10.0
+	rainBonus = 1.25
+
+#Upgrade cards: two slots in the Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears
+#and Snow Sheep Chiller. Speed and Efficiency multiply a job's time and its total FE; Capacity the energy buffer;
+#Range grows the working area; Yield adds to a separation's outputs; Muffler silences a machine.
+[upgrades]
+	#Speed card: its job time (0.6 = 60% of the time).
+	# Default: 0.6
+	# Range: 0.05 ~ 10.0
+	speedTime = 0.6
+	#Speed card: its FE a job (1.5 = half as much again).
+	# Default: 1.5
+	# Range: 0.0 ~ 100.0
+	speedEnergy = 1.5
+	#Efficiency card: its job time (1.15 = 15% longer).
+	# Default: 1.15
+	# Range: 0.05 ~ 10.0
+	efficiencyTime = 1.15
+	#Efficiency card: its FE a job (0.75 = three quarters).
+	# Default: 0.75
+	# Range: 0.0 ~ 100.0
+	efficiencyEnergy = 0.75
+	#How much of its effect a second card of the same kind has (0.5 = half; 1 = as much as the first).
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	secondCardStrength = 0.5
+	#Capacity card: its energy buffer and the most FE it takes in a tick (4 = four times).
+	# Default: 4.0
+	# Range: 1.0 ~ 1000.0
+	capacityMultiplier = 4.0
+	#Range card: blocks added to the working area on every side.
+	# Default: 1
+	# Range: 0 ~ 8
+	rangeBlocks = 1
+	#Yield card: extra of each output a separation gives (its main output and its second one).
+	# Default: 1
+	# Range: 0 ~ 64
+	yieldBonus = 1
+
+#Hume Field Generator (late game, 2x2x3). Every ticksPerRoll ticks its field rolls a random amount of FE per tick
+#between minPerTick and maxPerTick, and pushes that much each tick straight into whatever touches it. It has no buffer:
+#whatever isn't taken that tick is lost. Every pulseInterval ticks its field pulses (sparks and a hum, just for show).
+[hume_field_generator]
+	#Least FE it makes in a tick.
+	# Default: 200
+	# Range: 0 ~ 1000000
+	minPerTick = 200
+	#Most FE it makes in a tick (if it's below minPerTick, the two are swapped).
+	# Default: 1200
+	# Range: 0 ~ 1000000
+	maxPerTick = 1200
+	#Ticks between its field's pulses, a burst of sparks and a hum (20 = a second). 0: it never pulses.
+	# Default: 100
+	# Range: 0 ~ 72000
+	pulseInterval = 100
+	#Ticks each random amount lasts before its field rolls a new one (20 = a second; 1 = a new one every tick).
+	# Default: 20
+	# Range: 1 ~ 72000
+	ticksPerRoll = 20
+	#How far round the machine (in blocks) Sculk sheep steady its field.
+	# Default: 4
+	# Range: 0 ~ 16
+	sculkRadius = 4
+	#Most Sculk sheep that count. 0: sheep don't steady it.
+	# Default: 4
+	# Range: 0 ~ 16
+	maxSculkSheep = 4
+	#How much each Sculk sheep narrows the random range towards its middle (0.2 = a fifth).
+	#The range never narrows to nothing: at most 95%.
+	# Default: 0.2
+	# Range: 0.0 ~ 1.0
+	sculkSteadyPerSheep = 0.2
+
+#Implosion Chamber (cracks cobblestone into gravel and gravel into sand with the blasts of Explosive sheep in its pen)
+[implosion_chamber]
+	#How far its pen reaches out from it on each side (2 = 5x5, centred on it).
+	# Default: 2
+	# Range: 1 ~ 4
+	radius = 2
+	#Ticks between the sparks it lights an Explosive sheep's fuse with (100 = 5 seconds).
+	# Default: 100
+	# Range: 20 ~ 12000
+	sparkInterval = 100
+	#FE each spark takes. 0 = runs without power.
+	# Default: 1000
+	# Range: 0 ~ 1000000
+	sparkEnergy = 1000
+	#Items one blast cracks a step: cobblestone into gravel, and gravel into sand.
+	# Default: 8
+	# Range: 1 ~ 64
+	batch = 8
+	#Its energy buffer, in FE.
+	# Default: 20000
+	# Range: 0 ~ 10000000
+	capacity = 20000
+	#Most FE it takes in a tick.
+	# Default: 1000
+	# Range: 0 ~ 1000000
+	maxInput = 1000
+	#About how many seconds a popped (or sheared) Explosive sheep takes to regrow its wool on its own, without grass. 0 = only by grazing, like any sheep.
+	# Default: 20
+	# Range: 0 ~ 3600
+	explosiveRegrowSeconds = 20
+
+#Energy sheep (infused with a Hume Energy Cube: drains cubes near it and charges machines and powered tools round it, wirelessly)
+[energy_sheep]
+	#FE its fleece holds.
+	# Default: 100000
+	# Range: 1 ~ 100000000
+	capacity = 100000
+	#How far from it the Hume Energy Cubes it drains can be, in blocks.
+	# Default: 3
+	# Range: 1 ~ 8
+	drainRadius = 3
+	#Most FE a tick it draws from cubes.
+	# Default: 2000
+	# Range: 0 ~ 1000000
+	drainPerTick = 2000
+	#How far from it the machines and players it charges can be, in blocks.
+	# Default: 8
+	# Range: 1 ~ 16
+	chargeRadius = 8
+	#Most FE a tick it shares out, between everything it charges.
+	# Default: 2000
+	# Range: 0 ~ 1000000
+	chargePerTick = 2000

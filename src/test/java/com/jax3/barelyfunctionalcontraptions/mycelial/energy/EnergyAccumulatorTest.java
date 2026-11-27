@@ -17,7 +17,7 @@ class EnergyAccumulatorTest {
     }
 
     @Test
-    void networkOfThreeProducesExactly1728PerTenTicks() {
+    void threeGeneratorsProduceExactly1728PerTenTicks() {
         EnergyAccumulator[] generators = {new EnergyAccumulator(), new EnergyAccumulator(), new EnergyAccumulator()};
         long total = 0;
         for (int tick = 0; tick < 10; tick++) {

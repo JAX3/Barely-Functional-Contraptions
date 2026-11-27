@@ -5,13 +5,6 @@ import com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.GeneratorState
 import com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.MycelialGeneratorBlockEntity;
 import com.jax3.barelyfunctionalcontraptions.mycelial.capability.GeneratorItemHandler;
 import com.jax3.barelyfunctionalcontraptions.mycelial.config.ServerConfig;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.ConnectionType;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.GeneratorNetwork;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.GeneratorNetworkManager;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.LinkRules;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinking;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.NetworkMath;
 import com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -53,10 +46,6 @@ public final class GeneratorGameTests {
         return generator;
     }
 
-    private static GeneratorNetwork network(GameTestHelper helper, MycelialGeneratorBlockEntity generator) {
-        return GeneratorNetworkManager.get(helper.getLevel()).getNetwork(generator);
-    }
-
     /** Verification 1 + 6: one generator consumes a mushroom and water and produces FE. */
     public static void singleGeneratorProducesEnergy(GameTestHelper helper) {
         MycelialGeneratorBlockEntity generator = place(helper, new BlockPos(2, 1, 2), new ItemStack(Items.RED_MUSHROOM, 2), 1000);
@@ -73,60 +62,6 @@ public final class GeneratorGameTests {
             check(helper, water <= 1000 - per && water >= 1000 - 3 * per,
                     "About two water consumptions should have happened, tank has " + water);
             helper.succeed();
-        });
-    }
-
-    /** Verification 2: adjacent generators share one network in every direction. */
-    public static void adjacentGeneratorsFormOneNetwork(GameTestHelper helper) {
-        MycelialGeneratorBlockEntity center = place(helper, new BlockPos(3, 2, 3), ItemStack.EMPTY, 0);
-        MycelialGeneratorBlockEntity up = place(helper, new BlockPos(3, 3, 3), ItemStack.EMPTY, 0);
-        MycelialGeneratorBlockEntity east = place(helper, new BlockPos(4, 2, 3), ItemStack.EMPTY, 0);
-        MycelialGeneratorBlockEntity south = place(helper, new BlockPos(3, 2, 4), ItemStack.EMPTY, 0);
-        MycelialGeneratorBlockEntity separate = place(helper, new BlockPos(6, 2, 6), ItemStack.EMPTY, 0);
-        helper.runAfterDelay(2, () -> {
-            GeneratorNetwork network = network(helper, center);
-            check(helper, network.size() == 4, "Expected 4 members, got " + network.size());
-            check(helper, network == network(helper, up) && network == network(helper, east) && network == network(helper, south),
-                    "Adjacent generators must share one network");
-            check(helper, network(helper, separate) != network && network(helper, separate).size() == 1,
-                    "A detached generator must form its own network");
-            helper.succeed();
-        });
-    }
-
-    /** Verification 3: three running generators follow the exponential formula. */
-    public static void threeGeneratorsScaleExponentially(GameTestHelper helper) {
-        MycelialGeneratorBlockEntity a = place(helper, new BlockPos(2, 1, 2), new ItemStack(Items.BROWN_MUSHROOM, 4), 4000);
-        place(helper, new BlockPos(3, 1, 2), new ItemStack(Items.BROWN_MUSHROOM, 4), 4000);
-        place(helper, new BlockPos(4, 1, 2), new ItemStack(Items.BROWN_MUSHROOM, 4), 4000);
-        helper.succeedWhen(() -> {
-            GeneratorNetwork network = network(helper, a);
-            double base = ServerConfig.get(ServerConfig.BASE_GENERATION);
-            double multiplier = ServerConfig.get(ServerConfig.SCALING_MULTIPLIER);
-            double expectedEach = base * Math.pow(multiplier, 2);
-            check(helper, network.activeCount() == 3, "All three should be active");
-            check(helper, Math.abs(a.getLastExactOutput() - expectedEach) < EPSILON,
-                    "Expected " + expectedEach + " FE/t per generator, got " + a.getLastExactOutput());
-            double expectedTotal = NetworkMath.networkOutput(base, 3, multiplier, 0);
-            check(helper, Math.abs(network.totalOutput() - expectedTotal) < 1.0E-3,
-                    "Expected network total " + expectedTotal + ", got " + network.totalOutput());
-        });
-    }
-
-    /** Verification 4: removing the middle generator splits the network. */
-    public static void networkSplitsWhenGeneratorRemoved(GameTestHelper helper) {
-        MycelialGeneratorBlockEntity left = place(helper, new BlockPos(2, 1, 2), ItemStack.EMPTY, 0);
-        place(helper, new BlockPos(3, 1, 2), ItemStack.EMPTY, 0);
-        MycelialGeneratorBlockEntity right = place(helper, new BlockPos(4, 1, 2), ItemStack.EMPTY, 0);
-        helper.runAfterDelay(2, () -> {
-            check(helper, network(helper, left).size() == 3, "Expected one network of 3");
-            helper.setBlock(new BlockPos(3, 1, 2), Blocks.AIR);
-            helper.runAfterDelay(2, () -> {
-                check(helper, network(helper, left).size() == 1 && network(helper, right).size() == 1,
-                        "Network should split into two single generators");
-                check(helper, network(helper, left) != network(helper, right), "Split halves must be separate networks");
-                helper.succeed();
-            });
         });
     }
 
@@ -189,132 +124,18 @@ public final class GeneratorGameTests {
         });
     }
 
-    /** Verification 16: a full-size network cannot overflow. */
-    public static void hugeMultiplierDoesNotOverflow(GameTestHelper helper) {
-        double perGenerator = NetworkMath.generatorOutput(1_000_000D, 1000D, 10D, 1024, 0);
-        check(helper, perGenerator > 0 && perGenerator <= Integer.MAX_VALUE, "Output must be clamped to an int range");
-        helper.succeed();
-    }
-
-    // ------------------------------------------------------------------ Barely Functional Wrench (manual links)
-
-    private static GlobalPos global(GameTestHelper helper, BlockPos relative) {
-        return GlobalPos.of(helper.getLevel().dimension(), helper.absolutePos(relative));
-    }
-
-    /** Linked generators that are far apart form one network and share exponential scaling. */
-    public static void manualLinkJoinsDistantGenerators(GameTestHelper helper) {
-        BlockPos posA = new BlockPos(1, 1, 1);
-        BlockPos posB = new BlockPos(6, 1, 6);
-        MycelialGeneratorBlockEntity a = place(helper, posA, new ItemStack(Items.BROWN_MUSHROOM, 4), 4000);
-        MycelialGeneratorBlockEntity b = place(helper, posB, new ItemStack(Items.BROWN_MUSHROOM, 4), 4000);
-        helper.runAfterDelay(1, () -> {
-            LinkRules.Result result = ManualLinking.tryLink(helper.getLevel().getServer(), global(helper, posA), global(helper, posB));
-            check(helper, result == LinkRules.Result.SUCCESS, "Link should succeed, got " + result);
-            helper.succeedWhen(() -> {
-                GeneratorNetwork network = network(helper, a);
-                check(helper, network == network(helper, b) && network.size() == 2, "Linked generators must share one network");
-                check(helper, network.activeCount() == 2, "Both generators should be running");
-                double expected = ServerConfig.get(ServerConfig.BASE_GENERATION) * ServerConfig.get(ServerConfig.SCALING_MULTIPLIER);
-                check(helper, Math.abs(a.getLastExactOutput() - expected) < EPSILON,
-                        "Expected " + expected + " FE/t (scaled for 2 generators), got " + a.getLastExactOutput());
-                check(helper, GeneratorNetworkManager.get(helper.getLevel()).connectionType(a) == ConnectionType.MANUAL,
-                        "Connection type should be MANUAL");
-            });
+    /** Generators touching each other don't boost each other: each makes the base rate times its fuel, as on its own. */
+    public static void touchingGeneratorsStandAlone(GameTestHelper helper) {
+        MycelialGeneratorBlockEntity a = place(helper, new BlockPos(2, 1, 2), new ItemStack(Items.BROWN_MUSHROOM, 4), 4000);
+        MycelialGeneratorBlockEntity b = place(helper, new BlockPos(3, 1, 2), new ItemStack(Items.BROWN_MUSHROOM, 4), 4000);
+        MycelialGeneratorBlockEntity c = place(helper, new BlockPos(4, 1, 2), new ItemStack(Items.BROWN_MUSHROOM, 4), 4000);
+        helper.succeedWhen(() -> {
+            double base = ServerConfig.get(ServerConfig.BASE_GENERATION);
+            for (MycelialGeneratorBlockEntity generator : new MycelialGeneratorBlockEntity[]{a, b, c}) {
+                check(helper, generator.getState() == GeneratorState.RUNNING, "all three run");
+                check(helper, Math.abs(generator.getLastExactOutput() - base) < EPSILON,
+                        "each makes the base " + base + " FE/t, got " + generator.getLastExactOutput());
+            }
         });
-    }
-
-    /** Shift-clicking (unlinkAll) splits a network that was only held together by the link. */
-    public static void unlinkingSplitsNetwork(GameTestHelper helper) {
-        BlockPos posA = new BlockPos(1, 1, 1);
-        BlockPos posB = new BlockPos(6, 1, 6);
-        MycelialGeneratorBlockEntity a = place(helper, posA, ItemStack.EMPTY, 0);
-        MycelialGeneratorBlockEntity b = place(helper, posB, ItemStack.EMPTY, 0);
-        helper.runAfterDelay(1, () -> {
-            ManualLinking.tryLink(helper.getLevel().getServer(), global(helper, posA), global(helper, posB));
-            check(helper, network(helper, a) == network(helper, b), "Should be linked");
-            int removed = ManualLinking.unlinkAll(helper.getLevel().getServer(), global(helper, posA));
-            check(helper, removed == 1, "Exactly one link should be removed, removed " + removed);
-            check(helper, network(helper, a) != network(helper, b) && network(helper, a).size() == 1, "Network should split");
-            helper.succeed();
-        });
-    }
-
-    /** Destroying a generator removes its links from the partner too. */
-    public static void destroyedGeneratorLosesLinks(GameTestHelper helper) {
-        BlockPos posA = new BlockPos(1, 1, 1);
-        BlockPos posB = new BlockPos(6, 1, 6);
-        place(helper, posA, ItemStack.EMPTY, 0);
-        MycelialGeneratorBlockEntity b = place(helper, posB, ItemStack.EMPTY, 0);
-        helper.runAfterDelay(1, () -> {
-            ManualLinking.tryLink(helper.getLevel().getServer(), global(helper, posA), global(helper, posB));
-            ManualLinkData data = ManualLinkData.get(helper.getLevel().getServer());
-            check(helper, data.count(global(helper, posB)) == 1, "Link should exist");
-            helper.setBlock(posA, Blocks.AIR);
-            helper.runAfterDelay(1, () -> {
-                check(helper, data.count(global(helper, posB)) == 0, "Link must be removed with the destroyed generator");
-                check(helper, network(helper, b).size() == 1, "Partner should be alone again");
-                helper.succeed();
-            });
-        });
-    }
-
-    /** Duplicate and self links are refused; a third generator can join through the link chain. */
-    public static void duplicateLinksRejectedAndChainsMerge(GameTestHelper helper) {
-        BlockPos posA = new BlockPos(1, 1, 1);
-        BlockPos posB = new BlockPos(6, 1, 1);
-        BlockPos posC = new BlockPos(6, 1, 6);
-        MycelialGeneratorBlockEntity a = place(helper, posA, ItemStack.EMPTY, 0);
-        place(helper, posB, ItemStack.EMPTY, 0);
-        MycelialGeneratorBlockEntity c = place(helper, posC, ItemStack.EMPTY, 0);
-        helper.runAfterDelay(1, () -> {
-            var server = helper.getLevel().getServer();
-            check(helper, ManualLinking.tryLink(server, global(helper, posA), global(helper, posB)).success(), "A-B should link");
-            check(helper, ManualLinking.tryLink(server, global(helper, posB), global(helper, posA)) == LinkRules.Result.ALREADY_LINKED,
-                    "Reverse duplicate must be refused");
-            check(helper, ManualLinking.tryLink(server, global(helper, posA), global(helper, posA)) == LinkRules.Result.SAME_GENERATOR,
-                    "Self link must be refused");
-            check(helper, ManualLinking.tryLink(server, global(helper, posB), global(helper, posC)).success(), "B-C should link");
-            check(helper, network(helper, a) == network(helper, c) && network(helper, a).size() == 3,
-                    "A, B and C should form one network through the chain");
-            helper.succeed();
-        });
-    }
-
-    /** Touching and linked generators combine into one network; the bridge generator reports BOTH. */
-    public static void physicalAndManualConnectionsCombine(GameTestHelper helper) {
-        BlockPos posA = new BlockPos(1, 1, 1);
-        BlockPos posB = new BlockPos(2, 1, 1);
-        BlockPos posC = new BlockPos(6, 1, 6);
-        MycelialGeneratorBlockEntity a = place(helper, posA, ItemStack.EMPTY, 0);
-        MycelialGeneratorBlockEntity b = place(helper, posB, ItemStack.EMPTY, 0);
-        MycelialGeneratorBlockEntity c = place(helper, posC, ItemStack.EMPTY, 0);
-        helper.runAfterDelay(1, () -> {
-            ManualLinking.tryLink(helper.getLevel().getServer(), global(helper, posB), global(helper, posC));
-            GeneratorNetworkManager manager = GeneratorNetworkManager.get(helper.getLevel());
-            check(helper, network(helper, a) == network(helper, c) && network(helper, a).size() == 3, "Expected one network of 3");
-            check(helper, manager.connectionType(a) == ConnectionType.PHYSICAL, "A is only touching");
-            check(helper, manager.connectionType(b) == ConnectionType.BOTH, "B touches A and is linked to C");
-            check(helper, manager.connectionType(c) == ConnectionType.MANUAL, "C is only linked");
-            helper.succeed();
-        });
-    }
-
-    /** Link storage round-trips through NBT (world save and reload). */
-    public static void linkDataSurvivesSaveAndLoad(GameTestHelper helper) {
-        var registries = helper.getLevel().registryAccess();
-        GlobalPos a = global(helper, new BlockPos(1, 1, 1));
-        GlobalPos b = global(helper, new BlockPos(6, 1, 6));
-        GlobalPos c = GlobalPos.of(net.minecraft.world.level.Level.NETHER, new BlockPos(10, 64, -10));
-        ManualLinkData data = new ManualLinkData();
-        data.add(a, b);
-        data.add(b, c);
-        check(helper, !data.add(b, a), "Duplicates must be refused");
-        var ops = registries.createSerializationContext(NbtOps.INSTANCE);
-        ManualLinkData loaded = ManualLinkData.CODEC.parse(ops, ManualLinkData.CODEC.encodeStart(ops, data).getOrThrow()).getOrThrow();
-        check(helper, loaded.isLinked(a, b) && loaded.isLinked(b, a), "A-B lost");
-        check(helper, loaded.isLinked(b, c) && loaded.isLinked(c, b), "B-C (cross dimension) lost");
-        check(helper, loaded.totalLinks() == 2, "Expected 2 links, got " + loaded.totalLinks());
-        helper.succeed();
     }
 }

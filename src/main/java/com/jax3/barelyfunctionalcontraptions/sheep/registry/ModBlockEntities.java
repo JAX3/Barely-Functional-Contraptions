@@ -58,14 +58,9 @@ public final class ModBlockEntities {
                     () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EchoChamberBlockEntity::new, ModBlocks.ECHO_CHAMBER.get()));
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity>> THERMAL_REACTION_CHAMBER = REGISTER.register("thermal_reaction_chamber",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ThermalReactionChamberBlockEntity::new, ModBlocks.THERMAL_REACTION_CHAMBER.get()));
-    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity>> WOOL_BURNER = REGISTER.register("wool_burner",
-            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity::new, ModBlocks.WOOL_BURNER.get()));
 
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity>> BLAZE_FURNACE = REGISTER.register("blaze_furnace",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.BlazeFurnaceBlockEntity::new, ModBlocks.BLAZE_FURNACE.get()));
-
-    public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity>> POWERED_FURNACE = REGISTER.register("powered_furnace",
-            () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity::new, ModBlocks.POWERED_FURNACE.get()));
 
     public static final Supplier<BlockEntityType<com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity>> CHILLER = REGISTER.register("chiller",
             () -> new BlockEntityType<>(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity::new, ModBlocks.CHILLER.get()));

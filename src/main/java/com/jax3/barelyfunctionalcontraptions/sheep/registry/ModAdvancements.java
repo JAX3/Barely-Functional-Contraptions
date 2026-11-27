@@ -16,7 +16,6 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
  * vanilla's inventory_changed trigger; the special advancements have a single {@code minecraft:impossible}
  * criterion named "done" and are granted from code here:
  * <ul>
- *     <li>{@link #LINK_GENERATORS}: linking two Mycelial Generators with the Barely Functional Wrench;</li>
  *     <li>{@link #AUTO_SHEAR}: Automatic Shears shearing a sheep within {@link #AUTO_SHEAR_RADIUS} blocks of you;</li>
  *     <li>{@link #ZERO_POINT_DEATH}: being killed by a Zero Point beam;</li>
  *     <li>{@link #BLAZE_FURNACE} and {@link #SHEEP_TREADMILL}: that machine starting to make power near you;</li>
@@ -26,7 +25,6 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
  * The "every wool" challenge is plain data: an inventory_changed criterion for each built-in resource wool.
  */
 public final class ModAdvancements {
-    public static final String LINK_GENERATORS = "contraptions/link_generators";
     public static final String AUTO_SHEAR = "contraptions/auto_shear";
     /** A Blaze Sheep Furnace starting to make power from heat within {@link #AUTO_SHEAR_RADIUS} blocks of you. */
     public static final String BLAZE_FURNACE = "contraptions/blaze_furnace";

@@ -2,7 +2,6 @@ package com.jax3.barelyfunctionalcontraptions.mycelial.compat.jade;
 
 import com.jax3.barelyfunctionalcontraptions.mycelial.MycelialPower;
 import com.jax3.barelyfunctionalcontraptions.mycelial.blockentity.GeneratorState;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.NetworkStatus;
 import com.jax3.barelyfunctionalcontraptions.mycelial.util.NumberFormatting;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -37,18 +36,6 @@ public enum GeneratorInfoProvider implements IBlockComponentProvider {
                         : BuiltInRegistries.ITEM.getOptional(id).map(item -> new ItemStack(item).getHoverName()).orElse(Component.literal(d.fuelItem()));
                 tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.fuel", fuel, NumberFormatting.ticksToTime(d.burnRemaining()))
                         .withStyle(ChatFormatting.GRAY));
-            }
-            if (d.networkSize() > 1) {
-                tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.network", d.networkSize(), d.networkActive(),
-                        NumberFormatting.decimal(d.networkScale())).withStyle(ChatFormatting.DARK_AQUA));
-                NetworkStatus status = NetworkStatus.values()[Math.max(0, Math.min(NetworkStatus.values().length - 1, d.networkStatus()))];
-                if (status != NetworkStatus.ONLINE) {
-                    tooltip.add(Component.translatable("gui.barelyfunctionalcontraptions.network.status", Component.translatable(status.translationKey()))
-                            .withStyle(ChatFormatting.GRAY));
-                } else {
-                    tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.network_total", NumberFormatting.compact(d.networkTotal()))
-                            .withStyle(ChatFormatting.GRAY));
-                }
             }
         });
     }

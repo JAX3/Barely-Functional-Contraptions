@@ -109,7 +109,6 @@ public final class MachineReports {
             String status = b.generating() <= 0 ? "cold" : b.getEnergyHandler().getAmountAsLong() >= b.getEnergyHandler().getCapacityAsLong() ? "full" : "burning";
             return of(status, fe(b.generating()));
         }
-        if (be instanceof WoolBurnerBlockEntity b) return of(b.generating() > 0 ? "burning" : "idle", fe(b.generating()));
         if (be instanceof ThermalReactionChamberBlockEntity b) return of(b.state(), fe(b.generating()));
         if (be instanceof EchoChamberBlockEntity b) return of(b.state(), fe(b.generating()));
         // Its output is random from tick to tick, so the panel shows its average over the last second.
@@ -122,7 +121,6 @@ public final class MachineReports {
             return of(b.getState(), percent(energy.getAmountAsLong(), energy.getCapacityAsLong()));
         }
         // Machines: their status, and their progress or stored energy.
-        if (be instanceof PoweredFurnaceBlockEntity b) return of(b.status(), stored(b.getEnergyHandler()));
         if (be instanceof ChillerBlockEntity b) {
             // (The chiller has no power: its "no energy" means it's out of water.)
             return of(b.status() == MachineStatus.NO_ENERGY ? "no_water" : b.status().name().toLowerCase(Locale.ROOT), b.output().getCount() + " Ice");

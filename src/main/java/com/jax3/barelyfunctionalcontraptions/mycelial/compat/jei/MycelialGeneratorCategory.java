@@ -3,7 +3,6 @@ package com.jax3.barelyfunctionalcontraptions.mycelial.compat.jei;
 import com.jax3.barelyfunctionalcontraptions.mycelial.MycelialPower;
 import com.jax3.barelyfunctionalcontraptions.mycelial.config.EnergyRounding;
 import com.jax3.barelyfunctionalcontraptions.mycelial.config.ServerConfig;
-import com.jax3.barelyfunctionalcontraptions.mycelial.network.NetworkMath;
 import com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems;
 import com.jax3.barelyfunctionalcontraptions.mycelial.util.NumberFormatting;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -110,7 +109,7 @@ public class MycelialGeneratorCategory implements IRecipeCategory<MycelialFuelRe
                 NumberFormatting.decimal(def.energyMultiplier()), NumberFormatting.decimal(def.waterMultiplier())), TEXT_X, y, 0xFFB0B0BE, false);
         y += 11;
         graphics.text(font, Component.translatable("jei.barelyfunctionalcontraptions.bonuses",
-                NumberFormatting.decimal(def.myceliumBonus()), NumberFormatting.decimal(def.scalingBonus())), TEXT_X, y, 0xFF8FD27A, false);
+                NumberFormatting.decimal(def.myceliumBonus())), TEXT_X, y, 0xFF8FD27A, false);
     }
 
     @Override
@@ -125,7 +124,7 @@ public class MycelialGeneratorCategory implements IRecipeCategory<MycelialFuelRe
         int row = (int) ((mouseY - 4) / 11);
         return switch (row) {
             case 0 -> List.of(Component.translatable("jei.barelyfunctionalcontraptions.tooltip.burn").withStyle(ChatFormatting.GRAY));
-            case 1, 2 -> scalingTooltip(recipe);
+            case 1, 2 -> List.of(Component.translatable("jei.barelyfunctionalcontraptions.tooltip.output").withStyle(ChatFormatting.GRAY));
             case 3 -> List.of(Component.translatable("jei.barelyfunctionalcontraptions.tooltip.water",
                     NumberFormatting.decimal(recipe.waterPerInterval()), NumberFormatting.grouped(recipe.waterInterval()))
                     .withStyle(ChatFormatting.GRAY));
@@ -134,36 +133,5 @@ public class MycelialGeneratorCategory implements IRecipeCategory<MycelialFuelRe
                     Component.translatable("jei.barelyfunctionalcontraptions.tooltip.mycelium_info").withStyle(ChatFormatting.DARK_GRAY));
             default -> List.of();
         };
-    }
-
-    /** Explains exponential network scaling with values computed by the same code as the generator. */
-    private static List<Component> scalingTooltip(MycelialFuelRecipe recipe) {
-        List<Component> lines = new ArrayList<>();
-        double base = ServerConfig.get(ServerConfig.BASE_GENERATION);
-        boolean scaling = ServerConfig.get(ServerConfig.SCALING_ENABLED);
-        double multiplier = ServerConfig.get(ServerConfig.SCALING_MULTIPLIER) + recipe.definition().scalingBonus();
-        double cap = ServerConfig.get(ServerConfig.MAX_NETWORK_OUTPUT);
-        EnergyRounding rounding = ServerConfig.get(ServerConfig.ROUNDING);
-        lines.add(Component.translatable("jei.barelyfunctionalcontraptions.tooltip.scaling.title").withStyle(ChatFormatting.LIGHT_PURPLE));
-        if (!scaling) {
-            lines.add(Component.translatable("jei.barelyfunctionalcontraptions.tooltip.scaling.disabled").withStyle(ChatFormatting.GRAY));
-            return lines;
-        }
-        lines.add(Component.translatable("jei.barelyfunctionalcontraptions.tooltip.scaling.formula").withStyle(ChatFormatting.GRAY));
-        lines.add(Component.translatable("jei.barelyfunctionalcontraptions.tooltip.scaling.values", NumberFormatting.decimal(base),
-                NumberFormatting.decimal(multiplier)).withStyle(ChatFormatting.GRAY));
-        int maxExample = Math.min(ServerConfig.get(ServerConfig.JEI_EXAMPLE_NETWORK_SIZE), ServerConfig.get(ServerConfig.MAX_NETWORK_SIZE));
-        for (int n = 1; n <= maxExample; n++) {
-            double perGenerator = NetworkMath.generatorOutput(base, recipe.definition().energyMultiplier(), multiplier, n, cap);
-            double total = NetworkMath.safeMultiply(perGenerator, n);
-            lines.add(Component.translatable("jei.barelyfunctionalcontraptions.tooltip.scaling.row", n,
-                    NumberFormatting.grouped(rounding.roundForDisplay(total))).withStyle(ChatFormatting.DARK_AQUA));
-        }
-        if (ServerConfig.get(ServerConfig.COUNT_INACTIVE)) {
-            lines.add(Component.translatable("jei.barelyfunctionalcontraptions.tooltip.scaling.inactive_counted").withStyle(ChatFormatting.DARK_GRAY));
-        } else {
-            lines.add(Component.translatable("jei.barelyfunctionalcontraptions.tooltip.scaling.active_only").withStyle(ChatFormatting.DARK_GRAY));
-        }
-        return lines;
     }
 }

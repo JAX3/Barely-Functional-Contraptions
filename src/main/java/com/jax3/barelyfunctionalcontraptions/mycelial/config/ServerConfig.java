@@ -29,27 +29,10 @@ public final class ServerConfig {
     public static final ModConfigSpec.IntValue MAX_ENERGY_STORAGE;
     public static final ModConfigSpec.IntValue OUTPUT_TRANSFER_RATE;
     public static final ModConfigSpec.BooleanValue AUTO_OUTPUT;
-    public static final ModConfigSpec.DoubleValue MAX_NETWORK_OUTPUT;
     public static final ModConfigSpec.EnumValue<EnergyRounding> ROUNDING;
 
-    // [network]
-    public static final ModConfigSpec.BooleanValue SCALING_ENABLED;
-    public static final ModConfigSpec.DoubleValue SCALING_MULTIPLIER;
-    public static final ModConfigSpec.IntValue MAX_NETWORK_SIZE;
-    public static final ModConfigSpec.BooleanValue COUNT_INACTIVE;
-    public static final ModConfigSpec.BooleanValue MERGE_NETWORKS;
-    public static final ModConfigSpec.BooleanValue SHARE_RESOURCES;
-
-    // [network.wrench]
-    public static final ModConfigSpec.BooleanValue WRENCH_ENABLED;
-    public static final ModConfigSpec.IntValue MAX_LINK_DISTANCE;
-    public static final ModConfigSpec.IntValue MAX_MANUAL_CONNECTIONS;
-    public static final ModConfigSpec.BooleanValue ALLOW_CROSS_DIMENSION_LINKS;
-    public static final ModConfigSpec.BooleanValue REQUIRE_SAME_DIMENSION;
-    public static final ModConfigSpec.IntValue WRENCH_DURABILITY;
+    // [wrench]
     public static final ModConfigSpec.BooleanValue WRENCH_DISMANTLE;
-    public static final ModConfigSpec.BooleanValue ALLOW_LINK_MERGING;
-    public static final ModConfigSpec.BooleanValue SHOW_LINK_PARTICLES;
 
     // [fuel]
     public static final ModConfigSpec.ConfigValue<List<? extends String>> FUELS;
@@ -58,7 +41,6 @@ public final class ServerConfig {
     public static final ModConfigSpec.IntValue TANK_CAPACITY;
     public static final ModConfigSpec.IntValue WATER_PER_INTERVAL;
     public static final ModConfigSpec.IntValue WATER_INTERVAL;
-    public static final ModConfigSpec.BooleanValue WATER_SCALES_WITH_NETWORK;
     public static final ModConfigSpec.ConfigValue<List<? extends String>> ACCEPTED_FLUIDS;
     public static final ModConfigSpec.BooleanValue ALLOW_FLUID_EXTRACTION;
 
@@ -78,12 +60,6 @@ public final class ServerConfig {
     public static final ModConfigSpec.IntValue MIN_LIGHT;
     public static final ModConfigSpec.BooleanValue RESET_ON_SUCCESS;
     public static final ModConfigSpec.BooleanValue RESET_ON_STOP;
-    public static final ModConfigSpec.BooleanValue SHARE_CHANCE;
-    public static final ModConfigSpec.BooleanValue NETWORK_GROWTH_BONUS;
-    public static final ModConfigSpec.DoubleValue GROWTH_BONUS_PER_GENERATOR;
-    public static final ModConfigSpec.BooleanValue NETWORK_EXTRA_CONVERSIONS;
-    public static final ModConfigSpec.IntValue GENERATORS_PER_EXTRA;
-    public static final ModConfigSpec.IntValue MAX_EXTRA_CONVERSIONS;
     public static final ModConfigSpec.BooleanValue TRACK_CONVERSIONS;
     public static final ModConfigSpec.BooleanValue HUGE_MUSHROOM_ENABLED;
     public static final ModConfigSpec.DoubleValue HUGE_MUSHROOM_CHANCE;
@@ -99,7 +75,6 @@ public final class ServerConfig {
     public static final ModConfigSpec.BooleanValue FIRE_PLACE_EVENTS;
     public static final ModConfigSpec.BooleanValue RESPECT_SPAWN_PROTECTION;
     public static final ModConfigSpec.ConfigValue<String> FAKE_PLAYER_NAME;
-    public static final ModConfigSpec.IntValue JEI_EXAMPLE_NETWORK_SIZE;
 
     static {
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
@@ -119,7 +94,7 @@ public final class ServerConfig {
         b.pop();
 
         b.comment("Energy generation, storage and output.").push("energy");
-        BASE_GENERATION = b.comment("Base FE/t produced by one running generator before fuel and network multipliers.")
+        BASE_GENERATION = b.comment("FE/t produced by one running generator, before its fuel's energy multiplier.")
                 .defineInRange("baseGeneration", 200.0D, 0.0D, 1_000_000.0D);
         MAX_ENERGY_STORAGE = b.comment("Internal energy buffer of each generator, in FE.")
                 .defineInRange("maxEnergyStorage", 100_000, 1, Integer.MAX_VALUE);
@@ -128,62 +103,17 @@ public final class ServerConfig {
         AUTO_OUTPUT = b.comment("If true, generators actively push energy into adjacent energy receivers (cables, machines).",
                         "If false, energy must be pulled out by the neighbouring block.")
                 .translation("barelyfunctionalcontraptions.configuration.energy.autoOutput").define("autoOutput", true);
-        MAX_NETWORK_OUTPUT = b.comment("Optional maximum total FE/t of one generator network. 0 disables the cap.",
-                        "When the formula exceeds the cap, every member's output is scaled down proportionally.")
-                .defineInRange("maxNetworkOutput", 0.0D, 0.0D, 1.0E12D);
         ROUNDING = b.comment("How fractional FE/t values become whole FE each tick:",
                         "ACCUMULATE = carry fractions between ticks (exact long-run output),",
                         "NEAREST = round each tick, FLOOR = round down, CEILING = round up.",
-                        "Displayed network totals use NEAREST for ACCUMULATE and the chosen mode otherwise.")
+                        "The window shows NEAREST for ACCUMULATE and the chosen mode otherwise.")
                 .defineEnum("rounding", EnergyRounding.ACCUMULATE);
         b.pop();
 
-        b.comment("Connected generator networks. Generators touching on any of their six faces form one network.",
-                "Network FE/t = baseGeneration x Generators x scalingMultiplier ^ (Generators - 1)").push("network");
-        SCALING_ENABLED = b.comment("If false, every generator produces baseGeneration x fuel multiplier regardless of its network.")
-                .define("scalingEnabled", true);
-        SCALING_MULTIPLIER = b.comment("Exponential scaling multiplier applied per additional counted generator.")
-                .defineInRange("scalingMultiplier", 1.20D, 0.1D, 10.0D);
-        MAX_NETWORK_SIZE = b.comment("Maximum number of generators in one network. Extra generators form separate networks.")
-                .translation("barelyfunctionalcontraptions.configuration.network.maxNetworkSize").defineInRange("maxNetworkSize", 64, 1, 1024);
-        COUNT_INACTIVE = b.comment("If true, idle generators (no fuel, no water or full) also count towards the exponent.",
-                        "If false (default), only generators that are actively consuming mushrooms and water count.")
-                .define("countInactiveGenerators", false);
-        MERGE_NETWORKS = b.comment("If true, placing a generator that touches two separate networks merges them.",
-                        "If false, a new generator joins only the largest touching network and existing networks never merge.")
-                .define("mergeNetworks", true);
-        SHARE_RESOURCES = b.comment("If true, generators in one network share water (a dry generator drinks from its neighbours'",
-                        "tanks) and energy (production that does not fit in a full buffer flows into members with space).")
-                .define("shareResources", false);
-
-        b.comment("Barely Functional Wrench: manual (wireless) links between generators that are not touching.",
-                "Linked generators join one network and count towards the same exponential formula as touching ones.",
-                "Each generator keeps its own fuel, water and energy unless shareResources = true.").push("wrench");
-        WRENCH_ENABLED = b.comment("Enable the Barely Functional Wrench. When false, the wrench cannot create links and existing manual links",
-                        "stop counting (they are kept and come back when re-enabled).")
-                .translation("barelyfunctionalcontraptions.configuration.wrench.enabled").define("enabled", true);
-        MAX_LINK_DISTANCE = b.comment("Maximum straight-line distance in blocks between two linked generators.",
-                        "Existing links longer than a lowered limit stop counting until the limit is raised again.")
-                .defineInRange("max_link_distance", 64, 1, 4096);
-        MAX_MANUAL_CONNECTIONS = b.comment("Maximum manual links per generator (touching neighbours do not count).")
-                .defineInRange("max_manual_connections_per_generator", 8, 1, 64);
-        ALLOW_CROSS_DIMENSION_LINKS = b.comment("Allow linking generators in different dimensions (distance is ignored for such links).",
-                        "Only takes effect when require_same_dimension = false.")
-                .define("allow_cross_dimension_links", false);
-        REQUIRE_SAME_DIMENSION = b.comment("If true, links must stay within one dimension. Overrides allow_cross_dimension_links.")
-                .define("require_same_dimension", true);
-        WRENCH_DURABILITY = b.comment("Number of successful links a wrench can make before breaking. 0 = unlimited.")
-                .defineInRange("wrench_durability", 0, 0, 1_000_000);
+        b.comment("The Barely Functional Wrench.").push("wrench");
         WRENCH_DISMANTLE = b.comment("Hitting any of this mod's blocks with the wrench breaks it at once and puts it, and anything that",
                         "spills out of it, straight into the player's inventory. Dismantling doesn't use up the wrench.")
                 .define("dismantle_blocks", true);
-        ALLOW_LINK_MERGING = b.comment("If true, a link may join two existing multi-generator networks into one.",
-                        "If false, such links are refused; a single generator can still be linked into a network.")
-                .define("allow_network_merging", true);
-        SHOW_LINK_PARTICLES = b.comment("Show red and white particles along a new link and highlight the selected generator.")
-                .define("show_link_particles", true);
-        b.pop();
-
         b.pop();
 
         b.comment("Mushroom fuels. Each entry is a string: \"<item id or #tag>;burn=<ticks>;energy=<x>;water=<x>;mycelium=<x>;scaling=<x>\"",
@@ -191,13 +121,13 @@ public final class ServerConfig {
                 "  energy   multiplier on the base FE/t (default 1.0)",
                 "  water    multiplier on water consumption (default 1.0)",
                 "  mycelium multiplier on the mycelium chance increase per failed attempt (default 1.0)",
-                "  scaling  bonus added to the network scaling multiplier for this generator's own output (default 0.0)",
+                "  scaling  no longer used (generators no longer form networks); accepted and ignored",
                 "Exact item entries take priority over tag entries. Example for another mod: \"#c:mushrooms;burn=400\"").push("fuel");
         FUELS = b.comment("Accepted mushroom fuels.")
                 .defineListAllowEmpty("fuels",
                         List.of(
-                                "minecraft:brown_mushroom;burn=400;energy=1.0;water=1.0;mycelium=1.0;scaling=0.0",
-                                "minecraft:red_mushroom;burn=600;energy=1.25;water=1.0;mycelium=1.0;scaling=0.0"),
+                                "minecraft:brown_mushroom;burn=400;energy=1.0;water=1.0;mycelium=1.0",
+                                "minecraft:red_mushroom;burn=600;energy=1.25;water=1.0;mycelium=1.0"),
                         () -> "minecraft:brown_mushroom;burn=400",
                         FuelEntryParser::isValid);
         b.pop();
@@ -209,9 +139,6 @@ public final class ServerConfig {
                 .defineInRange("consumptionAmount", 10, 0, 100_000);
         WATER_INTERVAL = b.comment("Ticks between water consumptions.")
                 .defineInRange("consumptionInterval", 20, 1, 72_000);
-        WATER_SCALES_WITH_NETWORK = b.comment("If true, each generator's water use is also multiplied by its network scaling factor",
-                        "(scalingMultiplier ^ (Generators - 1)). Total network use always grows with the number of active generators.")
-                .define("scaleConsumptionWithNetwork", false);
         ACCEPTED_FLUIDS = b.comment("Fluids accepted into the tank. Fluid ids or #tags.")
                 .defineListAllowEmpty("acceptedFluids", List.of("minecraft:water"), () -> "minecraft:water", ServerConfig::isResourceIdOrTag);
         ALLOW_FLUID_EXTRACTION = b.comment("If true, pipes and buckets may drain water back out of a generator.")
@@ -232,7 +159,7 @@ public final class ServerConfig {
                 .defineInRange("attemptInterval", 100, 1, 72_000);
         SEARCH_RADIUS = b.comment("Radius (in blocks, on every axis) of the cube searched for convertible blocks.")
                 .defineInRange("searchRadius", 4, 0, 8);
-        MAX_CONVERSIONS = b.comment("Blocks converted by one successful attempt (before network bonuses).")
+        MAX_CONVERSIONS = b.comment("Blocks converted by one successful attempt.")
                 .defineInRange("maxConversionsPerAttempt", 1, 1, 64);
         ONLY_DIRT = b.comment("If true, only minecraft:dirt is converted. If false, the 'convertibleBlocks' list is used instead.")
                 .define("onlyDirt", true);
@@ -250,19 +177,6 @@ public final class ServerConfig {
                 .define("resetChanceOnSuccess", true);
         RESET_ON_STOP = b.comment("If true, the chance resets to initialChance whenever the generator stops running.")
                 .define("resetChanceOnStop", false);
-        SHARE_CHANCE = b.comment("If true, all generators in a network share (and together raise) one conversion chance.")
-                .define("shareChanceAcrossNetwork", false);
-        NETWORK_GROWTH_BONUS = b.comment("If true, larger networks raise the chance faster:",
-                        "increase x (1 + growthBonusPerGenerator x (ActiveGenerators - 1)).")
-                .define("networkIncreasesGrowthRate", false);
-        GROWTH_BONUS_PER_GENERATOR = b.comment("Growth rate bonus per additional active generator in the network.")
-                .defineInRange("growthBonusPerGenerator", 0.10D, 0.0D, 10.0D);
-        NETWORK_EXTRA_CONVERSIONS = b.comment("If true, larger networks convert extra blocks per successful attempt.")
-                .define("networkExtraConversions", false);
-        GENERATORS_PER_EXTRA = b.comment("One extra conversion per this many active generators in the network.")
-                .defineInRange("generatorsPerExtraConversion", 4, 1, 1024);
-        MAX_EXTRA_CONVERSIONS = b.comment("Upper limit of extra conversions from network size.")
-                .defineInRange("maxExtraConversions", 4, 0, 64);
         TRACK_CONVERSIONS = b.comment("If true, the GUI shows how many blocks each generator converted since it was loaded.")
                 .define("trackConversions", true);
         HUGE_MUSHROOM_ENABLED = b.comment("If true, a block that was just converted into mycelium may sprout a huge mushroom.")
@@ -294,8 +208,6 @@ public final class ServerConfig {
                 .define("respectSpawnProtection", true);
         FAKE_PLAYER_NAME = b.comment("Name of the fake player used for protection checks.")
                 .define("fakePlayerName", "[MycelialPower]");
-        JEI_EXAMPLE_NETWORK_SIZE = b.comment("Largest network size listed in the JEI scaling tooltip.")
-                .defineInRange("jeiExampleNetworkSize", 10, 1, 64);
         b.pop();
 
         SPEC = b.build();

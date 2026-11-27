@@ -13,13 +13,6 @@ public final class ModDataComponents {
     public static final DeferredRegister<DataComponentType<?>> COMPONENTS =
             DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, MycelialPower.MOD_ID);
 
-    /** The generator a Barely Functional Wrench has selected as the first end of a link. */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<GlobalPos>> SELECTED_GENERATOR =
-            COMPONENTS.register("selected_generator", () -> DataComponentType.<GlobalPos>builder()
-                    .persistent(GlobalPos.CODEC)
-                    .networkSynchronized(GlobalPos.STREAM_CODEC)
-                    .build());
-
     /** The Machine Status Panel a Barely Functional Wrench is linking machines to. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<GlobalPos>> LINKING_PANEL =
             COMPONENTS.register("linking_panel", () -> DataComponentType.<GlobalPos>builder()
@@ -32,22 +25,6 @@ public final class ModDataComponents {
             COMPONENTS.register("linking_controller", () -> DataComponentType.<GlobalPos>builder()
                     .persistent(GlobalPos.CODEC)
                     .networkSynchronized(GlobalPos.STREAM_CODEC)
-                    .build());
-
-    /** Successful links made with a Barely Functional Wrench (for the configurable durability). */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> WRENCH_USES =
-            COMPONENTS.register("wrench_uses", () -> DataComponentType.<Integer>builder()
-                    .persistent(Codec.INT)
-                    .networkSynchronized(ByteBufCodecs.VAR_INT)
-                    .build());
-
-    /**
-     * Game time until which a Barely Functional Wrench shows the enchantment glint after a successful link.
-     * Not saved to disk (a short visual effect), but synced so the client renders the glint.
-     */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> LINK_GLOW_UNTIL =
-            COMPONENTS.register("link_glow_until", () -> DataComponentType.<Long>builder()
-                    .networkSynchronized(ByteBufCodecs.VAR_LONG)
                     .build());
 
     private ModDataComponents() {

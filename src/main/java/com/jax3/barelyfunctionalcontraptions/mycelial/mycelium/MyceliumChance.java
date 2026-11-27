@@ -62,23 +62,4 @@ public final class MyceliumChance {
         }
         return chance;
     }
-
-    /** Growth factor for the network-size bonus: {@code 1 + bonusPerGenerator x (generators - 1)}. */
-    public static double networkGrowthFactor(int generators, double bonusPerGenerator) {
-        if (generators <= 1 || !(bonusPerGenerator > 0)) {
-            return 1.0D;
-        }
-        double factor = 1.0D + bonusPerGenerator * (generators - 1);
-        return Double.isFinite(factor) ? factor : 1.0D;
-    }
-
-    /** Conversions allowed in one successful attempt, including network bonus conversions. */
-    public static int conversionsPerAttempt(int base, int generators, boolean networkBonus, int generatorsPerExtra, int maxExtra) {
-        int conversions = Math.max(1, base);
-        if (networkBonus && generatorsPerExtra > 0 && generators > 1) {
-            int extra = Math.min(Math.max(0, maxExtra), generators / generatorsPerExtra);
-            conversions += extra;
-        }
-        return conversions;
-    }
 }

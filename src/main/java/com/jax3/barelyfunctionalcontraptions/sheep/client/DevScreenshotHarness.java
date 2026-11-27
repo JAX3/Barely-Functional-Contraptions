@@ -131,10 +131,6 @@ public final class DevScreenshotHarness {
             woolPackerTick(mc, server);
             return;
         }
-        if ("wool_burner".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
-            woolBurnerTick(mc, server);
-            return;
-        }
         if ("perf".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             perfTick(mc, server);
             return;
@@ -143,12 +139,8 @@ public final class DevScreenshotHarness {
             worldTourTick(mc, server);
             return;
         }
-        if ("powered_furnace".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
-            poweredFurnaceTick(mc, server);
-            return;
-        }
         if ("wrench_dismantle".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
-            // A survival player with the wrench hits a Powered Furnace (with Raw Iron in it) once, through the real
+            // A survival player with the wrench hits a Wool Packer (with Iron Wool in it) once, through the real
             // attack key: it should break at once and both go into the inventory.
             switch (tick) {
                 case 60 -> server.execute(() -> {
@@ -159,9 +151,9 @@ public final class DevScreenshotHarness {
                     player.getInventory().setItem(0, new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()));
                     player.getInventory().setSelectedSlot(0);
                     BlockPos at = origin.offset(0, 0, -2);
-                    player.level().setBlock(at, ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
-                    if (player.level().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity be) {
-                        be.setItem(0, new ItemStack(Items.RAW_IRON, 7));
+                    player.level().setBlock(at, ModBlocks.WOOL_PACKER.get().defaultBlockState(), 3);
+                    if (player.level().getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity be) {
+                        be.setItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.INPUT, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 7));
                     }
                 });
                 case 70 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 35", origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5));
@@ -170,7 +162,7 @@ public final class DevScreenshotHarness {
                     ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                     ResourcefulSheep.LOGGER.warn("DISMANTLE block now {}, furnaces {}, raw iron {}",
                             player.level().getBlockState(origin.offset(0, 0, -2)).getBlock(),
-                            player.getInventory().countItem(ModItems.POWERED_FURNACE.get()), player.getInventory().countItem(Items.RAW_IRON));
+                            player.getInventory().countItem(ModItems.WOOL_PACKER.get()), player.getInventory().countItem(Items.RAW_IRON));
                 });
                 case 115 -> mc.execute(() -> McClient.setScreen(mc, new InventoryScreen(mc.player)));
                 case 135 -> shot(mc, "wrench_dismantle");
@@ -1692,6 +1684,14 @@ public final class DevScreenshotHarness {
             // Glow Ink sheep goes where each lamp lit a panel. It scans the whole platform, from any cell.
             {"forceload the platform", 2, 3},
             {"glow ink for lamps", 2, 3},
+            // Then the Wool Burner, Powered Furnace and three of the four Woollen Armour pieces were cut: their blocks
+            // and items load as nothing. Clear the two cells that showed the machines, relabel the armour stands, take
+            // the missing machines off the status panel, and rebuild the Hume Field cell (its Wool Packer stands in for
+            // the furnace) with its Energy sheep (its packer too) and Sculk sheep.
+            {"after the cuts", 2, 3},
+            {"hume field", 3, 6},
+            {"energy sheep", 3, 6},
+            {"hume field sculk", 3, 6},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -1964,7 +1964,7 @@ public final class DevScreenshotHarness {
 
     /**
      * Three Hume Field Generators showing their three states: one with two Hume Energy Cubes against it (delivering all
-     * it makes), one with only a Powered Furnace against it (wasting what the furnace can't take, and everything once
+     * it makes), one with only a Wool Packer against it (wasting what the furnace can't take, and everything once
      * it's full), and one on its own (all of it lost).
      */
     private static void humeFieldWorldScene(MinecraftServer server) {
@@ -1997,16 +1997,16 @@ public final class DevScreenshotHarness {
         BlockPos first = g.offset(HUME_WORLD_X[0], 0, -1);
         level.setBlock(first.west(), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
         level.setBlock(first.west().above(), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
-        // Wasting: a Powered Furnace against the second one's east side, smelting cobblestone from a chest above into a
+        // Wasting: a Wool Packer against the second one's east side, packing Iron Wool from a chest above into bales in a
         // chest under the floor. It takes only the little it uses each tick; the rest is lost.
         BlockPos furnace = g.offset(HUME_WORLD_X[1], 0, -1).east(2);
-        level.setBlock(furnace, ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+        level.setBlock(furnace, ModBlocks.WOOL_PACKER.get().defaultBlockState(), 3);
         level.setBlock(furnace.above(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
         level.setBlock(furnace.above(2), Blocks.CHEST.defaultBlockState(), 3);
         level.setBlock(furnace.below(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
         level.setBlock(furnace.below(2), Blocks.CHEST.defaultBlockState(), 3);
         if (level.getBlockEntity(furnace.above(2)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity feed) {
-            for (int i = 0; i < feed.getContainerSize(); i++) feed.setItem(i, new ItemStack(Items.COBBLESTONE, 64));
+            for (int i = 0; i < feed.getContainerSize(); i++) feed.setItem(i, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 64));
         }
         label(server, g.above(7).north(3), "Hume Field Generator: random power, no buffer", "light_purple");
         label(server, g.above(6).north(3), "A new amount every second", "yellow");
@@ -2083,7 +2083,7 @@ public final class DevScreenshotHarness {
 
     /**
      * An Energy sheep in a little fenced pen beside the first Hume Field Generator's two cubes (cell (3, 6), west end),
-     * so the generator fills the cubes, the sheep drains them, and it powers a Powered Furnace a few blocks south of it,
+     * so the generator fills the cubes, the sheep drains them, and it powers a Wool Packer a few blocks south of it,
      * wirelessly, smelting Cobblestone from a chest above into a chest in the floor. Added to the cell without
      * rebuilding it; the furnace is more than 8 blocks from the other generators' blocks, so their states don't change.
      */
@@ -2114,19 +2114,19 @@ public final class DevScreenshotHarness {
         level.addFreshEntity(sheep);
         com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
                 com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(energy, uses));
-        // Its furnace: four south of the pen, fed Cobblestone from a chest above, smelting into a chest in the floor.
+        // Its Wool Packer: four south of the pen, fed Iron Wool from a chest above, packing bales into a chest in the floor.
         BlockPos furnace = pen.south(5);
         for (BlockPos p : BlockPos.betweenClosed(furnace.offset(-1, 0, -1), furnace.offset(1, 3, 1))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
-        level.setBlock(furnace, ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+        level.setBlock(furnace, ModBlocks.WOOL_PACKER.get().defaultBlockState(), 3);
         level.setBlock(furnace.above(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
         level.setBlock(furnace.above(2), Blocks.CHEST.defaultBlockState(), 3);
         level.setBlock(furnace.below(), Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN), 3);
         level.setBlock(furnace.below(2), Blocks.CHEST.defaultBlockState(), 3);
         if (level.getBlockEntity(furnace.above(2)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity feed) {
-            for (int i = 0; i < feed.getContainerSize(); i++) feed.setItem(i, new ItemStack(Items.COBBLESTONE, 64));
+            for (int i = 0; i < feed.getContainerSize(); i++) feed.setItem(i, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 64));
         }
         label(server, furnace.above(4), "Energy sheep: drains the cubes,", "yellow");
-        label(server, furnace.above(3), "powers this furnace wirelessly", "yellow");
+        label(server, furnace.above(3), "powers this packer wirelessly", "yellow");
         ResourcefulSheep.LOGGER.info("EXTEND energy sheep at {} by the cubes at {}, its furnace at {}", pen, cubes, furnace);
     }
 
@@ -2262,6 +2262,46 @@ public final class DevScreenshotHarness {
         ResourcefulSheep.LOGGER.info("EXTEND glow ink for lamps: {} sheep", placed);
     }
 
+    /**
+     * Tidies the test world after the Wool Burner, Powered Furnace and Woollen Beanie, Jumper and Leggings were cut:
+     * clears their two machine cells, (0, 3) and (4, 3), to bare floor; replaces the armour stands' labels in (0, 4);
+     * and unlinks every machine the status panel can no longer find.
+     */
+    private static void afterTheCuts(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        for (int[] cell : new int[][]{{0, 3}, {4, 3}}) {
+            int x0 = SQUARE_X + GRID_X + cell[0] * CELL_W, z0 = SQUARE_Z + GRID_Z + cell[1] * CELL_D;
+            BlockPos a = new BlockPos(x0 + 1, 35, z0 + 1), b = new BlockPos(x0 + CELL_W - 1, 50, z0 + CELL_D - 1);
+            for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, net.minecraft.world.phys.AABB.encapsulatingFullBlocks(a, b),
+                    e -> !(e instanceof ServerPlayer))) e.discard();
+            for (BlockPos p : BlockPos.betweenClosed(a, b)) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+            // Anything set into the floor (hoppers, chests under it) goes too.
+            for (BlockPos p : BlockPos.betweenClosed(a.below(3), new BlockPos(b.getX(), 34, b.getZ()))) {
+                if (level.getBlockEntity(p) != null) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+            }
+            ResourcefulSheep.LOGGER.info("EXTEND cleared cell ({}, {}) from {} to {}", cell[0], cell[1], a, b);
+        }
+        // The armour stands' cell: they wear only their boots now.
+        int[] armour = cellCentre(0, 4, 1);
+        var box = new net.minecraft.world.phys.AABB(armour[0] - 13, 34, armour[1] - 11, armour[0] + 13, 50, armour[1] + 11);
+        int stands = level.getEntitiesOfClass(net.minecraft.world.entity.decoration.ArmorStand.class, box).size();
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, box, e -> e instanceof net.minecraft.world.entity.Display.TextDisplay)) e.discard();
+        label(server, new BlockPos(armour[0], 38, armour[1] - 2), "Woollen Boots: you make no sound", "aqua");
+        ResourcefulSheep.LOGGER.info("EXTEND relabelled {} armour stands", stands);
+        // The status panel: unlink what's gone.
+        BlockPos master = new BlockPos(128, 37, 152);
+        if (level.getBlockEntity(master) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity panel) {
+            int removed = 0;
+            for (BlockPos link : java.util.List.copyOf(panel.links())) {
+                if (level.getBlockEntity(link) == null) {
+                    panel.toggleLink(level, link);
+                    removed++;
+                }
+            }
+            ResourcefulSheep.LOGGER.info("EXTEND status panel: unlinked {} missing machines, {} left", removed, panel.links().size());
+        }
+    }
+
     /** Clears the loose items (the Explosive Wool its sheep's blasts left before it caught it) from the Implosion Chamber's cell. */
     private static void sweepImplosionWool(MinecraftServer server) {
         ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
@@ -2289,75 +2329,12 @@ public final class DevScreenshotHarness {
         }
     }
 
-    /** Two Powered Furnaces, one alone and one with two Blaze sheep, both powered and fed by hoppers. */
-    private static void poweredFurnaceScene(MinecraftServer server) {
-        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
-        ServerLevel level = player.level();
-        origin = player.blockPosition();
-        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false"}) {
-            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
-        }
-        BlockPos o = origin;
-        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(8, 6, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
-        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(8, -1, 4))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
-        var blaze = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(ResourcefulSheep.id("blaze")).orElseThrow();
-        String[] names = {"Powered Furnace", "With 2 Blaze sheep"};
-        for (int i = 0; i < 2; i++) {
-            BlockPos at = o.offset(-3 + i * 6, 0, -4);
-            level.setBlock(at, ModBlocks.POWERED_FURNACE.get().defaultBlockState()
-                    .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.PoweredFurnaceBlock.FACING, Direction.SOUTH), 3);
-            level.setBlock(at.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
-            level.setBlock(at.above(), Blocks.HOPPER.defaultBlockState(), 3);
-            level.setBlock(at.above(2), Blocks.CHEST.defaultBlockState(), 3);
-            if (level.getBlockEntity(at.above(2)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity chest) {
-                chest.setItem(0, new ItemStack(Items.RAW_IRON, 64));
-                chest.setItem(1, new ItemStack(Items.RAW_GOLD, 32));
-            }
-            label(server, at.above(3), names[i], i == 0 ? "white" : "gold");
-            if (i == 1) {
-                if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity be) be.setShowsArea(true);
-                for (int side : new int[]{-1, 1}) {
-                    var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-                    sheep.snapTo(at.getX() + 0.5 + side, at.getY(), at.getZ() + 0.5, 180, 0);
-                    sheep.setNoAi(true);
-                    level.addFreshEntity(sheep);
-                    com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
-                            com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(blaze.id(), blaze.effectiveInfusionUses()));
-                }
-            }
-        }
-    }
 
-    /** The Powered Furnace scene, then the window of the one with Blaze sheep: {@code -PharnessScene=powered_furnace}. */
-    private static void poweredFurnaceTick(Minecraft mc, MinecraftServer server) {
-        switch (tick) {
-            case 60 -> server.execute(() -> {
-                poweredFurnaceScene(server);
-                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "gamemode spectator @a");
-            });
-            case 70 -> setHudHidden(mc, true);
-            case 80 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 25", origin.getX() + 0.5, origin.getY() + 1.5, origin.getZ() + 1.5));
-            case 200 -> shot(mc, "101_powered_furnace");
-            case 202 -> {
-                command(server, "gamemode creative @a");
-                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 3.5, origin.getY(), origin.getZ() - 1.5));
-            }
-            case 210 -> openAt(server, origin.offset(3, 0, -4));
-            case 235 -> shot(mc, "101_powered_furnace_gui");
-            case 240 -> mc.stop();
-            default -> {}
-        }
-    }
-
-    /** A Woollen Armour set in the given wool colours (helmet, jumper, leggings, boots), coloured as crafting would. */
+    /** Woollen Boots in the last of the given wool colours, coloured as crafting would, in the feet slot of a stand's set. */
     private static ItemStack[] woollenSet(net.minecraft.world.item.DyeColor... colours) {
-        var items = new net.minecraft.world.item.Item[]{com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_HELMET.get(),
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_CHESTPLATE.get(),
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_LEGGINGS.get(),
-                com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_BOOTS.get()};
-        ItemStack[] set = new ItemStack[4];
-        for (int i = 0; i < 4; i++) {
-            set[i] = new ItemStack(items[i]);
+        ItemStack[] set = {ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY};
+        for (int i = 3; i < 4; i++) {
+            set[i] = new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOLLEN_BOOTS.get());
             set[i].set(net.minecraft.core.component.DataComponents.DYED_COLOR, net.minecraft.world.item.component.DyedItemColor.applyDyes(
                     (net.minecraft.world.item.component.DyedItemColor) null, java.util.List.of(colours[Math.min(i, colours.length - 1)])));
         }
@@ -2594,7 +2571,7 @@ public final class DevScreenshotHarness {
     }
 
     /**
-     * An Energy sheep beside a charged bank of Hume Energy Cubes, sparks arcing from it to two Powered Furnaces a few
+     * An Energy sheep beside a charged bank of Hume Energy Cubes, sparks arcing from it to two Wool Packers a few
      * blocks off; then Jade on the sheep and on a furnace: {@code -PharnessScene=energy_sheep}.
      */
     private static void energySheepTick(Minecraft mc, MinecraftServer server) {
@@ -2616,7 +2593,7 @@ public final class DevScreenshotHarness {
                     }
                 }
                 for (BlockPos p : new BlockPos[]{origin.offset(3, 0, -9), origin.offset(4, 0, -4)}) {
-                    level.setBlock(p, ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+                    level.setBlock(p, ModBlocks.WOOL_PACKER.get().defaultBlockState(), 3);
                 }
                 var energy = ResourcefulSheep.id("energy");
                 int uses = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(energy).orElseThrow().effectiveInfusionUses();
@@ -2849,7 +2826,7 @@ public final class DevScreenshotHarness {
     /**
      * A basic ore processing line, as planned: six Iron sheep in a pen that is exactly the Automatic Shears' 3x3 area;
      * pipes over the top carry their wool to a Mechanical Separator; a pipe trench under the row takes its Raw Iron to
-     * three Powered Furnaces, its String to a Wool Burner, and the ingots, nuggets and spare String to a chest (the only
+     * three Wool Packers (once furnaces), its String, and the ingots, nuggets and spare String to a chest (the only
      * filter, on the chest's side). A Mycelial Generator watered by a Fluid Reservoir powers it all through a cable
      * behind the row. Machines at the player's feet level; the trench is in the floor.
      */
@@ -2868,16 +2845,14 @@ public final class DevScreenshotHarness {
             boolean edge = x == -2 || x == 2 || z == -4 || z == 0;
             if (edge && !(z == 0 && (x == 0 || x == 2))) level.setBlock(o.offset(x, 0, z), Blocks.OAK_FENCE.defaultBlockState(), 3);
         }
-        // The row: shears and separator facing into the pen, three Powered Furnaces, a Wool Burner, a chest.
+        // The row: shears and separator facing into the pen, three Wool Packers, a chest.
         level.setBlock(o, ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState()
                 .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.AutomaticShearsBlock.FACING, Direction.NORTH), 3);
         level.setBlock(o.east(2), ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState().setValue(MechanicalSeparatorBlock.FACING, Direction.NORTH), 3);
         for (int x = 3; x <= 5; x++) {
-            level.setBlock(o.east(x), ModBlocks.POWERED_FURNACE.get().defaultBlockState()
-                    .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.PoweredFurnaceBlock.FACING, Direction.SOUTH), 3);
+            level.setBlock(o.east(x), ModBlocks.WOOL_PACKER.get().defaultBlockState()
+                    .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolPackerBlock.FACING, Direction.SOUTH), 3);
         }
-        level.setBlock(o.east(6), ModBlocks.WOOL_BURNER.get().defaultBlockState()
-                .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.FACING, Direction.SOUTH), 3);
         level.setBlock(o.east(7), Blocks.CHEST.defaultBlockState().setValue(net.minecraft.world.level.block.ChestBlock.FACING, Direction.SOUTH), 3);
         // Power: a Mycelial Generator watered by a Fluid Reservoir on a 2x2 pool, and a cable along the back of the row.
         for (int x = 8; x <= 9; x++) for (int z = 1; z <= 2; z++) {
@@ -3214,7 +3189,7 @@ public final class DevScreenshotHarness {
     /**
      * The Machine Status Panel for the test world: nine panels joined into a 3x3 screen on a stone-brick wall, linked to
      * the real machines of the scenes round it on the platform (the nearest of each kind within its range: the Echo
-     * Chamber, the Thermal Reaction Chamber, the Grass Seeder, the Herd Counters, the Powered Furnaces and so on), with a
+     * Chamber, the Thermal Reaction Chamber, the Grass Seeder, the Herd Counters, the Wool Packers and so on), with a
      * comparator in front of it lighting a lamp while any of them has a problem.
      */
     private static void panelWorldScene(MinecraftServer server) {
@@ -3317,12 +3292,11 @@ public final class DevScreenshotHarness {
                     for (int i = 0; i < chest.getContainerSize(); i++) if (!chest.getItem(i).isEmpty()) report.append(" chest:").append(chest.getItem(i));
                 }
                 for (int x = 3; x <= 5; x++) {
-                    if (level.getBlockEntity(origin.east(x)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity f) {
+                    if (level.getBlockEntity(origin.east(x)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity f) {
                         report.append(" furnace").append(x).append(':').append(f.getItem(0)).append('/').append(f.output()).append('/').append(f.status());
                     }
                 }
                 if (level.getBlockEntity(origin.east(2)) instanceof MechanicalSeparatorBlockEntity sep) report.append(" separatorIn:").append(sep.getInventory().getStack(SeparatorInventory.INPUT));
-                if (level.getBlockEntity(origin.east(6)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity burner) report.append(" burner:").append(burner.fuel()).append(" gen ").append(burner.generating());
                 ResourcefulSheep.LOGGER.warn(report.toString());
             });
             case 604 -> {
@@ -4187,7 +4161,7 @@ public final class DevScreenshotHarness {
     }
 
     /**
-     * A Machine Status Panel on a stone wall, linked to a running Powered Furnace, a Grass Seeder out of fuel, a half-full
+     * A Machine Status Panel on a stone wall, linked to a running Wool Packer, a Grass Seeder out of fuel, a half-full
      * Hume Energy Cube and a Herd Counter (that one through the real wrench clicks), with a comparator lighting a lamp
      * while anything has a problem: {@code -PharnessScene=status_panel}.
      */
@@ -4421,9 +4395,9 @@ public final class DevScreenshotHarness {
                 level.setBlock(panel.south(2), Blocks.REDSTONE_LAMP.defaultBlockState(), 3);
                 // The machines.
                 BlockPos furnace = o.offset(-4, 0, -3), seeder = o.offset(4, 0, -3), cube = o.offset(-4, 0, 0), counter = o.offset(4, 0, 0);
-                level.setBlock(furnace, ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+                level.setBlock(furnace, ModBlocks.WOOL_PACKER.get().defaultBlockState(), 3);
                 level.setBlock(furnace.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
-                if (level.getBlockEntity(furnace) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity f) f.setItem(0, new ItemStack(Items.RAW_IRON, 64));
+                if (level.getBlockEntity(furnace) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity f) f.setItem(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity.INPUT, ResourceWoolItem.create(ResourcefulSheep.id("iron"), 64));
                 for (BlockPos p : BlockPos.betweenClosed(seeder.offset(-1, -1, -1), seeder.offset(1, -1, 1))) level.setBlock(p, Blocks.DIRT.defaultBlockState(), 2);
                 level.setBlock(seeder, ModBlocks.GRASS_SEEDER.get().defaultBlockState(), 3);
                 level.setBlock(cube, ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
@@ -4444,13 +4418,13 @@ public final class DevScreenshotHarness {
                     sheep.setNoAi(true);
                     level.addFreshEntity(sheep);
                 }
-                // More machines: a second furnace and Automatic Shears with no power, a Mechanical Separator, a Wool Burner,
+                // More machines: a second furnace and Automatic Shears with no power, a Mechanical Separator, a Blaze Sheep Furnace,
                 // more cubes and an Energy Meter.
                 BlockPos[] more = {o.offset(-6, 0, -1), o.offset(-6, 0, 1), o.offset(6, 0, -1), o.offset(6, 0, 1), o.offset(-3, 0, 2), o.offset(3, 0, 2)};
-                level.setBlock(more[0], ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+                level.setBlock(more[0], ModBlocks.WOOL_PACKER.get().defaultBlockState(), 3);
                 level.setBlock(more[1], ModBlocks.AUTOMATIC_SHEARS.get().defaultBlockState(), 3);
                 level.setBlock(more[2], ModBlocks.MECHANICAL_SEPARATOR.get().defaultBlockState(), 3);
-                level.setBlock(more[3], ModBlocks.WOOL_BURNER.get().defaultBlockState(), 3);
+                level.setBlock(more[3], ModBlocks.BLAZE_FURNACE.get().defaultBlockState(), 3);
                 level.setBlock(more[4], ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
                 level.setBlock(more[5], ModBlocks.ENERGY_METER.get().defaultBlockState(), 3);
                 if (level.getBlockEntity(topLeft) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.StatusPanelBlockEntity be) {
@@ -4604,7 +4578,7 @@ public final class DevScreenshotHarness {
                 // The Energy sheep in cell (3, 6) and its furnace.
                 for (var sh : level.getEntitiesOfClass(net.minecraft.world.entity.animal.sheep.Sheep.class, new net.minecraft.world.phys.AABB(new BlockPos(92, 35, 176)).inflate(3),
                         com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep::isEnergySheep)) {
-                    String furnaceInfo = level.getBlockEntity(new BlockPos(92, 35, 181)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity f
+                    String furnaceInfo = level.getBlockEntity(new BlockPos(92, 35, 181)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity f
                             ? f.status() + " " + f.getEnergyHandler().getAmountAsLong() + " FE" : "missing";
                     ResourcefulSheep.LOGGER.warn("TOUR energy sheep at {}: charge {}; its furnace {}", sh.blockPosition(),
                             com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.charge(sh), furnaceInfo);
@@ -4792,16 +4766,6 @@ public final class DevScreenshotHarness {
             }
             return null;
         };
-        // The wrench's generator-to-generator links whose ends both move, before moving.
-        var manualLinks = com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData.get(server);
-        java.util.List<GlobalPos[]> manual = new java.util.ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            int[] b = (int[]) SQUARE_SCENES[i][1];
-            for (BlockPos p : BlockPos.betweenClosed(b[0] - 1, b[4], b[2] - 1, b[1] + 1, b[5] + 6, b[3] + 1)) {
-                GlobalPos gp = GlobalPos.of(level.dimension(), p.immutable());
-                for (GlobalPos m : manualLinks.linksOf(gp)) if (gp.pos().asLong() < m.pos().asLong()) manual.add(new GlobalPos[]{gp, m});
-            }
-        }
         // The entities of each scene, before moving (the clone would leave them floating).
         java.util.List<java.util.List<net.minecraft.world.entity.Entity>> entities = new java.util.ArrayList<>();
         for (int i = 0; i < n; i++) {
@@ -4836,14 +4800,6 @@ public final class DevScreenshotHarness {
             ResourcefulSheep.LOGGER.warn("SQUARE '{}' moved by {} {} {} ({} entities), centre now {} {}", SQUARE_SCENES[i][0], o[0], o[1], o[2],
                     entities.get(i).size(), centre[0], centre[1]);
         }
-        // Re-point the links that moved.
-        for (GlobalPos[] link : manual) {
-            BlockPos a = moved.apply(link[0].pos()), c = moved.apply(link[1].pos());
-            if (a == null || c == null) continue;
-            manualLinks.remove(link[0], link[1]);
-            manualLinks.add(GlobalPos.of(level.dimension(), a), GlobalPos.of(level.dimension(), c));
-        }
-        ResourcefulSheep.LOGGER.warn("SQUARE links moved: {} manual", manual.size());
         // A crafting table left over from an old screenshot.
         level.setBlock(new BlockPos(-17, 39, 8), Blocks.AIR.defaultBlockState(), 3);
         // Clear out wild mobs and leftovers, and stop them spawning in the platform's shadow on the sand below.
@@ -4904,7 +4860,6 @@ public final class DevScreenshotHarness {
             for (var e : ents) kinds.merge(net.minecraft.world.entity.EntityType.getKey(e.getType()).getPath(), 1, Integer::sum);
             ResourcefulSheep.LOGGER.warn("SURVEY x {}..{} y {}..{} z {}..{} blocks {} entities {}", minX + x0, maxX + x0, minY + y0, maxY + y0, minZ + z0, maxZ + z0, count, kinds);
         }
-        ResourcefulSheep.LOGGER.warn("SURVEY links {}", com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData.get(server));
     }
 
     /**
@@ -5017,6 +4972,7 @@ public final class DevScreenshotHarness {
                         case "hume field sculk" -> humeFieldSculkScene(server);
                         case "forceload the platform" -> command(server, "forceload add 0 24 146 192"); // its entities load before the next step
                         case "glow ink for lamps" -> glowInkForLamps(server);
+                        case "after the cuts" -> afterTheCuts(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
@@ -5153,7 +5109,7 @@ public final class DevScreenshotHarness {
             case 348 -> shot(mc, "99_guide_recipes_bales");
             case 350 -> { if (McClient.screen(mc) instanceof GuideScreen guide) { guide.openTab(GuideBook.Tab.WIP); guide.openChapter("Quantum Sheep"); } }
             case 360 -> shot(mc, "99_guide_wip");
-            case 362 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Wool Burner"); }
+            case 362 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Glow Panels"); }
             case 372 -> shot(mc, "83_guide_power_tab");
             case 376 -> mc.stop();
             default -> {}
@@ -5165,7 +5121,7 @@ public final class DevScreenshotHarness {
     private static final String[][] SHOWCASE_ROWS = {
             {"mechanical_separator", "automatic_shears", "wool_packer", "infusion_altar", "wool_bale"},
             {"mycelial_generator", "zero_point_energy_module", "glow_panel", "blaze_furnace"},
-            {"wool_burner", "hume_energy_cube", "fluid_tank", "fluid_reservoir", "creative_generator"},
+            {"hume_energy_cube", "fluid_tank", "fluid_reservoir", "creative_generator"},
             {"energy_cable", "fluid_pipe", "item_pipe", "energy_meter", "functional_machine_block"},
     };
 
@@ -5498,96 +5454,6 @@ public final class DevScreenshotHarness {
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 24", o.getX() + 0.0, o.getY() + 4, o.getZ() + 6.5));
     }
 
-    /** Three Wool Burners (wool, string, Coal Wool) charging cubes, and one fed by a hopper: {@code -PharnessScene=wool_burner}. */
-    private static void woolBurnerTick(Minecraft mc, MinecraftServer server) {
-        switch (tick) {
-            case 60 -> server.execute(() -> woolBurnerScene(server));
-            case 70 -> setHudHidden(mc, true);
-            case 120 -> server.execute(() -> {
-                for (int i = 0; i < 4; i++) {
-                    if (server.overworld().getBlockEntity(origin.offset(-5 + i * 3, 0, -4)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity be) {
-                        ResourcefulSheep.LOGGER.info("BURNER {} generating={} burn={}/{} fuel={} lit={}", i, be.generating(), be.burnTime(), be.burnTotal(), be.fuel(),
-                                be.getBlockState().getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.LIT));
-                    }
-                }
-            });
-            case 140 -> shot(mc, "76_wool_burners");
-            case 142 -> command(server, String.format(java.util.Locale.ROOT, "time set midnight"));
-            case 190 -> shot(mc, "77_wool_burners_night");
-            case 192 -> {
-                setHudHidden(mc, false);
-                command(server, "time set noon");
-                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 30", origin.getX() + 1.5, origin.getY(), origin.getZ() - 1.5));
-            }
-            case 196 -> openAt(server, origin.offset(1, 0, -4)); // the Coal Wool burner
-            case 206 -> shot(mc, "78_wool_burner_gui");
-            // Hover over the fuel box for its list of fuels.
-            case 208 -> {
-                var window = mc.getWindow();
-                double scale = window.getGuiScale();
-                int left = (window.getGuiScaledWidth() - 176) / 2, top = (window.getGuiScaledHeight() - 193) / 2;
-                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, window.handle(), (left + 67) * scale, (top + 30) * scale);
-            }
-            case 225 -> shot(mc, "78_wool_burner_gui_fuels");
-            case 227 -> {
-                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4);
-                if (mc.player != null) mc.player.closeContainer();
-                McClient.setScreen(mc, new GuideScreen());
-            }
-            case 237 -> { if (McClient.screen(mc) instanceof GuideScreen guide) guide.openChapter("Wool Burner"); }
-            case 250 -> shot(mc, "79_guide_wool_burner");
-            // The other tabs, opened with real clicks on their buttons.
-            case 252, 266, 280 -> {
-                int tabIndex = (tick - 252) / 14 + 1; // Logistics, Production, Utility
-                var window = mc.getWindow();
-                double scale = window.getGuiScale();
-                int left = (window.getGuiScaledWidth() - 330) / 2, top = (window.getGuiScaledHeight() - 214) / 2;
-                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, window.handle(), (left + 6 + tabIndex * 28 + 13) * scale, (top + 21 + 10) * scale);
-                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseButton(mc, window.handle(), new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 1);
-                com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseButton(mc, window.handle(), new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0), 0);
-            }
-            case 258, 272, 286 -> com.jax3.barelyfunctionalcontraptions.compat.McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); // no tooltip in the shot
-            case 262 -> shot(mc, "79_guide_tab_logistics");
-            case 276 -> shot(mc, "79_guide_tab_production");
-            case 290 -> shot(mc, "79_guide_tab_utility");
-            case 300 -> mc.stop();
-            default -> {}
-        }
-    }
-
-    private static void woolBurnerScene(MinecraftServer server) {
-        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
-        ServerLevel level = player.level();
-        origin = player.blockPosition();
-        for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamerule advance_time false", "gamerule advance_weather false"}) {
-            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
-        }
-        BlockPos o = origin;
-        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(8, 6, 6))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
-        for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(8, -1, 6))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
-        // Plain wool, string, Coal Wool, and one fed by a hopper from a chest of mixed wool. Each charges a cube behind it.
-        ItemStack[] fuels = {new ItemStack(Vanilla.wool(DyeColor.WHITE), 32), new ItemStack(Items.STRING, 64),
-                com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.create(ResourcefulSheep.id("coal"), 16), ItemStack.EMPTY};
-        String[] names = {"Wool: 30 FE/t", "String: 30 FE/t", "Coal Wool: 120 FE/t", "Fed by a hopper"};
-        for (int i = 0; i < 4; i++) {
-            BlockPos at = o.offset(-5 + i * 3, 0, -4);
-            level.setBlock(at, ModBlocks.WOOL_BURNER.get().defaultBlockState()
-                    .setValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock.FACING, Direction.SOUTH), 3);
-            if (level.getBlockEntity(at) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolBurnerBlockEntity be) be.setItem(0, fuels[i]);
-            level.setBlock(at.north(), ModBlocks.HUME_ENERGY_CUBE.get().defaultBlockState(), 3);
-            label(server, at.above(i == 3 ? 3 : 1), names[i], i == 2 ? "gold" : "white");
-        }
-        BlockPos fed = o.offset(4, 0, -4);
-        level.setBlock(fed.above(), Blocks.HOPPER.defaultBlockState(), 3);
-        level.setBlock(fed.above(2), Blocks.CHEST.defaultBlockState(), 3);
-        if (level.getBlockEntity(fed.above(2)) instanceof net.minecraft.world.Container chest) {
-            chest.setItem(0, new ItemStack(Vanilla.wool(DyeColor.RED), 64));
-            chest.setItem(1, new ItemStack(Vanilla.wool(DyeColor.BLUE), 64));
-            chest.setItem(2, new ItemStack(Items.STRING, 64));
-        }
-        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
-                String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 20", o.getX() + 0.0, o.getY() + 2, o.getZ() + 4.5));
-    }
 
     /** The Blaze Sheep Furnace with four Blaze sheep, and both machines' working areas shown: {@code -PharnessScene=blaze_furnace}. */
     private static void blazeFurnaceTick(Minecraft mc, MinecraftServer server) {
@@ -5924,7 +5790,7 @@ public final class DevScreenshotHarness {
                     be.upgrades().setItem(0, new ItemStack(ModItems.SPEED_UPGRADE.get()));
                 }
                 level.setBlock(s.north(), ModBlocks.CREATIVE_GENERATOR.get().defaultBlockState(), 3);
-                level.setBlock(s.east(2), ModBlocks.POWERED_FURNACE.get().defaultBlockState(), 3);
+                level.setBlock(s.east(2), ModBlocks.WOOL_PACKER.get().defaultBlockState(), 3);
                 player.getInventory().clearContent();
                 player.getInventory().setItem(0, new ItemStack(ModItems.SPEED_UPGRADE.get(), 3));
                 player.getInventory().setItem(1, new ItemStack(ModItems.EFFICIENCY_UPGRADE.get(), 2));
@@ -5944,7 +5810,7 @@ public final class DevScreenshotHarness {
             case 105 -> server.execute(() -> {
                 if (server.overworld().getBlockEntity(at) instanceof MechanicalSeparatorBlockEntity be) be.upgrades().setItem(1, new ItemStack(ModItems.MUFFLER_UPGRADE.get()));
                 // Two Speed cards in the furnace: Maximum Overdrive for the player standing by.
-                if (server.overworld().getBlockEntity(at.east(2)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity f) {
+                if (server.overworld().getBlockEntity(at.east(2)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity f) {
                     f.upgrades().setItem(0, new ItemStack(ModItems.SPEED_UPGRADE.get()));
                     f.upgrades().setItem(1, new ItemStack(ModItems.SPEED_UPGRADE.get()));
                 }
@@ -5978,7 +5844,7 @@ public final class DevScreenshotHarness {
                 server.execute(() -> {
                     ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                     BlockPos f = at.east(2);
-                    if (player.level().getBlockEntity(f) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.PoweredFurnaceBlockEntity be) player.openMenu(be, f);
+                    if (player.level().getBlockEntity(f) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.WoolPackerBlockEntity be) player.openMenu(be, f);
                 });
             }
             case 175 -> { McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); McClient.clearChat(mc); }

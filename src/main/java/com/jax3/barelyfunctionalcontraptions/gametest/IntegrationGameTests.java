@@ -68,7 +68,6 @@ public final class IntegrationGameTests {
         TESTS.put("integration_mycelial_generator_powers_automatic_shears", IntegrationGameTests::generatorPowersAutomaticShears);
         TESTS.put("shift_placing_faces_machines_away", IntegrationGameTests::shiftPlacingFacesAway);
         TESTS.put("integration_fluid_reservoir_waters_generator", IntegrationGameTests::reservoirWatersGenerator);
-        TESTS.put("integration_wrench_leaves_machines_alone", IntegrationGameTests::wrenchLeavesMachines);
         TESTS.put("integration_generator_charges_energy_cube", IntegrationGameTests::generatorChargesCube);
         TESTS.forEach((name, fn) -> FUNCTIONS.register(name, () -> fn));
     }
@@ -203,15 +202,15 @@ public final class IntegrationGameTests {
     }
 
     /**
-     * The advancement tab: every advancement loads with the right parent, and the three special ones are granted by
-     * linking two generators with the wrench, by Automatic Shears shearing a sheep near you, and by dying to a Zero
+     * The advancement tab: every advancement loads with the right parent, and the two special ones are granted by
+     * Automatic Shears shearing a sheep near you, and by dying to a Zero
      * Point beam (and not by dying any other way).
      */
     private static void advancements(GameTestHelper h) {
         var server = h.getLevel().getServer();
         String[][] tree = {
                 {"root", null}, {"mycelial_generator", "root"}, {"mycelium_wrench", "mycelial_generator"},
-                {"link_generators", "mycelium_wrench"}, {"mechanical_separator", "root"}, {"automatic_shears", "root"},
+                {"mechanical_separator", "root"}, {"automatic_shears", "root"},
                 {"auto_shear", "automatic_shears"}, {"fluid_reservoir", "root"}, {"hume_energy_cube", "root"},
                 {"zero_point_energy_module", "root"}, {"zero_point_death", "zero_point_energy_module"}, {"energy_cable", "root"}, {"fluid_pipe", "root"}, {"item_pipe", "root"}, {"fluid_tank", "root"}, {"energy_meter", "energy_cable"}, {"glow_panel", "root"},
                 {"some_assembly_required", "root"}, {"maximum_overdrive", "some_assembly_required"}};
@@ -236,23 +235,8 @@ public final class IntegrationGameTests {
         };
         BlockPos shearsPos = new BlockPos(3, 1, 0);
         player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(shearsPos.above())));
-        String link = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.LINK_GENERATORS;
         String shear = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.AUTO_SHEAR;
         String death = com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.ZERO_POINT_DEATH;
-        h.assertFalse(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, link), "a new player hasn't linked generators");
-
-        // Fungal Network: link two generators with the wrench.
-        BlockPos genA = new BlockPos(0, 1, 4), genB = new BlockPos(6, 1, 4);
-        generator(h, genA, ItemStack.EMPTY, 0);
-        generator(h, genB, ItemStack.EMPTY, 0);
-        ItemStack wrench = new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get());
-        player.setItemInHand(InteractionHand.MAIN_HAND, wrench);
-        for (BlockPos pos : new BlockPos[] {genA, genB}) {
-            wrench.getItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND,
-                    new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(pos)),
-                            net.minecraft.core.Direction.UP, h.absolutePos(pos), false)));
-        }
-        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.isDone(player, link), "linking generators grants Fungal Network");
 
         // Don't Cross the Streams: only a Zero Point beam death counts.
         var beam = h.getLevel().damageSources().source(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.BEAM_DAMAGE);
@@ -521,44 +505,6 @@ public final class IntegrationGameTests {
 
     private static net.minecraft.core.GlobalPos global(GameTestHelper h, BlockPos pos) {
         return net.minecraft.core.GlobalPos.of(h.getLevel().dimension(), h.absolutePos(pos));
-    }
-
-    /**
-     * Wireless power to machines is gone: the wrench neither selects a machine nor links a selected generator to one
-     * (the click passes on to the machine), and the generator's status still survives the trip to the client.
-     */
-    private static void wrenchLeavesMachines(GameTestHelper h) {
-        BlockPos generatorPos = new BlockPos(0, 1, 0);
-        MycelialGeneratorBlockEntity generator = generator(h, generatorPos, ItemStack.EMPTY, 0);
-        BlockPos separatorPos = new BlockPos(5, 1, 5);
-        separator(h, separatorPos);
-        Player player = h.makeMockPlayer(GameType.SURVIVAL);
-        ItemStack wrench = new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get());
-        player.setItemInHand(InteractionHand.MAIN_HAND, wrench);
-        var item = (com.jax3.barelyfunctionalcontraptions.mycelial.item.MyceliumWrenchItem) wrench.getItem();
-        java.util.function.Function<BlockPos, net.minecraft.world.item.context.UseOnContext> click = pos -> new net.minecraft.world.item.context.UseOnContext(
-                player, InteractionHand.MAIN_HAND, new net.minecraft.world.phys.BlockHitResult(
-                        net.minecraft.world.phys.Vec3.atCenterOf(h.absolutePos(pos)), net.minecraft.core.Direction.UP, h.absolutePos(pos), false));
-        var selected = com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModDataComponents.SELECTED_GENERATOR.get();
-
-        h.assertTrue(item.onItemUseFirst(wrench, click.apply(separatorPos)) == net.minecraft.world.InteractionResult.PASS,
-                "the wrench passes a click on a machine on (it opens as usual)");
-        h.assertFalse(wrench.has(selected), "and doesn't select it");
-        item.useOn(click.apply(generatorPos));
-        h.assertTrue(global(h, generatorPos).equals(wrench.get(selected)), "a generator is still selected");
-        h.assertTrue(item.onItemUseFirst(wrench, click.apply(separatorPos)) == net.minecraft.world.InteractionResult.PASS,
-                "a machine after a generator is passed on too");
-        h.assertTrue(global(h, generatorPos).equals(wrench.get(selected)), "so the generator stays selected");
-        h.assertTrue(com.jax3.barelyfunctionalcontraptions.mycelial.network.ManualLinkData.get(h.getLevel().getServer()).count(global(h, generatorPos)) == 0,
-                "and no link was made");
-
-        var status = generator.createStatus();
-        var buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
-        com.jax3.barelyfunctionalcontraptions.mycelial.menu.GeneratorStatus.STREAM_CODEC.encode(buf, status);
-        var decoded = com.jax3.barelyfunctionalcontraptions.mycelial.menu.GeneratorStatus.STREAM_CODEC.decode(buf);
-        h.assertTrue(decoded.equals(status), "the generator's status survives the trip to the client");
-        h.assertTrue(buf.readableBytes() == 0, "nothing left unread");
-        h.succeed();
     }
 
     /** A running Mycelial Generator touching a Hume Energy Cube charges it, and through it a separator on the far side. */

@@ -9,12 +9,12 @@ public final class ModCapabilities {
     public static void register(RegisterCapabilitiesEvent event) {
         // Machines built on the machine frame: each offers the energy, fluid and items of the modules it has switched on.
         com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame.registerCapabilities(event,
-                ModBlockEntities.POWERED_FURNACE.get(), ModBlockEntities.WOOL_PACKER.get(), ModBlockEntities.CHILLER.get(),
+                ModBlockEntities.WOOL_PACKER.get(), ModBlockEntities.CHILLER.get(),
                 ModBlockEntities.INFUSION_ALTAR.get(), ModBlockEntities.GRASS_SEEDER.get(), ModBlockEntities.IMPLOSION_CHAMBER.get(),
                 ModBlockEntities.FLEECE_TRAWLER.get(), ModBlockEntities.AUTOMATIC_SHEARS.get(), ModBlockEntities.FLUID_RESERVOIR.get(),
                 ModBlockEntities.MECHANICAL_SEPARATOR.get(),
                 // the generators
-                ModBlockEntities.GLOW_PANEL.get(), ModBlockEntities.STATIC_GENERATOR.get(), ModBlockEntities.WOOL_BURNER.get(),
+                ModBlockEntities.GLOW_PANEL.get(), ModBlockEntities.STATIC_GENERATOR.get(),
                 ModBlockEntities.BLAZE_FURNACE.get(), ModBlockEntities.THERMAL_REACTION_CHAMBER.get(), ModBlockEntities.ZERO_POINT_ENERGY_MODULE.get());
         // The Sheep Treadmill and Echo Chamber are on the frame too, but span several blocks, so they're offered per block.
         // Hume Energy Cube: the whole connected group, in and out, on every face.
