@@ -1671,13 +1671,10 @@ public final class DevScreenshotHarness {
             // Panel ("hume field on the panel"), and built (4, 6), the Implosion Chamber ("implosion chamber"), and an
             // Energy sheep beside the Hume Field Generator's cubes in (3, 6) ("energy sheep"), the platform being full.
             // Each of those runs also laid the seventh row's floor again (extendPlatform didn't check it was done),
-            // wiping what its scenes had set into the floor; it checks now. Now: the whole seventh row rebuilt.
-            {"crates", 0, 6},
-            {"fleece trawler", 1, 6},
-            {"upgrades", 2, 6},
-            {"hume field", 3, 6},
-            {"implosion chamber", 4, 6},
-            {"energy sheep", 3, 6},
+            // wiping what its scenes had set into the floor; it checks now. Then the whole seventh row was rebuilt
+            // ("crates", "fleece trawler", "upgrades", "hume field", "implosion chamber", "energy sheep"). Now: the
+            // Explosive Wool left lying round the Implosion Chamber from before it caught its own, swept up.
+            {"sweep implosion wool", 4, 6},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -2015,6 +2012,9 @@ public final class DevScreenshotHarness {
                         || e instanceof net.minecraft.world.entity.animal.sheep.Sheep)) e.discard();
         for (BlockPos p : BlockPos.betweenClosed(g.offset(-9, 0, -6), g.offset(9, 6, 5))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
         for (BlockPos p : BlockPos.betweenClosed(g.offset(-9, -1, -6), g.offset(9, -1, 5))) level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), 2);
+        // A rebuild empties the old chests (and drops the old item frame) onto the floor: clear that away too.
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(g).inflate(12, 8, 12),
+                e -> e instanceof net.minecraft.world.entity.item.ItemEntity || e instanceof net.minecraft.world.entity.decoration.ItemFrame)) e.discard();
         BlockPos chamber = g.offset(-3, 0, -1);
         // Its pen: grass, fenced at 3 out, so the 5x5 inside is exactly its pen.
         for (BlockPos p : BlockPos.betweenClosed(chamber.offset(-3, -1, -3), chamber.offset(3, -1, 3))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
@@ -2111,6 +2111,21 @@ public final class DevScreenshotHarness {
         label(server, furnace.above(4), "Energy sheep: drains the cubes,", "yellow");
         label(server, furnace.above(3), "powers this furnace wirelessly", "yellow");
         ResourcefulSheep.LOGGER.info("EXTEND energy sheep at {} by the cubes at {}, its furnace at {}", pen, cubes, furnace);
+    }
+
+    /** Clears the loose items (the Explosive Wool its sheep's blasts left before it caught it) from the Implosion Chamber's cell. */
+    private static void sweepImplosionWool(MinecraftServer server) {
+        ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+        BlockPos chamber = new BlockPos(126, 35, 176);
+        var items = level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(chamber).inflate(14, 6, 12));
+        int count = 0;
+        java.util.Map<String, Integer> kinds = new java.util.TreeMap<>();
+        for (var item : items) {
+            count += item.getItem().getCount();
+            kinds.merge(item.getItem().getHoverName().getString(), item.getItem().getCount(), Integer::sum);
+            item.discard();
+        }
+        ResourcefulSheep.LOGGER.info("EXTEND swept {} loose items ({} stacks) from round the Implosion Chamber at {}: {}", count, items.size(), chamber, kinds);
     }
 
     /** Links the test world's three Hume Field Generators (cell (3, 6)) to its Machine Status Panel, if they aren't yet. */
@@ -4714,6 +4729,7 @@ public final class DevScreenshotHarness {
                         case "hume field on the panel" -> linkHumeFieldToPanel(server);
                         case "implosion chamber" -> implosionWorldScene(server);
                         case "energy sheep" -> energySheepWorldScene(server);
+                        case "sweep implosion wool" -> sweepImplosionWool(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
