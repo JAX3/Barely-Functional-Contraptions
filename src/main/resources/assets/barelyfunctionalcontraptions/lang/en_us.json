@@ -1269,6 +1269,8 @@
   "gui.barelyfunctionalcontraptions.implosion_chamber.slot.cracked": "Cracked once",
   "gui.barelyfunctionalcontraptions.implosion_chamber.slot.cracked.desc": "Gravel it cracked from Cobblestone, waiting for the next blast to crack it into Sand (up to %s a blast).",
   "gui.barelyfunctionalcontraptions.implosion_chamber.slot.output": "Output",
+  "gui.barelyfunctionalcontraptions.implosion_chamber.slot.wool": "Explosive Wool",
+  "gui.barelyfunctionalcontraptions.implosion_chamber.slot.wool.desc": "The wool its sheep's blasts blow off: it catches it here instead of leaving it in the pen. Hoppers and pipes take it out.",
   "gui.barelyfunctionalcontraptions.implosion_chamber.slot.output.desc": "Its Sand (or Gravel). Hoppers and pipes take it out.",
   "gui.barelyfunctionalcontraptions.implosion_chamber.energy": "%s / %s FE",
   "gui.barelyfunctionalcontraptions.implosion_chamber.energy.desc": "Each spark takes %s FE.",

@@ -48,7 +48,10 @@ public final class ExplosiveSheep {
     /** Something that wants to know when an Explosive sheep pops, e.g. a machine whose chamber catches the blast. */
     @FunctionalInterface
     public interface PopListener {
-        /** Called on the server just after {@code sheep} popped at {@code at}, with the wool it dropped. */
+        /**
+         * Called on the server as {@code sheep} pops at {@code at}, with the wool blown off it. A listener may take some
+         * or all of it (shrinking the stacks); whatever is left is dropped on the ground.
+         */
         void popped(ServerLevel level, Sheep sheep, BlockPos at, List<ItemStack> wool);
     }
 
@@ -107,15 +110,18 @@ public final class ExplosiveSheep {
         List<ItemStack> wool = new ArrayList<>();
         ItemStack shears = new ItemStack(Items.SHEARS);
         if (sheep instanceof net.neoforged.neoforge.common.IShearable shearable && shearable.isShearable(null, shears, level, at)) {
-            for (ItemStack drop : shearable.onSheared(null, shears, level, at)) {
-                wool.add(drop.copy());
-                ItemEntity item = new ItemEntity(level, centre.x, centre.y, centre.z, drop);
-                item.setDeltaMovement(level.getRandom().nextGaussian() * 0.15, 0.3 + level.getRandom().nextDouble() * 0.2, level.getRandom().nextGaussian() * 0.15);
-                level.addFreshEntity(item);
-            }
+            for (ItemStack drop : shearable.onSheared(null, shears, level, at)) wool.add(drop.copy());
         }
+        List<ItemStack> blown = wool.stream().map(ItemStack::copy).toList();
+        // Listeners (an Implosion Chamber whose pen it's in) may catch the wool; the rest is blown out onto the ground.
         for (PopListener listener : List.copyOf(LISTENERS)) listener.popped(level, sheep, at, wool);
-        return wool;
+        for (ItemStack left : wool) {
+            if (left.isEmpty()) continue;
+            ItemEntity item = new ItemEntity(level, centre.x, centre.y, centre.z, left);
+            item.setDeltaMovement(level.getRandom().nextGaussian() * 0.15, 0.3 + level.getRandom().nextDouble() * 0.2, level.getRandom().nextGaussian() * 0.15);
+            level.addFreshEntity(item);
+        }
+        return blown;
     }
 
     /** Fire and lava light it. */

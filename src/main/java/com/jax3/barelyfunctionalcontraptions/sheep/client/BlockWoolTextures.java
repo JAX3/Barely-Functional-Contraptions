@@ -106,10 +106,10 @@ public final class BlockWoolTextures {
     private static int[][] fittedMap(int width, int height, int bw, int bh) {
         int[][] map = new int[width * height][];
         // Head (texOffs 0,0; 6x6x6) and legs (texOffs 0,16; 4x6x4): every face upright.
-        fitBox(map, width, height, bw, bh, 0, 0, 6, 6, 6, false);
-        fitBox(map, width, height, bw, bh, 0, 16, 4, 6, 4, false);
+        fitBox(map, width, height, bw, bh, 0, 0, 6, 6, 6, false, PLAIN_ALL);
+        fitBox(map, width, height, bw, bh, 0, 16, 4, 6, 4, false, PLAIN_NONE);
         // Body (texOffs 28,8; 8x16x6, turned to lie along the sheep): its long faces run along the sheep.
-        fitBox(map, width, height, bw, bh, 28, 8, 8, 16, 6, true);
+        fitBox(map, width, height, bw, bh, 28, 8, 8, 16, 6, true, PLAIN_ENDS);
         return map;
     }
 
@@ -128,12 +128,18 @@ public final class BlockWoolTextures {
     }
 
     /** Fits the block's texture to each face of a model cube at {@code (u, v)}, {@code w x h x d}. */
-    private static void fitBox(int[][] map, int width, int height, int bw, int bh, int u, int v, int w, int h, int d, boolean lying) {
-        // {x0, y0, x1, y1, turned}: top, bottom, then the four sides (east, north, west, south).
+    /** Which faces of a box show only the block's plain edge, its stripes without the pattern in its middle. */
+    private static final int PLAIN_NONE = 0, PLAIN_ENDS = 1, PLAIN_ALL = 2;
+
+    private static void fitBox(int[][] map, int width, int height, int bw, int bh, int u, int v, int w, int h, int d, boolean lying, int plain) {
+        // {x0, y0, x1, y1, how}: top, bottom, then the four sides (east, north, west, south). How: 0 the block upright,
+        // 1 turned to run along the sheep, 2 only the block's plain edge (on a TNT fleece, its stripes but no letters:
+        // the face, chest and rump are too small to show "TNT" whole, so they carry the flanks' stripes round instead).
+        int ends = plain != PLAIN_NONE ? 2 : 0, sides = plain == PLAIN_ALL ? 2 : lying ? 1 : 0;
         int[][] faces = {
-                {u + d, v, u + d + w, v + d, 0}, {u + d + w, v, u + d + 2 * w, v + d, 0},
-                {u, v + d, u + d, v + d + h, lying ? 1 : 0}, {u + d, v + d, u + d + w, v + d + h, lying ? 1 : 0},
-                {u + d + w, v + d, u + 2 * d + w, v + d + h, lying ? 1 : 0}, {u + 2 * d + w, v + d, u + 2 * d + 2 * w, v + d + h, lying ? 1 : 0}};
+                {u + d, v, u + d + w, v + d, ends}, {u + d + w, v, u + d + 2 * w, v + d, ends},
+                {u, v + d, u + d, v + d + h, sides}, {u + d, v + d, u + d + w, v + d + h, sides},
+                {u + d + w, v + d, u + 2 * d + w, v + d + h, sides}, {u + 2 * d + w, v + d, u + 2 * d + 2 * w, v + d + h, sides}};
         for (int fi = 0; fi < faces.length; fi++) {
             int[] f = faces[fi];
             int fw = f[2] - f[0], fh = f[3] - f[1];
@@ -143,7 +149,11 @@ public final class BlockWoolTextures {
                 for (int x = f[0]; x < f[2] && x < width; x++) {
                     int lx = x - f[0], ly = y - f[1];
                     int sx, sy;
-                    if (f[4] == 1) {
+                    if (f[4] == 2) {
+                        // The block's edge, one column in from its border, stretched across the face.
+                        sx = Math.min(bw - 1, Math.max(1, bw / 16));
+                        sy = span(ly, fh, bh, Math.min(bh, fh * 5 / 3));
+                    } else if (f[4] == 1) {
                         // Turned: the face's length (down the texture) is across the block, its depth up the block.
                         sx = fit(flip ? fh - 1 - ly : ly, fh, bw);
                         // Across the sheep, a slice a little taller than the face (10 of 16 rows on a TNT flank): the

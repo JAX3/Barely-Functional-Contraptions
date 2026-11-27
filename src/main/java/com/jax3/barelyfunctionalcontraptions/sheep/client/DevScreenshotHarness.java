@@ -2460,10 +2460,15 @@ public final class DevScreenshotHarness {
                 }
             });
             case 62 -> setHudHidden(mc, true);
-            case 64 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 35", origin.getX() + 0.5, origin.getY() + 3.6, origin.getZ() + 1.5));
+            // Close in front of its door for the first blast (its porthole glows for a second), then from above.
+            case 64 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 25", origin.getX() + 0.5, origin.getY() + 0.2, origin.getZ() - 2.6));
             case 80 -> shot(mc, "117_implosion_chamber_lit");
             case 93 -> shot(mc, "117_implosion_chamber_blast");
-            case 110 -> shot(mc, "117_implosion_chamber_after");
+            case 97 -> shot(mc, "117_implosion_chamber_blast_late");
+            case 101 -> shot(mc, "117_implosion_chamber_blast_101");
+            case 105 -> shot(mc, "117_implosion_chamber_blast_105");
+            case 108 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 35", origin.getX() + 0.5, origin.getY() + 3.6, origin.getZ() + 1.5));
+            case 118 -> shot(mc, "117_implosion_chamber_after");
             case 112 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 20", origin.getX() + 0.5, origin.getY() + 1.2, origin.getZ() - 1.6));
             case 140 -> shot(mc, "117_implosion_chamber");
             // Jade on it, in creative with the HUD back and the chat cleared; then JEI and its chapter.
@@ -2534,11 +2539,21 @@ public final class DevScreenshotHarness {
             case 110 -> shot(mc, "116_explosive_sheep");
             case 112 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 18", origin.getX() + 1.0, origin.getY() + 1.0, origin.getZ() - 2.6));
             case 140 -> shot(mc, "116_explosive_sheep_close");
-            case 142 -> server.execute(() -> com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.light(explosiveSheep.get(1)));
-            case 162 -> shot(mc, "116_explosive_sheep_hissing");
-            case 173 -> shot(mc, "116_explosive_sheep_pop");
-            case 190 -> shot(mc, "116_explosive_sheep_after");
-            case 196 -> mc.stop();
+            // The middle sheep (facing west) close up: its north flank, its south flank, its face, and its back.
+            case 142 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 0 15", origin.getX() + 1.0, origin.getY() + 0.3, origin.getZ() - 7.4));
+            case 162 -> shot(mc, "116_explosive_detail_north");
+            case 164 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 180 15", origin.getX() + 1.0, origin.getY() + 0.3, origin.getZ() - 2.4));
+            case 184 -> shot(mc, "116_explosive_detail_south");
+            case 186 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 270 10", origin.getX() - 1.6, origin.getY() + 0.2, origin.getZ() - 4.9));
+            case 206 -> shot(mc, "116_explosive_detail_face");
+            case 208 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f 0 60", origin.getX() + 1.0, origin.getY() + 1.6, origin.getZ() - 6.6));
+            case 228 -> shot(mc, "116_explosive_detail_back");
+            case 230 -> command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 18", origin.getX() + 1.0, origin.getY() + 1.0, origin.getZ() - 2.6));
+            case 242 -> server.execute(() -> com.jax3.barelyfunctionalcontraptions.sheep.entity.ExplosiveSheep.light(explosiveSheep.get(1)));
+            case 262 -> shot(mc, "116_explosive_sheep_hissing");
+            case 273 -> shot(mc, "116_explosive_sheep_pop");
+            case 290 -> shot(mc, "116_explosive_sheep_after");
+            case 296 -> mc.stop();
             default -> {}
         }
     }
@@ -3441,12 +3456,15 @@ public final class DevScreenshotHarness {
      * shrieking: {@code -PharnessScene=echo_chamber}.
      */
     private static void echoChamberTick(Minecraft mc, MinecraftServer server) {
+        // Keep the chat empty all through: commands and advancements would otherwise print the player's name in it,
+        // and it shows in the window, Jade and JEI shots.
+        McClient.clearChat(mc);
         switch (tick) {
             case 60 -> server.execute(() -> {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
                 ServerLevel level = player.level();
                 origin = player.blockPosition();
-                for (String c : new String[]{"time set noon", "weather clear", "gamemode spectator @a"}) {
+                for (String c : new String[]{"time set noon", "weather clear", "gamerule send_command_feedback false", "gamemode spectator @a"}) {
                     server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), c);
                 }
                 for (BlockPos p : BlockPos.betweenClosed(origin.offset(-7, 0, -13), origin.offset(7, 7, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);

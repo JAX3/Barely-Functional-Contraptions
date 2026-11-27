@@ -25,18 +25,18 @@ import org.jspecify.annotations.Nullable;
  * positions match {@code textures/gui/implosion_chamber.png}.
  */
 public class ImplosionChamberMenu extends MachineMenu {
-    public static final int INPUT_X = 50, CRACKED_X = 88, OUTPUT_X = 126, SLOT_Y = 26;
+    public static final int INPUT_X = 50, CRACKED_X = 88, OUTPUT_X = 126, WOOL_X = 148, SLOT_Y = 26;
     public static final int INVENTORY_Y = 111;
     public static final int BUTTON_AREA = 0, BUTTON_TARGET = 1;
 
-    private static final int PLAYER_START = 3;
+    private static final int PLAYER_START = 4;
 
     private final ContainerLevelAccess access;
     private final ContainerData data;
     private final @Nullable ImplosionChamberBlockEntity blockEntity;
 
     public ImplosionChamberMenu(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf buf) {
-        this(containerId, playerInventory, buf.readBlockPos(), null, new SimpleContainer(3), new SimpleContainerData(ImplosionChamberBlockEntity.DATA_COUNT));
+        this(containerId, playerInventory, buf.readBlockPos(), null, new SimpleContainer(4), new SimpleContainerData(ImplosionChamberBlockEntity.DATA_COUNT));
     }
 
     public ImplosionChamberMenu(int containerId, Inventory playerInventory, ImplosionChamberBlockEntity be, ContainerData data) {
@@ -45,7 +45,7 @@ public class ImplosionChamberMenu extends MachineMenu {
 
     private ImplosionChamberMenu(int containerId, Inventory playerInventory, BlockPos pos, @Nullable ImplosionChamberBlockEntity be, Container slots, ContainerData data) {
         super(ModMenus.IMPLOSION_CHAMBER.get(), containerId);
-        checkContainerSize(slots, 3);
+        checkContainerSize(slots, 4);
         checkContainerDataCount(data, ImplosionChamberBlockEntity.DATA_COUNT);
         this.access = ContainerLevelAccess.create(playerInventory.player.level(), pos);
         this.data = data;
@@ -71,6 +71,12 @@ public class ImplosionChamberMenu extends MachineMenu {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
+            }
+        });
+        addSlot(new Slot(slots, ImplosionChamberBlockEntity.WOOL, WOOL_X, SLOT_Y) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return false; // the Explosive Wool its sheep's blasts blew off
             }
         });
         addStandardInventorySlots(playerInventory, 8, INVENTORY_Y);

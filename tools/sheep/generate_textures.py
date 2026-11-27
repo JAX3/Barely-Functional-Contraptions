@@ -4740,7 +4740,7 @@ def generate_implosion_chamber_gui():
         for x in range(19, 23):
             img.putpixel((x, ty), GUI["tick"])
     inset(img, 30, 12, 168, 84, GUI["panel"])         # the blast panel
-    for x0 in (50, 88, 126):
+    for x0 in (50, 88, 126, 148):
         slot(img, x0, 26)
     inset(img, 49, 49, 143, 55, GUI["gauge"])         # the fuse, 92x4 at (50, 50)
     inset(img, 8, 86, 18, 96, GUI["gauge"])           # status lamp housing

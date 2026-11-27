@@ -128,11 +128,12 @@ public class ImplosionChamberScreen extends AbstractContainerScreen<ImplosionCha
         if (!menu.getCarried().isEmpty()) return;
         String key = "gui.barelyfunctionalcontraptions.implosion_chamber.";
         List<Component> lines = new ArrayList<>();
-        if (hoveredSlot != null && hoveredSlot.index < 3) {
+        if (hoveredSlot != null && hoveredSlot.index < 4) {
             if (!hoveredSlot.hasItem() || hoveredSlot.index == ImplosionChamberBlockEntity.CRACKED) {
                 String slot = switch (hoveredSlot.index) {
                     case ImplosionChamberBlockEntity.INPUT -> "input";
                     case ImplosionChamberBlockEntity.CRACKED -> "cracked";
+                    case ImplosionChamberBlockEntity.WOOL -> "wool";
                     default -> "output";
                 };
                 lines.add(Component.translatable(key + "slot." + slot));

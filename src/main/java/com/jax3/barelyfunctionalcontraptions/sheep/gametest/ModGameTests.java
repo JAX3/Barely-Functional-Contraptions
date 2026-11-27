@@ -3161,6 +3161,11 @@ public final class ModGameTests {
             h.assertTrue(be.inventory().get(1).is(Items.GRAVEL) && be.inventory().get(1).getCount() == 8, "8 more Gravel waiting, got " + be.inventory().get(1));
             h.assertTrue(be.inventory().get(0).getCount() == 16, "16 Cobblestone left, got " + be.inventory().get(0));
             h.assertTrue(be.crackedTotal() == 24, "24 items cracked a step, got " + be.crackedTotal());
+            // It caught its sheep's wool rather than leave it on the ground.
+            h.assertTrue(ResourcefulSheep.id("explosive").equals(com.jax3.barelyfunctionalcontraptions.sheep.items.ResourceWoolItem.getResourceId(
+                    be.inventory().get(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity.WOOL))), "it caught the Explosive Wool");
+            h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new net.minecraft.world.phys.AABB(h.absolutePos(at)).inflate(4)).isEmpty(), "and none is left lying in its pen");
         });
     }
 

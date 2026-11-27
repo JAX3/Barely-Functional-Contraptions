@@ -44,14 +44,15 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
  *     wool comes off as usual (it lands in the pen), and it can't blast again until its wool grows back, so a
  *     Grass Seeder in the pen keeps it busy.</li>
  *     <li><b>Slots:</b> an input (Cobblestone, or Gravel to make Sand) that hoppers and pipes fill, the Gravel it has
- *     cracked and is waiting to crack again, and the output, which hoppers and pipes empty.</li>
+ *     cracked and is waiting to crack again, the output, and the Explosive Wool its sheep's blasts blow off (it catches
+ *     it rather than leave it on the ground); hoppers and pipes empty both outputs.</li>
  * </ul>
  * Its comparator signal reads how full its output is.
  */
 public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
         implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider {
     public static final int AREA_COLOR = 0xFFE3533A;
-    public static final int INPUT = 0, CRACKED = 1, OUTPUT = 2;
+    public static final int INPUT = 0, CRACKED = 1, OUTPUT = 2, WOOL = 3;
     /** Ticks its porthole glows after a blast. */
     public static final int FLASH_TICKS = 20;
     /** Values synced to its window ({@link com.jax3.barelyfunctionalcontraptions.sheep.menu.ImplosionChamberMenu}). */
@@ -107,6 +108,7 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
             .input("input", this::acceptsInput)
             .slot("cracked", stack -> false, false)
             .output("output")
+            .output("wool")
             .build());
 
     private Target target = Target.SAND;
@@ -263,7 +265,26 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
                 catcher = be;
             }
         }
-        if (catcher != null) catcher.catchBlast(level);
+        if (catcher != null) {
+            catcher.catchBlast(level);
+            catcher.catchWool(wool);
+        }
+    }
+
+    /** Takes as much of the blown-off {@code wool} into its wool slot as fits (shrinking the stacks). */
+    public void catchWool(List<ItemStack> wool) {
+        for (ItemStack stack : wool) {
+            if (stack.isEmpty()) continue;
+            ItemStack held = inventory.get(WOOL);
+            if (held.isEmpty()) {
+                inventory.set(WOOL, stack.split(stack.getMaxStackSize()));
+            } else if (ItemStack.isSameItemSameComponents(held, stack)) {
+                int n = Math.min(stack.getCount(), held.getMaxStackSize() - held.getCount());
+                held.grow(n);
+                stack.shrink(n);
+            }
+        }
+        setChanged();
     }
 
     /**

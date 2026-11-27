@@ -499,7 +499,7 @@
       "text": [
         "Cracks Cobblestone into Gravel, and Gravel into Sand, with the blasts of Explosive sheep. Infuse a sheep with TNT at the altar (2 Gunpowder and a Fire Charge round it) for an Explosive sheep.",
         "- Keep Explosive sheep in the 5x5 round it. Every 5 seconds, if it has stone to crack, room for what it makes and 1,000 FE, it lights the fuse of the nearest one that has its fleece on.",
-        "- The sheep hisses and pops, breaking nothing: its fleece comes off as Explosive Wool, and the chamber catches the blast. Each blast cracks up to 8 items a step: first the Gravel it cracked last time into Sand, then 8 Cobblestone into Gravel. So Cobblestone takes two blasts to become Sand.",
+        "- The sheep hisses and pops, breaking nothing: the chamber catches the blast, and the Explosive Wool it blows off too, in a slot of its own. Each blast cracks up to 8 items a step: first the Gravel it cracked last time into Sand, then 8 Cobblestone into Gravel. So Cobblestone takes two blasts to become Sand.",
         "- A popped sheep can't blast again until its wool grows back. Explosive sheep regrow their wool on their own, in about 20 seconds; a Grass Seeder in the pen helps the rest.",
         "- A sheep lit any other way in its pen (fire, or your flint and steel) counts too.",
         "Load it by right-clicking it with Cobblestone or Gravel, or with a hopper or pipe; take Sand and Gravel out the same way. Power comes in on every side. Right-click it with an empty hand to open its window: its slots, a fuse to its next spark, its sheep and the Gravel button, which makes it stop at Gravel. Sneak-right-click it to show its pen. A comparator reads how full its output is.",

@@ -16,7 +16,7 @@ For Minecraft 26.3, 26.2 and 26.1 on NeoForge.
 - **Explosive sheep:** infused with TNT. Light its fuse and it pops its fleece off as wool, breaking nothing. Regrows
   in about 20 s.
 - **Implosion Chamber:** lights the Explosive sheep in its pen and uses their blasts to crack Cobblestone into Gravel
-  and Gravel into Sand, 8 a blast.
+  and Gravel into Sand, 8 a blast. It catches the wool they blow off.
 - **Static Generator (mid game):** sheep rubbing Copper Combs make 100 FE/t each, up to 600. Combs oxidise; left full,
   it shocks things nearby.
 - **Hume Field Generator (late game):** makes a random 200–1,200 FE/t each second, with no buffer: what its neighbours
