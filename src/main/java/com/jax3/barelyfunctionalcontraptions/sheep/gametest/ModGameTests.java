@@ -181,10 +181,13 @@ public final class ModGameTests {
         ECHO_TESTS.put("implosion_chamber_can_stop_at_gravel", ModGameTests::implosionGravel);
         ECHO_TESTS.put("implosion_chamber_needs_sheep_power_and_stone", ModGameTests::implosionNeeds);
         ECHO_TESTS.put("implosion_chamber_on_the_status_panel", ModGameTests::implosionReport);
+        ECHO_TESTS.put("implosion_chamber_takes_speed_range_and_muffler_cards", ModGameTests::implosionCards);
+        TESTS.put("grass_seeder_range_card_and_trawler_speed_card", ModGameTests::seederAndTrawlerCards);
         ECHO_TESTS.put("explosive_sheep_regrow_their_wool_quickly", ModGameTests::explosiveRegrows);
         ECHO_TESTS.put("energy_sheep_drains_cubes_and_charges_machines", ModGameTests::energySheepCharges);
         ECHO_TESTS.put("energy_sheep_does_nothing_sheared", ModGameTests::energySheepSheared);
         ECHO_TESTS.put("energy_sheep_glows_with_its_charge", ModGameTests::energySheepGlows);
+        ECHO_TESTS.put("energy_sheep_pauses_with_the_wrench", ModGameTests::energySheepPauses);
         ECHO_TESTS.put("echo_chamber_power_follows_the_noise", ModGameTests::echoPower);
         ECHO_TESTS.put("echo_chamber_hears_vibrations_but_not_through_wool", ModGameTests::echoHearing);
         ECHO_TESTS.put("echo_chamber_pushes_power_out_of_its_port", ModGameTests::echoPort);
@@ -3205,12 +3208,48 @@ public final class ModGameTests {
         });
     }
 
+    /** A Range card widens the Grass Seeder's ground a block each side; a Speed card makes the Fleece Trawler haul sooner. */
+    private static void seederAndTrawlerCards(GameTestHelper h) {
+        h.setBlock(new BlockPos(1, 2, 1), ModBlocks.GRASS_SEEDER.get());
+        var seeder = h.getBlockEntity(new BlockPos(1, 2, 1), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GrassSeederBlockEntity.class);
+        int reach = seeder.reach();
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(seeder.getBlockState(), new ItemStack(ModItems.RANGE_UPGRADE.get())),
+                "the Grass Seeder takes a Range card");
+        seeder.upgrades().setItem(0, new ItemStack(ModItems.RANGE_UPGRADE.get()));
+        h.assertTrue(seeder.reach() == reach + 1, "a Range card widens its ground: " + reach + " -> " + seeder.reach());
+        h.setBlock(new BlockPos(4, 2, 4), ModBlocks.FLEECE_TRAWLER.get());
+        var trawler = h.getBlockEntity(new BlockPos(4, 2, 4), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.FleeceTrawlerBlockEntity.class);
+        int haul = trawler.haulTicks();
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(trawler.getBlockState(), new ItemStack(ModItems.SPEED_UPGRADE.get())),
+                "the Fleece Trawler takes a Speed card");
+        trawler.upgrades().setItem(0, new ItemStack(ModItems.SPEED_UPGRADE.get()));
+        h.assertTrue(trawler.haulTicks() < haul, "a Speed card hauls sooner: " + haul + " -> " + trawler.haulTicks());
+        h.succeed();
+    }
+
+    /** A Range card widens its pen a block each side, a Speed card sparks sooner, and a Muffler card quiets it. */
+    private static void implosionCards(GameTestHelper h) {
+        BlockPos at = new BlockPos(4, 2, 4);
+        var be = implosionAt(h, at);
+        double width = be.pen().getXsize();
+        int ticks = be.sparkTicks();
+        be.upgrades().setItem(0, new ItemStack(ModItems.RANGE_UPGRADE.get()));
+        h.assertTrue(be.pen().getXsize() == width + 2, "a Range card widens its pen by a block each side: " + width + " -> " + be.pen().getXsize());
+        be.upgrades().setItem(1, new ItemStack(ModItems.SPEED_UPGRADE.get()));
+        h.assertTrue(be.sparkTicks() < ticks, "a Speed card sparks sooner: " + ticks + " -> " + be.sparkTicks());
+        be.upgrades().setItem(1, new ItemStack(ModItems.MUFFLER_UPGRADE.get()));
+        h.assertTrue(be.muffled(), "a Muffler card quiets it");
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades.accepts(h.getBlockState(at), new ItemStack(ModItems.SPEED_UPGRADE.get())),
+                "its block takes the cards");
+        h.succeed();
+    }
+
     /** Its Machine Status Panel line: its status in the panel's words, and what its output holds. */
     private static void implosionReport(GameTestHelper h) {
         BlockPos at = new BlockPos(4, 2, 4);
         var be = implosionAt(h, at);
         var report = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.report(be);
-        h.assertTrue(report != null && report.number().equals("0"), "an empty chamber reports, with nothing out: " + report);
+        h.assertTrue(report != null && report.number().equals("0 cracked"), "a new chamber reports, having cracked nothing: " + report);
         be.insertInput(new ItemStack(Items.COBBLESTONE, 16));
         be.setTarget(com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ImplosionChamberBlockEntity.Target.GRAVEL);
         h.runAfterDelay(5, () -> {
@@ -3221,7 +3260,7 @@ public final class ModGameTests {
             var after = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.report(be);
             h.assertTrue(after.status().equals("cracking") && after.level() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineReports.Level.RUNNING,
                     "after a blast it's cracking: " + after);
-            h.assertTrue(after.number().equals("8 Gravel"), "and shows its output: " + after.number());
+            h.assertTrue(after.number().equals("8 cracked"), "and shows how much it has cracked: " + after.number());
             h.succeed();
         });
     }
@@ -3293,6 +3332,25 @@ public final class ModGameTests {
             }
             // And it really is light: the full one's block is at 15.
             h.assertTrue(h.getLevel().getBrightness(net.minecraft.world.level.LightLayer.BLOCK, h.absolutePos(new BlockPos(2, 2, 2))) == 15, "the full one's block is lit at 15");
+        });
+    }
+
+    /** Right-clicked with the wrench it pauses (draining nothing, keeping its charge); again, and it runs. */
+    private static void energySheepPauses(GameTestHelper h) {
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 1, 0), new BlockPos(8, 1, 6))) h.setBlock(p, Blocks.STONE);
+        h.setBlock(new BlockPos(3, 2, 3), ModBlocks.HUME_ENERGY_CUBE.get());
+        var cube = h.getBlockEntity(new BlockPos(3, 2, 3), com.jax3.barelyfunctionalcontraptions.sheep.blockentity.EnergyCubeBlockEntity.class);
+        cube.storage().set((int) cube.storage().getCapacityAsLong());
+        long full = cube.storage().getAmountAsLong();
+        Sheep sheep = sheepAt(h, new BlockPos(4, 2, 3), ResourcefulSheep.id("energy"));
+        Player player = playerHolding(h, new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get()));
+        player.interactOn(sheep, InteractionHand.MAIN_HAND, sheep.position());
+        h.assertTrue(com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.isPaused(sheep), "the wrench pauses it");
+        h.runAfterDelay(30, () -> {
+            h.assertTrue(cube.storage().getAmountAsLong() == full, "paused, it drains nothing");
+            player.interactOn(sheep, InteractionHand.MAIN_HAND, sheep.position());
+            h.assertTrue(!com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.isPaused(sheep), "the wrench again starts it");
+            h.succeedWhen(() -> h.assertTrue(cube.storage().getAmountAsLong() < full, "running again, it drains the cube"));
         });
     }
 

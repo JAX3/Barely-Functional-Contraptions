@@ -26,7 +26,7 @@ import net.minecraft.world.item.Items;
  * line. Top right: the Sand/Gravel switch and the show-pen button. Art: {@code textures/gui/implosion_chamber.png}, see
  * {@code tools/sheep/generate_textures.py}.
  */
-public class ImplosionChamberScreen extends AbstractContainerScreen<ImplosionChamberMenu> {
+public class ImplosionChamberScreen extends MachineScreen<ImplosionChamberMenu> {
     private static final Identifier TEXTURE = ResourcefulSheep.id("textures/gui/implosion_chamber.png");
     private static final int TEX = 256;
     private static final int ENERGY_X = 9, GAUGE_Y = 19, GAUGE_W = 14, GAUGE_H = 64, ENERGY_U = 176;
@@ -36,6 +36,9 @@ public class ImplosionChamberScreen extends AbstractContainerScreen<ImplosionCha
     private static final int AREA_X = 154, TARGET_X = 135, BUTTON_Y = 4, BUTTON_SIZE = 16, BUTTON_U = 176, BUTTON_V = 146;
     private static final int TEXT_COLOR = 0xFFDFE4F5, TEXT_DIM = 0xFFAEB4C6, ENERGY_TEXT = 0xFFFFD27F, EMBER_TEXT = 0xFFFFB45A;
     private static final int ARROW = 0xFF6A6F80, EMBER = 0xFFF07A2A, EMBER_HOT = 0xFFFFD27A, FUSE = 0xFFC9B89A, FUSE_BURNT = 0xFF3A3530;
+
+    /** The Sand/Gravel switch shows what it's making. */
+    private static final ItemStack[] SAND_ICON_OR_GRAVEL = {new ItemStack(Items.SAND), new ItemStack(Items.GRAVEL)};
 
     public ImplosionChamberScreen(ImplosionChamberMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, 193);
@@ -50,7 +53,8 @@ public class ImplosionChamberScreen extends AbstractContainerScreen<ImplosionCha
                 menu::isShowingArea, ImplosionChamberBlockEntity.AREA_COLOR, menu.containerId, ImplosionChamberMenu.BUTTON_AREA));
         addRenderableWidget(new AreaToggleButton(leftPos + TARGET_X, topPos + BUTTON_Y, TEXTURE, BUTTON_U, BUTTON_V,
                 () -> menu.getTarget() == Target.GRAVEL, ImplosionChamberBlockEntity.AREA_COLOR, menu.containerId, ImplosionChamberMenu.BUTTON_TARGET,
-                new ItemStack(Items.GRAVEL), Component.translatable("gui.barelyfunctionalcontraptions.implosion_chamber.target.button")));
+                () -> SAND_ICON_OR_GRAVEL[menu.getTarget() == Target.GRAVEL ? 1 : 0],
+                Component.translatable("gui.barelyfunctionalcontraptions.implosion_chamber.target.button")));
     }
 
     @Override

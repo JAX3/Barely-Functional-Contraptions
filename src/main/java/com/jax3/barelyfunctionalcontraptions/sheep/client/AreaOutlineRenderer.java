@@ -37,11 +37,23 @@ public class AreaOutlineRenderer<T extends BlockEntity & AreaDisplay> implements
         return new State();
     }
 
+    /** How near a machine must be for the wrench in your hand to show its area. */
+    public static final int WRENCH_RANGE = 32;
+
+    /** Whether you're holding the Barely Functional Wrench near {@code pos}: then every machine's area shows. */
+    static boolean wrenchShows(BlockPos pos) {
+        var player = net.minecraft.client.Minecraft.getInstance().player;
+        if (player == null) return false;
+        var wrench = com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get();
+        if (!player.getMainHandItem().is(wrench) && !player.getOffhandItem().is(wrench)) return false;
+        return player.blockPosition().closerThan(pos, WRENCH_RANGE);
+    }
+
     @Override
     public void extractRenderState(T be, State state, float partialTicks, Vec3 cameraPosition,
                                    ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         BlockEntityRenderer.super.extractRenderState(be, state, partialTicks, cameraPosition, breakProgress);
-        state.show = be.showsArea();
+        state.show = be.showsArea() || wrenchShows(be.getBlockPos());
         if (!state.show) return;
         BlockPos pos = be.getBlockPos();
         java.util.List<AABB> areas = be.displayedAreas();

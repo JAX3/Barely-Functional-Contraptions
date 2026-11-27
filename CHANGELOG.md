@@ -37,6 +37,10 @@ For Minecraft 26.3, 26.2 and 26.1 on NeoForge.
 - The command is now **`/bfc`**.
 - **Wireless power links** from the wrench are gone: use cables, or an Energy sheep.
 - Every machine now runs on one shared machine frame; worlds load as before.
+- **Quality of life:** holding the wrench shows every nearby machine's working area. Upgrade cards also fit the Grass
+  Seeder (Range), Fleece Trawler (Speed) and Implosion Chamber (Speed, Range, Muffler). The wrench pauses an Energy
+  sheep, or (sneaking) shows its reach. The Implosion Chamber's switch shows Sand or Gravel, and its status panel line
+  counts what it has cracked.
 
 ### Fixed
 - An Item Pipe on a Mechanical Separator's top can take its outputs.

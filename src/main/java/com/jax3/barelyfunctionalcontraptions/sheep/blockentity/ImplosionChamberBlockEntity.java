@@ -50,7 +50,8 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
  * Its comparator signal reads how full its output is.
  */
 public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
-        implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider {
+        implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider,
+        com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable {
     public static final int AREA_COLOR = 0xFFE3533A;
     public static final int INPUT = 0, CRACKED = 1, OUTPUT = 2, WOOL = 3;
     /** Ticks its porthole glows after a blast. */
@@ -110,6 +111,8 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
             .output("output")
             .output("wool")
             .build());
+    /** Its two upgrade cards: Speed (sparks sooner), Range (a wider pen) and Muffler (quiet blasts). */
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = install(new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this));
 
     private Target target = Target.SAND;
     private Status status = Status.IDLE;
@@ -135,7 +138,7 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
                 case 5 -> showArea ? 1 : 0;
                 case 6 -> target.ordinal();
                 case 7 -> Math.max(0, cooldown);
-                case 8 -> sparkInterval();
+                case 8 -> sparkTicks();
                 case 9 -> readySheep;
                 case 10 -> regrowingSheep;
                 case 11 -> (int) (blastsCapped & 0xFFFF);
@@ -189,9 +192,29 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
         return stack.is(Items.COBBLESTONE) || (stack.is(Items.GRAVEL) && target == Target.SAND);
     }
 
+    /** Ticks between its sparks, with its cards (a Speed card sparks sooner). */
+    public int sparkTicks() {
+        return upgradeEffects().ticks(sparkInterval());
+    }
+
+    /** FE a spark takes, with its cards. */
+    public int sparkCost() {
+        return upgradeEffects().energy(sparkEnergy());
+    }
+
+    /** Its pen, with a Range card's extra blocks. */
+    public AABB pen() {
+        return pen(worldPosition, rangeBonus());
+    }
+
     /** Its pen: the {@code radius} round it, at its own level and one up. */
     public static AABB pen(BlockPos pos) {
-        int r = radius();
+        return pen(pos, 0);
+    }
+
+    /** Its pen, {@code bonus} blocks wider each side. */
+    public static AABB pen(BlockPos pos, int bonus) {
+        int r = radius() + bonus;
         return new AABB(pos.getX() - r, pos.getY(), pos.getZ() - r, pos.getX() + r + 1, pos.getY() + 2, pos.getZ() + r + 1);
     }
 
@@ -210,7 +233,7 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
             level.setBlock(pos, state.setValue(ImplosionChamberBlock.BLASTING, glowing), Block.UPDATE_CLIENTS);
         }
         if (--cooldown <= 0) {
-            cooldown = sparkInterval();
+            cooldown = sparkTicks();
             spark(level, pos);
         }
         int signal = comparatorSignal();
@@ -222,7 +245,7 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
 
     /** Lights the nearest ready Explosive sheep in its pen, if it has work, room and power; sets its status either way. */
     private void spark(ServerLevel level, BlockPos pos) {
-        List<Sheep> explosive = level.getEntitiesOfClass(Sheep.class, pen(pos), s -> s.isAlive() && !s.isBaby()
+        List<Sheep> explosive = level.getEntitiesOfClass(Sheep.class, pen(), s -> s.isAlive() && !s.isBaby()
                 && com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.getInfusedResource(s)
                         .map(r -> r.appearance().has(com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Feature.FUSE)).orElse(false));
         Status was = status;
@@ -242,11 +265,11 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
                     .min(Comparator.comparingDouble(s -> s.distanceToSqr(centre))).orElse(null);
             if (ready == null) {
                 status = Status.WAITING;
-            } else if (!energy.consume(sparkEnergy())) {
+            } else if (!energy.consume(sparkCost())) {
                 status = Status.NO_POWER;
             } else {
-                ExplosiveSheep.light(ready);
-                level.playSound(null, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 0.8F, 0.8F);
+                ExplosiveSheep.light(ready, muffled());
+                if (!muffled()) level.playSound(null, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 0.8F, 0.8F);
                 status = Status.CRACKING;
             }
         }
@@ -258,7 +281,7 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
         ImplosionChamberBlockEntity catcher = null;
         double best = Double.MAX_VALUE;
         for (ImplosionChamberBlockEntity be : List.copyOf(LOADED)) {
-            if (be.isRemoved() || be.getLevel() != level || !pen(be.getBlockPos()).contains(sheep.position().add(0, 0.1, 0))) continue;
+            if (be.isRemoved() || be.getLevel() != level || !be.pen().contains(sheep.position().add(0, 0.1, 0))) continue;
             double d = be.getBlockPos().distToCenterSqr(sheep.position());
             if (d < best) {
                 best = d;
@@ -333,7 +356,7 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
         flash = FLASH_TICKS;
         status = Status.CRACKING;
         Vec3 c = Vec3.atCenterOf(worldPosition);
-        level.playSound(null, worldPosition, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 0.5F, 0.7F);
+        if (!muffled()) level.playSound(null, worldPosition, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 0.5F, 0.7F);
         level.sendParticles(ParticleTypes.POOF, c.x, c.y + 0.6, c.z, 10, 0.25, 0.2, 0.25, 0.02);
         if (done > 0) {
             level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK,
@@ -476,7 +499,12 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
 
     @Override
     public AABB displayedArea() {
-        return pen(worldPosition);
+        return pen();
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
+        return upgrades;
     }
 
     @Override
@@ -510,7 +538,7 @@ public class ImplosionChamberBlockEntity extends com.jax3.barelyfunctionalcontra
         out.putBoolean("show_area", showArea);
     }
 
-    /** Clients only need the area setting, for the outline. */
+    /** Clients need the area setting and its cards (a Range card widens the outline), for the outline. */
     @Override
     protected void writeClientData(CompoundTag tag) {
         tag.putBoolean("show_area", showArea);

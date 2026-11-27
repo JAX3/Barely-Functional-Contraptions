@@ -83,11 +83,20 @@ public final class ExplosiveSheep {
      * Returns whether it was lit now.
      */
     public static boolean light(Sheep sheep) {
+        return light(sheep, false);
+    }
+
+    /** As {@link #light(Sheep)}; {@code quiet} (a Muffler card in the Implosion Chamber that lit it) hushes its hiss and pop. */
+    public static boolean light(Sheep sheep, boolean quiet) {
         if (!(sheep.level() instanceof ServerLevel level) || isLit(sheep) || !hasFuse(sheep)) return false;
         LIT.put(sheep, level.getGameTime() + FUSE_TICKS);
-        level.playSound(null, sheep, SoundEvents.CREEPER_PRIMED, SoundSource.NEUTRAL, 1.0F, 1.2F);
+        if (quiet) QUIET.put(sheep, Boolean.TRUE);
+        else level.playSound(null, sheep, SoundEvents.CREEPER_PRIMED, SoundSource.NEUTRAL, 1.0F, 1.2F);
         return true;
     }
+
+    /** Sheep lit quietly, whose pop makes no bang. */
+    private static final Map<Sheep, Boolean> QUIET = new WeakHashMap<>();
 
     /** Pops it now: the blast, the shove, and its fleece blown off as wool. Returns the wool it dropped. */
     public static List<ItemStack> pop(Sheep sheep) {
@@ -95,7 +104,7 @@ public final class ExplosiveSheep {
         if (!(sheep.level() instanceof ServerLevel level)) return List.of();
         BlockPos at = sheep.blockPosition();
         Vec3 centre = sheep.position().add(0, sheep.getBbHeight() * 0.5, 0);
-        level.playSound(null, centre.x, centre.y, centre.z, SoundEvents.GENERIC_EXPLODE, SoundSource.NEUTRAL, 0.6F, 1.5F);
+        if (QUIET.remove(sheep) == null) level.playSound(null, centre.x, centre.y, centre.z, SoundEvents.GENERIC_EXPLODE, SoundSource.NEUTRAL, 0.6F, 1.5F);
         level.sendParticles(ParticleTypes.EXPLOSION, centre.x, centre.y, centre.z, 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.LARGE_SMOKE, centre.x, centre.y, centre.z, 12, 0.4, 0.3, 0.4, 0.02);
         // A shove, but no damage and no broken blocks.

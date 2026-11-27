@@ -2430,7 +2430,20 @@ public final class DevScreenshotHarness {
             }
             case 146 -> { setHudHidden(mc, false); McClient.clearChat(mc); }
             case 170 -> shot(mc, "118_energy_sheep_jade");
-            case 176 -> mc.stop();
+            // Its reach, as a sneak-right-click with the wrench shows it.
+            case 172 -> {
+                setHudHidden(mc, true);
+                command(server, "gamemode spectator @a");
+                server.execute(() -> {
+                    ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
+                    for (var sh : level.getEntitiesOfClass(net.minecraft.world.entity.animal.sheep.Sheep.class, new net.minecraft.world.phys.AABB(origin).inflate(12))) {
+                        com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.showReachFor(level, sh);
+                    }
+                });
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 35", origin.getX() + 0.5, origin.getY() + 9.0, origin.getZ() + 10.5));
+            }
+            case 200 -> shot(mc, "118_energy_sheep_reach");
+            case 206 -> mc.stop();
             default -> {}
         }
     }
@@ -2517,7 +2530,15 @@ public final class DevScreenshotHarness {
             });
             case 236 -> { McClient.mouseMove(mc, mc.getWindow().handle(), 4, 4); McClient.clearChat(mc); }
             case 246 -> shot(mc, "117_implosion_chamber_gui");
-            case 250 -> mc.stop();
+            // The wrench in hand shows every machine's area, without toggling it.
+            case 248 -> {
+                McClient.setScreen(mc, null);
+                server.execute(() -> server.getPlayerList().getPlayers().getFirst().setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
+                        new ItemStack(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get())));
+                command(server, String.format(java.util.Locale.ROOT, "tp @a %.1f %.1f %.1f 180 40", origin.getX() + 0.5, origin.getY() + 4.0, origin.getZ() + 2.5));
+            }
+            case 266 -> shot(mc, "117_wrench_shows_areas");
+            case 270 -> mc.stop();
             default -> {}
         }
     }

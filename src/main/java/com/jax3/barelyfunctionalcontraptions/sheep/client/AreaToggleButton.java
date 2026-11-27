@@ -20,7 +20,7 @@ import net.minecraft.world.item.Items;
  */
 public class AreaToggleButton extends AbstractButton {
     private static final ItemStack ICON = new ItemStack(Items.SPYGLASS);
-    private final ItemStack icon;
+    private final java.util.function.Supplier<ItemStack> icon;
     public static final int SIZE = 16;
 
     private final Identifier texture;
@@ -42,6 +42,12 @@ public class AreaToggleButton extends AbstractButton {
     /** Any other on-off button in the same style: {@code icon} on the button, framed in {@code frameColor} while on. */
     public AreaToggleButton(int x, int y, Identifier texture, int u, int v, BooleanSupplier shown, int frameColor, int containerId, int buttonId,
                             ItemStack icon, Component message) {
+        this(x, y, texture, u, v, shown, frameColor, containerId, buttonId, () -> icon, message);
+    }
+
+    /** As above, with an icon that can change (e.g. to show which way the switch is set). */
+    public AreaToggleButton(int x, int y, Identifier texture, int u, int v, BooleanSupplier shown, int frameColor, int containerId, int buttonId,
+                            java.util.function.Supplier<ItemStack> icon, Component message) {
         super(x, y, SIZE, SIZE, message);
         this.icon = icon;
         this.texture = texture;
@@ -62,7 +68,7 @@ public class AreaToggleButton extends AbstractButton {
     @Override
     protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         graphics.blit(RenderPipelines.GUI_TEXTURED, texture, getX(), getY(), u + (isHoveredOrFocused() ? SIZE : 0), v, SIZE, SIZE, 256, 256);
-        graphics.fakeItem(icon, getX(), getY());
+        graphics.fakeItem(icon.get(), getX(), getY());
         if (shown.getAsBoolean()) graphics.outline(getX() - 1, getY() - 1, SIZE + 2, SIZE + 2, frameColor);
     }
 

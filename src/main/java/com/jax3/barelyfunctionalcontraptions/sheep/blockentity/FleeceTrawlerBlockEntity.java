@@ -50,7 +50,8 @@ import net.minecraft.world.phys.Vec3;
  * the lure (0) and nine for the catch (1 to 9); hoppers and pipes put lures in and take the catch out.</p>
  */
 public class FleeceTrawlerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
-        implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider {
+        implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider,
+        com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable {
     public static final int LURE = 0, OUTPUTS = 9, SIZE = 1 + OUTPUTS;
     /** Its pool's reach: 7 wide, 7 out from its front, 4 down. */
     public static final int POOL_HALF_WIDTH = 3, POOL_LENGTH = 7, POOL_DEPTH = 4;
@@ -93,6 +94,8 @@ public class FleeceTrawlerBlockEntity extends com.jax3.barelyfunctionalcontrapti
     // Its one module: an inventory of a lure slot (resource wool in, never out) and nine catch slots (hoppers take from
     // them; nothing goes in). Saved as an item list.
     private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(trawlerSlots(this));
+    /** Its two upgrade cards: a Speed card hauls sooner. */
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = install(new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this));
     private Status status = Status.NO_WATER;
     private boolean tangled;
     private float progress;
@@ -149,11 +152,21 @@ public class FleeceTrawlerBlockEntity extends com.jax3.barelyfunctionalcontrapti
 
     // ------------------------------------------------------------------ hauling
 
+    /** Ticks a haul takes at speed 1, with its cards: a Speed card hauls sooner. */
+    public int haulTicks() {
+        return upgradeEffects().ticks(ModConfigs.getInt(ModConfigs.SERVER.trawlerHaulTicks));
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
+        return upgrades;
+    }
+
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, FleeceTrawlerBlockEntity be) {
         if (level.getGameTime() % 20 == Math.floorMod(pos.asLong(), 20)) be.look(level);
         if (be.status != Status.HAULING) return;
         be.progress += be.speed;
-        if (be.progress >= ModConfigs.getInt(ModConfigs.SERVER.trawlerHaulTicks)) {
+        if (be.progress >= be.haulTicks()) {
             be.progress = 0;
             be.haul(level, level.getRandom());
         }
@@ -318,7 +331,7 @@ public class FleeceTrawlerBlockEntity extends com.jax3.barelyfunctionalcontrapti
 
     /** How far through the haul it is, 0 to 100. */
     public int progressPercent() {
-        return Mth.clamp((int) (100 * progress / ModConfigs.getInt(ModConfigs.SERVER.trawlerHaulTicks)), 0, 100);
+        return Mth.clamp((int) (100 * progress / haulTicks()), 0, 100);
     }
 
     /** Puts resource wool in its lure slot from {@code stack}; how many went in. */

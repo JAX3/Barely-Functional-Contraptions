@@ -149,8 +149,8 @@ public final class MachineReports {
                 case FULL -> "output_full";
                 case NO_POWER -> "no_energy";
             };
-            ItemStack out = b.inventory().get(ImplosionChamberBlockEntity.OUTPUT);
-            return of(status, out.isEmpty() ? "0" : out.getCount() + " " + out.getHoverName().getString());
+            long n = b.crackedTotal();
+            return of(status, (n >= 10_000 ? String.format(Locale.ROOT, "%.1fk", n / 1000.0) : Long.toString(n)) + " cracked");
         }
         if (be instanceof HerdCounterBlockEntity b) {
             return of("counting", b.mode() == HerdCounterBlockEntity.Mode.FULL ? b.value() + "/" + b.target() : Integer.toString(b.value()));

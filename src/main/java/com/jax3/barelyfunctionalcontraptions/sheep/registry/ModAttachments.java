@@ -52,5 +52,12 @@ public final class ModAttachments {
                     .sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT)
                     .build());
 
+    /** Whether an Energy sheep has been paused with the wrench. Persisted while paused, and synced (Jade, its sparks). */
+    public static final Supplier<AttachmentType<Boolean>> SHEEP_PAUSED = REGISTER.register("sheep_paused",
+            () -> AttachmentType.builder(() -> false)
+                    .serialize(com.mojang.serialization.Codec.BOOL.fieldOf("paused"), paused -> paused)
+                    .sync(net.minecraft.network.codec.ByteBufCodecs.BOOL)
+                    .build());
+
     private ModAttachments() {}
 }

@@ -41,7 +41,8 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
  * Its comparator signal reads how green its area is.
  */
 public class GrassSeederBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame
-        implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider {
+        implements com.jax3.barelyfunctionalcontraptions.sheep.machine.InventoryHolder, AreaDisplay, net.minecraft.world.MenuProvider,
+        com.jax3.barelyfunctionalcontraptions.sheep.upgrade.Upgradeable {
     public static final int AREA_COLOR = 0xFF6FCF4A;
     /** The ground map in its window covers areas up to 7x7 (radius 3), three bits a block, five blocks to a value. */
     public static final int MAP_MAX = 7, MAP_VALUES = 10, MAP_PER_VALUE = 5, MAP_BITS = 3;
@@ -87,6 +88,8 @@ public class GrassSeederBlockEntity extends com.jax3.barelyfunctionalcontraption
     private final com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory inventory = install(com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineInventory.builder()
             .input("bone_meal", stack -> stack.is(Items.BONE_MEAL))
             .build());
+    /** Its two upgrade cards: a Range card widens the ground it tends by a block each side. */
+    private final com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades = install(new com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades(this));
     /** Blocks left from the Bone Meal it last opened. */
     private int boneCharges;
     private int cooldown;
@@ -122,7 +125,7 @@ public class GrassSeederBlockEntity extends com.jax3.barelyfunctionalcontraption
                 case 11 -> dirt;
                 case 12 -> shortGrass;
                 case 13 -> boneCharges;
-                case 14 -> radius();
+                case 14 -> reach();
                 case 15 -> grazing;
                 case 16 -> (int) (tendedCapped & 0xFFFF);
                 case 17 -> (int) (tendedCapped >>> 16);
@@ -162,15 +165,28 @@ public class GrassSeederBlockEntity extends com.jax3.barelyfunctionalcontraption
         return ModConfigs.getInt(ModConfigs.SERVER.seederWaterPerBlock);
     }
 
+    /** How far out its ground reaches: {@code radius}, and a block more each side for a Range card. */
+    public int reach() {
+        return radius() + rangeBonus();
+    }
+
     /** The sheep it watches: standing on its ground, {@code radius} out, at its own level. */
     public static AABB area(BlockPos pos) {
-        int r = radius();
+        return area(pos, radius());
+    }
+
+    /** As {@link #area(BlockPos)}, {@code r} out. */
+    public static AABB area(BlockPos pos, int r) {
         return new AABB(pos.getX() - r, pos.getY(), pos.getZ() - r, pos.getX() + r + 1, pos.getY() + 2, pos.getZ() + r + 1);
     }
 
     /** The ground it tends: the blocks at its feet, {@code radius} out, not the one under it. */
     public static List<BlockPos> ground(BlockPos pos) {
-        int r = radius();
+        return ground(pos, radius());
+    }
+
+    /** As {@link #ground(BlockPos)}, {@code r} out. */
+    public static List<BlockPos> ground(BlockPos pos, int r) {
         List<BlockPos> list = new ArrayList<>();
         for (int dx = -r; dx <= r; dx++) {
             for (int dz = -r; dz <= r; dz++) {
@@ -221,7 +237,7 @@ public class GrassSeederBlockEntity extends com.jax3.barelyfunctionalcontraption
     public void work(ServerLevel level, BlockPos pos) {
         List<BlockPos> bare = new ArrayList<>(), plantable = new ArrayList<>(), tall = new ArrayList<>(), tufts = new ArrayList<>();
         grass = dirt = shortGrass = tallGrass = 0;
-        for (BlockPos p : ground(pos)) {
+        for (BlockPos p : ground(pos, reach())) {
             BlockState state = level.getBlockState(p), above = level.getBlockState(p.above());
             boolean isDirt = state.is(Blocks.DIRT), isGrass = state.is(Blocks.GRASS_BLOCK);
             if (!isDirt && !isGrass) continue;
@@ -239,7 +255,7 @@ public class GrassSeederBlockEntity extends com.jax3.barelyfunctionalcontraption
                 plantable.add(p);
             }
         }
-        grazing = level.getEntitiesOfClass(Sheep.class, area(pos), s -> s.isAlive() && s.isSheared() && !s.isBaby()).size();
+        grazing = level.getEntitiesOfClass(Sheep.class, area(pos, reach()), s -> s.isAlive() && s.isSheared() && !s.isBaby()).size();
         Job job = null;
         List<BlockPos> targets = List.of();
         if (!bare.isEmpty()) {
@@ -306,7 +322,7 @@ public class GrassSeederBlockEntity extends com.jax3.barelyfunctionalcontraption
     /** What each block of its ground is, for the map in its window (areas up to {@link #MAP_MAX} across). */
     private void updateMap(ServerLevel level, BlockPos pos) {
         java.util.Arrays.fill(map, 0);
-        int r = radius();
+        int r = reach();
         if (r * 2 + 1 > MAP_MAX) return;
         int i = 0;
         for (int dz = -r; dz <= r; dz++) {
@@ -332,7 +348,7 @@ public class GrassSeederBlockEntity extends com.jax3.barelyfunctionalcontraption
     private void graze(ServerLevel level, BlockPos pos) {
         double chance = grazeChance();
         if (chance <= 0) return;
-        AABB area = area(pos);
+        AABB area = area(pos, reach());
         for (Sheep sheep : level.getEntitiesOfClass(Sheep.class, area, s -> s.isAlive() && s.isSheared() && !s.isBaby())) {
             if (level.getRandom().nextDouble() >= chance) continue;
             graze(level, sheep);
@@ -494,7 +510,7 @@ public class GrassSeederBlockEntity extends com.jax3.barelyfunctionalcontraption
 
     @Override
     public AABB displayedArea() {
-        int r = radius();
+        int r = reach();
         BlockPos p = worldPosition;
         return new AABB(p.getX() - r, p.getY() - 1, p.getZ() - r, p.getX() + r + 1, p.getY() + 1, p.getZ() + r + 1);
     }
@@ -502,6 +518,11 @@ public class GrassSeederBlockEntity extends com.jax3.barelyfunctionalcontraption
     @Override
     public int areaColor() {
         return AREA_COLOR;
+    }
+
+    @Override
+    public com.jax3.barelyfunctionalcontraptions.sheep.upgrade.MachineUpgrades upgrades() {
+        return upgrades;
     }
 
     /** Fills its power at once (GameTests, the screenshot harness). */

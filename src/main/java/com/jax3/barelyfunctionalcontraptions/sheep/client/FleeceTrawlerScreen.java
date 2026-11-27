@@ -23,7 +23,7 @@ import net.minecraft.world.inventory.Slot;
  * the haul's progress as a line being wound in, with a wave under it; right, its nine catch slots; along the bottom, the
  * status lamp and line. Top right: show or hide the pool.
  */
-public class FleeceTrawlerScreen extends AbstractContainerScreen<FleeceTrawlerMenu> {
+public class FleeceTrawlerScreen extends MachineScreen<FleeceTrawlerMenu> {
     /** The area button's art, shared with the Snow Sheep Chiller's window. */
     private static final Identifier BUTTON_TEXTURE = ResourcefulSheep.id("textures/gui/chiller.png");
     private static final int BUTTON_U = 176, BUTTON_V = 146, AREA_X = 154, AREA_Y = 4, BUTTON_SIZE = 16;

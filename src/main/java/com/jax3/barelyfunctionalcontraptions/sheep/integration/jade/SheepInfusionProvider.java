@@ -53,6 +53,9 @@ public enum SheepInfusionProvider implements IEntityComponentProvider {
             tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.sheep_charge",
                     String.format(java.util.Locale.ROOT, "%,d", com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.charge(entity)),
                     String.format(java.util.Locale.ROOT, "%,d", com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.capacity())).withColor(0xFFE14A));
+            if (com.jax3.barelyfunctionalcontraptions.sheep.entity.EnergySheep.isPaused(entity)) {
+                tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.sheep_paused").withStyle(ChatFormatting.GRAY));
+            }
         }
     }
 

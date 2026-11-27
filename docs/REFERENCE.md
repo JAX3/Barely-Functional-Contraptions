@@ -290,7 +290,7 @@ Every sheep has three stats from **1 to 10**. Wild sheep are all 1s, and you rai
 
 The **Infusion Altar** is a powered pedestal. Put the feeding item in its **centre slot** and the **catalysts** in the four slots around it, give it power, and stand a grown sheep **within 2 blocks** of it. A stream of the resource's colour runs from the altar to the sheep, which is held nearly still with Slowness (only the sheep, and only until the infusion ends). When the bar fills the sheep is infused. The items and power are only used when it finishes.
 
-**Showing the area:** click the spyglass button right of the status line in the altar's window, or sneak-right-click the altar with an empty hand, to outline in purple where a sheep must stand: 5x5 columns centred on the altar, from one block below it to one above. Do it again to hide it. The setting is saved with the altar, like the Automatic Shears' and Blaze Sheep Furnace's.
+**Showing the area:** click the spyglass button right of the status line in the altar's window, or sneak-right-click the altar with an empty hand, to outline in purple where a sheep must stand: 5x5 columns centred on the altar, from one block below it to one above. Do it again to hide it. The setting is saved with the altar, like the Automatic Shears' and Blaze Sheep Furnace's. **Holding the Barely Functional Wrench** shows the working area of every machine within 32 blocks, without switching any on.
 
 | Sheep | Feeding item | Catalysts | Power |
 |---|---|---|---|
@@ -801,6 +801,7 @@ A themed sheep infused with a **Hume Energy Cube** (2 Lightning Rods round it at
 - **Drains:** every half second it draws up to **2,000 FE a tick** (`drainPerTick`) from the Hume Energy Cubes within **3 blocks** of it (`drainRadius`) into its fleece, which holds **100,000 FE** (`capacity`).
 - **Charges:** it shares up to **2,000 FE a tick** (`chargePerTick`) between everything within **8 blocks** (`chargeRadius`): every block that takes FE (machines, generators' buffers; not Hume Energy Cubes or cables) and every powered item (tools, armour, anything that holds FE) in nearby players' inventories. Each gets a fair share, and sparks arc to what it charges.
 - Only a grown sheep with its fleece on does either; sheared, it keeps its charge until its wool grows back.
+- **The wrench:** right-click it to **pause** it (it keeps its charge but drains and charges nothing; Jade says *Paused*) or start it again; sneak-right-click to **show its reach** for 10 seconds, a purple box round the cubes it drains and a yellow one round what it charges.
 - **It glows with its charge:** like a Glow Ink sheep it lights the block it stands in, at a light level that follows its charge (15 when full, fading as it empties, none when empty), and its fleece is drawn as brightly. It sparks more often the fuller it is.
 - **Jade** shows its charge. Its wool separates into Redstone and Copper, with a chance of Glowstone. **Advancement:** *Static Cling*.
 - **Config:** `[energy_sheep]`: `capacity` (100,000), `drainRadius` (3), `drainPerTick` (2,000), `chargeRadius` (8), `chargePerTick` (2,000).
@@ -808,7 +809,7 @@ A themed sheep infused with a **Hume Energy Cube** (2 Lightning Rods round it at
 | An Energy sheep beside its cube bank | Jade |
 |---|---|
 | ![An Energy sheep in a fleece of Hume Energy Cube, little cubes on its back, beside a bank of Hume Energy Cubes](screenshots/118_energy_sheep.png) | ![Jade on an Energy sheep: Infused Energy, 100 shearings left, Charge 98,000 / 100,000 FE](screenshots/118_energy_sheep_jade.png) |
-| ![Three Energy sheep at night, empty, half charged and full: the empty one dark, the half-charged one casting a soft pool of light, the full one lighting a wide circle of ground](screenshots/118_energy_sheep_glow.png) | |
+| ![Three Energy sheep at night, empty, half charged and full: the empty one dark, the half-charged one casting a soft pool of light, the full one lighting a wide circle of ground](screenshots/118_energy_sheep_glow.png) | ![An Energy sheep showing its reach: a purple box of dust round the cubes it drains, a big yellow one round what it charges](screenshots/118_energy_sheep_reach.png) |
 
 ### Implosion Chamber
 A riveted blue-steel blast vessel with a round blast door on its front. It **cracks Cobblestone into Gravel, and Gravel into Sand**, with the blasts of **Explosive sheep** (infused with TNT) in the pen round it.
@@ -826,7 +827,7 @@ I P I      P = Piston
 - **Slots:** an input (Cobblestone, or Gravel to make Sand), an output, and a wool slot: it **catches the Explosive Wool** its sheep's blasts blow off instead of leaving it in the pen. Hoppers and pipes fill the input and empty both outputs. Power comes in on every side. Right-click it with Cobblestone or Gravel to load it.
 - **Window:** right-click it with an empty hand. Its energy gauge; its input, the Gravel it holds to crack again and its output in a row, with arrows that flare orange after a blast; a fuse burning down to its next spark; its Explosive sheep (ready and regrowing); its blasts and items cracked; and its status lamp and line. Top right, the **Sand/Gravel switch** (the Gravel button: lit, it stops at Gravel) and the spyglass that shows its pen. Hovering anything explains it.
 - **Comparator:** how full its output is.
-- **Machine Status Panel:** *Cracking* (with what its output holds), *Regrowing*, *No sheep*, *Nothing to crack*, *Output full* or *No power*.
+- **Machine Status Panel:** *Cracking* (with how much it has cracked), *Regrowing*, *No sheep*, *Nothing to crack*, *Output full* or *No power*.
 - **JEI:** a page for each step (Cobblestone to Gravel, Gravel to Sand) with an Explosive sheep, and an information page. **Jade:** its status, what it's making, the Gravel waiting to crack again, and its blasts and items cracked.
 - Mine it with a pickaxe. **Config:** `[implosion_chamber]`: `radius` (2), `sparkInterval` (100), `sparkEnergy` (1,000), `batch` (8), `capacity` (20,000), `maxInput` (1,000), `explosiveRegrowSeconds` (20).
 
@@ -976,7 +977,7 @@ A bale can be placed like a hay bale, standing up or lying down, in the colour o
 | ![The Mechanical Separator window with 3 Iron Wool Bales in its input slot and the tooltip: Iron Wool Bale, 9 x Iron Wool, pressed together](screenshots/88_separator_bale_gui.png) | ![The Contraptions Manual's Logistics tab with the new Wool Packer chapter open](screenshots/89_guide_wool_packer.png) |
 
 ### Upgrade cards
-Cards that go in a processing machine: to trade time for power or power for time, to hold more power, to reach further, to get more out of each wool, or to quieten it. The **Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears and Snow Sheep Chiller** each have **two upgrade slots**, in a small panel on the right of their window.
+Cards that go in a processing machine: to trade time for power or power for time, to hold more power, to reach further, to get more out of each wool, or to quieten it. The **Mechanical Separator, Wool Packer, Powered Furnace, Infusion Altar, Automatic Shears, Snow Sheep Chiller, Grass Seeder, Fleece Trawler and Implosion Chamber** each have **two upgrade slots**, in a small panel on the right of their window. The Grass Seeder takes Range, the Fleece Trawler Speed (quicker hauls), and the Implosion Chamber Speed (sparks sooner), Range (a wider pen) and Muffler (silences it and the pops of the sheep it lights).
 
 ![The blank Upgrade Base, the Speed Upgrade (a red strip and a lightning bolt), the Efficiency Upgrade (a lime strip and a copper coil), the Capacity Upgrade (a light blue strip and a battery), the Range Upgrade (a purple strip and a target), the Yield Upgrade (a yellow strip and a green plus) and the Muffler Upgrade (a black strip and a wool tuft over a speaker): Blue Steel circuit cards with gold contacts](screenshots/116_upgrade_cards.png)
 

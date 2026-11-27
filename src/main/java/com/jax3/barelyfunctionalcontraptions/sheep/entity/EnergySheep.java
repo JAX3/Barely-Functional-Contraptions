@@ -35,13 +35,36 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  *     takes FE, but not Hume Energy Cubes or cables) and the players' powered items (tools, armour, anything that holds
  *     FE, in any slot) within {@code chargeRadius} (8) blocks, a fair share each. Sparks arc to whatever it charges.</li>
  *     <li>Only a grown sheep with its fleece on does either; a sheared one keeps its charge until its wool grows back.</li>
+ *     <li><b>The wrench:</b> right-click it to pause it (it keeps its charge, and neither drains nor charges) or start
+ *     it again; sneak-right-click to outline its reach for {@link #REACH_TICKS} ticks: purple round the cubes it drains,
+ *     yellow round what it charges.</li>
  * </ul>
+ * What's round it is looked up once every {@link #CACHE_TICKS} ticks (or when it moves), not every time.
  */
 public final class EnergySheep {
     private EnergySheep() {}
 
     /** Ticks between its drains and charges. */
     public static final int INTERVAL = 10;
+    /** How long the wrench outlines its reach, in ticks. */
+    public static final int REACH_TICKS = 200;
+    /** How long it trusts its list of what's round it, in ticks, while it stays put. */
+    public static final int CACHE_TICKS = 100;
+
+    /** What's round a sheep: the cubes it can drain and the blocks it can charge, found at {@code at} at {@code time}. */
+    private record Nearby(BlockPos at, long time, List<BlockPos> cubes, List<BlockPos> targets) {}
+
+    private static final java.util.Map<Sheep, Nearby> NEARBY = new java.util.WeakHashMap<>();
+    /** Sheep showing their reach, and the game time to stop. */
+    private static final java.util.Map<Sheep, Long> SHOWING = new java.util.WeakHashMap<>();
+
+    public static boolean isPaused(Entity sheep) {
+        return sheep.hasData(ModAttachments.SHEEP_PAUSED) && sheep.getData(ModAttachments.SHEEP_PAUSED);
+    }
+
+    public static void setPaused(Entity sheep, boolean paused) {
+        if (paused != isPaused(sheep)) sheep.setData(ModAttachments.SHEEP_PAUSED, paused);
+    }
 
     public static boolean isEnergySheep(Entity entity) {
         return SheepFeatureEvents.has(entity, Feature.CHARGED);
@@ -65,15 +88,105 @@ public final class EnergySheep {
         if (sheep.level().isClientSide()) {
             // It crackles while it holds charge: hardly at all nearly empty, every tick or two when full.
             int charge = charge(sheep);
-            if (charge > 0 && isEnergySheep(sheep) && sheep.getRandom().nextFloat() < 0.05F + 0.55F * Math.min(1F, charge / (float) capacity())) {
+            if (charge > 0 && !isPaused(sheep) && isEnergySheep(sheep) && sheep.getRandom().nextFloat() < 0.05F + 0.55F * Math.min(1F, charge / (float) capacity())) {
                 sheep.level().addParticle(ParticleTypes.ELECTRIC_SPARK, sheep.getRandomX(0.6),
                         sheep.getY() + sheep.getBbHeight() * (0.5 + sheep.getRandom().nextDouble() * 0.6), sheep.getRandomZ(0.6), 0, 0.05, 0);
             }
             return;
         }
-        if ((sheep.tickCount + sheep.getId()) % INTERVAL != 0 || !(sheep.level() instanceof ServerLevel level) || !isEnergySheep(sheep)) return;
+        if (!(sheep.level() instanceof ServerLevel level)) return;
+        Long until = SHOWING.get(sheep);
+        if (until != null) {
+            if (level.getGameTime() >= until || !isEnergySheep(sheep)) SHOWING.remove(sheep);
+            else if (level.getGameTime() % 10 == 0) showReach(level, sheep);
+        }
+        if ((sheep.tickCount + sheep.getId()) % INTERVAL != 0 || !isEnergySheep(sheep) || isPaused(sheep)) return;
         drain(level, sheep);
         share(level, sheep);
+    }
+
+    /** What's round it, looked up again if it has moved or the list is old. */
+    private static Nearby nearby(ServerLevel level, Sheep sheep) {
+        Nearby known = NEARBY.get(sheep);
+        BlockPos at = sheep.blockPosition();
+        if (known != null && known.at().equals(at) && level.getGameTime() - known.time() < CACHE_TICKS) return known;
+        int drainRadius = ModConfigs.getInt(ModConfigs.SERVER.energySheepDrainRadius);
+        int chargeRadius = ModConfigs.getInt(ModConfigs.SERVER.energySheepChargeRadius);
+        List<BlockPos> cubes = new ArrayList<>(), targets = new ArrayList<>();
+        for (BlockEntity be : blockEntitiesNear(level, sheep.position(), Math.max(drainRadius, chargeRadius))) {
+            BlockPos p = be.getBlockPos();
+            int d = Math.max(Math.abs(p.getX() - at.getX()), Math.max(Math.abs(p.getY() - at.getY()), Math.abs(p.getZ() - at.getZ())));
+            if (be instanceof EnergyCubeBlockEntity) {
+                if (d <= drainRadius) cubes.add(p.immutable());
+            } else if (!(be instanceof EnergyCableBlockEntity) && d <= chargeRadius && blockHandler(level, p) != null) {
+                targets.add(p.immutable());
+            }
+        }
+        Nearby found = new Nearby(at.immutable(), level.getGameTime(), cubes, targets);
+        NEARBY.put(sheep, found);
+        return found;
+    }
+
+    /** The wrench: right-click pauses it or starts it again; sneak-right-click shows its reach for a while. */
+    @SubscribeEvent
+    public static void onInteract(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract event) {
+        if (!(event.getTarget() instanceof Sheep sheep) || !event.getItemStack().is(com.jax3.barelyfunctionalcontraptions.mycelial.registry.ModItems.MYCELIUM_WRENCH.get())) return;
+        if (!sheep.hasData(ModAttachments.SHEEP_INFUSION) || SheepInfusionEvents.getInfusedResource(sheep)
+                .map(r -> !r.appearance().has(Feature.CHARGED)).orElse(true)) return;
+        Player player = event.getEntity();
+        if (sheep.level() instanceof ServerLevel level) {
+            if (player.isSecondaryUseActive()) {
+                boolean show = !SHOWING.containsKey(sheep);
+                if (show) {
+                    SHOWING.put(sheep, level.getGameTime() + REACH_TICKS);
+                    showReach(level, sheep);
+                } else {
+                    SHOWING.remove(sheep);
+                }
+                player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable(show
+                        ? "message.barelyfunctionalcontraptions.energy_sheep.reach" : "message.barelyfunctionalcontraptions.energy_sheep.reach_hidden",
+                        ModConfigs.getInt(ModConfigs.SERVER.energySheepDrainRadius), ModConfigs.getInt(ModConfigs.SERVER.energySheepChargeRadius))
+                        .withColor(0xFFE14A));
+            } else {
+                boolean paused = !isPaused(sheep);
+                setPaused(sheep, paused);
+                level.playSound(null, sheep, net.minecraft.sounds.SoundEvents.LEVER_CLICK, net.minecraft.sounds.SoundSource.NEUTRAL, 0.6F, paused ? 0.6F : 0.9F);
+                player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable(paused
+                        ? "message.barelyfunctionalcontraptions.energy_sheep.paused" : "message.barelyfunctionalcontraptions.energy_sheep.running")
+                        .withColor(paused ? 0xAAAAAA : 0xFFE14A));
+            }
+        }
+        event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+        event.setCanceled(true);
+    }
+
+    /** Shows its reach for {@link #REACH_TICKS} ticks, as a sneak-right-click with the wrench does. */
+    public static void showReachFor(ServerLevel level, Sheep sheep) {
+        SHOWING.put(sheep, level.getGameTime() + REACH_TICKS);
+        showReach(level, sheep);
+    }
+
+    /** Dust along the edges of its two reaches: purple, the cubes it drains; yellow, what it charges. */
+    private static void showReach(ServerLevel level, Sheep sheep) {
+        BlockPos at = sheep.blockPosition();
+        outline(level, at, ModConfigs.getInt(ModConfigs.SERVER.energySheepDrainRadius), new net.minecraft.core.particles.DustParticleOptions(0x9A52F0, 1.2F));
+        outline(level, at, ModConfigs.getInt(ModConfigs.SERVER.energySheepChargeRadius), new net.minecraft.core.particles.DustParticleOptions(0xFFE14A, 1.4F));
+    }
+
+    private static void outline(ServerLevel level, BlockPos at, int radius, net.minecraft.core.particles.ParticleOptions dust) {
+        double x0 = at.getX() - radius, y0 = at.getY() - radius, z0 = at.getZ() - radius;
+        double size = radius * 2 + 1;
+        double[][] corners = {{0, 0, 0}, {1, 0, 0}, {0, 0, 1}, {1, 0, 1}, {0, 1, 0}, {1, 1, 0}, {0, 1, 1}, {1, 1, 1}};
+        int[][] edges = {{0, 1}, {0, 2}, {1, 3}, {2, 3}, {4, 5}, {4, 6}, {5, 7}, {6, 7}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
+        for (int[] e : edges) {
+            double[] a = corners[e[0]], b = corners[e[1]];
+            int steps = (int) size;
+            for (int k = 0; k <= steps; k++) {
+                double t = k / (double) steps;
+                level.sendParticles(dust, x0 + size * (a[0] + (b[0] - a[0]) * t), y0 + size * (a[1] + (b[1] - a[1]) * t),
+                        z0 + size * (a[2] + (b[2] - a[2]) * t), 1, 0, 0, 0, 0);
+            }
+        }
     }
 
     /** Draws FE from the Hume Energy Cubes near it, up to {@code drainPerTick} a tick and what its fleece has room for. */
@@ -82,8 +195,8 @@ public final class EnergySheep {
         int budget = Math.min(room, ModConfigs.getInt(ModConfigs.SERVER.energySheepDrainPerTick) * INTERVAL);
         if (budget <= 0) return 0;
         int drawn = 0;
-        for (BlockEntity be : blockEntitiesNear(level, sheep.position(), ModConfigs.getInt(ModConfigs.SERVER.energySheepDrainRadius))) {
-            if (!(be instanceof EnergyCubeBlockEntity cube)) continue;
+        for (BlockPos p : nearby(level, sheep).cubes()) {
+            if (!(level.getBlockEntity(p) instanceof EnergyCubeBlockEntity cube)) continue;
             EnergyHandler handler = cube.getEnergyHandler();
             try (Transaction tx = Transaction.openRoot()) {
                 int got = handler.extract(budget - drawn, tx);
@@ -103,12 +216,11 @@ public final class EnergySheep {
         int radius = ModConfigs.getInt(ModConfigs.SERVER.energySheepChargeRadius);
         List<EnergyHandler> targets = new ArrayList<>();
         List<Vec3> where = new ArrayList<>();
-        for (BlockEntity be : blockEntitiesNear(level, sheep.position(), radius)) {
-            if (be instanceof EnergyCubeBlockEntity || be instanceof EnergyCableBlockEntity) continue;
-            EnergyHandler handler = blockHandler(level, be.getBlockPos());
+        for (BlockPos p : nearby(level, sheep).targets()) {
+            EnergyHandler handler = level.isLoaded(p) ? blockHandler(level, p) : null; // gone since it looked: skip it
             if (handler == null) continue;
             targets.add(handler);
-            where.add(Vec3.atCenterOf(be.getBlockPos()));
+            where.add(Vec3.atCenterOf(p));
         }
         for (Player player : level.getEntitiesOfClass(Player.class, new AABB(sheep.blockPosition()).inflate(radius), p -> !p.isSpectator())) {
             for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {

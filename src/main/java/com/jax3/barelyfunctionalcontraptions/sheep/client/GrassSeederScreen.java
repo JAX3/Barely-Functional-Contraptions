@@ -23,7 +23,7 @@ import net.minecraft.world.entity.player.Inventory;
  * status lamp and line. Top right: the show-area button. Art: {@code textures/gui/grass_seeder.png}, see
  * {@code tools/sheep/generate_textures.py}.
  */
-public class GrassSeederScreen extends AbstractContainerScreen<GrassSeederMenu> {
+public class GrassSeederScreen extends MachineScreen<GrassSeederMenu> {
     private static final Identifier TEXTURE = ResourcefulSheep.id("textures/gui/grass_seeder.png");
     private static final int TEX = 256;
     private static final int ENERGY_X = 9, WATER_X = 27, GAUGE_Y = 19, GAUGE_W = 14, GAUGE_H = 64, ENERGY_U = 176, WATER_U = 192;
