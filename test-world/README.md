@@ -39,7 +39,7 @@ off), so nothing gathers in the platform's shadow.
 | Zero Point modules on walls (sideways beams); two **Dragon sheep** on purpur blocks stand in the lower beam (+50%: 7,500 FE/t) | `/tp @s 102 40 71` |
 | Bred lambs that kept their parents' infusion | `/tp @s 130 38 67` |
 | Fluid Tanks: water, lava, a single tank and an L | `/tp @s 18 39 93` |
-| New blocks: Glow Panels and a Glow Lamp, an Energy Meter, Item and Fluid Pipes with Pull and Push sides | `/tp @s 46 38 94.5` |
+| New blocks: Glow Panels and a Glow Ink sheep on one, an Energy Meter, Item and Fluid Pipes with Pull and Push sides | `/tp @s 46 38 94.5` |
 | Themed sheep: hay, wither, dragon, glow ink, skeleton, wither skeleton, spider, sculk, blaze, ghast | `/tp @s 87.5 37 95.5` |
 | Blaze Sheep Furnace with four Blaze sheep, and Automatic Shears, both with their working area shown | `/tp @s 131.5 40 90.5` |
 | Wool Burners on wool, string and Coal Wool, and one fed by a hopper | `/tp @s 17.5 37 113.5 180 25` |

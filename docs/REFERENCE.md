@@ -339,6 +339,8 @@ Put the wool into a **Mechanical Separator** and supply Forge Energy (FE).
 
 **Balance:** every wool separates into **2–4** of its resource (3 on average). With the default of 100 shearings per feeding, one Iron Ingot yields about 300 Raw Iron and one Diamond about 300 Diamonds, so infused sheep **multiply** resources a lot. (With `infusionUsesOverride = -1`, one Iron Ingot gives about 27 Raw Iron and one Diamond about 3 Diamonds.) The cost is the shearing time and the machine's energy. To tone it down, lower `primaryOutputMultiplier` (e.g. `0.34` brings it back to about 1 per wool), lower `infusionUsesOverride` (or set it to `-1`) or `infusionUsesMultiplier`, or set `primary_count` per resource.
 
+**Jams:** it's barely functional. When it starts on a different wool from the last one it separated, there's a **10%** chance (`jamChance`) that lint from the old wool clogs it: it stops for **10 seconds** (`jamSeconds`) with lint puffing out of it and a grinding clunk, its status reads *Jammed* (amber on the Machine Status Panel), then it shakes itself clear. **Shears** on it clear the jam at once (wearing them a little). Keep a separator to one wool to never see it jam.
+
 ### Crafting the separator
 ![Mechanical Separator recipe: iron ingots and a hopper on top, pistons either side of a Functional Machine Block in the middle, Copper Wool either side of shears along the bottom](screenshots/recipe_mechanical_separator.png)
 - Requires a stone pickaxe or better.
@@ -360,6 +362,7 @@ An FE-powered machine that shears sheep for you and keeps the wool.
 - **Redstone:** the same four modes as the separator, cycled with the button in the top-right corner: *Ignored* (default), *Active with Signal*, *Active without Signal*, *Disabled*.
 - **Show the area:** **sneak-right-click** it with an empty hand, or click the spyglass button next to the redstone button in its window, to draw the 3×3 area as a light-blue box with a grid on the ground. Do it again to hide it. The setting is saved with the block.
 - **Which mobs:** only those in the entity tag `#barelyfunctionalcontraptions:auto_shearable`, which is sheep by default. It never turns a mooshroom into a cow or takes a snow golem's pumpkin.
+- **The blades slip:** now and then (**5%** of the sheep it shears, `nickChance`) it nicks a sheep for half a heart, with a puff of red. A nick never kills: a sheep with a heart or less left is spared.
 - Its shears never wear out. Mine it with a stone pickaxe or better. When broken it keeps its stored energy and redstone mode, like the separator, and its wool drops on the ground.
 
 ![Automatic Shears recipe: Copper Wool top left and right, redstone top middle, shears left and right, a Functional Machine Block in the centre, iron ingots bottom left and right, a chest bottom middle](screenshots/recipe_automatic_shears.png)
@@ -494,30 +497,30 @@ A generator that comes in pairs. Put one module on the floor and another on the 
 
 ### New blocks at a glance
 
-![Glow Panels (in the sun, under a Glow Lamp and shaded), the Contraptions Manual in a frame, an Energy Meter reading 60 FE/t, and Item and Fluid Pipes with orange Pull and green Push plugs](screenshots/61_new_blocks.png)
+![Glow Panels (in the sun, under a Glow Ink sheep and shaded), the Contraptions Manual in a frame, an Energy Meter reading 60 FE/t, and Item and Fluid Pipes with orange Pull and green Push plugs](screenshots/61_new_blocks.png)
 
-*From the left: a Glow Panel in the sun, a Glow Lamp on a panel, a shaded panel with the Contraptions Manual framed on it, an Energy Meter reading a panel's 60 FE/t, and Item and Fluid Pipes with Pull (orange) and Push (green) sides. Staged with `./gradlew runClient -PscreenshotHarness -PharnessScene=new_blocks`.*
+*From the left: a Glow Panel in the sun, a Glow Ink sheep on a panel, a shaded panel with the Contraptions Manual framed on it, an Energy Meter reading a panel's 60 FE/t, and Item and Fluid Pipes with Pull (orange) and Push (green) sides. Staged with `./gradlew runClient -PscreenshotHarness -PharnessScene=new_blocks`.*
 
-### Glow Panel and Glow Lamp
-The **Glow Panel** is a thin, solar-style generator that makes Forge Energy from the **light falling on its top**. The **Glow Lamp** is a full-brightness lamp of glow ink that keeps the panels going at night and underground.
+### Glow Panel
+The **Glow Panel** is a thin, solar-style generator that makes Forge Energy from the **light falling on its top**. A **Glow Ink sheep** standing on it keeps it going at night and underground. (The Glow Lamp that used to do this is gone; see the changelog.)
 
 | By day | At sunset |
 |---|---|
-| ![Glow Panels in the sun, panels under Glow Lamps, and an Energy Meter reading 60 FE/t from a panel](screenshots/55_glow_panels.png) | ![The same scene at sunset: the panels in the open glow a dimmer teal and the meter reads 21 FE/t](screenshots/91_glow_panels_dusk.png) |
+| ![Glow Panels in the sun, panels lit by a Glow Ink sheep, and an Energy Meter reading 60 FE/t from a panel](screenshots/55_glow_panels.png) | ![The same scene at sunset: the panels in the open glow a dimmer teal and the meter reads 21 FE/t](screenshots/91_glow_panels_dusk.png) |
 
 At midnight the panels under the lamps still run:
 
-![The same scene at midnight: the panels under the lamps still run](screenshots/57_glow_panels_night.png)
+![The same scene at midnight: the panels under the Glow Ink sheep still run](screenshots/57_glow_panels_night.png)
 
 - **Sunlight:** with open sky above it, a panel makes up to **60 FE/t** (`sunRate`). It reads the sun the way a daylight detector does: less at dawn and dusk, in rain and in shade, and **nothing at night**.
-- **Glow light:** it also makes up to **40 FE/t** (`lightRate`) from **block light** on its top, scaled by the light level. A **Glow Lamp** sitting on it or above it gives the full 40 FE/t, and so does glowstone or any other light-15 block. A glowing **Glow Ink sheep** (light 12) standing right beside a panel lights it to about 29 FE/t. The panel uses whichever of sun or glow gives more.
+- **Glow light:** it also makes up to **40 FE/t** (`lightRate`) from **block light** on its top, scaled by the light level. Glowstone or any other light-15 block on it gives the full 40 FE/t.
+- **Glow Ink sheep:** a Glow Ink sheep with its fleece on standing **on a panel, or on the panels round it** (the 3x3 columns centred on it, up to two blocks above its top) gives it the full **40 FE/t**: its glow soaks into the cells. One sheep fenced in over a row of panels lights all of them it stands near. The panel uses whichever of sun or glow gives more.
 - **Shade:** a solid block on top that doesn't glow (stone, a machine) shades it completely.
 - **Output:** it stores 10,000 FE and pushes up to 1,000 FE/t into blocks **beside and below** it (cables, machines, Hume Energy Cubes, other mods' FE blocks). Cables and machines can also pull from it. Panels don't charge each other, and nothing can be pushed into a panel.
-- **Its cells show how much it is making.** They are dark when it makes nothing, dim when it makes up to a third of its best (60 FE/t by default): at dawn, dusk, in rain or in a lamp's spill light. They are half lit up to two-thirds (a Glow Lamp's 40 FE/t, so at night under a lamp) and fully lit above that (the midday sun). The panel gives off a little light to match (0 to 3). **Right-click** or **Jade** shows how much it makes and from which light. Every number is in `[glow_panel]` in the synced config.
+- **Its cells show how much it is making.** They are dark when it makes nothing, dim when it makes up to a third of its best (60 FE/t by default): at dawn, dusk, in rain or in a little spilt light. They are half lit up to two-thirds (a Glow Ink sheep's 40 FE/t, so at night under a sheep) and fully lit above that (the midday sun). The panel gives off a little light to match (0 to 3). **Right-click** or **Jade** shows how much it makes and from which light. Every number is in `[glow_panel]` in the synced config.
 - **Recipes:**
   - Glow Panel: a row of glass, a daylight detector between two quartz, and iron ingots around redstone.
-  - 2 Glow Lamps: glass in the corners, Glow Ink Sacs on the sides and glowstone dust in the middle.
-- Mine the panel with a pickaxe. The lamp breaks by hand.
+- Mine the panel with a pickaxe.
 
 ### Static Generator
 A mid-game generator, **two blocks tall**, that turns **friction** into power, like a Van de Graaff generator. Sheep rubbing against **Copper Combs** in its pen build up static, and its polished copper dome collects the charge and arcs it into power. Its blue-steel base has a charge gauge on the front, and a rubber belt runs up a column into the dome, which crackles with sparks while it charges.
@@ -705,6 +708,7 @@ A generator that makes Forge Energy from the **heat of Blaze sheep** standing ar
 - **Info:** its front glows, flickers and crackles while it runs, and small flames drift from each sheep heating it into it. Jade shows what it makes (for example *520 FE/t from 4 heat sources, boosted x2 for 27s, 4 x Blaze Rod waiting*). A **comparator** reads one level per 20 FE/t.
 - **Show the area:** click the spyglass button in its window, or **sneak-right-click** it with an empty hand, to draw its area as an orange box. Do it again to hide it.
 - **Recipe:** nether bricks and iron bars across the top, Blaze Rods either side of a Functional Machine Block, and redstone either side of a Blast Furnace. Mine it with a pickaxe; any loaded Blaze Rods drop.
+- **Sparks:** its sheep burn, and now and then (a **2%** chance every half second while it has heat, `fireChance`) a spark lands beside something **flammable** in or just round its area (wood, wool, leaves, a fence) and lights a fire there. Build it in stone, or keep flammable blocks more than a block outside its area.
 - Every number is in `[blaze_furnace]` in the synced config.
 
 ![The same scene at midnight: the furnace and the burning sheep light up the dark](screenshots/72_blaze_furnace_night.png)
@@ -761,6 +765,7 @@ The Blaze Sheep Furnace's icy opposite: it **freezes water into Ice with the col
 - **Speed:** one Snow sheep freezes an Ice every **5 seconds** (`ticksPerIce`); each one after the first adds 12.5% less (`falloff`), up to four (`maxColdSources`): about 2.7, 1.9 and 1.5 seconds for two, three and four.
 - **Water:** each Ice takes **1 bucket** (`waterPerIce`) from its **8-bucket tank** (`tankCapacity`). Right-click it with a Water Bucket, pipe water in from any side, or place a **Fluid Reservoir** beside it. Water can't be taken back out.
 - **Ice:** it goes in the chiller's one slot (a stack of 64). Hoppers and pipes take it out of any side; a comparator reads how full the slot is. While the slot is full it stops and keeps its water.
+- **Frosting over:** left full for **a minute** (`frostSeconds`) while its Snow sheep keep chilling it, it **frosts over**: it stops with snowflakes drifting off it, and its status reads *Frosted over*. Once there's room for Ice it thaws in **30 seconds** (`thawSeconds`), or at once if a Blaze sheep stands in its area. A hopper under it keeps it from ever frosting.
 - **Window:** right-click with an empty hand. The water gauge, the **cold column** (frost rising with the cold, a mark and pip for each Snow sheep), the speed, the freezing arrow into the Ice slot, how long each Ice takes, and the status (*Too warm*, *Freezing*, *No water*, *Ice slot full*).
 - **Area:** its spyglass button, or a sneak-right-click with an empty hand, outlines the area in light blue.
 - **Keeping its sheep close:** a Snow sheep that wanders up to 4 blocks outside the area is called back in while it has room for more (fewer than 4). The attraction area shows as a faint dashed box. See [Sheep attraction](#sheep-attraction).
@@ -1396,6 +1401,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `energyCostMultiplier` | 1.0 | Efficiency multiplier for energy |
 | `processingSpeedMultiplier` | 2.0 | Speed multiplier (total energy is unchanged): 2.0 = half of each wool's `processing_ticks` |
 | `resetProgressWhenUnpowered` | false | Reset progress instead of pausing it |
+| `jamChance` / `jamSeconds` | 0.1 / 10 | Chance it jams when it starts on a different wool, and how long a jam lasts (shears clear it at once) |
 | `energyInputSides` | BACK, LEFT, RIGHT, TOP, BOTTOM | Faces that accept FE |
 | `itemInputSides` | TOP, BACK, LEFT, RIGHT | Faces that accept wool |
 | `itemOutputSides` | BOTTOM | Faces to extract from and auto-push into |
@@ -1411,6 +1417,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `energyPerShear` | 2000 | FE used per sheep sheared (0 = runs without power) |
 | `energyCapacity` | 50000 | FE buffer |
 | `maxEnergyInput` | 1000 | FE accepted per tick (every face except the front) |
+| `nickChance` | 0.05 | Chance the blades nick a sheep they shear for half a heart (never fatal). 0 = never |
 
 **`[sheep_stats]`**
 
@@ -1532,6 +1539,7 @@ Each part can be switched off in Jade's settings under *Plugins → Barely Funct
 | `ticksPerIce` | 100 | Ticks per Ice with one Snow sheep |
 | `waterPerIce` / `tankCapacity` | 1000 / 8000 | mB of water per Ice, and the tank |
 | `coldSources` | `barelyfunctionalcontraptions:snow` | Sheep resources whose sheep give cold |
+| `frostSeconds` / `thawSeconds` | 60 / 30 | How long it can stay full with sheep chilling it before it frosts over (0 = never), and how long it takes to thaw once there's room |
 
 **`[wool_packer]`**
 

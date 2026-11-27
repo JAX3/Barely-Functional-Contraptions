@@ -10,13 +10,22 @@ public enum MachineStatus {
     NO_ENERGY(0xFFE8B23A),
     OUTPUT_FULL(0xFFE35D5D),
     INVALID_INPUT(0xFFE35D5D),
-    REDSTONE_DISABLED(0xFFB04040);
+    REDSTONE_DISABLED(0xFFB04040),
+    /** The Mechanical Separator is clogged with lint from the last wool (it clears itself, or shears clear it). */
+    JAMMED(0xFFE8B23A),
+    /** The Snow Sheep Chiller has frosted over, left full too long; it thaws once there's room (or a Blaze sheep warms it). */
+    FROSTED(0xFF7FD8FF);
 
     /** ARGB colour of the status lamp and text. */
     public final int color;
 
     MachineStatus(int color) {
         this.color = color;
+    }
+
+    /** Which of the machines' status lamp sprites it shows (a jam shows the amber one). */
+    public int lamp() {
+        return this == JAMMED || this == FROSTED ? NO_ENERGY.ordinal() : ordinal();
     }
 
     public static MachineStatus byId(int id) {

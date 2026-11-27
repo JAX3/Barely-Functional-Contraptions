@@ -82,7 +82,7 @@ public class MechanicalSeparatorScreen extends MachineScreen<MechanicalSeparator
         graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + GEAR_X, y + GEAR_Y, GEAR_U + frame * GEAR_SIZE, GEAR_V, GEAR_SIZE, GEAR_SIZE, TEX, TEX);
 
         // Status lamp.
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + LAMP_X, y + LAMP_Y, LAMP_U + status.ordinal() * 8 % 64, LAMP_V + status.ordinal() / 8 * 8, 8, 8, TEX, TEX);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + LAMP_X, y + LAMP_Y, LAMP_U + status.lamp() * 8 % 64, LAMP_V + status.lamp() / 8 * 8, 8, 8, TEX, TEX);
 
         // Redstone mode button (normal / hovered background + mode icon).
         boolean hovered = isHovering(BUTTON_X, BUTTON_Y, BUTTON_SIZE, BUTTON_SIZE, mouseX, mouseY);

@@ -133,13 +133,6 @@ public final class ModBlocks {
                     .sound(SoundType.IRON)
                     .lightLevel(state -> state.getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock.GLOW)));
 
-    /** A full-brightness lamp of glow ink: lights Glow Panels at night and underground. */
-    public static final DeferredBlock<net.minecraft.world.level.block.Block> GLOW_LAMP = REGISTER.registerSimpleBlock("glow_lamp",
-            p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE)
-                    .strength(0.3F)
-                    .sound(SoundType.IRON)
-                    .lightLevel(state -> 15));
-
     /** Burns wool, string and Coal Wool for FE. */
     public static final DeferredBlock<com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock> WOOL_BURNER = REGISTER.registerBlock("wool_burner",
             com.jax3.barelyfunctionalcontraptions.sheep.blocks.WoolBurnerBlock::new,

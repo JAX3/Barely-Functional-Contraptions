@@ -164,6 +164,7 @@ public class BlazeFurnaceBlockEntity extends com.jax3.barelyfunctionalcontraptio
         if (--scanCooldown <= 0) {
             scanCooldown = SCAN_INTERVAL;
             scan(level, pos, state);
+            if (heat > 0) maybeSpark(level, pos);
         }
         // A boost item burns only while there is heat to boost.
         if (boostTicks <= 0 && heat > 0) startBoost();
@@ -218,6 +219,58 @@ public class BlazeFurnaceBlockEntity extends com.jax3.barelyfunctionalcontraptio
                         com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.BLAZE_FURNACE);
             }
         }
+    }
+
+    /** This furnace's own fire odds, for tests ({@link com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks#NONE}: the config's). */
+    private double fireChanceOverride = com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks.NONE;
+
+    public void setFireChanceOverride(double chance) {
+        fireChanceOverride = chance;
+    }
+
+    /** Fires the furnace's sparks have lit since it was loaded. */
+    private int fires;
+
+    /**
+     * Now and then ({@code fireChance} a scan) a spark from its burning sheep lands beside something flammable in or
+     * round its area and lights a fire there. It tries a few spots; stone and metal round it are safe.
+     */
+    private void maybeSpark(ServerLevel level, BlockPos pos) {
+        double chance = com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks.chance(ModConfigs.getDouble(ModConfigs.SERVER.blazeFurnaceFireChance), fireChanceOverride);
+        if (chance <= 0 || level.getRandom().nextDouble() >= chance) return;
+        int r = ModConfigs.getInt(ModConfigs.SERVER.blazeFurnaceRadius) + 1;
+        var random = level.getRandom();
+        for (int attempt = 0; attempt < 8; attempt++) {
+            BlockPos at = pos.offset(random.nextIntBetweenInclusive(-r, r), random.nextIntBetweenInclusive(-1, 2), random.nextIntBetweenInclusive(-r, r));
+            if (lightFireAt(level, at)) {
+                fires++;
+                return;
+            }
+        }
+    }
+
+    /** Lights a fire at {@code at} if it's air beside something flammable and fire can stand there. */
+    public static boolean lightFireAt(ServerLevel level, BlockPos at) {
+        if (!level.getBlockState(at).isAir()) return false;
+        boolean flammable = false;
+        for (net.minecraft.core.Direction dir : net.minecraft.core.Direction.values()) {
+            BlockPos next = at.relative(dir);
+            if (level.getBlockState(next).isFlammable(level, next, dir.getOpposite())) {
+                flammable = true;
+                break;
+            }
+        }
+        if (!flammable) return false;
+        BlockState fire = net.minecraft.world.level.block.BaseFireBlock.getState(level, at);
+        if (!fire.canSurvive(level, at)) return false;
+        level.setBlock(at, fire, Block.UPDATE_ALL);
+        level.playSound(null, at, net.minecraft.sounds.SoundEvents.FIRECHARGE_USE, net.minecraft.sounds.SoundSource.BLOCKS, 0.6F, 1.4F);
+        return true;
+    }
+
+    /** Fires it has lit since it was loaded. */
+    public int fires() {
+        return fires;
     }
 
     private void startBoost() {

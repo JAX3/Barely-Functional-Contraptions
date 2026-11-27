@@ -147,6 +147,8 @@ public final class ModConfigs {
         public final ModConfigSpec.BooleanValue attractionEnabled;
         public final ModConfigSpec.IntValue attractionRange;
         public final ModConfigSpec.BooleanValue resetProgressWhenUnpowered;
+        public final ModConfigSpec.DoubleValue separatorJamChance;
+        public final ModConfigSpec.IntValue separatorJamSeconds;
         public final ModConfigSpec.ConfigValue<List<? extends String>> energyInputSides;
         public final ModConfigSpec.ConfigValue<List<? extends String>> itemInputSides;
         public final ModConfigSpec.ConfigValue<List<? extends String>> itemOutputSides;
@@ -321,6 +323,8 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue chillerRadius;
         public final ModConfigSpec.IntValue chillerMaxSources;
         public final ModConfigSpec.DoubleValue chillerFalloff;
+        public final ModConfigSpec.IntValue chillerFrostSeconds;
+        public final ModConfigSpec.IntValue chillerThawSeconds;
         public final ModConfigSpec.IntValue chillerTicksPerIce;
         public final ModConfigSpec.IntValue chillerWaterPerIce;
         public final ModConfigSpec.IntValue chillerTankCapacity;
@@ -329,8 +333,10 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue blazeFurnaceMaxHeaters;
         public final ModConfigSpec.DoubleValue blazeFurnaceFalloff;
         public final ModConfigSpec.IntValue blazeFurnaceCapacity;
+        public final ModConfigSpec.DoubleValue blazeFurnaceFireChance;
         public final ModConfigSpec.IntValue blazeFurnaceOutput;
         public final ModConfigSpec.IntValue automaticShearsInterval;
+        public final ModConfigSpec.DoubleValue automaticShearsNickChance;
         public final ModConfigSpec.IntValue automaticShearsEnergyPerShear;
         public final ModConfigSpec.IntValue automaticShearsEnergyCapacity;
         public final ModConfigSpec.IntValue automaticShearsMaxEnergyInput;
@@ -458,6 +464,11 @@ public final class ModConfigs {
                     .defineInRange("processingSpeedMultiplier", 2.0, 0.01, 100.0);
             resetProgressWhenUnpowered = b.comment("If true, progress resets when the machine runs out of energy instead of pausing.")
                     .define("resetProgressWhenUnpowered", false);
+            separatorJamChance = b.comment("Chance (0-1) that the separator jams when it starts on a different wool from the last one: lint from",
+                            "the old wool clogs it. 0 = it never jams.")
+                    .defineInRange("jamChance", 0.1, 0.0, 1.0);
+            separatorJamSeconds = b.comment("Seconds a jam lasts before it shakes itself clear. Shears on the separator clear it at once.")
+                    .defineInRange("jamSeconds", 10, 1, 3600);
             String sideHelp = "Valid values: FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM (relative to the machine's front face).";
             energyInputSides = b.comment("Sides that accept FE.", sideHelp)
                     .defineListAllowEmpty("energyInputSides", List.of("BACK", "LEFT", "RIGHT", "TOP", "BOTTOM"), () -> "BACK", ModConfigs::isSide);
@@ -483,10 +494,10 @@ public final class ModConfigs {
                     .defineInRange("creativeGeneratorOutput", 1_000_000, 0, Integer.MAX_VALUE);
             b.pop();
 
-            b.comment("Glow Panel (makes FE from sunlight, or from block light such as a Glow Lamp, falling on its top)").push("glow_panel");
+            b.comment("Glow Panel (makes FE from sunlight, or from block light or a Glow Ink sheep over it)").push("glow_panel");
             glowPanelSunRate = b.comment("FE/t in full sunlight. Scales down with the sky light (time of day, weather, shade).")
                     .defineInRange("sunRate", 60, 0, 1_000_000);
-            glowPanelLightRate = b.comment("FE/t under block light 15 (a Glow Lamp, glowstone...). Scales with the light level; the panel uses whichever of sun or block light gives more.")
+            glowPanelLightRate = b.comment("FE/t under block light 15 (glowstone, or a Glow Ink sheep over it). Scales with the light level; the panel uses whichever of sun or block light gives more.")
                     .defineInRange("lightRate", 40, 0, 1_000_000);
             glowPanelCapacity = b.comment("FE each panel stores.")
                     .defineInRange("capacity", 10_000, 1, Integer.MAX_VALUE);
@@ -583,6 +594,9 @@ public final class ModConfigs {
                     .defineInRange("falloff", 0.125, 0.0, 1.0);
             blazeFurnaceCapacity = b.comment("FE each furnace stores.")
                     .defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
+            blazeFurnaceFireChance = b.comment("Chance (0-1), every half second while Blaze sheep heat it, that a spark lights a fire beside a",
+                            "flammable block (wood, wool, leaves...) near it. 0 = it never does. Keep it in stone.")
+                    .defineInRange("fireChance", 0.02, 0.0, 1.0);
             blazeFurnaceOutput = b.comment("Most FE a furnace pushes into the blocks around it per tick, in total.")
                     .defineInRange("outputPerTick", 1_000, 0, Integer.MAX_VALUE);
             b.pop();
@@ -906,6 +920,11 @@ public final class ModConfigs {
                     .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
             chillerColdSources = b.comment("Sheep resources whose sheep chill it (with their fleece on).")
                     .defineListAllowEmpty("coldSources", List.of("barelyfunctionalcontraptions:snow"), () -> "barelyfunctionalcontraptions:snow", o -> o instanceof String);
+            chillerFrostSeconds = b.comment("Seconds its Snow sheep can keep chilling it with the Ice slot full before it frosts over. 0 = it never does.")
+                    .defineInRange("frostSeconds", 60, 0, 72_000);
+            chillerThawSeconds = b.comment("Seconds a frosted-over chiller takes to thaw once its Ice slot has room again. A Blaze sheep in its",
+                            "area thaws it at once.")
+                    .defineInRange("thawSeconds", 30, 1, 72_000);
             b.pop();
 
             b.comment("Automatic Shears (FE-powered; shears sheep in the 3x3 area in front of it into its inventory)").push("automatic_shears");
@@ -917,6 +936,9 @@ public final class ModConfigs {
                     .translation("barelyfunctionalcontraptions.configuration.automatic_shears.energyCapacity").defineInRange("energyCapacity", 50_000, 1, Integer.MAX_VALUE);
             automaticShearsMaxEnergyInput = b.comment("FE accepted per tick (every face except the front).")
                     .translation("barelyfunctionalcontraptions.configuration.automatic_shears.maxEnergyInput").defineInRange("maxEnergyInput", 1_000, 1, Integer.MAX_VALUE);
+            automaticShearsNickChance = b.comment("Chance (0-1) that the blades nick a sheep as they shear it: half a heart, never enough to kill it.",
+                            "0 = they never slip.")
+                    .defineInRange("nickChance", 0.05, 0.0, 1.0);
             b.pop();
 
             b.comment("Fluid Reservoir (makes water while placed directly on top of an infinite water source)").push("fluid_reservoir");

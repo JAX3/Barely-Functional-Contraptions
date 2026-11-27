@@ -2668,43 +2668,20 @@ GLOW_PANEL_SIDE = [  # Glow Panel side: the bottom 6 rows are the panel's edge
     "OOOOOOOOOOOOOOOO",
 ]
 
-GLOW_LAMP = [  # Glow Lamp: a glass frame around swirling glow ink
-    "OOOOOOOOOOOOOOOO",
-    "OwwwwwwwwwwwwwvO",
-    "OwCCCCcCCCCCCcvO",
-    "OwCYYCCcCCYCCcvO",
-    "OwCYCCCCcCCCCcvO",
-    "OwCCCcCCCCcCCCvO",
-    "OwcCCCCYYCCCcCvO",
-    "OwCCcCYGGYCcCCvO",
-    "OwCCCcYGGYCCCCvO",
-    "OwCcCCCYYCCcCCvO",
-    "OwCCCCcCCCCCcCvO",
-    "OwCCYCCCcCCCYCvO",
-    "OwCcCCCCCcCYYCvO",
-    "OwCCCcCCCCCCCCvO",
-    "OvvvvvvvvvvvvvvO",
-    "OOOOOOOOOOOOOOOO",
-]
-
-
 def generate_glow_panel():
-    """Glow Panel top (idle and lit), its edge, and the Glow Lamp."""
+    """Glow Panel top (idle and lit) and its edge."""
     idle = dict(CARTOON)
     idle["C"], idle["c"] = hexc("#1b2a44"), hexc("#2c4468")
     grid(GLOW_PANEL_TOP, idle).save(out("block/glow_panel_top.png"))
     lit = dict(CARTOON)
     lit["C"], lit["c"] = hexc("#9ffbe8"), hexc("#3fcfc0")
     grid(GLOW_PANEL_TOP, lit).save(out("block/glow_panel_top_lit.png"))
-    # In between, for when it makes less than its best (dusk, rain, a Glow Lamp at night): the cells part lit.
+    # In between, for when it makes less than its best (dusk, rain, a Glow Ink sheep at night): the cells part lit.
     for name, t in (("dim", 0.35), ("half", 0.68)):
         part = dict(CARTOON)
         part["C"], part["c"] = mix(idle["C"], lit["C"], t), mix(idle["c"], lit["c"], t)
         grid(GLOW_PANEL_TOP, part).save(out(f"block/glow_panel_top_{name}.png"))
     grid(GLOW_PANEL_SIDE, dict(CARTOON)).save(out("block/glow_panel_side.png"))
-    lamp = dict(CARTOON)
-    lamp["C"], lamp["c"], lamp["Y"], lamp["G"] = hexc("#5ee8d6"), hexc("#2fb7b0"), hexc("#b8fff2"), hexc("#ffffff")
-    grid(GLOW_LAMP, lamp).save(out("block/glow_lamp.png"))
 
 
 BLAZE_FURNACE_FRONT = [  # Blaze Sheep Furnace front: steel casing, brass-rimmed fire mouth (filled in per state)

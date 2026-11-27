@@ -1583,12 +1583,12 @@ public final class DevScreenshotHarness {
         for (BlockPos p : BlockPos.betweenClosed(o.offset(-12, -1, -10), o.offset(12, -1, 6))) level.setBlock(p, Blocks.POLISHED_ANDESITE.defaultBlockState(), 2);
         int z = -4;
         var panel = ModBlocks.GLOW_PANEL.get().defaultBlockState();
-        // Glow Panel in the sun; a Glow Lamp on a panel; a panel shaded by stone, with the Contraptions Manual framed on the stone.
+        // Glow Panel in the sun; a Glow Ink sheep on a panel; a panel shaded by stone, with the Contraptions Manual framed on the stone.
         level.setBlock(o.offset(-8, 0, z), panel, 3);
         label(server, o.offset(-8, 1, z), "Glow Panel", "aqua");
         level.setBlock(o.offset(-6, 0, z), panel, 3);
-        level.setBlock(o.offset(-6, 1, z), ModBlocks.GLOW_LAMP.get().defaultBlockState(), 3);
-        label(server, o.offset(-6, 2, z), "Glow Lamp", "aqua");
+        infusedWorldSheep(level, o.offset(-6, 1, z), "glow_ink", 0, true);
+        label(server, o.offset(-6, 3, z), "Glow Ink sheep", "aqua");
         level.setBlock(o.offset(-4, 0, z), panel, 3);
         level.setBlock(o.offset(-4, 1, z), Blocks.STONE_BRICKS.defaultBlockState(), 3);
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), String.format(java.util.Locale.ROOT,
@@ -1623,7 +1623,7 @@ public final class DevScreenshotHarness {
                 String.format(java.util.Locale.ROOT, "tp @a %.1f %d %.1f 180 15", o.getX() + 1.0, o.getY() + 3, o.getZ() + 8.5));
     }
 
-    /** Glow Panels, Glow Lamps and Energy Meters: {@code -PharnessScene=power_blocks}. */
+    /** Glow Panels, Glow Ink sheep on them, and Energy Meters: {@code -PharnessScene=power_blocks}. */
     private static void powerBlocksTick(Minecraft mc, MinecraftServer server) {
         switch (tick) {
             case 60 -> server.execute(() -> powerBlocksScene(server));
@@ -1688,6 +1688,10 @@ public final class DevScreenshotHarness {
             {"zero point dragons", 4, 0},
             {"zero point dragons", 3, 1},
             {"hume field sculk", 3, 6},
+            // Then the Glow Lamp was removed (Glow Ink sheep light the panels instead): its blocks load as air, so a
+            // Glow Ink sheep goes where each lamp lit a panel. It scans the whole platform, from any cell.
+            {"forceload the platform", 2, 3},
+            {"glow ink for lamps", 2, 3},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -2215,6 +2219,49 @@ public final class DevScreenshotHarness {
         ResourcefulSheep.LOGGER.info("EXTEND hume field sculk sheep at {} for the generator at {}", inside, core);
     }
 
+    /**
+     * Puts a Glow Ink sheep wherever a Glow Lamp lit a Glow Panel, now the lamp is gone (its blocks load as air): on the
+     * panel under each "Glow Lamp" label (relabelled), and on the middle panel of each roofed row of panels (the
+     * shelter of the power-blocks scene, whose slab roof goes up a block so the sheep fits).
+     */
+    private static void glowInkForLamps(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        int placed = 0;
+        // The labelled lamp: its label sat two above the panel, on the lamp.
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(0, 30, 24, 146, 50, 192),
+                e -> e instanceof net.minecraft.world.entity.Display.TextDisplay
+                        && level.getBlockEntity(e.blockPosition().below(2)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity)) {
+            // (Its text can't be read here: a label two above a panel, with nothing between, was the lamp's.)
+            BlockPos panel = e.blockPosition().below(2);
+            if (level.getBlockEntity(panel) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity && level.getBlockState(panel.above()).isAir()) {
+                infusedWorldSheep(level, panel.above(), "glow_ink", 0, true);
+                label(server, panel.above(3), "Glow Ink sheep", "aqua");
+                placed++;
+                ResourcefulSheep.LOGGER.info("EXTEND glow ink sheep on the labelled panel at {}", panel);
+            }
+            e.discard();
+        }
+        // Roofed panels (a slab two above, nothing between): raise the roof a block, and one sheep on the middle of each row.
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 33, 24), new BlockPos(146, 40, 192))) {
+            if (!(level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity)) continue;
+            BlockPos roof = p.above(2);
+            if (!level.getBlockState(p.above()).isAir() || !(level.getBlockState(roof).getBlock() instanceof net.minecraft.world.level.block.SlabBlock)) continue;
+            net.minecraft.world.level.block.state.BlockState slab = level.getBlockState(roof);
+            level.setBlock(roof, Blocks.AIR.defaultBlockState(), 3);
+            level.setBlock(roof.above(), slab, 3);
+            boolean west = level.getBlockEntity(p.west()) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity, east = level.getBlockEntity(p.east()) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity;
+            boolean north = level.getBlockEntity(p.north()) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity, south = level.getBlockEntity(p.south()) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity;
+            boolean middle = (west && east) || (north && south) || (!west && !east && !north && !south);
+            if (middle) {
+                infusedWorldSheep(level, p.above().immutable(), "glow_ink", 0, true);
+                placed++;
+                ResourcefulSheep.LOGGER.info("EXTEND glow ink sheep on the roofed panel at {}", p);
+            }
+        }
+        command(server, "forceload remove 0 24 146 192");
+        ResourcefulSheep.LOGGER.info("EXTEND glow ink for lamps: {} sheep", placed);
+    }
+
     /** Clears the loose items (the Explosive Wool its sheep's blasts left before it caught it) from the Implosion Chamber's cell. */
     private static void sweepImplosionWool(MinecraftServer server) {
         ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
@@ -2494,7 +2541,21 @@ public final class DevScreenshotHarness {
             });
             case 262 -> setHudHidden(mc, false);
             case 290 -> shot(mc, "check_hume_field_sculk_window");
-            case 296 -> mc.stop();
+            case 292 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                player.closeContainer();
+                command(server, "gamemode spectator @a");
+                command(server, "time set midnight");
+                command(server, "tp @a 41.5 37.5 85.5 135 30");
+            });
+            case 294 -> setHudHidden(mc, true);
+            case 340 -> server.execute(() -> {
+                if (server.overworld().getBlockEntity(new BlockPos(39, 35, 82)) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity be) {
+                    ResourcefulSheep.LOGGER.info("CHECK glow panel 39 35 82 at midnight: sheep {}, {} FE/t", be.sheepLit(), be.generating());
+                }
+            });
+            case 345 -> shot(mc, "check_glow_ink_panel_night");
+            case 350 -> mc.stop();
             default -> {}
         }
     }
@@ -4954,6 +5015,8 @@ public final class DevScreenshotHarness {
                         case "sweep implosion wool" -> sweepImplosionWool(server);
                         case "zero point dragons" -> zeroPointDragonScene(server);
                         case "hume field sculk" -> humeFieldSculkScene(server);
+                        case "forceload the platform" -> command(server, "forceload add 0 24 146 192"); // its entities load before the next step
+                        case "glow ink for lamps" -> glowInkForLamps(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
@@ -5101,7 +5164,7 @@ public final class DevScreenshotHarness {
 
     private static final String[][] SHOWCASE_ROWS = {
             {"mechanical_separator", "automatic_shears", "wool_packer", "infusion_altar", "wool_bale"},
-            {"mycelial_generator", "zero_point_energy_module", "glow_panel", "glow_lamp", "blaze_furnace"},
+            {"mycelial_generator", "zero_point_energy_module", "glow_panel", "blaze_furnace"},
             {"wool_burner", "hume_energy_cube", "fluid_tank", "fluid_reservoir", "creative_generator"},
             {"energy_cable", "fluid_pipe", "item_pipe", "energy_meter", "functional_machine_block"},
     };
@@ -5702,13 +5765,13 @@ public final class DevScreenshotHarness {
         for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, 0, -10), o.offset(8, 6, 4))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
         for (BlockPos p : BlockPos.betweenClosed(o.offset(-8, -1, -10), o.offset(8, -1, 4))) level.setBlock(p, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
         var panel = ModBlocks.GLOW_PANEL.get().defaultBlockState();
-        // Left: a 3x2 field of panels in the open. Right: three panels under Glow Lamps in a stone shelter.
+        // Left: a 3x2 field of panels in the open. Right: three panels in a stone shelter, lit by a Glow Ink sheep on the middle one.
         for (int x = -6; x <= -4; x++) for (int z = -6; z <= -5; z++) level.setBlock(o.offset(x, 0, z), panel, 3);
         for (int x = 3; x <= 5; x++) {
             level.setBlock(o.offset(x, 0, -6), panel, 3);
-            level.setBlock(o.offset(x, 1, -6), ModBlocks.GLOW_LAMP.get().defaultBlockState(), 3);
-            level.setBlock(o.offset(x, 2, -6), Blocks.STONE_BRICK_SLAB.defaultBlockState(), 3);
+            level.setBlock(o.offset(x, 3, -6), Blocks.STONE_BRICK_SLAB.defaultBlockState(), 3);
         }
+        infusedWorldSheep(level, o.offset(4, 1, -6), "glow_ink", 0, true);
         // Middle: Glow Panel -> Energy Meter -> Hume Energy Cube, and a Creative Generator -> meter -> cube for a big number.
         level.setBlock(o.offset(-1, 0, -3), panel, 3);
         level.setBlock(o.offset(0, 0, -3), ModBlocks.ENERGY_METER.get().defaultBlockState()

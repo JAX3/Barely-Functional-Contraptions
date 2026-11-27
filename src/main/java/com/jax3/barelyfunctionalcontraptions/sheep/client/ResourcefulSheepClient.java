@@ -243,7 +243,7 @@ public final class ResourcefulSheepClient {
                     String.format(java.util.Locale.ROOT, "%,d", com.jax3.barelyfunctionalcontraptions.sheep.blockentity.CableNetwork.transferRate()))
                     .withStyle(net.minecraft.ChatFormatting.GRAY));
         }
-        for (var item : java.util.List.of(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_LAMP,
+        for (var item : java.util.List.of(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLAZE_FURNACE, com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.CHILLER,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.POWERED_FURNACE,
                 com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BURNER,

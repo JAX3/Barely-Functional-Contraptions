@@ -196,6 +196,7 @@ public class AutomaticShearsBlockEntity extends com.jax3.barelyfunctionalcontrap
                 }
             }
             sheared++;
+            maybeNick(level, mob);
             if (!hasSpace()) break;
         }
         if (sheared > 0) {
@@ -205,6 +206,36 @@ public class AutomaticShearsBlockEntity extends com.jax3.barelyfunctionalcontrap
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModAdvancements.AUTO_SHEAR);
         }
         return sheared;
+    }
+
+    /** Half a heart, the most a nick does. */
+    public static final float NICK_DAMAGE = 1.0F;
+    /** These shears' own nick odds, for tests ({@link com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks#NONE}: the config's). */
+    private double nickChanceOverride = com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks.NONE;
+
+    public void setNickChanceOverride(double chance) {
+        nickChanceOverride = chance;
+    }
+
+    /** Sheep nicked since it was loaded (for its window and Jade). */
+    private int nicks;
+
+    /**
+     * The blades slip now and then ({@code nickChance}): the sheep is nicked for half a heart and bleats, but a nick
+     * never kills, so a sheep with a heart or less left is spared.
+     */
+    private void maybeNick(ServerLevel level, Mob mob) {
+        double chance = com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks.chance(ModConfigs.getDouble(ModConfigs.SERVER.automaticShearsNickChance), nickChanceOverride);
+        if (chance <= 0 || level.getRandom().nextDouble() >= chance || mob.getHealth() <= NICK_DAMAGE + 1.0F) return;
+        if (mob.hurtServer(level, level.damageSources().generic(), NICK_DAMAGE)) {
+            nicks++;
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.DAMAGE_INDICATOR, mob.getX(), mob.getY() + mob.getBbHeight(), mob.getZ(), 2, 0.2, 0.1, 0.2, 0.0);
+        }
+    }
+
+    /** Sheep it has nicked since it was loaded. */
+    public int nicks() {
+        return nicks;
     }
 
     /** True while at least one more item fits somewhere. */

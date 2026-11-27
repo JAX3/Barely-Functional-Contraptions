@@ -107,6 +107,10 @@ public final class ModGameTests {
         TESTS.put("separator_hopper_chain", ModGameTests::separatorHopperChain);
         TESTS.put("separator_never_overfills_output", ModGameTests::separatorOutputFull);
         TESTS.put("separator_state_survives_save_and_load", ModGameTests::separatorPersists);
+        TESTS.put("separator_jams_when_the_wool_changes", ModGameTests::separatorJams);
+        TESTS.put("automatic_shears_now_and_then_nick_a_sheep", ModGameTests::autoShearsNick);
+        TESTS.put("chiller_frosts_over_when_left_full", ModGameTests::chillerFrosts);
+        TESTS.put("blaze_furnace_sparks_light_fires", ModGameTests::blazeFurnaceFires);
         TESTS.put("separating_recipe_handles_plain_wool", ModGameTests::separatingRecipe);
         TESTS.put("config_multipliers_affect_values", ModGameTests::configMultipliers);
         TESTS.put("custom_definition_with_tag_parses", ModGameTests::customDefinitionParses);
@@ -270,7 +274,7 @@ public final class ModGameTests {
         TESTS.put("themed_sheep_advancements", ModGameTests::themedAdvancements);
         TESTS.put("energy_meter_measures_what_passes_through", ModGameTests::energyMeter);
         TESTS.put("energy_meter_faces_the_right_way_when_placed", ModGameTests::energyMeterPlacement);
-        TESTS.put("glow_panel_runs_on_glow_lamps", ModGameTests::glowPanel);
+        TESTS.put("glow_panel_runs_on_glow_ink_sheep", ModGameTests::glowPanel);
         TESTS.put("recipe_support_wool_ingredient_and_fuel_data_map", ModGameTests::recipeSupport);
         TESTS.put("melon_slice_gives_a_sheep_the_skin", ModGameTests::melonSliceSkin);
         TESTS.put("blaze_furnace_heats_from_blaze_sheep", ModGameTests::blazeFurnaceHeat);
@@ -3811,6 +3815,36 @@ public final class ModGameTests {
      * The Snow Sheep Chiller freezes water into Ice with the Snow sheep around it: two of them make Ice from its water,
      * a bucket each; one with only a sheared one stays idle; pipes fill it with water and can't empty it.
      */
+    /**
+     * A chiller left full with its Snow sheep chilling it frosts over (after 1 s here) and stops; once there's room for
+     * Ice, a Blaze sheep in its area thaws it at once and it freezes again.
+     */
+    private static void chillerFrosts(GameTestHelper h) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        h.setBlock(pos, ModBlocks.CHILLER.get());
+        var be = h.getBlockEntity(pos, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ChillerBlockEntity.class);
+        be.setFrostSecondsOverride(1);
+        for (int i = 0; i < 3; i++) be.fillFromBucket();
+        sheepAt(h, new BlockPos(1, 1, 2), ResourcefulSheep.id("snow"));
+        be.inventory().set(0, new ItemStack(Items.ICE, 64));
+        h.runAfterDelay(40, () -> {
+            h.assertTrue(be.isFrosted() && be.status() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.MachineStatus.FROSTED,
+                    "left full, it frosts over: " + be.status());
+            be.inventory().set(0, ItemStack.EMPTY);
+        });
+        h.runAfterDelay(60, () -> {
+            h.assertTrue(be.isFrosted() && be.output().isEmpty(), "emptied, it still has to thaw");
+            sheepAt(h, new BlockPos(3, 1, 2), ResourcefulSheep.id("blaze"));
+        });
+        h.runAfterDelay(80, () -> {
+            h.assertTrue(!be.isFrosted(), "a Blaze sheep thaws it at once");
+        });
+        h.runAfterDelay(200, () -> {
+            h.assertTrue(be.output().is(Items.ICE), "and it freezes again: " + be.output());
+            h.succeed();
+        });
+    }
+
     private static void chiller(GameTestHelper h) {
         Identifier snowId = ResourcefulSheep.id("snow");
         var chillerBlock = ModBlocks.CHILLER.get();
@@ -4488,6 +4522,26 @@ public final class ModGameTests {
         });
     }
 
+    /**
+     * With its nick odds at 1, the shears nick each sheep they shear for half a heart; a sheep with a heart or less
+     * left is spared.
+     */
+    private static void autoShearsNick(GameTestHelper h) {
+        var shears = autoShears(h);
+        shears.setNickChanceOverride(1.0);
+        Sheep healthy = sheepAt(h, 3, 2);
+        Sheep weak = sheepAt(h, 2, 3);
+        weak.setHealth(1.5F);
+        h.runAfterDelay(5, () -> {
+            h.assertTrue(healthy.isSheared() && weak.isSheared(), "both are sheared");
+            h.assertTrue(healthy.getHealth() == healthy.getMaxHealth() - com.jax3.barelyfunctionalcontraptions.sheep.blockentity.AutomaticShearsBlockEntity.NICK_DAMAGE,
+                    "the healthy one is nicked for half a heart: " + healthy.getHealth());
+            h.assertTrue(weak.isAlive() && weak.getHealth() == 1.5F, "the weak one is spared: " + weak.getHealth());
+            h.assertTrue(shears.nicks() == 1, "one nick counted, got " + shears.nicks());
+            h.succeed();
+        });
+    }
+
     /** A full inventory stops it shearing; emptying a slot starts it again. */
     private static void autoShearsStopWhenFull(GameTestHelper h) {
         var shears = autoShears(h);
@@ -4761,6 +4815,38 @@ public final class ModGameTests {
                     && be.getInventory().getStack(SeparatorInventory.SECONDARY).getCount() == 2, "2 string expected");
             h.assertTrue(be.getInventory().getStack(SeparatorInventory.INPUT).isEmpty(), "input consumed");
             h.assertTrue(be.getEnergy().getEnergy() == 80_000, "exactly 20,000 FE used, have " + be.getEnergy().getEnergy());
+        });
+    }
+
+    /**
+     * With its jam odds at 1, a separator that finished Iron Wool jams when Gold Wool goes in: it stops, then shears
+     * on it clear the jam and it finishes the gold. The same wool again never jams it.
+     */
+    private static void separatorJams(GameTestHelper h) {
+        BlockPos pos = new BlockPos(3, 1, 3);
+        MechanicalSeparatorBlockEntity be = separator(h, pos);
+        be.setJamChanceOverride(1.0);
+        insertEnergy(be.getEnergy(), 200_000);
+        be.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(IRON, 2));
+        h.runAfterDelay(110, () -> {
+            h.assertTrue(be.getInventory().getStack(SeparatorInventory.INPUT).isEmpty() && !be.isJammed(), "two Iron Wool in a row never jam it");
+            be.getInventory().setStack(SeparatorInventory.PRIMARY, ItemStack.EMPTY);
+            be.getInventory().setStack(SeparatorInventory.SECONDARY, ItemStack.EMPTY);
+            be.getInventory().setStack(SeparatorInventory.BONUS, ItemStack.EMPTY); // iron nuggets would block gold's
+            be.getInventory().setStack(SeparatorInventory.INPUT, ResourceWoolItem.create(ResourcefulSheep.id("gold"), 1));
+        });
+        h.runAfterDelay(130, () -> {
+            h.assertTrue(be.isJammed() && be.getStatus() == MachineStatus.JAMMED, "a different wool jams it: " + be.getStatus());
+            h.assertTrue(be.getProgress() == 0 && be.jamSecondsLeft() > 0, "it stops while jammed");
+            Player player = h.makeMockPlayer(GameType.SURVIVAL);
+            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.SHEARS));
+            h.useBlock(pos, player);
+            h.assertTrue(!be.isJammed(), "shears clear the jam");
+            h.assertTrue(player.getMainHandItem().getDamageValue() == 1, "and wear a little");
+        });
+        h.runAfterDelay(200, () -> {
+            h.assertTrue(be.getInventory().getStack(SeparatorInventory.PRIMARY).is(Items.RAW_GOLD), "then it separates the gold");
+            h.succeed();
         });
     }
 
@@ -5646,23 +5732,31 @@ public final class ModGameTests {
     // ------------------------------------------------------------------ Glow Panel
 
     private static void glowPanel(GameTestHelper h) {
-        // Under a Glow Lamp with a roof over it (no sky, so only the lamp counts): the full light rate.
+        // A Glow Ink sheep standing on it, with a roof over them (no sky, so only the sheep counts): the full light rate.
         BlockPos lit = new BlockPos(1, 1, 1);
         h.setBlock(lit, ModBlocks.GLOW_PANEL.get());
-        h.setBlock(lit.above(), ModBlocks.GLOW_LAMP.get());
-        h.setBlock(lit.above(2), Blocks.STONE);
+        h.setBlock(lit.above(3), Blocks.STONE);
+        sheepAt(h, lit.above(), ResourcefulSheep.id("glow_ink"));
         var cube = cube(h, lit.east());
+        // A plain sheep on a roofed panel: no light at all.
+        BlockPos plain = new BlockPos(1, 1, 5);
+        h.setBlock(plain, ModBlocks.GLOW_PANEL.get());
+        h.setBlock(plain.above(3), Blocks.STONE);
+        sheepAt(h, plain.above(), null);
         // Covered by stone: no light at all.
         BlockPos dark = new BlockPos(4, 1, 1);
         h.setBlock(dark, ModBlocks.GLOW_PANEL.get());
         h.setBlock(dark.above(), Blocks.STONE);
-        h.runAfterDelay(10, () -> {
+        h.runAfterDelay(25, () -> {
             var panel = h.getBlockEntity(lit, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity.class);
             int rate = com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getInt(com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.glowPanelLightRate);
-            h.assertTrue(panel.generating() == rate, "a Glow Lamp gives the full " + rate + " FE/t, got " + panel.generating());
+            h.assertTrue(panel.sheepLit() && panel.generating() == rate, "a Glow Ink sheep gives the full " + rate + " FE/t, got " + panel.generating());
+            var plainPanel = h.getBlockEntity(plain, com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity.class);
+            // (The Glow Ink sheep's own light reaches it a little, four blocks off.)
+            h.assertTrue(!plainPanel.sheepLit() && plainPanel.generating() < rate, "a plain sheep doesn't count, got " + plainPanel.generating());
             h.assertTrue(panel.source() == com.jax3.barelyfunctionalcontraptions.sheep.blockentity.GlowPanelBlockEntity.Source.GLOW, "from glow light, got " + panel.source());
             var GLOW = com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock.GLOW;
-            h.assertTrue(h.getBlockState(lit).getValue(GLOW) == 2, "a lamp's 40 of the best 60 FE/t lights the cells half way, got " + h.getBlockState(lit).getValue(GLOW));
+            h.assertTrue(h.getBlockState(lit).getValue(GLOW) == 2, "a sheep's 40 of the best 60 FE/t lights the cells half way, got " + h.getBlockState(lit).getValue(GLOW));
             h.assertTrue(h.getBlockState(dark).getValue(GLOW) == 0, "a covered panel stays dark");
             java.util.function.IntUnaryOperator glowFor = com.jax3.barelyfunctionalcontraptions.sheep.blocks.GlowPanelBlock::glowFor;
             h.assertTrue(glowFor.applyAsInt(60) == 3 && glowFor.applyAsInt(40) == 2 && glowFor.applyAsInt(20) == 1
@@ -5796,6 +5890,25 @@ public final class ModGameTests {
     private static net.minecraft.world.phys.BlockHitResult hitTop(GameTestHelper h, BlockPos rel) {
         BlockPos abs = h.absolutePos(rel);
         return new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(abs).add(0, 0.5, 0), Direction.UP, abs, false);
+    }
+
+    /**
+     * With its fire odds at 1, sparks from a heated Blaze Sheep Furnace light a fire beside the planks near it; stone
+     * round another furnace never catches.
+     */
+    private static void blazeFurnaceFires(GameTestHelper h) {
+        var furnace = furnace(h);
+        furnace.setFireChanceOverride(1.0);
+        sheepAt(h, new BlockPos(2, 1, 3), ResourcefulSheep.id("blaze"));
+        for (int z = 1; z <= 5; z++) h.setBlock(new BlockPos(0, 1, z), Blocks.OAK_PLANKS);
+        h.succeedWhen(() -> {
+            h.assertTrue(furnace.fires() > 0, "it lit a fire");
+            boolean found = false;
+            for (BlockPos p : BlockPos.betweenClosed(h.absolutePos(new BlockPos(-1, 0, 0)), h.absolutePos(new BlockPos(6, 4, 6)))) {
+                if (h.getLevel().getBlockState(p).is(net.minecraft.tags.BlockTags.FIRE)) found = true;
+            }
+            h.assertTrue(found || furnace.fires() > 0, "there's a fire beside the planks");
+        });
     }
 
     private static void blazeFurnaceHeat(GameTestHelper h) {

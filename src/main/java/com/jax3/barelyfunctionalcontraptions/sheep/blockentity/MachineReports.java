@@ -49,7 +49,7 @@ public final class MachineReports {
             "filling", "burning", "boosted", "running", "counting", "hauling", "delivering", "cracking");
     /** ... that mean it's fine but waiting on something. */
     private static final Set<String> WAITING = Set.of("full", "energy_full", "redstone_disabled", "too_quiet", "asleep", "waking", "resting",
-            "all_green", "running_hot", "running_cold", "not_infinite", "cold", "nearly_full", "no_empty_crates", "no_crates", "wasting", "regrowing");
+            "all_green", "running_hot", "running_cold", "not_infinite", "cold", "nearly_full", "no_empty_crates", "no_crates", "wasting", "regrowing", "jammed", "frosted");
 
     private static Report of(Enum<?> status, String number) {
         return of(status.name().toLowerCase(Locale.ROOT), number);

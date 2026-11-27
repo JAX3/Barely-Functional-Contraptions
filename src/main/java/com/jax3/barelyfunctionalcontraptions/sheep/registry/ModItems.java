@@ -53,7 +53,6 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> ENERGY_METER = REGISTER.registerSimpleBlockItem(ModBlocks.ENERGY_METER);
 
     public static final DeferredItem<BlockItem> GLOW_PANEL = REGISTER.registerSimpleBlockItem(ModBlocks.GLOW_PANEL);
-    public static final DeferredItem<BlockItem> GLOW_LAMP = REGISTER.registerSimpleBlockItem(ModBlocks.GLOW_LAMP);
     public static final DeferredItem<BlockItem> BLAZE_FURNACE = REGISTER.registerSimpleBlockItem(ModBlocks.BLAZE_FURNACE);
     public static final DeferredItem<BlockItem> CHILLER = REGISTER.registerSimpleBlockItem(ModBlocks.CHILLER);
     public static final DeferredItem<BlockItem> POWERED_FURNACE = REGISTER.registerSimpleBlockItem(ModBlocks.POWERED_FURNACE);

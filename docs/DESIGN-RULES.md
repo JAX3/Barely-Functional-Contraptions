@@ -121,14 +121,14 @@ Small ways to deepen what's already there (rule 5). These don't need the two-wee
 ### Needs a quirk (rule 3)
 These machines work, but nothing about them is barely functional yet. Each needs one small quirk, not a rework.
 - **Wool Burner:** no downside yet.
-- **Blaze Sheep Furnace:** no downside yet.
-- **Snow Sheep Chiller:** no downside yet.
 - **Powered Furnace:** a plain fast furnace; Blaze sheep are only a bonus.
-- **Mechanical Separator:** the core machine, with no quirk.
-- **Automatic Shears:** no quirk.
 - **Infusion Altar:** no quirk.
 - **Wool Packer:** no quirk.
-- **Glow Panel:** no quirk (making nothing at night is how all solar power works). Its sheep are optional too (rule 1).
+- **Glow Panel:** no quirk (making nothing at night is how all solar power works). Glow Ink sheep now light it in place
+  of the removed Glow Lamp.
+
+Done: the Mechanical Separator jams, the Automatic Shears nick, the Snow Sheep Chiller frosts over and the Blaze Sheep
+Furnace throws sparks.
 
 ### Other extras
 - **Echo Chamber:** catalysts, an Echo Shard boost, fatigue.

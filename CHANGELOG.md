@@ -36,6 +36,11 @@ For Minecraft 26.3, 26.2 and 26.1 on NeoForge.
 - Processing machines are **about half as fast again** for the same power.
 - The command is now **`/bfc`**.
 - **Wireless power links** from the wrench are gone: use cables, or an Energy sheep.
+- **Quirks:** the Mechanical Separator may jam when you change wools (shears clear it); the Automatic Shears now and
+  then nick a sheep; a Snow Sheep Chiller left full frosts over; a Blaze Sheep Furnace's sparks can light flammable
+  blocks near it.
+- **The Glow Lamp is gone:** a Glow Ink sheep standing on Glow Panels gives them full glow power instead. Placed lamps
+  disappear from worlds.
 - **Sheep in every generator:** Dragon sheep standing in a Zero Point beam don't burn and add +25% each (up to 4).
   Sculk sheep near a Hume Field Generator steady its random output towards the average.
 - Every machine now runs on one shared machine frame; worlds load as before.

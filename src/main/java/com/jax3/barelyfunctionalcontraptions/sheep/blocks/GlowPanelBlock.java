@@ -27,7 +27,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * The Glow Panel: a thin panel (like a daylight detector) whose cells light up while it is making power, brighter the
- * more it makes: {@link #GLOW} 0 is dark, 1 dim (dusk, rain), 2 half (a Glow Lamp at night) and 3 full (noon sun).
+ * more it makes: {@link #GLOW} 0 is dark, 1 dim (dusk, rain), 2 half (a Glow Ink sheep at night) and 3 full (noon sun).
  */
 public class GlowPanelBlock extends BaseEntityBlock {
     /**

@@ -33,7 +33,7 @@ Craft a book with a Functional Machine Block to get the in-game guide. Its chapt
 |---|---|
 | ![The Contraptions Manual on its Power tab, with the Wool Burner chapter open](docs/screenshots/83_guide_power_tab.png) | ![The Production tab: Infusing Sheep, Themed Sheep, Infusion Altar, Breeding Sheep, Wool Machines and Fluid Reservoir](docs/screenshots/84_guide_production_tab.png) |
 
-![Every block in the mod on stepped rows, each with its name: the Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar and a Wool Bale in front; the Mycelial Generator, Zero Point Energy Module, Glow Panel, Glow Lamp and Blaze Sheep Furnace; the Wool Burner, Hume Energy Cube, Fluid Tank, Fluid Reservoir and Creative Generator; and the Energy Cable, Fluid Pipe, Item Pipe, Energy Meter and Functional Machine Block at the back](docs/screenshots/showcase_blocks.png)
+![Every block in the mod on stepped rows, each with its name: the Mechanical Separator, Automatic Shears, Wool Packer, Infusion Altar and a Wool Bale in front; the Mycelial Generator, Zero Point Energy Module, Glow Panel and Blaze Sheep Furnace; the Wool Burner, Hume Energy Cube, Fluid Tank, Fluid Reservoir and Creative Generator; and the Energy Cable, Fluid Pipe, Item Pipe, Energy Meter and Functional Machine Block at the back](docs/screenshots/showcase_blocks.png)
 
 ![The Recipes tab's Mechanical Separator chapter: Blaze, Brown Mushroom and Coal wool with their outputs, power and time](docs/screenshots/99_guide_recipes_separator.png)
 
@@ -45,9 +45,9 @@ The manual sorts the generators into tiers.
 
 ### Glow Panels
 
-Make up to 60 FE/t from sunlight and up to 40 FE/t from block light; a Glow Lamp gives full power day or night. Their cells glow brighter the more they make, and go dim at dusk and dark at night.
+Make up to 60 FE/t from sunlight and up to 40 FE/t from block light; a Glow Ink sheep standing on them gives full power day or night. Their cells glow brighter the more they make, and go dim at dusk and dark at night.
 
-![Glow Panels in the sun with a Glow Lamp](docs/screenshots/55_glow_panels.png)
+![Glow Panels in the sun](docs/screenshots/55_glow_panels.png)
 
 ### Wool Burner
 
@@ -65,7 +65,7 @@ A sheep walks its belt for the wheat hanging at the front and makes 20 FE/t, mor
 
 ### Blaze Furnace
 
-Makes power from the heat of Blaze sheep standing round it: 80 FE/t for one, up to 260 FE/t for four. Only a sheep with its blazing fleece on counts, and each Blaze Rod doubles the output for 30 seconds.
+Makes power from the heat of Blaze sheep standing round it: 80 FE/t for one, up to 260 FE/t for four. Only a sheep with its blazing fleece on counts, and each Blaze Rod doubles the output for 30 seconds. Its sheep throw sparks: keep wood and wool away from it, or it may set them alight.
 
 ![A Blaze Sheep Furnace beside a burning Blaze sheep, with its area shown](docs/screenshots/70_blaze_furnace.png)
 
@@ -187,7 +187,7 @@ Smelts anything a Furnace can, on power instead of fuel, in a little over half t
 
 ### Snow Sheep Chiller
 
-The Blaze Furnace's icy opposite: Snow sheep standing round it freeze water into Ice, one every 5 seconds with one sheep and about every 1.5 with four. It needs no power, just a bucket of water per Ice, and hoppers can take the Ice out.
+The Blaze Furnace's icy opposite: Snow sheep standing round it freeze water into Ice, one every 5 seconds with one sheep and about every 1.5 with four. It needs no power, just a bucket of water per Ice, and hoppers can take the Ice out. Leave it full for a minute and it frosts over until it thaws.
 
 ![A Snow Sheep Chiller on a snowy floor with three Snow sheep round it inside its blue area outline, snowflakes drifting in, and a hopper underneath](docs/screenshots/100_chiller.png)
 
@@ -235,7 +235,7 @@ A wall screen that shows how your machines are doing, all in one place: link the
 
 ### Wool Machines
 
-The Mechanical Separator turns resource wool back into 2–4 of its resource, string and sometimes a bonus. Automatic Shears shear every sheep in front of them and keep the wool for hoppers and pipes.
+The Mechanical Separator turns resource wool back into 2–4 of its resource, string and sometimes a bonus. It sometimes jams when you switch wools (shears clear it). Automatic Shears shear every sheep in front of them and keep the wool for hoppers and pipes, now and then nicking one.
 
 ![Automatic Shears beside a pen of infused sheep](docs/screenshots/13_automatic_shears.png)
 

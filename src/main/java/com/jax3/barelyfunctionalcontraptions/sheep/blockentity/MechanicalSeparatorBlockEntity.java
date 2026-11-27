@@ -65,6 +65,17 @@ public class MechanicalSeparatorBlockEntity extends com.jax3.barelyfunctionalcon
     private RedstoneMode redstoneMode = ModConfigs.get(ModConfigs.SERVER.defaultRedstoneMode);
     private boolean powered;
     private ItemStack lastInput = ItemStack.EMPTY;
+    /** The last item it finished separating (one of it), to tell when the wool changes. */
+    private ItemStack lastSeparated = ItemStack.EMPTY;
+    /** This separator's own jam odds, for tests ({@link com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks#NONE}: the config's). */
+    private double jamChanceOverride = com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks.NONE;
+
+    public void setJamChanceOverride(double chance) {
+        jamChanceOverride = chance;
+    }
+
+    /** Ticks left on a jam (0: not jammed). */
+    private int jamTicks;
     private boolean inventoryDirty = true;
 
     private final ContainerData data = new ContainerData() {
@@ -142,18 +153,29 @@ public class MechanicalSeparatorBlockEntity extends com.jax3.barelyfunctionalcon
             long total = fx.energy(sep.totalEnergy());
             energyPerTick = (int) Math.min(Integer.MAX_VALUE, (total + maxProgress - 1) / maxProgress);
             int thisTick = EnergyShare.forTick(total, maxProgress, progress);
-            if (!mode.allows(powered)) {
+            if (jamTicks > 0) {
+                newStatus = MachineStatus.JAMMED;
+                if (--jamTicks % 20 == 0) jamEffects(level, pos, jamTicks == 0);
+                setChanged();
+            } else if (!mode.allows(powered)) {
                 newStatus = MachineStatus.REDSTONE_DISABLED;
             } else if (!outputsFit(sep)) {
                 newStatus = MachineStatus.OUTPUT_FULL;
             } else if (energy.getEnergy() < thisTick) {
                 newStatus = MachineStatus.NO_ENERGY;
                 if (ModConfigs.getBool(ModConfigs.SERVER.resetProgressWhenUnpowered)) progress = 0;
+            } else if (progress == 0 && jams(level, input)) {
+                newStatus = MachineStatus.JAMMED;
+                jamTicks = Math.max(1, ModConfigs.getInt(ModConfigs.SERVER.separatorJamSeconds) * 20);
+                lastSeparated = input.copyWithCount(1); // jammed on it once; it won't jam again on the same wool
+                jamEffects(level, pos, false);
+                setChanged();
             } else {
                 newStatus = MachineStatus.PROCESSING;
                 energy.consume(thisTick);
                 progress++;
                 if (progress >= maxProgress) {
+                    lastSeparated = input.copyWithCount(1);
                     finish(sep, level.getRandom());
                     progress = 0;
                 }
@@ -176,6 +198,45 @@ public class MechanicalSeparatorBlockEntity extends com.jax3.barelyfunctionalcon
             inventoryDirty = false;
             setChanged();
         }
+    }
+
+    /** Whether starting on {@code input} jams it: a different wool from the last one, and an unlucky roll. */
+    private boolean jams(ServerLevel level, ItemStack input) {
+        double chance = com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks.chance(ModConfigs.getDouble(ModConfigs.SERVER.separatorJamChance), jamChanceOverride);
+        if (chance <= 0 || lastSeparated.isEmpty() || ItemStack.isSameItemSameComponents(input, lastSeparated)) return false;
+        if (level.getRandom().nextDouble() >= chance) {
+            lastSeparated = input.copyWithCount(1); // got away with it this time
+            return false;
+        }
+        return true;
+    }
+
+    /** Lint puffing out of a jammed separator, with a grinding clunk; and a pop when it shakes clear. */
+    private void jamEffects(ServerLevel level, BlockPos pos, boolean cleared) {
+        var top = net.minecraft.world.phys.Vec3.atCenterOf(pos).add(0, 0.6, 0);
+        level.sendParticles(new net.minecraft.core.particles.ItemParticleOption(net.minecraft.core.particles.ParticleTypes.ITEM, com.jax3.barelyfunctionalcontraptions.compat.Vanilla.wool(net.minecraft.world.item.DyeColor.WHITE)),
+                top.x, top.y, top.z, cleared ? 16 : 5, 0.25, 0.1, 0.25, 0.05);
+        if (upgrades.effects().muffled()) return;
+        level.playSound(null, pos, cleared ? net.minecraft.sounds.SoundEvents.WOOL_BREAK : net.minecraft.sounds.SoundEvents.GRINDSTONE_USE,
+                net.minecraft.sounds.SoundSource.BLOCKS, 0.5F, cleared ? 1.2F : 0.6F);
+    }
+
+    /** Clears a jam at once (shears on it). Returns whether it was jammed. */
+    public boolean clearJam() {
+        if (jamTicks <= 0 || !(level instanceof ServerLevel server)) return false;
+        jamTicks = 0;
+        jamEffects(server, worldPosition, true);
+        setChanged();
+        return true;
+    }
+
+    public boolean isJammed() {
+        return jamTicks > 0;
+    }
+
+    /** Seconds left on a jam. */
+    public int jamSecondsLeft() {
+        return (jamTicks + 19) / 20;
     }
 
     private boolean outputsFit(Separation sep) {
@@ -313,6 +374,8 @@ public class MechanicalSeparatorBlockEntity extends com.jax3.barelyfunctionalcon
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output); // its modules: upgrades, inventory, energy
         output.putInt("progress", progress);
+        output.putInt("jam_ticks", jamTicks);
+        if (!lastSeparated.isEmpty()) output.store("last_separated", ItemStack.CODEC, lastSeparated);
         output.putInt("redstone_mode", redstoneMode.ordinal());
     }
 
@@ -320,6 +383,8 @@ public class MechanicalSeparatorBlockEntity extends com.jax3.barelyfunctionalcon
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input); // its modules
         progress = input.getIntOr("progress", 0);
+        jamTicks = Math.max(0, input.getIntOr("jam_ticks", 0));
+        lastSeparated = input.read("last_separated", ItemStack.CODEC).orElse(ItemStack.EMPTY);
         redstoneMode = RedstoneMode.byId(input.getIntOr("redstone_mode", redstoneMode.ordinal()));
         lastInput = inventory.getStack(SeparatorInventory.INPUT).copyWithCount(1);
     }

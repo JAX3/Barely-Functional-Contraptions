@@ -61,6 +61,17 @@ public class ChillerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sh
     private boolean showArea;
     private MachineStatus status = MachineStatus.IDLE;
     private int lastSignal;
+    /** Ticks its Snow sheep have chilled it with the Ice slot full, towards frosting over. */
+    private int fullTicks;
+    /** This chiller's own frost time in seconds, for tests ({@link com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks#NONE}: the config's). */
+    private double frostSecondsOverride = com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks.NONE;
+
+    public void setFrostSecondsOverride(int seconds) {
+        frostSecondsOverride = seconds;
+    }
+
+    /** Ticks left to thaw, while frosted over (0: not frosted). */
+    private int thawTicks;
 
     private final net.minecraft.world.inventory.ContainerData data = new net.minecraft.world.inventory.ContainerData() {
         @Override
@@ -143,14 +154,31 @@ public class ChillerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sh
         }
         ItemStack output = inventory.get(0);
         boolean room = output.isEmpty() || (output.is(Items.ICE) && output.getCount() < output.getMaxStackSize());
-        if (cold <= 0) {
+        if (thawTicks > 0) {
+            // Frosted over: it thaws only while there's room for Ice, at once if a Blaze sheep warms it.
+            if (room && (--thawTicks <= 0 || warmed(level, pos))) {
+                thawTicks = 0;
+                level.sendParticles(net.minecraft.core.particles.ParticleTypes.DRIPPING_WATER, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 10, 0.4, 0.2, 0.4, 0.0);
+                if (!muffled()) level.playSound(null, pos, net.minecraft.sounds.SoundEvents.GLASS_BREAK, net.minecraft.sounds.SoundSource.BLOCKS, 0.4F, 1.6F);
+            }
+            status = thawTicks > 0 ? MachineStatus.FROSTED : MachineStatus.IDLE;
+            if (level.getGameTime() % 10 == 0) {
+                level.sendParticles(net.minecraft.core.particles.ParticleTypes.SNOWFLAKE, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 2, 0.4, 0.2, 0.4, 0.0);
+            }
+            setChanged();
+        } else if (cold <= 0) {
             status = MachineStatus.IDLE;
+            fullTicks = 0;
         } else if (!room) {
+            int frostAfter = (frostSecondsOverride >= 0 ? (int) frostSecondsOverride
+                    : com.jax3.barelyfunctionalcontraptions.sheep.machine.Quirks.off(frostSecondsOverride) ? 0 : ModConfigs.getInt(ModConfigs.SERVER.chillerFrostSeconds)) * 20;
+            if (frostAfter > 0 && ++fullTicks >= frostAfter) frostOver(level, pos);
             status = MachineStatus.OUTPUT_FULL;
         } else if (tank.getAmount() < waterPerIce()) {
             status = MachineStatus.NO_ENERGY; // shown as "No water"
         } else {
             status = MachineStatus.PROCESSING;
+            fullTicks = 0;
             progress += cold;
             if (progress >= ticksPerIce() * 100) {
                 progress = 0;
@@ -168,6 +196,32 @@ public class ChillerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sh
         }
         boolean active = status == MachineStatus.PROCESSING;
         if (state.getValue(ChillerBlock.ACTIVE) != active) level.setBlock(pos, state.setValue(ChillerBlock.ACTIVE, active), Block.UPDATE_ALL);
+    }
+
+    /** Left full too long with its Snow sheep still chilling it, it frosts over: it stops until it thaws. */
+    private void frostOver(ServerLevel level, BlockPos pos) {
+        fullTicks = 0;
+        thawTicks = ModConfigs.getInt(ModConfigs.SERVER.chillerThawSeconds) * 20;
+        progress = 0;
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.SNOWFLAKE, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 30, 0.5, 0.4, 0.5, 0.02);
+        if (!muffled()) level.playSound(null, pos, net.minecraft.sounds.SoundEvents.POWDER_SNOW_PLACE, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.8F);
+        setChanged();
+    }
+
+    /** Whether a heat source (a Blaze sheep, by default) stands in its area, to thaw it at once. */
+    private boolean warmed(ServerLevel level, BlockPos pos) {
+        AABB area = chillingArea(pos, rangeBonus());
+        return !level.getEntities((net.minecraft.world.entity.Entity) null, area,
+                e -> area.contains(e.position()) && com.jax3.barelyfunctionalcontraptions.sheep.furnace.FurnaceHeatManager.heatOf(e).isPresent()).isEmpty();
+    }
+
+    public boolean isFrosted() {
+        return thawTicks > 0;
+    }
+
+    /** Seconds left to thaw (counting only while there's room for Ice). */
+    public int thawSecondsLeft() {
+        return (thawTicks + 19) / 20;
     }
 
     /** Counts the Snow sheep in the area. */
@@ -275,6 +329,8 @@ public class ChillerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sh
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input); // its modules: water, upgrades, the Ice
         progress = input.getIntOr("progress", 0);
+        fullTicks = Math.max(0, input.getIntOr("full_ticks", 0));
+        thawTicks = Math.max(0, input.getIntOr("thaw_ticks", 0));
         showArea = input.getBooleanOr("show_area", false);
         chillers = input.getIntArray("chillers").orElse(new int[0]);
     }
@@ -283,6 +339,8 @@ public class ChillerBlockEntity extends com.jax3.barelyfunctionalcontraptions.sh
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output); // its modules
         output.putInt("progress", progress);
+        output.putInt("full_ticks", fullTicks);
+        output.putInt("thaw_ticks", thawTicks);
         output.putBoolean("show_area", showArea);
     }
 

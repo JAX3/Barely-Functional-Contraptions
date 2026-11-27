@@ -63,6 +63,21 @@ public class MechanicalSeparatorBlock extends FacingMachineBlock {
                 (l, pos, s, be) -> MechanicalSeparatorBlockEntity.serverTick(serverLevel, pos, s, be));
     }
 
+    /** Shears clear a jam (snipping the lint out), wearing them a little. */
+    @Override
+    protected InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+                                          net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        if (!stack.is(net.minecraft.world.item.Items.SHEARS) || !(level.getBlockEntity(pos) instanceof MechanicalSeparatorBlockEntity be) || !be.isJammed()) {
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
+        if (!level.isClientSide() && be.clearJam()) {
+            level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
+            stack.hurtAndBreak(1, player, hand == net.minecraft.world.InteractionHand.MAIN_HAND
+                    ? net.minecraft.world.entity.EquipmentSlot.MAINHAND : net.minecraft.world.entity.EquipmentSlot.OFFHAND);
+        }
+        return InteractionResult.SUCCESS;
+    }
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof MechanicalSeparatorBlockEntity be) {

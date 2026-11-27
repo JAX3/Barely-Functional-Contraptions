@@ -55,7 +55,6 @@ public final class ContraptionsCreativeTab {
     public static final List<Section> SECTIONS = List.of(
             guide("power", 0xFFB8792A, () -> new ItemStack(com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.HUME_ENERGY_CUBE.get()), items(
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_PANEL,
-                    com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.GLOW_LAMP,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.WOOL_BURNER,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.SHEEP_TREADMILL,
                     com.jax3.barelyfunctionalcontraptions.sheep.registry.ModItems.BLAZE_FURNACE,

@@ -92,6 +92,8 @@ neoForge {
         gameTestServer {
             type = 'gameTestServer'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // The machines' random quirks (a jam, a nick, a spark) stay off unless a test turns one on for its machine.
+            systemProperty 'barelyfunctionalcontraptions.quirksOff', 'true'
         }
 
         configureEach {

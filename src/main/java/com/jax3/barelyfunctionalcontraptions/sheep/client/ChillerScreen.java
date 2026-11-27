@@ -90,7 +90,7 @@ public class ChillerScreen extends MachineScreen<ChillerMenu> {
         if (filled > 0) graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + ARROW_X, y + ARROW_Y, ARROW_U, ARROW_V + 10, filled, ARROW_H, TEX, TEX);
 
         MachineStatus lamp = menu.getStatus();
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + LAMP_X, y + LAMP_Y, LAMP_U + lamp.ordinal() * 8 % 64, LAMP_V + lamp.ordinal() / 8 * 8, 8, 8, TEX, TEX);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x + LAMP_X, y + LAMP_Y, LAMP_U + lamp.lamp() * 8 % 64, LAMP_V + lamp.lamp() / 8 * 8, 8, 8, TEX, TEX);
     }
 
     private Component statusText() {

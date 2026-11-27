@@ -71,12 +71,10 @@
       "text": [
         "The Glow Panel makes power from the light falling on its top.",
         "- In full sunlight it makes 60 FE/t, less at dawn, dusk and in rain, and nothing at night.",
-        "- Under block light it makes up to 40 FE/t. A Glow Lamp on it or above it gives the full amount, day or night, even underground.",
-        "- A glowing Glow Ink sheep standing next to it lights it up too.",
-        "Its cells glow brighter the more it makes: dim at dawn, dusk or in rain, half lit under a Glow Lamp at night, fully lit in the midday sun, and dark when it makes nothing.",
-        "It pushes its energy into blocks beside and below it.",
-        "## Glow Lamp",
-        "A full-brightness lamp made from glow ink sacs, glass and glowstone dust."
+        "- Under block light it makes up to 40 FE/t.",
+        "- A Glow Ink sheep standing on it, or on the panels around it (up to two blocks above), gives the full 40 FE/t, day or night, even underground. Fence one in over a row of panels.",
+        "Its cells glow brighter the more it makes: dim at dawn, dusk or in rain, half lit under a Glow Ink sheep at night, fully lit in the midday sun, and dark when it makes nothing.",
+        "It pushes its energy into blocks beside and below it."
       ]
     },
     {
