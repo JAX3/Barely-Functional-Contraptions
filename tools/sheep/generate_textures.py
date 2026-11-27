@@ -5235,20 +5235,20 @@ def main():
 
 
 
-SHEEP_ATTRACTOR_TOP = [  # Sheep Attractor face: a riveted steel plate with a sheaf of wheat on a purple lure ring
+SHEEP_ATTRACTOR_TOP = [  # Sheep Attractor face: a red horseshoe magnet with steel tips on a riveted steel plate
     "OOOOOOOOOOOOOOOO",
     "OBHHHHHHHHHHHHbO",
     "OHMMMMMMMMMMMMSO",
-    "OHMMppppppppMMSO",
-    "OHMpPYYCYCYCPpSO",
-    "OHMpPCYYCYYCPpSO",
-    "OHMpPYCYYCYYPpSO",
-    "OHMpPcCYCYCcPpSO",
-    "OHMpPPcCYCcPPpSO",
-    "OHMpPPPcCcPPPpSO",
-    "OHMpPPPcCcPPPpSO",
-    "OHMpPPcCYCcPPpSO",
-    "OHMMppppppppMMSO",
+    "OHMOOOOMMOOOOMSO",
+    "OHMOBHOMMOHbOMSO",
+    "OHMOHbOMMOHbOMSO",
+    "OHMOOOOMMOOOOMSO",
+    "OHMOLROMMORDOMSO",
+    "OHMOLROMMORDOMSO",
+    "OHMOLROOOORDOMSO",
+    "OHMOLRRRRRRDOMSO",
+    "OHMMOLRRRRDOMMSO",
+    "OHMMMOOOOOOMMMSO",
     "OHMMMMMMMMMMMMSO",
     "ObSSSSSSSSSSSSbO",
     "OOOOOOOOOOOOOOOO",
@@ -5265,9 +5265,9 @@ SHEEP_ATTRACTOR_SIDE = [  # its edge, half a block thick (the top half of the te
     "................",
     "OOOOOOOOOOOOOOOO",
     "OHHHHHHHHHHHHHHO",
-    "OMbMMMMCYMMMMbMO",
-    "OMMMMMYCCYMMMMMO",
-    "OMMMMMMCYMMMMMMO",
+    "OMbMMMMMMMMMMbMO",
+    "OMMMMMMLRDMMMMMO",
+    "OMMMMMMMMMMMMMMO",
     "OSSSSSSSSSSSSSSO",
     "OSSSSSSSSSSSSSSO",
     "OOOOOOOOOOOOOOOO",
@@ -5275,8 +5275,9 @@ SHEEP_ATTRACTOR_SIDE = [  # its edge, half a block thick (the top half of the te
 
 
 def generate_sheep_attractor():
-    """Sheep Attractor: its face (wheat on a lure ring) and its half-thick edge."""
+    """Sheep Attractor: its face (a horseshoe magnet) and its half-thick edge."""
     pal = dict(CARTOON)
+    pal["L"], pal["R"], pal["D"] = hexc("#ff8a7a"), hexc("#e0453f"), hexc("#9c2a2e")  # magnet highlight / red / shadow
     grid(SHEEP_ATTRACTOR_TOP, pal).save(out("block/sheep_attractor_top.png"))
     grid(SHEEP_ATTRACTOR_SIDE, pal).save(out("block/sheep_attractor_side.png"))
 

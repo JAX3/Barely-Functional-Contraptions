@@ -509,7 +509,7 @@
       "icon": "barelyfunctionalcontraptions:sheep_attractor",
       "tab": "utility",
       "text": [
-        "A half-slab lure, a sheaf of wheat on a steel plate, that clips onto a sheep machine.",
+        "A half-slab lure, a horseshoe magnet on a steel plate, that clips onto a sheep machine.",
         "- Place it against any face of a Blaze Sheep Furnace, Snow Sheep Chiller, Static Generator, Thermal Reaction Chamber or Echo Chamber (any of its blocks).",
         "- While it's fitted, the machine calls the sheep it uses back into its area when one wanders up to 4 blocks out, as sheep follow wheat. It only calls as many as it has room for, and two machines never pull the same sheep.",
         "- Without one, a machine leaves its sheep to wander. One attractor is enough; more do nothing extra.",

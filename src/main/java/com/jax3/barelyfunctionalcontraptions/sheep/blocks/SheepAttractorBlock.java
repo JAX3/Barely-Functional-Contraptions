@@ -19,7 +19,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The Sheep Attractor: a half-slab lure (a sheaf of wheat on a steel plate) that clips onto any face of a sheep
+ * The Sheep Attractor: a half-slab lure (a horseshoe magnet on a steel plate) that clips onto any face of a sheep
  * machine. While one is fitted, the machine calls its sheep back into its working area when they wander a little way
  * out (see {@link com.jax3.barelyfunctionalcontraptions.sheep.blockentity.SheepAttraction}); without one, it doesn't.
  *
