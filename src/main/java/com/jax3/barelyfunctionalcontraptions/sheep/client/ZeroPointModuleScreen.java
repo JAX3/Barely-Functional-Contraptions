@@ -160,10 +160,23 @@ public class ZeroPointModuleScreen extends AbstractContainerScreen<ZeroPointModu
         centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.stored", Numbers.grouped(menu.getAmount())), 21, ENERGY_TEXT);
         centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.capacity", Numbers.grouped(menu.getCapacity())), 31, TEXT_DIM);
         centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.generating", Numbers.grouped(menu.getPairOutput())), 48, GEN_COLOR);
-        centred(graphics, Component.translatable(menu.getLink() == ZeroPointLink.LINKED
-                ? "gui.barelyfunctionalcontraptions.zpe.shared" : "gui.barelyfunctionalcontraptions.zpe.not_linked"), 58, TEXT_DIM);
+        if (menu.getLink() == ZeroPointLink.LINKED && menu.getDragons() > 0) {
+            centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.zpe.dragons", menu.getDragons(),
+                    dragonPercent(menu.getDragons())), 58, DRAGON_COLOR);
+        } else {
+            centred(graphics, Component.translatable(menu.getLink() == ZeroPointLink.LINKED
+                    ? "gui.barelyfunctionalcontraptions.zpe.shared" : "gui.barelyfunctionalcontraptions.zpe.not_linked"), 58, TEXT_DIM);
+        }
         centred(graphics, Component.translatable("gui.barelyfunctionalcontraptions.cube.out", Numbers.grouped(menu.getOutRate())), 68, OUT_COLOR);
         graphics.text(font, statusText(), LAMP_X + 13, LAMP_Y + 1, statusLamp().color, false);
+    }
+
+    private static final int DRAGON_COLOR = 0xFFD97BFF;
+
+    /** The boost this many Dragon sheep give, in whole percent. */
+    static int dragonPercent(int dragons) {
+        return (int) Math.round(100 * dragons * com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getDouble(
+                com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.zpeDragonBonus));
     }
 
     private void centred(GuiGraphicsExtractor graphics, Component text, int y, int color) {

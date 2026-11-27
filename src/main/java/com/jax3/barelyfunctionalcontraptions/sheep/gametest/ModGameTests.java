@@ -138,6 +138,7 @@ public final class ModGameTests {
         TESTS.put("zero_point_beam_burns_what_touches_it", ModGameTests::zeroPointBeamBurns);
         TESTS.put("zero_point_beam_kills_have_looting", ModGameTests::zeroPointBeamLooting);
         TESTS.put("zero_point_modules_link_sideways", ModGameTests::zeroPointSideways);
+        TESTS.put("zero_point_beam_is_boosted_by_dragon_sheep", ModGameTests::zeroPointDragons);
         TESTS.put("bred_lambs_keep_the_infusion", ModGameTests::breedingKeepsInfusion);
         TESTS.put("fluid_tank_single", ModGameTests::tankSingle);
         TESTS.put("fluid_tank_group_fills_bottom_up", ModGameTests::tankGroup);
@@ -175,6 +176,7 @@ public final class ModGameTests {
         TESTS.put("hume_field_generator_window_recipe_and_drop", ModGameTests::humeFieldWindowRecipeDrop);
         TESTS.put("hume_field_generator_pulses_on_its_own", ModGameTests::humeFieldPulse);
         TESTS.put("status_panel_shows_the_hume_field_generator", ModGameTests::humeFieldOnPanel);
+        TESTS.put("hume_field_generator_is_steadied_by_sculk_sheep", ModGameTests::humeFieldSculk);
         TESTS.put("echo_chamber_is_three_by_three", ModGameTests::echoChamber);
         ECHO_TESTS.put("echo_chamber_counts_its_warden_sheep", ModGameTests::echoCountsHerd);
         ECHO_TESTS.put("implosion_chamber_cracks_cobble_to_gravel_to_sand", ModGameTests::implosionCracks);
@@ -1243,6 +1245,33 @@ public final class ModGameTests {
     }
 
     /** Builds the whole 2x2x3 Hume Field Generator with its bottom north-west corner at {@code origin}. */
+    /**
+     * Sculk sheep near a Hume Field Generator steady its field: each narrows the range its rolls come from towards the
+     * middle, and its rolls stay inside the narrowed range. A plain sheep doesn't count. Its window shows how many.
+     */
+    private static void humeFieldSculk(GameTestHelper h) {
+        var be = humeFieldAt(h, new BlockPos(1, 1, 1));
+        for (int z = 1; z <= 3; z++) sheepAt(h, new BlockPos(4, 1, z), ResourcefulSheep.id("warden"));
+        sheepAt(h, new BlockPos(4, 1, 4), null);
+        int min = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.rangeMin();
+        int max = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.rangeMax();
+        int lo = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.steadyMin(3);
+        int hi = com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.steadyMax(3);
+        h.assertTrue(lo > min && hi < max && Math.abs((lo + hi) - (min + max)) <= 1, "three Sculk sheep narrow " + min + "-" + max + " round its middle, to " + lo + "-" + hi);
+        int perRoll = ModConfigs.getInt(ModConfigs.SERVER.humeFieldTicksPerRoll);
+        h.onEachTick(() -> {
+            if (h.getTick() <= perRoll + 2) return; // its first roll after the sheep arrived
+            h.assertTrue(be.sculk() == 3, "three Sculk sheep count, the plain one doesn't: " + be.sculk());
+            h.assertTrue(be.generated() >= lo && be.generated() <= hi, "it made " + be.generated() + ", outside the steadied " + lo + "-" + hi);
+        });
+        h.runAfterDelay(perRoll * 4, () -> {
+            var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+            var menu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.HumeFieldGeneratorMenu) be.createMenu(0, player.getInventory(), player);
+            h.assertTrue(menu.getSculk() == 3 && menu.getRangeMin() == lo && menu.getRangeMax() == hi, "its window shows the steadied range");
+            h.succeed();
+        });
+    }
+
     private static com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity humeFieldAt(GameTestHelper h, BlockPos origin) {
         var block = ModBlocks.HUME_FIELD_GENERATOR.get();
         for (int p = 0; p < 4; p++) {
@@ -5086,6 +5115,42 @@ public final class ModGameTests {
         h.succeedWhen(() -> {
             h.assertTrue(pig.getHealth() < health || !pig.isAlive(), "the sideways beam hurts the pig standing in it");
             h.assertTrue(pig.isOnFire() || !pig.isAlive(), "and sets it on fire");
+        });
+    }
+
+    /**
+     * Dragon sheep standing in a Zero Point beam aren't burned, and each one adds dragonBonus to the pair's output; the
+     * two modules still split it between them. A plain sheep doesn't count.
+     */
+    private static void zeroPointDragons(GameTestHelper h) {
+        int perBlock = ModConfigs.getInt(ModConfigs.SERVER.zpeEnergyPerBlock);
+        double bonus = ModConfigs.getDouble(ModConfigs.SERVER.zpeDragonBonus);
+        BlockPos floor = new BlockPos(1, 1, 1), ceiling = new BlockPos(1, 4, 1);
+        h.setBlock(floor, zpe(Direction.UP));
+        h.setBlock(ceiling, zpe(Direction.DOWN));
+        Sheep dragon = sheepAt(h, new BlockPos(1, 2, 1), ResourcefulSheep.id("dragon"));
+        // A second pair with only a plain sheep in its beam: no boost.
+        BlockPos plainFloor = new BlockPos(5, 1, 5), plainCeiling = new BlockPos(5, 4, 5);
+        h.setBlock(plainFloor, zpe(Direction.UP));
+        h.setBlock(plainCeiling, zpe(Direction.DOWN));
+        sheepAt(h, new BlockPos(5, 2, 5), null);
+        h.runAfterDelay(2, () -> {
+            var low = zpeAt(h, floor);
+            var high = zpeAt(h, ceiling);
+            h.assertTrue(low.getDragons() == 1 && high.getDragons() == 1, "both modules see the Dragon sheep: " + low.getDragons() + "/" + high.getDragons());
+            int boosted = (int) Math.round(2 * perBlock * (1 + bonus));
+            h.assertTrue(low.getPairOutput() == boosted, "a 2-block gap with a Dragon sheep makes " + boosted + ", got " + low.getPairOutput());
+            h.assertTrue(low.getGenerating() + high.getGenerating() == boosted, "the two halves add up to the boosted output");
+            var plain = zpeAt(h, plainFloor);
+            zpeAt(h, plainCeiling);
+            h.assertTrue(plain.getDragons() == 0 && plain.getPairOutput() == 2 * perBlock, "a plain sheep doesn't boost it");
+            var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+            var menu = (com.jax3.barelyfunctionalcontraptions.sheep.menu.ZeroPointModuleMenu) low.createMenu(0, player.getInventory(), player);
+            h.assertTrue(menu.getDragons() == 1, "its window shows the Dragon sheep");
+        });
+        h.runAfterDelay(40, () -> {
+            h.assertTrue(dragon.isAlive() && dragon.getHealth() == dragon.getMaxHealth() && !dragon.isOnFire(), "the beam doesn't burn a Dragon sheep");
+            h.succeed();
         });
     }
 

@@ -38,6 +38,11 @@ public enum ZeroPointModuleProvider implements IBlockComponentProvider {
         tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.zpe.linked_" + where, distance - 1).withColor(0x3FC8FF));
         tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.zpe.output",
                 String.format(Locale.ROOT, "%,d", be.getPairOutput())).withStyle(ChatFormatting.GRAY));
+        if (be.getDragons() > 0) {
+            int percent = (int) Math.round(100 * be.getDragons() * com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.getDouble(
+                    com.jax3.barelyfunctionalcontraptions.sheep.config.ModConfigs.SERVER.zpeDragonBonus));
+            tooltip.add(Component.translatable("jade.barelyfunctionalcontraptions.zpe.dragons", be.getDragons(), percent).withColor(0xD97BFF));
+        }
     }
 
     @Override

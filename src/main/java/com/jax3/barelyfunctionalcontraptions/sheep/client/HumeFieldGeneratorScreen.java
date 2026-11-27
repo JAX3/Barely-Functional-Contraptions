@@ -47,7 +47,7 @@ public class HumeFieldGeneratorScreen extends AbstractContainerScreen<HumeFieldG
 
     /** Pixels up a {@code height}-tall gauge for {@code value} on a scale to the range's top. */
     private int scaled(int value, int height) {
-        return Math.round(height * Mth.clamp(value / (float) Math.max(1, menu.getRangeMax()), 0F, 1F));
+        return Math.round(height * Mth.clamp(value / (float) Math.max(1, HumeFieldGeneratorBlockEntity.rangeMax()), 0F, 1F));
     }
 
     @Override
@@ -128,9 +128,12 @@ public class HumeFieldGeneratorScreen extends AbstractContainerScreen<HumeFieldG
         graphics.text(font, lost, PANEL_R - font.width(lost), 30, menu.getLost() > 0 ? LOST_TEXT : TEXT_DIM, false);
         graphics.text(font, Component.translatable(key + "average", Numbers.grouped(menu.getAverage())), PANEL_L, 74, AVERAGE, false);
         Component range = Component.translatable(key + "range", Numbers.grouped(menu.getRangeMin()), Numbers.grouped(menu.getRangeMax()));
-        graphics.text(font, range, PANEL_R - font.width(range), 74, TEXT_DIM, false);
+        graphics.text(font, range, PANEL_R - font.width(range), 74, menu.getSculk() > 0 ? SCULK : TEXT_DIM, false);
         graphics.text(font, statusText(), LAMP_X + 13, LAMP_Y, menu.getStatus().color, false);
     }
+
+    /** Sculk sheep's colour, for a range they've steadied. */
+    private static final int SCULK = 0xFF29DFEB;
 
     @Override
     protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
@@ -157,6 +160,7 @@ public class HumeFieldGeneratorScreen extends AbstractContainerScreen<HumeFieldG
             lines.add(Component.translatable(key + "gauge.average", Numbers.grouped(menu.getAverage())).withColor(AVERAGE));
             lines.add(Component.translatable(key + "gauge.range", Numbers.grouped(menu.getRangeMin()), Numbers.grouped(menu.getRangeMax()))
                     .withStyle(ChatFormatting.GRAY));
+            if (menu.getSculk() > 0) lines.add(Component.translatable(key + "sculk", menu.getSculk()).withColor(SCULK));
             lines.add(Component.translatable(key + "range.desc").withStyle(ChatFormatting.DARK_GRAY));
         } else if (menu.getUntilPulse() > 0 && isHovering(imageWidth - 60, 3, 54, 12, mouseX, mouseY)) {
             lines.add(Component.translatable(key + "pulse.title", (menu.getUntilPulse() + 19) / 20).withColor(FIELD));

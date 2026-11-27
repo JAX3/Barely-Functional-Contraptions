@@ -71,6 +71,8 @@ public class ZeroPointModuleMenu extends MachineMenu {
     /** How far along the column the last scan stopped. */
     public int getStoppedAt() { return data.get(13); }
     public int getMaxRange() { return data.get(14); }
+    /** Dragon sheep in the beam boosting it. */
+    public int getDragons() { return data.get(15); }
 
     public float getFillFraction() {
         int capacity = getCapacity();

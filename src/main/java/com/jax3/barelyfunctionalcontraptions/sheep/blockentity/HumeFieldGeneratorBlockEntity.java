@@ -24,6 +24,9 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  *     (cables, cubes, machines), and whatever they don't take is lost. Nothing can be pulled from it.</li>
  *     <li>It offers the FE to its neighbours in turn, starting with a different one each tick, so no one of them always
  *     gets first pick.</li>
+ *     <li><b>Sculk sheep</b> (any sheep whose resource has the {@code sculk} feature) within {@code sculkRadius} blocks
+ *     <b>steady</b> its field: each one narrows the range its rolls come from towards the middle by
+ *     {@code sculkSteadyPerSheep}, up to {@code maxSculkSheep}. The average stays the same; the swings get smaller.</li>
  *     <li>Every {@code pulseInterval} ticks its field <b>pulses</b>: a burst of purple particles and a deep hum (just
  *     for show).</li>
  * </ul>
@@ -35,9 +38,9 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
     /** How many rolls its window's trace shows (the last one the roll now), and how many its average is over. */
     public static final int HISTORY = 28, AVERAGE_OVER = 10;
     /** Values synced to the window: generated, delivered, average, min and max (two shorts each), status, receivers, the trace. */
-    public static final int DATA_COUNT = 13 + HISTORY;
+    public static final int DATA_COUNT = 14 + HISTORY;
     /** Where the trace starts in its synced values. */
-    public static final int TRACE_DATA = 13;
+    public static final int TRACE_DATA = 14;
 
     /** How its power is going, for the window, Jade and the status lamp. */
     public enum Status {
@@ -73,6 +76,8 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
     private int start;
     private int pulses;
     private int receivers;
+    /** Sculk sheep steadying its field, counted at each roll. */
+    private int sculk;
     private Status status = Status.NOTHING_CONNECTED;
     /** The last {@link #HISTORY} ticks, oldest first from {@link #head}: what it made and what was taken. */
     private final int[] madeHistory = new int[HISTORY], takenHistory = new int[HISTORY];
@@ -96,13 +101,14 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
                 case 3 -> delivered >>> 16;
                 case 4 -> average() & 0xFFFF;
                 case 5 -> average() >>> 16;
-                case 6 -> rangeMin() & 0xFFFF;
-                case 7 -> rangeMin() >>> 16;
-                case 8 -> rangeMax() & 0xFFFF;
-                case 9 -> rangeMax() >>> 16;
+                case 6 -> steadyMin() & 0xFFFF;
+                case 7 -> steadyMin() >>> 16;
+                case 8 -> steadyMax() & 0xFFFF;
+                case 9 -> steadyMax() >>> 16;
                 case 10 -> status.ordinal();
                 case 11 -> receivers;
                 case 12 -> Math.min(Short.MAX_VALUE, Math.max(0, untilPulse));
+                case 13 -> sculk;
                 default -> 0;
             };
         }
@@ -139,7 +145,7 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
     }
 
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, HumeFieldGeneratorBlockEntity be) {
-        if (--be.untilRoll <= 0 || be.generated < rangeMin() || be.generated > rangeMax()) be.newRoll(level);
+        if (--be.untilRoll <= 0 || be.generated < rangeMin() || be.generated > rangeMax()) be.newRoll(level, pos);
         be.receivers = 0;
         be.delivered = be.generated > 0 ? be.offer(level, pos, be.generated) : 0;
         if (be.generated <= 0) be.receivers = be.countReceivers(level, pos);
@@ -155,9 +161,10 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
     }
 
     /** Its field rolls a new amount (the trace moves on to a new slot), held for {@code ticksPerRoll} ticks. */
-    private void newRoll(ServerLevel level) {
+    private void newRoll(ServerLevel level, BlockPos origin) {
         if (rollTicks > 0) head = (head + 1) % HISTORY;
-        generated = roll(level);
+        sculk = countSculk(level, origin);
+        generated = roll(level, steadyMin(), steadyMax());
         untilRoll = Math.max(1, ModConfigs.getInt(ModConfigs.SERVER.humeFieldTicksPerRoll));
         rollTaken = 0;
         rollTicks = 0;
@@ -192,6 +199,10 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
         var centre = centre(origin);
         level.sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL, centre.x, centre.y, centre.z, 60, 0.9, 1.1, 0.9, 0.08);
         level.sendParticles(net.minecraft.core.particles.ParticleTypes.WITCH, centre.x, centre.y + 1.2, centre.z, 16, 0.6, 0.3, 0.6, 0.02);
+        // The Sculk sheep steadying it soak up a little of the pulse.
+        for (var sheep : sculkSheep(level, origin)) {
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.SCULK_SOUL, sheep.getX(), sheep.getY() + sheep.getBbHeight(), sheep.getZ(), 2, 0.2, 0.1, 0.2, 0.02);
+        }
         level.playSound(null, origin.offset(1, 1, 1), net.minecraft.sounds.SoundEvents.BEACON_POWER_SELECT, net.minecraft.sounds.SoundSource.BLOCKS,
                 1.2F, 0.55F + level.getRandom().nextFloat() * 0.1F);
         pulses++;
@@ -204,6 +215,58 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
 
     public static int rangeMax() {
         return Math.max(ModConfigs.getInt(ModConfigs.SERVER.humeFieldMinPerTick), ModConfigs.getInt(ModConfigs.SERVER.humeFieldMaxPerTick));
+    }
+
+    /** Whether this is a Sculk sheep, which steadies the field. */
+    public static boolean isSculkSheep(net.minecraft.world.entity.Entity entity) {
+        return com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.has(entity,
+                com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Feature.SCULK);
+    }
+
+    /** The space round the machine where Sculk sheep steady it. */
+    public static net.minecraft.world.phys.AABB fieldArea(BlockPos origin) {
+        int r = ModConfigs.getInt(ModConfigs.SERVER.humeFieldSculkRadius);
+        return new net.minecraft.world.phys.AABB(origin.getX(), origin.getY(), origin.getZ(),
+                origin.getX() + 2, origin.getY() + HumeFieldGeneratorBlock.LAYERS, origin.getZ() + 2).inflate(r);
+    }
+
+    private static List<net.minecraft.world.entity.animal.sheep.Sheep> sculkSheep(ServerLevel level, BlockPos origin) {
+        if (ModConfigs.getInt(ModConfigs.SERVER.humeFieldMaxSculk) <= 0) return List.of();
+        return level.getEntitiesOfClass(net.minecraft.world.entity.animal.sheep.Sheep.class, fieldArea(origin), HumeFieldGeneratorBlockEntity::isSculkSheep);
+    }
+
+    /** Sculk sheep near it, up to {@code maxSculkSheep}. */
+    public static int countSculk(ServerLevel level, BlockPos origin) {
+        return Math.min(ModConfigs.getInt(ModConfigs.SERVER.humeFieldMaxSculk), sculkSheep(level, origin).size());
+    }
+
+    /** How much of the range is left with this many Sculk sheep: 1 with none, never under 5%. */
+    public static double steadiness(int sculk) {
+        return Math.max(0.05, 1 - ModConfigs.getDouble(ModConfigs.SERVER.humeFieldSculkSteady) * Math.max(0, sculk));
+    }
+
+    /** The ends of the range its rolls come from now, narrowed towards the middle by its Sculk sheep. */
+    public static int steadyMin(int sculk) {
+        double mid = (rangeMin() + rangeMax()) / 2.0, half = (rangeMax() - rangeMin()) / 2.0 * steadiness(sculk);
+        return (int) Math.round(mid - half);
+    }
+
+    public static int steadyMax(int sculk) {
+        double mid = (rangeMin() + rangeMax()) / 2.0, half = (rangeMax() - rangeMin()) / 2.0 * steadiness(sculk);
+        return (int) Math.round(mid + half);
+    }
+
+    public int steadyMin() {
+        return steadyMin(sculk);
+    }
+
+    public int steadyMax() {
+        return steadyMax(sculk);
+    }
+
+    /** Sculk sheep steadying its field (counted at its last roll). */
+    public int sculk() {
+        return sculk;
     }
 
     /** How many blocks touching it take power, without offering any. */
@@ -242,10 +305,9 @@ public class HumeFieldGeneratorBlockEntity extends com.jax3.barelyfunctionalcont
         return count == 0 ? 0 : (int) (sum / count);
     }
 
-    /** A roll's FE per tick: a random amount in the configured range (either way round). */
-    private static int roll(ServerLevel level) {
-        int a = ModConfigs.getInt(ModConfigs.SERVER.humeFieldMinPerTick), b = ModConfigs.getInt(ModConfigs.SERVER.humeFieldMaxPerTick);
-        return level.getRandom().nextIntBetweenInclusive(Math.min(a, b), Math.max(a, b));
+    /** A roll's FE per tick: a random amount between {@code min} and {@code max}. */
+    private static int roll(ServerLevel level, int min, int max) {
+        return level.getRandom().nextIntBetweenInclusive(Math.min(min, max), Math.max(min, max));
     }
 
     /** Offers {@code amount} FE to the blocks touching the machine in turn; how much they took (the rest is lost). */

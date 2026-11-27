@@ -35,6 +35,10 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  * "vaporised by a Zero Point beam" death message) and sets it on fire for {@code beamBurnSeconds}. With
  * {@code beamCountsAsPlayerKill} each hit also marks the mob as hurt by a fake player, so a beam kill drops experience
  * and player-only loot as if a player had killed it.</p>
+ *
+ * <p>Dragon sheep (any sheep whose resource has {@link com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Feature#WINGS
+ * wings}) standing in the beam aren't burned: they stretch the gap, and each one adds {@code dragonBonus} to the pair's
+ * output, up to {@code maxDragonSheep}. The lead module counts them when it scans; its partner reads the lead's count.</p>
  */
 public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalcontraptions.sheep.machine.MachineFrame implements net.minecraft.world.MenuProvider {
     private static final int SCAN_INTERVAL = 5;
@@ -45,6 +49,8 @@ public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalc
     private final PairEnergy pairEnergy = new PairEnergy();
     /** Distance in blocks to the partner (2 = one block of gap), or 0 when not linked. */
     private int linkDistance;
+    /** Dragon sheep standing in the beam (counted by the lead module; its partner copies it). */
+    private int dragons;
     /** FE this module adds to its own buffer every tick (its half of the pair's output). */
     private int generating;
     private long lastTickPushed;
@@ -75,6 +81,7 @@ public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalc
                 case 12 -> link.ordinal();
                 case 13 -> stoppedAt;
                 case 14 -> ModConfigs.getInt(ModConfigs.SERVER.zpeMaxRange);
+                case 15 -> dragons;
                 default -> 0;
             };
         }
@@ -87,7 +94,7 @@ public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalc
             return DATA_COUNT;
         }
     };
-    public static final int DATA_COUNT = 15;
+    public static final int DATA_COUNT = 16;
 
     public ZeroPointEnergyModuleBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ZERO_POINT_ENERGY_MODULE.get(), pos, state);
@@ -125,11 +132,18 @@ public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalc
         link = scan.link();
         stoppedAt = scan.stoppedAt();
         int distance = scan.distance();
-        int pairRate = pairOutput(distance);
+        int dragonCount = distance <= 0 ? 0 : isLead(facing) ? countDragons(level, pos, facing, distance)
+                : level.getBlockEntity(pos.relative(facing, distance)) instanceof ZeroPointEnergyModuleBlockEntity lead ? lead.dragons : 0;
+        int pairRate = pairOutput(distance, dragonCount);
         // The lead module keeps the odd FE so the pair adds up to exactly pairRate.
         int share = isLead(facing) ? (pairRate + 1) / 2 : pairRate / 2;
         int[] sections = isLead(facing) ? beamSections(level, pos, facing, distance) : new int[0];
-        if (distance == linkDistance && share == generating && java.util.Arrays.equals(sections, beamSections)) return;
+        if (distance == linkDistance && share == generating && dragonCount == dragons && java.util.Arrays.equals(sections, beamSections)) return;
+        if (isLead(facing) && dragonCount > dragons) {
+            var mid = beamArea(pos, facing, distance).getCenter();
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.PORTAL, mid.x, mid.y, mid.z, 12, 0.3, distance * 0.2, 0.3, 0.01);
+        }
+        dragons = dragonCount;
         linkDistance = distance;
         generating = share;
         beamSections = sections;
@@ -206,7 +220,7 @@ public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalc
         if (damage <= 0) return;
         int burnSeconds = ModConfigs.getInt(ModConfigs.SERVER.zpeBeamBurnSeconds);
         var targets = level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, beamArea(pos, getBlockState().getValue(ZeroPointEnergyModuleBlock.FACING), linkDistance),
-                e -> e.isAlive() && !e.isSpectator());
+                e -> e.isAlive() && !e.isSpectator() && !isDragonSheep(e));
         if (targets.isEmpty()) return;
         var source = level.damageSources().source(BEAM_DAMAGE);
         net.minecraft.world.entity.player.Player killer = ModConfigs.getBool(ModConfigs.SERVER.zpeBeamPlayerKill) ? beamPlayer(level, pos) : null;
@@ -215,6 +229,21 @@ public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalc
             if (killer != null && !(target instanceof net.minecraft.world.entity.player.Player)) target.setLastHurtByPlayer(killer, 100);
             if (target.hurtServer(level, source, damage) && burnSeconds > 0) target.igniteForSeconds(burnSeconds);
         }
+    }
+
+    /** Whether this is a Dragon sheep, which the beam doesn't burn and which boosts it. */
+    public static boolean isDragonSheep(net.minecraft.world.entity.Entity entity) {
+        return com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepFeatureEvents.has(entity,
+                com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepAppearance.Feature.WINGS);
+    }
+
+    /** Dragon sheep touching the beam, up to {@code maxDragonSheep}. */
+    public static int countDragons(Level level, BlockPos leadPos, Direction facing, int distance) {
+        int max = ModConfigs.getInt(ModConfigs.SERVER.zpeMaxDragons);
+        if (max <= 0 || distance <= 0) return 0;
+        int found = level.getEntitiesOfClass(net.minecraft.world.entity.animal.sheep.Sheep.class, beamArea(leadPos, facing, distance),
+                ZeroPointEnergyModuleBlockEntity::isDragonSheep).size();
+        return Math.min(max, found);
     }
 
     /** Name of the fake player beam kills are credited to. */
@@ -270,11 +299,17 @@ public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalc
         return outputLimit(getPairOutput());
     }
 
-    /** FE/t a pair this far apart makes in total (0 when not linked). */
+    /** FE/t a pair this far apart makes in total (0 when not linked), with no Dragon sheep in the beam. */
     public static int pairOutput(int distance) {
+        return pairOutput(distance, 0);
+    }
+
+    /** FE/t a pair this far apart makes with this many Dragon sheep in the beam: each adds {@code dragonBonus}. */
+    public static int pairOutput(int distance, int dragons) {
         if (distance <= 0) return 0;
-        long rate = (long) ModConfigs.getInt(ModConfigs.SERVER.zpeEnergyPerBlock) * (distance - 1);
-        return (int) Math.min(Integer.MAX_VALUE, rate);
+        double boost = 1 + ModConfigs.getDouble(ModConfigs.SERVER.zpeDragonBonus) * Math.max(0, dragons);
+        double rate = (double) ModConfigs.getInt(ModConfigs.SERVER.zpeEnergyPerBlock) * (distance - 1) * boost;
+        return (int) Math.min(Integer.MAX_VALUE, Math.round(rate));
     }
 
     /** Pushes from the pair's pool (this buffer first, then the partner's) into every neighbouring receiver. */
@@ -325,7 +360,12 @@ public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalc
 
     /** The whole pair's FE/t. */
     public int getPairOutput() {
-        return pairOutput(linkDistance);
+        return pairOutput(linkDistance, dragons);
+    }
+
+    /** Dragon sheep in the beam that boost it. */
+    public int getDragons() {
+        return dragons;
     }
 
     /** FE in this module's own buffer (not counting the partner's). */
@@ -388,6 +428,7 @@ public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalc
         super.loadAdditional(input); // its module: its buffer
         linkDistance = Math.max(0, input.getIntOr("LinkDistance", 0));
         generating = Math.max(0, input.getIntOr("Generating", 0));
+        dragons = Math.max(0, input.getIntOr("Dragons", 0));
         beamSections = input.getIntArray("BeamSections").filter(a -> a.length % 2 == 0).orElse(new int[0]);
     }
 
@@ -396,6 +437,7 @@ public class ZeroPointEnergyModuleBlockEntity extends com.jax3.barelyfunctionalc
         super.saveAdditional(output); // its module
         output.putInt("LinkDistance", linkDistance);
         output.putInt("Generating", generating);
+        output.putInt("Dragons", dragons);
         output.putIntArray("BeamSections", beamSections);
     }
 

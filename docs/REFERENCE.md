@@ -463,6 +463,7 @@ A generator that comes in pairs. Put one module on the floor and another on the 
   - have nothing solid in the way. The beam passes through air, glass, panes, leaves and anything else see-through, so you can build a glass tube around it. Any solid block breaks the link.
   Modules check for their partner a few times a second, so breaking a block in the way, or one of the modules, switches the beam off almost straight away.
 - **Power:** a linked pair makes **1,000 FE/t for every block of gap** (`energyPerBlock`). A 5-block gap makes 5,000 FE/t, and a 63-block gap, the largest, makes 63,000 FE/t.
+- **Dragon sheep:** a Dragon sheep (infused with Dragon's Breath) standing in the beam **isn't burned**: it stretches the gap, and each one adds **+25%** to the pair's output (`dragonBonus`), up to **4** (`maxDragonSheep`), so four double it. Purple portal sparks puff along the beam when one steps in. The window and Jade show how many are in the beam and the boost. Other sheep burn as usual.
 - **Take it from either end:** the two modules share **one pool of energy**, so **the pair's full output can be taken from either module**. You only need to connect one of them: a machine on the floor module gets all 5,000 FE/t, not half. Each module adds a 50,000 FE buffer to the pool (100,000 FE for the pair).
 - **Output:** each module **pushes energy from the pool into every machine or cable touching it**, up to 100,000 FE/t (`maxOutput`), and **never less than the pair's whole output**: if the pair makes more than `maxOutput`, the limit rises to match, so one module can always give out everything the pair makes. Cables can also pull from it. If both ends have machines, they share what the pair makes. Modules don't accept energy and never push into each other.
 - **Looks:** while linked, the emitters glow bright blue, pulse and give off light, and blue sparks drift around them. Unlinked modules are dull grey-blue.
@@ -634,12 +635,13 @@ A late-game generator, 2x2 and three blocks tall (two and three-quarters with it
 
 - **Power:** every `ticksPerRoll` ticks (20, a second) its field rolls a **random** amount of FE per tick between `[hume_field_generator] minPerTick` and `maxPerTick` (200-1,200 FE/t by default, 700 on average), and makes that much each tick until the next roll.
 - **No buffer:** that tick's power goes straight into whatever touches any of its blocks (Energy Cables, Hume Energy Cubes, machines), offered to a different neighbour first each tick. Whatever they can't take is **lost**, and nothing can pull power out of it. On its own it wastes everything; a Hume Energy Cube against it catches all of it and evens out the swings.
+- **Sculk sheep steady it:** every Sculk sheep (infused with an Echo Shard) within **4 blocks** of it (`sculkRadius`) narrows the range its rolls come from towards the middle by a fifth (`sculkSteadyPerSheep`), up to **4** (`maxSculkSheep`). The average stays 700 FE/t; the swings shrink: one sheep gives 300-1,100, four give 600-800. The window's range turns sculk blue and its tooltip, and Jade, say how many are steadying it. When it pulses, sculk souls rise from them.
 - **The pulse:** every `pulseInterval` ticks (100, 5 seconds) its field pulses, with a burst of purple sparks and a deep hum. It's just for show; `pulseInterval = 0` stops it.
 - **Window:** a field gauge with what it makes now against its range (shaded) and its average over its last 10 rolls (yellow marks); what it makes, what was taken and what was lost this tick; a trace of its last 27 rolls and the one now (one bar a second at the default), each bar purple where taken and red where lost, with the range's ends dashed across; its average and range; a countdown to the next pulse (flashing in its last second); and a status lamp: *Delivering all it makes* (green), *Wasting power* (amber: some or all of it lost), *Nothing to take it: all lost* (red), *Field off* (grey, a range of 0). Every part has a tooltip. Its core flickers slowly.
 - **Jade:** its status, its output now and range, what was taken and lost, its average, the next pulse and that it has no buffer, whichever of its blocks you look at. **JEI:** a page with its range, average, how often it rolls and the no-buffer rule (read from the config), and an information page.
 - **Machine Status Panel:** link it with the wrench from any of its blocks. Its line reads *Delivering* (green), *Wasting power* (amber) or *Not connected* (red, a problem the panel's comparator counts), with its average FE/t over its last 10 rolls.
 - **Recipe:** Block of Blue Steel, Tinted Glass, Block of Blue Steel; Hume Energy Cube, Nether Star, Hume Energy Cube; Block of Blue Steel, Functional Machine Block, Block of Blue Steel. Unlocked by picking up a Nether Star.
-- **Config** `[hume_field_generator]`: `minPerTick` (200), `maxPerTick` (1,200; swapped if below the minimum), `ticksPerRoll` (20), `pulseInterval` (100 ticks).
+- **Config** `[hume_field_generator]`: `minPerTick` (200), `maxPerTick` (1,200; swapped if below the minimum), `ticksPerRoll` (20), `pulseInterval` (100 ticks), `sculkRadius` (4), `maxSculkSheep` (4), `sculkSteadyPerSheep` (0.2).
 
 | From the front | Close up |
 |---|---|
@@ -1589,6 +1591,8 @@ Changes to `waterPerSecond` and `capacity` apply to reservoirs that are already 
 | `beamDamage` | 4.0 | Damage the beam does to anything living touching it (2 = one heart), at most twice a second. 0 = harmless, no fire |
 | `beamBurnSeconds` | 5 | Seconds the beam sets things on fire for. 0 = no fire |
 | `beamCountsAsPlayerKill` | true | Mobs the beam kills drop experience and player-only loot, credited to a fake player called [Zero Point Beam] |
+| `maxDragonSheep` | 4 | Most Dragon sheep standing in the beam that boost it. 0 = sheep don't boost it |
+| `dragonBonus` | 0.25 | Extra output for each Dragon sheep in the beam (0.25 = +25%). The beam doesn't burn them |
 | `beamLooting` | 1 | Looting level for mobs the beam kills: each stack they drop gets 0 to this many extra items. 0 = normal drops |
 | `maxOutput` | 100000 | Most FE/t each module pushes into, or lets be pulled by, its neighbours. A linked module can always give out at least its pair's whole output, even when that is more than this |
 

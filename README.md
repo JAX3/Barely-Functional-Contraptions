@@ -85,7 +85,7 @@ Two blocks tall, like a Van de Graaff generator. Sheep rubbing against Copper Co
 
 ### Zero Point Module
 
-Two modules facing each other across open space link with a beam and make 1,000 FE/t for every block of gap, up to 64. Stained glass in the gap colours the beam, and the beam burns anything that walks into it.
+Two modules facing each other across open space link with a beam and make 1,000 FE/t for every block of gap, up to 64. Stained glass in the gap colours the beam, and the beam burns anything that walks into it, except Dragon sheep: each one standing in it adds a quarter more power, up to four.
 
 ![Two Zero Point Energy Modules joined by a beam coloured by stained glass](docs/screenshots/34_zero_point_coloured_beam.png)
 
@@ -103,7 +103,7 @@ A 3x3x3 generator that turns noise into power. Warden sheep in a pen in front of
 
 ### Hume Field Generator
 
-A late-game 2x2 generator three blocks tall whose field can't make up its mind: every second it makes a new, random 200 to 1,200 FE/t. It has no buffer, so that power goes straight into the cables, Hume Energy Cubes and machines touching it, and whatever they can't take is lost. Every 5 seconds its field pulses with a burst of purple sparks. Made from four Blocks of Blue Steel, Tinted Glass, two Hume Energy Cubes, a Nether Star and a Functional Machine Block.
+A late-game 2x2 generator three blocks tall whose field can't make up its mind: every second it makes a new, random 200 to 1,200 FE/t. It has no buffer, so that power goes straight into the cables, Hume Energy Cubes and machines touching it, and whatever they can't take is lost. Sculk (Warden) sheep nearby steady its field, narrowing the swings towards 700 FE/t. Every 5 seconds its field pulses with a burst of purple sparks. Made from four Blocks of Blue Steel, Tinted Glass, two Hume Energy Cubes, a Nether Star and a Functional Machine Block.
 
 ![A Hume Field Generator pulsing purple sparks beside a Hume Energy Cube](docs/screenshots/hume_field_pulse.png)
 

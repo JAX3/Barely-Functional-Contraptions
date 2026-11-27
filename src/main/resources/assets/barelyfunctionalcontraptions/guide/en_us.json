@@ -185,6 +185,7 @@
       "text": [
         "Place two modules facing each other, on a floor and ceiling or on two walls, with open space between them.",
         "- They link with a beam and make 1,000 FE/t for every block of gap, up to 64 blocks.",
+        "- Dragon sheep standing in the beam don't burn: each one adds a quarter more power, up to four (double).",
         "- Take the energy from either end.",
         "- Stained glass in the gap colours the beam.",
         "- The beam burns anything that walks into it, and mobs it kills drop loot as if you had killed them."
@@ -254,6 +255,7 @@
         "- Every second its field rolls a random 200 to 1,200 FE/t, 700 on average, and makes that much each tick until the next roll.",
         "- It has no buffer. Each tick's power goes straight into whatever touches any of its twelve blocks: Energy Cables, Hume Energy Cubes, machines. Whatever they can't take that tick is lost, and nothing can pull power out of it.",
         "- On its own it wastes everything it makes. A Hume Energy Cube against it is the easy way to catch all of it and smooth out the swings.",
+        "- Sculk sheep within 4 blocks steady its field: each one narrows its swings towards 700 FE/t, up to four (600 to 800).",
         "- Every 5 seconds its field pulses with a burst of purple sparks and a hum. Its window and Jade count down to it.",
         "## Its window",
         "- The gauge shows the power it makes now against its range, with its average marked. The trace shows its last rolls: purple where its power was taken, red where it was lost.",

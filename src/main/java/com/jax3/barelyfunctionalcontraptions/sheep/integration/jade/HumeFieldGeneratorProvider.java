@@ -34,15 +34,15 @@ public final class HumeFieldGeneratorProvider {
 
     private HumeFieldGeneratorProvider() {}
 
-    public record Data(int status, int generated, int delivered, int average, int min, int max, int receivers, int untilPulse) {
+    public record Data(int status, int generated, int delivered, int average, int min, int max, int receivers, int untilPulse, int sculk) {
         static final StreamCodec<RegistryFriendlyByteBuf, Data> CODEC = StreamCodec.of(
                 (buf, d) -> {
-                    for (int v : new int[]{d.status, d.generated, d.delivered, d.average, d.min, d.max, d.receivers, d.untilPulse}) ByteBufCodecs.VAR_INT.encode(buf, v);
+                    for (int v : new int[]{d.status, d.generated, d.delivered, d.average, d.min, d.max, d.receivers, d.untilPulse, d.sculk}) ByteBufCodecs.VAR_INT.encode(buf, v);
                 },
                 buf -> {
-                    int[] v = new int[8];
+                    int[] v = new int[9];
                     for (int i = 0; i < v.length; i++) v[i] = ByteBufCodecs.VAR_INT.decode(buf);
-                    return new Data(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
+                    return new Data(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8]);
                 });
     }
 
@@ -66,7 +66,7 @@ public final class HumeFieldGeneratorProvider {
         public @Nullable Data streamData(BlockAccessor accessor) {
             if (!(accessor.getBlockEntity() instanceof HumeFieldGeneratorBlockEntity be)) return null;
             return new Data(be.status().ordinal(), be.generated(), be.delivered(), be.average(),
-                    HumeFieldGeneratorBlockEntity.rangeMin(), HumeFieldGeneratorBlockEntity.rangeMax(), be.receivers(), be.untilPulse());
+                    be.steadyMin(), be.steadyMax(), be.receivers(), be.untilPulse(), be.sculk());
         }
 
         @Override
@@ -99,6 +99,7 @@ public final class HumeFieldGeneratorProvider {
                 if (lost > 0) tooltip.add(Component.translatable(key + "lost", Numbers.grouped(lost)).withColor(LOST));
             }
             tooltip.add(Component.translatable(key + "average", Numbers.grouped(d.average())).withColor(GREY));
+            if (d.sculk() > 0) tooltip.add(Component.translatable(key + "sculk", d.sculk()).withColor(0x29DFEB));
             if (d.untilPulse() > 0) tooltip.add(Component.translatable(key + "pulse", (d.untilPulse() + 19) / 20).withColor(0x9A7ACF));
             tooltip.add(Component.translatable(key + "no_buffer").withColor(GREY));
         }

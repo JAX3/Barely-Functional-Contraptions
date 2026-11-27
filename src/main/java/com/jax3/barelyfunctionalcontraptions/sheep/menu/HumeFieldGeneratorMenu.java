@@ -62,6 +62,8 @@ public class HumeFieldGeneratorMenu extends MachineMenu {
     public int getReceivers() { return data.get(11); }
     /** Ticks until its field next pulses (0 if it never does). */
     public int getUntilPulse() { return data.get(12); }
+    /** Sculk sheep steadying its field. */
+    public int getSculk() { return data.get(13); }
 
     /** Tick {@code i} of the trace (0 the oldest): what it made as a share of the range's top, 0-1. */
     public float sampleHeight(int i) {

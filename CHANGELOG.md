@@ -36,6 +36,8 @@ For Minecraft 26.3, 26.2 and 26.1 on NeoForge.
 - Processing machines are **about half as fast again** for the same power.
 - The command is now **`/bfc`**.
 - **Wireless power links** from the wrench are gone: use cables, or an Energy sheep.
+- **Sheep in every generator:** Dragon sheep standing in a Zero Point beam don't burn and add +25% each (up to 4).
+  Sculk sheep near a Hume Field Generator steady its random output towards the average.
 - Every machine now runs on one shared machine frame; worlds load as before.
 - **Quality of life:** holding the wrench shows every nearby machine's working area. Upgrade cards also fit the Grass
   Seeder (Range), Fleece Trawler (Speed) and Implosion Chamber (Speed, Range, Muffler). The wrench pauses an Energy

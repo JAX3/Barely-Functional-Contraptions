@@ -164,6 +164,9 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue humeFieldMaxPerTick;
         public final ModConfigSpec.IntValue humeFieldPulseInterval;
         public final ModConfigSpec.IntValue humeFieldTicksPerRoll;
+        public final ModConfigSpec.IntValue humeFieldSculkRadius;
+        public final ModConfigSpec.IntValue humeFieldMaxSculk;
+        public final ModConfigSpec.DoubleValue humeFieldSculkSteady;
         public final ModConfigSpec.IntValue woolBurnerCapacity;
         public final ModConfigSpec.IntValue woolBurnerOutput;
         public final ModConfigSpec.BooleanValue statsEnabled;
@@ -348,6 +351,8 @@ public final class ModConfigs {
         public final ModConfigSpec.IntValue zpeBeamBurnSeconds;
         public final ModConfigSpec.IntValue zpeBeamLooting;
         public final ModConfigSpec.BooleanValue zpeBeamPlayerKill;
+        public final ModConfigSpec.IntValue zpeMaxDragons;
+        public final ModConfigSpec.DoubleValue zpeDragonBonus;
         public final ModConfigSpec.IntValue cableTransferRate;
         public final ModConfigSpec.IntValue tankCapacityPerTank;
         public final ModConfigSpec.IntValue tankTransferPerTank;
@@ -500,6 +505,13 @@ public final class ModConfigs {
                     .defineInRange("ticksPerRoll", 20, 1, 72_000);
             humeFieldPulseInterval = b.comment("Ticks between its field's pulses, a burst of sparks and a hum (20 = a second). 0: it never pulses.")
                     .defineInRange("pulseInterval", 100, 0, 72_000);
+            humeFieldSculkRadius = b.comment("How far round the machine (in blocks) Sculk sheep steady its field.")
+                    .defineInRange("sculkRadius", 4, 0, 16);
+            humeFieldMaxSculk = b.comment("Most Sculk sheep that count. 0: sheep don't steady it.")
+                    .defineInRange("maxSculkSheep", 4, 0, 16);
+            humeFieldSculkSteady = b.comment("How much each Sculk sheep narrows the random range towards its middle (0.2 = a fifth).",
+                            "The range never narrows to nothing: at most 95%.")
+                    .defineInRange("sculkSteadyPerSheep", 0.2, 0.0, 1.0);
             b.pop();
 
             b.comment("Wool Burner (burns wool, string and Coal Wool for FE; fuels are data-driven, see wool_burner_fuel)").push("wool_burner");
@@ -972,6 +984,10 @@ public final class ModConfigs {
             zpeBeamPlayerKill = b.comment("Mobs the beam kills count as killed by a player: they drop experience and player-only loot",
                             "(like a zombie's rare iron ingot). The kill is credited to a fake player called [Zero Point Beam].")
                     .define("beamCountsAsPlayerKill", true);
+            zpeMaxDragons = b.comment("Most Dragon sheep standing in the beam that boost it. 0: sheep don't boost it.")
+                    .defineInRange("maxDragonSheep", 4, 0, 16);
+            zpeDragonBonus = b.comment("Extra output for each Dragon sheep standing in the beam (0.25 = +25%). The beam doesn't burn them.")
+                    .defineInRange("dragonBonus", 0.25, 0.0, 10.0);
             b.pop();
 
             b.comment("Energy Cable (touching cables form one network that carries FE between generators, cubes and machines)").push("energy_cable");
