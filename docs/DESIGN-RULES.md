@@ -10,6 +10,13 @@ them before it is built. The aim is a mod where every feature matters, not a mod
 
 If an idea doesn't fit that sentence, it doesn't belong in this mod, however good it is.
 
+### Support blocks are exempt
+Storage, transport and display blocks support the sheep machines rather than being machines themselves: the Hume
+Energy Cube, Fluid Tank, Fluid Reservoir, Wool-Lined Crate, Crate Controller, Machine Status Panel, Energy Cable,
+Energy Meter, and Item and Fluid Pipes. They don't need sheep (rule 1) or a quirk (rule 3). Instead they must pass one
+test: **does it make a sheep machine easier to run?** A support block that only helps other mods' machines doesn't
+belong. Rules 2 and 4 to 10 still apply to them.
+
 ## The rules
 
 ### 1. It must pass the identity test
@@ -110,6 +117,20 @@ Not to be started until they have waited two weeks and pass rules 1 to 3. Ideas 
 ## Extras for finished machines
 
 Small ways to deepen what's already there (rule 5). These don't need the two-week wait.
+
+### Needs a quirk (rule 3)
+These machines work, but nothing about them is barely functional yet. Each needs one small quirk, not a rework.
+- **Wool Burner:** no downside yet.
+- **Blaze Sheep Furnace:** no downside yet.
+- **Snow Sheep Chiller:** no downside yet.
+- **Powered Furnace:** a plain fast furnace; Blaze sheep are only a bonus.
+- **Mechanical Separator:** the core machine, with no quirk.
+- **Automatic Shears:** no quirk.
+- **Infusion Altar:** no quirk.
+- **Wool Packer:** no quirk.
+- **Glow Panel:** no quirk (making nothing at night is how all solar power works). Its sheep are optional too (rule 1).
+
+### Other extras
 - **Echo Chamber:** catalysts, an Echo Shard boost, fatigue.
 - **Upgrade cards:** coloured plates on a machine for its cards; its cards on the Machine Status Panel; a better
   processing step (wool into fibre, giving 4–6 resource instead of 2–4).
