@@ -325,6 +325,10 @@ public final class DevScreenshotHarness {
             blockWoolTick(mc, server);
             return;
         }
+        if ("sheep_generators".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
+            sheepGeneratorsTick(mc, server);
+            return;
+        }
         if ("energy_glow".equals(System.getProperty("barelyfunctionalcontraptions.screenshotHarness.scene"))) {
             energyGlowTick(mc, server);
             return;
@@ -1679,6 +1683,11 @@ public final class DevScreenshotHarness {
             // ("crates", "fleece trawler", "upgrades", "hume field", "implosion chamber", "energy sheep"). Now: the
             // Explosive Wool left lying round the Implosion Chamber from before it caught its own, swept up.
             {"sweep implosion wool", 4, 6},
+            // Then sheep for the two generators that had none: Dragon sheep in the Zero Point beams of (4, 0) and (3, 1),
+            // and Sculk sheep steadying the first Hume Field Generator in (3, 6).
+            {"zero point dragons", 4, 0},
+            {"zero point dragons", 3, 1},
+            {"hume field sculk", 3, 6},
     };
     /** Rows of cells on the platform now: the seventh was added south of the first six, for the crates. */
     private static final int PLATFORM_ROWS = 7;
@@ -2117,6 +2126,95 @@ public final class DevScreenshotHarness {
         ResourcefulSheep.LOGGER.info("EXTEND energy sheep at {} by the cubes at {}, its furnace at {}", pen, cubes, furnace);
     }
 
+    /** A grown, infused sheep of this resource at the middle of {@code at}, facing {@code yaw}; kept when the world is saved. */
+    private static net.minecraft.world.entity.animal.sheep.Sheep infusedWorldSheep(ServerLevel level, BlockPos at, String resource, float yaw, boolean still) {
+        var id = ResourcefulSheep.id(resource);
+        int uses = com.jax3.barelyfunctionalcontraptions.sheep.resource.SheepResourceRegistry.server().byId(id).orElseThrow().effectiveInfusionUses();
+        var sheep = Vanilla.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        sheep.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, yaw, 0);
+        sheep.setPersistenceRequired();
+        if (still) sheep.setNoAi(true);
+        level.addFreshEntity(sheep);
+        com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusionEvents.setInfusion(sheep,
+                com.jax3.barelyfunctionalcontraptions.sheep.entity.SheepInfusion.NONE.withResource(id, uses));
+        return sheep;
+    }
+
+    /**
+     * Dragon sheep in the Zero Point beams of the cell round the player: for each linked lead module (pointing up, south
+     * or east), up to two Dragon sheep standing in the beam where there's room (air, with something to stand on; for an
+     * upright beam, just above the floor module). They're kept still (no AI) so they stay in the beam.
+     */
+    private static void zeroPointDragonScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        var area = new net.minecraft.world.phys.AABB(origin).inflate(14, 10, 14);
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, area,
+                e -> com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.isDragonSheep(e))) e.discard();
+        int placed = 0;
+        for (BlockPos p : BlockPos.betweenClosed(origin.offset(-14, -4, -14), origin.offset(14, 10, 14))) {
+            if (!(level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity zpe)) continue;
+            Direction facing = level.getBlockState(p).getValue(com.jax3.barelyfunctionalcontraptions.sheep.blocks.ZeroPointEnergyModuleBlock.FACING);
+            int distance = zpe.getLinkDistance();
+            if (distance <= 0 || !com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity.isLead(facing)) continue;
+            BlockPos lead = p.immutable();
+            int here = 0;
+            for (int i = 1; i < distance && here < 2; i++) {
+                BlockPos at = lead.relative(facing, i);
+                boolean upright = facing == Direction.UP;
+                if (upright && i > 1) break; // one on the floor module; the rest of an upright beam is in the air
+                if (!level.getBlockState(at).isAir() || level.getBlockState(at.above()).canOcclude()) continue;
+                if (!upright && i == 1) continue; // not right against the emitter
+                if (!upright && !level.getBlockState(at.below()).isFaceSturdy(level, at.below(), Direction.UP)) {
+                    // A beam a block above the floor: stand the sheep on a purpur block, up into it.
+                    BlockPos step = at.below();
+                    if (!level.getBlockState(step).isAir() || !level.getBlockState(step.below()).isFaceSturdy(level, step.below(), Direction.UP)) continue;
+                    level.setBlock(step, Blocks.PURPUR_BLOCK.defaultBlockState(), 3);
+                }
+                infusedWorldSheep(level, at, "dragon", facing.toYRot(), true);
+                here++;
+                i++; // leave a block between them
+            }
+            placed += here;
+            ResourcefulSheep.LOGGER.info("EXTEND zero point pair at {} facing {} gap {}: {} Dragon sheep", lead, facing, distance - 1, here);
+            if (here > 0) label(server, lead.relative(facing, distance / 2).above(upLabel(facing)), "Dragon sheep in the beam: +25% each", "light_purple");
+        }
+        ResourcefulSheep.LOGGER.info("EXTEND zero point dragons: {} placed round {}", placed, origin);
+    }
+
+    /** How far above a beam's middle its Dragon sheep label goes: clear of an upright beam's side, over a sideways one. */
+    private static int upLabel(Direction facing) {
+        return facing == Direction.UP ? 0 : 2;
+    }
+
+    /**
+     * Three Sculk sheep in a little fenced pen against the north side of the first Hume Field Generator (cell (3, 6),
+     * the one its cubes catch everything from), steadying its field so its window shows a narrower range.
+     */
+    private static void humeFieldSculkScene(MinecraftServer server) {
+        ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+        ServerLevel level = player.level();
+        origin = player.blockPosition();
+        BlockPos core = origin.offset(0, 0, -3).offset(HUME_WORLD_X[0], 0, -1); // its north-west bottom block
+        // The pen: fences from one west of it to one east of it, three blocks north, inside 2 wide and 2 deep.
+        BlockPos nw = core.offset(-1, 0, -4), se = core.offset(2, 0, -1);
+        for (var e : level.getEntities((net.minecraft.world.entity.Entity) null, net.minecraft.world.phys.AABB.encapsulatingFullBlocks(nw, se).inflate(1, 3, 1),
+                e -> com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity.isSculkSheep(e))) e.discard();
+        for (BlockPos p : BlockPos.betweenClosed(nw, se.above(2))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        for (BlockPos p : BlockPos.betweenClosed(nw, se)) {
+            boolean edge = p.getX() == nw.getX() || p.getX() == se.getX() || p.getZ() == nw.getZ() || p.getZ() == se.getZ();
+            if (edge) level.setBlock(p, Blocks.OAK_FENCE.defaultBlockState(), 3);
+        }
+        for (BlockPos p : BlockPos.betweenClosed(nw, se)) level.setBlock(p, level.getBlockState(p).getBlock().defaultBlockState(), 3); // join the fences
+        BlockPos inside = core.offset(0, 0, -3);
+        infusedWorldSheep(level, inside, "warden", 180, false);
+        infusedWorldSheep(level, inside.east(), "warden", 180, false);
+        infusedWorldSheep(level, inside.south(), "warden", 180, false);
+        label(server, core.offset(1, 3, -3), "Sculk sheep steady its field", "aqua");
+        ResourcefulSheep.LOGGER.info("EXTEND hume field sculk sheep at {} for the generator at {}", inside, core);
+    }
+
     /** Clears the loose items (the Explosive Wool its sheep's blasts left before it caught it) from the Implosion Chamber's cell. */
     private static void sweepImplosionWool(MinecraftServer server) {
         ServerLevel level = server.getPlayerList().getPlayers().getFirst().level();
@@ -2356,6 +2454,51 @@ public final class DevScreenshotHarness {
      * Three Energy sheep at night, empty, half charged and full, to show their fleece glowing brighter the fuller it is:
      * {@code -PharnessScene=energy_glow}.
      */
+    /**
+     * Checks the test world's Dragon and Sculk sheep at their generators: logs what the Zero Point pairs and the first
+     * Hume Field Generator see, and shoots each, with the Hume Field Generator's window:
+     * {@code -PharnessScene=sheep_generators -PharnessWorld="BFC Test World"}.
+     */
+    private static void sheepGeneratorsTick(Minecraft mc, MinecraftServer server) {
+        BlockPos upright = new BlockPos(129, 35, 38), sideways = new BlockPos(98, 36, 61), hume = new BlockPos(95, 35, 176);
+        switch (tick) {
+            case 60 -> {
+                McClient.clearChat(mc);
+                for (String c : new String[]{"gamerule send_command_feedback false", "time set noon", "weather clear", "gamemode spectator @a",
+                        "forceload add 90 30 135 70", "forceload add 90 170 100 180"}) command(server, c);
+            }
+            case 62 -> setHudHidden(mc, true);
+            case 64 -> command(server, "tp @a 131.5 37 43.5 165 10");
+            case 140 -> server.execute(() -> {
+                ServerLevel level = server.overworld();
+                for (BlockPos p : new BlockPos[]{upright, sideways}) {
+                    if (level.getBlockEntity(p) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.ZeroPointEnergyModuleBlockEntity be) {
+                        ResourcefulSheep.LOGGER.info("CHECK zero point {}: gap {}, {} Dragon sheep, {} FE/t", p, be.getLinkDistance() - 1, be.getDragons(), be.getPairOutput());
+                    }
+                }
+                if (level.getBlockEntity(hume) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity be) {
+                    ResourcefulSheep.LOGGER.info("CHECK hume field {}: {} Sculk sheep, range {}-{}, making {}", hume, be.sculk(), be.steadyMin(), be.steadyMax(), be.generated());
+                }
+            });
+            case 150 -> shot(mc, "check_zero_point_dragon_upright");
+            case 155 -> command(server, "tp @a 103.5 38 65.5 135 15");
+            case 200 -> shot(mc, "check_zero_point_dragon_sideways");
+            case 205 -> command(server, "tp @a 97.5 38 169.5 0 30");
+            case 250 -> shot(mc, "check_hume_field_sculk");
+            case 255 -> server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
+                command(server, "gamemode creative @a");
+                if (server.overworld().getBlockEntity(hume) instanceof com.jax3.barelyfunctionalcontraptions.sheep.blockentity.HumeFieldGeneratorBlockEntity be) {
+                    player.openMenu(be, hume);
+                }
+            });
+            case 262 -> setHudHidden(mc, false);
+            case 290 -> shot(mc, "check_hume_field_sculk_window");
+            case 296 -> mc.stop();
+            default -> {}
+        }
+    }
+
     private static void energyGlowTick(Minecraft mc, MinecraftServer server) {
         switch (tick) {
             case 60 -> server.execute(() -> {
@@ -4809,6 +4952,8 @@ public final class DevScreenshotHarness {
                         case "implosion chamber" -> implosionWorldScene(server);
                         case "energy sheep" -> energySheepWorldScene(server);
                         case "sweep implosion wool" -> sweepImplosionWool(server);
+                        case "zero point dragons" -> zeroPointDragonScene(server);
+                        case "hume field sculk" -> humeFieldSculkScene(server);
                         default -> throw new IllegalStateException("no builder for " + EXTRA_SCENES[i][0]);
                     }
                     ResourcefulSheep.LOGGER.info("EXTEND scene '{}' built at origin {}", EXTRA_SCENES[i][0], origin);
